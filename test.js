@@ -355,11 +355,19 @@
             definitions: {
                 // init TestCrudModel schema
                 TestCrudModel: {
-                    // drop collection on init
-                    _collectionDrop: true,
-                    _collectionName: 'SwltTestCrud',
                     // init default crud-api
-                    _crudApi: '_test',
+                    _crudApiList: [
+                        'crudCountManyByQuery',
+                        'crudCreateOne',
+                        'crudDeleteManyByQuery',
+                        'crudDeleteOneByUniqueKey.id',
+                        'crudExistsOneByUniqueKey.id',
+                        'crudGetOneByUniqueKey.id',
+                        'crudGetManyByQuery',
+                        'crudUpdateOneByUniqueKey.id',
+                        'crudUpsertOne'
+                    ],
+                    _tagName: '_test',
                     properties: {
                         propArray: { items: {}, type: 'array' },
                         propArraySubdoc: {

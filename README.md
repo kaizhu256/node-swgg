@@ -275,8 +275,8 @@ instruction
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "swagger-ui-lite": "2015.11.1",
-        "utility2": "2015.11.7"
+        "swagger-ui-lite": "2015.11.3",
+        "utility2": "2015.11.10"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -302,15 +302,15 @@ instruction
     "scripts": {
         "build-ci": "node_modules/.bin/utility2 shRun shReadmeBuild",
         "build-doc": "node_modules/.bin/utility2 shRun shReadmeExportPackageJson && \
-node_modules/.bin/utility2 shRun shDocApiCreate \"{ \
-exampleFileList:['example.js','test.js','index.js'], \
-moduleDict:{'swagger-lite':{aliasList:['swlt'],exports:require('./index.js')}} \
+node_modules/.bin/utility2 shRun shDocApiCreate \"{\
+exampleFileList:['example.js','test.js','index.js'],\
+moduleDict:{'swagger-lite':{aliasList:['swlt'],exports:require('./index.js')}}\
 }\"",
         "start": "npm_config_mode_auto_restart=1 node_modules/.bin/utility2 shRun shIstanbulCover node test.js",
         "test": "node_modules/.bin/utility2 shRun shReadmeExportPackageJson && \
 node_modules/.bin/utility2 test node test.js"
     },
-    "version": "2015.11.2"
+    "version": "2015.11.3"
 }
 ```
 
@@ -318,9 +318,7 @@ node_modules/.bin/utility2 test node test.js"
 
 # todo
 - add logging feature
-- rename delete to remove for naming consistency
-- migrate to travis-ci docker container build
-- add cached param for crudGetByQueryMany
+- add cached param for crudGetManyByQuery
 - add SwltUserLoginTokenCapped
 - re-enable user login/logout
 - test /user/login and /user/logout
@@ -329,10 +327,9 @@ node_modules/.bin/utility2 test node test.js"
 
 
 
-# change since bae6e032
-- npm publish 2015.11.2
-- working swagger validation tests
-- remove mongodb dependency
+# change since 11cec971
+- npm publish 2015.11.3
+- add auto-generation of crud feature
 - none
 
 

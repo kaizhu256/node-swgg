@@ -41,6 +41,232 @@
             : require('utility2');
         // init swagger-lite
         local.swlt = { cacheDict: { collection: {}, methodPath: {} }, local: local };
+        // init crudApiDefault
+        local.swlt.cacheDict.crudApiDefault = {
+            crudCountManyByQuery: {
+                _method: 'get',
+                _path: '/{{_tagName}}/crudCountManyByQuery',
+                _tagName: '{{_tagName}}',
+                operationId: 'crudCountManyByQuery',
+                parameters: [{
+                    default: '{}',
+                    description: 'query param',
+                    format: 'json',
+                    in: 'query',
+                    name: 'query',
+                    type: 'string'
+                }],
+                summary: 'count many {{_schemaName}} objects by query',
+                tags: ['{{_tagName}}']
+            },
+            crudCreateOne: {
+                _method: 'post',
+                _path: '/{{_tagName}}/crudCreateOne',
+                _tagName: '{{_tagName}}',
+                operationId: 'crudCreateOne',
+                parameters: [{
+                    description: '{{_schemaName}} object',
+                    in: 'body',
+                    name: 'body',
+                    required: true,
+                    schema: { $ref: '#/definitions/{{_schemaName}}' }
+                }],
+                responses: {
+                    200: {
+                        description:
+                            '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                        schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    }
+                },
+                summary: 'create one {{_schemaName}} object',
+                tags: ['{{_tagName}}']
+            },
+            crudDeleteManyByQuery: {
+                _method: 'delete',
+                _path: '/{{_tagName}}/crudDeleteManyByQuery',
+                _tagName: '{{_tagName}}',
+                operationId: 'crudDeleteManyByQuery',
+                parameters: [{
+                    default: '{"{{_uniqueKey}}":{"$in":["{{_uniqueKey}}0","{{_uniqueKey}}1"]}}',
+                    description: 'query param',
+                    format: 'json',
+                    in: 'query',
+                    name: 'query',
+                    required: true,
+                    type: 'string'
+                }],
+                responses: {
+                    200: {
+                        description:
+                            '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                        schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    }
+                },
+                summary: 'delete many {{_schemaName}} objects by query',
+                tags: ['{{_tagName}}']
+            },
+            crudDeleteOneByUniqueKey: {
+                _method: 'delete',
+                _path: '/{{_tagName}}/crudDeleteOneByUniqueKey/{{{_uniqueKey}}}',
+                _tagName: '{{_tagName}}',
+                _uniqueKey: '{{_uniqueKey}}',
+                operationId: 'crudDeleteOneByUniqueKey.{{_uniqueKey}}',
+                parameters: [{
+                    description: '{{_schemaName}} {{_uniqueKey}}',
+                    in: 'path',
+                    name: '{{_uniqueKey}}',
+                    required: true,
+                    type: 'string'
+                }],
+                summary: 'delete one {{_schemaName}} object by {{_uniqueKey}}',
+                tags: ['{{_tagName}}']
+            },
+            crudExistsOneByUniqueKey: {
+                _method: 'get',
+                _path: '/{{_tagName}}/crudExistsOneByUniqueKey/{{{_uniqueKey}}}',
+                _tagName: '{{_tagName}}',
+                _uniqueKey: '{{_uniqueKey}}',
+                operationId: 'crudExistsOneByUniqueKey.{{_uniqueKey}}',
+                parameters: [{
+                    description: '{{_schemaName}} {{_uniqueKey}}',
+                    in: 'path',
+                    name: '{{_uniqueKey}}',
+                    required: true,
+                    type: 'string'
+                }],
+                summary: 'check if one {{_schemaName}} object exists by {{_uniqueKey}}',
+                tags: ['{{_tagName}}']
+            },
+            crudGetManyByQuery: {
+                _method: 'get',
+                _path: '/{{_tagName}}/crudGetManyByQuery',
+                _tagName: '{{_tagName}}',
+                operationId: 'crudGetManyByQuery',
+                parameters: [{
+                    default: '{}',
+                    description: 'query param',
+                    format: 'json',
+                    in: 'query',
+                    name: 'query',
+                    required: true,
+                    type: 'string'
+                }, {
+                    default: '{}',
+                    description: 'fields param',
+                    format: 'json',
+                    in: 'query',
+                    name: 'fields',
+                    type: 'string'
+                }, {
+                    default: 10,
+                    description: 'cursor limit param',
+                    in: 'query',
+                    name: 'limit',
+                    required: true,
+                    type: 'integer'
+                }, {
+                    default: 0,
+                    description: 'cursor skip param',
+                    in: 'query',
+                    name: 'skip',
+                    type: 'integer'
+                }, {
+                    default: '{"_timeModified":-1}',
+                    description: 'cursor sort param',
+                    format: 'json',
+                    in: 'query',
+                    name: 'sort',
+                    type: 'string'
+                }],
+                responses: {
+                    200: {
+                        description:
+                            '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                        schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    }
+                },
+                summary: 'get many {{_schemaName}} objects by query',
+                tags: ['{{_tagName}}']
+            },
+            crudGetOneByUniqueKey: {
+                _method: 'get',
+                _path: '/{{_tagName}}/crudGetOneByUniqueKey/{{{_uniqueKey}}}',
+                _tagName: '{{_tagName}}',
+                _uniqueKey: '{{_uniqueKey}}',
+                operationId: 'crudGetOneByUniqueKey.{{_uniqueKey}}',
+                parameters: [{
+                    description: '{{_schemaName}} {{_uniqueKey}}',
+                    in: 'path',
+                    name: '{{_uniqueKey}}',
+                    required: true,
+                    type: 'string'
+                }],
+                responses: {
+                    200: {
+                        description:
+                            '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                        schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    }
+                },
+                summary: 'get one {{_schemaName}} object by {{_uniqueKey}}',
+                tags: ['{{_tagName}}']
+            },
+            crudUpdateOneByUniqueKey: {
+                _method: 'patch',
+                _path: '/{{_tagName}}/crudUpdateOneByUniqueKey.{{{_uniqueKey}}}',
+                _tagName: '{{_tagName}}',
+                _uniqueKey: '{{_uniqueKey}}',
+                operationId: 'crudUpdateOneByUniqueKey.{{_uniqueKey}}',
+                parameters: [{
+                    description: '{{_schemaName}} {{_uniqueKey}}',
+                    in: 'path',
+                    name: '{{_uniqueKey}}',
+                    required: true,
+                    type: 'string'
+                }, {
+                    description: '{{_schemaName}} object with no validation check',
+                    in: 'body',
+                    name: 'body',
+                    required: true,
+                    schema: { $ref: '#/definitions/Object' }
+                }],
+                responses: {
+                    200: {
+                        description:
+                            '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                        schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    }
+                },
+                summary: 'update one {{_schemaName}} object by {{_uniqueKey}}',
+                tags: ['{{_tagName}}']
+            },
+            crudUpsertOne: {
+                _method: 'put',
+                _path: '/{{_tagName}}/crudUpsertOne',
+                _tagName: '{{_tagName}}',
+                operationId: 'crudReplaceOneBy',
+                parameters: [{
+                    description: '{{_schemaName}} object',
+                    in: 'body',
+                    name: 'body',
+                    required: true,
+                    schema: { $ref: '#/definitions/{{_schemaName}}' }
+                }],
+                responses: {
+                    200: {
+                        description:
+                            '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                        schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    }
+                },
+                summary: 'upsert one {{_schemaName}} object',
+                tags: ['{{_tagName}}']
+            }
+        };
+        Object.keys(local.swlt.cacheDict.crudApiDefault).forEach(function (key) {
+            local.swlt.cacheDict.crudApiDefault[key] =
+                JSON.stringify(local.swlt.cacheDict.crudApiDefault[key]);
+        });
     }());
 
 
@@ -374,9 +600,63 @@
             /*
              * this function will update the api
              */
-            var methodPath, tmp;
+            var methodPath, tmp, uniqueKey;
             options.definitions = options.definitions || {};
             options.paths = options.paths || {};
+
+            Object.keys(options.definitions).forEach(function (schemaName) {
+                var schema;
+                schema = options.definitions[schemaName];
+                schema._schemaName = schemaName;
+                local.utility2.objectSetDefault(options, JSON.parse(JSON.stringify({
+                    definitions: {
+                        // init JsonapiResponse{{_schemaName}}
+                        'JsonapiResponse{{_schemaName}}': {
+                            properties: { data: {
+                                items: { $ref: '#/definitions/{{_schemaName}}' },
+                                type: 'array'
+                            } },
+                            'x-inheritList': [{ $ref: '#/definitions/JsonapiResponse' }]
+                        }
+                    }
+                }).replace((/\{\{_schemaName\}\}/g), schemaName)), 2);
+                // hack - init swaggerJson$$Dummy,
+                // to pass validation warnings for auto-created schemas
+                tmp = local.swlt.swaggerJson$$Dummy;
+                local.utility2.objectSetOverride(tmp, JSON.parse(JSON.stringify({
+                    paths: { '/$$Dummy/{{_schemaName}}': { get: {
+                        responses: {
+                            200: {
+                                description: '',
+                                schema: { $ref:
+                                    '#/definitions/JsonapiResponse{{_schemaName}}' }
+                            }
+                        }
+                    } } }
+                }).replace((/\{\{_schemaName\}\}/g), schemaName)), 2);
+                // init crud-api
+                (schema._crudApiList || []).forEach(function (crudApi) {
+                    uniqueKey = (/ByUniqueKey\.(.*)/).exec(crudApi);
+                    uniqueKey = uniqueKey && uniqueKey[1];
+                    crudApi = crudApi.replace('.' + uniqueKey, '');
+                    crudApi = JSON.parse(local.swlt.cacheDict.crudApiDefault[
+                        crudApi
+                    ]
+                        .replace((/\{\{_schemaName\}\}/g), schema._schemaName)
+                        .replace((/\{\{_tagName\}\}/g), schema._tagName)
+                        .replace((/\{\{_uniqueKey\}\}/g), uniqueKey));
+                    options.paths[crudApi._path] = options.paths[crudApi._path] || {};
+                    options.paths[crudApi._path][crudApi._method] = crudApi;
+                });
+                // init crudApi / schemaName
+                schema = options.definitions[schemaName] = JSON.parse(
+                    JSON.stringify(schema)
+                        .replace((/\{\{_schemaName\}\}/g), schema._schemaName)
+                        .replace((/\{\{_tagName\}\}/g), schema._tagName)
+                        .replace((/\{\{_uniqueKey\}\}/g), uniqueKey)
+                );
+            });
+
             // update paths
             Object.keys(options.paths).forEach(function (path) {
                 Object.keys(options.paths[path]).forEach(function (method) {
@@ -465,11 +745,11 @@
                 local.swlt.swaggerJson$$Dummy,
                 2
             ));
-            //!! // init crud-api
-            //!! local.swlt.api = new local.swlt.SwaggerClient({
-                //!! url: 'http://localhost:' + local.utility2.serverPortInit()
-            //!! });
-            //!! local.swlt.api.buildFromSpec(local.utility2.jsonCopy(local.swlt.swaggerJson));
+            // init crud-api
+            local.swlt.api = new local.swlt.SwaggerClient({
+                url: 'http://localhost:' + local.utility2.serverPortInit()
+            });
+            local.swlt.api.buildFromSpec(local.utility2.jsonCopy(local.swlt.swaggerJson));
         };
 
         local.swlt.middlewareError = function (error, request, response) {
@@ -689,9 +969,11 @@
                             items: { $ref: '#/definitions/JsonapiError' },
                             type: 'array'
                         },
+                        meta: { $ref: '#/definitions/Object' },
                         statusCode: { type: 'integer' }
                     }
-                }
+                },
+                Object: { type: 'object' }
             },
             info: {
                 description: 'demo of swagger-lite crud-api',
@@ -751,7 +1033,7 @@
             )
             // swagger-hack - update swagger.json url
             .replace(
-                'http://petstore.swagger.io/v2/swagger.json',
+                'https://kaizhu256.github.io/node-swagger-ui-lite/build/swagger.json',
                 local.swlt.swaggerJson.basePath + '/swagger.json'
             );
         local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.css'] = local.fs
@@ -760,12 +1042,57 @@
         local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.js'] = local.fs
             .readFileSync(local.swagger_ui.__dirname + '/swagger-ui.rollup.js', 'utf8')
             // swagger-hack - disable underscore-min.map
-            .replace('//# sourceMappingURL=underscore-min.map', '')
+            .replace((/^\/\/# sourceMappingURL=.*/gm), '')
             // swagger-hack - save swaggerJson
             .replace(
                 'this.apis = {};',
                 'this.apis = {}; this.swaggerJson = JSON.parse(JSON.stringify(response));'
-            );
+            )
+            // swagger-hack - disable missingParams validation handling
+            .replace(
+                'var missingParams = this.getMissingParams(args);',
+                'var missingParams = [];'
+            )
+            // swagger-hack - add modeErroData and validation handling
+            .replace('new SwaggerHttp().execute(obj, opts);', 'if (opts.modeErrorData) {' +
+                    'var onError = success;' +
+                    'error = function (error) {' +
+                        'error = error.obj || error;' +
+                        'error = error.data || error;' +
+                        'try { error = JSON.parse(error); } catch (ignore) {}' +
+                        'if (typeof error === "string") {' +
+                            'error = { message: error };' +
+                        '}' +
+                        'onError(error);' +
+                    '};' +
+                    'success = function (data) { onError(null, data); };' +
+                '}' +
+                'try {' +
+                    'if (window.swlt) {' +
+                        'window.swlt.validateByParamDefList({' +
+                            'data: window.swlt.normalizeParamDictSwagger(' +
+                                'JSON.parse(JSON.stringify(args)),' +
+                                'this' +
+                            '),' +
+                            'key: this.operation.operationId,' +
+                            'paramDefList: this.parameters' +
+                        '});' +
+                    '}' +
+                '} catch (errorCaught) {' +
+                    'window.swlt.onErrorJsonapi(null, function (error) {' +
+                        'obj.on.error({' +
+                            'data: JSON.stringify(error),' +
+                            'headers: { "Content-Type": "application/json" }' +
+                        '});' +
+                    '})(errorCaught);' +
+                    'return;' +
+                '}' +
+                'new SwaggerHttp().execute(obj, opts);')
+            // swagger-hack - handle json error
+            .replace('new_err.status = res.status;', 'new_err.status = res.status;' +
+                'if (res.body && res.body.message && res.body.stack) { err = res.body; }')
+            // swagger-hack - disable online validation
+            .replace("if ('validatorUrl' in opts.swaggerOptions) {", "if (true) {");
         local.utility2.cacheDict.assets['/assets/swagger-ui.favicon-16x16.png'] = local.fs
             .readFileSync(local.swagger_ui.__dirname +
                 '/swagger-ui.favicon-16x16.png');
@@ -781,6 +1108,51 @@
         local.utility2.cacheDict.assets['/assets/swagger-ui.throbber.gif'] = local.fs
             .readFileSync(local.swagger_ui.__dirname +
                 '/swagger-ui.throbber.gif');
+        // init SwaggerClient
+        (function () {
+            local.XMLHttpRequest = function () {
+                var self;
+                self = this;
+                self.headers = {};
+            };
+            local.XMLHttpRequest.prototype.onreadystatechange = local.utility2.nop;
+            local.XMLHttpRequest.prototype.open = function (method, url) {
+                this.method = method;
+                this.url = url;
+            };
+            local.XMLHttpRequest.prototype.send = function (data) {
+                var self;
+                self = this;
+                self.data = data;
+                self.xhr = self;
+                local.utility2.ajax(self, local.utility2.nop);
+            };
+            local.XMLHttpRequest.prototype.setRequestHeader = function (key, value) {
+                this.headers[key.toLowerCase()] = value;
+            };
+            local.clearInterval = clearInterval;
+            local.clearTimeout = clearTimeout;
+            local.console = console;
+            local.setInterval = setInterval;
+            local.setTimeout = setTimeout;
+            local.window = local;
+
+            local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.js'].replace(
+                // swagger-hack - remove browser js-env code
+                (/([\S\s]+?) swagger-client ([\S\s]+?\n\},\{\}\]\},\{\},\[1\]\)\(1\)\n\}\);)/),
+                function (match0, match1, match2) {
+                    // jslint-hack
+                    local.utility2.nop(match0);
+                    local.vm.runInNewContext(
+                        match1.replace((/\S+/g), '') + '/*' + match2,
+                        local,
+                        __dirname + '/swagger-ui.rollup.js'
+                    );
+                }
+            );
+            local.swlt.SwaggerClient = local.SwaggerClient;
+            local.swlt.SwaggerUi = local.SwaggerUi;
+        }());
         // init api
         local.swlt.apiUpdate({});
         break;
