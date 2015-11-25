@@ -40,13 +40,13 @@
             ? window.utility2
             : require('utility2');
         // init swagger-lite
-        local.swlt = { cacheDict: { collection: {}, methodPath: {} }, local: local };
-        // init crudApiDefault
-        local.swlt.cacheDict.crudApiDefault = {
+        local.swgg = { cacheDict: { collection: {}, pathObject: {} }, local: local };
+        // init pathObjectDefault
+        local.swgg.cacheDict.pathObjectDefault = {
             crudCountManyByQuery: {
                 _method: 'get',
-                _path: '/{{_tagName}}/crudCountManyByQuery',
-                _tagName: '{{_tagName}}',
+                _path: '/{{_pathPrefix}}/crudCountManyByQuery',
+                _pathPrefix: '{{_pathPrefix}}',
                 operationId: 'crudCountManyByQuery',
                 parameters: [{
                     default: '{}',
@@ -57,12 +57,12 @@
                     type: 'string'
                 }],
                 summary: 'count many {{_schemaName}} objects by query',
-                tags: ['{{_tagName}}']
+                tags: ['{{_pathPrefix}}']
             },
             crudCreateOne: {
                 _method: 'post',
-                _path: '/{{_tagName}}/crudCreateOne',
-                _tagName: '{{_tagName}}',
+                _path: '/{{_pathPrefix}}/crudCreateOne',
+                _pathPrefix: '{{_pathPrefix}}',
                 operationId: 'crudCreateOne',
                 parameters: [{
                     description: '{{_schemaName}} object',
@@ -79,15 +79,15 @@
                     }
                 },
                 summary: 'create one {{_schemaName}} object',
-                tags: ['{{_tagName}}']
+                tags: ['{{_pathPrefix}}']
             },
             crudDeleteManyByQuery: {
                 _method: 'delete',
-                _path: '/{{_tagName}}/crudDeleteManyByQuery',
-                _tagName: '{{_tagName}}',
+                _path: '/{{_pathPrefix}}/crudDeleteManyByQuery',
+                _pathPrefix: '{{_pathPrefix}}',
                 operationId: 'crudDeleteManyByQuery',
                 parameters: [{
-                    default: '{"{{_uniqueKey}}":{"$in":["{{_uniqueKey}}0","{{_uniqueKey}}1"]}}',
+                    default: '{"{{_keyUnique}}":{"$in":["{{_keyUnique}}0","{{_keyUnique}}1"]}}',
                     description: 'query param',
                     format: 'json',
                     in: 'query',
@@ -103,44 +103,44 @@
                     }
                 },
                 summary: 'delete many {{_schemaName}} objects by query',
-                tags: ['{{_tagName}}']
+                tags: ['{{_pathPrefix}}']
             },
-            crudDeleteOneByUniqueKey: {
+            crudDeleteOneByKeyUnique: {
+                _keyUnique: '{{_keyUnique}}',
                 _method: 'delete',
-                _path: '/{{_tagName}}/crudDeleteOneByUniqueKey/{{{_uniqueKey}}}',
-                _tagName: '{{_tagName}}',
-                _uniqueKey: '{{_uniqueKey}}',
-                operationId: 'crudDeleteOneByUniqueKey.{{_uniqueKey}}',
+                _path: '/{{_pathPrefix}}/crudDeleteOneByKeyUnique/{{{_keyUnique}}}',
+                _pathPrefix: '{{_pathPrefix}}',
+                operationId: 'crudDeleteOneByKeyUnique.{{_keyUnique}}',
                 parameters: [{
-                    description: '{{_schemaName}} {{_uniqueKey}}',
+                    description: '{{_schemaName}} {{_keyUnique}}',
                     in: 'path',
-                    name: '{{_uniqueKey}}',
+                    name: '{{_keyUnique}}',
                     required: true,
                     type: 'string'
                 }],
-                summary: 'delete one {{_schemaName}} object by {{_uniqueKey}}',
-                tags: ['{{_tagName}}']
+                summary: 'delete one {{_schemaName}} object by {{_keyUnique}}',
+                tags: ['{{_pathPrefix}}']
             },
-            crudExistsOneByUniqueKey: {
+            crudExistsOneByKeyUnique: {
+                _keyUnique: '{{_keyUnique}}',
                 _method: 'get',
-                _path: '/{{_tagName}}/crudExistsOneByUniqueKey/{{{_uniqueKey}}}',
-                _tagName: '{{_tagName}}',
-                _uniqueKey: '{{_uniqueKey}}',
-                operationId: 'crudExistsOneByUniqueKey.{{_uniqueKey}}',
+                _path: '/{{_pathPrefix}}/crudExistsOneByKeyUnique/{{{_keyUnique}}}',
+                _pathPrefix: '{{_pathPrefix}}',
+                operationId: 'crudExistsOneByKeyUnique.{{_keyUnique}}',
                 parameters: [{
-                    description: '{{_schemaName}} {{_uniqueKey}}',
+                    description: '{{_schemaName}} {{_keyUnique}}',
                     in: 'path',
-                    name: '{{_uniqueKey}}',
+                    name: '{{_keyUnique}}',
                     required: true,
                     type: 'string'
                 }],
-                summary: 'check if one {{_schemaName}} object exists by {{_uniqueKey}}',
-                tags: ['{{_tagName}}']
+                summary: 'check if one {{_schemaName}} object exists by {{_keyUnique}}',
+                tags: ['{{_pathPrefix}}']
             },
             crudGetManyByQuery: {
                 _method: 'get',
-                _path: '/{{_tagName}}/crudGetManyByQuery',
-                _tagName: '{{_tagName}}',
+                _path: '/{{_pathPrefix}}/crudGetManyByQuery',
+                _pathPrefix: '{{_pathPrefix}}',
                 operationId: 'crudGetManyByQuery',
                 parameters: [{
                     default: '{}',
@@ -186,18 +186,18 @@
                     }
                 },
                 summary: 'get many {{_schemaName}} objects by query',
-                tags: ['{{_tagName}}']
+                tags: ['{{_pathPrefix}}']
             },
-            crudGetOneByUniqueKey: {
+            crudGetOneByKeyUnique: {
+                _keyUnique: '{{_keyUnique}}',
                 _method: 'get',
-                _path: '/{{_tagName}}/crudGetOneByUniqueKey/{{{_uniqueKey}}}',
-                _tagName: '{{_tagName}}',
-                _uniqueKey: '{{_uniqueKey}}',
-                operationId: 'crudGetOneByUniqueKey.{{_uniqueKey}}',
+                _path: '/{{_pathPrefix}}/crudGetOneByKeyUnique/{{{_keyUnique}}}',
+                _pathPrefix: '{{_pathPrefix}}',
+                operationId: 'crudGetOneByKeyUnique.{{_keyUnique}}',
                 parameters: [{
-                    description: '{{_schemaName}} {{_uniqueKey}}',
+                    description: '{{_schemaName}} {{_keyUnique}}',
                     in: 'path',
-                    name: '{{_uniqueKey}}',
+                    name: '{{_keyUnique}}',
                     required: true,
                     type: 'string'
                 }],
@@ -208,19 +208,19 @@
                         schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
                     }
                 },
-                summary: 'get one {{_schemaName}} object by {{_uniqueKey}}',
-                tags: ['{{_tagName}}']
+                summary: 'get one {{_schemaName}} object by {{_keyUnique}}',
+                tags: ['{{_pathPrefix}}']
             },
-            crudUpdateOneByUniqueKey: {
+            crudUpdateOneByKeyUnique: {
+                _keyUnique: '{{_keyUnique}}',
                 _method: 'patch',
-                _path: '/{{_tagName}}/crudUpdateOneByUniqueKey.{{{_uniqueKey}}}',
-                _tagName: '{{_tagName}}',
-                _uniqueKey: '{{_uniqueKey}}',
-                operationId: 'crudUpdateOneByUniqueKey.{{_uniqueKey}}',
+                _path: '/{{_pathPrefix}}/crudUpdateOneByKeyUnique/{{{_keyUnique}}}',
+                _pathPrefix: '{{_pathPrefix}}',
+                operationId: 'crudUpdateOneByKeyUnique.{{_keyUnique}}',
                 parameters: [{
-                    description: '{{_schemaName}} {{_uniqueKey}}',
+                    description: '{{_schemaName}} {{_keyUnique}}',
                     in: 'path',
-                    name: '{{_uniqueKey}}',
+                    name: '{{_keyUnique}}',
                     required: true,
                     type: 'string'
                 }, {
@@ -237,13 +237,13 @@
                         schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
                     }
                 },
-                summary: 'update one {{_schemaName}} object by {{_uniqueKey}}',
-                tags: ['{{_tagName}}']
+                summary: 'update one {{_schemaName}} object by {{_keyUnique}}',
+                tags: ['{{_pathPrefix}}']
             },
             crudUpsertOne: {
                 _method: 'put',
-                _path: '/{{_tagName}}/crudUpsertOne',
-                _tagName: '{{_tagName}}',
+                _path: '/{{_pathPrefix}}/crudUpsertOne',
+                _pathPrefix: '{{_pathPrefix}}',
                 operationId: 'crudReplaceOneBy',
                 parameters: [{
                     description: '{{_schemaName}} object',
@@ -260,12 +260,13 @@
                     }
                 },
                 summary: 'upsert one {{_schemaName}} object',
-                tags: ['{{_tagName}}']
+                tags: ['{{_pathPrefix}}']
             }
         };
-        Object.keys(local.swlt.cacheDict.crudApiDefault).forEach(function (key) {
-            local.swlt.cacheDict.crudApiDefault[key] =
-                JSON.stringify(local.swlt.cacheDict.crudApiDefault[key]);
+        // JSON.stringify pathObject to prevent side-effects
+        Object.keys(local.swgg.cacheDict.pathObjectDefault).forEach(function (key) {
+            local.swgg.cacheDict.pathObjectDefault[key] =
+                JSON.stringify(local.swgg.cacheDict.pathObjectDefault[key]);
         });
     }());
 
@@ -273,12 +274,12 @@
 
     // run shared js-env code
     (function () {
-        local.swlt.normalizeParamDictSwagger = function (data, methodPath) {
+        local.swgg.normalizeParamDictSwagger = function (data, pathObject) {
             /*
-             * this function will parse the data according to methodPath.parameters
+             * this function will parse the data according to pathObject.parameters
              */
             var tmp;
-            methodPath.parameters.forEach(function (paramDef) {
+            pathObject.parameters.forEach(function (paramDef) {
                 tmp = data[paramDef.name];
                 // init default value
                 if (tmp === undefined) {
@@ -304,7 +305,7 @@
                         break;
                     }
                 }
-                // JSON.parse swltParamDict
+                // JSON.parse swggParamDict
                 if (paramDef.type !== 'string' &&
                         (typeof tmp === 'string' ||
                         (local.modeJs === 'node' && Buffer.isBuffer(tmp)))) {
@@ -318,7 +319,7 @@
             return data;
         };
 
-        local.swlt.onErrorJsonapi = function (options, onError) {
+        local.swgg.onErrorJsonapi = function (options, onError) {
             /*
              * this function will convert the error and data to jsonapi format,
              * http://jsonapi.org/format/#errors
@@ -367,7 +368,7 @@
             };
         };
 
-        local.swlt.schemaDereference = function ($ref) {
+        local.swgg.schemaDereference = function ($ref) {
             /*
              * this function will try to dereference the schema from $ref
              */
@@ -375,13 +376,13 @@
                 return ((local.global.swaggerUi &&
                     local.global.swaggerUi.api &&
                     local.global.swaggerUi.api.swaggerJson) ||
-                    local.swlt.swaggerJson)
+                    local.swgg.swaggerJson)
                     .definitions[(/^\#\/definitions\/(\w+)$/).exec($ref)[1]];
             } catch (ignore) {
             }
         };
 
-        local.swlt.validateByParamDefList = function (options) {
+        local.swgg.validateByParamDefList = function (options) {
             /*
              * this function will validate options.data against options.paramDefList
              */
@@ -392,7 +393,7 @@
                 local.utility2.assert(data && typeof data === 'object', data);
                 (options.paramDefList || []).forEach(function (paramDef) {
                     key = paramDef.name;
-                    local.swlt.validateByPropertyDef({
+                    local.swgg.validateByPropertyDef({
                         data: data[key],
                         key: key,
                         propertyDef: paramDef,
@@ -406,7 +407,7 @@
             }
         };
 
-        local.swlt.validateByPropertyDef = function (options) {
+        local.swgg.validateByPropertyDef = function (options) {
             /*
              * this function will validate options.data against options.propertyDef
              */
@@ -430,11 +431,11 @@
             // validate schema
             tmp = propertyDef.$ref || (propertyDef.schema && propertyDef.schema.$ref);
             if (tmp) {
-                local.swlt.validateBySchema({
+                local.swgg.validateBySchema({
                     circularList: options.circularList,
                     data: data,
                     key: tmp,
-                    schema: local.swlt.schemaDereference(tmp)
+                    schema: local.swgg.schemaDereference(tmp)
                 });
                 return;
             }
@@ -458,7 +459,7 @@
                 assert(Array.isArray(data) && propertyDef.items);
                 // recurse - validate elements in list
                 data.forEach(function (element) {
-                    local.swlt.validateByPropertyDef({
+                    local.swgg.validateByPropertyDef({
                         circularList: options.circularList,
                         data: element,
                         key: options.key,
@@ -519,7 +520,7 @@
             }
         };
 
-        local.swlt.validateBySchema = function (options) {
+        local.swgg.validateBySchema = function (options) {
             /*
              * this function will validate options.data against options.schema
              */
@@ -549,7 +550,7 @@
                 );
                 Object.keys(schema.properties || {}).forEach(function (_) {
                     key = _;
-                    local.swlt.validateByPropertyDef({
+                    local.swgg.validateByPropertyDef({
                         circularList: options.circularList,
                         data: data[key],
                         depth: options.depth - 1,
@@ -565,7 +566,7 @@
             }
         };
 
-        local.swlt.validateBySwagger = function (options) {
+        local.swgg.validateBySwagger = function (options) {
             /*
              * this function will validate the entire swagger json object
              */
@@ -596,14 +597,14 @@
 
     // run node js-env code
     case 'node':
-        local.swlt.apiUpdate = function (options) {
+        local.swgg.apiUpdate = function (options) {
             /*
              * this function will update the api
              */
-            var methodPath, tmp, uniqueKey;
+            var keyUnique, pathObject, tmp;
             options.definitions = options.definitions || {};
             options.paths = options.paths || {};
-
+            // init _pathObjectDefaultList
             Object.keys(options.definitions).forEach(function (schemaName) {
                 var schema;
                 schema = options.definitions[schemaName];
@@ -622,7 +623,7 @@
                 }).replace((/\{\{_schemaName\}\}/g), schemaName)), 2);
                 // hack - init swaggerJson$$Dummy,
                 // to pass validation warnings for auto-created schemas
-                tmp = local.swlt.swaggerJson$$Dummy;
+                tmp = local.swgg.swaggerJson$$Dummy;
                 local.utility2.objectSetOverride(tmp, JSON.parse(JSON.stringify({
                     paths: { '/$$Dummy/{{_schemaName}}': { get: {
                         responses: {
@@ -635,36 +636,35 @@
                     } } }
                 }).replace((/\{\{_schemaName\}\}/g), schemaName)), 2);
                 // init crud-api
-                (schema._crudApiList || []).forEach(function (crudApi) {
-                    uniqueKey = (/ByUniqueKey\.(.*)/).exec(crudApi);
-                    uniqueKey = uniqueKey && uniqueKey[1];
-                    crudApi = crudApi.replace('.' + uniqueKey, '');
-                    crudApi = JSON.parse(local.swlt.cacheDict.crudApiDefault[
-                        crudApi
+                (schema._pathObjectDefaultList || []).forEach(function (pathObject) {
+                    keyUnique = (/ByKeyUnique\.(.*)/).exec(pathObject);
+                    keyUnique = keyUnique && keyUnique[1];
+                    pathObject = pathObject.replace('.' + keyUnique, '');
+                    pathObject = JSON.parse(local.swgg.cacheDict.pathObjectDefault[
+                        pathObject
                     ]
-                        .replace((/\{\{_schemaName\}\}/g), schema._schemaName)
-                        .replace((/\{\{_tagName\}\}/g), schema._tagName)
-                        .replace((/\{\{_uniqueKey\}\}/g), uniqueKey));
-                    options.paths[crudApi._path] = options.paths[crudApi._path] || {};
-                    options.paths[crudApi._path][crudApi._method] = crudApi;
+                        .replace((/\{\{_keyUnique\}\}/g), keyUnique)
+                        .replace((/\{\{_pathPrefix\}\}/g), schema._pathPrefix)
+                        .replace((/\{\{_schemaName\}\}/g), schema._schemaName));
+                    options.paths[pathObject._path] = options.paths[pathObject._path] || {};
+                    options.paths[pathObject._path][pathObject._method] = pathObject;
                 });
-                // init crudApi / schemaName
+                // init pathObject / schemaName
                 schema = options.definitions[schemaName] = JSON.parse(
                     JSON.stringify(schema)
+                        .replace((/\{\{_keyUnique\}\}/g), keyUnique)
+                        .replace((/\{\{_pathPrefix\}\}/g), schema._pathPrefix)
                         .replace((/\{\{_schemaName\}\}/g), schema._schemaName)
-                        .replace((/\{\{_tagName\}\}/g), schema._tagName)
-                        .replace((/\{\{_uniqueKey\}\}/g), uniqueKey)
                 );
             });
-
             // update paths
             Object.keys(options.paths).forEach(function (path) {
                 Object.keys(options.paths[path]).forEach(function (method) {
-                    methodPath = options.paths[path][method];
-                    methodPath._method = method;
-                    methodPath._path = path;
-                    // init methodPath
-                    local.utility2.objectSetDefault(methodPath, {
+                    pathObject = options.paths[path][method];
+                    pathObject._method = method;
+                    pathObject._path = path;
+                    // init pathObject
+                    local.utility2.objectSetDefault(pathObject, {
                         parameters: [],
                         responses: {
                             200: {
@@ -675,13 +675,13 @@
                         },
                         tags: []
                     }, 2);
-                    // update cacheDict.methodPath
-                    local.swlt.cacheDict.methodPath[method.toUpperCase() + ' ' + path.replace(
+                    // update cacheDict.pathObject
+                    local.swgg.cacheDict.pathObject[method.toUpperCase() + ' ' + path.replace(
                         (/\{.*/),
                         function (match0) {
                             return match0.replace((/[^\/]/g), '');
                         }
-                    )] = JSON.stringify(methodPath);
+                    )] = JSON.stringify(pathObject);
                 });
             });
             // merge tags
@@ -692,17 +692,17 @@
                 tmp[key].name = key;
             });
             // update tags from options.tags
-            [local.swlt.swaggerJson.tags, options.tags].forEach(function (tags) {
+            [local.swgg.swaggerJson.tags, options.tags].forEach(function (tags) {
                 (tags || []).forEach(function (element) {
                     tmp[element.name] = element;
                 });
             });
-            tmp = local.swlt.swaggerJson.tags = Object.keys(tmp).sort().map(function (key) {
+            tmp = local.swgg.swaggerJson.tags = Object.keys(tmp).sort().map(function (key) {
                 return tmp[key];
             });
             // update swaggerJson with options, with underscore keys removed
             local.utility2.objectSetOverride(
-                local.swlt.swaggerJson,
+                local.swgg.swaggerJson,
                 local.utility2.objectTraverse(
                     // jsonCopy object to prevent side-effects
                     local.utility2.jsonCopy(options),
@@ -720,39 +720,39 @@
                 2
             );
             // restore tags
-            local.swlt.swaggerJson.tags = tmp;
+            local.swgg.swaggerJson.tags = tmp;
             // init properties from x-inheritList
             [0, 1, 2, 3].forEach(function () {
-                Object.keys(local.swlt.swaggerJson.definitions).forEach(function (schema) {
-                    schema = local.swlt.swaggerJson.definitions[schema];
+                Object.keys(local.swgg.swaggerJson.definitions).forEach(function (schema) {
+                    schema = local.swgg.swaggerJson.definitions[schema];
                     // jsonCopy object to prevent side-effects
                     local.utility2.jsonCopy(schema['x-inheritList'] || [])
                         .reverse()
                         .forEach(function (element) {
                             local.utility2.objectSetDefault(schema, {
                                 properties:
-                                    local.swlt.schemaDereference(element.$ref).properties
+                                    local.swgg.schemaDereference(element.$ref).properties
                             }, 2);
                         });
                 });
             });
             // jsonCopy object to prevent side-effects
-            local.swlt.swaggerJson = JSON.parse(local.utility2
-                .jsonStringifyOrdered(local.utility2.jsonCopy(local.swlt.swaggerJson)));
+            local.swgg.swaggerJson = JSON.parse(local.utility2
+                .jsonStringifyOrdered(local.utility2.jsonCopy(local.swgg.swaggerJson)));
             // validate swaggerJson
-            local.swlt.validateBySwagger(local.utility2.objectSetDefault(
-                local.utility2.jsonCopy(local.swlt.swaggerJson),
-                local.swlt.swaggerJson$$Dummy,
+            local.swgg.validateBySwagger(local.utility2.objectSetDefault(
+                local.utility2.jsonCopy(local.swgg.swaggerJson),
+                local.swgg.swaggerJson$$Dummy,
                 2
             ));
             // init crud-api
-            local.swlt.api = new local.swlt.SwaggerClient({
+            local.swgg.api = new local.swgg.SwaggerClient({
                 url: 'http://localhost:' + local.utility2.serverPortInit()
             });
-            local.swlt.api.buildFromSpec(local.utility2.jsonCopy(local.swlt.swaggerJson));
+            local.swgg.api.buildFromSpec(local.utility2.jsonCopy(local.swgg.swaggerJson));
         };
 
-        local.swlt.middlewareError = function (error, request, response) {
+        local.swgg.middlewareError = function (error, request, response) {
             /*
              * this function will handle errors according to http://jsonapi.org/format/#errors
              */
@@ -760,7 +760,7 @@
                 error = new Error('404 Not Found');
                 error.statusCode = 404;
             }
-            local.swlt.onErrorJsonapi(null, function (error) {
+            local.swgg.onErrorJsonapi(null, function (error) {
                 local.utility2.serverRespondHeadSet(request, response, error.statusCode, {});
                 // debug statusCode / method / url
                 local.utility2.errorMessagePrepend(error, response.statusCode + ' ' +
@@ -771,26 +771,26 @@
             })(error);
         };
 
-        local.swlt.middlewareBodyParse = function (request, response, nextMiddleware) {
+        local.swgg.middlewareBodyParse = function (request, response, nextMiddleware) {
             /*
              * this function will parse the request-body
              */
             // jslint-hack
             local.utility2.nop(response);
             local.utility2.testTryCatch(function () {
-                if (request.swltBodyParsed) {
+                if (request.swggBodyParsed) {
                     nextMiddleware();
                     return;
                 }
-                request.swltBodyParsed = String(request.bodyRaw);
+                request.swggBodyParsed = String(request.bodyRaw);
                 switch ((/[^;]*/).exec(request.headers['content-type'] || '')[0]) {
                 case 'application/x-www-form-urlencoded':
-                    request.swltBodyParsed =
-                        local.url.parse('?' + request.swltBodyParsed, true).query;
+                    request.swggBodyParsed =
+                        local.url.parse('?' + request.swggBodyParsed, true).query;
                     break;
                 default:
                     try {
-                        request.swltBodyParsed = JSON.parse(request.swltBodyParsed);
+                        request.swggBodyParsed = JSON.parse(request.swggBodyParsed);
                     } catch (ignore) {
                     }
                 }
@@ -798,7 +798,7 @@
             }, nextMiddleware);
         };
 
-        local.swlt.middlewareSwagger = function (request, response, nextMiddleware) {
+        local.swgg.middlewareSwagger = function (request, response, nextMiddleware) {
             /*
              * this function will run the main swagger-lite middleware
              */
@@ -814,94 +814,94 @@
                         // if request.url is not prefixed with swaggerJson.basePath,
                         // then default to nextMiddleware
                         if (request.urlParsed.pathnameNormalized
-                                .indexOf(local.swlt.swaggerJson.basePath) !== 0) {
+                                .indexOf(local.swgg.swaggerJson.basePath) !== 0) {
                             modeNext = Infinity;
                             onNext();
                             return;
                         }
-                        // init swltPathname
-                        request.swltPathname = request.method + ' ' +
+                        // init swggPathname
+                        request.swggPathname = request.method + ' ' +
                             request.urlParsed.pathnameNormalized
-                            .replace(local.swlt.swaggerJson.basePath, '');
-                        switch (request.swltPathname) {
+                            .replace(local.swgg.swaggerJson.basePath, '');
+                        switch (request.swggPathname) {
                         // serve swagger.json
                         case 'GET /swagger.json':
-                            response.end(JSON.stringify(local.swlt.swaggerJson));
+                            response.end(JSON.stringify(local.swgg.swaggerJson));
                             return;
                         }
-                        // init swltMethodPath
+                        // init swggPathObject
                         while (true) {
-                            request.swltMethodPath =
-                                local.swlt.cacheDict.methodPath[request.swltPathname];
-                            // if swltMethodPath exists, then break and continue
-                            if (request.swltMethodPath) {
-                                request.swltMethodPath = JSON.parse(request.swltMethodPath);
+                            request.swggPathObject =
+                                local.swgg.cacheDict.pathObject[request.swggPathname];
+                            // if swggPathObject exists, then break and continue
+                            if (request.swggPathObject) {
+                                request.swggPathObject = JSON.parse(request.swggPathObject);
                                 onNext();
                                 break;
                             }
-                            // if cannot init swltMethodPath, then default to nextMiddleware
-                            if (request.swltPathname === request.swltPathnameOld) {
+                            // if cannot init swggPathObject, then default to nextMiddleware
+                            if (request.swggPathname === request.swggPathnameOld) {
                                 modeNext = Infinity;
                                 onNext();
                                 break;
                             }
-                            request.swltPathnameOld = request.swltPathname;
-                            request.swltPathname =
-                                request.swltPathname.replace((/\/[^\/]+?(\/*?)$/), '/$1');
+                            request.swggPathnameOld = request.swggPathname;
+                            request.swggPathname =
+                                request.swggPathname.replace((/\/[^\/]+?(\/*?)$/), '/$1');
                         }
                         break;
                     case 2:
-                        // init swltParamDict
-                        request.swltParamDict = {};
+                        // init swggParamDict
+                        request.swggParamDict = {};
                         // parse path param
                         tmp = request.urlParsed.pathname
-                            .replace(local.swlt.swaggerJson.basePath, '').split('/');
-                        request.swltMethodPath._path.split('/').forEach(function (key, ii) {
+                            .replace(local.swgg.swaggerJson.basePath, '').split('/');
+                        request.swggPathObject._path.split('/').forEach(function (key, ii) {
                             if ((/^\{\S*?\}$/).test(key)) {
-                                request.swltParamDict[key.slice(1, -1)] =
+                                request.swggParamDict[key.slice(1, -1)] =
                                     decodeURIComponent(tmp[ii]);
                             }
                         });
-                        request.swltMethodPath.parameters.forEach(function (paramDef) {
+                        request.swggPathObject.parameters.forEach(function (paramDef) {
                             switch (paramDef.in) {
                             // parse body param
                             case 'body':
-                                request.swltParamDict[paramDef.name] =
-                                    request.swltParamDict[paramDef.name] ||
-                                    request.swltBodyParsed;
+                                request.swggParamDict[paramDef.name] =
+                                    request.swggParamDict[paramDef.name] ||
+                                    request.swggBodyParsed;
                                 break;
                             // parse formData param
                             case 'formData':
-                                request.swltParamDict[paramDef.name] =
-                                    request.swltParamDict[paramDef.name] ||
-                                    request.swltBodyParsed[paramDef.name];
+                                request.swggParamDict[paramDef.name] =
+                                    request.swggParamDict[paramDef.name] ||
+                                    request.swggBodyParsed[paramDef.name];
                                 break;
                             // parse header param
                             case 'header':
-                                request.swltParamDict[paramDef.name] =
+                                request.swggParamDict[paramDef.name] =
                                     request.headers[paramDef.name.toLowerCase()];
                                 break;
                             // parse query param
                             case 'query':
-                                request.swltParamDict[paramDef.name] =
+                                request.swggParamDict[paramDef.name] =
                                     request.urlParsed.query[paramDef.name];
                                 break;
                             }
                             // init default param
-                            request.swltParamDict[paramDef.name] =
-                                request.swltParamDict[paramDef.name] || paramDef.default;
+                            request.swggParamDict[paramDef.name] =
+                                request.swggParamDict[paramDef.name] || paramDef.default;
                         });
                         onNext();
                         break;
                     case 3:
                         // normalize params
-                        local.swlt.normalizeParamDictSwagger(request
-                            .swltParamDict, request.swltMethodPath);
+                        local.swgg.normalizeParamDictSwagger(request
+                            .swggParamDict, request.swggPathObject);
                         // validate params
-                        local.swlt.validateByParamDefList({
-                            data: request.swltParamDict,
-                            key: request.swltPathname,
-                            paramDefList: request.swltMethodPath.parameters
+                        local.swgg.validateByParamDefList({
+                            data: request.swggParamDict,
+                            key: request.swggPathname,
+                            paramDefList: request.swggPathObject.parameters
                         });
                         onNext();
                         break;
@@ -921,7 +921,7 @@
     // run browser js-env code
     case 'browser':
         // export swagger-lite
-        window.swlt = local.swlt;
+        window.swgg = local.swgg;
         break;
 
 
@@ -929,7 +929,7 @@
     // run node js-env code
     case 'node':
         // export swagger-lite
-        module.exports = local.swlt;
+        module.exports = local.swgg;
         module.exports.__dirname = __dirname;
         // require modules
         local.fs = require('fs');
@@ -939,7 +939,7 @@
         local.url = require('url');
         local.vm = require('vm');
         // init swaggerJson
-        local.swlt.swaggerJson = {
+        local.swgg.swaggerJson = {
             basePath: local.utility2.envDict.npm_config_mode_api_prefix || '/api/v0',
             definitions: {
                 Array: { items: {}, type: 'array' },
@@ -985,7 +985,7 @@
             tags: []
         };
         // hack - init swaggerJson$$Dummy to pass validation warnings for auto-created schemas
-        local.swlt.swaggerJson$$Dummy = {
+        local.swgg.swaggerJson$$Dummy = {
             definitions: {
                 $$Dummy: {
                     properties: {
@@ -1034,7 +1034,7 @@
             // swagger-hack - update swagger.json url
             .replace(
                 'https://kaizhu256.github.io/node-swagger-ui-lite/build/swagger.json',
-                local.swlt.swaggerJson.basePath + '/swagger.json'
+                local.swgg.swaggerJson.basePath + '/swagger.json'
             );
         local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.css'] = local.fs
             .readFileSync(local.swagger_ui.__dirname +
@@ -1068,9 +1068,9 @@
                     'success = function (data) { onError(null, data); };' +
                 '}' +
                 'try {' +
-                    'if (window.swlt) {' +
-                        'window.swlt.validateByParamDefList({' +
-                            'data: window.swlt.normalizeParamDictSwagger(' +
+                    'if (window.swgg) {' +
+                        'window.swgg.validateByParamDefList({' +
+                            'data: window.swgg.normalizeParamDictSwagger(' +
                                 'JSON.parse(JSON.stringify(args)),' +
                                 'this' +
                             '),' +
@@ -1079,7 +1079,7 @@
                         '});' +
                     '}' +
                 '} catch (errorCaught) {' +
-                    'window.swlt.onErrorJsonapi(null, function (error) {' +
+                    'window.swgg.onErrorJsonapi(null, function (error) {' +
                         'obj.on.error({' +
                             'data: JSON.stringify(error),' +
                             'headers: { "Content-Type": "application/json" }' +
@@ -1150,11 +1150,11 @@
                     );
                 }
             );
-            local.swlt.SwaggerClient = local.SwaggerClient;
-            local.swlt.SwaggerUi = local.SwaggerUi;
+            local.swgg.SwaggerClient = local.SwaggerClient;
+            local.swgg.SwaggerUi = local.SwaggerUi;
         }());
         // init api
-        local.swlt.apiUpdate({});
+        local.swgg.apiUpdate({});
         break;
     }
 }());

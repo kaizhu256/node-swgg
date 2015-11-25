@@ -98,15 +98,15 @@ instruction
         // export local
         local.global.local = local;
         // init swagger-lite
-        local.swlt = local.modeJs === 'browser'
-            ? window.swlt
+        local.swgg = local.modeJs === 'browser'
+            ? window.swgg
             : require('swagger-lite');
-        // import swlt.local
-        Object.keys(local.swlt.local).forEach(function (key) {
-            local[key] = local[key] || local.swlt.local[key];
+        // import swgg.local
+        Object.keys(local.swgg.local).forEach(function (key) {
+            local[key] = local[key] || local.swgg.local[key];
         });
         // init utility2
-        local.utility2 = local.swlt.local.utility2;
+        local.utility2 = local.swgg.local.utility2;
         // init onReady
         local.utility2.onReadyInit();
     }());
@@ -196,8 +196,8 @@ instruction
             );
         local.utility2.cacheDict.assets['/test/test.js'] =
             local.utility2.istanbulInstrumentInPackage(
-                local.fs.readFileSync(local.swlt.__dirname + '/test.js', 'utf8'),
-                local.swlt.__dirname + '/test.js',
+                local.fs.readFileSync(local.swgg.__dirname + '/test.js', 'utf8'),
+                local.swgg.__dirname + '/test.js',
                 'swagger-lite'
             );
         // init middleware
@@ -209,7 +209,7 @@ instruction
             // init http-body-get middleware
             local.utility2.middlewareBodyGet,
             // init http-body-parse middleware
-            local.swlt.middlewareBodyParse,
+            local.swgg.middlewareBodyParse,
             // init swagger pre-middleware
             function (request, response, nextMiddleware) {
                 // jslint-hack
@@ -226,14 +226,14 @@ instruction
                 nextMiddleware();
             },
             // init swagger middleware
-            local.swlt.middlewareSwagger
+            local.swgg.middlewareSwagger
         ]);
         // init error-middleware
-        local.middlewareError = local.swlt.middlewareError;
+        local.middlewareError = local.swgg.middlewareError;
         // init petstore-api
         (function () {
             var options;
-            options = local.utility2.jsonCopy(require(local.swlt.local
+            options = local.utility2.jsonCopy(require(local.swgg.local
                 .swagger_ui.__dirname + '/swagger.json'));
             options = {
                 definitions: options.definitions,
@@ -241,7 +241,7 @@ instruction
                 securityDefinitions: options.securityDefinitions,
                 tags: options.tags
             };
-            local.swlt.apiUpdate(options);
+            local.swgg.apiUpdate(options);
         }());
         // run server-test
         local.utility2.testRunServer(local);
@@ -304,13 +304,13 @@ instruction
         "build-doc": "node_modules/.bin/utility2 shRun shReadmeExportPackageJson && \
 node_modules/.bin/utility2 shRun shDocApiCreate \"{\
 exampleFileList:['example.js','test.js','index.js'],\
-moduleDict:{'swagger-lite':{aliasList:['swlt'],exports:require('./index.js')}}\
+moduleDict:{'swagger-lite':{aliasList:['swgg'],exports:require('./index.js')}}\
 }\"",
         "start": "npm_config_mode_auto_restart=1 node_modules/.bin/utility2 shRun shIstanbulCover node test.js",
         "test": "node_modules/.bin/utility2 shRun shReadmeExportPackageJson && \
 node_modules/.bin/utility2 test node test.js"
     },
-    "version": "2015.11.4"
+    "version": "2015.11.6"
 }
 ```
 
@@ -318,8 +318,8 @@ node_modules/.bin/utility2 test node test.js"
 
 # todo
 - add logging feature
-- add cached param for crudGetManyByQuery
-- add SwltUserLoginTokenCapped
+- add cached version crudGetManyByQueryCached
+- add swggUserLoginTokenCapped
 - re-enable user login/logout
 - test /user/login and /user/logout
 - add max / min validation
@@ -327,9 +327,13 @@ node_modules/.bin/utility2 test node test.js"
 
 
 
-# change since ed101e75
-- npm publish 2015.11.4
-- update to swagger-ui-lite @ 2015.11.4
+# change since a3e23a60
+- npm publish 2015.11.6
+- rename crudApi to pathObjectDefault
+- rename uniqueKey to keyUnique
+- rename methodPath to pathObject
+- rename swlt to swgg
+- rename tagName to pathPrefix
 - none
 
 

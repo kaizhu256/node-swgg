@@ -77,7 +77,9 @@
             [{
                 url: '/_test/undefined'
             }, {
-                url: '/api/v0/_test/errormiddleware'
+                url: '/api/v0/_test/errorMiddleware'
+            }, {
+                url: '/api/v0/_test/undefined'
             }].forEach(function (options) {
                 onParallel.counter += 1;
                 local.utility2.ajax(options, function (error) {
@@ -144,10 +146,10 @@
                 key: 'crudCountByQueryOne',
                 method: 'get'
             }].forEach(function (options) {
-                options.paramDefList = local.swlt.swaggerJson
+                options.paramDefList = local.swgg.swaggerJson
                     .paths['/_test/' + options.key][options.method]
                     .parameters;
-                local.swlt.validateByParamDefList(options);
+                local.swgg.validateByParamDefList(options);
             });
             // test validateByParamDefList's error handling-behavior
             [{
@@ -161,10 +163,10 @@
             }].forEach(function (options) {
                 try {
                     error = null;
-                    options.paramDefList = local.swlt.swaggerJson
+                    options.paramDefList = local.swgg.swaggerJson
                         .paths['/_test/' + options.key][options.method]
                         .parameters;
-                    local.swlt.validateByParamDefList(options);
+                    local.swgg.validateByParamDefList(options);
                 } catch (errorCaught) {
                     error = errorCaught;
                 }
@@ -172,7 +174,7 @@
                 local.utility2.assert(error, error);
             });
             // test validateByPropertyDef's circular-reference handling-behavior
-            local.swlt.validateByPropertyDef({
+            local.swgg.validateByPropertyDef({
                 data: { propObject: {} },
                 propertyDef: { propObject: { type: 'object' } }
             });
@@ -186,7 +188,7 @@
             var optionsCopy;
             options = {
                 data: { propRequired: true },
-                schema: local.swlt.swaggerJson.definitions.TestCrudModel
+                schema: local.swgg.swaggerJson.definitions.TestCrudModel
             };
             [
                 { key: 'propArray', value: [null] },
@@ -217,7 +219,7 @@
                 optionsCopy.propArraySubdoc = optionsCopy.propArraySubdoc || [optionsCopy];
                 optionsCopy.propObject = optionsCopy.propObject || optionsCopy;
                 optionsCopy.propObjectSubdoc = optionsCopy.propObjectSubdoc || optionsCopy;
-                local.swlt.validateBySchema({ data: optionsCopy, schema: options.schema });
+                local.swgg.validateBySchema({ data: optionsCopy, schema: options.schema });
             });
             onError();
         };
@@ -229,7 +231,7 @@
             var error, optionsCopy;
             options = {
                 data: { propRequired: true },
-                schema: local.swlt.swaggerJson.definitions.TestCrudModel
+                schema: local.swgg.swaggerJson.definitions.TestCrudModel
             };
             [
                 { data: null },
@@ -261,7 +263,7 @@
                     error = null;
                     optionsCopy = local.utility2.jsonCopy(options.data);
                     optionsCopy[element.key] = element.value;
-                    local.swlt.validateBySchema({
+                    local.swgg.validateBySchema({
                         data: element.data === null
                             ? null
                             : optionsCopy,
@@ -289,7 +291,7 @@
             ], function (onError) {
                 [null, {}].forEach(function (element) {
                     try {
-                        local.swlt.validateBySwagger(element);
+                        local.swgg.validateBySwagger(element);
                     } catch (errorCaught) {
                         error = errorCaught;
                     }
@@ -331,7 +333,7 @@
         window.swaggerUi = new window.SwaggerUi({
             dom_id: "swagger-ui-container",
             onComplete: function () {
-                local.swlt.swaggerJson = local.swlt.api.swaggerJson;
+                local.swgg.swaggerJson = local.swgg.api.swaggerJson;
                 local.utility2.onReady();
             },
             supportedSubmitMethods: ['delete', 'get', 'patch', 'post', 'put'],
@@ -339,7 +341,7 @@
         });
         // init api
         window.swaggerUi.load();
-        local.swlt.api = window.swaggerUi.api;
+        local.swgg.api = window.swaggerUi.api;
         // run test
         local.utility2.testRun(local);
         break;
@@ -349,25 +351,25 @@
     // run node js-env code
     case 'node':
         // test null apiUpdate handling-behavior
-        local.swlt.apiUpdate({});
+        local.swgg.apiUpdate({});
         // init test api
-        local.swlt.apiUpdate({
+        local.swgg.apiUpdate({
             definitions: {
                 // init TestCrudModel schema
                 TestCrudModel: {
                     // init default crud-api
-                    _crudApiList: [
+                    _pathObjectDefaultList: [
                         'crudCountManyByQuery',
                         'crudCreateOne',
                         'crudDeleteManyByQuery',
-                        'crudDeleteOneByUniqueKey.id',
-                        'crudExistsOneByUniqueKey.id',
-                        'crudGetOneByUniqueKey.id',
+                        'crudDeleteOneByKeyUnique.id',
+                        'crudExistsOneByKeyUnique.id',
                         'crudGetManyByQuery',
-                        'crudUpdateOneByUniqueKey.id',
+                        'crudGetOneByKeyUnique.id',
+                        'crudUpdateOneByKeyUnique.id',
                         'crudUpsertOne'
                     ],
-                    _tagName: '_test',
+                    _pathPrefix: '_test',
                     properties: {
                         propArray: { items: {}, type: 'array' },
                         propArraySubdoc: {
@@ -414,7 +416,7 @@
         local.middleware.middlewareList.push(function (request, response, nextMiddleware) {
             // jslint-hack
             local.utility2.nop(response);
-            switch (request.swltPathname) {
+            switch (request.swggPathname) {
             case 'GET /_test/errorMiddleware':
                 nextMiddleware(new Error('dummy error'));
                 break;
