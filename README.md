@@ -36,7 +36,7 @@ lightweight standalone swagger-ui server backed by nedb
 - darwin or linux os
 
 #### [api-doc](https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html)
-[![api-doc](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.docApiCreate.slimerjs._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swagger-lite_2Ftmp_2Fbuild_2Fdoc.api.html.png)](https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html)
+[![api-doc](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.docApiCreate.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swagger-lite_2Ftmp_2Fbuild_2Fdoc.api.html.png)](https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html)
 
 
 
@@ -254,7 +254,7 @@ instruction
 [![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.testExampleJs.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
 
 #### output from electron-lite
-[![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.testExampleJs.slimerjs..png)](https://hrku01-swagger-lite-beta.herokuapp.com)
+[![screen-capture](screen-capture.testExampleJs.browser..png)](https://hrku01-swagger-lite-beta.herokuapp.com)
 
 
 
@@ -275,7 +275,7 @@ instruction
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "swagger-ui-lite": "2015.11.3",
+        "swagger-ui-lite": "2015.11.4",
         "utility2": "2015.11.10"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
@@ -310,7 +310,7 @@ moduleDict:{'swagger-lite':{aliasList:['swlt'],exports:require('./index.js')}}\
         "test": "node_modules/.bin/utility2 shRun shReadmeExportPackageJson && \
 node_modules/.bin/utility2 test node test.js"
     },
-    "version": "2015.11.3"
+    "version": "2015.11.4"
 }
 ```
 
@@ -327,9 +327,9 @@ node_modules/.bin/utility2 test node test.js"
 
 
 
-# change since 11cec971
-- npm publish 2015.11.3
-- add auto-generation of crud feature
+# change since ed101e75
+- npm publish 2015.11.4
+- update to swagger-ui-lite @ 2015.11.4
 - none
 
 
