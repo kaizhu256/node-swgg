@@ -228,7 +228,7 @@
                     in: 'body',
                     name: 'body',
                     required: true,
-                    schema: { $ref: '#/definitions/Object' }
+                    schema: { type: 'object' }
                 }],
                 responses: {
                     200: {
@@ -319,53 +319,121 @@
             return data;
         };
 
-        local.swgg.onErrorJsonapi = function (options, onError) {
+        local._onErrorJsonapiData = function (data) {
             /*
-             * this function will convert the error and data to jsonapi format,
+             * this function will normalize the data to jsonapi format,
+             * http://jsonapi.org/format/#document-structure-resource-objects
+             */
+            if (data && data.meta && data.meta.isJsonapiResponse) {
+                return data;
+            }
+            if (!Array.isArray(data)) {
+                data = [data];
+            }
+            if (!data.length) {
+                data.push({});
+            }
+            data = data.map(function (element) {
+                if (!(element && typeof element === 'object')) {
+                    element = { data: String(element) };
+                }
+                return element;
+            });
+            return { data: data, meta: { isJsonapiResponse: true } };
+        };
+
+        local._onErrorJsonapiError = function (error) {
+            /*
+             * this function will normalize the error to jsonapi format,
              * http://jsonapi.org/format/#errors
+             */
+            var data;
+            data = error;
+            if (!data || (data && data.meta && data.meta.isJsonapiResponse)) {
+                return data;
+            }
+            if (!Array.isArray(data)) {
+                data = [data];
+            }
+            if (!data.length) {
+                data.push({});
+            }
+            data = data.map(function (element) {
+                if (!(element && typeof element === 'object')) {
+                    element = { message: String(element) };
+                }
+                error = local.utility2.jsonCopy(element);
+                // copy error fields over from error object
+                [
+                    // jsonapi error fields
+                    // http://jsonapi.org/format/#error-objects
+                    'code',
+                    'detail',
+                    'id',
+                    'links',
+                    'meta',
+                    'source',
+                    'status',
+                    'title',
+                    // custom error fields
+                    'message',
+                    'name',
+                    'stack',
+                    'statusCode'
+                ].forEach(function (key) {
+                    error[key] = element[key];
+                });
+                error.message = error.title = error.message || error.title;
+                error.status = error.statusCode =
+                    Number(error.status) || Number(error.statusCode) || 500;
+                error = local.utility2.objectSetOverride(error, {
+                    status: String(error.status),
+                    code: String(error.code || error.status),
+                    detail: String(error.detail || error.stack),
+                    title: String(error.title || error.message)
+                });
+                return error;
+            });
+            error = local.utility2.jsonCopy(data[0]);
+            error.errors = data;
+            error.meta = { isJsonapiResponse: true };
+            return error;
+        };
+
+        local.swgg.onErrorJsonapi = function (onError) {
+            /*
+             * this function will normalize the error and data to jsonapi format,
+             * http://jsonapi.org/format/#errors
+             * http://jsonapi.org/format/#document-structure-resource-objects
              * and pass them to onError
              */
             return function (error, data) {
-                if (typeof options === 'function') {
-                    options = options();
-                }
-                options = options || {};
-                options.id = options.id || local.utility2.uuidTime();
-                // handle error
-                if (error) {
-                    if (error.errors && Array.isArray(error.errors) && error.errors[0]) {
-                        onError(error);
-                        return;
-                    }
-                    // prepend mongodb-errmsg
-                    if (error.errmsg) {
-                        local.utility2.errorMessagePrepend(error, error.errmsg + '\n');
-                    }
-                    options.message = error.message;
-                    options.stack = error.stack;
-                    options.statusCode = Number(error.statusCode) || 500;
-                    options.errors = local.utility2.jsonCopy(error);
-                    local.utility2.objectSetDefault(options.errors, {
-                        code: options.statusCode,
-                        detail: options.stack,
-                        id: options.id,
-                        message: options.message
-                    });
-                    options.errors.code = String(options.errors.code);
-                    options.errors.detail = String(options.errors.detail);
-                    options.errors.id = String(options.errors.id);
-                    options.errors.message = String(options.errors.message);
-                    options.errors = [options.errors];
-                    onError(options);
-                    return;
-                }
-                // handle data
-                options.data = data;
-                if (!Array.isArray(options.data)) {
-                    options.data = [options.data];
-                }
-                onError(null, options);
+                onError(local._onErrorJsonapiError(error), local._onErrorJsonapiData(data));
             };
+        };
+
+        local.swgg.serverRespondJsonapi = function (request, response, error, data) {
+            /*
+             * this function will respond in jsonapi format
+             * http://jsonapi.org/format/#errors
+             * http://jsonapi.org/format/#document-structure-resource-objects
+             */
+            local.swgg.onErrorJsonapi(function (error, data) {
+                local.utility2.serverRespondHeadSet(
+                    request,
+                    response,
+                    error && error.statusCode,
+                    { 'Content-Type': 'application/json; charset=UTF-8' }
+                );
+                if (error) {
+                    // debug statusCode / method / url
+                    local.utility2.errorMessagePrepend(error, response.statusCode + ' ' +
+                        request.method + ' ' + request.url + '\n');
+                    // print error.stack to stderr
+                    local.utility2.onErrorDefault(error);
+                }
+                response.end(JSON.stringify(error || data));
+            })(error, data);
         };
 
         local.swgg.schemaDereference = function ($ref) {
@@ -490,20 +558,15 @@
                 assert(typeof data === 'object');
                 break;
             case 'string':
-                assert(typeof data === 'string');
+                assert(typeof data === 'string' || propertyDef.format === 'binary');
                 switch (propertyDef.format) {
                 // https://github.com/swagger-api/swagger-spec/issues/50
                 case 'byte':
                     assert(!(/[^\n\r\+\/0-9\=A-Za-z]/).test(data));
                     break;
                 case 'date':
-                    tmp = new Date(data);
-                    assert(tmp.getTime() && data === tmp.toISOString().slice(0, 10));
-                    break;
                 case 'date-time':
-                    tmp = new Date(data);
-                    assert(tmp.getTime() &&
-                        data.slice(0, 19) === tmp.toISOString().slice(0, 19));
+                    assert(isFinite(new Date(data).getTime()));
                     break;
                 case 'email':
                     assert(local.utility2.regexpEmailValidate.test(data));
@@ -534,12 +597,6 @@
                         return;
                     }
                     options.circularList.push(data);
-                }
-                // validate data
-                switch (options.key) {
-                // ignore undefined schema
-                case '#/definitions/Undefined':
-                    return;
                 }
                 local.utility2.assert(data && typeof data === 'object', 'invalid data ' + data);
                 schema = options.schema;
@@ -599,12 +656,12 @@
     case 'node':
         local.swgg.apiUpdate = function (options) {
             /*
-             * this function will update the api
+             * this function will update the swagger-api
              */
             var keyUnique, pathObject, tmp;
             options.definitions = options.definitions || {};
             options.paths = options.paths || {};
-            // init _pathObjectDefaultList
+            // init pathObjectDefaultList
             Object.keys(options.definitions).forEach(function (schemaName) {
                 var schema;
                 schema = options.definitions[schemaName];
@@ -635,21 +692,22 @@
                         }
                     } } }
                 }).replace((/\{\{_schemaName\}\}/g), schemaName)), 2);
-                // init crud-api
+                // init pathObject
                 (schema._pathObjectDefaultList || []).forEach(function (pathObject) {
                     keyUnique = (/ByKeyUnique\.(.*)/).exec(pathObject);
                     keyUnique = keyUnique && keyUnique[1];
                     pathObject = pathObject.replace('.' + keyUnique, '');
-                    pathObject = JSON.parse(local.swgg.cacheDict.pathObjectDefault[
-                        pathObject
-                    ]
+                    pathObject = JSON.parse(local.swgg.cacheDict
+                        .pathObjectDefault[pathObject]
                         .replace((/\{\{_keyUnique\}\}/g), keyUnique)
                         .replace((/\{\{_pathPrefix\}\}/g), schema._pathPrefix)
                         .replace((/\{\{_schemaName\}\}/g), schema._schemaName));
+                    // add _schemaName to pathObject
+                    pathObject._schemaName = schemaName;
                     options.paths[pathObject._path] = options.paths[pathObject._path] || {};
                     options.paths[pathObject._path][pathObject._method] = pathObject;
                 });
-                // init pathObject / schemaName
+                // init keyUnique / pathObject / schemaName
                 schema = options.definitions[schemaName] = JSON.parse(
                     JSON.stringify(schema)
                         .replace((/\{\{_keyUnique\}\}/g), keyUnique)
@@ -745,9 +803,9 @@
                 local.swgg.swaggerJson$$Dummy,
                 2
             ));
-            // init crud-api
+            // init SwaggerClient
             local.swgg.api = new local.swgg.SwaggerClient({
-                url: 'http://localhost:' + local.utility2.serverPortInit()
+                url: 'http://localhost:' + local.utility2.envDict.PORT
             });
             local.swgg.api.buildFromSpec(local.utility2.jsonCopy(local.swgg.swaggerJson));
         };
@@ -760,15 +818,7 @@
                 error = new Error('404 Not Found');
                 error.statusCode = 404;
             }
-            local.swgg.onErrorJsonapi(null, function (error) {
-                local.utility2.serverRespondHeadSet(request, response, error.statusCode, {});
-                // debug statusCode / method / url
-                local.utility2.errorMessagePrepend(error, response.statusCode + ' ' +
-                    request.method + ' ' + request.url + '\n');
-                // print error.stack to stderr
-                local.utility2.onErrorDefault(error);
-                response.end(JSON.stringify(error));
-            })(error);
+            local.swgg.serverRespondJsonapi(request, response, error);
         };
 
         local.swgg.middlewareBodyParse = function (request, response, nextMiddleware) {
@@ -798,17 +848,15 @@
             }, nextMiddleware);
         };
 
-        local.swgg.middlewareSwagger = function (request, response, nextMiddleware) {
+        local.swgg.middlewareValidate = function (request, response, nextMiddleware) {
             /*
-             * this function will run the main swagger-lite middleware
+             * this function will run the swagger-validation middleware
              */
             var modeNext, onNext, tmp;
             modeNext = 0;
-            onNext = function (error) {
+            onNext = function () {
                 local.utility2.testTryCatch(function () {
-                    modeNext = error
-                        ? Infinity
-                        : modeNext + 1;
+                    modeNext += 1;
                     switch (modeNext) {
                     case 1:
                         // if request.url is not prefixed with swaggerJson.basePath,
@@ -891,9 +939,6 @@
                             request.swggParamDict[paramDef.name] =
                                 request.swggParamDict[paramDef.name] || paramDef.default;
                         });
-                        onNext();
-                        break;
-                    case 3:
                         // normalize params
                         local.swgg.normalizeParamDictSwagger(request
                             .swggParamDict, request.swggPathObject);
@@ -906,7 +951,7 @@
                         onNext();
                         break;
                     default:
-                        nextMiddleware(error);
+                        nextMiddleware();
                     }
                 }, nextMiddleware);
             };
@@ -945,17 +990,12 @@
                 Array: { items: {}, type: 'array' },
                 // http://jsonapi.org/format/#errors
                 JsonapiError: {
-                    properties: {
-                        code: { type: 'string' },
-                        detail: { type: 'string' },
-                        id: { type: 'string' },
-                        message: { type: 'string' }
-                    }
                 },
                 // http://jsonapi.org/format/#document-structure-resource-objects
                 JsonapiResource: {
                     properties: {
-                        id: { type: 'string' }
+                        id: { type: 'string' },
+                        type: { type: 'string' }
                     }
                 },
                 // http://jsonapi.org/format/#document-structure-top-level
@@ -969,11 +1009,10 @@
                             items: { $ref: '#/definitions/JsonapiError' },
                             type: 'array'
                         },
-                        meta: { $ref: '#/definitions/Object' },
+                        meta: { type: 'object' },
                         statusCode: { type: 'integer' }
                     }
-                },
-                Object: { type: 'object' }
+                }
             },
             info: {
                 description: 'demo of swagger-lite crud-api',
@@ -1079,7 +1118,7 @@
                         '});' +
                     '}' +
                 '} catch (errorCaught) {' +
-                    'window.swgg.onErrorJsonapi(null, function (error) {' +
+                    'window.swgg.onErrorJsonapi(function (error) {' +
                         'obj.on.error({' +
                             'data: JSON.stringify(error),' +
                             'headers: { "Content-Type": "application/json" }' +

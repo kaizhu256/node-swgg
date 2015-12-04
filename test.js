@@ -77,7 +77,10 @@
             [{
                 url: '/_test/undefined'
             }, {
-                url: '/api/v0/_test/errorMiddleware'
+                url: '/api/v0/_test/onErrorJsonapiError'
+            }, {
+                method: 'POST',
+                url: '/api/v0/_test/paramDefault/aa?paramJson=syntax%20error'
             }, {
                 url: '/api/v0/_test/undefined'
             }].forEach(function (options) {
@@ -91,6 +94,26 @@
                 });
             });
             onParallel();
+        };
+
+        local.testCase_onErrorJsonapi_default = function (options, onError) {
+            /*
+             * this function will test onErrorJsonapi's default handling-behavior
+             */
+            // jslint-hack
+            local.utility2.nop(options);
+            local.utility2.ajax({
+                url: '/api/v0/_test/onErrorJsonapiDefault'
+            }, function (error, data) {
+                local.utility2.testTryCatch(function () {
+                    // validate no error occurred
+                    local.utility2.assert(!error, error);
+                    // validate data
+                    data = JSON.parse(data.responseText);
+                    local.utility2.assert(data.data[0].data === 'hello', data);
+                    onError();
+                }, onError);
+            });
         };
 
         local.testCase_ajax_validation = function (options, onError) {
@@ -118,10 +141,10 @@
                 onParallel.counter += 1;
                 local.utility2.ajax(options, function (error) {
                     local.utility2.testTryCatch(function () {
-                        // validate error
-                        local.utility2.assert(error && error.statusCode === 404, error);
                         // validate error occurred
                         local.utility2.assert(error, error);
+                        // validate error
+                        local.utility2.assert(error.statusCode === 404, error);
                         onParallel();
                     }, onParallel);
                 });
@@ -129,56 +152,77 @@
             onParallel();
         };
 
-        /* istanbul ignore next */
-        local.testCase2_validateByParamDefList_default = function (options, onError) {
+        local.testCase_validateByParamDefList_default = function (options, onError) {
             /*
              * this function will test validateByParamDefList's default handling-behavior
              */
-            var error;
             // jslint-hack
             local.utility2.nop(options);
-            [{
-                data: { body: { propRequired: true } },
-                key: 'crudCreateOne',
-                method: 'post'
-            }, {
-                data: { query: '{}' },
-                key: 'crudCountByQueryOne',
-                method: 'get'
-            }].forEach(function (options) {
-                options.paramDefList = local.swgg.swaggerJson
-                    .paths['/_test/' + options.key][options.method]
-                    .parameters;
-                local.swgg.validateByParamDefList(options);
+            local.swgg.api._test.paramDefault({
+                id: 'test_' + local.utility2.uuidTime(),
+                // test array-csv-param handling-behavior
+                paramArrayCsv: 'aa,bb',
+                // test array-pipes-param handling-behavior
+                paramArrayPipes: 'aa|bb',
+                // test array-ssv-param handling-behavior
+                paramArraySsv: 'aa bb',
+                // test array-tsv-param handling-behavior
+                paramArrayTsv: 'aa\tbb',
+                // test body-param handling-behavior
+                paramBody: 'hello body',
+                // test header-param handling-behavior
+                paramHeader: 'hello header',
+                // test json-param handling-behavior
+                paramJson: '1',
+                // test path-param handling-behavior
+                paramPath: 'hello path',
+                // test required-param handling-behavior
+                paramRequired: 'hello required'
+            }, { modeErrorData: true }, function (error, data) {
+                local.utility2.testTryCatch(function () {
+                    // validate no error occurred
+                    local.utility2.assert(!error, error);
+                    // validate object
+                    data = local.utility2.jsonStringifyOrdered(data.obj.data[0]);
+                    local.utility2.assert(data === JSON.stringify({
+                        paramArrayCsv: ['aa', 'bb'],
+                        paramArrayPipes: ['aa', 'bb'],
+                        paramArraySsv: ['aa', 'bb'],
+                        paramArrayTsv: ['aa', 'bb'],
+                        paramBody: 'hello body',
+                        paramHeader: 'hello header',
+                        paramJson: '1',
+                        paramPath: 'hello path',
+                        paramRequired: 'hello required'
+                    }), data);
+                    onError();
+                }, onError);
             });
-            // test validateByParamDefList's error handling-behavior
-            [{
-                data: { body: { propRequired: null } },
-                key: 'crudCreateOne',
-                method: 'post'
-            }, {
-                data: { query: 'syntax error' },
-                key: 'crudCountByQueryOne',
-                method: 'get'
-            }].forEach(function (options) {
-                try {
-                    error = null;
-                    options.paramDefList = local.swgg.swaggerJson
-                        .paths['/_test/' + options.key][options.method]
-                        .parameters;
-                    local.swgg.validateByParamDefList(options);
-                } catch (errorCaught) {
-                    error = errorCaught;
-                }
-                // validate error occurred
-                local.utility2.assert(error, error);
+        };
+
+        local.testCase_validateByParamDefList_formData = function (options, onError) {
+            /*
+             * this function will test validateByParamDefList's formData handling-behavior
+             */
+            // jslint-hack
+            local.utility2.nop(options);
+            local.swgg.api._test.paramFormData({
+                id: 'test_' + local.utility2.uuidTime(),
+                paramFormData1: 'aa',
+                paramFormData2: 'bb'
+            }, { modeErrorData: true }, function (error, data) {
+                local.utility2.testTryCatch(function () {
+                    // validate no error occurred
+                    local.utility2.assert(!error, error);
+                    // validate object
+                    data = local.utility2.jsonStringifyOrdered(data.obj.data[0]);
+                    local.utility2.assert(data === JSON.stringify({
+                        paramFormData1: 'aa',
+                        paramFormData2: 'bb'
+                    }), data);
+                    onError();
+                }, onError);
             });
-            // test validateByPropertyDef's circular-reference handling-behavior
-            local.swgg.validateByPropertyDef({
-                data: { propObject: {} },
-                propertyDef: { propObject: { type: 'object' } }
-            });
-            onError();
         };
 
         local.testCase_validateBySchema_default = function (options, onError) {
@@ -273,7 +317,7 @@
                     error = errorCaught;
                 }
                 // validate error occurred
-                local.utility2.assert(error, error);
+                local.utility2.assert(error, element);
             });
             onError();
         };
@@ -357,7 +401,7 @@
             definitions: {
                 // init TestCrudModel schema
                 TestCrudModel: {
-                    // init default crud-api
+                    // init _pathObjectDefaultList
                     _pathObjectDefaultList: [
                         'crudCountManyByQuery',
                         'crudCreateOne',
@@ -397,28 +441,142 @@
                             { default: 'null', format: 'json', type: 'string' },
                         propUndefined: {}
                     },
-                    required: ['propRequired'],
-                    'x-inheritList': [{ $ref: '#/definitions/JsonapiResource' }]
+                    required: ['propRequired']
                 },
                 // init TestNullModel schema
                 TestNullModel: {}
             },
             paths: {
-                // test midddleware-error handling-behavior
-                '/_test/errorMiddleware': { get: {
-                    operationId: 'errorMiddleware',
+                // test onErrorJsonapi's default handling-behavior
+                '/_test/onErrorJsonapiDefault': { get: {
+                    operationId: 'onErrorJsonapiDefault',
+                    tags: ['_test']
+                } },
+                // test onErrorJsonapi's error handling-behavior
+                '/_test/onErrorJsonapiError': { get: {
+                    operationId: 'onErrorJsonapiError',
+                    tags: ['_test']
+                } },
+                // test default-param handling-behavior
+                '/_test/paramDefault/{paramPath}': { post: {
+                    operationId: 'paramDefault',
+                    parameters: [{
+                        // test array-csv-param handling-behavior
+                        collectionFormat: 'csv',
+                        description: 'csv-array param',
+                        in: 'query',
+                        items: { type: 'string' },
+                        name: 'paramArrayCsv',
+                        type: 'array'
+                    }, {
+                        // test array-pipes-param handling-behavior
+                        collectionFormat: 'pipes',
+                        description: 'pipes-array param',
+                        in: 'query',
+                        items: { type: 'string' },
+                        name: 'paramArrayPipes',
+                        type: 'array'
+                    }, {
+                        // test array-ssv-param handling-behavior
+                        collectionFormat: 'ssv',
+                        description: 'ssv-array param',
+                        in: 'query',
+                        items: { type: 'string' },
+                        name: 'paramArraySsv',
+                        type: 'array'
+                    }, {
+                        // test array-tsv-param handling-behavior
+                        collectionFormat: 'tsv',
+                        description: 'tsv-array param',
+                        in: 'query',
+                        items: { type: 'string' },
+                        name: 'paramArrayTsv',
+                        type: 'array'
+                    }, {
+                        // test body-param handling-behavior
+                        description: 'body',
+                        in: 'body',
+                        name: 'paramBody',
+                        schema: { format: 'binary', type: 'string' }
+                    }, {
+                        // test header-param handling-behavior
+                        description: 'header param',
+                        in: 'header',
+                        name: 'paramHeader',
+                        type: 'string'
+                    }, {
+                        // test json-param handling-behavior
+                        description: 'json param',
+                        format: 'json',
+                        in: 'query',
+                        name: 'paramJson',
+                        type: 'string'
+                    }, {
+                        // test optional-param handling-behavior
+                        description: 'optional param',
+                        in: 'query',
+                        name: 'paramOptional',
+                        type: 'string'
+                    }, {
+                        // test path-param handling-behavior
+                        description: 'path param',
+                        in: 'path',
+                        name: 'paramPath',
+                        required: true,
+                        type: 'string'
+                    }, {
+                        // test required-param handling-behavior
+                        description: 'required param',
+                        in: 'query',
+                        name: 'paramRequired',
+                        required: true,
+                        type: 'string'
+                    }],
+                    summary: 'test default-param handling-behavior',
+                    tags: ['_test']
+                } },
+                // test form-data-param handling-behavior
+                '/_test/paramFormData': { post: {
+                    operationId: 'paramFormData',
+                    parameters: [{
+                        description: 'form-data param 1',
+                        in: 'formData',
+                        name: 'paramFormData1',
+                        required: true,
+                        type: 'string'
+                    }, {
+                        description: 'form-data param 2',
+                        in: 'formData',
+                        name: 'paramFormData2',
+                        required: true,
+                        type: 'string'
+                    }],
+                    summary: 'echo request params back to client',
                     tags: ['_test']
                 } }
             },
             _tagDict: { _test: { description: 'internal test-api' } }
         });
+        // test redundant http-body-parse-middleware handling-behavior
+        local.middleware.middlewareList.push(local.swgg.middlewareBodyParse);
         // init test-middleware
         local.middleware.middlewareList.push(function (request, response, nextMiddleware) {
-            // jslint-hack
-            local.utility2.nop(response);
+            local.request = request;
+            local.response = response;
             switch (request.swggPathname) {
-            case 'GET /_test/errorMiddleware':
-                nextMiddleware(new Error('dummy error'));
+            case 'GET /_test/onErrorJsonapiDefault':
+                // test redundant onErrorJsonapi handling-behavior
+                local.swgg.onErrorJsonapi(function (error, data) {
+                    local.swgg.serverRespondJsonapi(request, response, error, data);
+                })(null, 'hello');
+                break;
+            case 'GET /_test/onErrorJsonapiError':
+                // test redundant onErrorJsonapi handling-behavior
+                local.swgg.onErrorJsonapi(nextMiddleware)('string error');
+                break;
+            case 'POST /_test/paramDefault/':
+            case 'POST /_test/paramFormData':
+                local.swgg.serverRespondJsonapi(request, response, null, request.swggParamDict);
                 break;
             default:
                 nextMiddleware();

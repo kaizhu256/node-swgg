@@ -53,7 +53,7 @@ this node script will serve a lightweight standalone swagger-ui server backed by
 instruction
     1. save this script as example.js
     2. run the shell command:
-          $ npm install swagger-lite && npm_config_server_port=1337 node example.js
+          $ npm install swagger-lite && PORT=1337 node example.js
     3. open a browser to http://localhost:1337
     4. interact with the swagger-ui crud-api
 */
@@ -107,8 +107,6 @@ instruction
         });
         // init utility2
         local.utility2 = local.swgg.local.utility2;
-        // init onReady
-        local.utility2.onReadyInit();
     }());
     switch (local.modeJs) {
 
@@ -225,8 +223,8 @@ instruction
                 response.setHeader('Content-Type', 'application/json; charset=UTF-8');
                 nextMiddleware();
             },
-            // init swagger middleware
-            local.swgg.middlewareSwagger
+            // init swagger-validation middleware
+            local.swgg.middlewareValidate
         ]);
         // init error-middleware
         local.middlewareError = local.swgg.middlewareError;
@@ -276,11 +274,11 @@ instruction
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "swagger-ui-lite": "2015.11.4",
-        "utility2": "2015.11.10"
+        "utility2": "2015.11.13"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
-        "electron-lite": "2015.10.5"
+        "electron-lite": "2015.11.1"
     },
     "engines": { "node": ">=4.2" },
     "keywords": [
@@ -304,19 +302,25 @@ instruction
         "build-doc": "node_modules/.bin/utility2 shRun shReadmeExportPackageJson && \
 node_modules/.bin/utility2 shRun shDocApiCreate \"{\
 exampleFileList:['example.js','test.js','index.js'],\
-moduleDict:{'swagger-lite':{aliasList:['swgg'],exports:require('./index.js')}}\
+moduleDict:{\
+'swagger-lite':{aliasList:['swgg'],exports:require('./index.js')},\
+'swagger-lite.api':{aliasList:['api'],exports:require('./index.js').api}\
+}\
 }\"",
-        "start": "npm_config_mode_auto_restart=1 node_modules/.bin/utility2 shRun shIstanbulCover node test.js",
+        "start": "PORT=${PORT:-8080} npm_config_mode_auto_restart=1 \
+node_modules/.bin/utility2 shRun shIstanbulCover node test.js",
         "test": "node_modules/.bin/utility2 shRun shReadmeExportPackageJson && \
+PORT=$(node_modules/.bin/utility2 shServerPortRandom) \
 node_modules/.bin/utility2 test node test.js"
     },
-    "version": "2015.11.6"
+    "version": "2015.11.7"
 }
 ```
 
 
 
 # todo
+- add nedb backend
 - add logging feature
 - add cached version crudGetManyByQueryCached
 - add swggUserLoginTokenCapped
@@ -327,13 +331,11 @@ node_modules/.bin/utility2 test node test.js"
 
 
 
-# change since a3e23a60
-- npm publish 2015.11.6
-- rename crudApi to pathObjectDefault
-- rename uniqueKey to keyUnique
-- rename methodPath to pathObject
-- rename swlt to swgg
-- rename tagName to pathPrefix
+# change since fb605776
+- npm publish 2015.11.7
+- add function swgg.serverRespondJsonapi
+- remove #/definitions/Object and #/definitions/Undefined
+- add _schemaName to pathObject
 - none
 
 
@@ -387,5 +389,5 @@ MODE_BUILD=gitLsTree shRunScreenCapture shGitLsTree || exit $?
 MODE_BUILD=gitLog shRunScreenCapture git log -50 --pretty="%ai\u000a%B" || exit $?
 # upload build-artifacts to github, and if number of commits > 16, then squash older commits
 COMMIT_LIMIT=16 shBuildGithubUpload || exit $?
-exit $EXIT_CODE
+exit "$EXIT_CODE"
 ```
