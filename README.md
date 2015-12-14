@@ -6,11 +6,17 @@ lightweight standalone swagger-ui server backed by nedb
 
 
 
+# live test-server
+[![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.herokuDeploy.browser..png)](https://hrku01-swagger-lite-beta.herokuapp.com)
+
+
+
 # build-status [![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swagger-lite.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
 [![build commit status](https://kaizhu256.github.io/node-swagger-lite/build/build.badge.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
 
 | git-branch : | [master](https://github.com/kaizhu256/node-swagger-lite/tree/master) | [beta](https://github.com/kaizhu256/node-swagger-lite/tree/beta) | [alpha](https://github.com/kaizhu256/node-swagger-lite/tree/alpha)|
 |--:|:--|:--|:--|
+| test-server : | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-master.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-beta.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-alpha.herokuapp.com)|
 | test-report : | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.html)|
 | coverage : | [![istanbul-lite coverage](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.html/index.html) | [![istanbul-lite coverage](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.html/index.html) | [![istanbul-lite coverage](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.html/index.html)|
 | build-artifacts : | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..master..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..beta..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..alpha..travis-ci.org)|
@@ -78,7 +84,7 @@ instruction
     (function () {
         // init local
         local = {};
-        // init js-env
+        // init modeJs
         local.modeJs = (function () {
             try {
                 return module.exports &&
@@ -187,11 +193,7 @@ instruction
             ''
         );
         local.utility2.cacheDict.assets['/assets/example.js'] =
-            local.utility2.istanbulInstrumentInPackage(
-                local.fs.readFileSync(__dirname + '/example.js', 'utf8'),
-                __dirname + '/example.js',
-                'swagger-lite'
-            );
+            local.fs.readFileSync(__dirname + '/example.js', 'utf8');
         local.utility2.cacheDict.assets['/test/test.js'] =
             local.utility2.istanbulInstrumentInPackage(
                 local.fs.readFileSync(local.swgg.__dirname + '/test.js', 'utf8'),
@@ -205,7 +207,7 @@ instruction
             // init cached-assets middleware
             local.utility2.middlewareAssetsCached,
             // init http-body-get middleware
-            local.utility2.middlewareBodyGet,
+            local.utility2.middlewareBodyRead,
             // init http-body-parse middleware
             local.swgg.middlewareBodyParse,
             // init swagger pre-middleware
@@ -252,7 +254,7 @@ instruction
 [![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.testExampleJs.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
 
 #### output from electron-lite
-[![screen-capture](screen-capture.testExampleJs.browser..png)](https://hrku01-swagger-lite-beta.herokuapp.com)
+[![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.testExampleJs.browser..png)](https://hrku01-swagger-lite-beta.herokuapp.com)
 
 
 
@@ -273,8 +275,8 @@ instruction
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "swagger-ui-lite": "2015.11.4",
-        "utility2": "2015.11.13"
+        "swagger-ui-lite": "2015.11.7",
+        "utility2": "2015.11.16"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -299,9 +301,10 @@ instruction
     },
     "scripts": {
         "build-ci": "node_modules/.bin/utility2 shRun shReadmeBuild",
-        "build-doc": "node_modules/.bin/utility2 shRun shReadmeExportPackageJson && \
-node_modules/.bin/utility2 shRun shDocApiCreate \"{\
-exampleFileList:['example.js','test.js','index.js'],\
+        "build-doc": "MODE_LINENO=0 \
+node_modules/.bin/utility2 shRun shReadmeExportFile package.json package.json && \
+node_modules/.bin/utility2 shRun shDocApiCreate \"module.exports={\
+exampleFileList:['README.md','test.js','index.js'],\
 moduleDict:{\
 'swagger-lite':{aliasList:['swgg'],exports:require('./index.js')},\
 'swagger-lite.api':{aliasList:['api'],exports:require('./index.js').api}\
@@ -309,11 +312,12 @@ moduleDict:{\
 }\"",
         "start": "PORT=${PORT:-8080} npm_config_mode_auto_restart=1 \
 node_modules/.bin/utility2 shRun shIstanbulCover node test.js",
-        "test": "node_modules/.bin/utility2 shRun shReadmeExportPackageJson && \
+        "test": "MODE_LINENO=0 \
+node_modules/.bin/utility2 shRun shReadmeExportFile package.json package.json && \
 PORT=$(node_modules/.bin/utility2 shServerPortRandom) \
 node_modules/.bin/utility2 test node test.js"
     },
-    "version": "2015.11.7"
+    "version": "2015.11.8"
 }
 ```
 
@@ -326,16 +330,20 @@ node_modules/.bin/utility2 test node test.js"
 - add swggUserLoginTokenCapped
 - re-enable user login/logout
 - test /user/login and /user/logout
+- add enum validation
 - add max / min validation
 - none
 
 
 
-# change since fb605776
-- npm publish 2015.11.7
-- add function swgg.serverRespondJsonapi
-- remove #/definitions/Object and #/definitions/Undefined
-- add _schemaName to pathObject
+# change since 644ff074
+- npm publish 2015.11.8
+- move most of node js-env code to shared js-env
+- working nedb interface
+- deployed heroku test-server
+- wiggle frontend input during validation error
+- update to uglified swagger-ui-lite
+- remove #/definitions/JsonapiResource and #/definitions/JsonapiError
 - none
 
 
@@ -363,10 +371,10 @@ shBuild() {
     # run npm-test on published package
     shRun shNpmTestPublished || return $?
 
-    # test example js script
-    export npm_config_timeout_exit=10000 || return $?
-    MODE_BUILD=testExampleJs shRunScreenCapture shReadmeTestJs example.js || return $?
-    unset npm_config_timeout_exit || return $?
+    #!! # test example js script
+    #!! export npm_config_timeout_exit=10000 || return $?
+    #!! MODE_BUILD=testExampleJs shRunScreenCapture shReadmeTestJs example.js || return $?
+    #!! unset npm_config_timeout_exit || return $?
 
     # run npm-test
     MODE_BUILD=npmTest shRunScreenCapture npm test --mode-coverage || return $?
@@ -377,7 +385,18 @@ shBuild() {
     # if running legacy-node, then do not continue
     [ "$(node --version)" \< "v5.0" ] && exit
 
-    true
+    if [ "$CI_BRANCH" = alpha ] ||
+        [ "$CI_BRANCH" = beta ] ||
+        [ "$CI_BRANCH" = master ]
+    then
+        # deploy app to heroku
+        shRun shHerokuDeploy "hrku01-$npm_package_name-$CI_BRANCH" || return $?
+        # test deployed app to heroku
+        TEST_URL="https://hrku01-$npm_package_name-$CI_BRANCH.herokuapp.com" || return $?
+        TEST_URL="$TEST_URL?modeTest=consoleLogResult&timeExit={{timeExit}}" || return $?
+        MODE_BUILD=herokuTest modeBrowserTest=test modeTestAdd=1 \
+            url="$TEST_URL" shBrowserTest || return $?
+    fi
 }
 shBuild
 

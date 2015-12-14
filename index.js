@@ -18,7 +18,7 @@
     (function () {
         // init local
         local = {};
-        // init js-env
+        // init modeJs
         local.modeJs = (function () {
             try {
                 return module.exports &&
@@ -81,13 +81,35 @@
                 summary: 'create one {{_schemaName}} object',
                 tags: ['{{_pathPrefix}}']
             },
+            crudCreateOrReplaceOne: {
+                _method: 'put',
+                _path: '/{{_pathPrefix}}/crudCreateOrReplaceOne',
+                _pathPrefix: '{{_pathPrefix}}',
+                operationId: 'crudCreateOrReplaceOne',
+                parameters: [{
+                    description: '{{_schemaName}} object',
+                    in: 'body',
+                    name: 'body',
+                    required: true,
+                    schema: { $ref: '#/definitions/{{_schemaName}}' }
+                }],
+                responses: {
+                    200: {
+                        description:
+                            '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                        schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    }
+                },
+                summary: 'create or replace one {{_schemaName}} object',
+                tags: ['{{_pathPrefix}}']
+            },
             crudDeleteManyByQuery: {
                 _method: 'delete',
                 _path: '/{{_pathPrefix}}/crudDeleteManyByQuery',
                 _pathPrefix: '{{_pathPrefix}}',
                 operationId: 'crudDeleteManyByQuery',
                 parameters: [{
-                    default: '{"{{_keyUnique}}":{"$in":["{{_keyUnique}}0","{{_keyUnique}}1"]}}',
+                    default: '{"{{_keyUnique}}":"{{_keyUnique}}1"}',
                     description: 'query param',
                     format: 'json',
                     in: 'query',
@@ -171,7 +193,7 @@
                     name: 'skip',
                     type: 'integer'
                 }, {
-                    default: '{"_timeModified":-1}',
+                    default: '{}',
                     description: 'cursor sort param',
                     format: 'json',
                     in: 'query',
@@ -186,6 +208,37 @@
                     }
                 },
                 summary: 'get many {{_schemaName}} objects by query',
+                tags: ['{{_pathPrefix}}']
+            },
+            crudGetOneByQuery: {
+                _method: 'get',
+                _path: '/{{_pathPrefix}}/crudGetOneByQuery',
+                _pathPrefix: '{{_pathPrefix}}',
+                operationId: 'crudGetOneByQuery',
+                parameters: [{
+                    default: '{"{{_keyUnique}}":"{{_keyUnique}}1"}',
+                    description: 'query param',
+                    format: 'json',
+                    in: 'query',
+                    name: 'query',
+                    required: true,
+                    type: 'string'
+                }, {
+                    default: '{}',
+                    description: 'fields param',
+                    format: 'json',
+                    in: 'query',
+                    name: 'fields',
+                    type: 'string'
+                }],
+                responses: {
+                    200: {
+                        description:
+                            '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                        schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    }
+                },
+                summary: 'get one {{_schemaName}} object by query',
                 tags: ['{{_pathPrefix}}']
             },
             crudGetOneByKeyUnique: {
@@ -240,12 +293,19 @@
                 summary: 'update one {{_schemaName}} object by {{_keyUnique}}',
                 tags: ['{{_pathPrefix}}']
             },
-            crudUpsertOne: {
+            crudUpsertOneByKeyUnique: {
+                _keyUnique: '{{_keyUnique}}',
                 _method: 'put',
-                _path: '/{{_pathPrefix}}/crudUpsertOne',
+                _path: '/{{_pathPrefix}}/crudUpsertOneByKeyUnique/{{{_keyUnique}}}',
                 _pathPrefix: '{{_pathPrefix}}',
-                operationId: 'crudReplaceOneBy',
+                operationId: 'crudUpsertOneByKeyUnique.{{_keyUnique}}',
                 parameters: [{
+                    description: '{{_schemaName}} {{_keyUnique}}',
+                    in: 'path',
+                    name: '{{_keyUnique}}',
+                    required: true,
+                    type: 'string'
+                }, {
                     description: '{{_schemaName}} object',
                     in: 'body',
                     name: 'body',
@@ -259,11 +319,11 @@
                         schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
                     }
                 },
-                summary: 'upsert one {{_schemaName}} object',
+                summary: 'upsert one {{_schemaName}} object by {{_keyUnique}}',
                 tags: ['{{_pathPrefix}}']
             }
         };
-        // JSON.stringify pathObject to prevent side-effects
+        // jsonCopy object to prevent side-effects
         Object.keys(local.swgg.cacheDict.pathObjectDefault).forEach(function (key) {
             local.swgg.cacheDict.pathObjectDefault[key] =
                 JSON.stringify(local.swgg.cacheDict.pathObjectDefault[key]);
@@ -274,386 +334,6 @@
 
     // run shared js-env code
     (function () {
-        local.swgg.normalizeParamDictSwagger = function (data, pathObject) {
-            /*
-             * this function will parse the data according to pathObject.parameters
-             */
-            var tmp;
-            pathObject.parameters.forEach(function (paramDef) {
-                tmp = data[paramDef.name];
-                // init default value
-                if (tmp === undefined) {
-                    // jsonCopy object to prevent side-effects
-                    data[paramDef.name] = local.utility2.jsonCopy(paramDef.default);
-                }
-                // parse csv array
-                if (paramDef.type === 'array' &&
-                        paramDef.collectionFormat &&
-                        typeof tmp === 'string') {
-                    switch (paramDef.collectionFormat) {
-                    case 'csv':
-                        tmp = tmp.split(',');
-                        break;
-                    case 'pipes':
-                        tmp = tmp.split('|');
-                        break;
-                    case 'ssv':
-                        tmp = tmp.split(' ');
-                        break;
-                    case 'tsv':
-                        tmp = tmp.split('\t');
-                        break;
-                    }
-                }
-                // JSON.parse swggParamDict
-                if (paramDef.type !== 'string' &&
-                        (typeof tmp === 'string' ||
-                        (local.modeJs === 'node' && Buffer.isBuffer(tmp)))) {
-                    try {
-                        tmp = JSON.parse(tmp);
-                    } catch (ignore) {
-                    }
-                }
-                data[paramDef.name] = tmp;
-            });
-            return data;
-        };
-
-        local._onErrorJsonapiData = function (data) {
-            /*
-             * this function will normalize the data to jsonapi format,
-             * http://jsonapi.org/format/#document-structure-resource-objects
-             */
-            if (data && data.meta && data.meta.isJsonapiResponse) {
-                return data;
-            }
-            if (!Array.isArray(data)) {
-                data = [data];
-            }
-            if (!data.length) {
-                data.push({});
-            }
-            data = data.map(function (element) {
-                if (!(element && typeof element === 'object')) {
-                    element = { data: String(element) };
-                }
-                return element;
-            });
-            return { data: data, meta: { isJsonapiResponse: true } };
-        };
-
-        local._onErrorJsonapiError = function (error) {
-            /*
-             * this function will normalize the error to jsonapi format,
-             * http://jsonapi.org/format/#errors
-             */
-            var data;
-            data = error;
-            if (!data || (data && data.meta && data.meta.isJsonapiResponse)) {
-                return data;
-            }
-            if (!Array.isArray(data)) {
-                data = [data];
-            }
-            if (!data.length) {
-                data.push({});
-            }
-            data = data.map(function (element) {
-                if (!(element && typeof element === 'object')) {
-                    element = { message: String(element) };
-                }
-                error = local.utility2.jsonCopy(element);
-                // copy error fields over from error object
-                [
-                    // jsonapi error fields
-                    // http://jsonapi.org/format/#error-objects
-                    'code',
-                    'detail',
-                    'id',
-                    'links',
-                    'meta',
-                    'source',
-                    'status',
-                    'title',
-                    // custom error fields
-                    'message',
-                    'name',
-                    'stack',
-                    'statusCode'
-                ].forEach(function (key) {
-                    error[key] = element[key];
-                });
-                error.message = error.title = error.message || error.title;
-                error.status = error.statusCode =
-                    Number(error.status) || Number(error.statusCode) || 500;
-                error = local.utility2.objectSetOverride(error, {
-                    status: String(error.status),
-                    code: String(error.code || error.status),
-                    detail: String(error.detail || error.stack),
-                    title: String(error.title || error.message)
-                });
-                return error;
-            });
-            error = local.utility2.jsonCopy(data[0]);
-            error.errors = data;
-            error.meta = { isJsonapiResponse: true };
-            return error;
-        };
-
-        local.swgg.onErrorJsonapi = function (onError) {
-            /*
-             * this function will normalize the error and data to jsonapi format,
-             * http://jsonapi.org/format/#errors
-             * http://jsonapi.org/format/#document-structure-resource-objects
-             * and pass them to onError
-             */
-            return function (error, data) {
-                onError(local._onErrorJsonapiError(error), local._onErrorJsonapiData(data));
-            };
-        };
-
-        local.swgg.serverRespondJsonapi = function (request, response, error, data) {
-            /*
-             * this function will respond in jsonapi format
-             * http://jsonapi.org/format/#errors
-             * http://jsonapi.org/format/#document-structure-resource-objects
-             */
-            local.swgg.onErrorJsonapi(function (error, data) {
-                local.utility2.serverRespondHeadSet(
-                    request,
-                    response,
-                    error && error.statusCode,
-                    { 'Content-Type': 'application/json; charset=UTF-8' }
-                );
-                if (error) {
-                    // debug statusCode / method / url
-                    local.utility2.errorMessagePrepend(error, response.statusCode + ' ' +
-                        request.method + ' ' + request.url + '\n');
-                    // print error.stack to stderr
-                    local.utility2.onErrorDefault(error);
-                }
-                response.end(JSON.stringify(error || data));
-            })(error, data);
-        };
-
-        local.swgg.schemaDereference = function ($ref) {
-            /*
-             * this function will try to dereference the schema from $ref
-             */
-            try {
-                return ((local.global.swaggerUi &&
-                    local.global.swaggerUi.api &&
-                    local.global.swaggerUi.api.swaggerJson) ||
-                    local.swgg.swaggerJson)
-                    .definitions[(/^\#\/definitions\/(\w+)$/).exec($ref)[1]];
-            } catch (ignore) {
-            }
-        };
-
-        local.swgg.validateByParamDefList = function (options) {
-            /*
-             * this function will validate options.data against options.paramDefList
-             */
-            var data, key;
-            try {
-                data = options.data;
-                // validate data
-                local.utility2.assert(data && typeof data === 'object', data);
-                (options.paramDefList || []).forEach(function (paramDef) {
-                    key = paramDef.name;
-                    local.swgg.validateByPropertyDef({
-                        data: data[key],
-                        key: key,
-                        propertyDef: paramDef,
-                        required: paramDef.required
-                    });
-                });
-            } catch (errorCaught) {
-                local.utility2.errorMessagePrepend(errorCaught, '"' + options.key + '.' + key +
-                    '" - ');
-                throw errorCaught;
-            }
-        };
-
-        local.swgg.validateByPropertyDef = function (options) {
-            /*
-             * this function will validate options.data against options.propertyDef
-             */
-            var assert, data, propertyDef, tmp;
-            assert = function (valid) {
-                if (!valid) {
-                    throw new Error('invalid "' + options.key + ':' + (propertyDef.format ||
-                        propertyDef.type) + '" property - ' + JSON.stringify(data));
-                }
-            };
-            data = options.data;
-            propertyDef = options.propertyDef;
-            // validate undefined data
-            if (data === null || data === undefined) {
-                if (options.required) {
-                    throw new Error('required "' + options.key + ':' + (propertyDef.format ||
-                        propertyDef.type) + '" property cannot be null or undefined');
-                }
-                return;
-            }
-            // validate schema
-            tmp = propertyDef.$ref || (propertyDef.schema && propertyDef.schema.$ref);
-            if (tmp) {
-                local.swgg.validateBySchema({
-                    circularList: options.circularList,
-                    data: data,
-                    key: tmp,
-                    schema: local.swgg.schemaDereference(tmp)
-                });
-                return;
-            }
-            // init circularList
-            if (data && typeof data === 'object') {
-                options.circularList = options.circularList || [];
-                if (options.circularList.indexOf(data) >= 0) {
-                    return;
-                }
-                options.circularList.push(data);
-            }
-            // validate propertyDef embedded in propertyDef.schema.type
-            if (!propertyDef.type && propertyDef.schema && propertyDef.schema.type) {
-                propertyDef = propertyDef.schema;
-            }
-            // validate propertyDef.type
-            // https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md
-            // #data-types
-            switch (propertyDef.type) {
-            case 'array':
-                assert(Array.isArray(data) && propertyDef.items);
-                // recurse - validate elements in list
-                data.forEach(function (element) {
-                    local.swgg.validateByPropertyDef({
-                        circularList: options.circularList,
-                        data: element,
-                        key: options.key,
-                        propertyDef: propertyDef.items
-                    });
-                });
-                break;
-            case 'boolean':
-                assert(typeof data === 'boolean');
-                break;
-            case 'integer':
-                assert(typeof data === 'number' && isFinite(data) && (data | 0) === data);
-                switch (propertyDef.format) {
-                case 'int32':
-                case 'int64':
-                    break;
-                }
-                break;
-            case 'number':
-                assert(typeof data === 'number' && isFinite(data));
-                switch (propertyDef.format) {
-                case 'double':
-                case 'float':
-                    break;
-                }
-                break;
-            case 'object':
-                assert(typeof data === 'object');
-                break;
-            case 'string':
-                assert(typeof data === 'string' || propertyDef.format === 'binary');
-                switch (propertyDef.format) {
-                // https://github.com/swagger-api/swagger-spec/issues/50
-                case 'byte':
-                    assert(!(/[^\n\r\+\/0-9\=A-Za-z]/).test(data));
-                    break;
-                case 'date':
-                case 'date-time':
-                    assert(isFinite(new Date(data).getTime()));
-                    break;
-                case 'email':
-                    assert(local.utility2.regexpEmailValidate.test(data));
-                    break;
-                case 'json':
-                    try {
-                        JSON.parse(data);
-                    } catch (errorCaught) {
-                        assert(null);
-                    }
-                    break;
-                }
-                break;
-            }
-        };
-
-        local.swgg.validateBySchema = function (options) {
-            /*
-             * this function will validate options.data against options.schema
-             */
-            var data, key, schema;
-            try {
-                data = options.data;
-                // init circularList
-                if (data && typeof data === 'object') {
-                    options.circularList = options.circularList || [];
-                    if (options.circularList.indexOf(data) >= 0) {
-                        return;
-                    }
-                    options.circularList.push(data);
-                }
-                local.utility2.assert(data && typeof data === 'object', 'invalid data ' + data);
-                schema = options.schema;
-                // validate schema
-                local.utility2.assert(
-                    schema && typeof schema === 'object',
-                    'invalid schema ' + schema
-                );
-                Object.keys(schema.properties || {}).forEach(function (_) {
-                    key = _;
-                    local.swgg.validateByPropertyDef({
-                        circularList: options.circularList,
-                        data: data[key],
-                        depth: options.depth - 1,
-                        key: key,
-                        propertyDef: schema.properties[key],
-                        required: schema.required && schema.required.indexOf(key) >= 0
-                    });
-                });
-            } catch (errorCaught) {
-                local.utility2.errorMessagePrepend(errorCaught, '"' + options.key + '.' + key +
-                    '" - ');
-                throw errorCaught;
-            }
-        };
-
-        local.swgg.validateBySwagger = function (options) {
-            /*
-             * this function will validate the entire swagger json object
-             */
-            local.swagger_tools.v2.validate(
-                // jsonCopy object to prevent side-effects
-                local.utility2.jsonCopy(options),
-                function (error, result) {
-                    // validate no error occurred
-                    local.utility2.assert(!error, error);
-                    ['errors', 'undefined', 'warnings'].forEach(function (errorType) {
-                        ((result && result[errorType]) || [
-                        ]).slice(0, 8).forEach(function (element) {
-                            console.error('swagger schema - ' + errorType.slice(0, -1) + ' - ' +
-                                element.code + ' - ' + element.message + ' - ' +
-                                JSON.stringify(element.path));
-                        });
-                    });
-                    error = result && result.errors && result.errors[0];
-                    // validate no error occurred
-                    local.utility2.assert(!error, new Error(error && error.message));
-                }
-            );
-        };
-    }());
-    switch (local.modeJs) {
-
-
-
-    // run node js-env code
-    case 'node':
         local.swgg.apiUpdate = function (options) {
             /*
              * this function will update the swagger-api
@@ -810,17 +490,6 @@
             local.swgg.api.buildFromSpec(local.utility2.jsonCopy(local.swgg.swaggerJson));
         };
 
-        local.swgg.middlewareError = function (error, request, response) {
-            /*
-             * this function will handle errors according to http://jsonapi.org/format/#errors
-             */
-            if (!error) {
-                error = new Error('404 Not Found');
-                error.statusCode = 404;
-            }
-            local.swgg.serverRespondJsonapi(request, response, error);
-        };
-
         local.swgg.middlewareBodyParse = function (request, response, nextMiddleware) {
             /*
              * this function will parse the request-body
@@ -828,6 +497,7 @@
             // jslint-hack
             local.utility2.nop(response);
             local.utility2.testTryCatch(function () {
+                // if request is already parsed, then goto nextMiddleware
                 if (request.swggBodyParsed) {
                     nextMiddleware();
                     return;
@@ -846,6 +516,17 @@
                 }
                 nextMiddleware();
             }, nextMiddleware);
+        };
+
+        local.swgg.middlewareError = function (error, request, response) {
+            /*
+             * this function will handle errors according to http://jsonapi.org/format/#errors
+             */
+            if (!error) {
+                error = new Error('404 Not Found');
+                error.statusCode = 404;
+            }
+            local.swgg.serverRespondJsonapi(request, response, error);
         };
 
         local.swgg.middlewareValidate = function (request, response, nextMiddleware) {
@@ -957,15 +638,345 @@
             };
             onNext();
         };
-        break;
-    }
+
+        local.swgg.normalizeParamDictSwagger = function (data, pathObject) {
+            /*
+             * this function will parse the data according to pathObject.parameters
+             */
+            var tmp;
+            pathObject.parameters.forEach(function (paramDef) {
+                tmp = data[paramDef.name];
+                // init default value
+                if (tmp === undefined) {
+                    // jsonCopy object to prevent side-effects
+                    data[paramDef.name] = local.utility2.jsonCopy(paramDef.default);
+                }
+                // parse csv array
+                if (paramDef.type === 'array' &&
+                        paramDef.collectionFormat &&
+                        typeof tmp === 'string') {
+                    switch (paramDef.collectionFormat) {
+                    case 'csv':
+                        tmp = tmp.split(',');
+                        break;
+                    case 'pipes':
+                        tmp = tmp.split('|');
+                        break;
+                    case 'ssv':
+                        tmp = tmp.split(' ');
+                        break;
+                    case 'tsv':
+                        tmp = tmp.split('\t');
+                        break;
+                    }
+                }
+                // JSON.parse swggParamDict
+                if (paramDef.type !== 'string' &&
+                        (typeof tmp === 'string' ||
+                        (local.modeJs === 'node' && Buffer.isBuffer(tmp)))) {
+                    try {
+                        tmp = JSON.parse(tmp);
+                    } catch (ignore) {
+                    }
+                }
+                data[paramDef.name] = tmp;
+            });
+            return data;
+        };
+
+        local.swgg.onErrorJsonapi = function (onError) {
+            /*
+             * this function will normalize the error and data to jsonapi format,
+             * http://jsonapi.org/format/#errors
+             * http://jsonapi.org/format/#document-structure-resource-objects
+             * and pass them to onError
+             */
+            return function (error, data) {
+                data = [error, data].map(function (data, ii) {
+                    // if no error occurred, then return
+                    if ((ii === 0 && !data) ||
+                            // if data is already normalized, then return it
+                            (data && data.meta && data.meta.isJsonapiResponse)) {
+                        return data;
+                    }
+                    // normalize data-list
+                    if (!Array.isArray(data)) {
+                        data = [data];
+                    }
+                    // normalize data-list to be non-empty
+                    if (!data.length) {
+                        data.push({});
+                    }
+                    // normalize data-list to contain non-null objects
+                    data = data.map(function (element) {
+                        if (!(element && typeof element === 'object')) {
+                            element = ii === 0
+                                ? { message: String(element) }
+                                : { data: String(element) };
+                        }
+                        // normalize error-object to plain json-object
+                        if (ii === 0) {
+                            error = local.utility2.jsonCopy(element);
+                            error.message = element.message;
+                            error.stack = element.stack;
+                            error.statusCode = Number(error.statusCode) || 500;
+                            return error;
+                        }
+                        return element;
+                    });
+                    if (ii === 0) {
+                        error = local.utility2.jsonCopy(data[0]);
+                        error.errors = data;
+                        error.meta = { isJsonapiResponse: true };
+                        return error;
+                    }
+                    return { data: data, meta: { isJsonapiResponse: true } };
+                });
+                onError(data[0], data[1]);
+            };
+        };
+
+        local.swgg.schemaDereference = function ($ref) {
+            /*
+             * this function will try to dereference the schema from $ref
+             */
+            try {
+                return ((local.global.swaggerUi &&
+                    local.global.swaggerUi.api &&
+                    local.global.swaggerUi.api.swaggerJson) || local.swgg.swaggerJson)
+                    .definitions[(/^\#\/definitions\/(\w+)$/).exec($ref)[1]];
+            } catch (ignore) {
+            }
+        };
+
+        local.swgg.serverRespondJsonapi = function (request, response, error, data) {
+            /*
+             * this function will respond in jsonapi format
+             * http://jsonapi.org/format/#errors
+             * http://jsonapi.org/format/#document-structure-resource-objects
+             */
+            local.swgg.onErrorJsonapi(function (error, data) {
+                local.utility2.serverRespondHeadSet(
+                    request,
+                    response,
+                    error && error.statusCode,
+                    { 'Content-Type': 'application/json; charset=UTF-8' }
+                );
+                if (error) {
+                    // debug statusCode / method / url
+                    local.utility2.errorMessagePrepend(error, response.statusCode + ' ' +
+                        request.method + ' ' + request.url + '\n');
+                    // print error.stack to stderr
+                    local.utility2.onErrorDefault(error);
+                }
+                response.end(JSON.stringify(error || data));
+            })(error, data);
+        };
+
+        local.swgg.validateByParamDefList = function (options) {
+            /*
+             * this function will validate options.data against options.paramDefList
+             */
+            var data, key;
+            try {
+                data = options.data;
+                // validate data
+                local.utility2.assert(data && typeof data === 'object', data);
+                (options.paramDefList || []).forEach(function (paramDef) {
+                    key = paramDef.name;
+                    local.swgg.validateByPropertyDef({
+                        data: data[key],
+                        key: key,
+                        propertyDef: paramDef,
+                        required: paramDef.required
+                    });
+                });
+            } catch (errorCaught) {
+                errorCaught.statusCode = errorCaught.statusCode || 400;
+                local.utility2.errorMessagePrepend(errorCaught, options.key + '.' + key +
+                    ' - ');
+                throw errorCaught;
+            }
+        };
+
+        local.swgg.validateByPropertyDef = function (options) {
+            /*
+             * this function will validate options.data against options.propertyDef
+             */
+            var data, propertyDef, tmp;
+            data = options.data;
+            propertyDef = options.propertyDef;
+            // validate undefined data
+            if (data === null || data === undefined) {
+                if (options.required) {
+                    throw new Error('required property ' + options.key + ':' +
+                        (propertyDef.format || propertyDef.type) +
+                        ' cannot be null or undefined');
+                }
+                return;
+            }
+            // validate schema
+            tmp = propertyDef.$ref || (propertyDef.schema && propertyDef.schema.$ref);
+            if (tmp) {
+                local.swgg.validateBySchema({
+                    circularList: options.circularList,
+                    data: data,
+                    key: tmp,
+                    schema: local.swgg.schemaDereference(tmp)
+                });
+                return;
+            }
+            // init circularList
+            if (data && typeof data === 'object') {
+                options.circularList = options.circularList || [];
+                if (options.circularList.indexOf(data) >= 0) {
+                    return;
+                }
+                options.circularList.push(data);
+            }
+            // validate propertyDef embedded in propertyDef.schema.type
+            if (!propertyDef.type && propertyDef.schema && propertyDef.schema.type) {
+                propertyDef = propertyDef.schema;
+            }
+            // validate propertyDef.type
+            // https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md
+            // #data-types
+            try {
+                switch (propertyDef.type) {
+                case 'array':
+                    local.utility2.assert(Array.isArray(data) && propertyDef.items);
+                    // recurse - validate elements in list
+                    data.forEach(function (element) {
+                        local.swgg.validateByPropertyDef({
+                            circularList: options.circularList,
+                            data: element,
+                            key: options.key,
+                            propertyDef: propertyDef.items
+                        });
+                    });
+                    break;
+                case 'boolean':
+                    local.utility2.assert(typeof data === 'boolean');
+                    break;
+                case 'integer':
+                    local.utility2.assert(typeof data === 'number' && isFinite(data) &&
+                        (data | 0) === data);
+                    switch (propertyDef.format) {
+                    case 'int32':
+                    case 'int64':
+                        break;
+                    }
+                    break;
+                case 'number':
+                    local.utility2.assert(typeof data === 'number' && isFinite(data));
+                    switch (propertyDef.format) {
+                    case 'double':
+                    case 'float':
+                        break;
+                    }
+                    break;
+                case 'object':
+                    local.utility2.assert(typeof data === 'object');
+                    break;
+                case 'string':
+                    local.utility2.assert(typeof data === 'string' ||
+                        propertyDef.format === 'binary');
+                    switch (propertyDef.format) {
+                    // https://github.com/swagger-api/swagger-spec/issues/50
+                    case 'byte':
+                        local.utility2.assert(!(/[^\n\r\+\/0-9\=A-Za-z]/).test(data));
+                        break;
+                    case 'date':
+                    case 'date-time':
+                        local.utility2.assert(isFinite(new Date(data).getTime()));
+                        break;
+                    case 'email':
+                        local.utility2.assert(local.utility2.regexpEmailValidate.test(data));
+                        break;
+                    case 'json':
+                        JSON.parse(data);
+                        break;
+                    }
+                    break;
+                }
+            } catch (errorCaught) {
+                throw new Error('invalid property ' + options.key + ':' + (propertyDef.format ||
+                    propertyDef.type) + ' - ' + JSON.stringify(data));
+            }
+        };
+
+        local.swgg.validateBySchema = function (options) {
+            /*
+             * this function will validate options.data against options.schema
+             */
+            var data, key, schema;
+            try {
+                data = options.data;
+                // init circularList
+                if (data && typeof data === 'object') {
+                    options.circularList = options.circularList || [];
+                    if (options.circularList.indexOf(data) >= 0) {
+                        return;
+                    }
+                    options.circularList.push(data);
+                }
+                local.utility2.assert(data && typeof data === 'object', 'invalid data ' + data);
+                schema = options.schema;
+                // validate schema
+                local.utility2.assert(
+                    schema && typeof schema === 'object',
+                    'invalid schema ' + schema
+                );
+                Object.keys(schema.properties || {}).forEach(function (_) {
+                    key = _;
+                    local.swgg.validateByPropertyDef({
+                        circularList: options.circularList,
+                        data: data[key],
+                        depth: options.depth - 1,
+                        key: key,
+                        propertyDef: schema.properties[key],
+                        required: schema.required && schema.required.indexOf(key) >= 0
+                    });
+                });
+            } catch (errorCaught) {
+                local.utility2.errorMessagePrepend(errorCaught, options.key + '.' + key +
+                    ' - ');
+                throw errorCaught;
+            }
+        };
+
+        local.swgg.validateBySwagger = function (options) {
+            /*
+             * this function will validate the entire swagger json object
+             */
+            local.swagger_tools.v2.validate(
+                // jsonCopy object to prevent side-effects
+                local.utility2.jsonCopy(options),
+                function (error, result) {
+                    // validate no error occurred
+                    local.utility2.assert(!error, error);
+                    ['errors', 'undefined', 'warnings'].forEach(function (errorType) {
+                        ((result && result[errorType]) || [
+                        ]).slice(0, 8).forEach(function (element) {
+                            console.error('swagger schema - ' + errorType.slice(0, -1) + ' - ' +
+                                element.code + ' - ' + element.message + ' - ' +
+                                JSON.stringify(element.path));
+                        });
+                    });
+                    error = result && result.errors && result.errors[0];
+                    // validate no error occurred
+                    local.utility2.assert(!error, new Error(error && error.message));
+                }
+            );
+        };
+    }());
     switch (local.modeJs) {
 
 
 
     // run browser js-env code
     case 'browser':
-        // export swagger-lite
+        // init exports
         window.swgg = local.swgg;
         break;
 
@@ -973,11 +984,13 @@
 
     // run node js-env code
     case 'node':
-        // export swagger-lite
+        // init exports
         module.exports = local.swgg;
         module.exports.__dirname = __dirname;
         // require modules
         local.fs = require('fs');
+        local.http = require('http');
+        local.https = require('https');
         local.path = require('path');
         local.swagger_tools = require('swagger-ui-lite/swagger-tools-standalone-min.js');
         local.swagger_ui = require('swagger-ui-lite');
@@ -988,25 +1001,15 @@
             basePath: local.utility2.envDict.npm_config_mode_api_prefix || '/api/v0',
             definitions: {
                 Array: { items: {}, type: 'array' },
-                // http://jsonapi.org/format/#errors
-                JsonapiError: {
-                },
-                // http://jsonapi.org/format/#document-structure-resource-objects
-                JsonapiResource: {
-                    properties: {
-                        id: { type: 'string' },
-                        type: { type: 'string' }
-                    }
-                },
                 // http://jsonapi.org/format/#document-structure-top-level
                 JsonapiResponse: {
                     properties: {
                         data: {
-                            items: { $ref: '#/definitions/JsonapiResource' },
+                            items: { type: 'object' },
                             type: 'array'
                         },
                         errors: {
-                            items: { $ref: '#/definitions/JsonapiError' },
+                            items: { type: 'object' },
                             type: 'array'
                         },
                         meta: { type: 'object' },
@@ -1052,6 +1055,8 @@
             } } }
         };
         // init assets
+        local.utility2.cacheDict.assets['/assets/nedb.min.js'] = local.fs
+            .readFileSync(local.swagger_ui.__dirname + '/nedb.min.js', 'utf8');
         local.utility2.cacheDict.assets['/assets/swagger-lite.js'] = local.utility2
             .istanbulInstrumentInPackage(
                 local.fs.readFileSync(__filename, 'utf8'),
@@ -1067,6 +1072,7 @@
             .replace(
                 "<script src='swagger-ui.rollup.js' type='text/javascript'></script>",
                 "<script src='swagger-ui.rollup.js' type='text/javascript'></script>" +
+                    '<script src="/assets/nedb.min.js"></script>' +
                     '<script src="/assets/utility2.js"></script>' +
                     '<script src="/assets/swagger-lite.js"></script>'
             )
@@ -1078,58 +1084,178 @@
         local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.css'] = local.fs
             .readFileSync(local.swagger_ui.__dirname +
                 '/swagger-ui.rollup.css', 'utf8');
+        /* istanbul ignore next */
+        // https://github.com/swagger-api/swagger-js/blob/v2.1.3/lib/types/operation.js#L619
+        local._OperationPrototypeExecute = function (arg1, arg2, arg3, arg4, parent) {
+            /*global SwaggerHttp, helpers*/
+            var allHeaders,
+                args,
+                attrname,
+                body,
+                contentTypeHeaders,
+                error,
+                format,
+                headers,
+                obj,
+                onError,
+                opts,
+                success,
+                url;
+            args = arg1 || {};
+            opts = {};
+            if (typeof arg2 === 'object') {
+                opts = arg2;
+                success = arg3;
+                error = arg4;
+            }
+            if (this.client) {
+                opts.client = this.client;
+            }
+            if (this.responseInterceptor) {
+                opts.responseInterceptor = this.responseInterceptor;
+            }
+            if (typeof arg2 === 'function') {
+                success = arg2;
+                error = arg3;
+            }
+            success = (success || this.parent.defaultSuccessCallback || helpers.log);
+            error = (error || this.parent.defaultErrorCallback || helpers.log);
+            if (opts.useJQuery === undefined) {
+                opts.useJQuery = this.useJQuery;
+            }
+            // swagger-hack - disable missingParams validation handling
+            // missingParams = this.getMissingParams(args);
+            // if (missingParams.length > 0) {
+                // message = 'missing required params: ' + missingParams;
+                // helpers.fail(message);
+                // error(message);
+                // return;
+            // }
+            allHeaders = this.getHeaderParams(args);
+            contentTypeHeaders = this.setContentTypes(args, opts);
+            headers = {};
+            for (attrname in allHeaders) {
+                if (allHeaders.hasOwnProperty(attrname)) {
+                    headers[attrname] = allHeaders[attrname];
+                }
+            }
+            for (attrname in contentTypeHeaders) {
+                if (contentTypeHeaders.hasOwnProperty(attrname)) {
+                    headers[attrname] = contentTypeHeaders[attrname];
+                }
+            }
+            body = this.getBody(contentTypeHeaders, args, opts);
+            url = this.urlify(args);
+            if (url.indexOf('.{format}') > 0) {
+                if (headers) {
+                    format = headers.Accept || headers.accept;
+                    if (format && format.indexOf('json') > 0) {
+                        url = url.replace('.{format}', '.json');
+                    } else if (format && format.indexOf('xml') > 0) {
+                        url = url.replace('.{format}', '.xml');
+                    }
+                }
+            }
+            obj = {
+                url: url,
+                method: this.method.toUpperCase(),
+                body: body,
+                useJQuery: opts.useJQuery,
+                headers: headers,
+                on: {
+                    response: function (response) {
+                        return success(response, parent);
+                    },
+                    error: function (response) {
+                        return error(response, parent);
+                    }
+                }
+            };
+            this.clientAuthorizations.apply(obj, this.operation.security);
+            if (opts.mock === true) {
+                return obj;
+            }
+            if (opts.modeErrorData) {
+                onError = success;
+                error = function (error) {
+                    error = error.obj || error;
+                    error = error.data || error;
+                    try { error = JSON.parse(error); } catch (ignore) {}
+                    if (typeof error === "string") {
+                        error = { message: error };
+                    }
+                    onError(error);
+                };
+                success = function (data) { onError(null, data); };
+            }
+            try {
+                if (window.swgg) {
+                    window.swgg.validateByParamDefList({
+                        data: window.swgg.normalizeParamDictSwagger(
+                            JSON.parse(JSON.stringify(args)),
+                            this
+                        ),
+                        key: this.operation.operationId,
+                        paramDefList: this.parameters
+                    });
+                }
+            } catch (errorCaught) {
+                window.swgg.onErrorJsonapi(function (error) {
+                    obj.on.error({
+                        data: JSON.stringify(error),
+                        headers: { "Content-Type": "application/json" }
+                    });
+                })(errorCaught);
+                // wiggle input on Error
+                if (parent && window.jQuery) {
+                    window.jQuery(".sandbox", window.jQuery(parent.el))
+                        .find("input[type='text'],select.parameter," +
+                            "textarea.body-textarea")
+                        .each(function () {
+                            window.jQuery(this).addClass("error");
+                            window.jQuery(this).wiggle();
+                        });
+                }
+                return;
+            }
+            new SwaggerHttp().execute(obj, opts);
+        };
+        local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.css'] = local.fs
+            .readFileSync(local.swagger_ui.__dirname + '/swagger-ui.rollup.css', 'utf8') +
+/* jslint-ignore-begin */
+'\n\
+.swagger-section .swagger-ui-wrap ul#resources li.resource ul.endpoints li.endpoint ul.operations li.operation div.content form select.error {\n\
+  outline: 2px solid black;\n\
+  outline-color: #cc0000;\n\
+}\n\
+.swagger-section .swagger-ui-wrap ul#resources li.resource ul.endpoints li.endpoint ul.operations li.operation div.content form textarea.error {\n\
+  outline: 2px solid black;\n\
+  outline-color: #cc0000;\n\
+}\n\
+\n' +
+/* jslint-ignore-end */
+            String();
         local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.js'] = local.fs
             .readFileSync(local.swagger_ui.__dirname + '/swagger-ui.rollup.js', 'utf8')
-            // swagger-hack - disable underscore-min.map
+            // swagger-hack - disable sourceMappingURL
             .replace((/^\/\/# sourceMappingURL=.*/gm), '')
             // swagger-hack - save swaggerJson
             .replace(
-                'this.apis = {};',
-                'this.apis = {}; this.swaggerJson = JSON.parse(JSON.stringify(response));'
-            )
-            // swagger-hack - disable missingParams validation handling
-            .replace(
-                'var missingParams = this.getMissingParams(args);',
-                'var missingParams = [];'
+                'this.apis={}',
+                'this.apis={},this.swaggerJson=JSON.parse(JSON.stringify(e))'
             )
             // swagger-hack - add modeErroData and validation handling
-            .replace('new SwaggerHttp().execute(obj, opts);', 'if (opts.modeErrorData) {' +
-                    'var onError = success;' +
-                    'error = function (error) {' +
-                        'error = error.obj || error;' +
-                        'error = error.data || error;' +
-                        'try { error = JSON.parse(error); } catch (ignore) {}' +
-                        'if (typeof error === "string") {' +
-                            'error = { message: error };' +
-                        '}' +
-                        'onError(error);' +
-                    '};' +
-                    'success = function (data) { onError(null, data); };' +
-                '}' +
-                'try {' +
-                    'if (window.swgg) {' +
-                        'window.swgg.validateByParamDefList({' +
-                            'data: window.swgg.normalizeParamDictSwagger(' +
-                                'JSON.parse(JSON.stringify(args)),' +
-                                'this' +
-                            '),' +
-                            'key: this.operation.operationId,' +
-                            'paramDefList: this.parameters' +
-                        '});' +
-                    '}' +
-                '} catch (errorCaught) {' +
-                    'window.swgg.onErrorJsonapi(function (error) {' +
-                        'obj.on.error({' +
-                            'data: JSON.stringify(error),' +
-                            'headers: { "Content-Type": "application/json" }' +
-                        '});' +
-                    '})(errorCaught);' +
-                    'return;' +
-                '}' +
-                'new SwaggerHttp().execute(obj, opts);')
+            .replace(String() +
+/* jslint-ignore-begin */
+'Operation.prototype.execute=function(e,t,r,n,i){var s,a,o=e||{},p={};_.isObject(t)&&(p=t,s=r,a=n),this.client&&(p.client=this.client),this.responseInterceptor&&(p.responseInterceptor=this.responseInterceptor),"function"==typeof t&&(s=t,a=r),s=s||this.parent.defaultSuccessCallback||helpers.log,a=a||this.parent.defaultErrorCallback||helpers.log,"undefined"==typeof p.useJQuery&&(p.useJQuery=this.useJQuery);var l=this.getMissingParams(o);if(l.length>0){var u="missing required params: "+l;return helpers.fail(u),void a(u)}var h,d=this.getHeaderParams(o),c=this.setContentTypes(o,p),m={};for(h in d)m[h]=d[h];for(h in c)m[h]=c[h];var f=this.getBody(c,o,p),y=this.urlify(o);if(y.indexOf(".{format}")>0&&m){var g=m.Accept||m.accept;g&&g.indexOf("json")>0?y=y.replace(".{format}",".json"):g&&g.indexOf("xml")>0&&(y=y.replace(".{format}",".xml"))}var v={url:y,method:this.method.toUpperCase(),body:f,useJQuery:p.useJQuery,headers:m,on:{response:function(e){return s(e,i)},error:function(e){return a(e,i)}}};return this.clientAuthorizations.apply(v,this.operation.security),p.mock===!0?v:void(new SwaggerHttp).execute(v,p)}' +
+/* jslint-ignore-end */
+                    String(), 'Operation.prototype.execute=' + local._OperationPrototypeExecute
+                    .toString()
+                    // coverage-hack - uncover
+                    .replace((/\b__cov_.*?\+\+/g), '0'))
             // swagger-hack - handle json error
-            .replace('new_err.status = res.status;', 'new_err.status = res.status;' +
-                'if (res.body && res.body.message && res.body.stack) { err = res.body; }')
+            .replace('r.callback(t||i,e)', 'r.callback(' +
+                '(e&&e.body&&e.body.message&&e.body.stack?e.body:t)||i,e)')
             // swagger-hack - disable online validation
             .replace("if ('validatorUrl' in opts.swaggerOptions) {", "if (true) {");
         local.utility2.cacheDict.assets['/assets/swagger-ui.favicon-16x16.png'] = local.fs
@@ -1147,51 +1273,187 @@
         local.utility2.cacheDict.assets['/assets/swagger-ui.throbber.gif'] = local.fs
             .readFileSync(local.swagger_ui.__dirname +
                 '/swagger-ui.throbber.gif');
+        // init XMLHttpRequest
+        local.XMLHttpRequest = local.utility2.XMLHttpRequest = function () {
+            /*
+             * this function will construct the xhr-connection
+             * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+             */
+            this.headers = {};
+            this.onError = this.onError.bind(this);
+            this.onLoadList = [];
+            this.onResponse = this.onResponse.bind(this);
+            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/readyState
+            this.readyState = 0;
+            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/response
+            this.response = null;
+            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseText
+            this.responseText = '';
+            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseType
+            this.responseType = '';
+            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/status
+            this.status = this.statusCode = 0;
+            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/statusText
+            this.statusText = '';
+            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/timeout
+            this.timeout = local.utility2.timeoutDefault;
+        };
+        local.utility2.XMLHttpRequest.prototype.abort = function () {
+            /*
+             * this function will abort the request if it has already been sent
+             * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#abort()
+             */
+            this.onError(new Error('abort'));
+        };
+        // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/upload
+        local.utility2.XMLHttpRequest.prototype.upload = {
+            addEventListener: local.utility2.nop
+        };
+        local.utility2.XMLHttpRequest.prototype.addEventListener = function (type, onError) {
+            /*
+             * this function will add event listeners to the xhr-connection
+             */
+            switch (type) {
+            case 'abort':
+            case 'error':
+            case 'load':
+                this.onLoadList.push(onError);
+                break;
+            }
+        };
+        local.utility2.XMLHttpRequest.prototype.getAllResponseHeaders = function () {
+            /*
+             * this function will return all the response headers, separated by CRLF,
+             * as a string, or null if no response has been received
+             * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+             * #getAllResponseHeaders()
+             */
+            var self;
+            self = this;
+            return Object.keys(self.responseStream.headers).map(function (key) {
+                return key + ': ' + self.responseStream.headers[key] + '\r\n';
+            }).join('') + '\r\n';
+        };
+        local.utility2.XMLHttpRequest.prototype.getResponseHeader = function (key) {
+            /*
+             * this function will return the string containing the text of the specified header,
+             * or null if either the response has not yet been received
+             * or the header doesn't exist in the response
+             * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+             * #getResponseHeader()
+             */
+            return (this.responseStream.headers && this.responseStream.headers[key]) || null;
+        };
+        local.utility2.XMLHttpRequest.prototype.onError = function (error, data) {
+            /*
+             * this function will handle the error and data passed back to the xhr-connection
+             */
+            if (this.done) {
+                return;
+            }
+            this.error = error;
+            this.response = data;
+            this.responseText = (data && data.toString()) || '';
+            // update xhr
+            this.readyState = 4;
+            this.onreadystatechange();
+            // handle data
+            this.onLoadList.forEach(function (onError) {
+                onError({ type: error
+                    ? 'error'
+                    : 'load' });
+            });
+        };
+        local.utility2.XMLHttpRequest.prototype.onResponse = function (responseStream) {
+            /*
+             * this function will handle the responseStream from the xhr-connection
+             */
+            this.responseStream = responseStream;
+            // update xhr
+            this.status = this.statusCode = this.responseStream.statusCode;
+            this.statusText = local.http.STATUS_CODES[this.responseStream.statusCode] || '';
+            this.readyState = 1;
+            this.onreadystatechange();
+            this.readyState = 2;
+            this.onreadystatechange();
+            this.readyState = 3;
+            this.onreadystatechange();
+            if (this.responseType === 'response') {
+                this.onError(null, this.responseStream);
+                return;
+            }
+            local.utility2.streamReadAll(this.responseStream, this.onError);
+        };
+        // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/onreadystatechange
+        local.utility2.XMLHttpRequest.prototype.onreadystatechange = local.utility2.nop;
+        local.utility2.XMLHttpRequest.prototype.open = function (method, url) {
+            /*
+             * this function will init the request
+             * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#open()
+             */
+            this.method = method;
+            this.url = url;
+            // handle implicit localhost
+            if (this.url[0] === '/') {
+                this.url = 'http://localhost:' + local.utility2.envDict.PORT + this.url;
+            }
+            // parse url
+            this.urlParsed = local.url.parse(String(this.url));
+            this.hostname = this.urlParsed.hostname;
+            this.path = this.urlParsed.path;
+            this.port = this.urlParsed.port;
+            // init requestStream
+            this.requestStream = (this.urlParsed.protocol === 'https:'
+                ? local.https
+                : local.http).request(this, this.onResponse)
+                // handle request-error
+                .on('error', this.onError);
+        };
+        // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#overrideMimeType()
+        local.utility2.XMLHttpRequest.prototype.overrideMimeType = local.utility2.nop;
+        local.utility2.XMLHttpRequest.prototype.send = function (data) {
+            /*
+             * this function will send the request
+             * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#send()
+             */
+            this.data = data;
+            // send data
+            this.requestStream.end(this.data);
+        };
+        local.utility2.XMLHttpRequest.prototype.setRequestHeader = function (key, value) {
+            /*
+             * this function will set the value of an HTTP request header
+             * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+             * #setRequestHeader()
+             */
+            key = key.toLowerCase();
+            this.headers[key] = value;
+            this.requestStream.setHeader(key, value);
+        };
+        // init window
+        local.window = local;
         // init SwaggerClient
-        (function () {
-            local.XMLHttpRequest = function () {
-                var self;
-                self = this;
-                self.headers = {};
-            };
-            local.XMLHttpRequest.prototype.onreadystatechange = local.utility2.nop;
-            local.XMLHttpRequest.prototype.open = function (method, url) {
-                this.method = method;
-                this.url = url;
-            };
-            local.XMLHttpRequest.prototype.send = function (data) {
-                var self;
-                self = this;
-                self.data = data;
-                self.xhr = self;
-                local.utility2.ajax(self, local.utility2.nop);
-            };
-            local.XMLHttpRequest.prototype.setRequestHeader = function (key, value) {
-                this.headers[key.toLowerCase()] = value;
-            };
-            local.clearInterval = clearInterval;
-            local.clearTimeout = clearTimeout;
-            local.console = console;
-            local.setInterval = setInterval;
-            local.setTimeout = setTimeout;
-            local.window = local;
-
-            local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.js'].replace(
-                // swagger-hack - remove browser js-env code
-                (/([\S\s]+?) swagger-client ([\S\s]+?\n\},\{\}\]\},\{\},\[1\]\)\(1\)\n\}\);)/),
-                function (match0, match1, match2) {
-                    // jslint-hack
-                    local.utility2.nop(match0);
-                    local.vm.runInNewContext(
-                        match1.replace((/\S+/g), '') + '/*' + match2,
-                        local,
-                        __dirname + '/swagger-ui.rollup.js'
-                    );
-                }
-            );
-            local.swgg.SwaggerClient = local.SwaggerClient;
-            local.swgg.SwaggerUi = local.SwaggerUi;
-        }());
+        local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.js'].replace(
+            // swagger-hack - remove browser js-env code
+            (/([\S\s]+?) swagger-client ([\S\s]+?\n\},\{\}\]\},\{\},\[1\]\)\(1\)\n\}\);)/),
+            function (match0, match1, match2) {
+                // jslint-hack
+                local.utility2.nop(match0);
+                local.utility2.requireFromScript(
+                    __dirname + '/swagger-ui.rollup.js',
+                    '"use strict"; (function () {' +
+                        'var XMLHttpRequest, exports, module, window;' +
+                        'window = require("' + __filename + '").local;' +
+                        'XMLHttpRequest = window.XMLHttpRequest;' +
+                        // preserve lineno
+                        match1.replace((/\S+/g), '') + '/*' + match2 +
+                        '\n}());'
+                );
+                local.swgg.SwaggerClient = local.SwaggerClient;
+            }
+        );
+        // init nedb
+        local.swgg.nedb = require('swagger-ui-lite/nedb.min.js');
         // init api
         local.swgg.apiUpdate({});
         break;

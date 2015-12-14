@@ -17,7 +17,7 @@
     (function () {
         // init local
         local = {};
-        // init js-env
+        // init modeJs
         local.modeJs = (function () {
             try {
                 return module.exports &&
@@ -37,24 +37,27 @@
             break;
         // re-init local from example.js
         case 'node':
-            require('fs').writeFileSync(
-                __dirname + '/example.js',
-                require('fs').readFileSync(__dirname + '/README.md', 'utf8')
-                    // support syntax-highlighting
-                    .replace((/[\S\s]+?\n.*?example.js\s*?```\w*?\n/), function (match0) {
-                        // preserve lineno
-                        return match0.replace((/.+/g), '');
-                    })
-                    .replace((/\n```[\S\s]+/), '')
-                    // disable mock package.json env
-                    .replace(/(process.env.npm_package_\w+ = )/g, '// $1')
-                    // alias require('$npm_package_name') to require('index.js');
+            local.script = require('fs').readFileSync(__dirname + '/README.md', 'utf8')
+                // support syntax-highlighting
+                .replace((/[\S\s]+?\n.*?example.js\s*?```\w*?\n/), function (match0) {
+                    // preserve lineno
+                    return match0.replace((/.+/g), '');
+                })
+                .replace((/\n```[\S\s]+/), '')
+                // disable mock package.json env
+                .replace(/(process.env.npm_package_\w+ = )/g, '// $1')
+                // alias require('$npm_package_name') to require('index.js');
+                .replace(
+                    "require('" + process.env.npm_package_name + "')",
+                    "require(__dirname + '/index.js')"
+                );
+            // require example.js
+            local = require('utility2')
+                .requireFromScript(__dirname + '/example.js', local.script
                     .replace(
-                        "require('" + process.env.npm_package_name + "')",
-                        "require(__dirname + '/index.js')"
-                    )
-            );
-            local = require(__dirname + '/example.js');
+                        "local.fs.readFileSync(__dirname + '/example.js', 'utf8')",
+                        JSON.stringify(local.script)
+                    ));
             break;
         }
     }());
@@ -73,11 +76,8 @@
             local.utility2.nop(options);
             onParallel = local.utility2.onParallel(onError);
             onParallel.counter += 1;
-            // test ajax error handling-behavior
             [{
                 url: '/_test/undefined'
-            }, {
-                url: '/api/v0/_test/onErrorJsonapiError'
             }, {
                 method: 'POST',
                 url: '/api/v0/_test/paramDefault/aa?paramJson=syntax%20error'
@@ -85,10 +85,13 @@
                 url: '/api/v0/_test/undefined'
             }].forEach(function (options) {
                 onParallel.counter += 1;
-                local.utility2.ajax(options, function (error) {
+                local.utility2.ajax(options, function (error, xhr) {
                     local.utility2.testTryCatch(function () {
                         // validate error occurred
                         local.utility2.assert(error, error);
+                        // validate error is in jsonapi-format
+                        error = JSON.parse(xhr.responseText);
+                        local.utility2.assert(error.errors[0], error);
                         onParallel();
                     }, onParallel);
                 });
@@ -100,20 +103,102 @@
             /*
              * this function will test onErrorJsonapi's default handling-behavior
              */
+            var onParallel;
             // jslint-hack
             local.utility2.nop(options);
-            local.utility2.ajax({
-                url: '/api/v0/_test/onErrorJsonapiDefault'
+            onParallel = local.utility2.onParallel(onError);
+            onParallel.counter += 1;
+            [
+                'hello',
+                ['hello'],
+                [{ data: 'hello' }],
+                { data: [{ data: 'hello' }], meta: { isJsonapiResponse: true } }
+            ].forEach(function (data) {
+                onParallel.counter += 1;
+                local.swgg.api._test.onErrorJsonapi({ data: JSON.stringify(data) }, {
+                    modeErrorData: true
+                }, function (error, data) {
+                    local.utility2.testTryCatch(function () {
+                        // validate no error occurred
+                        local.utility2.assert(!error, error);
+                        // validate data
+                        local.utility2.assert(data.obj.data[0].data === 'hello', data);
+                        onParallel();
+                    }, onParallel);
+                });
+            });
+            onParallel();
+        };
+
+        local.testCase_onErrorJsonapi_emptyArray = function (options, onError) {
+            /*
+             * this function will test onErrorJsonapi's empty-array handling-behavior
+             */
+            var onParallel;
+            // jslint-hack
+            local.utility2.nop(options);
+            onParallel = local.utility2.onParallel(onError);
+            onParallel.counter += 1;
+            onParallel.counter += 1;
+            local.swgg.api._test.onErrorJsonapi({ data: '[]' }, {
+                modeErrorData: true
             }, function (error, data) {
                 local.utility2.testTryCatch(function () {
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     // validate data
-                    data = JSON.parse(data.responseText);
-                    local.utility2.assert(data.data[0].data === 'hello', data);
-                    onError();
-                }, onError);
+                    local.utility2.assert(data.obj.data[0].data === undefined, data);
+                    onParallel();
+                }, onParallel);
             });
+            onParallel.counter += 1;
+            local.swgg.api._test.onErrorJsonapi({ error: '[]' }, {
+                modeErrorData: true
+            }, function (error) {
+                local.utility2.testTryCatch(function () {
+                    // validate error occurred
+                    local.utility2.assert(error, error);
+                    // validate error
+                    local.utility2.assert(error.errors[0].message === undefined, error);
+                    onParallel();
+                }, onParallel);
+            });
+            onParallel();
+        };
+
+        local.testCase_onErrorJsonapi_error = function (options, onError) {
+            /*
+             * this function will test onErrorJsonapi's error handling-behavior
+             */
+            var onParallel;
+            // jslint-hack
+            local.utility2.nop(options);
+            onParallel = local.utility2.onParallel(onError);
+            onParallel.counter += 1;
+            [
+                'hello',
+                ['hello'],
+                [{ message: 'hello' }],
+                {
+                    errors: [{ message: 'hello' }],
+                    meta: { isJsonapiResponse: true },
+                    statusCode: 500
+                }
+            ].forEach(function (data) {
+                onParallel.counter += 1;
+                local.swgg.api._test.onErrorJsonapi({ error: JSON.stringify(data) }, {
+                    modeErrorData: true
+                }, function (error) {
+                    local.utility2.testTryCatch(function () {
+                        // validate error occurred
+                        local.utility2.assert(error, error);
+                        // validate error
+                        local.utility2.assert(error.errors[0].message === 'hello', error);
+                        onParallel();
+                    }, onParallel);
+                });
+            });
+            onParallel();
         };
 
         local.testCase_ajax_validation = function (options, onError) {
@@ -158,8 +243,10 @@
              */
             // jslint-hack
             local.utility2.nop(options);
+            // test nop handling-behavior
+            local.swgg.validateByParamDefList({ data: {} });
             local.swgg.api._test.paramDefault({
-                id: 'test_' + local.utility2.uuidTime(),
+                id: 'test_' + local.utility2.uuidTimeCreate(),
                 // test array-csv-param handling-behavior
                 paramArrayCsv: 'aa,bb',
                 // test array-pipes-param handling-behavior
@@ -207,7 +294,7 @@
             // jslint-hack
             local.utility2.nop(options);
             local.swgg.api._test.paramFormData({
-                id: 'test_' + local.utility2.uuidTime(),
+                id: 'test_' + local.utility2.uuidTimeCreate(),
                 paramFormData1: 'aa',
                 paramFormData2: 'bb'
             }, { modeErrorData: true }, function (error, data) {
@@ -244,7 +331,7 @@
                 { key: 'propNumberFloat', value: 0.5 },
                 { key: 'propNumberDouble', value: 0.5 },
                 { key: 'propObject', value: {} },
-                { key: 'propObjectSubdoc', value: {} },
+                { key: 'propObjectSubdoc', value: { propRequired: true } },
                 { key: 'propString', value: '' },
                 { key: 'propStringByte', value: local.modeJs === 'browser'
                     ? local.global.btoa(local.utility2.stringAsciiCharset)
@@ -399,19 +486,29 @@
         // init test api
         local.swgg.apiUpdate({
             definitions: {
+                // init onErrorJsonapi schema
+                onErrorJsonapi: {
+                    _pathPrefix: '_test',
+                    properties: {
+                        data: { type: 'object' },
+                        error: { default: {}, type: 'object' }
+                    }
+                },
                 // init TestCrudModel schema
                 TestCrudModel: {
                     // init _pathObjectDefaultList
                     _pathObjectDefaultList: [
                         'crudCountManyByQuery',
                         'crudCreateOne',
+                        'crudCreateOrReplaceOne',
                         'crudDeleteManyByQuery',
                         'crudDeleteOneByKeyUnique.id',
                         'crudExistsOneByKeyUnique.id',
                         'crudGetManyByQuery',
+                        'crudGetOneByQuery',
                         'crudGetOneByKeyUnique.id',
                         'crudUpdateOneByKeyUnique.id',
-                        'crudUpsertOne'
+                        'crudUpsertOneByKeyUnique.id'
                     ],
                     _pathPrefix: '_test',
                     properties: {
@@ -437,8 +534,7 @@
                         propStringDatetime: { format: 'date-time', type: 'string' },
                         propStringEmail:
                             { default: 'a@a.com', format: 'email', type: 'string' },
-                        propStringJson:
-                            { default: 'null', format: 'json', type: 'string' },
+                        propStringJson: { default: 'null', format: 'json', type: 'string' },
                         propUndefined: {}
                     },
                     required: ['propRequired']
@@ -447,14 +543,23 @@
                 TestNullModel: {}
             },
             paths: {
-                // test onErrorJsonapi's default handling-behavior
-                '/_test/onErrorJsonapiDefault': { get: {
-                    operationId: 'onErrorJsonapiDefault',
-                    tags: ['_test']
-                } },
-                // test onErrorJsonapi's error handling-behavior
-                '/_test/onErrorJsonapiError': { get: {
-                    operationId: 'onErrorJsonapiError',
+                // test onErrorJsonapi handling-behavior
+                '/_test/onErrorJsonapi': { get: {
+                    operationId: 'onErrorJsonapi',
+                    parameters: [{
+                        description: 'data param',
+                        format: 'json',
+                        in: 'query',
+                        name: 'data',
+                        type: 'string'
+                    }, {
+                        description: 'error param',
+                        format: 'json',
+                        in: 'query',
+                        name: 'error',
+                        type: 'string'
+                    }],
+                    summary: 'test onErrorJsonapi handling-behavior',
                     tags: ['_test']
                 } },
                 // test default-param handling-behavior
@@ -551,7 +656,7 @@
                         required: true,
                         type: 'string'
                     }],
-                    summary: 'echo request params back to client',
+                    summary: 'test form-data-param handling-behavior',
                     tags: ['_test']
                 } }
             },
@@ -563,19 +668,19 @@
         local.middleware.middlewareList.push(function (request, response, nextMiddleware) {
             local.request = request;
             local.response = response;
-            switch (request.swggPathname) {
-            case 'GET /_test/onErrorJsonapiDefault':
+            switch (request.swggPathObject && request.swggPathObject.operationId) {
+            case 'onErrorJsonapi':
                 // test redundant onErrorJsonapi handling-behavior
                 local.swgg.onErrorJsonapi(function (error, data) {
                     local.swgg.serverRespondJsonapi(request, response, error, data);
-                })(null, 'hello');
+                })(
+                    JSON.parse(request.swggParamDict.error || 'null'),
+                    JSON.parse(request.swggParamDict.data || 'null')
+                );
                 break;
-            case 'GET /_test/onErrorJsonapiError':
+            case 'paramDefault':
+            case 'paramFormData':
                 // test redundant onErrorJsonapi handling-behavior
-                local.swgg.onErrorJsonapi(nextMiddleware)('string error');
-                break;
-            case 'POST /_test/paramDefault/':
-            case 'POST /_test/paramFormData':
                 local.swgg.serverRespondJsonapi(request, response, null, request.swggParamDict);
                 break;
             default:
@@ -583,7 +688,7 @@
             }
         });
         // run validation test
-        //!! local.testCase_validateByParamDefList_default(null, local.utility2.onErrorDefault);
+        local.testCase_validateByParamDefList_default(null, local.utility2.onErrorDefault);
         local.testCase_validateBySchema_default(null, local.utility2.onErrorDefault);
         local.testCase_validateBySwagger_default(null, local.utility2.onErrorDefault);
         // debug dir
@@ -592,14 +697,7 @@
         ].forEach(function (dir) {
             local.fs.readdirSync(dir).forEach(function (file) {
                 file = dir + '/' + file;
-                switch (file) {
-                case __dirname + '/example.js':
-                    break;
-                // if the file is modified, then restart the process
-                default:
-                    local.utility2.onFileModifiedRestart(file);
-                    break;
-                }
+                local.utility2.onFileModifiedRestart(file);
                 switch (local.path.extname(file)) {
                 case '.js':
                 case '.json':
