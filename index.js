@@ -21,14 +21,15 @@
         // init modeJs
         local.modeJs = (function () {
             try {
+                return typeof navigator.userAgent === 'string' &&
+                    typeof document.querySelector('body') === 'object' &&
+                    typeof XMLHttpRequest.prototype.open === 'function' &&
+                    'browser';
+            } catch (errorCaughtBrowser) {
                 return module.exports &&
                     typeof process.versions.node === 'string' &&
                     typeof require('http').createServer === 'function' &&
                     'node';
-            } catch (errorCaughtNode) {
-                return typeof navigator.userAgent === 'string' &&
-                    typeof document.querySelector('body') === 'object' &&
-                    'browser';
             }
         }());
         // init global
@@ -295,7 +296,7 @@
             },
             crudUpsertOneByKeyUnique: {
                 _keyUnique: '{{_keyUnique}}',
-                _method: 'put',
+                _method: 'post',
                 _path: '/{{_pathPrefix}}/crudUpsertOneByKeyUnique/{{{_keyUnique}}}',
                 _pathPrefix: '{{_pathPrefix}}',
                 operationId: 'crudUpsertOneByKeyUnique.{{_keyUnique}}',
@@ -335,9 +336,9 @@
     // run shared js-env code
     (function () {
         local.swgg.apiUpdate = function (options) {
-            /*
-             * this function will update the swagger-api
-             */
+        /*
+         * this function will update the swagger-api
+         */
             var keyUnique, pathObject, tmp;
             options.definitions = options.definitions || {};
             options.paths = options.paths || {};
@@ -491,9 +492,9 @@
         };
 
         local.swgg.middlewareBodyParse = function (request, response, nextMiddleware) {
-            /*
-             * this function will parse the request-body
-             */
+        /*
+         * this function will parse the request-body
+         */
             // jslint-hack
             local.utility2.nop(response);
             local.utility2.testTryCatch(function () {
@@ -519,9 +520,9 @@
         };
 
         local.swgg.middlewareError = function (error, request, response) {
-            /*
-             * this function will handle errors according to http://jsonapi.org/format/#errors
-             */
+        /*
+         * this function will handle errors according to http://jsonapi.org/format/#errors
+         */
             if (!error) {
                 error = new Error('404 Not Found');
                 error.statusCode = 404;
@@ -530,9 +531,9 @@
         };
 
         local.swgg.middlewareValidate = function (request, response, nextMiddleware) {
-            /*
-             * this function will run the swagger-validation middleware
-             */
+        /*
+         * this function will run the swagger-validation middleware
+         */
             var modeNext, onNext, tmp;
             modeNext = 0;
             onNext = function () {
@@ -640,9 +641,9 @@
         };
 
         local.swgg.normalizeParamDictSwagger = function (data, pathObject) {
-            /*
-             * this function will parse the data according to pathObject.parameters
-             */
+        /*
+         * this function will parse the data according to pathObject.parameters
+         */
             var tmp;
             pathObject.parameters.forEach(function (paramDef) {
                 tmp = data[paramDef.name];
@@ -685,12 +686,12 @@
         };
 
         local.swgg.onErrorJsonapi = function (onError) {
-            /*
-             * this function will normalize the error and data to jsonapi format,
-             * http://jsonapi.org/format/#errors
-             * http://jsonapi.org/format/#document-structure-resource-objects
-             * and pass them to onError
-             */
+        /*
+         * http://jsonapi.org/format/#errors
+         * http://jsonapi.org/format/#document-structure-resource-objects
+         * this function will normalize the error and data to jsonapi format,
+         * and pass them to onError
+         */
             return function (error, data) {
                 data = [error, data].map(function (data, ii) {
                     // if no error occurred, then return
@@ -737,9 +738,9 @@
         };
 
         local.swgg.schemaDereference = function ($ref) {
-            /*
-             * this function will try to dereference the schema from $ref
-             */
+        /*
+         * this function will try to dereference the schema from $ref
+         */
             try {
                 return ((local.global.swaggerUi &&
                     local.global.swaggerUi.api &&
@@ -750,11 +751,11 @@
         };
 
         local.swgg.serverRespondJsonapi = function (request, response, error, data) {
-            /*
-             * this function will respond in jsonapi format
-             * http://jsonapi.org/format/#errors
-             * http://jsonapi.org/format/#document-structure-resource-objects
-             */
+        /*
+         * http://jsonapi.org/format/#errors
+         * http://jsonapi.org/format/#document-structure-resource-objects
+         * this function will respond in jsonapi format
+         */
             local.swgg.onErrorJsonapi(function (error, data) {
                 local.utility2.serverRespondHeadSet(
                     request,
@@ -774,9 +775,9 @@
         };
 
         local.swgg.validateByParamDefList = function (options) {
-            /*
-             * this function will validate options.data against options.paramDefList
-             */
+        /*
+         * this function will validate options.data against options.paramDefList
+         */
             var data, key;
             try {
                 data = options.data;
@@ -800,9 +801,9 @@
         };
 
         local.swgg.validateByPropertyDef = function (options) {
-            /*
-             * this function will validate options.data against options.propertyDef
-             */
+        /*
+         * this function will validate options.data against options.propertyDef
+         */
             var data, propertyDef, tmp;
             data = options.data;
             propertyDef = options.propertyDef;
@@ -899,6 +900,9 @@
                     }
                     break;
                 }
+                if (propertyDef.enum) {
+                    local.utility2.assert(propertyDef.enum.indexOf(data) >= 0);
+                }
             } catch (errorCaught) {
                 throw new Error('invalid property ' + options.key + ':' + (propertyDef.format ||
                     propertyDef.type) + ' - ' + JSON.stringify(data));
@@ -906,9 +910,9 @@
         };
 
         local.swgg.validateBySchema = function (options) {
-            /*
-             * this function will validate options.data against options.schema
-             */
+        /*
+         * this function will validate options.data against options.schema
+         */
             var data, key, schema;
             try {
                 data = options.data;
@@ -946,9 +950,9 @@
         };
 
         local.swgg.validateBySwagger = function (options) {
-            /*
-             * this function will validate the entire swagger json object
-             */
+        /*
+         * this function will validate the entire swagger json object
+         */
             local.swagger_tools.v2.validate(
                 // jsonCopy object to prevent side-effects
                 local.utility2.jsonCopy(options),
@@ -1275,10 +1279,10 @@
                 '/swagger-ui.throbber.gif');
         // init XMLHttpRequest
         local.XMLHttpRequest = local.utility2.XMLHttpRequest = function () {
-            /*
-             * this function will construct the xhr-connection
-             * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
-             */
+        /*
+         * this function will construct the xhr-connection
+         * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+         */
             this.headers = {};
             this.onError = this.onError.bind(this);
             this.onLoadList = [];
@@ -1299,10 +1303,10 @@
             this.timeout = local.utility2.timeoutDefault;
         };
         local.utility2.XMLHttpRequest.prototype.abort = function () {
-            /*
-             * this function will abort the request if it has already been sent
-             * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#abort()
-             */
+        /*
+         * this function will abort the request if it has already been sent
+         * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#abort()
+         */
             this.onError(new Error('abort'));
         };
         // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/upload
@@ -1310,9 +1314,9 @@
             addEventListener: local.utility2.nop
         };
         local.utility2.XMLHttpRequest.prototype.addEventListener = function (type, onError) {
-            /*
-             * this function will add event listeners to the xhr-connection
-             */
+        /*
+         * this function will add event listeners to the xhr-connection
+         */
             switch (type) {
             case 'abort':
             case 'error':
@@ -1322,12 +1326,12 @@
             }
         };
         local.utility2.XMLHttpRequest.prototype.getAllResponseHeaders = function () {
-            /*
-             * this function will return all the response headers, separated by CRLF,
-             * as a string, or null if no response has been received
-             * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
-             * #getAllResponseHeaders()
-             */
+        /*
+         * this function will return all the response headers, separated by CRLF,
+         * as a string, or null if no response has been received
+         * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+         * #getAllResponseHeaders()
+         */
             var self;
             self = this;
             return Object.keys(self.responseStream.headers).map(function (key) {
@@ -1335,19 +1339,19 @@
             }).join('') + '\r\n';
         };
         local.utility2.XMLHttpRequest.prototype.getResponseHeader = function (key) {
-            /*
-             * this function will return the string containing the text of the specified header,
-             * or null if either the response has not yet been received
-             * or the header doesn't exist in the response
-             * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
-             * #getResponseHeader()
-             */
+        /*
+         * this function will return the string containing the text of the specified header,
+         * or null if either the response has not yet been received
+         * or the header doesn't exist in the response
+         * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+         * #getResponseHeader()
+         */
             return (this.responseStream.headers && this.responseStream.headers[key]) || null;
         };
         local.utility2.XMLHttpRequest.prototype.onError = function (error, data) {
-            /*
-             * this function will handle the error and data passed back to the xhr-connection
-             */
+        /*
+         * this function will handle the error and data passed back to the xhr-connection
+         */
             if (this.done) {
                 return;
             }
@@ -1365,9 +1369,9 @@
             });
         };
         local.utility2.XMLHttpRequest.prototype.onResponse = function (responseStream) {
-            /*
-             * this function will handle the responseStream from the xhr-connection
-             */
+        /*
+         * this function will handle the responseStream from the xhr-connection
+         */
             this.responseStream = responseStream;
             // update xhr
             this.status = this.statusCode = this.responseStream.statusCode;
@@ -1387,10 +1391,10 @@
         // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/onreadystatechange
         local.utility2.XMLHttpRequest.prototype.onreadystatechange = local.utility2.nop;
         local.utility2.XMLHttpRequest.prototype.open = function (method, url) {
-            /*
-             * this function will init the request
-             * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#open()
-             */
+        /*
+         * this function will init the request
+         * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#open()
+         */
             this.method = method;
             this.url = url;
             // handle implicit localhost
@@ -1412,20 +1416,20 @@
         // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#overrideMimeType()
         local.utility2.XMLHttpRequest.prototype.overrideMimeType = local.utility2.nop;
         local.utility2.XMLHttpRequest.prototype.send = function (data) {
-            /*
-             * this function will send the request
-             * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#send()
-             */
+        /*
+         * this function will send the request
+         * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#send()
+         */
             this.data = data;
             // send data
             this.requestStream.end(this.data);
         };
         local.utility2.XMLHttpRequest.prototype.setRequestHeader = function (key, value) {
-            /*
-             * this function will set the value of an HTTP request header
-             * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
-             * #setRequestHeader()
-             */
+        /*
+         * this function will set the value of an HTTP request header
+         * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+         * #setRequestHeader()
+         */
             key = key.toLowerCase();
             this.headers[key] = value;
             this.requestStream.setHeader(key, value);

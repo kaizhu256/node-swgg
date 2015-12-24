@@ -87,14 +87,15 @@ instruction
         // init modeJs
         local.modeJs = (function () {
             try {
+                return typeof navigator.userAgent === 'string' &&
+                    typeof document.querySelector('body') === 'object' &&
+                    typeof XMLHttpRequest.prototype.open === 'function' &&
+                    'browser';
+            } catch (errorCaughtBrowser) {
                 return module.exports &&
                     typeof process.versions.node === 'string' &&
                     typeof require('http').createServer === 'function' &&
                     'node';
-            } catch (errorCaughtNode) {
-                return typeof navigator.userAgent === 'string' &&
-                    typeof document.querySelector('body') === 'object' &&
-                    'browser';
             }
         }());
         // init global
@@ -317,7 +318,7 @@ node_modules/.bin/utility2 shRun shReadmeExportFile package.json package.json &&
 PORT=$(node_modules/.bin/utility2 shServerPortRandom) \
 node_modules/.bin/utility2 test node test.js"
     },
-    "version": "2015.11.8"
+    "version": "2015.11.9"
 }
 ```
 
@@ -336,14 +337,9 @@ node_modules/.bin/utility2 test node test.js"
 
 
 
-# change since 644ff074
-- npm publish 2015.11.8
-- move most of node js-env code to shared js-env
-- working nedb interface
-- deployed heroku test-server
-- wiggle frontend input during validation error
-- update to uglified swagger-ui-lite
-- remove #/definitions/JsonapiResource and #/definitions/JsonapiError
+# change since 50cf53b4
+- npm publish 2015.11.9
+- add enum validation
 - none
 
 
@@ -371,10 +367,10 @@ shBuild() {
     # run npm-test on published package
     shRun shNpmTestPublished || return $?
 
-    #!! # test example js script
-    #!! export npm_config_timeout_exit=10000 || return $?
-    #!! MODE_BUILD=testExampleJs shRunScreenCapture shReadmeTestJs example.js || return $?
-    #!! unset npm_config_timeout_exit || return $?
+    # test example js script
+    export npm_config_timeout_exit=10000 || return $?
+    MODE_BUILD=testExampleJs shRunScreenCapture shReadmeTestJs example.js || return $?
+    unset npm_config_timeout_exit || return $?
 
     # run npm-test
     MODE_BUILD=npmTest shRunScreenCapture npm test --mode-coverage || return $?

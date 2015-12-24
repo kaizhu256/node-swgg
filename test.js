@@ -20,14 +20,15 @@
         // init modeJs
         local.modeJs = (function () {
             try {
+                return typeof navigator.userAgent === 'string' &&
+                    typeof document.querySelector('body') === 'object' &&
+                    typeof XMLHttpRequest.prototype.open === 'function' &&
+                    'browser';
+            } catch (errorCaughtBrowser) {
                 return module.exports &&
                     typeof process.versions.node === 'string' &&
                     typeof require('http').createServer === 'function' &&
                     'node';
-            } catch (errorCaughtNode) {
-                return typeof navigator.userAgent === 'string' &&
-                    typeof document.querySelector('body') === 'object' &&
-                    'browser';
             }
         }());
         switch (local.modeJs) {
@@ -68,9 +69,9 @@
     (function () {
         // init tests
         local.testCase_ajax_error = function (options, onError) {
-            /*
-             * this function will test ajax's error handling-behavior
-             */
+        /*
+         * this function will test ajax's error handling-behavior
+         */
             var onParallel;
             // jslint-hack
             local.utility2.nop(options);
@@ -100,9 +101,9 @@
         };
 
         local.testCase_onErrorJsonapi_default = function (options, onError) {
-            /*
-             * this function will test onErrorJsonapi's default handling-behavior
-             */
+        /*
+         * this function will test onErrorJsonapi's default handling-behavior
+         */
             var onParallel;
             // jslint-hack
             local.utility2.nop(options);
@@ -131,9 +132,9 @@
         };
 
         local.testCase_onErrorJsonapi_emptyArray = function (options, onError) {
-            /*
-             * this function will test onErrorJsonapi's empty-array handling-behavior
-             */
+        /*
+         * this function will test onErrorJsonapi's empty-array handling-behavior
+         */
             var onParallel;
             // jslint-hack
             local.utility2.nop(options);
@@ -167,9 +168,9 @@
         };
 
         local.testCase_onErrorJsonapi_error = function (options, onError) {
-            /*
-             * this function will test onErrorJsonapi's error handling-behavior
-             */
+        /*
+         * this function will test onErrorJsonapi's error handling-behavior
+         */
             var onParallel;
             // jslint-hack
             local.utility2.nop(options);
@@ -202,9 +203,9 @@
         };
 
         local.testCase_ajax_validation = function (options, onError) {
-            /*
-             * this function will test ajax's error handling-behavior
-             */
+        /*
+         * this function will test ajax's error handling-behavior
+         */
             var onParallel;
             // jslint-hack
             local.utility2.nop(options);
@@ -238,9 +239,9 @@
         };
 
         local.testCase_validateByParamDefList_default = function (options, onError) {
-            /*
-             * this function will test validateByParamDefList's default handling-behavior
-             */
+        /*
+         * this function will test validateByParamDefList's default handling-behavior
+         */
             // jslint-hack
             local.utility2.nop(options);
             // test nop handling-behavior
@@ -257,6 +258,8 @@
                 paramArrayTsv: 'aa\tbb',
                 // test body-param handling-behavior
                 paramBody: 'hello body',
+                // test enum-param handling-behavior
+                paramEnum: 0,
                 // test header-param handling-behavior
                 paramHeader: 'hello header',
                 // test json-param handling-behavior
@@ -277,6 +280,7 @@
                         paramArraySsv: ['aa', 'bb'],
                         paramArrayTsv: ['aa', 'bb'],
                         paramBody: 'hello body',
+                        paramEnum: 0,
                         paramHeader: 'hello header',
                         paramJson: '1',
                         paramPath: 'hello path',
@@ -288,9 +292,9 @@
         };
 
         local.testCase_validateByParamDefList_formData = function (options, onError) {
-            /*
-             * this function will test validateByParamDefList's formData handling-behavior
-             */
+        /*
+         * this function will test validateByParamDefList's formData handling-behavior
+         */
             // jslint-hack
             local.utility2.nop(options);
             local.swgg.api._test.paramFormData({
@@ -313,9 +317,9 @@
         };
 
         local.testCase_validateBySchema_default = function (options, onError) {
-            /*
-             * this function will test validateBySchema's default handling-behavior
-             */
+        /*
+         * this function will test validateBySchema's default handling-behavior
+         */
             var optionsCopy;
             options = {
                 data: { propRequired: true },
@@ -325,6 +329,7 @@
                 { key: 'propArray', value: [null] },
                 { key: 'propArraySubdoc', value: [{ propRequired: true }] },
                 { key: 'propBoolean', value: true },
+                { key: 'propEnum', value: 0 },
                 { key: 'propInteger', value: 0 },
                 { key: 'propIntegerInt32', value: 0 },
                 { key: 'propIntegerInt64', value: 0 },
@@ -356,9 +361,9 @@
         };
 
         local.testCase_validateBySchema_error = function (options, onError) {
-            /*
-             * this function will test validateBySchema's error handling-behavior
-             */
+        /*
+         * this function will test validateBySchema's error handling-behavior
+         */
             var error, optionsCopy;
             options = {
                 data: { propRequired: true },
@@ -369,6 +374,7 @@
                 { key: 'propArray', value: true },
                 { key: 'propArraySubdoc', value: [{ propRequired: null }] },
                 { key: 'propBoolean', value: 0 },
+                { key: 'propEnum', value: -1 },
                 { key: 'propInteger', value: true },
                 { key: 'propInteger', value: Infinity },
                 { key: 'propInteger', value: NaN },
@@ -410,9 +416,9 @@
         };
 
         local.testCase_validateBySwagger_default = function (options, onError) {
-            /*
-             * this function will test validateBySwagger's default handling-behavior
-             */
+        /*
+         * this function will test validateBySwagger's default handling-behavior
+         */
             var error;
             // jslint-hack
             local.utility2.nop(options);
@@ -440,9 +446,9 @@
     // run node js-env code
     case 'node':
         local.testCase_testPage_default = function (options, onError) {
-            /*
-             * this function will test the test-page's default handling-behavior
-             */
+        /*
+         * this function will test the test-page's default handling-behavior
+         */
             // jslint-hack
             local.utility2.nop(options);
             local.utility2.browserTest({
@@ -519,6 +525,7 @@
                             type: 'array'
                         },
                         propBoolean: { type: 'boolean' },
+                        propEnum: { enum: [0, 1], type: 'integer' },
                         propInteger: { type: 'integer' },
                         propIntegerInt32: { format: 'int32', type: 'integer' },
                         propIntegerInt64: { format: 'int64', type: 'integer' },
@@ -603,6 +610,13 @@
                         in: 'body',
                         name: 'paramBody',
                         schema: { format: 'binary', type: 'string' }
+                    }, {
+                        // test enum-param handling-behavior
+                        description: 'enum param',
+                        enum: [0, 1],
+                        in: 'query',
+                        name: 'paramEnum',
+                        type: 'integer'
                     }, {
                         // test header-param handling-behavior
                         description: 'header param',
