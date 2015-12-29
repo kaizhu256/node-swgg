@@ -1260,6 +1260,16 @@
             // swagger-hack - handle json error
             .replace('r.callback(t||i,e)', 'r.callback(' +
                 '(e&&e.body&&e.body.message&&e.body.stack?e.body:t)||i,e)')
+            // swagger-hack - resolve %2F in hashtag
+            .replace(
+                "var fragments = $.param.fragment().split('/')",
+                "var fragments = $.param.fragment().split('/')" +
+                    ".map(function (element) { return element.replace((/%2F/g), '\\\\/'); })"
+            )
+            .replace(
+                "var resource = Docs.escapeResourceName(resource",
+                "var resource = Docs.escapeResourceName(resource.replace(/(\\\\\\\/)/g, '/')"
+            )
             // swagger-hack - disable online validation
             .replace("if ('validatorUrl' in opts.swaggerOptions) {", "if (true) {");
         local.utility2.cacheDict.assets['/assets/swagger-ui.favicon-16x16.png'] = local.fs

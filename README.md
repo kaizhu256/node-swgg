@@ -277,7 +277,7 @@ instruction
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "swagger-ui-lite": "2015.11.7",
-        "utility2": "2015.11.16"
+        "utility2": "2015.12.4"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -318,7 +318,7 @@ node_modules/.bin/utility2 shRun shReadmeExportFile package.json package.json &&
 PORT=$(node_modules/.bin/utility2 shServerPortRandom) \
 node_modules/.bin/utility2 test node test.js"
     },
-    "version": "2015.11.9"
+    "version": "2015.11.10"
 }
 ```
 
@@ -337,9 +337,9 @@ node_modules/.bin/utility2 test node test.js"
 
 
 
-# change since 50cf53b4
-- npm publish 2015.11.9
-- add enum validation
+# change since 75668c9c
+- npm publish 2015.11.10
+- swagger-hack - resolve %2F in hashtag
 - none
 
 
