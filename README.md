@@ -7,7 +7,7 @@ lightweight standalone swagger-ui server backed by nedb
 
 
 # live test-server
-[![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.herokuDeploy.browser..png)](https://hrku01-swagger-lite-beta.herokuapp.com)
+[![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.githubDeploy.browser._2Fnode-swagger-lite_2Fbuild..alpha..travis-ci.org_2Fapp_2Findex.html.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html)
 
 
 
@@ -16,9 +16,9 @@ lightweight standalone swagger-ui server backed by nedb
 
 | git-branch : | [master](https://github.com/kaizhu256/node-swagger-lite/tree/master) | [beta](https://github.com/kaizhu256/node-swagger-lite/tree/beta) | [alpha](https://github.com/kaizhu256/node-swagger-lite/tree/alpha)|
 |--:|:--|:--|:--|
-| test-server : | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-master.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-beta.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-alpha.herokuapp.com)|
+| test-server : | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/app/index.html)|
 | test-report : | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.html)|
-| coverage : | [![istanbul-lite coverage](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.html/index.html) | [![istanbul-lite coverage](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.html/index.html) | [![istanbul-lite coverage](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.html/index.html)|
+| coverage : | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.html/index.html)|
 | build-artifacts : | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..master..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..beta..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..alpha..travis-ci.org)|
 
 #### master branch
@@ -59,7 +59,7 @@ this node script will serve a lightweight standalone swagger-ui server backed by
 instruction
     1. save this script as example.js
     2. run the shell command:
-          $ npm install swagger-lite && PORT=1337 node example.js
+        $ npm install swagger-lite && PORT=1337 node example.js
     3. open a browser to http://localhost:1337
     4. interact with the swagger-ui crud-api
 */
@@ -67,7 +67,7 @@ instruction
 /*jslint
     browser: true,
     maxerr: 8,
-    maxlen: 196,
+    maxlen: 96,
     node: true,
     nomen: true,
     regexp: true,
@@ -114,93 +114,6 @@ instruction
         });
         // init utility2
         local.utility2 = local.swgg.local.utility2;
-    }());
-    switch (local.modeJs) {
-
-
-
-    // run node js-env code
-    case 'node':
-        // export local
-        module.exports = local;
-        local.path = require('path');
-        // init assets
-        local.utility2.cacheDict.assets['/'] = '<!DOCTYPE html>\n' +
-/* jslint-ignore-begin */
-'<html>\n' +
-'<head>\n' +
-'    <meta charset="UTF-8">\n' +
-'    <title>\n' +
-'    {{envDict.npm_package_name}} [{{envDict.npm_package_version}}]\n' +
-'    </title>\n' +
-'    <link rel="stylesheet" href="/assets/utility2.css">\n' +
-'    <style>\n' +
-'    * {\n' +
-'        box-sizing: border-box;\n' +
-'    }\n' +
-'    body {\n' +
-'        background-color: #fff;\n' +
-'        font-family: Helvetical Neue, Helvetica, Arial, sans-serif;\n' +
-'    }\n' +
-'    body > div {\n' +
-'        margin: 20px 0 20px 0;\n' +
-'    }\n' +
-'    .testReportDiv {\n' +
-'        display: none;\n' +
-'    }\n' +
-'    </style>\n' +
-'    {{envDict.npm_config_html_head_extra}}\n' +
-'</head>\n' +
-'<body>\n' +
-'    <div class="ajaxProgressDiv" style="display: none;">\n' +
-'    <div class="ajaxProgressBarDiv ajaxProgressBarDivLoading">loading</div>\n' +
-'    </div>\n' +
-'    <h1>{{envDict.npm_package_name}} [{{envDict.npm_package_version}}]</h1>\n' +
-'    <h3>{{envDict.npm_package_description}}</h3>\n' +
-'    <div class="testReportDiv"></div>\n' +
-'    <div id="swagger-ui-container" style="display: none;"></div>\n' +
-'    <iframe height="512" src="/assets/swagger-ui.html" width="100%"></iframe>\n' +
-'    <script src="/assets/utility2.js"></script>\n' +
-'    <script src="/assets/swagger-ui.rollup.js"></script>\n' +
-'    <script src="/assets/swagger-lite.js"></script>\n' +
-'    <script src="/assets/example.js"></script>\n' +
-'    <script src="/test/test.js"></script>\n' +
-'    <script>\n' +
-'    window.utility2 = window.utility2 || {};\n' +
-'    window.utility2.envDict = {\n' +
-'        npm_package_description: "{{envDict.npm_package_description}}",\n' +
-'        npm_package_name: "{{envDict.npm_package_name}}",\n' +
-'        npm_package_version: "{{envDict.npm_package_version}}"\n' +
-'    };\n' +
-'    document.querySelector("iframe").onload = function () {\n' +
-'        var self;\n' +
-'        self = this;\n' +
-'        self.height = innerHeight - self.offsetTop - 20;\n' +
-'        self.contentWindow.location.hash = location.hash;\n' +
-'        self.contentWindow.onclick = function () {\n' +
-'            setTimeout(function () {\n' +
-'                location.hash = self.contentWindow.location.hash;\n' +
-'            });\n' +
-'        };\n' +
-'    };\n' +
-'    </script>\n' +
-'    {{envDict.npm_config_html_body_extra}}\n' +
-'</body>\n' +
-/* jslint-ignore-end */
-            '</html>\n';
-        local.utility2.cacheDict.assets['/'] = local.utility2.stringFormat(
-            local.utility2.cacheDict.assets['/'],
-            { envDict: local.utility2.envDict },
-            ''
-        );
-        local.utility2.cacheDict.assets['/assets/example.js'] =
-            local.fs.readFileSync(__dirname + '/example.js', 'utf8');
-        local.utility2.cacheDict.assets['/test/test.js'] =
-            local.utility2.istanbulInstrumentInPackage(
-                local.fs.readFileSync(local.swgg.__dirname + '/test.js', 'utf8'),
-                local.swgg.__dirname + '/test.js',
-                'swagger-lite'
-            );
         // init middleware
         local.middleware = local.utility2.middlewareGroupCreate([
             // init pre-middleware
@@ -231,11 +144,158 @@ instruction
         ]);
         // init error-middleware
         local.middlewareError = local.swgg.middlewareError;
+        // run server-test
+        local.utility2.testRunServer(local);
+    }());
+    switch (local.modeJs) {
+
+
+
+    // run node js-env code
+    case 'node':
+        // export local
+        module.exports = local;
+        local.path = require('path');
+        // init assets
+        // https://github.com/swagger-api/swagger-ui/blob/v2.1.2/dist/index.html
+        /* jslint-ignore-begin */
+        local.utility2.cacheDict.assets['/'] = '<!DOCTYPE html>\n\
+<html>\n\
+<head>\n\
+    <meta charset="UTF-8">\n\
+    <title>\n\
+    {{envDict.npm_package_name}} [{{envDict.npm_package_version}}]\n\
+    </title>\n\
+    <link href="assets/utility2.css" rel="stylesheet">\n\
+    <style>\n\
+    * {\n\
+        box-sizing: border-box;\n\
+    }\n\
+    body {\n\
+        background-color: #fff;\n\
+        font-family: Helvetical Neue, Helvetica, Arial, sans-serif;\n\
+    }\n\
+    body > div {\n\
+        margin-top: 20px;\n\
+    }\n\
+    .testReportDiv {\n\
+        display: none;\n\
+    }\n\
+    </style>\n\
+\n\
+    <link href="assets/swagger-ui.favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">\n\
+    <link href="assets/swagger-ui.favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">\n\
+    <link href="assets/swagger-ui.rollup.css" media="screen" rel="stylesheet" type="text/css">\n\
+</head>\n\
+<body>\n\
+    <div class="ajaxProgressDiv" style="display: none;">\n\
+    <div class="ajaxProgressBarDiv ajaxProgressBarDivLoading">loading</div>\n\
+    </div>\n\
+    <h1>{{envDict.npm_package_name}} [{{envDict.npm_package_version}}]</h1>\n\
+    <h3>{{envDict.npm_package_description}}</h3>\n\
+    <div class="testReportDiv"></div>\n\
+\n\
+    <div class="swagger-section">\n\
+    <div id="header">\n\
+        <div class="swagger-ui-wrap">\n\
+        <a id="logo" href="http://swagger.io">swagger</a>\n\
+        <form id="api_selector">\n\
+        <div class="input">\n\
+        <input placeholder="http://example.com/api" id="input_baseUrl" name="baseUrl" type="text"/>\n\
+        </div>\n\
+        <div class="input">\n\
+        <input placeholder="api_key" id="input_apiKey" name="apiKey" type="text"/>\n\
+        </div>\n\
+        <div class="input"><a id="explore" href="#" data-sw-translate>Explore</a></div>\n\
+        </form>\n\
+        </div>\n\
+    </div>\n\
+    <div id="message-bar" class="swagger-ui-wrap" data-sw-translate>&nbsp;</div>\n\
+    <div id="swagger-ui-container" class="swagger-ui-wrap"></div>\n\
+    </div>\n\
+    <script src="assets/nedb.min.js"></script>\n\
+    <script src="assets/swagger-tools-standalone-min.js"></script>\n\
+    <script src="assets/swagger-ui.rollup.js"></script>\n\
+    <script src="assets/utility2.js"></script>\n\
+    <script src="assets/swagger-lite.js"></script>\n\
+    <script src="assets/example.js"></script>\n\
+    <script src="assets/test.js"></script>\n\
+    <script>\n\
+    window.utility2.envDict = {\n\
+        npm_package_description: "{{envDict.npm_package_description}}",\n\
+        npm_package_name: "{{envDict.npm_package_name}}",\n\
+        npm_package_version: "{{envDict.npm_package_version}}"\n\
+    };\n\
+    $(function () {\n\
+        var url = window.location.search.match(/url=([^&]+)/);\n\
+        if (url && url.length > 1) {\n\
+            url = decodeURIComponent(url[1]);\n\
+        } else {\n\
+            url = location.pathname.replace((/\\/[^\/]*?$/), "") + "/api/v0/swagger.json";\n\
+        }\n\
+        // Pre load translate...\n\
+        if(window.SwaggerTranslator) {\n\
+            window.SwaggerTranslator.translate();\n\
+        }\n\
+        local.utility2.onReady.counter += 1;\n\
+        window.swaggerUi = new SwaggerUi({\n\
+            url: url,\n\
+            dom_id: "swagger-ui-container",\n\
+            supportedSubmitMethods: ["get", "post", "put", "delete", "patch"],\n\
+            onComplete: function(swaggerApi, swaggerUi){\n\
+                if(typeof initOAuth == "function") {\n\
+                    initOAuth({\n\
+                        clientId: "your-client-id",\n\
+                        clientSecret: "your-client-secret",\n\
+                        realm: "your-realms",\n\
+                        appName: "your-app-name",\n\
+                        scopeSeparator: ","\n\
+                    });\n\
+                }\n\
+                if(window.SwaggerTranslator) {\n\
+                    window.SwaggerTranslator.translate();\n\
+                }\n\
+                $("pre code").each(function(i, e) {\n\
+                    hljs.highlightBlock(e)\n\
+                });\n\
+                addApiKeyAuthorization();\n\
+                local.utility2.onReady();\n\
+            },\n\
+            onFailure: function(data) {\n\
+                log("Unable to Load SwaggerUI");\n\
+            },\n\
+            docExpansion: "none",\n\
+            apisSorter: "alpha",\n\
+            showRequestHeaders: false\n\
+        });\n\
+        function addApiKeyAuthorization(){\n\
+            var key = encodeURIComponent($("#input_apiKey")[0].value);\n\
+            if(key && key.trim() != "") {\n\
+                var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("api_key", key, "query");\n\
+                window.swaggerUi.api.clientAuthorizations.add("api_key", apiKeyAuth);\n\
+                log("added key " + key);\n\
+            }\n\
+        }\n\
+        $("#input_apiKey").change(addApiKeyAuthorization);\n\
+        window.swaggerUi.load();\n\
+        local.swgg.api = window.swaggerUi.api;\n\
+    });\n\
+    </script>\n\
+</body>\n\
+</html>';
+        /* jslint-ignore-end */
+        local.utility2.cacheDict.assets['/'] = local.utility2.stringFormat(
+            local.utility2.cacheDict.assets['/'],
+            { envDict: local.utility2.envDict },
+            ''
+        );
+        local.utility2.cacheDict.assets['/assets/example.js'] =
+            local.fs.readFileSync(__dirname + '/example.js', 'utf8');
         // init petstore-api
         (function () {
             var options;
-            options = local.utility2.jsonCopy(require(local.swgg.local
-                .swagger_ui.__dirname + '/swagger.json'));
+            options = local.utility2.jsonCopy(require(local.swgg.local.swagger_ui.__dirname +
+                '/swagger.json'));
             options = {
                 definitions: options.definitions,
                 paths: options.paths,
@@ -244,8 +304,6 @@ instruction
             };
             local.swgg.apiUpdate(options);
         }());
-        // run server-test
-        local.utility2.testRunServer(local);
         break;
     }
 }());
@@ -277,11 +335,11 @@ instruction
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "swagger-ui-lite": "2015.11.7",
-        "utility2": "2015.12.4"
+        "utility2": "2015.12.6"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
-        "electron-lite": "2015.11.1"
+        "electron-lite": "2015.11.2"
     },
     "engines": { "node": ">=4.2" },
     "keywords": [
@@ -301,24 +359,25 @@ instruction
         "url" : "https://github.com/kaizhu256/node-swagger-lite.git"
     },
     "scripts": {
-        "build-ci": "node_modules/.bin/utility2 shRun shReadmeBuild",
+        "build-ci": "utility2 shRun shReadmeBuild",
         "build-doc": "MODE_LINENO=0 \
-node_modules/.bin/utility2 shRun shReadmeExportFile package.json package.json && \
-node_modules/.bin/utility2 shRun shDocApiCreate \"module.exports={\
+utility2 shRun shReadmeExportFile package.json package.json && \
+utility2 shRun shDocApiCreate \"module.exports={\
 exampleFileList:['README.md','test.js','index.js'],\
 moduleDict:{\
 'swagger-lite':{aliasList:['swgg'],exports:require('./index.js')},\
 'swagger-lite.api':{aliasList:['api'],exports:require('./index.js').api}\
 }\
 }\"",
-        "start": "PORT=${PORT:-8080} npm_config_mode_auto_restart=1 \
-node_modules/.bin/utility2 shRun shIstanbulCover node test.js",
-        "test": "MODE_LINENO=0 \
-node_modules/.bin/utility2 shRun shReadmeExportFile package.json package.json && \
-PORT=$(node_modules/.bin/utility2 shServerPortRandom) \
-node_modules/.bin/utility2 test node test.js"
+        "start": "export PORT=${PORT:-8080} && \
+export npm_config_mode_auto_restart=1 && \
+utility2 shRun shIstanbulCover node test.js",
+        "test": "export MODE_LINENO=0 && \
+utility2 shRun shReadmeExportFile package.json package.json && \
+export PORT=$(utility2 shServerPortRandom) && \
+utility2 test node test.js"
     },
-    "version": "2015.11.10"
+    "version": "2015.12.1"
 }
 ```
 
@@ -337,9 +396,11 @@ node_modules/.bin/utility2 test node test.js"
 
 
 
-# change since 75668c9c
-- npm publish 2015.11.10
-- swagger-hack - resolve %2F in hashtag
+# change since 751510c8
+- npm publish 2015.12.1
+- migrate live-test-server from heroku to github, with browser emulation of server
+- revamp local._OperationPrototypeExecute to mock ajax request to browser-emulated server
+- remove ./Procfile
 - none
 
 
@@ -365,33 +426,40 @@ shBuild() {
     . node_modules/.bin/utility2 && shInit || return $?
 
     # run npm-test on published package
-    shRun shNpmTestPublished || return $?
+    (export npm_config_mode_coverage=1 &&
+        shNpmTestPublished) || return $?
 
     # test example js script
-    export npm_config_timeout_exit=10000 || return $?
-    MODE_BUILD=testExampleJs shRunScreenCapture shReadmeTestJs example.js || return $?
-    unset npm_config_timeout_exit || return $?
+    (export MODE_BUILD=testExampleJs &&
+        export npm_config_timeout_exit=10000 &&
+        shRunScreenCapture shReadmeTestJs example.js) || return $?
 
     # run npm-test
-    MODE_BUILD=npmTest shRunScreenCapture npm test --mode-coverage || return $?
+    (export MODE_BUILD=npmTest &&
+        shRunScreenCapture npm test --mode-coverage) || return $?
 
     # create api-doc
     npm run-script build-doc || return $?
 
     # if running legacy-node, then do not continue
-    [ "$(node --version)" \< "v5.0" ] && exit
+    [ "$(node --version)" \< "v5.0" ] && exit || true
 
     if [ "$CI_BRANCH" = alpha ] ||
         [ "$CI_BRANCH" = beta ] ||
         [ "$CI_BRANCH" = master ]
     then
-        # deploy app to heroku
-        shRun shHerokuDeploy "hrku01-$npm_package_name-$CI_BRANCH" || return $?
-        # test deployed app to heroku
-        TEST_URL="https://hrku01-$npm_package_name-$CI_BRANCH.herokuapp.com" || return $?
-        TEST_URL="$TEST_URL?modeTest=consoleLogResult&timeExit={{timeExit}}" || return $?
-        MODE_BUILD=herokuTest modeBrowserTest=test modeTestAdd=1 \
-            url="$TEST_URL" shBrowserTest || return $?
+        TEST_URL="https://$(printf "$GITHUB_REPO" | \
+            perl -pe 's/\//.github.io\//')/build..$CI_BRANCH..travis-ci.org/app/index.html" || \
+            return $?
+        # deploy app to gh-pages
+        (export npm_config_file_test_report_merge="$npm_config_dir_build/test-report.json" &&
+            shGithubDeploy) || return $?
+        # test deployed app to gh-pages
+        (export MODE_BUILD=githubTest &&
+            export modeBrowserTest=test &&
+            export npm_config_file_test_report_merge="$npm_config_dir_build/test-report.json" &&
+            export url="$TEST_URL?modeTest=consoleLogResult&timeExit={{timeExit}}" &&
+            shBrowserTest) || return $?
     fi
 }
 shBuild
@@ -399,10 +467,16 @@ shBuild
 # save exit-code
 EXIT_CODE=$?
 # create package-listing
-MODE_BUILD=gitLsTree shRunScreenCapture shGitLsTree || exit $?
+(export MODE_BUILD=gitLsTree &&
+    shRunScreenCapture shGitLsTree) || exit $?
 # create recent changelog of last 50 commits
-MODE_BUILD=gitLog shRunScreenCapture git log -50 --pretty="%ai\u000a%B" || exit $?
+(export MODE_BUILD=gitLog &&
+    shRunScreenCapture git log -50 --pretty="%ai\u000a%B") || exit $?
+# cleanup remote build dir
+# export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build" || exit $?
 # upload build-artifacts to github, and if number of commits > 16, then squash older commits
-COMMIT_LIMIT=16 shBuildGithubUpload || exit $?
+(export COMMIT_LIMIT=16 &&
+    export MODE_BUILD=githubUpload &&
+    shBuildGithubUpload) || exit $?
 exit "$EXIT_CODE"
 ```

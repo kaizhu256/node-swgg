@@ -52,13 +52,16 @@
                     "require('" + process.env.npm_package_name + "')",
                     "require(__dirname + '/index.js')"
                 );
+            local.utility2 = require('utility2');
             // require example.js
-            local = require('utility2')
-                .requireFromScript(__dirname + '/example.js', local.script
+            local = local.utility2.requireFromScript(
+                __dirname + '/example.js',
+                local.utility2.jslintAndPrint(local.script, __dirname + '/example.js')
                     .replace(
                         "local.fs.readFileSync(__dirname + '/example.js', 'utf8')",
                         JSON.stringify(local.script)
-                    ));
+                    )
+            );
             break;
         }
     }());
@@ -78,11 +81,14 @@
             onParallel = local.utility2.onParallel(onError);
             onParallel.counter += 1;
             [{
-                url: '/_test/undefined'
+                // test 404-error handling-behavior
+                url: '/test/undefined'
             }, {
                 method: 'POST',
+                // test param-parse-error handling-behavior
                 url: '/api/v0/_test/paramDefault/aa?paramJson=syntax%20error'
             }, {
+                // test 404-api-error handling-behavior
                 url: '/api/v0/_test/undefined'
             }].forEach(function (options) {
                 onParallel.counter += 1;
@@ -445,6 +451,79 @@
 
     // run node js-env code
     case 'node':
+        local.testCase_build_assets = function (options, onError) {
+        /*
+         * this function will test build's asset handling-behavior
+         */
+            var onParallel;
+            // jslint-hack
+            local.utility2.nop(options);
+            onParallel = local.utility2.onParallel(onError);
+            onParallel.counter += 1;
+            [{
+                file: '/index.html',
+                url: '/'
+            }, {
+                file: '/api/v0/swagger.json',
+                url: '/api/v0/swagger.json'
+            }, {
+                file: '/assets/example.js',
+                url: '/assets/example.js'
+            }, {
+                file: '/assets/nedb.min.js',
+                url: '/assets/nedb.min.js'
+            }, {
+                file: '/assets/swagger-lite.js',
+                url: '/assets/swagger-lite.js'
+            }, {
+                file: '/assets/swagger-tools-standalone-min.js',
+                url: '/assets/swagger-tools-standalone-min.js'
+            }, {
+                file: '/assets/swagger-ui.explorer_icons.png',
+                url: '/assets/swagger-ui.explorer_icons.png'
+            }, {
+                file: '/assets/swagger-ui.favicon-16x16.png',
+                url: '/assets/swagger-ui.favicon-16x16.png'
+            }, {
+                file: '/assets/swagger-ui.favicon-32x32.png',
+                url: '/assets/swagger-ui.favicon-32x32.png'
+            }, {
+                file: '/assets/swagger-ui.logo_small.png',
+                url: '/assets/swagger-ui.logo_small.png'
+            }, {
+                file: '/assets/swagger-ui.rollup.css',
+                url: '/assets/swagger-ui.rollup.css'
+            }, {
+                file: '/assets/swagger-ui.rollup.js',
+                url: '/assets/swagger-ui.rollup.js'
+            }, {
+                file: '/assets/swagger-ui.throbber.gif',
+                url: '/assets/swagger-ui.throbber.gif'
+            }, {
+                file: '/assets/test.js',
+                url: '/assets/test.js'
+            }, {
+                file: '/assets/utility2.css',
+                url: '/assets/utility2.css'
+            }, {
+                file: '/assets/utility2.js',
+                url: '/assets/utility2.js'
+            }].forEach(function (element) {
+                onParallel.counter += 1;
+                local.utility2.ajax({ url: element.url }, function (error, xhr) {
+                    // validate no error occurred
+                    onParallel.counter += 1;
+                    onParallel(error);
+                    local.utility2.fsWriteFileWithMkdirp(
+                        local.utility2.envDict.npm_config_dir_build + '/app' + element.file,
+                        xhr.response,
+                        onParallel
+                    );
+                });
+            });
+            onParallel();
+        };
+
         local.testCase_testPage_default = function (options, onError) {
         /*
          * this function will test the test-page's default handling-behavior
@@ -459,34 +538,11 @@
         };
         break;
     }
-    switch (local.modeJs) {
 
 
 
-    // run browser js-env code
-    case 'browser':
-        // init swaggerUi
-        local.utility2.onReady.counter += 1;
-        window.swaggerUi = new window.SwaggerUi({
-            dom_id: "swagger-ui-container",
-            onComplete: function () {
-                local.swgg.swaggerJson = local.swgg.api.swaggerJson;
-                local.utility2.onReady();
-            },
-            supportedSubmitMethods: ['delete', 'get', 'patch', 'post', 'put'],
-            url: '/api/v0/swagger.json'
-        });
-        // init api
-        window.swaggerUi.load();
-        local.swgg.api = window.swaggerUi.api;
-        // run test
-        local.utility2.testRun(local);
-        break;
-
-
-
-    // run node js-env code
-    case 'node':
+    // run shared js-env code
+    (function () {
         // test null apiUpdate handling-behavior
         local.swgg.apiUpdate({});
         // init test api
@@ -678,6 +734,13 @@
         });
         // test redundant http-body-parse-middleware handling-behavior
         local.middleware.middlewareList.push(local.swgg.middlewareBodyParse);
+        // init serverLocal
+        local.utility2.serverLocalUrlTest = function (url) {
+            url = local.utility2.urlParse(url).pathname;
+            return local.modeJs === 'browser' &&
+                url.indexOf('/api/v0/swagger.json') < 0 &&
+                (/\/api\/v0\/|\/test\//).test(url);
+        };
         // init test-middleware
         local.middleware.middlewareList.push(function (request, response, nextMiddleware) {
             local.request = request;
@@ -701,18 +764,33 @@
                 nextMiddleware();
             }
         });
+    }());
+    switch (local.modeJs) {
+
+
+
+    // run node js-env code
+    case 'node':
         // run validation test
         local.testCase_validateByParamDefList_default(null, local.utility2.onErrorDefault);
         local.testCase_validateBySchema_default(null, local.utility2.onErrorDefault);
         local.testCase_validateBySwagger_default(null, local.utility2.onErrorDefault);
+        local.utility2.cacheDict.assets['/assets/test.js'] =
+            local.utility2.istanbulInstrumentInPackage(
+                local.fs.readFileSync(__filename, 'utf8'),
+                local.swgg.__dirname + '/test.js',
+                'swagger-lite'
+            );
         // debug dir
         [
+            local.utility2.__dirname,
             __dirname
         ].forEach(function (dir) {
             local.fs.readdirSync(dir).forEach(function (file) {
                 file = dir + '/' + file;
                 local.utility2.onFileModifiedRestart(file);
                 switch (local.path.extname(file)) {
+                case '.css':
                 case '.js':
                 case '.json':
                     // jslint file

@@ -38,7 +38,7 @@
             : global;
         // init utility2
         local.utility2 = local.modeJs === 'browser'
-            ? window.utility2
+            ? local.global.utility2
             : require('utility2');
         // init swagger-lite
         local.swgg = { cacheDict: { collection: {}, pathObject: {} }, local: local };
@@ -339,12 +339,11 @@
         /*
          * this function will update the swagger-api
          */
-            var keyUnique, pathObject, tmp;
+            var keyUnique, pathObject, schema, tmp;
             options.definitions = options.definitions || {};
             options.paths = options.paths || {};
             // init pathObjectDefaultList
             Object.keys(options.definitions).forEach(function (schemaName) {
-                var schema;
                 schema = options.definitions[schemaName];
                 schema._schemaName = schemaName;
                 local.utility2.objectSetDefault(options, JSON.parse(JSON.stringify({
@@ -378,8 +377,7 @@
                     keyUnique = (/ByKeyUnique\.(.*)/).exec(pathObject);
                     keyUnique = keyUnique && keyUnique[1];
                     pathObject = pathObject.replace('.' + keyUnique, '');
-                    pathObject = JSON.parse(local.swgg.cacheDict
-                        .pathObjectDefault[pathObject]
+                    pathObject = JSON.parse(local.swgg.cacheDict.pathObjectDefault[pathObject]
                         .replace((/\{\{_keyUnique\}\}/g), keyUnique)
                         .replace((/\{\{_pathPrefix\}\}/g), schema._pathPrefix)
                         .replace((/\{\{_schemaName\}\}/g), schema._schemaName));
@@ -389,12 +387,10 @@
                     options.paths[pathObject._path][pathObject._method] = pathObject;
                 });
                 // init keyUnique / pathObject / schemaName
-                schema = options.definitions[schemaName] = JSON.parse(
-                    JSON.stringify(schema)
-                        .replace((/\{\{_keyUnique\}\}/g), keyUnique)
-                        .replace((/\{\{_pathPrefix\}\}/g), schema._pathPrefix)
-                        .replace((/\{\{_schemaName\}\}/g), schema._schemaName)
-                );
+                schema = options.definitions[schemaName] = JSON.parse(JSON.stringify(schema)
+                    .replace((/\{\{_keyUnique\}\}/g), keyUnique)
+                    .replace((/\{\{_pathPrefix\}\}/g), schema._pathPrefix)
+                    .replace((/\{\{_schemaName\}\}/g), schema._schemaName));
             });
             // update paths
             Object.keys(options.paths).forEach(function (path) {
@@ -476,8 +472,9 @@
                 });
             });
             // jsonCopy object to prevent side-effects
-            local.swgg.swaggerJson = JSON.parse(local.utility2
-                .jsonStringifyOrdered(local.utility2.jsonCopy(local.swgg.swaggerJson)));
+            local.swgg.swaggerJson = JSON.parse(local.utility2.jsonStringifyOrdered(
+                local.utility2.jsonCopy(local.swgg.swaggerJson)
+            ));
             // validate swaggerJson
             local.swgg.validateBySwagger(local.utility2.objectSetDefault(
                 local.utility2.jsonCopy(local.swgg.swaggerJson),
@@ -507,7 +504,7 @@
                 switch ((/[^;]*/).exec(request.headers['content-type'] || '')[0]) {
                 case 'application/x-www-form-urlencoded':
                     request.swggBodyParsed =
-                        local.url.parse('?' + request.swggBodyParsed, true).query;
+                        local.utility2.urlParse('?' + request.swggBodyParsed, true).query;
                     break;
                 default:
                     try {
@@ -543,15 +540,14 @@
                     case 1:
                         // if request.url is not prefixed with swaggerJson.basePath,
                         // then default to nextMiddleware
-                        if (request.urlParsed.pathnameNormalized
+                        if (request.urlParsed.pathname
                                 .indexOf(local.swgg.swaggerJson.basePath) !== 0) {
                             modeNext = Infinity;
                             onNext();
                             return;
                         }
                         // init swggPathname
-                        request.swggPathname = request.method + ' ' +
-                            request.urlParsed.pathnameNormalized
+                        request.swggPathname = request.method + ' ' + request.urlParsed.pathname
                             .replace(local.swgg.swaggerJson.basePath, '');
                         switch (request.swggPathname) {
                         // serve swagger.json
@@ -561,8 +557,9 @@
                         }
                         // init swggPathObject
                         while (true) {
-                            request.swggPathObject =
-                                local.swgg.cacheDict.pathObject[request.swggPathname];
+                            request.swggPathObject = local.swgg.cacheDict.pathObject[
+                                request.swggPathname
+                            ];
                             // if swggPathObject exists, then break and continue
                             if (request.swggPathObject) {
                                 request.swggPathObject = JSON.parse(request.swggPathObject);
@@ -576,8 +573,8 @@
                                 break;
                             }
                             request.swggPathnameOld = request.swggPathname;
-                            request.swggPathname =
-                                request.swggPathname.replace((/\/[^\/]+?(\/*?)$/), '/$1');
+                            request.swggPathname = request.swggPathname
+                                .replace((/\/[^\/]+?(\/*?)$/), '/$1');
                         }
                         break;
                     case 2:
@@ -622,8 +619,10 @@
                                 request.swggParamDict[paramDef.name] || paramDef.default;
                         });
                         // normalize params
-                        local.swgg.normalizeParamDictSwagger(request
-                            .swggParamDict, request.swggPathObject);
+                        local.swgg.normalizeParamDictSwagger(
+                            request.swggParamDict,
+                            request.swggPathObject
+                        );
                         // validate params
                         local.swgg.validateByParamDefList({
                             data: request.swggParamDict,
@@ -974,32 +973,11 @@
             );
         };
     }());
-    switch (local.modeJs) {
 
 
 
-    // run browser js-env code
-    case 'browser':
-        // init exports
-        window.swgg = local.swgg;
-        break;
-
-
-
-    // run node js-env code
-    case 'node':
-        // init exports
-        module.exports = local.swgg;
-        module.exports.__dirname = __dirname;
-        // require modules
-        local.fs = require('fs');
-        local.http = require('http');
-        local.https = require('https');
-        local.path = require('path');
-        local.swagger_tools = require('swagger-ui-lite/swagger-tools-standalone-min.js');
-        local.swagger_ui = require('swagger-ui-lite');
-        local.url = require('url');
-        local.vm = require('vm');
+    // run shared js-env code
+    (function () {
         // init swaggerJson
         local.swgg.swaggerJson = {
             basePath: local.utility2.envDict.npm_config_mode_api_prefix || '/api/v0',
@@ -1058,189 +1036,165 @@
                 }
             } } }
         };
+    }());
+    switch (local.modeJs) {
+
+
+
+    // run browser js-env code
+    case 'browser':
+        // init exports
+        local.global.swgg = local.swgg;
+        // require modules
+        local.swagger_tools = local.global.SwaggerTools.specs;
+        local.swgg.SwaggerClient = local.global.SwaggerClient;
+        local.url = local.utility2.local.url;
+        break;
+
+
+
+    // run node js-env code
+    case 'node':
+        // init exports
+        module.exports = local.swgg;
+        module.exports.__dirname = __dirname;
+        // require modules
+        local.fs = require('fs');
+        local.http = require('http');
+        local.https = require('https');
+        local.path = require('path');
+        local.swagger_tools = require('swagger-ui-lite/swagger-tools-standalone-min.js');
+        local.swagger_ui = require('swagger-ui-lite');
+        local.url = require('url');
+        local.vm = require('vm');
         // init assets
-        local.utility2.cacheDict.assets['/assets/nedb.min.js'] = local.fs
-            .readFileSync(local.swagger_ui.__dirname + '/nedb.min.js', 'utf8');
-        local.utility2.cacheDict.assets['/assets/swagger-lite.js'] = local.utility2
-            .istanbulInstrumentInPackage(
+        local.utility2.cacheDict.assets['/assets/nedb.min.js'] =
+            local.fs.readFileSync(local.swagger_ui.__dirname + '/nedb.min.js', 'utf8');
+        local.utility2.cacheDict.assets['/assets/swagger-lite.js'] =
+            local.utility2.istanbulInstrumentInPackage(
                 local.fs.readFileSync(__filename, 'utf8'),
                 __filename,
                 'swagger-lite'
             );
-        local.utility2.cacheDict.assets['/assets/swagger-ui.html'] = local.fs
-            .readFileSync(
-                local.swagger_ui.__dirname + '/swagger-ui.html',
-                'utf8'
-            )
-            // swagger-hack - add extra assets
-            .replace(
-                "<script src='swagger-ui.rollup.js' type='text/javascript'></script>",
-                "<script src='swagger-ui.rollup.js' type='text/javascript'></script>" +
-                    '<script src="/assets/nedb.min.js"></script>' +
-                    '<script src="/assets/utility2.js"></script>' +
-                    '<script src="/assets/swagger-lite.js"></script>'
-            )
-            // swagger-hack - update swagger.json url
-            .replace(
-                'https://kaizhu256.github.io/node-swagger-ui-lite/build/swagger.json',
-                local.swgg.swaggerJson.basePath + '/swagger.json'
-            );
-        local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.css'] = local.fs
-            .readFileSync(local.swagger_ui.__dirname +
-                '/swagger-ui.rollup.css', 'utf8');
-        /* istanbul ignore next */
-        // https://github.com/swagger-api/swagger-js/blob/v2.1.3/lib/types/operation.js#L619
-        local._OperationPrototypeExecute = function (arg1, arg2, arg3, arg4, parent) {
-            /*global SwaggerHttp, helpers*/
-            var allHeaders,
-                args,
-                attrname,
-                body,
-                contentTypeHeaders,
-                error,
-                format,
-                headers,
-                obj,
-                onError,
-                opts,
-                success,
-                url;
-            args = arg1 || {};
-            opts = {};
-            if (typeof arg2 === 'object') {
-                opts = arg2;
-                success = arg3;
-                error = arg4;
-            }
-            if (this.client) {
-                opts.client = this.client;
-            }
-            if (this.responseInterceptor) {
-                opts.responseInterceptor = this.responseInterceptor;
-            }
-            if (typeof arg2 === 'function') {
-                success = arg2;
-                error = arg3;
-            }
-            success = (success || this.parent.defaultSuccessCallback || helpers.log);
-            error = (error || this.parent.defaultErrorCallback || helpers.log);
-            if (opts.useJQuery === undefined) {
-                opts.useJQuery = this.useJQuery;
-            }
-            // swagger-hack - disable missingParams validation handling
-            // missingParams = this.getMissingParams(args);
-            // if (missingParams.length > 0) {
-                // message = 'missing required params: ' + missingParams;
-                // helpers.fail(message);
-                // error(message);
-                // return;
-            // }
-            allHeaders = this.getHeaderParams(args);
-            contentTypeHeaders = this.setContentTypes(args, opts);
-            headers = {};
-            for (attrname in allHeaders) {
-                if (allHeaders.hasOwnProperty(attrname)) {
-                    headers[attrname] = allHeaders[attrname];
-                }
-            }
-            for (attrname in contentTypeHeaders) {
-                if (contentTypeHeaders.hasOwnProperty(attrname)) {
-                    headers[attrname] = contentTypeHeaders[attrname];
-                }
-            }
-            body = this.getBody(contentTypeHeaders, args, opts);
-            url = this.urlify(args);
-            if (url.indexOf('.{format}') > 0) {
-                if (headers) {
-                    format = headers.Accept || headers.accept;
-                    if (format && format.indexOf('json') > 0) {
-                        url = url.replace('.{format}', '.json');
-                    } else if (format && format.indexOf('xml') > 0) {
-                        url = url.replace('.{format}', '.xml');
-                    }
-                }
-            }
-            obj = {
-                url: url,
-                method: this.method.toUpperCase(),
-                body: body,
-                useJQuery: opts.useJQuery,
-                headers: headers,
-                on: {
-                    response: function (response) {
-                        return success(response, parent);
-                    },
-                    error: function (response) {
-                        return error(response, parent);
-                    }
-                }
-            };
-            this.clientAuthorizations.apply(obj, this.operation.security);
-            if (opts.mock === true) {
-                return obj;
-            }
-            if (opts.modeErrorData) {
-                onError = success;
-                error = function (error) {
-                    error = error.obj || error;
-                    error = error.data || error;
-                    try { error = JSON.parse(error); } catch (ignore) {}
-                    if (typeof error === "string") {
-                        error = { message: error };
-                    }
-                    onError(error);
-                };
-                success = function (data) { onError(null, data); };
-            }
-            try {
-                if (window.swgg) {
-                    window.swgg.validateByParamDefList({
-                        data: window.swgg.normalizeParamDictSwagger(
-                            JSON.parse(JSON.stringify(args)),
-                            this
-                        ),
-                        key: this.operation.operationId,
-                        paramDefList: this.parameters
-                    });
-                }
-            } catch (errorCaught) {
-                window.swgg.onErrorJsonapi(function (error) {
-                    obj.on.error({
-                        data: JSON.stringify(error),
-                        headers: { "Content-Type": "application/json" }
-                    });
-                })(errorCaught);
-                // wiggle input on Error
-                if (parent && window.jQuery) {
-                    window.jQuery(".sandbox", window.jQuery(parent.el))
-                        .find("input[type='text'],select.parameter," +
-                            "textarea.body-textarea")
-                        .each(function () {
-                            window.jQuery(this).addClass("error");
-                            window.jQuery(this).wiggle();
-                        });
-                }
-                return;
-            }
-            new SwaggerHttp().execute(obj, opts);
-        };
-        local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.css'] = local.fs
-            .readFileSync(local.swagger_ui.__dirname + '/swagger-ui.rollup.css', 'utf8') +
+        local.utility2.cacheDict.assets['/assets/swagger-tools-standalone-min.js'] =
+            local.fs.readFileSync(local.swagger_ui.__dirname +
+                '/swagger-tools-standalone-min.js', 'utf8');
+        local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.css'] =
+            local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.rollup.css', 'utf8')
+            .replace((/^(\w.+?(?:,| \{))/gm), '.swagger-section $1') +
 /* jslint-ignore-begin */
 '\n\
+.swagger-section #header {\n\
+    border: 1px solid black;\n\
+}\n\
 .swagger-section .swagger-ui-wrap ul#resources li.resource ul.endpoints li.endpoint ul.operations li.operation div.content form select.error {\n\
-  outline: 2px solid black;\n\
-  outline-color: #cc0000;\n\
+    outline: 2px solid black;\n\
+    outline-color: #cc0000;\n\
 }\n\
 .swagger-section .swagger-ui-wrap ul#resources li.resource ul.endpoints li.endpoint ul.operations li.operation div.content form textarea.error {\n\
-  outline: 2px solid black;\n\
-  outline-color: #cc0000;\n\
+    outline: 2px solid black;\n\
+    outline-color: #cc0000;\n\
 }\n\
 \n' +
 /* jslint-ignore-end */
             String();
-        local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.js'] = local.fs
-            .readFileSync(local.swagger_ui.__dirname + '/swagger-ui.rollup.js', 'utf8')
+        /* istanbul ignore next */
+        // https://github.com/swagger-api/swagger-js/blob/v2.1.3/lib/types/operation.js#L619
+        local._OperationPrototypeExecute = function (
+            data,
+            options,
+            onData,
+            onError,
+            parent,
+            // jslint-hack
+            local
+        ) {
+            var onErrorData, self;
+            local = window;
+            self = this;
+            if (typeof options === 'function') {
+                onError = onData;
+                onData = options;
+                options = {};
+            }
+            data = data || {};
+            // init options
+            options.headers = local.utility2.objectSetDefault(
+                self.setContentTypes(data, options),
+                self.getHeaderParams(data)
+            );
+            options.data = self.getBody(options.headers, data, options);
+            options.method = self.method.toUpperCase();
+            options.url = self.urlify(data);
+            self.clientAuthorizations.apply(options, self.operation.security);
+            if (options.mock) {
+                return options;
+            }
+            // init onErrorData
+            onErrorData = function (error, data) {
+                data = data || {};
+                data = {
+                    data: data.responseText,
+                    headers: data.getAllResponseHeaders,
+                    method: data.method,
+                    obj: (function () {
+                        try {
+                            return JSON.parse(data.responseText);
+                        } catch (ignore) {
+                        }
+                    }()),
+                    status: data.statusCode,
+                    url: data.url
+                };
+                if (options.modeErrorData) {
+                    onData(error && data.obj, data);
+                    return;
+                }
+                if (error) {
+                    (onError || local.utility2.nop).call(options, data, parent);
+                    return;
+                }
+                (onData || local.utility2.nop).call(options, data, parent);
+            };
+            // validate data
+            try {
+                local.swgg.validateByParamDefList({
+                    data: local.swgg.normalizeParamDictSwagger(
+                        local.utility2.jsonCopy(data),
+                        self
+                    ),
+                    key: self.operation.operationId,
+                    paramDefList: self.parameters
+                });
+            } catch (errorCaught) {
+                local.swgg.onErrorJsonapi(function (error) {
+                    onErrorData(error, {
+                        getAllResponseHeaders: function () {
+                            return { "Content-Type": "application/json" };
+                        },
+                        responseText: JSON.stringify(error),
+                        method: options.method,
+                        obj: error,
+                        statusCode: 400,
+                        url: options.url
+                    });
+                })(errorCaught);
+                // wiggle input on Error
+                if (parent && local.jQuery) {
+                    local.jQuery(".sandbox", local.jQuery(parent.el))
+                        .find("input[type='text'],select.parameter," +
+                            "textarea.body-textarea")
+                        .each(function () {
+                            local.jQuery(self).addClass("error");
+                            local.jQuery(self).wiggle();
+                        });
+                }
+                return;
+            }
+            local.utility2.ajax(options, onErrorData);
+        };
+        local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.js'] =
+            local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.rollup.js', 'utf8')
             // swagger-hack - disable sourceMappingURL
             .replace((/^\/\/# sourceMappingURL=.*/gm), '')
             // swagger-hack - save swaggerJson
@@ -1253,10 +1207,12 @@
 /* jslint-ignore-begin */
 'Operation.prototype.execute=function(e,t,r,n,i){var s,a,o=e||{},p={};_.isObject(t)&&(p=t,s=r,a=n),this.client&&(p.client=this.client),this.responseInterceptor&&(p.responseInterceptor=this.responseInterceptor),"function"==typeof t&&(s=t,a=r),s=s||this.parent.defaultSuccessCallback||helpers.log,a=a||this.parent.defaultErrorCallback||helpers.log,"undefined"==typeof p.useJQuery&&(p.useJQuery=this.useJQuery);var l=this.getMissingParams(o);if(l.length>0){var u="missing required params: "+l;return helpers.fail(u),void a(u)}var h,d=this.getHeaderParams(o),c=this.setContentTypes(o,p),m={};for(h in d)m[h]=d[h];for(h in c)m[h]=c[h];var f=this.getBody(c,o,p),y=this.urlify(o);if(y.indexOf(".{format}")>0&&m){var g=m.Accept||m.accept;g&&g.indexOf("json")>0?y=y.replace(".{format}",".json"):g&&g.indexOf("xml")>0&&(y=y.replace(".{format}",".xml"))}var v={url:y,method:this.method.toUpperCase(),body:f,useJQuery:p.useJQuery,headers:m,on:{response:function(e){return s(e,i)},error:function(e){return a(e,i)}}};return this.clientAuthorizations.apply(v,this.operation.security),p.mock===!0?v:void(new SwaggerHttp).execute(v,p)}' +
 /* jslint-ignore-end */
-                    String(), 'Operation.prototype.execute=' + local._OperationPrototypeExecute
-                    .toString()
+                    String(),
+                    // preserve lineno
+                    local.utility2.uglify('Operation.prototype.execute=' +
+                    local._OperationPrototypeExecute.toString()
                     // coverage-hack - uncover
-                    .replace((/\b__cov_.*?\+\+/g), '0'))
+                    .replace((/\b__cov_.*?\+\+/g), '0')))
             // swagger-hack - handle json error
             .replace('r.callback(t||i,e)', 'r.callback(' +
                 '(e&&e.body&&e.body.message&&e.body.stack?e.body:t)||i,e)')
@@ -1272,178 +1228,19 @@
             )
             // swagger-hack - disable online validation
             .replace("if ('validatorUrl' in opts.swaggerOptions) {", "if (true) {");
-        local.utility2.cacheDict.assets['/assets/swagger-ui.favicon-16x16.png'] = local.fs
-            .readFileSync(local.swagger_ui.__dirname +
-                '/swagger-ui.favicon-16x16.png');
-        local.utility2.cacheDict.assets['/assets/swagger-ui.favicon-32x32.png'] = local.fs
-            .readFileSync(local.swagger_ui.__dirname +
-                '/swagger-ui.favicon-32x32.png');
-        local.utility2.cacheDict.assets['/assets/swagger-ui.explorer_icons.png'] = local.fs
-            .readFileSync(local.swagger_ui.__dirname +
+        local.utility2.cacheDict.assets['/assets/swagger-ui.favicon-16x16.png'] =
+            local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.favicon-16x16.png');
+        local.utility2.cacheDict.assets['/assets/swagger-ui.favicon-32x32.png'] =
+            local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.favicon-32x32.png');
+        local.utility2.cacheDict.assets['/assets/swagger-ui.explorer_icons.png'] =
+            local.fs.readFileSync(local.swagger_ui.__dirname +
                 '/swagger-ui.explorer_icons.png');
-        local.utility2.cacheDict.assets['/assets/swagger-ui.logo_small.png'] = local.fs
-            .readFileSync(local.swagger_ui.__dirname +
-                '/swagger-ui.logo_small.png');
-        local.utility2.cacheDict.assets['/assets/swagger-ui.throbber.gif'] = local.fs
-            .readFileSync(local.swagger_ui.__dirname +
-                '/swagger-ui.throbber.gif');
+        local.utility2.cacheDict.assets['/assets/swagger-ui.logo_small.png'] =
+            local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.logo_small.png');
+        local.utility2.cacheDict.assets['/assets/swagger-ui.throbber.gif'] =
+            local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.throbber.gif');
         // init XMLHttpRequest
-        local.XMLHttpRequest = local.utility2.XMLHttpRequest = function () {
-        /*
-         * this function will construct the xhr-connection
-         * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
-         */
-            this.headers = {};
-            this.onError = this.onError.bind(this);
-            this.onLoadList = [];
-            this.onResponse = this.onResponse.bind(this);
-            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/readyState
-            this.readyState = 0;
-            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/response
-            this.response = null;
-            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseText
-            this.responseText = '';
-            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseType
-            this.responseType = '';
-            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/status
-            this.status = this.statusCode = 0;
-            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/statusText
-            this.statusText = '';
-            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/timeout
-            this.timeout = local.utility2.timeoutDefault;
-        };
-        local.utility2.XMLHttpRequest.prototype.abort = function () {
-        /*
-         * this function will abort the request if it has already been sent
-         * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#abort()
-         */
-            this.onError(new Error('abort'));
-        };
-        // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/upload
-        local.utility2.XMLHttpRequest.prototype.upload = {
-            addEventListener: local.utility2.nop
-        };
-        local.utility2.XMLHttpRequest.prototype.addEventListener = function (type, onError) {
-        /*
-         * this function will add event listeners to the xhr-connection
-         */
-            switch (type) {
-            case 'abort':
-            case 'error':
-            case 'load':
-                this.onLoadList.push(onError);
-                break;
-            }
-        };
-        local.utility2.XMLHttpRequest.prototype.getAllResponseHeaders = function () {
-        /*
-         * this function will return all the response headers, separated by CRLF,
-         * as a string, or null if no response has been received
-         * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
-         * #getAllResponseHeaders()
-         */
-            var self;
-            self = this;
-            return Object.keys(self.responseStream.headers).map(function (key) {
-                return key + ': ' + self.responseStream.headers[key] + '\r\n';
-            }).join('') + '\r\n';
-        };
-        local.utility2.XMLHttpRequest.prototype.getResponseHeader = function (key) {
-        /*
-         * this function will return the string containing the text of the specified header,
-         * or null if either the response has not yet been received
-         * or the header doesn't exist in the response
-         * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
-         * #getResponseHeader()
-         */
-            return (this.responseStream.headers && this.responseStream.headers[key]) || null;
-        };
-        local.utility2.XMLHttpRequest.prototype.onError = function (error, data) {
-        /*
-         * this function will handle the error and data passed back to the xhr-connection
-         */
-            if (this.done) {
-                return;
-            }
-            this.error = error;
-            this.response = data;
-            this.responseText = (data && data.toString()) || '';
-            // update xhr
-            this.readyState = 4;
-            this.onreadystatechange();
-            // handle data
-            this.onLoadList.forEach(function (onError) {
-                onError({ type: error
-                    ? 'error'
-                    : 'load' });
-            });
-        };
-        local.utility2.XMLHttpRequest.prototype.onResponse = function (responseStream) {
-        /*
-         * this function will handle the responseStream from the xhr-connection
-         */
-            this.responseStream = responseStream;
-            // update xhr
-            this.status = this.statusCode = this.responseStream.statusCode;
-            this.statusText = local.http.STATUS_CODES[this.responseStream.statusCode] || '';
-            this.readyState = 1;
-            this.onreadystatechange();
-            this.readyState = 2;
-            this.onreadystatechange();
-            this.readyState = 3;
-            this.onreadystatechange();
-            if (this.responseType === 'response') {
-                this.onError(null, this.responseStream);
-                return;
-            }
-            local.utility2.streamReadAll(this.responseStream, this.onError);
-        };
-        // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/onreadystatechange
-        local.utility2.XMLHttpRequest.prototype.onreadystatechange = local.utility2.nop;
-        local.utility2.XMLHttpRequest.prototype.open = function (method, url) {
-        /*
-         * this function will init the request
-         * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#open()
-         */
-            this.method = method;
-            this.url = url;
-            // handle implicit localhost
-            if (this.url[0] === '/') {
-                this.url = 'http://localhost:' + local.utility2.envDict.PORT + this.url;
-            }
-            // parse url
-            this.urlParsed = local.url.parse(String(this.url));
-            this.hostname = this.urlParsed.hostname;
-            this.path = this.urlParsed.path;
-            this.port = this.urlParsed.port;
-            // init requestStream
-            this.requestStream = (this.urlParsed.protocol === 'https:'
-                ? local.https
-                : local.http).request(this, this.onResponse)
-                // handle request-error
-                .on('error', this.onError);
-        };
-        // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#overrideMimeType()
-        local.utility2.XMLHttpRequest.prototype.overrideMimeType = local.utility2.nop;
-        local.utility2.XMLHttpRequest.prototype.send = function (data) {
-        /*
-         * this function will send the request
-         * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#send()
-         */
-            this.data = data;
-            // send data
-            this.requestStream.end(this.data);
-        };
-        local.utility2.XMLHttpRequest.prototype.setRequestHeader = function (key, value) {
-        /*
-         * this function will set the value of an HTTP request header
-         * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
-         * #setRequestHeader()
-         */
-            key = key.toLowerCase();
-            this.headers[key] = value;
-            this.requestStream.setHeader(key, value);
-        };
+        local.XMLHttpRequest = local.utility2.local._http.XMLHttpRequest;
         // init window
         local.window = local;
         // init SwaggerClient
