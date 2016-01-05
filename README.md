@@ -188,7 +188,7 @@ instruction
     <link href="assets/swagger-ui.rollup.css" media="screen" rel="stylesheet" type="text/css">\n\
 </head>\n\
 <body>\n\
-    <div class="ajaxProgressDiv" style="display: none;">\n\
+    <div class="ajaxProgressDiv" style="display: block;">\n\
     <div class="ajaxProgressBarDiv ajaxProgressBarDivLoading">loading</div>\n\
     </div>\n\
     <h1>{{envDict.npm_package_name}} [{{envDict.npm_package_version}}]</h1>\n\
@@ -220,67 +220,65 @@ instruction
     <script src="assets/swagger-lite.js"></script>\n\
     <script src="assets/example.js"></script>\n\
     <script src="assets/test.js"></script>\n\
-    <script>\n\
+    <script>$(function () {\n\
     window.utility2.envDict = {\n\
         npm_package_description: "{{envDict.npm_package_description}}",\n\
         npm_package_name: "{{envDict.npm_package_name}}",\n\
         npm_package_version: "{{envDict.npm_package_version}}"\n\
     };\n\
-    $(function () {\n\
-        var url = window.location.search.match(/url=([^&]+)/);\n\
-        if (url && url.length > 1) {\n\
-            url = decodeURIComponent(url[1]);\n\
-        } else {\n\
-            url = location.pathname.replace((/\\/[^\/]*?$/), "") + "/api/v0/swagger.json";\n\
-        }\n\
-        // Pre load translate...\n\
-        if(window.SwaggerTranslator) {\n\
-            window.SwaggerTranslator.translate();\n\
-        }\n\
-        local.utility2.onReady.counter += 1;\n\
-        window.swaggerUi = new SwaggerUi({\n\
-            url: url,\n\
-            dom_id: "swagger-ui-container",\n\
-            supportedSubmitMethods: ["get", "post", "put", "delete", "patch"],\n\
-            onComplete: function(swaggerApi, swaggerUi){\n\
-                if(typeof initOAuth == "function") {\n\
-                    initOAuth({\n\
-                        clientId: "your-client-id",\n\
-                        clientSecret: "your-client-secret",\n\
-                        realm: "your-realms",\n\
-                        appName: "your-app-name",\n\
-                        scopeSeparator: ","\n\
-                    });\n\
-                }\n\
-                if(window.SwaggerTranslator) {\n\
-                    window.SwaggerTranslator.translate();\n\
-                }\n\
-                $("pre code").each(function(i, e) {\n\
-                    hljs.highlightBlock(e)\n\
+    var url = window.location.search.match(/url=([^&]+)/);\n\
+    if (url && url.length > 1) {\n\
+        url = decodeURIComponent(url[1]);\n\
+    } else {\n\
+        url = location.pathname.replace((/\\/[^\/]*?$/), "") + "/api/v0/swagger.json";\n\
+    }\n\
+    // Pre load translate...\n\
+    if(window.SwaggerTranslator) {\n\
+        window.SwaggerTranslator.translate();\n\
+    }\n\
+    local.utility2.onReady.counter += 1;\n\
+    window.swaggerUi = new SwaggerUi({\n\
+        url: url,\n\
+        dom_id: "swagger-ui-container",\n\
+        supportedSubmitMethods: ["get", "post", "put", "delete", "patch"],\n\
+        onComplete: function(swaggerApi, swaggerUi){\n\
+            if(typeof initOAuth == "function") {\n\
+                initOAuth({\n\
+                    clientId: "your-client-id",\n\
+                    clientSecret: "your-client-secret",\n\
+                    realm: "your-realms",\n\
+                    appName: "your-app-name",\n\
+                    scopeSeparator: ","\n\
                 });\n\
-                addApiKeyAuthorization();\n\
-                local.utility2.onReady();\n\
-            },\n\
-            onFailure: function(data) {\n\
-                log("Unable to Load SwaggerUI");\n\
-            },\n\
-            docExpansion: "none",\n\
-            apisSorter: "alpha",\n\
-            showRequestHeaders: false\n\
-        });\n\
-        function addApiKeyAuthorization(){\n\
-            var key = encodeURIComponent($("#input_apiKey")[0].value);\n\
-            if(key && key.trim() != "") {\n\
-                var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("api_key", key, "query");\n\
-                window.swaggerUi.api.clientAuthorizations.add("api_key", apiKeyAuth);\n\
-                log("added key " + key);\n\
             }\n\
-        }\n\
-        $("#input_apiKey").change(addApiKeyAuthorization);\n\
-        window.swaggerUi.load();\n\
-        local.swgg.api = window.swaggerUi.api;\n\
+            if(window.SwaggerTranslator) {\n\
+                window.SwaggerTranslator.translate();\n\
+            }\n\
+            $("pre code").each(function(i, e) {\n\
+                hljs.highlightBlock(e)\n\
+            });\n\
+            addApiKeyAuthorization();\n\
+            local.utility2.onReady();\n\
+        },\n\
+        onFailure: function(data) {\n\
+            log("Unable to Load SwaggerUI");\n\
+        },\n\
+        docExpansion: "none",\n\
+        apisSorter: "alpha",\n\
+        showRequestHeaders: false\n\
     });\n\
-    </script>\n\
+    function addApiKeyAuthorization(){\n\
+        var key = encodeURIComponent($("#input_apiKey")[0].value);\n\
+        if(key && key.trim() != "") {\n\
+            var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("api_key", key, "query");\n\
+            window.swaggerUi.api.clientAuthorizations.add("api_key", apiKeyAuth);\n\
+            log("added key " + key);\n\
+        }\n\
+    }\n\
+    $("#input_apiKey").change(addApiKeyAuthorization);\n\
+    window.swaggerUi.load();\n\
+    local.swgg.api = window.swaggerUi.api;\n\
+    });</script>\n\
 </body>\n\
 </html>';
         /* jslint-ignore-end */
@@ -377,13 +375,14 @@ utility2 shRun shReadmeExportFile package.json package.json && \
 export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js"
     },
-    "version": "2015.12.1"
+    "version": "2015.12.2"
 }
 ```
 
 
 
 # todo
+- fix wiggle
 - add nedb backend
 - add logging feature
 - add cached version crudGetManyByQueryCached
@@ -396,11 +395,9 @@ utility2 test node test.js"
 
 
 
-# change since 751510c8
-- npm publish 2015.12.1
-- migrate live-test-server from heroku to github, with browser emulation of server
-- revamp local._OperationPrototypeExecute to mock ajax request to browser-emulated server
-- remove ./Procfile
+# change since c6e946d3
+- npm publish 2015.12.2
+- add initial loading icon
 - none
 
 

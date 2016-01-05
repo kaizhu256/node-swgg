@@ -13,7 +13,7 @@
 
 
 
-    // run shared js-env code
+    // run shared js-env code - pre-init
     (function () {
         // init local
         local = {};
@@ -68,7 +68,7 @@
 
 
 
-    // run shared js-env code
+    // run shared js-env code - function
     (function () {
         // init tests
         local.testCase_ajax_error = function (options, onError) {
@@ -449,7 +449,7 @@
 
 
 
-    // run node js-env code
+    // run node js-env code - function
     case 'node':
         local.testCase_build_assets = function (options, onError) {
         /*
@@ -541,7 +541,7 @@
 
 
 
-    // run shared js-env code
+    // run shared js-env code - post-init
     (function () {
         // test null apiUpdate handling-behavior
         local.swgg.apiUpdate({});
@@ -769,7 +769,7 @@
 
 
 
-    // run node js-env code
+    // run node js-env code - post-init
     case 'node':
         // run validation test
         local.testCase_validateByParamDefList_default(null, local.utility2.onErrorDefault);

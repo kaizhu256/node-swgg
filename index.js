@@ -14,7 +14,7 @@
 
 
 
-    // run shared js-env code
+    // run shared js-env code - pre-init
     (function () {
         // init local
         local = {};
@@ -333,7 +333,7 @@
 
 
 
-    // run shared js-env code
+    // run shared js-env code - function
     (function () {
         local.swgg.apiUpdate = function (options) {
         /*
@@ -976,7 +976,7 @@
 
 
 
-    // run shared js-env code
+    // run shared js-env code - post-init
     (function () {
         // init swaggerJson
         local.swgg.swaggerJson = {
@@ -1041,7 +1041,7 @@
 
 
 
-    // run browser js-env code
+    // run browser js-env code - post-init
     case 'browser':
         // init exports
         local.global.swgg = local.swgg;
@@ -1053,7 +1053,7 @@
 
 
 
-    // run node js-env code
+    // run node js-env code - post-init
     case 'node':
         // init exports
         module.exports = local.swgg;
@@ -1079,25 +1079,23 @@
         local.utility2.cacheDict.assets['/assets/swagger-tools-standalone-min.js'] =
             local.fs.readFileSync(local.swagger_ui.__dirname +
                 '/swagger-tools-standalone-min.js', 'utf8');
+        local.utility2.cacheDict.assets['/assets/swagger-ui.html'] =
+            local.fs.readFileSync(local.swagger_ui.__dirname +
+                '/swagger-ui.html', 'utf8');
         local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.css'] =
             local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.rollup.css', 'utf8')
             .replace((/^(\w.+?(?:,| \{))/gm), '.swagger-section $1') +
-/* jslint-ignore-begin */
-'\n\
-.swagger-section #header {\n\
-    border: 1px solid black;\n\
-}\n\
-.swagger-section .swagger-ui-wrap ul#resources li.resource ul.endpoints li.endpoint ul.operations li.operation div.content form select.error {\n\
-    outline: 2px solid black;\n\
-    outline-color: #cc0000;\n\
-}\n\
-.swagger-section .swagger-ui-wrap ul#resources li.resource ul.endpoints li.endpoint ul.operations li.operation div.content form textarea.error {\n\
-    outline: 2px solid black;\n\
-    outline-color: #cc0000;\n\
-}\n\
-\n' +
-/* jslint-ignore-end */
-            String();
+            '.swagger-section #header {\n' +
+                'border: 1px solid black;\n' +
+            '}\n' +
+            '.swagger-section select.error {\n' +
+                'outline: 2px solid black;\n' +
+                'outline-color: #cc0000;\n' +
+            '}\n' +
+            '.swagger-section textarea.error {\n' +
+                'outline: 2px solid black;\n' +
+                'outline-color: #cc0000;\n' +
+            '}';
         /* istanbul ignore next */
         // https://github.com/swagger-api/swagger-js/blob/v2.1.3/lib/types/operation.js#L619
         local._OperationPrototypeExecute = function (
