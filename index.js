@@ -1129,21 +1129,31 @@
                 return options;
             }
             // init onErrorData
-            onErrorData = function (error, data) {
-                data = data || {};
-                data = {
-                    data: data.responseText,
-                    headers: data.getAllResponseHeaders,
-                    method: data.method,
-                    obj: (function () {
-                        try {
-                            return JSON.parse(data.responseText);
-                        } catch (ignore) {
-                        }
-                    }()),
-                    status: data.statusCode,
-                    url: data.url
-                };
+            onErrorData = function (error, xhr) {
+                xhr = xhr || {};
+                data = {};
+                data.data = data.statusText = xhr.responseText;
+                data.headers = { 'content-type': 'application/json' };
+                ((xhr.getAllResponseHeaders && xhr.getAllResponseHeaders()) || '').replace(
+                    (/.+/g),
+                    function (item) {
+                        item = item.split(':');
+                        data.headers[item[0].trim().toLowerCase()] =
+                            item.slice(1).join(':').trim();
+                    }
+                );
+                data.method = xhr.method;
+                data.obj = {};
+                try {
+                    data.obj = JSON.parse(xhr.responseText);
+                } catch (ignore) {
+                }
+                data.status = xhr.statusCode;
+                // debugPrint 200
+                if (data.status === undefined) {
+                    data.status = 200;
+                }
+                data.url = xhr.url;
                 if (options.modeErrorData) {
                     onData(error && data.obj, data);
                     return;
@@ -1167,9 +1177,6 @@
             } catch (errorCaught) {
                 local.swgg.onErrorJsonapi(function (error) {
                     onErrorData(error, {
-                        getAllResponseHeaders: function () {
-                            return { "Content-Type": "application/json" };
-                        },
                         responseText: JSON.stringify(error),
                         method: options.method,
                         obj: error,
@@ -1183,8 +1190,8 @@
                         .find("input[type='text'],select.parameter," +
                             "textarea.body-textarea")
                         .each(function () {
-                            local.jQuery(self).addClass("error");
-                            local.jQuery(self).wiggle();
+                            local.jQuery(this).addClass("error");
+                            local.jQuery(this).wiggle();
                         });
                 }
                 return;

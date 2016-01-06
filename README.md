@@ -333,7 +333,7 @@ instruction
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "swagger-ui-lite": "2015.11.7",
-        "utility2": "2015.12.6"
+        "utility2": "2015.12.7"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -375,14 +375,13 @@ utility2 shRun shReadmeExportFile package.json package.json && \
 export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js"
     },
-    "version": "2015.12.2"
+    "version": "2015.12.3"
 }
 ```
 
 
 
 # todo
-- fix wiggle
 - add nedb backend
 - add logging feature
 - add cached version crudGetManyByQueryCached
@@ -395,9 +394,9 @@ utility2 test node test.js"
 
 
 
-# change since c6e946d3
-- npm publish 2015.12.2
-- add initial loading icon
+# change since f3e9bc10
+- npm publish 2015.12.3
+- fix ui-wiggle for client-side validation error
 - none
 
 
