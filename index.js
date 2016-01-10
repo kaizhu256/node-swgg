@@ -483,7 +483,7 @@
             ));
             // init SwaggerClient
             local.swgg.api = new local.swgg.SwaggerClient({
-                url: 'http://localhost:' + local.utility2.envDict.PORT
+                url: local.utility2.serverLocalHost
             });
             local.swgg.api.buildFromSpec(local.utility2.jsonCopy(local.swgg.swaggerJson));
         };
@@ -1048,7 +1048,6 @@
         // require modules
         local.swagger_tools = local.global.SwaggerTools.specs;
         local.swgg.SwaggerClient = local.global.SwaggerClient;
-        local.url = local.utility2.local.url;
         break;
 
 
@@ -1062,10 +1061,8 @@
         local.fs = require('fs');
         local.http = require('http');
         local.https = require('https');
-        local.path = require('path');
         local.swagger_tools = require('swagger-ui-lite/swagger-tools-standalone-min.js');
         local.swagger_ui = require('swagger-ui-lite');
-        local.url = require('url');
         local.vm = require('vm');
         // init assets
         local.utility2.cacheDict.assets['/assets/nedb.min.js'] =
@@ -1079,9 +1076,6 @@
         local.utility2.cacheDict.assets['/assets/swagger-tools-standalone-min.js'] =
             local.fs.readFileSync(local.swagger_ui.__dirname +
                 '/swagger-tools-standalone-min.js', 'utf8');
-        local.utility2.cacheDict.assets['/assets/swagger-ui.html'] =
-            local.fs.readFileSync(local.swagger_ui.__dirname +
-                '/swagger-ui.html', 'utf8');
         local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.css'] =
             local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.rollup.css', 'utf8')
             .replace((/^(\w.+?(?:,| \{))/gm), '.swagger-section $1') +
@@ -1096,143 +1090,12 @@
                 'outline: 2px solid black;\n' +
                 'outline-color: #cc0000;\n' +
             '}';
-        /* istanbul ignore next */
-        // https://github.com/swagger-api/swagger-js/blob/v2.1.3/lib/types/operation.js#L619
-        local._OperationPrototypeExecute = function (
-            data,
-            options,
-            onData,
-            onError,
-            parent,
-            // jslint-hack
-            local
-        ) {
-            var onErrorData, self;
-            local = window;
-            self = this;
-            if (typeof options === 'function') {
-                onError = onData;
-                onData = options;
-                options = {};
-            }
-            data = data || {};
-            // init options
-            options.headers = local.utility2.objectSetDefault(
-                self.setContentTypes(data, options),
-                self.getHeaderParams(data)
-            );
-            options.data = self.getBody(options.headers, data, options);
-            options.method = self.method.toUpperCase();
-            options.url = self.urlify(data);
-            self.clientAuthorizations.apply(options, self.operation.security);
-            if (options.mock) {
-                return options;
-            }
-            // init onErrorData
-            onErrorData = function (error, xhr) {
-                xhr = xhr || {};
-                data = {};
-                data.data = data.statusText = xhr.responseText;
-                data.headers = { 'content-type': 'application/json' };
-                ((xhr.getAllResponseHeaders && xhr.getAllResponseHeaders()) || '').replace(
-                    (/.+/g),
-                    function (item) {
-                        item = item.split(':');
-                        data.headers[item[0].trim().toLowerCase()] =
-                            item.slice(1).join(':').trim();
-                    }
-                );
-                data.method = xhr.method;
-                data.obj = {};
-                try {
-                    data.obj = JSON.parse(xhr.responseText);
-                } catch (ignore) {
-                }
-                data.status = xhr.statusCode;
-                // debugPrint 200
-                if (data.status === undefined) {
-                    data.status = 200;
-                }
-                data.url = xhr.url;
-                if (options.modeErrorData) {
-                    onData(error && data.obj, data);
-                    return;
-                }
-                if (error) {
-                    (onError || local.utility2.nop).call(options, data, parent);
-                    return;
-                }
-                (onData || local.utility2.nop).call(options, data, parent);
-            };
-            // validate data
-            try {
-                local.swgg.validateByParamDefList({
-                    data: local.swgg.normalizeParamDictSwagger(
-                        local.utility2.jsonCopy(data),
-                        self
-                    ),
-                    key: self.operation.operationId,
-                    paramDefList: self.parameters
-                });
-            } catch (errorCaught) {
-                local.swgg.onErrorJsonapi(function (error) {
-                    onErrorData(error, {
-                        responseText: JSON.stringify(error),
-                        method: options.method,
-                        obj: error,
-                        statusCode: 400,
-                        url: options.url
-                    });
-                })(errorCaught);
-                // wiggle input on Error
-                if (parent && local.jQuery) {
-                    local.jQuery(".sandbox", local.jQuery(parent.el))
-                        .find("input[type='text'],select.parameter," +
-                            "textarea.body-textarea")
-                        .each(function () {
-                            local.jQuery(this).addClass("error");
-                            local.jQuery(this).wiggle();
-                        });
-                }
-                return;
-            }
-            local.utility2.ajax(options, onErrorData);
-        };
         local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.js'] =
-            local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.rollup.js', 'utf8')
-            // swagger-hack - disable sourceMappingURL
-            .replace((/^\/\/# sourceMappingURL=.*/gm), '')
-            // swagger-hack - save swaggerJson
-            .replace(
-                'this.apis={}',
-                'this.apis={},this.swaggerJson=JSON.parse(JSON.stringify(e))'
-            )
-            // swagger-hack - add modeErroData and validation handling
-            .replace(String() +
-/* jslint-ignore-begin */
-'Operation.prototype.execute=function(e,t,r,n,i){var s,a,o=e||{},p={};_.isObject(t)&&(p=t,s=r,a=n),this.client&&(p.client=this.client),this.responseInterceptor&&(p.responseInterceptor=this.responseInterceptor),"function"==typeof t&&(s=t,a=r),s=s||this.parent.defaultSuccessCallback||helpers.log,a=a||this.parent.defaultErrorCallback||helpers.log,"undefined"==typeof p.useJQuery&&(p.useJQuery=this.useJQuery);var l=this.getMissingParams(o);if(l.length>0){var u="missing required params: "+l;return helpers.fail(u),void a(u)}var h,d=this.getHeaderParams(o),c=this.setContentTypes(o,p),m={};for(h in d)m[h]=d[h];for(h in c)m[h]=c[h];var f=this.getBody(c,o,p),y=this.urlify(o);if(y.indexOf(".{format}")>0&&m){var g=m.Accept||m.accept;g&&g.indexOf("json")>0?y=y.replace(".{format}",".json"):g&&g.indexOf("xml")>0&&(y=y.replace(".{format}",".xml"))}var v={url:y,method:this.method.toUpperCase(),body:f,useJQuery:p.useJQuery,headers:m,on:{response:function(e){return s(e,i)},error:function(e){return a(e,i)}}};return this.clientAuthorizations.apply(v,this.operation.security),p.mock===!0?v:void(new SwaggerHttp).execute(v,p)}' +
-/* jslint-ignore-end */
-                    String(),
-                    // preserve lineno
-                    local.utility2.uglify('Operation.prototype.execute=' +
-                    local._OperationPrototypeExecute.toString()
-                    // coverage-hack - uncover
-                    .replace((/\b__cov_.*?\+\+/g), '0')))
-            // swagger-hack - handle json error
-            .replace('r.callback(t||i,e)', 'r.callback(' +
-                '(e&&e.body&&e.body.message&&e.body.stack?e.body:t)||i,e)')
-            // swagger-hack - resolve %2F in hashtag
-            .replace(
-                "var fragments = $.param.fragment().split('/')",
-                "var fragments = $.param.fragment().split('/')" +
-                    ".map(function (element) { return element.replace((/%2F/g), '\\\\/'); })"
-            )
-            .replace(
-                "var resource = Docs.escapeResourceName(resource",
-                "var resource = Docs.escapeResourceName(resource.replace(/(\\\\\\\/)/g, '/')"
-            )
-            // swagger-hack - disable online validation
-            .replace("if ('validatorUrl' in opts.swaggerOptions) {", "if (true) {");
+            local.utility2.istanbulInstrumentInPackage(
+                local.fs.readFileSync(__dirname + '/swagger-ui.rollup.js', 'utf8'),
+                __dirname + '/swagger-ui.rollup.js',
+                'swagger-lite'
+            );
         local.utility2.cacheDict.assets['/assets/swagger-ui.favicon-16x16.png'] =
             local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.favicon-16x16.png');
         local.utility2.cacheDict.assets['/assets/swagger-ui.favicon-32x32.png'] =
@@ -1244,30 +1107,20 @@
             local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.logo_small.png');
         local.utility2.cacheDict.assets['/assets/swagger-ui.throbber.gif'] =
             local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.throbber.gif');
+        local.utility2.cacheDict.assets['/swagger-ui.html'] =
+            local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.html', 'utf8');
+        local.utility2.cacheDict.assets['/swagger-lite.html'] = local.utility2.stringFormat(
+            local.fs.readFileSync(__dirname + '/README.md', 'utf8')
+                .replace((/[\S\s]*?<html>/), '<!DOCTYPE html><html>')
+                .replace((/<\/html>[\S\s]*/), '</html>')
+                .replace((/\\n\\$/gm), ''),
+            { envDict: local.utility2.envDict },
+            ''
+        );
         // init XMLHttpRequest
         local.XMLHttpRequest = local.utility2.local._http.XMLHttpRequest;
-        // init window
-        local.window = local;
         // init SwaggerClient
-        local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.js'].replace(
-            // swagger-hack - remove browser js-env code
-            (/([\S\s]+?) swagger-client ([\S\s]+?\n\},\{\}\]\},\{\},\[1\]\)\(1\)\n\}\);)/),
-            function (match0, match1, match2) {
-                // jslint-hack
-                local.utility2.nop(match0);
-                local.utility2.requireFromScript(
-                    __dirname + '/swagger-ui.rollup.js',
-                    '"use strict"; (function () {' +
-                        'var XMLHttpRequest, exports, module, window;' +
-                        'window = require("' + __filename + '").local;' +
-                        'XMLHttpRequest = window.XMLHttpRequest;' +
-                        // preserve lineno
-                        match1.replace((/\S+/g), '') + '/*' + match2 +
-                        '\n}());'
-                );
-                local.swgg.SwaggerClient = local.SwaggerClient;
-            }
-        );
+        local.swgg.SwaggerClient = require('./swagger-ui.rollup.js');
         // init nedb
         local.swgg.nedb = require('swagger-ui-lite/nedb.min.js');
         // init api

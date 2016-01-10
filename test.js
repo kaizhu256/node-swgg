@@ -106,6 +106,42 @@
             onParallel();
         };
 
+        local.testCase_ajax_validation = function (options, onError) {
+        /*
+         * this function will test ajax's error handling-behavior
+         */
+            var onParallel;
+            // jslint-hack
+            local.utility2.nop(options);
+            onParallel = local.utility2.onParallel(onError);
+            onParallel.counter += 1;
+            // test ajax passed handling-behavior
+            [{
+                data: JSON.stringify({
+                    "category": {"id": 0, "name": ""},
+                    "id": 0,
+                    "name": "doggie",
+                    "photoUrls": ["string"],
+                    "status": "available",
+                    "tags": [{ "id": 0, "name": "string" }]
+                }),
+                method: 'POST',
+                url: '/api/v0/pet'
+            }].forEach(function (options) {
+                onParallel.counter += 1;
+                local.utility2.ajax(options, function (error) {
+                    local.utility2.testTryCatch(function () {
+                        // validate error occurred
+                        local.utility2.assert(error, error);
+                        // validate error
+                        local.utility2.assert(error.statusCode === 404, error);
+                        onParallel();
+                    }, onParallel);
+                });
+            });
+            onParallel();
+        };
+
         local.testCase_onErrorJsonapi_default = function (options, onError) {
         /*
          * this function will test onErrorJsonapi's default handling-behavior
@@ -201,42 +237,6 @@
                         local.utility2.assert(error, error);
                         // validate error
                         local.utility2.assert(error.errors[0].message === 'hello', error);
-                        onParallel();
-                    }, onParallel);
-                });
-            });
-            onParallel();
-        };
-
-        local.testCase_ajax_validation = function (options, onError) {
-        /*
-         * this function will test ajax's error handling-behavior
-         */
-            var onParallel;
-            // jslint-hack
-            local.utility2.nop(options);
-            onParallel = local.utility2.onParallel(onError);
-            onParallel.counter += 1;
-            // test ajax passed handling-behavior
-            [{
-                data: JSON.stringify({
-                    "category": {"id": 0, "name": ""},
-                    "id": 0,
-                    "name": "doggie",
-                    "photoUrls": ["string"],
-                    "status": "available",
-                    "tags": [{ "id": 0, "name": "string" }]
-                }),
-                method: 'POST',
-                url: '/api/v0/pet'
-            }].forEach(function (options) {
-                onParallel.counter += 1;
-                local.utility2.ajax(options, function (error) {
-                    local.utility2.testTryCatch(function () {
-                        // validate error occurred
-                        local.utility2.assert(error, error);
-                        // validate error
-                        local.utility2.assert(error.statusCode === 404, error);
                         onParallel();
                     }, onParallel);
                 });
@@ -449,6 +449,65 @@
 
 
 
+    // run browser js-env code - function
+    case 'browser':
+        local.testCase_ui_default = function (options, onError) {
+        /*
+         * this function will test the ui's default handling-behavior
+         */
+            options = {};
+            options.onParallel = local.utility2.onParallel(onError);
+            options.onParallel.counter += 1;
+            [1, -1].forEach(function (ii) {
+                Object.keys(local.global.SwaggerUi.Views).sort(function (aa, bb) {
+                    return (aa < bb
+                        ? -1
+                        : 1) * ii;
+                }).forEach(function (view) {
+                    view = local.global.SwaggerUi.Views[view];
+                    Object.keys(view.prototype.events || {}).sort(function (aa, bb) {
+                        return (aa < bb
+                            ? -1
+                            : 1) * ii;
+                    }).forEach(function (event) {
+                        event = {
+                            query: event.split(' ').slice(1).join(' '),
+                            key: event,
+                            name: event.split(' ')[0],
+                            value: view.prototype.events[event]
+                        };
+                        switch (event.name) {
+                        case 'click':
+                        case 'mousedown':
+                        case 'mouseenter':
+                            event.type = 'MouseEvent';
+                            break;
+                        case 'keyup':
+                            event.type = 'KeyboardEvent';
+                            break;
+                        }
+                        if (event.type) {
+                            options.onParallel.counter += 1;
+                            setTimeout(function () {
+                                Array.prototype.slice.call(document.querySelectorAll(
+                                    '.swagger-section ' + event.query
+                                )).forEach(function (element) {
+                                    event.event = document.createEvent(event.type);
+                                    event.event.initEvent(event.name, true, true);
+                                    element.dispatchEvent(event.event);
+                                });
+                                options.onParallel();
+                            }, options.onParallel.counter * 100);
+                        }
+                    });
+                });
+            });
+            options.onParallel();
+        };
+        break;
+
+
+
     // run node js-env code - function
     case 'node':
         local.testCase_build_assets = function (options, onError) {
@@ -508,6 +567,9 @@
             }, {
                 file: '/assets/utility2.js',
                 url: '/assets/utility2.js'
+            }, {
+                file: '/swagger-lite.html',
+                url: '/swagger-lite.html'
             }].forEach(function (element) {
                 onParallel.counter += 1;
                 local.utility2.ajax({ url: element.url }, function (error, xhr) {
@@ -532,8 +594,8 @@
             local.utility2.nop(options);
             local.utility2.browserTest({
                 modeCoverageMerge: true,
-                url: 'http://localhost:' + local.utility2.envDict.PORT +
-                    '?modeTest=consoleLogResult'
+                url: local.utility2.serverLocalHost +
+                    '/?modeTest=consoleLogResult#!/_test/paramDefault'
             }, onError);
         };
         break;

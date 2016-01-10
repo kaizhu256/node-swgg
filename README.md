@@ -1,5 +1,5 @@
 swagger-lite
-===============
+============
 lightweight standalone swagger-ui server backed by nedb
 
 [![NPM](https://img.shields.io/npm/v/swagger-lite.svg?style=flat-square)](https://www.npmjs.com/package/swagger-lite) [![NPM](https://img.shields.io/npm/dm/swagger-lite.svg?style=flat-square)](https://www.npmjs.com/package/swagger-lite)
@@ -215,8 +215,8 @@ instruction
     </div>\n\
     <script src="assets/nedb.min.js"></script>\n\
     <script src="assets/swagger-tools-standalone-min.js"></script>\n\
-    <script src="assets/swagger-ui.rollup.js"></script>\n\
     <script src="assets/utility2.js"></script>\n\
+    <script src="assets/swagger-ui.rollup.js"></script>\n\
     <script src="assets/swagger-lite.js"></script>\n\
     <script src="assets/example.js"></script>\n\
     <script src="assets/test.js"></script>\n\
@@ -254,9 +254,6 @@ instruction
             if(window.SwaggerTranslator) {\n\
                 window.SwaggerTranslator.translate();\n\
             }\n\
-            $("pre code").each(function(i, e) {\n\
-                hljs.highlightBlock(e)\n\
-            });\n\
             addApiKeyAuthorization();\n\
             local.utility2.onReady();\n\
         },\n\
@@ -333,7 +330,7 @@ instruction
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "swagger-ui-lite": "2015.11.7",
-        "utility2": "2015.12.7"
+        "utility2": "2015.12.9"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -375,7 +372,7 @@ utility2 shRun shReadmeExportFile package.json package.json && \
 export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js"
     },
-    "version": "2015.12.3"
+    "version": "2015.12.4"
 }
 ```
 
@@ -394,9 +391,11 @@ utility2 test node test.js"
 
 
 
-# change since f3e9bc10
-- npm publish 2015.12.3
-- fix ui-wiggle for client-side validation error
+# change since 621b87a9
+- npm publish 2015.12.4
+- shrink file swagger-ui.rollup.js
+- add file swagger-ui.rollup.js
+- add asset /swagger-lite.html
 - none
 
 
@@ -414,28 +413,28 @@ utility2 test node test.js"
 
 # this shell script will run the build for this package
 
-shBuild() {
-    # this function will run the main build
-    local TEST_URL || return $?
+shBuild() {(set -e
+# this function will run the main build
 
     # init env
-    . node_modules/.bin/utility2 && shInit || return $?
+    . node_modules/.bin/utility2 && shInit
 
+    (set -e
     # run npm-test on published package
     (export npm_config_mode_coverage=1 &&
-        shNpmTestPublished) || return $?
+        shNpmTestPublished)
 
     # test example js script
     (export MODE_BUILD=testExampleJs &&
         export npm_config_timeout_exit=10000 &&
-        shRunScreenCapture shReadmeTestJs example.js) || return $?
+        shRunScreenCapture shReadmeTestJs example.js)
 
     # run npm-test
     (export MODE_BUILD=npmTest &&
-        shRunScreenCapture npm test --mode-coverage) || return $?
+        shRunScreenCapture npm test --mode-coverage)
 
     # create api-doc
-    npm run-script build-doc || return $?
+    npm run-script build-doc
 
     # if running legacy-node, then do not continue
     [ "$(node --version)" \< "v5.0" ] && exit || true
@@ -445,34 +444,39 @@ shBuild() {
         [ "$CI_BRANCH" = master ]
     then
         TEST_URL="https://$(printf "$GITHUB_REPO" | \
-            perl -pe 's/\//.github.io\//')/build..$CI_BRANCH..travis-ci.org/app/index.html" || \
-            return $?
+            perl -pe 's/\//.github.io\//')/build..$CI_BRANCH..travis-ci.org/app/index.html"
         # deploy app to gh-pages
         (export npm_config_file_test_report_merge="$npm_config_dir_build/test-report.json" &&
-            shGithubDeploy) || return $?
+            shGithubDeploy)
         # test deployed app to gh-pages
         (export MODE_BUILD=githubTest &&
             export modeBrowserTest=test &&
             export npm_config_file_test_report_merge="$npm_config_dir_build/test-report.json" &&
             export url="$TEST_URL?modeTest=consoleLogResult&timeExit={{timeExit}}" &&
-            shBrowserTest) || return $?
+            shBrowserTest)
     fi
-}
-shBuild
+    )
 
-# save exit-code
-EXIT_CODE=$?
-# create package-listing
-(export MODE_BUILD=gitLsTree &&
-    shRunScreenCapture shGitLsTree) || exit $?
-# create recent changelog of last 50 commits
-(export MODE_BUILD=gitLog &&
-    shRunScreenCapture git log -50 --pretty="%ai\u000a%B") || exit $?
-# cleanup remote build dir
-# export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build" || exit $?
-# upload build-artifacts to github, and if number of commits > 16, then squash older commits
-(export COMMIT_LIMIT=16 &&
-    export MODE_BUILD=githubUpload &&
-    shBuildGithubUpload) || exit $?
-exit "$EXIT_CODE"
-```
+    # save exit-code
+    EXIT_CODE=$?
+
+    # create package-listing
+    (export MODE_BUILD=gitLsTree &&
+        shRunScreenCapture shGitLsTree)
+
+    # create recent changelog of last 50 commits
+    (export MODE_BUILD=gitLog &&
+        shRunScreenCapture git log -50 --pretty="%ai\u000a%B")
+
+    # cleanup remote build dir
+    # export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
+
+    # upload build-artifacts to github, and if number of commits > 16, then squash older commits
+    (export COMMIT_LIMIT=16 &&
+        export MODE_BUILD=githubUpload &&
+        shBuildGithubUpload)
+
+    # exit exit-code
+    exit "$EXIT_CODE"
+)}
+shBuild
