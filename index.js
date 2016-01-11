@@ -60,57 +60,13 @@
                 summary: 'count many {{_schemaName}} objects by query',
                 tags: ['{{_pathPrefix}}']
             },
-            crudCreateOne: {
-                _method: 'post',
-                _path: '/{{_pathPrefix}}/crudCreateOne',
-                _pathPrefix: '{{_pathPrefix}}',
-                operationId: 'crudCreateOne',
-                parameters: [{
-                    description: '{{_schemaName}} object',
-                    in: 'body',
-                    name: 'body',
-                    required: true,
-                    schema: { $ref: '#/definitions/{{_schemaName}}' }
-                }],
-                responses: {
-                    200: {
-                        description:
-                            '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                        schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
-                    }
-                },
-                summary: 'create one {{_schemaName}} object',
-                tags: ['{{_pathPrefix}}']
-            },
-            crudCreateOrReplaceOne: {
-                _method: 'put',
-                _path: '/{{_pathPrefix}}/crudCreateOrReplaceOne',
-                _pathPrefix: '{{_pathPrefix}}',
-                operationId: 'crudCreateOrReplaceOne',
-                parameters: [{
-                    description: '{{_schemaName}} object',
-                    in: 'body',
-                    name: 'body',
-                    required: true,
-                    schema: { $ref: '#/definitions/{{_schemaName}}' }
-                }],
-                responses: {
-                    200: {
-                        description:
-                            '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                        schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
-                    }
-                },
-                summary: 'create or replace one {{_schemaName}} object',
-                tags: ['{{_pathPrefix}}']
-            },
             crudDeleteManyByQuery: {
                 _method: 'delete',
                 _path: '/{{_pathPrefix}}/crudDeleteManyByQuery',
                 _pathPrefix: '{{_pathPrefix}}',
                 operationId: 'crudDeleteManyByQuery',
                 parameters: [{
-                    default: '{"{{_keyUnique}}":"{{_keyUnique}}1"}',
+                    default: '{"id":"undefined"}',
                     description: 'query param',
                     format: 'json',
                     in: 'query',
@@ -217,7 +173,7 @@
                 _pathPrefix: '{{_pathPrefix}}',
                 operationId: 'crudGetOneByQuery',
                 parameters: [{
-                    default: '{"{{_keyUnique}}":"{{_keyUnique}}1"}',
+                    default: '{}',
                     description: 'query param',
                     format: 'json',
                     in: 'query',
@@ -265,24 +221,17 @@
                 summary: 'get one {{_schemaName}} object by {{_keyUnique}}',
                 tags: ['{{_pathPrefix}}']
             },
-            crudUpdateOneByKeyUnique: {
-                _keyUnique: '{{_keyUnique}}',
-                _method: 'patch',
-                _path: '/{{_pathPrefix}}/crudUpdateOneByKeyUnique/{{{_keyUnique}}}',
+            crudUpsertOne: {
+                _method: 'put',
+                _path: '/{{_pathPrefix}}/crudUpsertOne',
                 _pathPrefix: '{{_pathPrefix}}',
-                operationId: 'crudUpdateOneByKeyUnique.{{_keyUnique}}',
+                operationId: 'crudUpsertOne',
                 parameters: [{
-                    description: '{{_schemaName}} {{_keyUnique}}',
-                    in: 'path',
-                    name: '{{_keyUnique}}',
-                    required: true,
-                    type: 'string'
-                }, {
-                    description: '{{_schemaName}} object with no validation check',
+                    description: '{{_schemaName}} object',
                     in: 'body',
                     name: 'body',
                     required: true,
-                    schema: { type: 'object' }
+                    schema: { $ref: '#/definitions/{{_schemaName}}' }
                 }],
                 responses: {
                     200: {
@@ -291,12 +240,12 @@
                         schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
                     }
                 },
-                summary: 'update one {{_schemaName}} object by {{_keyUnique}}',
+                summary: 'create or replace one {{_schemaName}} object',
                 tags: ['{{_pathPrefix}}']
             },
             crudUpsertOneByKeyUnique: {
                 _keyUnique: '{{_keyUnique}}',
-                _method: 'post',
+                _method: 'put',
                 _path: '/{{_pathPrefix}}/crudUpsertOneByKeyUnique/{{{_keyUnique}}}',
                 _pathPrefix: '{{_pathPrefix}}',
                 operationId: 'crudUpsertOneByKeyUnique.{{_keyUnique}}',
@@ -320,15 +269,73 @@
                         schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
                     }
                 },
-                summary: 'upsert one {{_schemaName}} object by {{_keyUnique}}',
+                summary: 'create or replace one {{_schemaName}} object',
                 tags: ['{{_pathPrefix}}']
             }
         };
-        // jsonCopy object to prevent side-effects
+        // stringify pathObjectDefault items to prevent side-effects
         Object.keys(local.swgg.cacheDict.pathObjectDefault).forEach(function (key) {
             local.swgg.cacheDict.pathObjectDefault[key] =
                 JSON.stringify(local.swgg.cacheDict.pathObjectDefault[key]);
         });
+        // init swaggerJson
+        local.swgg.swaggerJson = {
+            basePath: local.utility2.envDict.npm_config_mode_api_prefix || '/api/v0',
+            definitions: {
+                Array: { items: {}, type: 'array' },
+                // http://jsonapi.org/format/#document-structure-top-level
+                JsonapiResponse: {
+                    properties: {
+                        data: {
+                            items: { type: 'object' },
+                            type: 'array'
+                        },
+                        errors: {
+                            items: { type: 'object' },
+                            type: 'array'
+                        },
+                        meta: { type: 'object' },
+                        statusCode: { type: 'integer' }
+                    }
+                }
+            },
+            info: {
+                description: 'demo of swagger-lite crud-api',
+                title: 'swagger-lite api',
+                version: '0'
+            },
+            paths: {},
+            swagger: '2.0',
+            tags: []
+        };
+        // hack - init swaggerJson$$Dummy to pass validation warnings for auto-created schemas
+        local.swgg.swaggerJson$$Dummy = {
+            definitions: {
+                $$Dummy: {
+                    properties: {
+                        propArray: {
+                            items: { $ref: '#/definitions/Array' },
+                            type: 'array'
+                        }
+                    }
+                },
+                JsonapiResponse$$Dummy: {
+                    properties: { data: {
+                        items: { $ref: '#/definitions/$$Dummy' },
+                        type: 'array'
+                    } },
+                    'x-inheritList': [{ $ref: '#/definitions/JsonapiResponse' }]
+                }
+            },
+            paths: { '/$$Dummy': { get: {
+                responses: {
+                    200: {
+                        description: '',
+                        schema: { $ref: '#/definitions/JsonapiResponse$$Dummy' }
+                    }
+                }
+            } } }
+        };
     }());
 
 
@@ -411,12 +418,18 @@
                         tags: []
                     }, 2);
                     // update cacheDict.pathObject
-                    local.swgg.cacheDict.pathObject[method.toUpperCase() + ' ' + path.replace(
+                    tmp = method.toUpperCase() + ' ' + path.replace(
                         (/\{.*/),
                         function (match0) {
                             return match0.replace((/[^\/]/g), '');
                         }
-                    )] = JSON.stringify(pathObject);
+                    );
+                    local.swgg.cacheDict.pathObject[tmp] = JSON.stringify(
+                        local.utility2.objectSetDefault(
+                            pathObject,
+                            JSON.parse(local.swgg.cacheDict.pathObject[tmp] || '{}')
+                        )
+                    );
                 });
             });
             // merge tags
@@ -482,15 +495,32 @@
                 2
             ));
             // init SwaggerClient
-            local.swgg.api = new local.swgg.SwaggerClient({
+            local.SwaggerClient = local.modeJs === 'browser'
+                ? local.global.SwaggerClient
+                : require('./lib.swagger-ui.js');
+            local.swgg.api = new local.SwaggerClient({
                 url: local.utility2.serverLocalHost
             });
             local.swgg.api.buildFromSpec(local.utility2.jsonCopy(local.swgg.swaggerJson));
+            // init nedb
+            local.Nedb = local.Nedb || (local.modeJs === 'browser'
+                ? local.global.Nedb
+                : require('swagger-ui-lite/nedb.min.js')) || local.utility2.nop;
+            // init collection
+            Object.keys(local.swgg.swaggerJson.definitions).forEach(function (schemaName) {
+                local.swgg.cacheDict.collection[schemaName] =
+                    local.swgg.cacheDict.collection[schemaName] || new local.Nedb({
+                        autoload: true,
+                        filename: (local.modeJs === 'browser'
+                            ? ''
+                            : process.cwd()) + '/tmp/nedb.collection/' + schemaName
+                    });
+            });
         };
 
         local.swgg.middlewareBodyParse = function (request, response, nextMiddleware) {
         /*
-         * this function will parse the request-body
+         * this function will run the middleware that will parse the request-body
          */
             // jslint-hack
             local.utility2.nop(response);
@@ -516,9 +546,159 @@
             }, nextMiddleware);
         };
 
+        local.swgg.middlewareCrud = function (request, response, nextMiddleware) {
+        /*
+         * this function will run the middleware that will implement the backend db using nedb
+         */
+            var crud, modeNext, onNext, onParallel;
+            modeNext = 0;
+            onNext = function (error, data) {
+                modeNext = error
+                    ? Infinity
+                    : modeNext + 1;
+                switch (modeNext) {
+                case 1:
+                    crud = request.crud = {};
+                    crud.collection = request.swggPathObject &&
+                        request.swggPathObject._schemaName &&
+                        local.swgg.cacheDict.collection[request.swggPathObject._schemaName];
+                    if (!crud.collection) {
+                        modeNext = Infinity;
+                        onNext();
+                        return;
+                    }
+                    // init crud.data
+                    crud.data = local.utility2.jsonCopy(request.swggParamDict);
+                    // init crud.operationId
+                    crud.operationId = request.swggPathObject._operationId ||
+                        request.swggPathObject.operationId;
+                    // JSON.parse json-string
+                    request.swggPathObject.parameters.forEach(function (param) {
+                        if (param.format === 'json' &&
+                                param.type === 'string' &&
+                                crud.data[param.name]) {
+                            crud.data[param.name] =
+                                JSON.parse(crud.data[param.name]);
+                        }
+                    });
+                    // init crud.queryByKeyUnique
+                    crud.keyUnique = crud.operationId.split('.')[1];
+                    crud.queryByKeyUnique = {};
+                    crud.queryByKeyUnique[crud.keyUnique] =
+                        crud.data[crud.keyUnique];
+                    // normalize id to _id
+                    local.swgg.normalizeIdMongodb([
+                        crud.queryByKeyUnique,
+                        crud.data
+                    ]);
+                    crud.data._id = crud.data._id ||
+                        local.utility2.uuidTimeCreate();
+                    if (crud.data.body) {
+                        crud.data.body._id = crud.data.body._id ||
+                            crud.data._id;
+                    }
+                    switch (crud.operationId.split('.')[0]) {
+                    case 'crudCountManyByQuery':
+                        crud.collection.count(
+                            crud.data.query,
+                            onNext
+                        );
+                        break;
+                    case 'crudDeleteManyByQuery':
+                        crud.collection.find(crud.data.query, {
+                            id: 1
+                        }, onNext);
+                        break;
+                    case 'crudDeleteOneByKeyUnique':
+                        crud.collection.remove(crud.queryByKeyUnique, onNext);
+                        break;
+                    case 'crudExistsOneByKeyUnique':
+                        crud.collection.findOne(crud.queryByKeyUnique, {
+                            id: 1
+                        }, onNext);
+                        break;
+                    case 'crudGetManyByQuery':
+                        crud.collection.find(
+                            crud.data.query,
+                            crud.data.fields
+                        )
+                            .sort(crud.data.sort)
+                            .skip(crud.data.skip)
+                            .limit(crud.data.limit)
+                            .exec(onNext);
+                        break;
+                    case 'crudGetOneByQuery':
+                        crud.collection.findOne(
+                            crud.data.query,
+                            crud.data.fields,
+                            onNext
+                        );
+                        break;
+                    case 'crudGetOneByKeyUnique':
+                        crud.collection.findOne(crud.queryByKeyUnique, onNext);
+                        break;
+                    case 'crudUpsertOne':
+                    case 'crudUpsertOneByKeyUnique':
+                        crud.collection.update({
+                            _id: crud.data.body._id
+                        }, crud.data.body, { upsert: true}, onNext);
+                        break;
+                    default:
+                        modeNext = Infinity;
+                        onNext();
+                    }
+                    break;
+                case 2:
+                    switch (crud.operationId.split('.')[0]) {
+                    case 'crudDeleteManyByQuery':
+                        onParallel = local.utility2.onParallel(onNext);
+                        onParallel.counter += 1;
+                        crud.data.count = data.length;
+                        data.forEach(function (element) {
+                            onParallel.counter += 1;
+                            crud.collection.remove({ _id: element._id }, onParallel);
+                        });
+                        onParallel();
+                        break;
+                    default:
+                        onNext(error, data);
+                    }
+                    break;
+                case 3:
+                    switch (crud.operationId.split('.')[0]) {
+                    case 'crudDeleteManyByQuery':
+                        data = crud.data.count;
+                        break;
+                    case 'crudExistsOneByKeyUnique':
+                        data = !!data;
+                        break;
+                    case 'crudGetManyByQuery':
+                        data = {
+                            data: data,
+                            meta: { count: data.length, isJsonapiResponse: true }
+                        };
+                        break;
+                    case 'crudUpsertOne':
+                    case 'crudUpsertOneByKeyUnique':
+                        data = {
+                            data: [local.swgg.normalizeIdSwagger(crud.data.body)],
+                            meta: { data: data, isJsonapiResponse: true }
+                        };
+                        break;
+                    }
+                    local.swgg.serverRespondJsonapi(request, response, error, data);
+                    break;
+                default:
+                    nextMiddleware(error, data);
+                }
+            };
+            onNext();
+        };
+
         local.swgg.middlewareError = function (error, request, response) {
         /*
-         * this function will handle errors according to http://jsonapi.org/format/#errors
+         * this function will run the middleware that will handle errors according to
+         * http://jsonapi.org/format/#errors
          */
             if (!error) {
                 error = new Error('404 Not Found');
@@ -529,7 +709,7 @@
 
         local.swgg.middlewareValidate = function (request, response, nextMiddleware) {
         /*
-         * this function will run the swagger-validation middleware
+         * this function will run the middleware that will validate the swagger-request
          */
             var modeNext, onNext, tmp;
             modeNext = 0;
@@ -639,6 +819,32 @@
             onNext();
         };
 
+        local.swgg.normalizeIdMongodb = function (data) {
+            /*
+             * this function will recursively convert the property id to _id
+             */
+            local.utility2.objectTraverse(data, function (element) {
+                if (element && element.id) {
+                    element._id = element._id || element.id;
+                    delete element.id;
+                }
+            });
+            return data;
+        };
+
+        local.swgg.normalizeIdSwagger = function (data) {
+            /*
+             * this function will recursively convert the property _id to id
+             */
+            local.utility2.objectTraverse(data, function (element) {
+                if (element && element._id) {
+                    element.id = element.id || element._id;
+                    delete element._id;
+                }
+            });
+            return data;
+        };
+
         local.swgg.normalizeParamDictSwagger = function (data, pathObject) {
         /*
          * this function will parse the data according to pathObject.parameters
@@ -712,7 +918,7 @@
                         if (!(element && typeof element === 'object')) {
                             element = ii === 0
                                 ? { message: String(element) }
-                                : { data: String(element) };
+                                : { data: element };
                         }
                         // normalize error-object to plain json-object
                         if (ii === 0) {
@@ -769,7 +975,11 @@
                     // print error.stack to stderr
                     local.utility2.onErrorDefault(error);
                 }
-                response.end(JSON.stringify(error || data));
+                data = error || data;
+                response.end(JSON.stringify(local.utility2.objectSetDefault(data, { meta: {
+                    statusCode: data.statusCode,
+                    requestUrl: request.url
+                } }, 2)));
             })(error, data);
         };
 
@@ -976,67 +1186,6 @@
 
 
 
-    // run shared js-env code - post-init
-    (function () {
-        // init swaggerJson
-        local.swgg.swaggerJson = {
-            basePath: local.utility2.envDict.npm_config_mode_api_prefix || '/api/v0',
-            definitions: {
-                Array: { items: {}, type: 'array' },
-                // http://jsonapi.org/format/#document-structure-top-level
-                JsonapiResponse: {
-                    properties: {
-                        data: {
-                            items: { type: 'object' },
-                            type: 'array'
-                        },
-                        errors: {
-                            items: { type: 'object' },
-                            type: 'array'
-                        },
-                        meta: { type: 'object' },
-                        statusCode: { type: 'integer' }
-                    }
-                }
-            },
-            info: {
-                description: 'demo of swagger-lite crud-api',
-                title: 'swagger-lite api',
-                version: '0'
-            },
-            paths: {},
-            swagger: '2.0',
-            tags: []
-        };
-        // hack - init swaggerJson$$Dummy to pass validation warnings for auto-created schemas
-        local.swgg.swaggerJson$$Dummy = {
-            definitions: {
-                $$Dummy: {
-                    properties: {
-                        propArray: {
-                            items: { $ref: '#/definitions/Array' },
-                            type: 'array'
-                        }
-                    }
-                },
-                JsonapiResponse$$Dummy: {
-                    properties: { data: {
-                        items: { $ref: '#/definitions/$$Dummy' },
-                        type: 'array'
-                    } },
-                    'x-inheritList': [{ $ref: '#/definitions/JsonapiResponse' }]
-                }
-            },
-            paths: { '/$$Dummy': { get: {
-                responses: {
-                    200: {
-                        description: '',
-                        schema: { $ref: '#/definitions/JsonapiResponse$$Dummy' }
-                    }
-                }
-            } } }
-        };
-    }());
     switch (local.modeJs) {
 
 
@@ -1047,7 +1196,6 @@
         local.global.swgg = local.swgg;
         // require modules
         local.swagger_tools = local.global.SwaggerTools.specs;
-        local.swgg.SwaggerClient = local.global.SwaggerClient;
         break;
 
 
@@ -1059,11 +1207,8 @@
         module.exports.__dirname = __dirname;
         // require modules
         local.fs = require('fs');
-        local.http = require('http');
-        local.https = require('https');
         local.swagger_tools = require('swagger-ui-lite/swagger-tools-standalone-min.js');
         local.swagger_ui = require('swagger-ui-lite');
-        local.vm = require('vm');
         // init assets
         local.utility2.cacheDict.assets['/assets/nedb.min.js'] =
             local.fs.readFileSync(local.swagger_ui.__dirname + '/nedb.min.js', 'utf8');
@@ -1076,24 +1221,12 @@
         local.utility2.cacheDict.assets['/assets/swagger-tools-standalone-min.js'] =
             local.fs.readFileSync(local.swagger_ui.__dirname +
                 '/swagger-tools-standalone-min.js', 'utf8');
-        local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.css'] =
-            local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.rollup.css', 'utf8')
-            .replace((/^(\w.+?(?:,| \{))/gm), '.swagger-section $1') +
-            '.swagger-section #header {\n' +
-                'border: 1px solid black;\n' +
-            '}\n' +
-            '.swagger-section select.error {\n' +
-                'outline: 2px solid black;\n' +
-                'outline-color: #cc0000;\n' +
-            '}\n' +
-            '.swagger-section textarea.error {\n' +
-                'outline: 2px solid black;\n' +
-                'outline-color: #cc0000;\n' +
-            '}';
-        local.utility2.cacheDict.assets['/assets/swagger-ui.rollup.js'] =
+        local.utility2.cacheDict.assets['/assets/swagger-lite.css'] =
+            local.fs.readFileSync(__dirname + '/index.css', 'utf8');
+        local.utility2.cacheDict.assets['/assets/swagger-lite.lib.swagger-ui.js'] =
             local.utility2.istanbulInstrumentInPackage(
-                local.fs.readFileSync(__dirname + '/swagger-ui.rollup.js', 'utf8'),
-                __dirname + '/swagger-ui.rollup.js',
+                local.fs.readFileSync(__dirname + '/lib.swagger-ui.js', 'utf8'),
+                __dirname + '/lib.swagger-ui.js',
                 'swagger-lite'
             );
         local.utility2.cacheDict.assets['/assets/swagger-ui.favicon-16x16.png'] =
@@ -1119,10 +1252,6 @@
         );
         // init XMLHttpRequest
         local.XMLHttpRequest = local.utility2.local._http.XMLHttpRequest;
-        // init SwaggerClient
-        local.swgg.SwaggerClient = require('./swagger-ui.rollup.js');
-        // init nedb
-        local.swgg.nedb = require('swagger-ui-lite/nedb.min.js');
         // init api
         local.swgg.apiUpdate({});
         break;

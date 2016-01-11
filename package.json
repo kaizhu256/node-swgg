@@ -3,11 +3,11 @@
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "swagger-ui-lite": "2015.11.7",
-        "utility2": "2015.12.9"
+        "utility2": "2015.12.10"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
-        "electron-lite": "2015.11.2"
+        "electron-lite": "2015.12.3"
     },
     "engines": { "node": ">=4.2" },
     "keywords": [
@@ -45,5 +45,5 @@
 
 
     },
-    "version": "2015.12.4"
+    "version": "2015.12.5"
 }

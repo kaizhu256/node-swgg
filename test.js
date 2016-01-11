@@ -532,8 +532,14 @@
                 file: '/assets/nedb.min.js',
                 url: '/assets/nedb.min.js'
             }, {
+                file: '/assets/swagger-lite.css',
+                url: '/assets/swagger-lite.css'
+            }, {
                 file: '/assets/swagger-lite.js',
                 url: '/assets/swagger-lite.js'
+            }, {
+                file: '/assets/swagger-lite.lib.swagger-ui.js',
+                url: '/assets/swagger-lite.lib.swagger-ui.js'
             }, {
                 file: '/assets/swagger-tools-standalone-min.js',
                 url: '/assets/swagger-tools-standalone-min.js'
@@ -549,12 +555,6 @@
             }, {
                 file: '/assets/swagger-ui.logo_small.png',
                 url: '/assets/swagger-ui.logo_small.png'
-            }, {
-                file: '/assets/swagger-ui.rollup.css',
-                url: '/assets/swagger-ui.rollup.css'
-            }, {
-                file: '/assets/swagger-ui.rollup.js',
-                url: '/assets/swagger-ui.rollup.js'
             }, {
                 file: '/assets/swagger-ui.throbber.gif',
                 url: '/assets/swagger-ui.throbber.gif'
@@ -623,15 +623,13 @@
                     // init _pathObjectDefaultList
                     _pathObjectDefaultList: [
                         'crudCountManyByQuery',
-                        'crudCreateOne',
-                        'crudCreateOrReplaceOne',
                         'crudDeleteManyByQuery',
                         'crudDeleteOneByKeyUnique.id',
                         'crudExistsOneByKeyUnique.id',
                         'crudGetManyByQuery',
                         'crudGetOneByQuery',
                         'crudGetOneByKeyUnique.id',
-                        'crudUpdateOneByKeyUnique.id',
+                        'crudUpsertOne',
                         'crudUpsertOneByKeyUnique.id'
                     ],
                     _pathPrefix: '_test',

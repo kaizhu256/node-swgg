@@ -114,6 +114,8 @@ instruction
         });
         // init utility2
         local.utility2 = local.swgg.local.utility2;
+        // init petstore-api
+        local.swgg.apiUpdate({});
         // init middleware
         local.middleware = local.utility2.middlewareGroupCreate([
             // init pre-middleware
@@ -140,8 +142,16 @@ instruction
                 nextMiddleware();
             },
             // init swagger-validation middleware
-            local.swgg.middlewareValidate
+            local.swgg.middlewareValidate,
+            // init crud middleware
+            local.swgg.middlewareCrud
         ]);
+        //!! // init middleware-petstore
+        //!! local.middleware.middlewareList.push(function (request, response, nextMiddleware) {
+            //!! // jslint-hack
+            //!! local.utility2.nop(request, response);
+            //!! nextMiddleware();
+        //!! });
         // init error-middleware
         local.middlewareError = local.swgg.middlewareError;
         // run server-test
@@ -185,7 +195,7 @@ instruction
 \n\
     <link href="assets/swagger-ui.favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">\n\
     <link href="assets/swagger-ui.favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">\n\
-    <link href="assets/swagger-ui.rollup.css" media="screen" rel="stylesheet" type="text/css">\n\
+    <link href="assets/swagger-lite.css" media="screen" rel="stylesheet" type="text/css">\n\
 </head>\n\
 <body>\n\
     <div class="ajaxProgressDiv" style="display: block;">\n\
@@ -216,7 +226,7 @@ instruction
     <script src="assets/nedb.min.js"></script>\n\
     <script src="assets/swagger-tools-standalone-min.js"></script>\n\
     <script src="assets/utility2.js"></script>\n\
-    <script src="assets/swagger-ui.rollup.js"></script>\n\
+    <script src="assets/swagger-lite.lib.swagger-ui.js"></script>\n\
     <script src="assets/swagger-lite.js"></script>\n\
     <script src="assets/example.js"></script>\n\
     <script src="assets/test.js"></script>\n\
@@ -330,11 +340,11 @@ instruction
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "swagger-ui-lite": "2015.11.7",
-        "utility2": "2015.12.9"
+        "utility2": "2015.12.10"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
-        "electron-lite": "2015.11.2"
+        "electron-lite": "2015.12.3"
     },
     "engines": { "node": ">=4.2" },
     "keywords": [
@@ -372,14 +382,14 @@ utility2 shRun shReadmeExportFile package.json package.json && \
 export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js"
     },
-    "version": "2015.12.4"
+    "version": "2015.12.5"
 }
 ```
 
 
 
 # todo
-- add nedb backend
+- implement petstore backend with nedb
 - add logging feature
 - add cached version crudGetManyByQueryCached
 - add swggUserLoginTokenCapped
@@ -391,11 +401,11 @@ utility2 test node test.js"
 
 
 
-# change since 621b87a9
-- npm publish 2015.12.4
-- shrink file swagger-ui.rollup.js
-- add file swagger-ui.rollup.js
-- add asset /swagger-lite.html
+# change since 00df5720
+- npm publish 2015.12.5
+- add nedb backend
+- rename swagger-ui.rollup.js to lib.swagger-ui.js
+- add file index.css and rename asset swagger-ui.rollup.css to swagger-lite.css
 - none
 
 
@@ -467,6 +477,9 @@ shBuild() {(set -e
     # create recent changelog of last 50 commits
     (export MODE_BUILD=gitLog &&
         shRunScreenCapture git log -50 --pretty="%ai\u000a%B")
+
+    # if running legacy-node, then do not continue
+    [ "$(node --version)" \< "v5.0" ] && exit || true
 
     # cleanup remote build dir
     # export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
