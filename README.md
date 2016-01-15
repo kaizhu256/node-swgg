@@ -59,7 +59,7 @@ this node script will serve a lightweight standalone swagger-ui server backed by
 instruction
     1. save this script as example.js
     2. run the shell command:
-        $ npm install swagger-lite && PORT=1337 node example.js
+        $ npm install swagger-lite && export PORT=1337 && node example.js
     3. open a browser to http://localhost:1337
     4. interact with the swagger-ui crud-api
 */
@@ -172,36 +172,36 @@ instruction
         local.utility2.cacheDict.assets['/'] = '<!DOCTYPE html>\n\
 <html>\n\
 <head>\n\
-    <meta charset="UTF-8">\n\
-    <title>\n\
-    {{envDict.npm_package_name}} [{{envDict.npm_package_version}}]\n\
-    </title>\n\
-    <link href="assets/utility2.css" rel="stylesheet">\n\
-    <style>\n\
-    * {\n\
-        box-sizing: border-box;\n\
-    }\n\
-    body {\n\
-        background-color: #fff;\n\
-        font-family: Helvetical Neue, Helvetica, Arial, sans-serif;\n\
-    }\n\
-    body > div {\n\
-        margin-top: 20px;\n\
-    }\n\
-    .testReportDiv {\n\
-        display: none;\n\
-    }\n\
-    </style>\n\
+<meta charset="UTF-8">\n\
+<title>\n\
+{{envDict.npm_package_name}} @ {{envDict.npm_package_version}}\n\
+</title>\n\
+<link href="assets.utility2.css" rel="stylesheet">\n\
+<style>\n\
+* {\n\
+    box-sizing: border-box;\n\
+}\n\
+body {\n\
+    background-color: #fff;\n\
+    font-family: Helvetical Neue, Helvetica, Arial, sans-serif;\n\
+}\n\
+body > div {\n\
+    margin-top: 20px;\n\
+}\n\
+.testReportDiv {\n\
+    display: none;\n\
+}\n\
+</style>\n\
 \n\
-    <link href="assets/swagger-ui.favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">\n\
-    <link href="assets/swagger-ui.favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">\n\
-    <link href="assets/swagger-lite.css" media="screen" rel="stylesheet" type="text/css">\n\
+<link href="assets.swagger-ui.favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">\n\
+<link href="assets.swagger-ui.favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">\n\
+<link href="assets.swagger-lite.css" media="screen" rel="stylesheet" type="text/css">\n\
 </head>\n\
 <body>\n\
     <div class="ajaxProgressDiv" style="display: block;">\n\
     <div class="ajaxProgressBarDiv ajaxProgressBarDivLoading">loading</div>\n\
     </div>\n\
-    <h1>{{envDict.npm_package_name}} [{{envDict.npm_package_version}}]</h1>\n\
+    <h1>{{envDict.npm_package_name}} @ {{envDict.npm_package_version}}</h1>\n\
     <h3>{{envDict.npm_package_description}}</h3>\n\
     <div class="testReportDiv"></div>\n\
 \n\
@@ -223,69 +223,69 @@ instruction
     <div id="message-bar" class="swagger-ui-wrap" data-sw-translate>&nbsp;</div>\n\
     <div id="swagger-ui-container" class="swagger-ui-wrap"></div>\n\
     </div>\n\
-    <script src="assets/nedb.min.js"></script>\n\
-    <script src="assets/swagger-tools-standalone-min.js"></script>\n\
-    <script src="assets/utility2.js"></script>\n\
-    <script src="assets/swagger-lite.lib.swagger-ui.js"></script>\n\
-    <script src="assets/swagger-lite.js"></script>\n\
-    <script src="assets/example.js"></script>\n\
-    <script src="assets/test.js"></script>\n\
-    <script>$(function () {\n\
-    window.utility2.envDict = {\n\
-        npm_package_description: "{{envDict.npm_package_description}}",\n\
-        npm_package_name: "{{envDict.npm_package_name}}",\n\
-        npm_package_version: "{{envDict.npm_package_version}}"\n\
-    };\n\
-    var url = window.location.search.match(/url=([^&]+)/);\n\
-    if (url && url.length > 1) {\n\
-        url = decodeURIComponent(url[1]);\n\
-    } else {\n\
-        url = location.pathname.replace((/\\/[^\/]*?$/), "") + "/api/v0/swagger.json";\n\
-    }\n\
-    // Pre load translate...\n\
-    if(window.SwaggerTranslator) {\n\
-        window.SwaggerTranslator.translate();\n\
-    }\n\
-    local.utility2.onReady.counter += 1;\n\
-    window.swaggerUi = new SwaggerUi({\n\
-        url: url,\n\
-        dom_id: "swagger-ui-container",\n\
-        supportedSubmitMethods: ["get", "post", "put", "delete", "patch"],\n\
-        onComplete: function(swaggerApi, swaggerUi){\n\
-            if(typeof initOAuth == "function") {\n\
-                initOAuth({\n\
-                    clientId: "your-client-id",\n\
-                    clientSecret: "your-client-secret",\n\
-                    realm: "your-realms",\n\
-                    appName: "your-app-name",\n\
-                    scopeSeparator: ","\n\
-                });\n\
-            }\n\
-            if(window.SwaggerTranslator) {\n\
-                window.SwaggerTranslator.translate();\n\
-            }\n\
-            addApiKeyAuthorization();\n\
-            local.utility2.onReady();\n\
-        },\n\
-        onFailure: function(data) {\n\
-            log("Unable to Load SwaggerUI");\n\
-        },\n\
-        docExpansion: "none",\n\
-        apisSorter: "alpha",\n\
-        showRequestHeaders: false\n\
-    });\n\
-    function addApiKeyAuthorization(){\n\
-        var key = encodeURIComponent($("#input_apiKey")[0].value);\n\
-        if(key && key.trim() != "") {\n\
-            var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("api_key", key, "query");\n\
-            window.swaggerUi.api.clientAuthorizations.add("api_key", apiKeyAuth);\n\
-            log("added key " + key);\n\
+<script src="assets.nedb.min.js"></script>\n\
+<script src="assets.swagger-tools-standalone-min.js"></script>\n\
+<script src="assets.utility2.js"></script>\n\
+<script src="assets.swagger-lite.lib.swagger-ui.js"></script>\n\
+<script src="assets.swagger-lite.js"></script>\n\
+<script src="assets.example.js"></script>\n\
+<script src="assets.test.js"></script>\n\
+<script>$(function () {\n\
+window.utility2.envDict = {\n\
+    npm_package_description: "{{envDict.npm_package_description}}",\n\
+    npm_package_name: "{{envDict.npm_package_name}}",\n\
+    npm_package_version: "{{envDict.npm_package_version}}"\n\
+};\n\
+var url = window.location.search.match(/url=([^&]+)/);\n\
+if (url && url.length > 1) {\n\
+    url = decodeURIComponent(url[1]);\n\
+} else {\n\
+    url = location.pathname.replace((/\\/[^\\/]*?$/), "") + "/api/v0/swagger.json";\n\
+}\n\
+// Pre load translate...\n\
+if(window.SwaggerTranslator) {\n\
+    window.SwaggerTranslator.translate();\n\
+}\n\
+window.utility2.onReady.counter += 1;\n\
+window.swaggerUi = new SwaggerUi({\n\
+    url: url,\n\
+    dom_id: "swagger-ui-container",\n\
+    supportedSubmitMethods: ["get", "post", "put", "delete", "patch"],\n\
+    onComplete: function(swaggerApi, swaggerUi){\n\
+        if(typeof initOAuth == "function") {\n\
+            initOAuth({\n\
+                clientId: "your-client-id",\n\
+                clientSecret: "your-client-secret",\n\
+                realm: "your-realms",\n\
+                appName: "your-app-name",\n\
+                scopeSeparator: ","\n\
+            });\n\
         }\n\
+        if(window.SwaggerTranslator) {\n\
+            window.SwaggerTranslator.translate();\n\
+        }\n\
+        addApiKeyAuthorization();\n\
+        window.utility2.onReady();\n\
+    },\n\
+    onFailure: function(data) {\n\
+        console.log("Unable to Load SwaggerUI");\n\
+    },\n\
+    docExpansion: "none",\n\
+    apisSorter: "alpha",\n\
+    showRequestHeaders: false\n\
+});\n\
+function addApiKeyAuthorization(){\n\
+    var key = encodeURIComponent($("#input_apiKey")[0].value);\n\
+    if(key && key.trim() != "") {\n\
+        var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("api_key", key, "query");\n\
+        window.swaggerUi.api.clientAuthorizations.add("api_key", apiKeyAuth);\n\
+        console.log("added key " + key);\n\
     }\n\
-    $("#input_apiKey").change(addApiKeyAuthorization);\n\
-    window.swaggerUi.load();\n\
-    local.swgg.api = window.swaggerUi.api;\n\
-    });</script>\n\
+}\n\
+$("#input_apiKey").change(addApiKeyAuthorization);\n\
+window.swaggerUi.load();\n\
+window.swgg.api = window.swaggerUi.api;\n\
+});</script>\n\
 </body>\n\
 </html>';
         /* jslint-ignore-end */
@@ -294,7 +294,7 @@ instruction
             { envDict: local.utility2.envDict },
             ''
         );
-        local.utility2.cacheDict.assets['/assets/example.js'] =
+        local.utility2.cacheDict.assets['/assets.example.js'] =
             local.fs.readFileSync(__dirname + '/example.js', 'utf8');
         // init petstore-api
         (function () {
@@ -340,7 +340,7 @@ instruction
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "swagger-ui-lite": "2015.11.7",
-        "utility2": "2015.12.10"
+        "utility2": "2015.12.11"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -359,9 +359,9 @@ instruction
     "license": "MIT",
     "name": "swagger-lite",
     "os": ["darwin", "linux"],
-    "repository" : {
-        "type" : "git",
-        "url" : "https://github.com/kaizhu256/node-swagger-lite.git"
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/kaizhu256/node-swagger-lite.git"
     },
     "scripts": {
         "build-ci": "utility2 shRun shReadmeBuild",
@@ -382,7 +382,7 @@ utility2 shRun shReadmeExportFile package.json package.json && \
 export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js"
     },
-    "version": "2015.12.5"
+    "version": "2015.12.6"
 }
 ```
 
@@ -401,11 +401,9 @@ utility2 test node test.js"
 
 
 
-# change since 00df5720
-- npm publish 2015.12.5
-- add nedb backend
-- rename swagger-ui.rollup.js to lib.swagger-ui.js
-- add file index.css and rename asset swagger-ui.rollup.css to swagger-lite.css
+# change since bb841e3d
+- npm publish 2015.12.6
+- rename assets/* to assets.*
 - none
 
 

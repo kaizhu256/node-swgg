@@ -3,7 +3,7 @@
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "swagger-ui-lite": "2015.11.7",
-        "utility2": "2015.12.10"
+        "utility2": "2015.12.11"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -22,9 +22,9 @@
     "license": "MIT",
     "name": "swagger-lite",
     "os": ["darwin", "linux"],
-    "repository" : {
-        "type" : "git",
-        "url" : "https://github.com/kaizhu256/node-swagger-lite.git"
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/kaizhu256/node-swagger-lite.git"
     },
     "scripts": {
         "build-ci": "utility2 shRun shReadmeBuild",
@@ -45,5 +45,5 @@
 
 
     },
-    "version": "2015.12.5"
+    "version": "2015.12.6"
 }

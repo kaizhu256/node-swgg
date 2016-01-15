@@ -154,8 +154,7 @@
             [
                 'hello',
                 ['hello'],
-                [{ data: 'hello' }],
-                { data: [{ data: 'hello' }], meta: { isJsonapiResponse: true } }
+                { data: ['hello'], meta: { isJsonapiResponse: true } }
             ].forEach(function (data) {
                 onParallel.counter += 1;
                 local.swgg.api._test.onErrorJsonapi({ data: JSON.stringify(data) }, {
@@ -165,7 +164,7 @@
                         // validate no error occurred
                         local.utility2.assert(!error, error);
                         // validate data
-                        local.utility2.assert(data.obj.data[0].data === 'hello', data);
+                        local.utility2.assert(data.obj.data[0] === 'hello', data);
                         onParallel();
                     }, onParallel);
                 });
@@ -190,7 +189,7 @@
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     // validate data
-                    local.utility2.assert(data.obj.data[0].data === undefined, data);
+                    local.utility2.assert(data.obj.data[0] === null, data);
                     onParallel();
                 }, onParallel);
             });
@@ -202,7 +201,7 @@
                     // validate error occurred
                     local.utility2.assert(error, error);
                     // validate error
-                    local.utility2.assert(error.errors[0].message === undefined, error);
+                    local.utility2.assert(error.errors[0].message === 'null', error);
                     onParallel();
                 }, onParallel);
             });
@@ -526,50 +525,50 @@
                 file: '/api/v0/swagger.json',
                 url: '/api/v0/swagger.json'
             }, {
-                file: '/assets/example.js',
-                url: '/assets/example.js'
+                file: '/assets.example.js',
+                url: '/assets.example.js'
             }, {
-                file: '/assets/nedb.min.js',
-                url: '/assets/nedb.min.js'
+                file: '/assets.nedb.min.js',
+                url: '/assets.nedb.min.js'
             }, {
-                file: '/assets/swagger-lite.css',
-                url: '/assets/swagger-lite.css'
+                file: '/assets.swagger-lite.css',
+                url: '/assets.swagger-lite.css'
             }, {
-                file: '/assets/swagger-lite.js',
-                url: '/assets/swagger-lite.js'
+                file: '/assets.swagger-lite.js',
+                url: '/assets.swagger-lite.js'
             }, {
-                file: '/assets/swagger-lite.lib.swagger-ui.js',
-                url: '/assets/swagger-lite.lib.swagger-ui.js'
+                file: '/assets.swagger-lite.lib.swagger-ui.js',
+                url: '/assets.swagger-lite.lib.swagger-ui.js'
             }, {
-                file: '/assets/swagger-tools-standalone-min.js',
-                url: '/assets/swagger-tools-standalone-min.js'
+                file: '/assets.swagger-tools-standalone-min.js',
+                url: '/assets.swagger-tools-standalone-min.js'
             }, {
-                file: '/assets/swagger-ui.explorer_icons.png',
-                url: '/assets/swagger-ui.explorer_icons.png'
+                file: '/assets.swagger-ui.explorer_icons.png',
+                url: '/assets.swagger-ui.explorer_icons.png'
             }, {
-                file: '/assets/swagger-ui.favicon-16x16.png',
-                url: '/assets/swagger-ui.favicon-16x16.png'
+                file: '/assets.swagger-ui.favicon-16x16.png',
+                url: '/assets.swagger-ui.favicon-16x16.png'
             }, {
-                file: '/assets/swagger-ui.favicon-32x32.png',
-                url: '/assets/swagger-ui.favicon-32x32.png'
+                file: '/assets.swagger-ui.favicon-32x32.png',
+                url: '/assets.swagger-ui.favicon-32x32.png'
             }, {
-                file: '/assets/swagger-ui.logo_small.png',
-                url: '/assets/swagger-ui.logo_small.png'
+                file: '/assets.swagger-ui.logo_small.png',
+                url: '/assets.swagger-ui.logo_small.png'
             }, {
-                file: '/assets/swagger-ui.throbber.gif',
-                url: '/assets/swagger-ui.throbber.gif'
+                file: '/assets.swagger-ui.throbber.gif',
+                url: '/assets.swagger-ui.throbber.gif'
             }, {
-                file: '/assets/test.js',
-                url: '/assets/test.js'
+                file: '/assets.test.js',
+                url: '/assets.test.js'
             }, {
-                file: '/assets/utility2.css',
-                url: '/assets/utility2.css'
+                file: '/assets.utility2.css',
+                url: '/assets.utility2.css'
             }, {
-                file: '/assets/utility2.js',
-                url: '/assets/utility2.js'
+                file: '/assets.utility2.js',
+                url: '/assets.utility2.js'
             }, {
-                file: '/swagger-lite.html',
-                url: '/swagger-lite.html'
+                file: '/swagger-ui.html',
+                url: '/swagger-ui.html'
             }].forEach(function (element) {
                 onParallel.counter += 1;
                 local.utility2.ajax({ url: element.url }, function (error, xhr) {
@@ -623,14 +622,14 @@
                     // init _pathObjectDefaultList
                     _pathObjectDefaultList: [
                         'crudCountManyByQuery',
+                        'crudCreateOrReplaceOne',
+                        'crudCreateOrReplaceOneByKeyUnique.id',
                         'crudDeleteManyByQuery',
                         'crudDeleteOneByKeyUnique.id',
                         'crudExistsOneByKeyUnique.id',
                         'crudGetManyByQuery',
                         'crudGetOneByQuery',
-                        'crudGetOneByKeyUnique.id',
-                        'crudUpsertOne',
-                        'crudUpsertOneByKeyUnique.id'
+                        'crudGetOneByKeyUnique.id'
                     ],
                     _pathPrefix: '_test',
                     properties: {
@@ -835,7 +834,7 @@
         local.testCase_validateByParamDefList_default(null, local.utility2.onErrorDefault);
         local.testCase_validateBySchema_default(null, local.utility2.onErrorDefault);
         local.testCase_validateBySwagger_default(null, local.utility2.onErrorDefault);
-        local.utility2.cacheDict.assets['/assets/test.js'] =
+        local.utility2.cacheDict.assets['/assets.test.js'] =
             local.utility2.istanbulInstrumentInPackage(
                 local.fs.readFileSync(__filename, 'utf8'),
                 local.swgg.__dirname + '/test.js',

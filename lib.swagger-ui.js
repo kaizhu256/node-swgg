@@ -41,14 +41,14 @@
                     'node';
             }
         }());
-        // init utility2
-        local.utility2 = local.modeJs === 'browser'
-            ? window.utility2
-            : require('utility2');
         // init global
         local.global = local.modeJs === 'browser'
             ? window
             : global;
+        // init utility2
+        local.utility2 = local.modeJs === 'browser'
+            ? local.global.utility2
+            : require('utility2');
         // init functions
         local.escape = function (text) {
             return text
@@ -116,9 +116,6 @@
 /* jslint-ignore-begin */
             var helpers;
             helpers = {};
-            var log = helpers.log = function () {
-                console.log(Array.prototype.slice.call(arguments)[0]);
-            };
             var optionHtml = helpers.optionHtml = function (label, value) {
                 return '<tr><td class="optionName">' + label + ':</td><td>' + value + '</td></tr>';
             };
@@ -385,7 +382,7 @@
                         } else if (local.isUndefined(schema.items)) {
                             output.push({});
                         } else {
-                            helpers.log('Array type\'s \'items\' property is not an array or an object, cannot process');
+                            console.log('Array type\'s \'items\' property is not an array or an object, cannot process');
                         }
                     }
                 }
@@ -519,7 +516,7 @@
                                 html += addReference(schema.items, helpers.simpleRef(schema.items.$ref));
                             }
                         } else {
-                            helpers.log('Array type\'s \'items\' schema is not an array or an object, cannot process');
+                            console.log('Array type\'s \'items\' schema is not an array or an object, cannot process');
                             html += 'object';
                         }
 
@@ -671,7 +668,7 @@
                                 html += '<div>' + addReference(schema.items, helpers.simpleRef(schema.items.$ref)) + '</div>';
                             }
                         } else {
-                            helpers.log('Array type\'s \'items\' property is not an array or an object, cannot process');
+                            console.log('Array type\'s \'items\' property is not an array or an object, cannot process');
                             html += '<div>object</div>';
                         }
                     } else {
@@ -1391,10 +1388,6 @@
                     if (param.type === 'array') {
                         param.isList = true;
                         param.allowMultiple = true;
-                        // the enum can be defined at the items level
-                        if (param.items && param.items.enum) {
-                            param.enum = param.items.enum;
-                        }
                     }
 
                     var innerType = this.getType(param);
@@ -1650,7 +1643,7 @@
                 }
 
                 if (typeof dontPrint === 'undefined') {
-                    helpers.log(out);
+                    console.log(out);
                 }
 
                 return out;
@@ -2074,12 +2067,12 @@
 
                 if (consumes && this.consumes) {
                     if (this.consumes.indexOf(consumes) === -1) {
-                        helpers.log('server doesn\'t consume ' + consumes + ', try ' + JSON.stringify(this.consumes));
+                        console.log('server doesn\'t consume ' + consumes + ', try ' + JSON.stringify(this.consumes));
                     }
                 }
 
                 if (!this.matchesAccept(accepts)) {
-                    helpers.log('server can\'t produce ' + accepts);
+                    console.log('server can\'t produce ' + accepts);
                 }
 
                 if ((consumes && body !== '') || (consumes === 'application/x-www-form-urlencoded')) {
@@ -2107,23 +2100,10 @@
                 return this.produces.indexOf(accepts) !== -1 || this.produces.indexOf('*/*') !== -1;
             };
 
-            Operation.prototype.asCurl = function (args1, args2) {
-                var opts = {
-                    mock: true
-                };
-                if (typeof args2 === 'object') {
-                    for (var argKey in args2) {
-                        opts[argKey] = args2[argKey];
-                    }
-                }
-                var obj = this.execute(args1, opts);
-
-                this.clientAuthorizations.apply(obj);
-
+            Operation.prototype.asCurl = function (args1) {
+                var obj = this.execute(args1, { mock: true });
                 var results = [];
-
                 results.push('-X ' + this.method.toUpperCase());
-
                 if (obj.headers) {
                     var key;
 
@@ -2131,7 +2111,6 @@
                         results.push('--header "' + key + ': ' + obj.headers[key] + '"');
                     }
                 }
-
                 if (obj.body) {
                     var body;
 
@@ -2140,10 +2119,8 @@
                     } else {
                         body = obj.body;
                     }
-
                     results.push('-d "' + body.replace(/"/g, '\\"') + '"');
                 }
-
                 return 'curl ' + (results.join(' ')) + ' "' + obj.url + '"';
             };
 
@@ -2507,7 +2484,7 @@
                             return;
                         } else if (!local.isPlainObject(operation)) {
                             // Operation exists but it is not an Operation Object.  Since this is invalid, log it.
-                            helpers.log('The \'' + method + '\' operation for \'' + path + '\' path is not an Operation Object');
+                            console.log('The \'' + method + '\' operation for \'' + path + '\' path is not an Operation Object');
 
                             return;
                         }
@@ -2536,17 +2513,17 @@
                             var operationGroup = self[clientProperty];
 
                             if (clientProperty !== tag) {
-                                helpers.log('The \'' + tag + '\' tag conflicts with a SwaggerClient function/property name.  Use \'client.' +
+                                console.log('The \'' + tag + '\' tag conflicts with a SwaggerClient function/property name.  Use \'client.' +
                                     clientProperty + '\' or \'client.apis.' + tag + '\' instead of \'client.' + tag + '\'.');
                             }
 
                             if (apiProperty !== tag) {
-                                helpers.log('The \'' + tag + '\' tag conflicts with a SwaggerClient operation function/property name.  Use ' +
+                                console.log('The \'' + tag + '\' tag conflicts with a SwaggerClient operation function/property name.  Use ' +
                                     '\'client.apis.' + apiProperty + '\' instead of \'client.apis.' + tag + '\'.');
                             }
 
                             if (reservedApiTags.indexOf(operationId) > -1) {
-                                helpers.log('The \'' + operationId + '\' operationId conflicts with a SwaggerClient operation ' +
+                                console.log('The \'' + operationId + '\' operationId conflicts with a SwaggerClient operation ' +
                                     'function/property name.  Use \'client.apis.' + apiProperty + '._' + operationId +
                                     '\' instead of \'client.apis.' + apiProperty + '.' + operationId + '\'.');
 
@@ -2640,7 +2617,7 @@
                 if (dontPrint) {
                     return output;
                 } else {
-                    helpers.log(output);
+                    console.log(output);
 
                     return output;
                 }
@@ -3987,19 +3964,6 @@ void 0===c?d&&"get"in d&&null!==(e=d.get(a,b))?e:(e=n.find.attr(a,b),null==e?voi
 
                 this.Handlebars = this.Handlebars || {};
                 this.Handlebars.templates = this.Handlebars.templates || {};
-                this.Handlebars.templates.apikey_button_view = Handlebars.template({
-                    "compiler": [6, ">= 2.0.0-beta.1"],
-                    "main": function (depth0, helpers, partials, data) {
-                        var helper, functionType = "function",
-                            escapeExpression = this.escapeExpression;
-                        return "<!--div class='auth_button' id='apikey_button'><img class='auth_icon' alt='apply api key' src='images/apikey.jpeg'></div-->\n<div class='auth_container' id='apikey_container'>\n  <div class='key_input_container'>\n    <div class='auth_label'><label for='input_apiKey_entry'>" + escapeExpression(((helper = helpers.keyName || (depth0 != null ? depth0.keyName : depth0)), (typeof helper === functionType ? helper.call(depth0, {
-                            "name": "keyName",
-                            "hash": {},
-                            "data": data
-                        }) : helper))) + "</label></div>\n    <input placeholder='api_key' class='auth_input' id='input_apiKey_entry' name='apiKey' type='text'/>\n    <div class='auth_submit'><a class='auth_submit_button' id='apply_api_key' href='#' data-sw-translate>apply</a></div>\n  </div>\n</div>\n";
-                    },
-                    "useData": true
-                });
                 this.Handlebars.templates.content_type = Handlebars.template({
                     "1": function (depth0, helpers, partials, data) {
                         var stack1, buffer = "";
@@ -4123,24 +4087,6 @@ void 0===c?d&&"get"in d&&null!==(e=d.get(a,b))?e:(e=n.find.attr(a,b),null==e?voi
                     //   b.attr("title", "copy to clipboard")
                     // },
                     // 500))
-                }
-
-                // Logging function that accounts for browsers that don't have window.console
-                function log() {
-                    log.history = log.history || [];
-                    log.history.push(arguments);
-                    if (this.console) {
-                        console.log(Array.prototype.slice.call(arguments)[0]);
-                    }
-                }
-
-                // Handle browsers that do console incorrectly (IE9 and below, see http://stackoverflow.com/a/5539378/7913)
-                if (Function.prototype.bind && console && typeof console.log === "object") {
-                    [
-                        "log", "info", "warn", "error", "assert", "dir", "clear", "profile", "profileEnd"
-                    ].forEach(function (method) {
-                        console[method] = this.bind(console[method], console);
-                    }, Function.prototype.call);
                 }
 
                 window.Docs = {
@@ -4519,39 +4465,6 @@ void 0===c?d&&"get"in d&&null!==(e=d.get(a,b))?e:(e=n.find.attr(a,b),null==e?voi
                         }
                         return buffer + "</div>\n";
                     },
-                    "7": function (depth0, helpers, partials, data) {
-                        return "        <div class=\"auth\">\n        <span class=\"api-ic ic-error\">";
-                    },
-                    "9": function (depth0, helpers, partials, data) {
-                        var stack1, buffer = "          <div class=\"api_information_panel\">\n";
-                        stack1 = helpers.each.call(depth0, depth0, {
-                            "name": "each",
-                            "hash": {},
-                            "fn": this.program(10, data),
-                            "inverse": this.noop,
-                            "data": data
-                        });
-                        if (stack1 != null) {
-                            buffer += stack1;
-                        }
-                        return buffer + "          </div>\n";
-                    },
-                    "10": function (depth0, helpers, partials, data) {
-                        var stack1, lambda = this.lambda,
-                            escapeExpression = this.escapeExpression,
-                            buffer = "            <div title='";
-                        stack1 = lambda((depth0 != null ? depth0.description : depth0), depth0);
-                        if (stack1 != null) {
-                            buffer += stack1;
-                        }
-                        return buffer + "'>" + escapeExpression(lambda((depth0 != null ? depth0.scope : depth0), depth0)) + "</div>\n";
-                    },
-                    "12": function (depth0, helpers, partials, data) {
-                        return "</span></div>";
-                    },
-                    "14": function (depth0, helpers, partials, data) {
-                        return "        <div class='access'>\n          <span class=\"api-ic ic-off\" title=\"click to authenticate\"></span>\n        </div>\n";
-                    },
                     "16": function (depth0, helpers, partials, data) {
                         var helper, functionType = "function",
                             helperMissing = helpers.helperMissing,
@@ -4673,58 +4586,6 @@ void 0===c?d&&"get"in d&&null!==(e=d.get(a,b))?e:(e=n.find.attr(a,b),null==e?voi
                             "inverse": this.noop,
                             "data": data
                         });
-                        if (stack1 != null) {
-                            buffer += stack1;
-                        }
-                        stack1 = ((helper = (helper = helpers.oauth || (depth0 != null ? depth0.oauth : depth0)) != null ? helper : helperMissing), (options = {
-                            "name": "oauth",
-                            "hash": {},
-                            "fn": this.program(7, data),
-                            "inverse": this.noop,
-                            "data": data
-                        }), (typeof helper === functionType ? helper.call(depth0, options) : helper));
-                        if (!helpers.oauth) {
-                            stack1 = blockHelperMissing.call(depth0, stack1, options);
-                        }
-                        if (stack1 != null) {
-                            buffer += stack1;
-                        }
-                        buffer += "\n";
-                        stack1 = helpers.each.call(depth0, (depth0 != null ? depth0.oauth : depth0), {
-                            "name": "each",
-                            "hash": {},
-                            "fn": this.program(9, data),
-                            "inverse": this.noop,
-                            "data": data
-                        });
-                        if (stack1 != null) {
-                            buffer += stack1;
-                        }
-                        buffer += "        ";
-                        stack1 = ((helper = (helper = helpers.oauth || (depth0 != null ? depth0.oauth : depth0)) != null ? helper : helperMissing), (options = {
-                            "name": "oauth",
-                            "hash": {},
-                            "fn": this.program(12, data),
-                            "inverse": this.noop,
-                            "data": data
-                        }), (typeof helper === functionType ? helper.call(depth0, options) : helper));
-                        if (!helpers.oauth) {
-                            stack1 = blockHelperMissing.call(depth0, stack1, options);
-                        }
-                        if (stack1 != null) {
-                            buffer += stack1;
-                        }
-                        buffer += "\n";
-                        stack1 = ((helper = (helper = helpers.oauth || (depth0 != null ? depth0.oauth : depth0)) != null ? helper : helperMissing), (options = {
-                            "name": "oauth",
-                            "hash": {},
-                            "fn": this.program(14, data),
-                            "inverse": this.noop,
-                            "data": data
-                        }), (typeof helper === functionType ? helper.call(depth0, options) : helper));
-                        if (!helpers.oauth) {
-                            stack1 = blockHelperMissing.call(depth0, stack1, options);
-                        }
                         if (stack1 != null) {
                             buffer += stack1;
                         }
@@ -5759,60 +5620,6 @@ void 0===c?d&&"get"in d&&null!==(e=d.get(a,b))?e:(e=n.find.attr(a,b),null==e?voi
 
                 'use strict';
 
-                SwaggerUi.Views.ApiKeyButton = Backbone.View.extend({ // TODO: append this to global SwaggerUi
-
-                    events: {
-                        'click #apikey_button': 'toggleApiKeyContainer',
-                        'click #apply_api_key': 'applyApiKey'
-                    },
-
-                    initialize: function (opts) {
-                        this.options = opts || {};
-                        this.router = this.options.router;
-                    },
-
-                    render: function () {
-                        var template = this.template();
-                        $(this.el).html(template(this.model));
-
-                        return this;
-                    },
-
-
-                    applyApiKey: function () {
-                        var keyAuth = new SwaggerClient.ApiKeyAuthorization(
-                            this.model.name,
-                            $('#input_apiKey_entry').val(),
-                            this.model.in
-                        );
-                        this.router.api.clientAuthorizations.add(this.model.name, keyAuth);
-                        this.router.load();
-                        $('#apikey_container').show();
-                    },
-
-                    toggleApiKeyContainer: function () {
-                        if ($('#apikey_container').length) {
-
-                            var elem = $('#apikey_container').first();
-
-                            if (elem.is(':visible')) {
-                                elem.hide();
-                            } else {
-
-                                // hide others
-                                $('.auth_container').hide();
-                                elem.show();
-                            }
-                        }
-                    },
-
-                    template: function () {
-                        return Handlebars.templates.apikey_button_view;
-                    }
-
-                });
-                'use strict';
-
                 SwaggerUi.Views.ContentTypeView = Backbone.View.extend({
                     initialize: function () {},
 
@@ -5944,14 +5751,6 @@ void 0===c?d&&"get"in d&&null!==(e=d.get(a,b))?e:(e=n.find.attr(a,b),null==e?voi
                             for (var name in this.model.securityDefinitions) {
                                 var auth = this.model.securityDefinitions[name];
                                 var button;
-
-                                if (auth.type === 'apiKey' && $('#apikey_button').length === 0) {
-                                    button = new SwaggerUi.Views.ApiKeyButton({
-                                        model: auth,
-                                        router: this.router
-                                    }).render().el;
-                                    $('.auth_main_container').append(button);
-                                }
                             }
                         }
 
@@ -6012,7 +5811,6 @@ void 0===c?d&&"get"in d&&null!==(e=d.get(a,b))?e:(e=n.find.attr(a,b),null==e?voi
                         'click .submit': 'submitOperation',
                         'click .response_hider': 'hideResponse',
                         'click .toggleOperation': 'toggleOperationContent',
-                        'mouseenter .api-ic': 'mouseEnter',
                         'dblclick .curl': 'selectText',
                     },
 
@@ -6042,39 +5840,6 @@ void 0===c?d&&"get"in d&&null!==(e=d.get(a,b))?e:(e=n.find.attr(a,b),null==e?voi
                             selection.removeAllRanges();
                             selection.addRange(range);
                         }
-                    },
-
-                    mouseEnter: function (e) {
-                        var elem = $(this.el).find('.content');
-                        var x = e.pageX;
-                        var y = e.pageY;
-                        var scX = $(window).scrollLeft();
-                        var scY = $(window).scrollTop();
-                        var scMaxX = scX + $(window).width();
-                        var scMaxY = scY + $(window).height();
-                        var wd = elem.width();
-                        var hgh = elem.height();
-
-                        if (x + wd > scMaxX) {
-                            x = scMaxX - wd;
-                        }
-
-                        if (x < scX) {
-                            x = scX;
-                        }
-
-                        if (y + hgh > scMaxY) {
-                            y = scMaxY - hgh;
-                        }
-
-                        if (y < scY) {
-                            y = scY;
-                        }
-
-                        var pos = {};
-                        pos.top = y;
-                        pos.left = x;
-                        elem.css(pos);
                     },
 
                     // Note: copied from CoffeeScript compiled file
@@ -6684,19 +6449,7 @@ void 0===c?d&&"get"in d&&null!==(e=d.get(a,b))?e:(e=n.find.attr(a,b),null==e?voi
                         if (textArea.value === null || jQuery.trim(textArea.value).length === 0) {
                             return null;
                         }
-                        param = this.getParamByName(textArea.name);
-                        if (param && param.type && param.type.toLowerCase() === 'array') {
-                            parsed = textArea.value.split('\n');
-                            result = [];
-                            for (i = 0; i < parsed.length; i++) {
-                                if (parsed[i] !== null && jQuery.trim(parsed[i]).length > 0) {
-                                    result.push(parsed[i]);
-                                }
-                            }
-                            return result.length > 0 ? result : null;
-                        } else {
-                            return textArea.value;
-                        }
+                        return textArea.value;
                     },
 
                     getParamByName: function (name) {

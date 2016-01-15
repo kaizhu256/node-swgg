@@ -60,6 +60,57 @@
                 summary: 'count many {{_schemaName}} objects by query',
                 tags: ['{{_pathPrefix}}']
             },
+            crudCreateOrReplaceOne: {
+                _method: 'put',
+                _path: '/{{_pathPrefix}}/crudCreateOrReplaceOne',
+                _pathPrefix: '{{_pathPrefix}}',
+                operationId: 'crudCreateOrReplaceOne',
+                parameters: [{
+                    description: '{{_schemaName}} object',
+                    in: 'body',
+                    name: 'body',
+                    required: true,
+                    schema: { $ref: '#/definitions/{{_schemaName}}' }
+                }],
+                responses: {
+                    200: {
+                        description:
+                            '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                        schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    }
+                },
+                summary: 'create or replace one {{_schemaName}} object',
+                tags: ['{{_pathPrefix}}']
+            },
+            crudCreateOrReplaceOneByKeyUnique: {
+                _keyUnique: '{{_keyUnique}}',
+                _method: 'put',
+                _path: '/{{_pathPrefix}}/crudCreateOrReplaceOneByKeyUnique/{{{_keyUnique}}}',
+                _pathPrefix: '{{_pathPrefix}}',
+                operationId: 'crudCreateOrReplaceOneByKeyUnique.{{_keyUnique}}',
+                parameters: [{
+                    description: '{{_schemaName}} {{_keyUnique}}',
+                    in: 'path',
+                    name: '{{_keyUnique}}',
+                    required: true,
+                    type: 'string'
+                }, {
+                    description: '{{_schemaName}} object',
+                    in: 'body',
+                    name: 'body',
+                    required: true,
+                    schema: { $ref: '#/definitions/{{_schemaName}}' }
+                }],
+                responses: {
+                    200: {
+                        description:
+                            '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                        schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    }
+                },
+                summary: 'create or replace one {{_schemaName}} object',
+                tags: ['{{_pathPrefix}}']
+            },
             crudDeleteManyByQuery: {
                 _method: 'delete',
                 _path: '/{{_pathPrefix}}/crudDeleteManyByQuery',
@@ -220,57 +271,6 @@
                 },
                 summary: 'get one {{_schemaName}} object by {{_keyUnique}}',
                 tags: ['{{_pathPrefix}}']
-            },
-            crudUpsertOne: {
-                _method: 'put',
-                _path: '/{{_pathPrefix}}/crudUpsertOne',
-                _pathPrefix: '{{_pathPrefix}}',
-                operationId: 'crudUpsertOne',
-                parameters: [{
-                    description: '{{_schemaName}} object',
-                    in: 'body',
-                    name: 'body',
-                    required: true,
-                    schema: { $ref: '#/definitions/{{_schemaName}}' }
-                }],
-                responses: {
-                    200: {
-                        description:
-                            '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                        schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
-                    }
-                },
-                summary: 'create or replace one {{_schemaName}} object',
-                tags: ['{{_pathPrefix}}']
-            },
-            crudUpsertOneByKeyUnique: {
-                _keyUnique: '{{_keyUnique}}',
-                _method: 'put',
-                _path: '/{{_pathPrefix}}/crudUpsertOneByKeyUnique/{{{_keyUnique}}}',
-                _pathPrefix: '{{_pathPrefix}}',
-                operationId: 'crudUpsertOneByKeyUnique.{{_keyUnique}}',
-                parameters: [{
-                    description: '{{_schemaName}} {{_keyUnique}}',
-                    in: 'path',
-                    name: '{{_keyUnique}}',
-                    required: true,
-                    type: 'string'
-                }, {
-                    description: '{{_schemaName}} object',
-                    in: 'body',
-                    name: 'body',
-                    required: true,
-                    schema: { $ref: '#/definitions/{{_schemaName}}' }
-                }],
-                responses: {
-                    200: {
-                        description:
-                            '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                        schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
-                    }
-                },
-                summary: 'create or replace one {{_schemaName}} object',
-                tags: ['{{_pathPrefix}}']
             }
         };
         // stringify pathObjectDefault items to prevent side-effects
@@ -280,7 +280,7 @@
         });
         // init swaggerJson
         local.swgg.swaggerJson = {
-            basePath: local.utility2.envDict.npm_config_mode_api_prefix || '/api/v0',
+            basePath: '/api/v0',
             definitions: {
                 Array: { items: {}, type: 'array' },
                 // http://jsonapi.org/format/#document-structure-top-level
@@ -503,13 +503,13 @@
             });
             local.swgg.api.buildFromSpec(local.utility2.jsonCopy(local.swgg.swaggerJson));
             // init nedb
-            local.Nedb = local.Nedb || (local.modeJs === 'browser'
+            local.swgg.Nedb = local.swgg.Nedb || (local.modeJs === 'browser'
                 ? local.global.Nedb
                 : require('swagger-ui-lite/nedb.min.js')) || local.utility2.nop;
             // init collection
             Object.keys(local.swgg.swaggerJson.definitions).forEach(function (schemaName) {
                 local.swgg.cacheDict.collection[schemaName] =
-                    local.swgg.cacheDict.collection[schemaName] || new local.Nedb({
+                    local.swgg.cacheDict.collection[schemaName] || new local.swgg.Nedb({
                         autoload: true,
                         filename: (local.modeJs === 'browser'
                             ? ''
@@ -604,6 +604,12 @@
                             onNext
                         );
                         break;
+                    case 'crudCreateOrReplaceOne':
+                    case 'crudCreateOrReplaceOneByKeyUnique':
+                        crud.collection.update({
+                            _id: crud.data.body._id
+                        }, crud.data.body, { upsert: true}, onNext);
+                        break;
                     case 'crudDeleteManyByQuery':
                         crud.collection.find(crud.data.query, {
                             id: 1
@@ -637,12 +643,6 @@
                     case 'crudGetOneByKeyUnique':
                         crud.collection.findOne(crud.queryByKeyUnique, onNext);
                         break;
-                    case 'crudUpsertOne':
-                    case 'crudUpsertOneByKeyUnique':
-                        crud.collection.update({
-                            _id: crud.data.body._id
-                        }, crud.data.body, { upsert: true}, onNext);
-                        break;
                     default:
                         modeNext = Infinity;
                         onNext();
@@ -666,6 +666,13 @@
                     break;
                 case 3:
                     switch (crud.operationId.split('.')[0]) {
+                    case 'crudCreateOrReplaceOne':
+                    case 'crudCreateOrReplaceOneByKeyUnique':
+                        data = {
+                            data: [local.swgg.normalizeIdSwagger(crud.data.body)],
+                            meta: { data: data, isJsonapiResponse: true }
+                        };
+                        break;
                     case 'crudDeleteManyByQuery':
                         data = crud.data.count;
                         break;
@@ -676,13 +683,6 @@
                         data = {
                             data: data,
                             meta: { count: data.length, isJsonapiResponse: true }
-                        };
-                        break;
-                    case 'crudUpsertOne':
-                    case 'crudUpsertOneByKeyUnique':
-                        data = {
-                            data: [local.swgg.normalizeIdSwagger(crud.data.body)],
-                            meta: { data: data, isJsonapiResponse: true }
                         };
                         break;
                     }
@@ -911,29 +911,25 @@
                     }
                     // normalize data-list to be non-empty
                     if (!data.length) {
-                        data.push({});
+                        data.push(null);
                     }
-                    // normalize data-list to contain non-null objects
-                    data = data.map(function (element) {
-                        if (!(element && typeof element === 'object')) {
-                            element = ii === 0
-                                ? { message: String(element) }
-                                : { data: element };
-                        }
-                        // normalize error-object to plain json-object
-                        if (ii === 0) {
+                    // normalize error-list to contain non-null objects
+                    if (ii === 0) {
+                        data = data.map(function (element) {
+                            if (!(element && typeof element === 'object')) {
+                                element = { message: String(element) };
+                            }
+                            // normalize error-object to plain json-object
                             error = local.utility2.jsonCopy(element);
                             error.message = element.message;
                             error.stack = element.stack;
                             error.statusCode = Number(error.statusCode) || 500;
-                            return error;
-                        }
-                        return element;
-                    });
-                    if (ii === 0) {
+                            return element;
+                        });
                         error = local.utility2.jsonCopy(data[0]);
                         error.errors = data;
                         error.meta = { isJsonapiResponse: true };
+                        error.statusCode = error.statusCode || 500;
                         return error;
                     }
                     return { data: data, meta: { isJsonapiResponse: true } };
@@ -977,8 +973,7 @@
                 }
                 data = error || data;
                 response.end(JSON.stringify(local.utility2.objectSetDefault(data, { meta: {
-                    statusCode: data.statusCode,
-                    requestUrl: request.url
+                    statusCode: data.statusCode
                 } }, 2)));
             })(error, data);
         };
@@ -1024,6 +1019,12 @@
                         ' cannot be null or undefined');
                 }
                 return;
+            }
+            // validate enum
+            if (propertyDef.enum && propertyDef.enum.indexOf(data) < 0) {
+                throw new Error('invalid enum property ' + options.key + ':' +
+                    (propertyDef.format || propertyDef.type) + ' - ' + JSON.stringify(data) +
+                    ' not in ' + JSON.stringify(propertyDef.enum));
             }
             // validate schema
             tmp = propertyDef.$ref || (propertyDef.schema && propertyDef.schema.$ref);
@@ -1109,12 +1110,11 @@
                     }
                     break;
                 }
-                if (propertyDef.enum) {
-                    local.utility2.assert(propertyDef.enum.indexOf(data) >= 0);
-                }
             } catch (errorCaught) {
-                throw new Error('invalid property ' + options.key + ':' + (propertyDef.format ||
-                    propertyDef.type) + ' - ' + JSON.stringify(data));
+                errorCaught.message = errorCaught.message ||
+                    'invalid property ' + options.key + ':' +
+                    (propertyDef.format || propertyDef.type) + ' - ' + JSON.stringify(data);
+                throw errorCaught;
             }
         };
 
@@ -1210,43 +1210,42 @@
         local.swagger_tools = require('swagger-ui-lite/swagger-tools-standalone-min.js');
         local.swagger_ui = require('swagger-ui-lite');
         // init assets
-        local.utility2.cacheDict.assets['/assets/nedb.min.js'] =
+        local.utility2.cacheDict.assets['/assets.nedb.min.js'] =
             local.fs.readFileSync(local.swagger_ui.__dirname + '/nedb.min.js', 'utf8');
-        local.utility2.cacheDict.assets['/assets/swagger-lite.js'] =
+        local.utility2.cacheDict.assets['/assets.swagger-lite.js'] =
             local.utility2.istanbulInstrumentInPackage(
                 local.fs.readFileSync(__filename, 'utf8'),
                 __filename,
                 'swagger-lite'
             );
-        local.utility2.cacheDict.assets['/assets/swagger-tools-standalone-min.js'] =
+        local.utility2.cacheDict.assets['/assets.swagger-tools-standalone-min.js'] =
             local.fs.readFileSync(local.swagger_ui.__dirname +
                 '/swagger-tools-standalone-min.js', 'utf8');
-        local.utility2.cacheDict.assets['/assets/swagger-lite.css'] =
+        local.utility2.cacheDict.assets['/assets.swagger-lite.css'] =
             local.fs.readFileSync(__dirname + '/index.css', 'utf8');
-        local.utility2.cacheDict.assets['/assets/swagger-lite.lib.swagger-ui.js'] =
+        local.utility2.cacheDict.assets['/assets.swagger-lite.lib.swagger-ui.js'] =
             local.utility2.istanbulInstrumentInPackage(
                 local.fs.readFileSync(__dirname + '/lib.swagger-ui.js', 'utf8'),
                 __dirname + '/lib.swagger-ui.js',
                 'swagger-lite'
             );
-        local.utility2.cacheDict.assets['/assets/swagger-ui.favicon-16x16.png'] =
+        local.utility2.cacheDict.assets['/assets.swagger-ui.favicon-16x16.png'] =
             local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.favicon-16x16.png');
-        local.utility2.cacheDict.assets['/assets/swagger-ui.favicon-32x32.png'] =
+        local.utility2.cacheDict.assets['/assets.swagger-ui.favicon-32x32.png'] =
             local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.favicon-32x32.png');
-        local.utility2.cacheDict.assets['/assets/swagger-ui.explorer_icons.png'] =
+        local.utility2.cacheDict.assets['/assets.swagger-ui.explorer_icons.png'] =
             local.fs.readFileSync(local.swagger_ui.__dirname +
                 '/swagger-ui.explorer_icons.png');
-        local.utility2.cacheDict.assets['/assets/swagger-ui.logo_small.png'] =
+        local.utility2.cacheDict.assets['/assets.swagger-ui.logo_small.png'] =
             local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.logo_small.png');
-        local.utility2.cacheDict.assets['/assets/swagger-ui.throbber.gif'] =
+        local.utility2.cacheDict.assets['/assets.swagger-ui.throbber.gif'] =
             local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.throbber.gif');
-        local.utility2.cacheDict.assets['/swagger-ui.html'] =
-            local.fs.readFileSync(local.swagger_ui.__dirname + '/swagger-ui.html', 'utf8');
-        local.utility2.cacheDict.assets['/swagger-lite.html'] = local.utility2.stringFormat(
+        local.utility2.cacheDict.assets['/swagger-ui.html'] = local.utility2.stringFormat(
             local.fs.readFileSync(__dirname + '/README.md', 'utf8')
                 .replace((/[\S\s]*?<html>/), '<!DOCTYPE html><html>')
                 .replace((/<\/html>[\S\s]*/), '</html>')
-                .replace((/\\n\\$/gm), ''),
+                .replace((/\\n\\$/gm), '')
+                .replace((/\\\\/g), '\\'),
             { envDict: local.utility2.envDict },
             ''
         );
