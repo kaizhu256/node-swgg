@@ -2,8 +2,7 @@
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "swagger-ui-lite": "2015.11.7",
-        "utility2": "2015.12.11"
+        "utility2": "2016.1.2"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -28,7 +27,11 @@
     },
     "scripts": {
         "build-ci": "utility2 shRun shReadmeBuild",
-        "build-doc": "MODE_LINENO=0 utility2 shRun shReadmeExportFile package.json package.json && utility2 shRun shDocApiCreate \"module.exports={exampleFileList:['README.md','test.js','index.js'],moduleDict:{'swagger-lite':{aliasList:['swgg'],exports:require('./index.js')},'swagger-lite.api':{aliasList:['api'],exports:require('./index.js').api}}}\"",
+        "build-doc": "MODE_LINENO=0 utility2 shRun shReadmeExportFile package.json package.json && utility2 shRun shDocApiCreate \"module.exports={exampleFileList:['README.md','test.js','index.js'],moduleDict:{'swagger-lite':{aliasList:['swgg'],exports:require('./index.js')},'swagger-lite.Nedb.prototype':{aliasList:['collection'],exports:require('./index.js').Nedb.prototype},'swagger-lite.api':{aliasList:['api'],exports:require('./index.js').api},'swagger-lite.tools.v2':{aliasList:['tools.v2'],exports:require('./index.js').tools.v2.__proto__}}}\"",
+
+
+
+
 
 
 
@@ -45,5 +48,5 @@
 
 
     },
-    "version": "2015.12.6"
+    "version": "2016.1.1"
 }

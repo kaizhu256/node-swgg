@@ -6095,7 +6095,7 @@ void 0===c?d&&"get"in d&&null!==(e=d.get(a,b))?e:(e=n.find.attr(a,b),null==e?voi
                                 $('.request_url pre', $(this.el)).text(this.invocationUrl);
 
                                 map.parameterContentType = 'multipart/form-data';
-
+                                this.map = map;
                                 return this.model.execute(map, opts, this.showCompleteStatus, this.showErrorStatus, this);
                             } else {
                                 this.map = map;
@@ -6449,7 +6449,19 @@ void 0===c?d&&"get"in d&&null!==(e=d.get(a,b))?e:(e=n.find.attr(a,b),null==e?voi
                         if (textArea.value === null || jQuery.trim(textArea.value).length === 0) {
                             return null;
                         }
-                        return textArea.value;
+                        param = this.getParamByName(textArea.name);
+                        if (param && param.type && param.type.toLowerCase() === 'array') {
+                            parsed = textArea.value.split('\n');
+                            result = [];
+                            for (i = 0; i < parsed.length; i++) {
+                                if (parsed[i] !== null && jQuery.trim(parsed[i]).length > 0) {
+                                    result.push(parsed[i]);
+                                }
+                            }
+                            return result.length > 0 ? result : null;
+                        } else {
+                            return textArea.value;
+                        }
                     },
 
                     getParamByName: function (name) {

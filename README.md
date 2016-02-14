@@ -65,6 +65,7 @@ instruction
 */
 
 /*jslint
+    bitwise: true,
     browser: true,
     maxerr: 8,
     maxlen: 96,
@@ -114,19 +115,17 @@ instruction
         });
         // init utility2
         local.utility2 = local.swgg.local.utility2;
-        // init petstore-api
-        local.swgg.apiUpdate({});
         // init middleware
         local.middleware = local.utility2.middlewareGroupCreate([
-            // init pre-middleware
+            // init init-middleware
             local.utility2.middlewareInit,
-            // init cached-assets middleware
+            // init cached-assets-middleware
             local.utility2.middlewareAssetsCached,
-            // init http-body-get middleware
+            // init http-body-read-middleware
             local.utility2.middlewareBodyRead,
-            // init http-body-parse middleware
+            // init http-body-parse-middleware
             local.swgg.middlewareBodyParse,
-            // init swagger pre-middleware
+            // init swagger-init-middleware
             function (request, response, nextMiddleware) {
                 // jslint-hack
                 local.utility2.nop(request);
@@ -141,17 +140,63 @@ instruction
                 response.setHeader('Content-Type', 'application/json; charset=UTF-8');
                 nextMiddleware();
             },
-            // init swagger-validation middleware
+            // init swagger-validation-middleware
             local.swgg.middlewareValidate,
-            // init crud middleware
+            // init crud-middleware
             local.swgg.middlewareCrud
         ]);
-        //!! // init middleware-petstore
-        //!! local.middleware.middlewareList.push(function (request, response, nextMiddleware) {
-            //!! // jslint-hack
-            //!! local.utility2.nop(request, response);
-            //!! nextMiddleware();
-        //!! });
+        // init petstore-middleware
+        local.middleware.middlewareList.push(function (request, response, nextMiddleware) {
+            var modeNext, onNext, result;
+            modeNext = 0;
+            onNext = function (error, data) {
+                modeNext = error
+                    ? Infinity
+                    : modeNext + 1;
+                switch (modeNext) {
+                case 1:
+                    switch (request.swggPathname) {
+                    case 'GET /pet/findByStatus':
+                        local.swgg.collectionCreate('Pet').find({
+                            status: { $in: request.swggParamDict.status }
+                        }, onNext);
+                        break;
+                    case 'GET /pet/findByTags':
+                        local.swgg.collectionCreate('Pet').find({
+                            'tags.name': { $in: request.swggParamDict.tags }
+                        }, onNext);
+                        break;
+                    case 'GET /store/inventory':
+                        local.swgg.collectionCreate('Order').find({}, { status: 1 }, onNext);
+                        break;
+                    default:
+                        modeNext = Infinity;
+                        onNext();
+                    }
+                    break;
+                case 2:
+                    switch (request.swggPathname) {
+                    case 'GET /store/inventory':
+                        result = {};
+                        data.forEach(function (element) {
+                            result[element.status] = result[element.status] || 0;
+                            result[element.status] += 1;
+                        });
+                        onNext(null, result);
+                        break;
+                    default:
+                        onNext(null, data);
+                    }
+                    break;
+                case 3:
+                    local.swgg.serverRespondJsonapi(request, response, error, data);
+                    break;
+                default:
+                    nextMiddleware(error, data);
+                }
+            };
+            onNext();
+        });
         // init error-middleware
         local.middlewareError = local.swgg.middlewareError;
         // run server-test
@@ -166,6 +211,12 @@ instruction
         // export local
         module.exports = local;
         local.path = require('path');
+        // init petstore-api
+        local.global.petstoreSwaggerJson = local.utility2.jsonCopy(require(
+            local.swgg.__dirname + '/petstore.swagger.json'
+        ));
+        delete local.global.petstoreSwaggerJson.basePath;
+        delete local.global.petstoreSwaggerJson.host;
         // init assets
         // https://github.com/swagger-api/swagger-ui/blob/v2.1.2/dist/index.html
         /* jslint-ignore-begin */
@@ -195,7 +246,7 @@ body > div {\n\
 \n\
 <link href="assets.swagger-ui.favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">\n\
 <link href="assets.swagger-ui.favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">\n\
-<link href="assets.swagger-lite.css" media="screen" rel="stylesheet" type="text/css">\n\
+<link href="assets.swgg.css" media="screen" rel="stylesheet" type="text/css">\n\
 </head>\n\
 <body>\n\
     <div class="ajaxProgressDiv" style="display: block;">\n\
@@ -216,18 +267,19 @@ body > div {\n\
         <div class="input">\n\
         <input placeholder="api_key" id="input_apiKey" name="apiKey" type="text"/>\n\
         </div>\n\
-        <div class="input"><a id="explore" href="#" data-sw-translate>Explore</a></div>\n\
+        <div class="input"><a id="explore" href="#">Explore</a></div>\n\
         </form>\n\
         </div>\n\
     </div>\n\
-    <div id="message-bar" class="swagger-ui-wrap" data-sw-translate>&nbsp;</div>\n\
+    <div id="message-bar" class="swagger-ui-wrap">&nbsp;</div>\n\
     <div id="swagger-ui-container" class="swagger-ui-wrap"></div>\n\
     </div>\n\
-<script src="assets.nedb.min.js"></script>\n\
-<script src="assets.swagger-tools-standalone-min.js"></script>\n\
+<script src="assets.swgg.lib.nedb.js"></script>\n\
+<script src="assets.swgg.lib.swagger-tools.js"></script>\n\
 <script src="assets.utility2.js"></script>\n\
-<script src="assets.swagger-lite.lib.swagger-ui.js"></script>\n\
-<script src="assets.swagger-lite.js"></script>\n\
+<script src="assets.swgg.lib.swagger-ui.js"></script>\n\
+<script src="assets.swgg.js"></script>\n\
+<script>window.petstoreSwaggerJson = {{petstoreSwaggerJson}}</script>\n\
 <script src="assets.example.js"></script>\n\
 <script src="assets.test.js"></script>\n\
 <script>$(function () {\n\
@@ -241,10 +293,6 @@ if (url && url.length > 1) {\n\
     url = decodeURIComponent(url[1]);\n\
 } else {\n\
     url = location.pathname.replace((/\\/[^\\/]*?$/), "") + "/api/v0/swagger.json";\n\
-}\n\
-// Pre load translate...\n\
-if(window.SwaggerTranslator) {\n\
-    window.SwaggerTranslator.translate();\n\
 }\n\
 window.utility2.onReady.counter += 1;\n\
 window.swaggerUi = new SwaggerUi({\n\
@@ -260,9 +308,6 @@ window.swaggerUi = new SwaggerUi({\n\
                 appName: "your-app-name",\n\
                 scopeSeparator: ","\n\
             });\n\
-        }\n\
-        if(window.SwaggerTranslator) {\n\
-            window.SwaggerTranslator.translate();\n\
         }\n\
         addApiKeyAuthorization();\n\
         window.utility2.onReady();\n\
@@ -291,26 +336,201 @@ window.swgg.api = window.swaggerUi.api;\n\
         /* jslint-ignore-end */
         local.utility2.cacheDict.assets['/'] = local.utility2.stringFormat(
             local.utility2.cacheDict.assets['/'],
-            { envDict: local.utility2.envDict },
+            {
+                envDict: local.utility2.envDict,
+                petstoreSwaggerJson: JSON.stringify(local.global.petstoreSwaggerJson)
+            },
             ''
         );
         local.utility2.cacheDict.assets['/assets.example.js'] =
             local.fs.readFileSync(__dirname + '/example.js', 'utf8');
-        // init petstore-api
-        (function () {
-            var options;
-            options = local.utility2.jsonCopy(require(local.swgg.local.swagger_ui.__dirname +
-                '/swagger.json'));
-            options = {
-                definitions: options.definitions,
-                paths: options.paths,
-                securityDefinitions: options.securityDefinitions,
-                tags: options.tags
-            };
-            local.swgg.apiUpdate(options);
-        }());
         break;
     }
+
+
+
+    // run shared js-env code
+    (function () {
+        // init petstore-api
+        local.swgg.apiUpdate(local.global.petstoreSwaggerJson);
+        local.swgg.apiUpdate(local.utility2.objectSetOverride(local.swgg.swaggerJson, {
+            definitions: {
+                Pet: {
+                    _pathObjectDefaultList: ['crudGetManyByQuery'],
+                    _pathPrefix: 'pet',
+                    properties: { id: { default: 1, minimum: 1 } }
+                },
+                Order: {
+                    _pathObjectDefaultList: ['crudGetManyByQuery'],
+                    _pathPrefix: 'store',
+                    properties: { id: { default: 1, minimum: 1 } }
+                },
+                User: {
+                    _pathObjectDefaultList: ['crudGetManyByQuery'],
+                    _pathPrefix: 'user',
+                    properties: { id: { default: 1, minimum: 1 } }
+                }
+            },
+            paths: {
+                '/pet': {
+                    post: {
+                        _operationId: 'crudCreateOrReplaceOne',
+                        _schemaName: 'Pet'
+                    },
+                    put: {
+                        _operationId: 'crudCreateOrUpdateOne',
+                        _schemaName: 'Pet'
+                    }
+                },
+                '/pet/{petId}': {
+                    delete: {
+                        _keyAlias: 'id',
+                        _operationId: 'crudDeleteOneByKeyUnique.petId',
+                        _schemaName: 'Pet'
+                    },
+                    get: {
+                        _keyAlias: 'id',
+                        _operationId: 'crudGetOneByKeyUnique.petId',
+                        _schemaName: 'Pet'
+                    },
+                    post: {
+                        _keyAlias: 'id',
+                        _operationId: 'crudCreateOrUpdateOneByKeyUnique.petId',
+                        _schemaName: 'Pet'
+                    }
+                },
+                '/store/order': {
+                    post: {
+                        _operationId: 'crudCreateOrReplaceOne',
+                        _schemaName: 'Order'
+                    }
+                },
+                '/store/order/{orderId}': {
+                    delete: {
+                        _keyAlias: 'id',
+                        _operationId: 'crudDeleteOneByKeyUnique.orderId',
+                        _schemaName: 'Order'
+                    },
+                    get: {
+                        _keyAlias: 'id',
+                        _operationId: 'crudGetOneByKeyUnique.orderId',
+                        _schemaName: 'Order'
+                    }
+                },
+                '/user': {
+                    post: {
+                        _operationId: 'crudCreateOrReplaceOne',
+                        _schemaName: 'User'
+                    }
+                },
+                '/user/{username}': {
+                    delete: {
+                        _operationId: 'crudDeleteOneByKeyUnique.username',
+                        _schemaName: 'User'
+                    },
+                    get: {
+                        _operationId: 'crudGetOneByKeyUnique.username',
+                        _schemaName: 'User'
+                    },
+                    put: {
+                        _operationId: 'crudCreateOrUpdateOneByKeyUnique.username',
+                        _schemaName: 'User'
+                    }
+                },
+                '/user/createWithArray': {
+                    post: {
+                        _operationId: 'crudCreateOrReplaceMany',
+                        _schemaName: 'User'
+                    }
+                },
+                '/user/createWithList': {
+                    post: {
+                        _operationId: 'crudCreateOrReplaceMany',
+                        _schemaName: 'User'
+                    }
+                }
+            }
+        }, 8));
+        // init collection-list
+        local.utility2.onReady.counter += 1;
+        local.swgg.collectionListInit([{
+            docList: [{
+                id: 1,
+                name: 'birdie',
+                photoUrls: [],
+                status: 'available',
+                tags: [{ name: 'bird'}]
+            }, {
+                id: 2,
+                name: 'kittie',
+                status: 'pending',
+                photoUrls: [],
+                tags: [{ name: 'cat'}]
+            }, {
+                id: 3,
+                name: 'doggie',
+                photoUrls: [],
+                status: 'sold',
+                tags: [{ name: 'dog'}]
+            }],
+            drop: true,
+            ensureIndexList: [{
+                fieldName: 'id',
+                unique: true
+            }],
+            name: 'Pet'
+        }, {
+            docList: [{
+                id: 1,
+                status: 'available'
+            }, {
+                id: 2,
+                status: 'pending'
+            }, {
+                id: 3,
+                status: 'sold'
+            }],
+            drop: true,
+            ensureIndexList: [{
+                fieldName: 'id',
+                unique: true
+            }],
+            name: 'Order'
+        }, {
+            docList: [{
+                email: 'jane@doe.com',
+                firstName: 'jane',
+                id: 1,
+                lastName: 'doe',
+                password: 'hello',
+                phone: '1234-5678',
+                username: 'jane.doe'
+            }, {
+                email: 'john@doe.com',
+                firstName: 'john',
+                id: 2,
+                lastName: 'doe',
+                password: 'bye',
+                phone: '8765-4321',
+                username: 'john.doe'
+            }],
+            drop: true,
+            ensureIndexList: [{
+                fieldName: 'email',
+                unique: true
+            }, {
+                fieldName: 'id',
+                unique: true
+            }, {
+                fieldName: 'phone',
+                unique: true
+            }, {
+                fieldName: 'username',
+                unique: true
+            }],
+            name: 'User'
+        }], local.utility2.onReady);
+    }());
 }());
 ```
 
@@ -323,7 +543,6 @@ window.swgg.api = window.swaggerUi.api;\n\
 
 
 # npm-dependencies
-- [swagger-ui-lite](https://www.npmjs.com/package/swagger-ui-lite)
 - [utility2](https://www.npmjs.com/package/utility2)
 
 
@@ -339,8 +558,7 @@ window.swgg.api = window.swaggerUi.api;\n\
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "swagger-ui-lite": "2015.11.7",
-        "utility2": "2015.12.11"
+        "utility2": "2016.1.2"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -371,7 +589,11 @@ utility2 shRun shDocApiCreate \"module.exports={\
 exampleFileList:['README.md','test.js','index.js'],\
 moduleDict:{\
 'swagger-lite':{aliasList:['swgg'],exports:require('./index.js')},\
-'swagger-lite.api':{aliasList:['api'],exports:require('./index.js').api}\
+'swagger-lite.Nedb.prototype':{aliasList:['collection'],\
+exports:require('./index.js').Nedb.prototype},\
+'swagger-lite.api':{aliasList:['api'],exports:require('./index.js').api},\
+'swagger-lite.tools.v2':{aliasList:['tools.v2'],\
+exports:require('./index.js').tools.v2.__proto__}\
 }\
 }\"",
         "start": "export PORT=${PORT:-8080} && \
@@ -382,14 +604,17 @@ utility2 shRun shReadmeExportFile package.json package.json && \
 export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js"
     },
-    "version": "2015.12.6"
+    "version": "2016.1.1"
 }
 ```
 
 
 
 # todo
-- implement petstore backend with nedb
+- implement api POST /pet/{petId}/uploadImage
+- implement api GET /user/login
+- implement api GET /user/logout
+- add query macro
 - add logging feature
 - add cached version crudGetManyByQueryCached
 - add swggUserLoginTokenCapped
@@ -401,9 +626,14 @@ utility2 test node test.js"
 
 
 
-# change since bb841e3d
-- npm publish 2015.12.6
-- rename assets/* to assets.*
+# change since e80f1dc5
+- npm publish 2016.1.1
+- implement petstore backend with nedb
+- remove swagger-ui-lite dependency
+- fix missing createdAt field in nedb update-replace
+- add default-crud-api crudCreateOrReplaceMany, crudCreateOrUpdateOne, and crudCreateOrUpdateOneByKeyUnique
+- keep internal nedb _id separate from mongodb id
+- enable integer id's in default crud api
 - none
 
 
@@ -423,7 +653,6 @@ utility2 test node test.js"
 
 shBuild() {(set -e
 # this function will run the main build
-
     # init env
     . node_modules/.bin/utility2 && shInit
 
@@ -452,7 +681,7 @@ shBuild() {(set -e
         [ "$CI_BRANCH" = master ]
     then
         TEST_URL="https://$(printf "$GITHUB_REPO" | \
-            perl -pe 's/\//.github.io\//')/build..$CI_BRANCH..travis-ci.org/app/index.html"
+            sed 's/\//.github.io\//')/build..$CI_BRANCH..travis-ci.org/app/index.html"
         # deploy app to gh-pages
         (export npm_config_file_test_report_merge="$npm_config_dir_build/test-report.json" &&
             shGithubDeploy)
@@ -491,3 +720,4 @@ shBuild() {(set -e
     exit "$EXIT_CODE"
 )}
 shBuild
+```

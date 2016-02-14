@@ -50,7 +50,7 @@
                 // alias require('$npm_package_name') to require('index.js');
                 .replace(
                     "require('" + process.env.npm_package_name + "')",
-                    "require(__dirname + '/index.js')"
+                    "require('./index.js')"
                 );
             local.utility2 = require('utility2');
             // require example.js
@@ -82,7 +82,7 @@
             onParallel.counter += 1;
             [{
                 // test 404-error handling-behavior
-                url: '/test/undefined'
+                url: '/test.undefined'
             }, {
                 method: 'POST',
                 // test param-parse-error handling-behavior
@@ -106,41 +106,41 @@
             onParallel();
         };
 
-        local.testCase_ajax_validation = function (options, onError) {
-        /*
-         * this function will test ajax's error handling-behavior
-         */
-            var onParallel;
-            // jslint-hack
-            local.utility2.nop(options);
-            onParallel = local.utility2.onParallel(onError);
-            onParallel.counter += 1;
-            // test ajax passed handling-behavior
-            [{
-                data: JSON.stringify({
-                    "category": {"id": 0, "name": ""},
-                    "id": 0,
-                    "name": "doggie",
-                    "photoUrls": ["string"],
-                    "status": "available",
-                    "tags": [{ "id": 0, "name": "string" }]
-                }),
-                method: 'POST',
-                url: '/api/v0/pet'
-            }].forEach(function (options) {
-                onParallel.counter += 1;
-                local.utility2.ajax(options, function (error) {
-                    local.utility2.testTryCatch(function () {
-                        // validate error occurred
-                        local.utility2.assert(error, error);
-                        // validate error
-                        local.utility2.assert(error.statusCode === 404, error);
-                        onParallel();
-                    }, onParallel);
-                });
-            });
-            onParallel();
-        };
+        //!! local.testCase_ajax_validation = function (options, onError) {
+        //!! /*
+         //!! * this function will test ajax's error handling-behavior
+         //!! */
+            //!! var onParallel;
+            //!! // jslint-hack
+            //!! local.utility2.nop(options);
+            //!! onParallel = local.utility2.onParallel(onError);
+            //!! onParallel.counter += 1;
+            //!! // test ajax passed handling-behavior
+            //!! [{
+                //!! data: JSON.stringify({
+                    //!! "category": {"id": 0, "name": ""},
+                    //!! "id": 0,
+                    //!! "name": "doggie",
+                    //!! "photoUrls": ["string"],
+                    //!! "status": "available",
+                    //!! "tags": [{ "id": 0, "name": "string" }]
+                //!! }),
+                //!! method: 'POST',
+                //!! url: '/api/v0/pet'
+            //!! }].forEach(function (options) {
+                //!! onParallel.counter += 1;
+                //!! local.utility2.ajax(options, function (error) {
+                    //!! local.utility2.testTryCatch(function () {
+                        //!! // validate error occurred
+                        //!! local.utility2.assert(error, error);
+                        //!! // validate error
+                        //!! local.utility2.assert(error.statusCode === 404, error);
+                        //!! onParallel();
+                    //!! }, onParallel);
+                //!! });
+            //!! });
+            //!! onParallel();
+        //!! };
 
         local.testCase_onErrorJsonapi_default = function (options, onError) {
         /*
@@ -528,21 +528,6 @@
                 file: '/assets.example.js',
                 url: '/assets.example.js'
             }, {
-                file: '/assets.nedb.min.js',
-                url: '/assets.nedb.min.js'
-            }, {
-                file: '/assets.swagger-lite.css',
-                url: '/assets.swagger-lite.css'
-            }, {
-                file: '/assets.swagger-lite.js',
-                url: '/assets.swagger-lite.js'
-            }, {
-                file: '/assets.swagger-lite.lib.swagger-ui.js',
-                url: '/assets.swagger-lite.lib.swagger-ui.js'
-            }, {
-                file: '/assets.swagger-tools-standalone-min.js',
-                url: '/assets.swagger-tools-standalone-min.js'
-            }, {
                 file: '/assets.swagger-ui.explorer_icons.png',
                 url: '/assets.swagger-ui.explorer_icons.png'
             }, {
@@ -557,6 +542,21 @@
             }, {
                 file: '/assets.swagger-ui.throbber.gif',
                 url: '/assets.swagger-ui.throbber.gif'
+            }, {
+                file: '/assets.swgg.css',
+                url: '/assets.swgg.css'
+            }, {
+                file: '/assets.swgg.js',
+                url: '/assets.swgg.js'
+            }, {
+                file: '/assets.swgg.lib.nedb.js',
+                url: '/assets.swgg.lib.nedb.js'
+            }, {
+                file: '/assets.swgg.lib.swagger-tools.js',
+                url: '/assets.swgg.lib.swagger-tools.js'
+            }, {
+                file: '/assets.swgg.lib.swagger-ui.js',
+                url: '/assets.swgg.lib.swagger-ui.js'
             }, {
                 file: '/assets.test.js',
                 url: '/assets.test.js'
@@ -604,8 +604,6 @@
 
     // run shared js-env code - post-init
     (function () {
-        // test null apiUpdate handling-behavior
-        local.swgg.apiUpdate({});
         // init test api
         local.swgg.apiUpdate({
             definitions: {
@@ -622,6 +620,7 @@
                     // init _pathObjectDefaultList
                     _pathObjectDefaultList: [
                         'crudCountManyByQuery',
+                        'crudCreateOrReplaceMany',
                         'crudCreateOrReplaceOne',
                         'crudCreateOrReplaceOneByKeyUnique.id',
                         'crudDeleteManyByQuery',
@@ -633,6 +632,7 @@
                     ],
                     _pathPrefix: '_test',
                     properties: {
+                        id: { type: 'string' },
                         propArray: { items: {}, type: 'array' },
                         propArraySubdoc: {
                             default: [{ propRequired: true }],
@@ -798,7 +798,7 @@
             url = local.utility2.urlParse(url).pathname;
             return local.modeJs === 'browser' &&
                 url.indexOf('/api/v0/swagger.json') < 0 &&
-                (/\/api\/v0\/|\/test\//).test(url);
+                (/\/api\/v0\/|\/test\./).test(url);
         };
         // init test-middleware
         local.middleware.middlewareList.push(function (request, response, nextMiddleware) {
@@ -823,6 +823,39 @@
                 nextMiddleware();
             }
         });
+        // init collection-list
+        local.utility2.onReady.counter += 1;
+        local.swgg.collectionListInit([{
+            docList: [{
+                id: 'id1',
+                propArray: [{}],
+                propArraySubdoc: [{ propRequired: true }],
+                propBoolean: true,
+                propEnum: 0,
+                propInteger: 0,
+                propIntegerInt32: 0,
+                propIntegerInt64: 0,
+                propNumber: 0,
+                propNumberDouble: 0,
+                propNumberFloat: 0,
+                propObject: {},
+                propObjectSubdoc: {},
+                propRequired: true,
+                propString: 'string',
+                propStringByte: 'string',
+                propStringDate: '1970-01-01',
+                propStringDatetime: '1970-01-01T00:00:00.000Z',
+                propStringEmail: 'a@a.com',
+                propStringJson: 'null',
+                propUndefined: {}
+            }],
+            drop: true,
+            ensureIndexList: [{
+                fieldName: 'id',
+                unique: true
+            }],
+            name: 'TestCrudModel'
+        }], local.utility2.onReady);
     }());
     switch (local.modeJs) {
 
