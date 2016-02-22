@@ -2,7 +2,7 @@
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "utility2": "2016.1.2"
+        "utility2": "2016.1.4"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -40,6 +40,7 @@
 
 
 
+        "postinstall": "node index.js postinstall",
         "start": "export PORT=${PORT:-8080} && export npm_config_mode_auto_restart=1 && utility2 shRun shIstanbulCover node test.js",
 
 
@@ -48,5 +49,5 @@
 
 
     },
-    "version": "2016.1.1"
+    "version": "2016.1.2"
 }

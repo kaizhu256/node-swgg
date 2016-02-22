@@ -2,6 +2,6 @@
 *~
 .*
 example.js
-Procfile
+external
 node_modules
 tmp

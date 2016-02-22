@@ -36,21 +36,26 @@
         local.global = local.modeJs === 'browser'
             ? window
             : global;
-        // init utility2
+        // init lib utility2
         local.utility2 = local.modeJs === 'browser'
             ? local.global.utility2
             : require('utility2');
-        // init swagger-lite
+        // init lib jquery
+        local.jQuery = local.global.jQuery;
+        // init lib swagger-lite
         local.swgg = { cacheDict: { collection: {}, pathObject: {} }, local: local };
-        // init nedb
+        // init lib nedb
         local.swgg.Nedb = local.modeJs === 'browser'
             ? local.global.Nedb || local.utility2.nop
             : require('./lib.nedb.js');
-        // init swagger-tools
-        local.swgg.tools = local.modeJs === 'browser'
-            ? local.global.SwaggerTools.specs
-            : require('./lib.swagger-tools.js');
-        // init pathObjectDefault
+        local.utility2.testTryCatch(function () {
+            // init lib swagger-tools
+            local.swgg.tools = { v2: { validate: local.utility2.nop } };
+            local.swgg.tools = local.modeJs === 'browser'
+                ? local.global.SwaggerTools.specs
+                : require('./external/assets.swgg.lib.swagger-tools.js');
+        }, local.utility2.nop);
+        // init template cacheDict.pathObjectDefault
         local.swgg.cacheDict.pathObjectDefault = {
             crudCountManyByQuery: {
                 _method: 'get',
@@ -62,7 +67,7 @@
                     description: 'query param',
                     format: 'json',
                     in: 'query',
-                    name: 'query',
+                    name: '_queryQuery',
                     type: 'string'
                 }],
                 summary: 'count many {{_schemaName}} objects by query',
@@ -202,7 +207,7 @@
                     description: 'query param',
                     format: 'json',
                     in: 'query',
-                    name: 'query',
+                    name: '_queryQuery',
                     required: true,
                     type: 'string'
                 }],
@@ -254,39 +259,39 @@
                 _pathPrefix: '{{_pathPrefix}}',
                 operationId: 'crudGetManyByQuery',
                 parameters: [{
-                    default: '{}',
+                    default: '{"_id":{"$exists":true}}',
                     description: 'query param',
                     format: 'json',
                     in: 'query',
-                    name: 'query',
+                    name: '_queryQuery',
                     required: true,
                     type: 'string'
                 }, {
                     default: '{}',
-                    description: 'fields param',
+                    description: 'projection fields param',
                     format: 'json',
                     in: 'query',
-                    name: 'fields',
+                    name: '_queryFields',
                     type: 'string'
                 }, {
                     default: 20,
                     description: 'cursor limit param',
                     in: 'query',
-                    name: 'limit',
+                    name: '_queryLimit',
                     required: true,
                     type: 'integer'
                 }, {
                     default: 0,
                     description: 'cursor skip param',
                     in: 'query',
-                    name: 'skip',
+                    name: '_querySkip',
                     type: 'integer'
                 }, {
                     default: '{"updatedAt":-1}',
                     description: 'cursor sort param',
                     format: 'json',
                     in: 'query',
-                    name: 'sort',
+                    name: '_querySort',
                     type: 'string'
                 }],
                 responses: {
@@ -332,15 +337,15 @@
                     description: 'query param',
                     format: 'json',
                     in: 'query',
-                    name: 'query',
+                    name: '_queryQuery',
                     required: true,
                     type: 'string'
                 }, {
                     default: '{}',
-                    description: 'fields param',
+                    description: 'projection fields param',
                     format: 'json',
                     in: 'query',
-                    name: 'fields',
+                    name: '_queryFields',
                     type: 'string'
                 }],
                 responses: {
@@ -354,13 +359,13 @@
                 tags: ['{{_pathPrefix}}']
             }
         };
-        // stringify pathObjectDefault items to prevent side-effects
+        // JSON.stringify cacheDict.pathObjectDefault items to prevent side-effects
         Object.keys(local.swgg.cacheDict.pathObjectDefault).forEach(function (key) {
             local.swgg.cacheDict.pathObjectDefault[key] =
                 JSON.stringify(local.swgg.cacheDict.pathObjectDefault[key]);
         });
-        // init swaggerJson
-        local.swgg.swaggerJson = {
+        // init template swaggerJson
+        local.swgg.templateSwaggerJson = JSON.stringify({
             basePath: '/api/v0',
             definitions: {
                 Array: { items: {}, type: 'array' },
@@ -375,8 +380,7 @@
                             items: { type: 'object' },
                             type: 'array'
                         },
-                        meta: { type: 'object' },
-                        statusCode: { type: 'integer' }
+                        meta: { type: 'object' }
                     }
                 }
             },
@@ -388,9 +392,10 @@
             paths: {},
             swagger: '2.0',
             tags: []
-        };
-        // hack - init swaggerJson$$Dummy to pass validation warnings for auto-created schemas
-        local.swgg.swaggerJson$$Dummy = {
+        });
+        // hack - init template swaggerJson$$Dummy to pass validation warnings
+        // for auto-created schemas
+        local.swgg.templateSwaggerJson$$Dummy = JSON.stringify({
             definitions: {
                 $$Dummy: {
                     properties: {
@@ -416,18 +421,207 @@
                     }
                 }
             } } }
-        };
+        });
     }());
 
 
 
     // run shared js-env code - function
     (function () {
+        local.swgg.domDatatableInit = function (self) {
+        /*
+         * this function will init the ui-dom datatable-list
+         */
+            window.self = self; // debugPrint
+            // save self
+            local.swgg.domDatatable = self;
+            // reset swaggerJson
+            local.swgg.swaggerJson = local.swgg.swaggerJson$$Dummy = null;
+            local.swgg.apiUpdate(self.swaggerJson);
+            // init crud-api
+            Object.keys(self.crudDict).forEach(function (key) {
+                self[key] = local.swgg.api[self.name][self.crudDict[key]];
+            });
+            // init properties
+            self.domContainer = document.getElementById('swggDatatableContainerId1');
+            self.schema = local.utility2.jsonCopy(
+                local.swgg.swaggerJson.definitions[self.schemaName]
+            );
+            // inherit function from domDatatableInit
+            local.utility2.objectSetDefault(self, local.swgg.domDatatableInit);
+            self.cellRenderData = self.cellRenderData.bind(self);
+            self.cellRenderEdit = self.cellRenderEdit.bind(self);
+            self.rowEdit = self.rowEdit.bind(self);
+            // init datatableOptions
+            local.utility2.objectSetDefault(self, {
+                datatableOptions: {
+                    ajax: self.ajaxPage,
+                    order: [[1, 'asc']],
+                    pagingType: 'full_numbers',
+                    scrollX: true,
+                    serverSide: true
+                }
+            }, 2);
+            // init datatableOptions.column
+            self.datatableOptions.columns = [{
+                orderable: false,
+                render: self.cellRenderEdit,
+                title: ''
+            }].concat(Object.keys(self.schema.properties)
+                .sort(function (aa, bb) {
+                    return aa === 'id'
+                        ? -1
+                        : bb === 'id'
+                        ? 1
+                        : aa < bb
+                        ? -1
+                        : aa > bb
+                        ? 1
+                        : 0;
+                })
+                .map(function (key) {
+                    return {
+                        data: key.replace((/\./g), '\\.'),
+                        render: self.cellRenderData,
+                        title: key,
+                        xProperty: self.schema.properties[key]
+                    };
+                }));
+            // init datatable
+            self.domContainer.innerHTML = self.datatableOptions.domContainerHtml ||
+                '<table class="display" width="100%"></table>';
+            self.domTable = self.domContainer.querySelector('table');
+            self.datatable = local.jQuery(self.domTable).DataTable(self.datatableOptions);
+            // init event-handling
+            local.jQuery(self.domContainer).on('click', '.swggButtonRowEdit', self.rowEdit);
+            local.jQuery(self.domContainer).on('click', 'tr', self.rowSelect);
+        };
+
+        local.swgg.domDatatableInit.ajaxPage = function (options, callback) {
+        /*
+         * this function will send an ajax request for page-data
+         */
+            var self;
+            self = local.swgg.domDatatable;
+            options.data = {
+                _queryLimit: options.length,
+                _querySkip: options.start,
+                _querySort: options.order.length
+                    ? undefined
+                    : '{"' + self.columns[options.order[0].column].title + '":' +
+                        (options.order[0].dir === 'asc'
+                        ? 1
+                        : -1) + '}'
+            };
+            self.crudGetManyByQuery(options.data, {
+                modeErrorData: true
+            }, function (error, data) {
+                // validate no error occured
+                local.utility2.assert(!error, error);
+                self.pageData = data.obj;
+                callback({
+                    recordsFiltered: self.pageData.meta.queryCountFiltered,
+                    recordsTotal: self.pageData.meta.queryCountTotal,
+                    data: self.pageData.data
+                });
+            });
+        };
+
+        local.swgg.domDatatableInit.cellRenderData = function (data, type, row, meta) {
+        /*
+         * this function will render the data-cell
+         */
+            // jslint-hack
+            local.utility2.nop(type, row);
+            return '<span>' + local.utility2.stringHtmlSafe(
+                (this.datatableOptions.columns[meta.col].xProperty.type === 'string'
+                    ? String
+                    : JSON.stringify)(data || null)
+            ) + '</span>';
+        };
+
+        local.swgg.domDatatableInit.cellRenderEdit = function (data, type, row, meta) {
+        /*
+         * this function will render the edit-cell
+         */
+            var options;
+            // jslint-hack
+            local.utility2.nop(data, type, row);
+            options = this.datatable.page.info();
+            options.ii = options.page * options.length + meta.row + 1;
+            return '<span><button class="btn btn-xs swggButtonRowEdit">edit row ' +
+                options.ii + '</button></span>';
+        };
+
+        local.swgg.domDatatableInit.rowEdit = function (event) {
+        /*
+         * this function will render the data-cell
+         */
+            //!! debugPrint(event);
+            event.preventDefault();
+            event.stopPropagation();
+            local.jQuery('#swggDatatableRowEditModalId1').modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: true
+            });
+        };
+
+        local.swgg.domDatatableInit.rowSelect = function () {
+        /*
+         * this function will render the data-cell
+         */
+            local.jQuery(this).toggleClass('selected');
+        };
+
+        local.swgg.domDatatableListInit = function (self) {
+        /*
+         * this function will init the ui-dom datatable-list
+         */
+            var html;
+            // save self
+            local.swgg.domDatatableList = self;
+            self.domContainer = document.getElementById('swggDatatableListContainerId1');
+            html = '';
+            self.datatableList.forEach(function (options, ii) {
+                html += '<li data-ii="' + ii + '"><a href="#">' + options.name +
+                    '</a></li>\n';
+            });
+            self.domContainer.innerHTML = self.datatableListHtml || html;
+            // init event-handling
+            local.jQuery(self.domContainer).on('click', 'li', function () {
+                var options;
+                options = self.datatableList[this.dataset.ii];
+                local.utility2.ajax({
+                    modeJsonParseResponseText: true,
+                    url: options.urlSwaggerJson
+                }, function (error, xhr) {
+                    local.utility2.testTryCatch(function () {
+                        // validate no error occurred
+                        local.utility2.assert(!error, error);
+                        options.swaggerJson = xhr.responseJson;
+                        // init the ui-dom datatable
+                        local.swgg.domDatatableInit(options);
+                    }, local.utility2.onErrorDefault);
+                });
+            });
+            // init datatable
+            setTimeout(function () {
+                local.jQuery(self.domContainer).find('li').first().click();
+            });
+        };
+
         local.swgg.apiUpdate = function (options) {
         /*
          * this function will update the swagger-api
          */
             var keyUnique, pathObject, schema, tmp;
+            // init swaggerJson
+            local.swgg.swaggerJson = local.swgg.swaggerJson ||
+                JSON.parse(local.swgg.templateSwaggerJson);
+            // init swaggerJson$$Dummy
+            local.swgg.swaggerJson$$Dummy = local.swgg.swaggerJson$$Dummy ||
+                JSON.parse(local.swgg.templateSwaggerJson$$Dummy);
             options.definitions = options.definitions || {};
             options.paths = options.paths || {};
             // init pathObjectDefaultList
@@ -579,6 +773,7 @@
             local.SwaggerClient = local.modeJs === 'browser'
                 ? local.global.SwaggerClient
                 : require('./lib.swagger-ui.js');
+            // init swagger-api
             local.swgg.api = new local.SwaggerClient({
                 url: local.utility2.serverLocalHost
             });
@@ -590,10 +785,16 @@
          * this function will create a persistent nedb-collection from schemaName
          */
             if (!local.swgg.cacheDict.collection[schemaName]) {
+                // https://github.com/louischatriot/nedb/issues/134
+                // workaround for issue - Error creating index when db does not exist #134
                 if (local.modeJs === 'node' && !local.swgg.modeNedbInitialized) {
                     // init nedb dir
-                    local.fs.mkdir('tmp', local.utility2.nop);
-                    local.fs.mkdir('tmp/nedb.collection', local.utility2.nop);
+                    local.utility2.testTryCatch(function () {
+                        local.fs.mkdirSync('tmp');
+                    }, local.utility2.nop);
+                    local.utility2.testTryCatch(function () {
+                        local.fs.mkdirSync('tmp/nedb.collection');
+                    }, local.utility2.nop);
                 }
                 local.swgg.modeNedbInitialized = true;
                 local.swgg.cacheDict.collection[schemaName] = new local.swgg.Nedb({
@@ -628,12 +829,16 @@
                     // drop collection
                     if (options.drop) {
                         onParallel.counter += 1;
-                        collection.remove({}, { multi: true }, onParallel);
-                        Object.keys(collection.indexes).forEach(function (key) {
-                            if (key !== '_id') {
-                                onParallel.counter += 1;
-                                collection.removeIndex(key, onParallel);
-                            }
+                        collection.loadDatabase(function () {
+                            onParallel.counter += 1;
+                            collection.remove({}, { multi: true }, onParallel);
+                            Object.keys(collection.indexes).forEach(function (key) {
+                                if (key !== '_id') {
+                                    onParallel.counter += 1;
+                                    collection.removeIndex(key, onParallel);
+                                }
+                            });
+                            onParallel();
                         });
                     }
                     onParallel();
@@ -671,21 +876,28 @@
                     onError(error);
                 }
             };
-            onNext();
+            // coverage-hack - test error handling-behavior
+            onNext(options.error);
         };
 
         local.swgg.collectionListInit = function (optionsList, onError) {
         /*
-         * this function will init a list of persistent nedb-collections
+         * this function will serially init a list of persistent nedb-collections
          */
-            var onParallel;
-            onParallel = local.utility2.onParallel(onError);
-            onParallel.counter += 1;
-            optionsList.forEach(function (options) {
-                onParallel.counter += 1;
-                local.swgg.collectionInit(options, onParallel);
-            });
-            onParallel();
+            var modeNext, onNext;
+            modeNext = -1;
+            onNext = function (error) {
+                modeNext = error
+                    ? Infinity
+                    : modeNext + 1;
+                // recursively run each sub-middleware in middlewareList
+                if (modeNext < optionsList.length) {
+                    local.swgg.collectionInit(optionsList[modeNext], onNext);
+                    return;
+                }
+                onError(error);
+            };
+            onNext();
         };
 
         local.swgg.idInt52Create = function () {
@@ -727,15 +939,17 @@
         /*
          * this function will run the middleware that will implement the backend db using nedb
          */
-            var crud, modeNext, onNext;
+            var crud, modeNext, onNext, onParallel;
             modeNext = 0;
-            onNext = function (error, data, data2) {
+            onNext = function (error, data, meta) {
                 modeNext = error
                     ? Infinity
                     : modeNext + 1;
                 switch (modeNext) {
                 case 1:
+                    // init crud
                     crud = request.crud = {};
+                    // init crud.collection
                     crud.collection = request.swggPathObject &&
                         request.swggPathObject._schemaName &&
                         local.swgg.collectionCreate(request.swggPathObject._schemaName);
@@ -757,9 +971,31 @@
                             crud.data[param.name] = JSON.parse(crud.data[param.name]);
                         }
                     });
-                    // init crud.keyUnique
-                    crud.keyUnique = crud.operationId.split('.')[1] || 'id';
-                    crud.keyAlias = request.swggPathObject._keyAlias || crud.keyUnique;
+                    // init crud.query*
+                    [{
+                        key: 'queryFields',
+                        value: {}
+                    }, {
+                        key: 'queryLimit',
+                        value: 100
+                    }, {
+                        key: 'queryQuery',
+                        value: {}
+                    }, {
+                        key: 'querySkip',
+                        value: 0
+                    }, {
+                        key: 'querySort',
+                        value: { updatedAt: -1 }
+                    }].forEach(function (element) {
+                        crud[element.key] = crud.data['_' + element.key] || JSON.parse(
+                            local.utility2.stringFormat(
+                                request.swggPathObject['_' + element.key] || 'null',
+                                request.swggParamDict
+                            )
+                        ) || element.value;
+                    });
+                    // init crud.data.id
                     switch (crud.operationId) {
                     case 'crudCreateOrReplaceOne':
                     case 'crudCreateOrUpdateOne':
@@ -784,11 +1020,12 @@
                         break;
                     }
                     // init crud.queryByKeyUnique
-                    crud.queryByKeyUnique = {};
-                    crud.queryByKeyUnique[crud.keyAlias] = crud.data[crud.keyUnique];
+                    crud.keyAlias = request.swggPathObject._keyAlias;
+                    crud.keyUnique = crud.operationId.split('.')[1] || 'id';
+                    local.swgg.queryByKeyUniqueInit(crud);
                     switch (crud.operationId.split('.')[0]) {
                     case 'crudCountManyByQuery':
-                        crud.collection.count(crud.data.query, onNext);
+                        crud.collection.count(crud.queryQuery, onNext);
                         break;
                     case 'crudCreateOrReplaceMany':
                         crud.collection.remove({ id: { $in: crud.data.body.map(function (doc) {
@@ -805,6 +1042,9 @@
                         crud.data.body[crud.keyAlias] = crud.data[crud.keyUnique];
                         // replace doc
                         if (crud.operationId.indexOf('Replace') >= 0) {
+                            // https://github.com/louischatriot/nedb/issues/371
+                            // workaround for issue -
+                            // createdAt property removed when updating document #371
                             crud.data.body.createdAt = new Date().toISOString();
                             crud.collection.update(
                                 crud.queryByKeyUnique,
@@ -823,7 +1063,7 @@
                         }
                         break;
                     case 'crudDeleteManyByQuery':
-                        crud.collection.remove(crud.data.query, { multi: true }, onNext);
+                        crud.collection.remove(crud.queryQuery, { multi: true }, onNext);
                         break;
                     case 'crudDeleteOneByKeyUnique':
                         crud.collection.remove(crud.queryByKeyUnique, onNext);
@@ -832,17 +1072,32 @@
                         crud.collection.findOne(crud.queryByKeyUnique, { $: 1 }, onNext);
                         break;
                     case 'crudGetManyByQuery':
-                        crud.collection.find(crud.data.query, crud.data.fields)
-                            .sort(crud.data.sort)
-                            .skip(crud.data.skip)
-                            .limit(crud.data.limit)
-                            .exec(onNext);
+                        onParallel = local.utility2.onParallel(onNext);
+                        onParallel.counter += 1;
+                        crud.collection.find(crud.queryQuery, crud.queryFields)
+                            .sort(crud.querySort)
+                            .skip(crud.querySkip)
+                            .limit(crud.queryLimit)
+                            .exec(function (error, data) {
+                                crud.queryData = data;
+                                onParallel(error);
+                            });
+                        onParallel.counter += 1;
+                        crud.collection.count(crud.queryQuery, function (error, data) {
+                            crud.queryCountFiltered = data;
+                            onParallel(error);
+                        });
+                        onParallel.counter += 1;
+                        crud.collection.count({}, function (error, data) {
+                            crud.queryCountTotal = data;
+                            onParallel(error);
+                        });
                         break;
                     case 'crudGetOneByKeyUnique':
                         crud.collection.findOne(crud.queryByKeyUnique, onNext);
                         break;
                     case 'crudGetOneByQuery':
-                        crud.collection.findOne(crud.data.query, crud.data.fields, onNext);
+                        crud.collection.findOne(crud.queryQuery, crud.queryFields, onNext);
                         break;
                     default:
                         modeNext = Infinity;
@@ -858,7 +1113,13 @@
                     case 'crudCreateOrReplaceOneByKeyUnique':
                     case 'crudCreateOrUpdateOne':
                     case 'crudCreateOrUpdateOneByKeyUnique':
-                        onNext(null, data2);
+                        onNext(null, meta, data);
+                        break;
+                    case 'crudGetManyByQuery':
+                        onNext(null, crud.queryData, {
+                            queryCountFiltered: crud.queryCountFiltered,
+                            queryCountTotal: crud.queryCountTotal
+                        });
                         break;
                     case 'crudExistsOneByKeyUnique':
                         onNext(null, !!data);
@@ -868,10 +1129,10 @@
                     }
                     break;
                 case 3:
-                    local.swgg.serverRespondJsonapi(request, response, error, data);
+                    local.swgg.serverRespondJsonapi(request, response, null, data, meta);
                     break;
                 default:
-                    nextMiddleware(error, data);
+                    nextMiddleware(error, data, meta);
                 }
             };
             onNext();
@@ -975,8 +1236,10 @@
                             break;
                         }
                         // init default param
-                        request.swggParamDict[paramDef.name] =
-                            request.swggParamDict[paramDef.name] || paramDef.default;
+                        if (request.swggParamDict[paramDef.name] === undefined) {
+                            request.swggParamDict[paramDef.name] =
+                                local.utility2.jsonCopy(paramDef.default);
+                        }
                     });
                     // normalize params
                     local.swgg.normalizeParamDictSwagger(
@@ -1018,6 +1281,9 @@
                     case 'csv':
                         tmp = tmp.split(',');
                         break;
+                    case 'multi':
+                        tmp = [tmp];
+                        break;
                     case 'pipes':
                         tmp = tmp.split('|');
                         break;
@@ -1050,7 +1316,7 @@
          * this function will normalize the error and data to jsonapi format,
          * and pass them to onError
          */
-            return function (error, data) {
+            return function (error, data, meta) {
                 data = [error, data].map(function (data, ii) {
                     // if no error occurred, then return
                     if ((ii === 0 && !data) ||
@@ -1081,27 +1347,40 @@
                         });
                         error = local.utility2.jsonCopy(data[0]);
                         error.errors = data;
-                        error.meta = { isJsonapiResponse: true };
                         error.statusCode = error.statusCode || 500;
                         return error;
                     }
-                    return {
-                        data: data,
-                        meta: { isJsonapiResponse: true }
-                    };
+                    return { data: data };
                 });
+                // init data.meta
                 data.forEach(function (data, ii) {
-                    var dataList;
-                    dataList = data && (ii === 0
-                        ? data.errors
-                        : data.data);
-                    // init meta.dataLength
-                    if (dataList) {
-                        data.meta.dataLength = dataList.length;
+                    if (!data) {
+                        return;
                     }
+                    data.meta = local.utility2.jsonCopy(meta
+                        ? (typeof meta === 'object'
+                            ? meta
+                            : { metaData: meta })
+                        : {});
+                    data.meta.isJsonapiResponse = true;
+                    data.meta.dataLength = ii === 0
+                        ? data.errors
+                        : data.data;
+                    data.meta.dataLength = data.meta.dataLength.length;
+                    data.meta.statusCode = data.meta.statusCode || data.statusCode || 0;
                 });
                 onError(data[0], data[1]);
             };
+        };
+
+        local.swgg.queryByKeyUniqueInit = function (options) {
+        /*
+         * this function will init the property options.queryByKeyUnique
+         */
+            options.keyAlias = options.keyAlias || options.keyUnique;
+            options.keyValue = options.keyValue || options.data[options.keyUnique];
+            options.queryByKeyUnique = {};
+            options.queryByKeyUnique[options.keyAlias] = options.keyValue;
         };
 
         local.swgg.schemaDereference = function ($ref) {
@@ -1109,14 +1388,14 @@
          * this function will try to dereference the schema from $ref
          */
             try {
-                return local.swgg.swaggerJson.definitions[
+                return local.utility2.jsonCopy(local.swgg.swaggerJson.definitions[
                     (/^\#\/definitions\/(\w+)$/).exec($ref)[1]
-                ];
+                ]);
             } catch (ignore) {
             }
         };
 
-        local.swgg.serverRespondJsonapi = function (request, response, error, data) {
+        local.swgg.serverRespondJsonapi = function (request, response, error, data, meta) {
         /*
          * http://jsonapi.org/format/#errors
          * http://jsonapi.org/format/#document-structure-resource-objects
@@ -1137,10 +1416,8 @@
                     local.utility2.onErrorDefault(error);
                 }
                 data = error || data;
-                response.end(JSON.stringify(local.utility2.objectSetDefault(data, { meta: {
-                    statusCode: data.statusCode
-                } }, 2)));
-            })(error, data);
+                response.end(JSON.stringify(data));
+            })(error, data, meta);
         };
 
         local.swgg.validateByParamDefList = function (options) {
@@ -1401,103 +1678,6 @@
                 }
             );
         };
-
-        local.utility2.middlewareGroupCreate = function (middlewareList) {
-        /*
-         * this function will return a middleware-group,
-         * that will sequentially run the middlewares in middlewareList
-         */
-            var self;
-            self = function (request, response, nextMiddleware) {
-                var modeNext, onNext;
-                modeNext = -1;
-                onNext = function (error) {
-                    modeNext = error
-                        ? Infinity
-                        : modeNext + 1;
-                    // recursively run each sub-middleware in middlewareList
-                    if (modeNext < self.middlewareList.length) {
-                        // call sub-middleware in a try-catch block
-                        local.utility2.testTryCatch(function () {
-                            self.middlewareList[modeNext](request, response, onNext);
-                        }, onNext);
-                        return;
-                    }
-                    // default to nextMiddleware
-                    nextMiddleware(error);
-                };
-                onNext();
-            };
-            self.middlewareList = middlewareList;
-            return self;
-        };
-
-        local.utility2.urlParse = function (url) {
-        /*
-         * this function will parse the url according to
-         * https://developer.mozilla.org/en/docs/Web/API
-         */
-            var urlParsed;
-            urlParsed = {};
-            local.utility2.testTryCatch(function () {
-                // resolve host-less url
-                switch (local.modeJs) {
-                case 'browser':
-                    local.utility2.serverLocalHost = local.utility2.serverLocalHost ||
-                        location.protocol + '//' + location.host;
-                    // resolve absolute path
-                    if (url[0] === '/') {
-                        url = local.utility2.serverLocalHost + url;
-                    // resolve relative path
-                    } else if (!(/^\w+?:\/\//).test(url)) {
-                        url = local.utility2.serverLocalHost +
-                            location.pathname.replace((/\/[^\/]*?$/), '') + '/' + url;
-                    }
-                    urlParsed = new local.global.URL(url);
-                    break;
-                case 'node':
-                    local.utility2.serverLocalHost = local.utility2.serverLocalHost ||
-                        'http://localhost:' + (local.utility2.envDict.PORT || '80');
-                    // resolve absolute path
-                    if (url[0] === '/') {
-                        url = local.utility2.serverLocalHost + url;
-                    // resolve relative path
-                    } else if (!(/^\w+?:\/\//).test(url)) {
-                        url = local.utility2.serverLocalHost + '/' + url;
-                    }
-                    urlParsed = local.url.parse(url);
-                    break;
-                }
-                // init query
-                urlParsed.query = {};
-                urlParsed.search.slice(1).replace((/[^&]+/g), function (item) {
-                    item = item.split('=');
-                    item[0] = decodeURIComponent(item[0]);
-                    item[1] = decodeURIComponent(item.slice(1).join('='));
-                    // parse repeating query-param as an array
-                    if (urlParsed.query[item[0]]) {
-                        if (!Array.isArray(urlParsed.query[item[0]])) {
-                            urlParsed.query[item[0]] = [urlParsed.query[item[0]]];
-                        }
-                        urlParsed.query[item[0]].push(item[1]);
-                    } else {
-                        urlParsed.query[item[0]] = item[1];
-                    }
-                });
-            }, local.utility2.nop);
-            // https://developer.mozilla.org/en/docs/Web/API/URL#Properties
-            return {
-                hash: urlParsed.hash || '',
-                host: urlParsed.host || '',
-                hostname: urlParsed.hostname || '',
-                href: urlParsed.href || '',
-                pathname: urlParsed.pathname || '',
-                port: urlParsed.port || '',
-                protocol: urlParsed.protocol || '',
-                query: urlParsed.query || {},
-                search: urlParsed.search || ''
-            };
-        };
     }());
     switch (local.modeJs) {
 
@@ -1520,46 +1700,202 @@
         local.fs = require('fs');
         local.path = require('path');
         local.url = require('url');
+        // init template assets.swgg.admin-ui.html
+        local.swgg.templateAssetsSwggAdminUiHtml =
+            local.fs.readFileSync(__dirname + '/assets.swgg.admin-ui.html', 'utf8');
         // init assets
-        local.utility2.cacheDict.assets['/assets.swgg.css'] =
+        local.utility2.assetsDict['/assets.swgg.admin-ui.html'] =
+            local.fs.readFileSync(__dirname + '/assets.swgg.admin-ui.html', 'utf8');
+        local.utility2.assetsDict['/assets.swgg.css'] =
             local.fs.readFileSync(__dirname + '/index.css', 'utf8');
-        local.utility2.cacheDict.assets['/assets.swgg.js'] =
+        local.utility2.assetsDict['/assets.swgg.js'] =
             local.utility2.istanbulInstrumentInPackage(
                 local.fs.readFileSync(__filename, 'utf8'),
                 __filename,
                 'swagger-lite'
             );
-        local.utility2.cacheDict.assets['/assets.swgg.lib.nedb.js'] =
+        local.utility2.assetsDict['/assets.swgg.lib.nedb.js'] =
             local.fs.readFileSync(__dirname + '/lib.nedb.js', 'utf8');
-        local.utility2.cacheDict.assets['/assets.swgg.lib.swagger-tools.js'] =
-            local.fs.readFileSync(__dirname + '/lib.swagger-tools.js', 'utf8');
-        local.utility2.cacheDict.assets['/assets.swgg.lib.swagger-ui.js'] =
+        local.utility2.assetsDict['/assets.swgg.lib.swagger-ui.js'] =
             local.utility2.istanbulInstrumentInPackage(
                 local.fs.readFileSync(__dirname + '/lib.swagger-ui.js', 'utf8'),
                 __dirname + '/lib.swagger-ui.js',
                 'swagger-lite'
             );
-        local.utility2.cacheDict.assets['/assets.swagger-ui.explorer_icons.png'] =
-            local.fs.readFileSync(__dirname + '/assets.swagger-ui.explorer_icons.png');
-        local.utility2.cacheDict.assets['/assets.swagger-ui.favicon-16x16.png'] =
-            local.fs.readFileSync(__dirname + '/assets.swagger-ui.favicon-16x16.png');
-        local.utility2.cacheDict.assets['/assets.swagger-ui.favicon-32x32.png'] =
-            local.fs.readFileSync(__dirname + '/assets.swagger-ui.favicon-32x32.png');
-        local.utility2.cacheDict.assets['/assets.swagger-ui.logo_small.png'] =
-            local.fs.readFileSync(__dirname + '/assets.swagger-ui.logo_small.png');
-        local.utility2.cacheDict.assets['/assets.swagger-ui.throbber.gif'] =
-            local.fs.readFileSync(__dirname + '/assets.swagger-ui.throbber.gif');
-        local.utility2.cacheDict.assets['/swagger-ui.html'] = local.utility2.stringFormat(
+        local.utility2.testTryCatch(function () {
+            local.fs.readdirSync(__dirname + '/external').forEach(function (file) {
+                local.utility2.assetsDict['/' + file] =
+                    local.fs.readFileSync(__dirname + '/external/' + file);
+            });
+        }, local.utility2.nop);
+        local.utility2.assetsDict['/swagger-ui.html'] = local.utility2.stringFormat(
             local.fs.readFileSync(__dirname + '/README.md', 'utf8')
-                .replace((/[\S\s]*?<html>/), '<!DOCTYPE html><html>')
+                .replace((/[\S\s]*?<!doctype html>/), '<!doctype html>')
                 .replace((/<\/html>[\S\s]*/), '</html>')
                 .replace((/\\n\\$/gm), '')
                 .replace((/\\\\/g), '\\'),
             { envDict: local.utility2.envDict },
             ''
         );
-        // init XMLHttpRequest
-        local.XMLHttpRequest = local.utility2.local._http.XMLHttpRequest;
+        /* istanbul ignore next */
+        // run the cli
+        local.cliRun = function () {
+        /*
+         * this function will run the cli
+         */
+            var onParallel;
+            if (module !== require.main) {
+                return;
+            }
+            switch (process.argv[2]) {
+            case 'postinstall':
+                onParallel = local.utility2.onParallel(function (error) {
+                    // validate no error occurred
+                    local.utility2.assert(!error, error);
+                    console.log('fetching done');
+                });
+                onParallel.counter += 1;
+                local.fs.mkdir('external', local.utility2.nop);
+                [{
+                    file: 'external/assets.swgg.animate.css',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/daneden/animate.css/v3.1.0/animate.css'
+                // init lib bootstrap
+                }, {
+                    file: 'external/assets.swgg.bootstrap.css',
+                    transform: function (data) {
+                        return data.toString().replace(
+                            (/\.\.\/fonts\//g),
+                            'assets.swgg.bootstrap.'
+                        );
+                    },
+                    url: 'https://raw.githubusercontent.com' +
+                        '/twbs/bootstrap/v3.3.6/dist/css/bootstrap.min.css'
+                }, {
+                    file: 'external/assets.swgg.bootstrap.glyphicons-halflings-regular.eot',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/twbs/bootstrap/v3.3.6/dist/fonts/glyphicons-halflings-regular.eot'
+                }, {
+                    file: 'external/assets.swgg.bootstrap.glyphicons-halflings-regular.svg',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/twbs/bootstrap/v3.3.6/dist/fonts/glyphicons-halflings-regular.svg'
+                }, {
+                    file: 'external/assets.swgg.bootstrap.glyphicons-halflings-regular.ttf',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/twbs/bootstrap/v3.3.6/dist/fonts/glyphicons-halflings-regular.ttf'
+                }, {
+                    file: 'external/assets.swgg.bootstrap.glyphicons-halflings-regular.woff',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/twbs/bootstrap/v3.3.6/dist/fonts/glyphicons-halflings-regular.woff'
+                }, {
+                    file: 'external/assets.swgg.bootstrap.glyphicons-halflings-regular.woff2',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/twbs/bootstrap/v3.3.6/dist/fonts/glyphicons-halflings-regular.woff2'
+                }, {
+                    file: 'external/assets.swgg.lib.bootstrap.js',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/twbs/bootstrap/v3.3.6/dist/js/bootstrap.min.js'
+                // init lib datatables
+                }, {
+                    file: 'external/assets.swgg.datatables.bootstrap.css',
+                    url: 'https://cdn.datatables.net/1.10.11/css/dataTables.bootstrap.css'
+                }, {
+                    file: 'external/assets.swgg.datatables.css',
+                    transform: function (data) {
+                        return data.toString().replace(
+                            (/DataTables-1.10.11\/images\//g),
+                            'assets.swgg.datatables.images.'
+                        );
+                    },
+                    // https://www.datatables.net/download/
+                    url: 'https://cdn.datatables.net/t/dt/' +
+                        'jszip-2.5.0,pdfmake-0.1.18,dt-1.10.11,af-2.1.1,' +
+                        'b-1.1.2,b-colvis-1.1.2,b-html5-1.1.2,b-print-1.1.2,cr-1.3.1,' +
+                        'fc-3.2.1,fh-3.1.1,kt-2.1.1,r-2.0.2,rr-1.1.1,sc-1.4.1,se-1.1.2' +
+                        '/datatables.css'
+                }, {
+                    file: 'external/assets.swgg.datatables.images.sort_asc.png',
+                    url: 'https://cdnjs.cloudflare.com' +
+                        '/ajax/libs/datatables/1.10.11/images/sort_asc.png'
+                }, {
+                    file: 'external/assets.swgg.datatables.images.sort_asc_disabled.png',
+                    url: 'https://cdnjs.cloudflare.com' +
+                        '/ajax/libs/datatables/1.10.11/images/sort_asc_disabled.png'
+                }, {
+                    file: 'external/assets.swgg.datatables.images.sort_both.png',
+                    url: 'https://cdnjs.cloudflare.com' +
+                        '/ajax/libs/datatables/1.10.11/images/sort_both.png'
+                }, {
+                    file: 'external/assets.swgg.datatables.images.sort_desc.png',
+                    url: 'https://cdnjs.cloudflare.com' +
+                        '/ajax/libs/datatables/1.10.11/images/sort_desc.png'
+                }, {
+                    file: 'external/assets.swgg.datatables.images.sort_desc_disabled.png',
+                    url: 'https://cdnjs.cloudflare.com' +
+                        '/ajax/libs/datatables/1.10.11/images/sort_desc_disabled.png'
+                }, {
+                    file: 'external/assets.swgg.lib.datatables.bootstrap.js',
+                    url: 'https://cdn.datatables.net/1.10.11/js/dataTables.bootstrap.js'
+                }, {
+                    file: 'external/assets.swgg.lib.datatables.js',
+                    // https://www.datatables.net/download/
+                    url: 'https://cdn.datatables.net/t/dt/' +
+                        'jszip-2.5.0,pdfmake-0.1.18,dt-1.10.11,af-2.1.1,' +
+                        'b-1.1.2,b-colvis-1.1.2,b-html5-1.1.2,b-print-1.1.2,cr-1.3.1,' +
+                        'fc-3.2.1,fh-3.1.1,kt-2.1.1,r-2.0.2,rr-1.1.1,sc-1.4.1,se-1.1.2' +
+                        '/datatables.js'
+                // init lib jquery
+                }, {
+                    file: 'external/assets.swgg.lib.jquery.js',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/jquery/jquery/2.1.4/dist/jquery.min.js'
+                // init lib swagger-tools
+                }, {
+                    file: 'external/assets.swgg.lib.swagger-tools.js',
+                    url: 'https://raw.githubusercontent.com/apigee-127' +
+                        '/swagger-tools/v0.9.14/browser/swagger-tools-standalone-min.js'
+                // init lib swagger-ui
+                }, {
+                    file: 'external/assets.swgg.swagger-ui.explorer_icons.png',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/swagger-api/swagger-ui/v2.1.4/dist/images/explorer_icons.png'
+                }, {
+                    file: 'external/assets.swgg.swagger-ui.favicon-16x16.png',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/swagger-api/swagger-ui/v2.1.4/dist/images/favicon-16x16.png'
+                }, {
+                    file: 'external/assets.swgg.swagger-ui.favicon-32x32.png',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/swagger-api/swagger-ui/v2.1.4/dist/images/favicon-32x32.png'
+                }, {
+                    file: 'external/assets.swgg.swagger-ui.logo_small.png',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/swagger-api/swagger-ui/v2.1.4/dist/images/logo_small.png'
+                }, {
+                    file: 'external/assets.swgg.swagger-ui.throbber.gif',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/swagger-api/swagger-ui/v2.1.4/dist/images/throbber.gif'
+                }].forEach(function (options) {
+                    console.log('fetching ' + options.url);
+                    onParallel.counter += 1;
+                    local.utility2.ajax(options, function (error, xhr) {
+                        onParallel.counter += 1;
+                        onParallel(error);
+                        if (options.url.slice(-3) === '.js') {
+                            xhr.response = xhr.responseText + '\n/* istanbul ignore all */';
+                        }
+                        local.fs.writeFile(
+                            options.file,
+                            (options.transform || local.utility2.echo)(xhr.response),
+                            onParallel
+                        );
+                    });
+                });
+                onParallel();
+                break;
+            }
+        };
+        local.cliRun();
         break;
     }
 

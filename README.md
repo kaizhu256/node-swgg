@@ -37,7 +37,6 @@ lightweight standalone swagger-ui server backed by nedb
 
 
 # documentation
-#### this package is still work in progress
 #### this package requires
 - darwin or linux os
 
@@ -127,8 +126,6 @@ instruction
             local.swgg.middlewareBodyParse,
             // init swagger-init-middleware
             function (request, response, nextMiddleware) {
-                // jslint-hack
-                local.utility2.nop(request);
                 // enable cors
                 // http://en.wikipedia.org/wiki/Cross-origin_resource_sharing
                 response.setHeader(
@@ -138,6 +135,11 @@ instruction
                 response.setHeader('Access-Control-Allow-Origin', '*');
                 // init content-type
                 response.setHeader('Content-Type', 'application/json; charset=UTF-8');
+                // ignore .map files
+                if (request.urlParsed.pathname.slice(-4) === '.map') {
+                    local.utility2.serverRespondDefault(request, response, 404);
+                    return;
+                }
                 nextMiddleware();
             },
             // init swagger-validation-middleware
@@ -156,16 +158,6 @@ instruction
                 switch (modeNext) {
                 case 1:
                     switch (request.swggPathname) {
-                    case 'GET /pet/findByStatus':
-                        local.swgg.collectionCreate('Pet').find({
-                            status: { $in: request.swggParamDict.status }
-                        }, onNext);
-                        break;
-                    case 'GET /pet/findByTags':
-                        local.swgg.collectionCreate('Pet').find({
-                            'tags.name': { $in: request.swggParamDict.tags }
-                        }, onNext);
-                        break;
                     case 'GET /store/inventory':
                         local.swgg.collectionCreate('Order').find({}, { status: 1 }, onNext);
                         break;
@@ -220,8 +212,9 @@ instruction
         // init assets
         // https://github.com/swagger-api/swagger-ui/blob/v2.1.2/dist/index.html
         /* jslint-ignore-begin */
-        local.utility2.cacheDict.assets['/'] = '<!DOCTYPE html>\n\
-<html>\n\
+        local.utility2.assetsDict['/'] = '\
+<!doctype html>\n\
+<html lang="en">\n\
 <head>\n\
 <meta charset="UTF-8">\n\
 <title>\n\
@@ -244,13 +237,13 @@ body > div {\n\
 }\n\
 </style>\n\
 \n\
-<link href="assets.swagger-ui.favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">\n\
-<link href="assets.swagger-ui.favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">\n\
+<link href="assets.swgg.swagger-ui.favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">\n\
+<link href="assets.swgg.swagger-ui.favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">\n\
 <link href="assets.swgg.css" media="screen" rel="stylesheet" type="text/css">\n\
 </head>\n\
 <body>\n\
     <div class="ajaxProgressDiv" style="display: block;">\n\
-    <div class="ajaxProgressBarDiv ajaxProgressBarDivLoading">loading</div>\n\
+        <div class="ajaxProgressBarDiv ajaxProgressBarDivLoading">loading</div>\n\
     </div>\n\
     <h1>{{envDict.npm_package_name}} @ {{envDict.npm_package_version}}</h1>\n\
     <h3>{{envDict.npm_package_description}}</h3>\n\
@@ -274,6 +267,7 @@ body > div {\n\
     <div id="message-bar" class="swagger-ui-wrap">&nbsp;</div>\n\
     <div id="swagger-ui-container" class="swagger-ui-wrap"></div>\n\
     </div>\n\
+<script src="assets.swgg.lib.jquery.js"></script>\n\
 <script src="assets.swgg.lib.nedb.js"></script>\n\
 <script src="assets.swgg.lib.swagger-tools.js"></script>\n\
 <script src="assets.utility2.js"></script>\n\
@@ -332,17 +326,18 @@ window.swaggerUi.load();\n\
 window.swgg.api = window.swaggerUi.api;\n\
 });</script>\n\
 </body>\n\
-</html>';
+</html>\n\
+';
         /* jslint-ignore-end */
-        local.utility2.cacheDict.assets['/'] = local.utility2.stringFormat(
-            local.utility2.cacheDict.assets['/'],
+        local.utility2.assetsDict['/'] = local.utility2.stringFormat(
+            local.utility2.assetsDict['/'],
             {
                 envDict: local.utility2.envDict,
                 petstoreSwaggerJson: JSON.stringify(local.global.petstoreSwaggerJson)
             },
             ''
         );
-        local.utility2.cacheDict.assets['/assets.example.js'] =
+        local.utility2.assetsDict['/assets.example.js'] =
             local.fs.readFileSync(__dirname + '/example.js', 'utf8');
         break;
     }
@@ -358,17 +353,29 @@ window.swgg.api = window.swaggerUi.api;\n\
                 Pet: {
                     _pathObjectDefaultList: ['crudGetManyByQuery'],
                     _pathPrefix: 'pet',
-                    properties: { id: { default: 1, minimum: 1 } }
+                    properties: {
+                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
+                        id: { default: 1, minimum: 1 },
+                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
+                    }
                 },
                 Order: {
                     _pathObjectDefaultList: ['crudGetManyByQuery'],
                     _pathPrefix: 'store',
-                    properties: { id: { default: 1, minimum: 1 } }
+                    properties: {
+                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
+                        id: { default: 1, minimum: 1 },
+                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
+                    }
                 },
                 User: {
                     _pathObjectDefaultList: ['crudGetManyByQuery'],
                     _pathPrefix: 'user',
-                    properties: { id: { default: 1, minimum: 1 } }
+                    properties: {
+                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
+                        id: { default: 1, minimum: 1 },
+                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
+                    }
                 }
             },
             paths: {
@@ -379,6 +386,20 @@ window.swgg.api = window.swaggerUi.api;\n\
                     },
                     put: {
                         _operationId: 'crudCreateOrUpdateOne',
+                        _schemaName: 'Pet'
+                    }
+                },
+                '/pet/findByStatus': {
+                    get: {
+                        _operationId: 'crudGetManyByQuery',
+                        _queryQuery: '{"status":{"$in":{{status json}}}}',
+                        _schemaName: 'Pet'
+                    }
+                },
+                '/pet/findByTags': {
+                    get: {
+                        _operationId: 'crudGetManyByQuery',
+                        _queryQuery: '{"tags.name":{"$in":{{tags json}}}}',
                         _schemaName: 'Pet'
                     }
                 },
@@ -450,10 +471,9 @@ window.swgg.api = window.swaggerUi.api;\n\
                     }
                 }
             }
-        }, 8));
-        // init collection-list
-        local.utility2.onReady.counter += 1;
-        local.swgg.collectionListInit([{
+        }, 10));
+        // init collectionList
+        local.collectionList = [{
             docList: [{
                 id: 1,
                 name: 'birdie',
@@ -462,16 +482,16 @@ window.swgg.api = window.swaggerUi.api;\n\
                 tags: [{ name: 'bird'}]
             }, {
                 id: 2,
-                name: 'kittie',
+                name: 'doggie',
                 status: 'pending',
                 photoUrls: [],
-                tags: [{ name: 'cat'}]
+                tags: [{ name: 'dog'}]
             }, {
                 id: 3,
-                name: 'doggie',
+                name: 'fishie',
                 photoUrls: [],
                 status: 'sold',
-                tags: [{ name: 'dog'}]
+                tags: [{ name: 'fish'}]
             }],
             drop: true,
             ensureIndexList: [{
@@ -529,7 +549,23 @@ window.swgg.api = window.swaggerUi.api;\n\
                 unique: true
             }],
             name: 'User'
-        }], local.utility2.onReady);
+        }];
+        // init 100 extra random pets
+        local.ii = 0;
+        local.options = { docList: [], name: 'Pet' };
+        local.collectionList.push(local.options);
+        for (local.ii = 100; local.ii < 200; local.ii += 1) {
+            local.options.docList.push({
+                id: local.ii,
+                name: local.utility2.listShuffle(['birdie', 'doggie', 'fishie'])[0] +
+                    '-' + local.ii,
+                photoUrls: [],
+                status: local.utility2.listShuffle(['available', 'pending', 'sold'])[0],
+                tags: [{ name: local.utility2.listShuffle(['female', 'male'])[0] }]
+            });
+        }
+        local.utility2.onReady.counter += 1;
+        local.swgg.collectionListInit(local.collectionList, local.utility2.onReady);
     }());
 }());
 ```
@@ -558,7 +594,7 @@ window.swgg.api = window.swaggerUi.api;\n\
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "utility2": "2016.1.2"
+        "utility2": "2016.1.4"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -596,6 +632,7 @@ exports:require('./index.js').Nedb.prototype},\
 exports:require('./index.js').tools.v2.__proto__}\
 }\
 }\"",
+        "postinstall": "node index.js postinstall",
         "start": "export PORT=${PORT:-8080} && \
 export npm_config_mode_auto_restart=1 && \
 utility2 shRun shIstanbulCover node test.js",
@@ -604,36 +641,30 @@ utility2 shRun shReadmeExportFile package.json package.json && \
 export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js"
     },
-    "version": "2016.1.1"
+    "version": "2016.1.2"
 }
 ```
 
 
 
 # todo
+- design admin-ui resource
 - implement api POST /pet/{petId}/uploadImage
 - implement api GET /user/login
 - implement api GET /user/logout
-- add query macro
 - add logging feature
 - add cached version crudGetManyByQueryCached
 - add swggUserLoginTokenCapped
-- re-enable user login/logout
-- test /user/login and /user/logout
-- add enum validation
-- add max / min validation
 - none
 
 
 
-# change since e80f1dc5
-- npm publish 2016.1.1
-- implement petstore backend with nedb
-- remove swagger-ui-lite dependency
-- fix missing createdAt field in nedb update-replace
-- add default-crud-api crudCreateOrReplaceMany, crudCreateOrUpdateOne, and crudCreateOrUpdateOneByKeyUnique
-- keep internal nedb _id separate from mongodb id
-- enable integer id's in default crud api
+# change since be688f38
+- npm publish 2016.1.2
+- work-in-progress on experimental, swagger-based, admin-ui
+- add query macro for crudGetManyByQuery
+- add crud-tests for petstore api
+- move static assets to /external dir, which will be fetched during postinstall
 - none
 
 
