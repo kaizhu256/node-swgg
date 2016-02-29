@@ -40,14 +40,12 @@
         local.utility2 = local.modeJs === 'browser'
             ? local.global.utility2
             : require('utility2');
-        // init lib jquery
-        local.jQuery = local.global.jQuery;
         // init lib swagger-lite
         local.swgg = { cacheDict: { collection: {}, pathObject: {} }, local: local };
         // init lib nedb
         local.swgg.Nedb = local.modeJs === 'browser'
             ? local.global.Nedb || local.utility2.nop
-            : require('./lib.nedb.js');
+            : require('nedb-lite');
         local.utility2.testTryCatch(function () {
             // init lib swagger-tools
             local.swgg.tools = { v2: { validate: local.utility2.nop } };
@@ -428,189 +426,6 @@
 
     // run shared js-env code - function
     (function () {
-        local.swgg.domDatatableInit = function (self) {
-        /*
-         * this function will init the ui-dom datatable-list
-         */
-            window.self = self; // debugPrint
-            // save self
-            local.swgg.domDatatable = self;
-            // reset swaggerJson
-            local.swgg.swaggerJson = local.swgg.swaggerJson$$Dummy = null;
-            local.swgg.apiUpdate(self.swaggerJson);
-            // init crud-api
-            Object.keys(self.crudDict).forEach(function (key) {
-                self[key] = local.swgg.api[self.name][self.crudDict[key]];
-            });
-            // init properties
-            self.domContainer = document.getElementById('swggDatatableContainerId1');
-            self.schema = local.utility2.jsonCopy(
-                local.swgg.swaggerJson.definitions[self.schemaName]
-            );
-            // inherit function from domDatatableInit
-            local.utility2.objectSetDefault(self, local.swgg.domDatatableInit);
-            self.cellRenderData = self.cellRenderData.bind(self);
-            self.cellRenderEdit = self.cellRenderEdit.bind(self);
-            self.rowEdit = self.rowEdit.bind(self);
-            // init datatableOptions
-            local.utility2.objectSetDefault(self, {
-                datatableOptions: {
-                    ajax: self.ajaxPage,
-                    order: [[1, 'asc']],
-                    pagingType: 'full_numbers',
-                    scrollX: true,
-                    serverSide: true
-                }
-            }, 2);
-            // init datatableOptions.column
-            self.datatableOptions.columns = [{
-                orderable: false,
-                render: self.cellRenderEdit,
-                title: ''
-            }].concat(Object.keys(self.schema.properties)
-                .sort(function (aa, bb) {
-                    return aa === 'id'
-                        ? -1
-                        : bb === 'id'
-                        ? 1
-                        : aa < bb
-                        ? -1
-                        : aa > bb
-                        ? 1
-                        : 0;
-                })
-                .map(function (key) {
-                    return {
-                        data: key.replace((/\./g), '\\.'),
-                        render: self.cellRenderData,
-                        title: key,
-                        xProperty: self.schema.properties[key]
-                    };
-                }));
-            // init datatable
-            self.domContainer.innerHTML = self.datatableOptions.domContainerHtml ||
-                '<table class="display" width="100%"></table>';
-            self.domTable = self.domContainer.querySelector('table');
-            self.datatable = local.jQuery(self.domTable).DataTable(self.datatableOptions);
-            // init event-handling
-            local.jQuery(self.domContainer).on('click', '.swggButtonRowEdit', self.rowEdit);
-            local.jQuery(self.domContainer).on('click', 'tr', self.rowSelect);
-        };
-
-        local.swgg.domDatatableInit.ajaxPage = function (options, callback) {
-        /*
-         * this function will send an ajax request for page-data
-         */
-            var self;
-            self = local.swgg.domDatatable;
-            options.data = {
-                _queryLimit: options.length,
-                _querySkip: options.start,
-                _querySort: options.order.length
-                    ? undefined
-                    : '{"' + self.columns[options.order[0].column].title + '":' +
-                        (options.order[0].dir === 'asc'
-                        ? 1
-                        : -1) + '}'
-            };
-            self.crudGetManyByQuery(options.data, {
-                modeErrorData: true
-            }, function (error, data) {
-                // validate no error occured
-                local.utility2.assert(!error, error);
-                self.pageData = data.obj;
-                callback({
-                    recordsFiltered: self.pageData.meta.queryCountFiltered,
-                    recordsTotal: self.pageData.meta.queryCountTotal,
-                    data: self.pageData.data
-                });
-            });
-        };
-
-        local.swgg.domDatatableInit.cellRenderData = function (data, type, row, meta) {
-        /*
-         * this function will render the data-cell
-         */
-            // jslint-hack
-            local.utility2.nop(type, row);
-            return '<span>' + local.utility2.stringHtmlSafe(
-                (this.datatableOptions.columns[meta.col].xProperty.type === 'string'
-                    ? String
-                    : JSON.stringify)(data || null)
-            ) + '</span>';
-        };
-
-        local.swgg.domDatatableInit.cellRenderEdit = function (data, type, row, meta) {
-        /*
-         * this function will render the edit-cell
-         */
-            var options;
-            // jslint-hack
-            local.utility2.nop(data, type, row);
-            options = this.datatable.page.info();
-            options.ii = options.page * options.length + meta.row + 1;
-            return '<span><button class="btn btn-xs swggButtonRowEdit">edit row ' +
-                options.ii + '</button></span>';
-        };
-
-        local.swgg.domDatatableInit.rowEdit = function (event) {
-        /*
-         * this function will render the data-cell
-         */
-            //!! debugPrint(event);
-            event.preventDefault();
-            event.stopPropagation();
-            local.jQuery('#swggDatatableRowEditModalId1').modal({
-                backdrop: 'static',
-                keyboard: false,
-                show: true
-            });
-        };
-
-        local.swgg.domDatatableInit.rowSelect = function () {
-        /*
-         * this function will render the data-cell
-         */
-            local.jQuery(this).toggleClass('selected');
-        };
-
-        local.swgg.domDatatableListInit = function (self) {
-        /*
-         * this function will init the ui-dom datatable-list
-         */
-            var html;
-            // save self
-            local.swgg.domDatatableList = self;
-            self.domContainer = document.getElementById('swggDatatableListContainerId1');
-            html = '';
-            self.datatableList.forEach(function (options, ii) {
-                html += '<li data-ii="' + ii + '"><a href="#">' + options.name +
-                    '</a></li>\n';
-            });
-            self.domContainer.innerHTML = self.datatableListHtml || html;
-            // init event-handling
-            local.jQuery(self.domContainer).on('click', 'li', function () {
-                var options;
-                options = self.datatableList[this.dataset.ii];
-                local.utility2.ajax({
-                    modeJsonParseResponseText: true,
-                    url: options.urlSwaggerJson
-                }, function (error, xhr) {
-                    local.utility2.testTryCatch(function () {
-                        // validate no error occurred
-                        local.utility2.assert(!error, error);
-                        options.swaggerJson = xhr.responseJson;
-                        // init the ui-dom datatable
-                        local.swgg.domDatatableInit(options);
-                    }, local.utility2.onErrorDefault);
-                });
-            });
-            // init datatable
-            setTimeout(function () {
-                local.jQuery(self.domContainer).find('li').first().click();
-            });
-        };
-
         local.swgg.apiUpdate = function (options) {
         /*
          * this function will update the swagger-api
@@ -658,11 +473,19 @@
                 (schema._pathObjectDefaultList || []).forEach(function (pathObject) {
                     keyUnique = (/ByKeyUnique\.(.*)/).exec(pathObject);
                     keyUnique = keyUnique && keyUnique[1];
+                    keyUnique = keyUnique && keyUnique.split('.')[0];
                     pathObject = pathObject.replace('.' + keyUnique, '');
                     pathObject = JSON.parse(local.swgg.cacheDict.pathObjectDefault[pathObject]
                         .replace((/\{\{_keyUnique\}\}/g), keyUnique)
                         .replace((/\{\{_pathPrefix\}\}/g), schema._pathPrefix)
                         .replace((/\{\{_schemaName\}\}/g), schema._schemaName));
+                    // init keyUnique.format and keyUnique.type
+                    pathObject.parameters.forEach(function (param) {
+                        if (param.name === keyUnique) {
+                            param.format = schema.properties[keyUnique].format;
+                            param.type = schema.properties[keyUnique].type;
+                        }
+                    });
                     // add _schemaName to pathObject
                     pathObject._schemaName = schemaName;
                     options.paths[pathObject._path] = options.paths[pathObject._path] || {};
@@ -727,7 +550,6 @@
             local.utility2.objectSetOverride(
                 local.swgg.swaggerJson,
                 local.utility2.objectTraverse(
-                    // jsonCopy object to prevent side-effects
                     local.utility2.jsonCopy(options),
                     function (element) {
                         if (element && typeof element === 'object') {
@@ -748,7 +570,6 @@
             [0, 1, 2, 3].forEach(function () {
                 Object.keys(local.swgg.swaggerJson.definitions).forEach(function (schema) {
                     schema = local.swgg.swaggerJson.definitions[schema];
-                    // jsonCopy object to prevent side-effects
                     local.utility2.jsonCopy(schema['x-inheritList'] || [])
                         .reverse()
                         .forEach(function (element) {
@@ -759,16 +580,18 @@
                         });
                 });
             });
-            // jsonCopy object to prevent side-effects
+            // normalize swaggerJson
             local.swgg.swaggerJson = JSON.parse(local.utility2.jsonStringifyOrdered(
-                local.utility2.jsonCopy(local.swgg.swaggerJson)
+                local.swgg.swaggerJson
             ));
             // validate swaggerJson
-            local.swgg.validateBySwagger(local.utility2.objectSetDefault(
-                local.utility2.jsonCopy(local.swgg.swaggerJson),
-                local.swgg.swaggerJson$$Dummy,
-                2
-            ));
+            local.utility2.testTryCatch(function () {
+                local.swgg.validateBySwagger(local.utility2.objectSetDefault(
+                    local.utility2.jsonCopy(local.swgg.swaggerJson),
+                    local.swgg.swaggerJson$$Dummy,
+                    2
+                ));
+            }, local.utility2.onErrorDefault);
             // init SwaggerClient
             local.SwaggerClient = local.modeJs === 'browser'
                 ? local.global.SwaggerClient
@@ -784,6 +607,10 @@
         /*
          * this function will create a persistent nedb-collection from schemaName
          */
+            var dir;
+            dir = 'tmp/nedb.collection.' + (local.modeJs === 'browser'
+                ? 'browser'
+                : process.NODE_ENV || 'development');
             if (!local.swgg.cacheDict.collection[schemaName]) {
                 // https://github.com/louischatriot/nedb/issues/134
                 // workaround for issue - Error creating index when db does not exist #134
@@ -793,13 +620,13 @@
                         local.fs.mkdirSync('tmp');
                     }, local.utility2.nop);
                     local.utility2.testTryCatch(function () {
-                        local.fs.mkdirSync('tmp/nedb.collection');
+                        local.fs.mkdirSync(dir);
                     }, local.utility2.nop);
                 }
                 local.swgg.modeNedbInitialized = true;
                 local.swgg.cacheDict.collection[schemaName] = new local.swgg.Nedb({
                     autoload: true,
-                    filename: 'tmp/nedb.collection/' + schemaName,
+                    filename: dir + '/' + schemaName,
                     timestampData: true
                 });
             }
@@ -927,10 +754,9 @@
                     local.utility2.urlParse('?' + request.swggBodyParsed, true).query;
                 break;
             default:
-                try {
+                local.utility2.testTryCatch(function () {
                     request.swggBodyParsed = JSON.parse(request.swggBodyParsed);
-                } catch (ignore) {
-                }
+                }, local.utility2.nop);
             }
             nextMiddleware();
         };
@@ -1003,7 +829,7 @@
                         if (!crud.data.id) {
                             crud.data.id = local.utility2.uuidTimeCreate();
                             request.swggPathObject.parameters.forEach(function (param) {
-                                try {
+                                local.utility2.testTryCatch(function () {
                                     switch (param.in === 'body' &&
                                         local.swgg.schemaDereference(param.schema.$ref)
                                         .properties.id.type) {
@@ -1013,15 +839,15 @@
                                         crud.data.id = local.swgg.idInt52Create();
                                         break;
                                     }
-                                } catch (ignore) {
-                                }
+                                }, local.utility2.nop);
                             });
                         }
                         break;
                     }
                     // init crud.queryByKeyUnique
-                    crud.keyAlias = request.swggPathObject._keyAlias;
-                    crud.keyUnique = crud.operationId.split('.')[1] || 'id';
+                    crud.keyAlias = crud.operationId.split('.');
+                    crud.keyUnique = crud.keyAlias[1] || 'id';
+                    crud.keyAlias = crud.keyAlias[2] || crud.keyUnique;
                     local.swgg.queryByKeyUniqueInit(crud);
                     switch (crud.operationId.split('.')[0]) {
                     case 'crudCountManyByQuery':
@@ -1038,8 +864,8 @@
                     case 'crudCreateOrUpdateOneByKeyUnique':
                         crud.data.body = crud.data.body || local.utility2.jsonCopy(crud.data);
                         delete crud.data.body.id;
-                        delete crud.data.body[crud.keyUnique];
-                        crud.data.body[crud.keyAlias] = crud.data[crud.keyUnique];
+                        delete crud.data.body[crud.keyAlias];
+                        crud.data.body[crud.keyUnique] = crud.data[crud.keyAlias];
                         // replace doc
                         if (crud.operationId.indexOf('Replace') >= 0) {
                             // https://github.com/louischatriot/nedb/issues/371
@@ -1083,13 +909,8 @@
                                 onParallel(error);
                             });
                         onParallel.counter += 1;
-                        crud.collection.count(crud.queryQuery, function (error, data) {
-                            crud.queryCountFiltered = data;
-                            onParallel(error);
-                        });
-                        onParallel.counter += 1;
                         crud.collection.count({}, function (error, data) {
-                            crud.queryCountTotal = data;
+                            crud.paginationCountTotal = data;
                             onParallel(error);
                         });
                         break;
@@ -1117,8 +938,7 @@
                         break;
                     case 'crudGetManyByQuery':
                         onNext(null, crud.queryData, {
-                            queryCountFiltered: crud.queryCountFiltered,
-                            queryCountTotal: crud.queryCountTotal
+                            paginationCountTotal: crud.paginationCountTotal
                         });
                         break;
                     case 'crudExistsOneByKeyUnique':
@@ -1150,6 +970,21 @@
             local.swgg.serverRespondJsonapi(request, response, error);
         };
 
+        local.swgg.middlewareJsonpStateInit = function (request, response, nextMiddleware) {
+        /*
+         * this function will jsonp-init the browser-state
+         */
+            if (request.urlParsed.pathname === '/jsonp.swgg.stateInit.js') {
+                response.end('window.swgg.stateInit(' +
+                    JSON.stringify({
+                        swaggerJson: local.swgg.swaggerJson,
+                        swaggerPetstoreJson: local.swgg.swaggerPetstoreJson
+                    }) + ');');
+                return;
+            }
+            nextMiddleware();
+        };
+
         local.swgg.middlewareValidate = function (request, response, nextMiddleware) {
         /*
          * this function will run the middleware that will validate the swagger-request
@@ -1179,9 +1014,8 @@
                     }
                     // init swggPathObject
                     while (true) {
-                        request.swggPathObject = local.swgg.cacheDict.pathObject[
-                            request.swggPathname
-                        ];
+                        request.swggPathObject =
+                            local.swgg.cacheDict.pathObject[request.swggPathname];
                         // if swggPathObject exists, then break and continue
                         if (request.swggPathObject) {
                             request.swggPathObject = JSON.parse(request.swggPathObject);
@@ -1270,7 +1104,6 @@
                 tmp = data[paramDef.name];
                 // init default value
                 if (tmp === undefined) {
-                    // jsonCopy object to prevent side-effects
                     tmp = local.utility2.jsonCopy(paramDef.default);
                 }
                 // parse csv array
@@ -1299,10 +1132,9 @@
                 if (paramDef.type !== 'string' &&
                         (typeof tmp === 'string' ||
                         (local.modeJs === 'node' && Buffer.isBuffer(tmp)))) {
-                    try {
+                    local.utility2.testTryCatch(function () {
                         tmp = JSON.parse(tmp);
-                    } catch (ignore) {
-                    }
+                    }, local.utility2.nop);
                 }
                 data[paramDef.name] = tmp;
             });
@@ -1378,21 +1210,22 @@
          * this function will init the property options.queryByKeyUnique
          */
             options.keyAlias = options.keyAlias || options.keyUnique;
-            options.keyValue = options.keyValue || options.data[options.keyUnique];
+            options.keyValue = options.keyValue || options.data[options.keyAlias];
             options.queryByKeyUnique = {};
-            options.queryByKeyUnique[options.keyAlias] = options.keyValue;
+            options.queryByKeyUnique[options.keyUnique] = options.keyValue;
         };
 
         local.swgg.schemaDereference = function ($ref) {
         /*
          * this function will try to dereference the schema from $ref
          */
-            try {
-                return local.utility2.jsonCopy(local.swgg.swaggerJson.definitions[
+            var result;
+            local.utility2.testTryCatch(function () {
+                result = local.utility2.jsonCopy(local.swgg.swaggerJson.definitions[
                     (/^\#\/definitions\/(\w+)$/).exec($ref)[1]
                 ]);
-            } catch (ignore) {
-            }
+            }, local.utility2.nop);
+            return result;
         };
 
         local.swgg.serverRespondJsonapi = function (request, response, error, data, meta) {
@@ -1420,6 +1253,15 @@
             })(error, data, meta);
         };
 
+        local.swgg.stateInit = function (state) {
+        /*
+         * this function will init the state
+         */
+            Object.keys(state).forEach(function (key) {
+                local.swgg[key] = state[key];
+            });
+        };
+
         local.swgg.validateByParamDefList = function (options) {
         /*
          * this function will validate options.data against options.paramDefList
@@ -1433,6 +1275,7 @@
                     key = paramDef.name;
                     local.swgg.validateByPropertyDef({
                         data: data[key],
+                        isNotRequired: options.isNotRequired,
                         key: key,
                         propertyDef: paramDef,
                         required: paramDef.required
@@ -1455,7 +1298,7 @@
             propertyDef = options.propertyDef;
             // validate undefined data
             if (data === null || data === undefined) {
-                if (options.required) {
+                if (!options.isNotRequired && options.required) {
                     throw new Error('required property ' + options.key + ':' +
                         (propertyDef.format || propertyDef.type) +
                         ' cannot be null or undefined');
@@ -1642,6 +1485,7 @@
                         circularList: options.circularList,
                         data: data[key],
                         depth: options.depth - 1,
+                        isNotRequired: options.isNotRequired,
                         key: key,
                         propertyDef: schema.properties[key],
                         required: schema.required && schema.required.indexOf(key) >= 0
@@ -1659,7 +1503,6 @@
          * this function will validate the entire swagger json object
          */
             local.swgg.tools.v2.validate(
-                // jsonCopy object to prevent side-effects
                 local.utility2.jsonCopy(options),
                 function (error, result) {
                     // validate no error occurred
@@ -1697,15 +1540,26 @@
         module.exports = local.swgg;
         module.exports.__dirname = __dirname;
         // require modules
+        require('./lib.admin-ui.js');
         local.fs = require('fs');
         local.path = require('path');
         local.url = require('url');
+        // init petstore-api
+        local.swgg.swaggerPetstoreJson = JSON.parse(local.fs.readFileSync(
+            local.swgg.__dirname + '/lib.swagger.petstore.json',
+            'utf8'
+        ));
+        delete local.swgg.swaggerPetstoreJson.basePath;
+        delete local.swgg.swaggerPetstoreJson.host;
         // init template assets.swgg.admin-ui.html
         local.swgg.templateAssetsSwggAdminUiHtml =
             local.fs.readFileSync(__dirname + '/assets.swgg.admin-ui.html', 'utf8');
         // init assets
-        local.utility2.assetsDict['/assets.swgg.admin-ui.html'] =
-            local.fs.readFileSync(__dirname + '/assets.swgg.admin-ui.html', 'utf8');
+        local.utility2.assetsDict['/assets.swgg.admin-ui.html'] = local.utility2.stringFormat(
+            local.swgg.templateAssetsSwggAdminUiHtml,
+            { envDict: local.utility2.envDict },
+            ''
+        );
         local.utility2.assetsDict['/assets.swgg.css'] =
             local.fs.readFileSync(__dirname + '/index.css', 'utf8');
         local.utility2.assetsDict['/assets.swgg.js'] =
@@ -1714,8 +1568,10 @@
                 __filename,
                 'swagger-lite'
             );
+        local.utility2.assetsDict['/assets.swgg.lib.admin-ui.js'] =
+            local.fs.readFileSync(__dirname + '/lib.admin-ui.js', 'utf8');
         local.utility2.assetsDict['/assets.swgg.lib.nedb.js'] =
-            local.fs.readFileSync(__dirname + '/lib.nedb.js', 'utf8');
+            local.fs.readFileSync(local.swgg.Nedb.__dirname + '/index.js', 'utf8');
         local.utility2.assetsDict['/assets.swgg.lib.swagger-ui.js'] =
             local.utility2.istanbulInstrumentInPackage(
                 local.fs.readFileSync(__dirname + '/lib.swagger-ui.js', 'utf8'),
@@ -1797,9 +1653,6 @@
                         '/twbs/bootstrap/v3.3.6/dist/js/bootstrap.min.js'
                 // init lib datatables
                 }, {
-                    file: 'external/assets.swgg.datatables.bootstrap.css',
-                    url: 'https://cdn.datatables.net/1.10.11/css/dataTables.bootstrap.css'
-                }, {
                     file: 'external/assets.swgg.datatables.css',
                     transform: function (data) {
                         return data.toString().replace(
@@ -1834,16 +1687,13 @@
                     url: 'https://cdnjs.cloudflare.com' +
                         '/ajax/libs/datatables/1.10.11/images/sort_desc_disabled.png'
                 }, {
-                    file: 'external/assets.swgg.lib.datatables.bootstrap.js',
-                    url: 'https://cdn.datatables.net/1.10.11/js/dataTables.bootstrap.js'
-                }, {
                     file: 'external/assets.swgg.lib.datatables.js',
                     // https://www.datatables.net/download/
                     url: 'https://cdn.datatables.net/t/dt/' +
                         'jszip-2.5.0,pdfmake-0.1.18,dt-1.10.11,af-2.1.1,' +
                         'b-1.1.2,b-colvis-1.1.2,b-html5-1.1.2,b-print-1.1.2,cr-1.3.1,' +
                         'fc-3.2.1,fh-3.1.1,kt-2.1.1,r-2.0.2,rr-1.1.1,sc-1.4.1,se-1.1.2' +
-                        '/datatables.js'
+                        '/datatables.min.js'
                 // init lib jquery
                 }, {
                     file: 'external/assets.swgg.lib.jquery.js',

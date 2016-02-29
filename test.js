@@ -85,15 +85,15 @@
                 crudDeleteOneByKeyUnique: local.swgg.api.pet.deletePet,
                 crudGetOneByKeyUnique: local.swgg.api.pet.getPetById,
                 data: { id: 10, name: 'name', photoUrls: ['photoUrls'] },
-                keyAlias: 'petId',
-                keyUnique: 'id'
+                keyAlias: 'id',
+                keyUnique: 'petId'
             }, {
                 crudCreateOrReplaceOne: local.swgg.api.store.placeOrder,
                 crudDeleteOneByKeyUnique: local.swgg.api.store.deleteOrder,
                 crudGetOneByKeyUnique: local.swgg.api.store.getOrderById,
                 data: { id: 10 },
-                keyAlias: 'orderId',
-                keyUnique: 'id'
+                keyAlias: 'id',
+                keyUnique: 'orderId'
             }, {
                 crudCreateOrReplaceOne: local.swgg.api.user.createUser,
                 crudDeleteOneByKeyUnique: local.swgg.api.user.deleteUser,
@@ -136,7 +136,7 @@
                     default:
                         onError(error, data);
                     }
-                }, onNext);
+                }, onError);
             };
             onNext();
         };
@@ -176,7 +176,7 @@
                     default:
                         onError(error, data);
                     }
-                }, onNext);
+                }, onError);
             };
             onNext();
         };
@@ -225,7 +225,7 @@
                     default:
                         onError(error, data);
                     }
-                }, onNext);
+                }, onError);
             };
             onNext();
         };
@@ -265,7 +265,7 @@
                     default:
                         onError(error, data);
                     }
-                }, onNext);
+                }, onError);
             };
             onNext();
         };
@@ -299,13 +299,13 @@
                         local.utility2.assert(!error, error);
                         // validate data
                         local.utility2.assert(data.obj.data.length === 1 &&
-                            data.obj.data[0][options.keyUnique] === options.keyValue, data);
+                            data.obj.data[0][options.keyAlias] === options.keyValue, data);
                         onNext();
                         break;
                     default:
                         onError(error, data);
                     }
-                }, onNext);
+                }, onError);
             };
             onNext();
         };
@@ -339,7 +339,7 @@
                         error = JSON.parse(xhr.responseText);
                         local.utility2.assert(error.errors[0], error);
                         onParallel();
-                    }, onParallel);
+                    }, onError);
                 });
             });
             onParallel();
@@ -369,7 +369,7 @@
                         // validate data
                         local.utility2.assert(data.obj.data[0] === 'hello', data);
                         onParallel();
-                    }, onParallel);
+                    }, onError);
                 });
             });
             onParallel();
@@ -394,7 +394,7 @@
                     // validate data
                     local.utility2.assert(data.obj.data[0] === null, data);
                     onParallel();
-                }, onParallel);
+                }, onError);
             });
             onParallel.counter += 1;
             local.swgg.api._test.onErrorJsonapi({ error: '[]' }, {
@@ -406,7 +406,7 @@
                     // validate error
                     local.utility2.assert(error.errors[0].message === 'null', error);
                     onParallel();
-                }, onParallel);
+                }, onError);
             });
             onParallel();
         };
@@ -440,7 +440,7 @@
                         // validate error
                         local.utility2.assert(error.errors[0].message === 'hello', error);
                         onParallel();
-                    }, onParallel);
+                    }, onError);
                 });
             });
             onParallel();
@@ -575,7 +575,7 @@
         /*
          * this function will test validateBySchema's error handling-behavior
          */
-            var error, optionsCopy;
+            var optionsCopy;
             options = {
                 data: { propRequired: true },
                 schema: local.swgg.swaggerJson.definitions.TestCrudModel
@@ -607,8 +607,8 @@
                 { key: 'propStringEmail', value: 'null' },
                 { key: 'propStringJson', value: 'syntax error' }
             ].forEach(function (element) {
-                try {
-                    error = null;
+                local.utility2.testTryCatch(function () {
+                    options.error = null;
                     optionsCopy = local.utility2.jsonCopy(options.data);
                     optionsCopy[element.key] = element.value;
                     local.swgg.validateBySchema({
@@ -617,11 +617,11 @@
                             : optionsCopy,
                         schema: options.schema
                     });
-                } catch (errorCaught) {
-                    error = errorCaught;
-                }
+                }, function (error) {
+                    options.error = error;
+                });
                 // validate error occurred
-                local.utility2.assert(error, element);
+                local.utility2.assert(options.error, element);
             });
             onError();
         };
@@ -630,21 +630,19 @@
         /*
          * this function will test validateBySwagger's default handling-behavior
          */
-            var error;
-            // jslint-hack
-            local.utility2.nop(options);
+            options = {};
             local.utility2.testMock([
                 // suppress console.error
                 [console, { error: local.utility2.nop }]
             ], function (onError) {
                 [null, {}].forEach(function (element) {
-                    try {
+                    local.utility2.testTryCatch(function () {
                         local.swgg.validateBySwagger(element);
-                    } catch (errorCaught) {
-                        error = errorCaught;
-                    }
+                    }, function (error) {
+                        options.data = error;
+                    });
                     // validate error occurred
-                    local.utility2.assert(error, error);
+                    local.utility2.assert(options.data, options.data);
                 });
                 onError();
             }, onError);
@@ -664,7 +662,10 @@
             options.onParallel = local.utility2.onParallel(onError);
             options.onParallel.counter += 1;
             [1, -1].forEach(function (ii) {
-                Object.keys(local.global.SwaggerUi.Views).sort(function (aa, bb) {
+                Object.keys(local.global.SwaggerUi.Views).sort(function () {
+                    // coverage-hack
+                    return Math.random() - 0.5;
+                }).sort(function (aa, bb) {
                     return (aa < bb
                         ? -1
                         : 1) * ii;
@@ -734,11 +735,17 @@
                 file: '/assets.example.js',
                 url: '/assets.example.js'
             }, {
+                file: '/assets.swgg.admin-ui.html',
+                url: '/assets.swgg.admin-ui.html'
+            }, {
                 file: '/assets.swgg.css',
                 url: '/assets.swgg.css'
             }, {
                 file: '/assets.swgg.js',
                 url: '/assets.swgg.js'
+            }, {
+                file: '/assets.swgg.lib.admin-ui.js',
+                url: '/assets.swgg.lib.admin-ui.js'
             }, {
                 file: '/assets.swgg.lib.nedb.js',
                 url: '/assets.swgg.lib.nedb.js'
@@ -755,16 +762,19 @@
                 file: '/assets.utility2.js',
                 url: '/assets.utility2.js'
             }, {
+                file: '/jsonp.swgg.stateInit.js',
+                url: '/jsonp.swgg.stateInit.js'
+            }, {
                 file: '/swagger-ui.html',
                 url: '/swagger-ui.html'
-            }].forEach(function (element) {
+            }].forEach(function (options) {
                 onParallel.counter += 1;
-                local.utility2.ajax({ url: element.url }, function (error, xhr) {
+                local.utility2.ajax(options, function (error, xhr) {
                     // validate no error occurred
                     onParallel.counter += 1;
                     onParallel(error);
                     local.utility2.fsWriteFileWithMkdirp(
-                        local.utility2.envDict.npm_config_dir_build + '/app' + element.file,
+                        local.utility2.envDict.npm_config_dir_build + '/app' + options.file,
                         xhr.response,
                         onParallel
                     );
@@ -1047,7 +1057,8 @@
                 local.swgg.serverRespondJsonapi(request, response, null, request.swggParamDict);
                 break;
             default:
-                nextMiddleware();
+                // serve file
+                local.utility2.middlewareFileServer(request, response, nextMiddleware);
             }
         });
         // init collection-list
@@ -1086,19 +1097,40 @@
 
     // run node js-env code - post-init
     case 'node':
-        // run validation test
-        local.testCase_validateByParamDefList_default(null, local.utility2.onErrorDefault);
-        local.testCase_validateBySchema_default(null, local.utility2.onErrorDefault);
-        local.testCase_validateBySwagger_default(null, local.utility2.onErrorDefault);
+        // init assets
+        local.utility2.assetsDict['/'] = local.utility2.stringFormat(
+            local.utility2.templateIndexHtml,
+            {
+                envDict: local.utility2.envDict,
+                // add script assets.test.js
+                scriptExtra: '</script><script src="assets.test.js"></script>'
+            },
+            ''
+        );
         local.utility2.assetsDict['/assets.test.js'] =
             local.utility2.istanbulInstrumentInPackage(
                 local.fs.readFileSync(__filename, 'utf8'),
                 local.swgg.__dirname + '/test.js',
                 'swagger-lite'
             );
+        local.utility2.assetsDict['/assets.swgg.admin-ui.html'] = local.utility2.stringFormat(
+            local.swgg.templateAssetsSwggAdminUiHtml,
+            {
+                envDict: local.utility2.envDict,
+                // add script assets.test.js
+                scriptExtra: '</script><script src="assets.example.js"></script>' +
+                    '</script><script src="assets.test.js"></script>'
+            },
+            ''
+        );
+        // run validation test
+        local.testCase_validateByParamDefList_default(null, local.utility2.onErrorDefault);
+        local.testCase_validateBySchema_default(null, local.utility2.onErrorDefault);
+        local.testCase_validateBySwagger_default(null, local.utility2.onErrorDefault);
         // debug dir
         [
             local.utility2.__dirname,
+            local.swgg.Nedb.__dirname,
             __dirname
         ].forEach(function (dir) {
             local.fs.readdirSync(dir).forEach(function (file) {

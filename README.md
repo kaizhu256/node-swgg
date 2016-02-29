@@ -6,6 +6,41 @@ lightweight standalone swagger-ui server backed by nedb
 
 
 
+# todo
+- remove body-name dependency for body-param
+- replace crudCreateOrUpdateOne* with crudUpdateOneByKeyUnique
+- admin-ui - remove uniqueKey = 'id' dependency
+- admin-ui - add feature to disable first-level required-validation-check for PATCH updates
+- add admin-ui crud CREATE
+- do not send readonly properties in swagger-client-request
+- design admin-ui resource
+- implement api POST /pet/{petId}/uploadImage
+- implement api GET /user/login
+- implement api GET /user/logout
+- add logging feature
+- add cached version crudGetManyByQueryCached
+- add swggUserLoginTokenCapped
+- none
+
+
+
+# change since commit 3ed24df2
+- npm publish 2016.1.3
+- add dependency nedb-lite
+- admin-ui - integrate serverLocal into admin-ui
+- use jsonp to init default browser-state instead of with hard-coded template
+- split index.js into index.js and lib.admin-ui.js
+- admin-ui - hook utility2.assert and utility2.onErrorDefault with bootstrap alert;
+- admin-ui - add crud UPDATE
+- admin-ui - show swagger-property-type in thead / tfoot / form input
+- add keyAlias param in operationId
+- swgg.apiUpdate will now error-log schema-validation-errors instead of throwing them
+- add file-server
+- add admin-ui crud DELETE
+- none
+
+
+
 # live test-server
 [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.githubDeploy.browser._2Fnode-swagger-lite_2Fbuild..alpha..travis-ci.org_2Fapp_2Findex.html.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html)
 
@@ -40,7 +75,9 @@ lightweight standalone swagger-ui server backed by nedb
 #### this package requires
 - darwin or linux os
 
-#### [api-doc](https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html)
+#### api-doc
+- [https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html](https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html)
+
 [![api-doc](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.docApiCreate.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swagger-lite_2Ftmp_2Fbuild_2Fdoc.api.html.png)](https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html)
 
 
@@ -53,7 +90,7 @@ lightweight standalone swagger-ui server backed by nedb
 /*
 example.js
 
-this node script will serve a lightweight standalone swagger-ui server backed by nedb
+this node script will run a lightweight standalone swagger-ui server backed by nedb
 
 instruction
     1. save this script as example.js
@@ -80,7 +117,7 @@ instruction
 
 
 
-    // run shared js-env code
+    // run shared js-env code - pre-init
     (function () {
         // init local
         local = {};
@@ -124,6 +161,8 @@ instruction
             local.utility2.middlewareBodyRead,
             // init http-body-parse-middleware
             local.swgg.middlewareBodyParse,
+            // init jsonp-state-init-middleware
+            local.swgg.middlewareJsonpStateInit,
             // init swagger-init-middleware
             function (request, response, nextMiddleware) {
                 // enable cors
@@ -203,16 +242,10 @@ instruction
         // export local
         module.exports = local;
         local.path = require('path');
-        // init petstore-api
-        local.global.petstoreSwaggerJson = local.utility2.jsonCopy(require(
-            local.swgg.__dirname + '/petstore.swagger.json'
-        ));
-        delete local.global.petstoreSwaggerJson.basePath;
-        delete local.global.petstoreSwaggerJson.host;
         // init assets
         // https://github.com/swagger-api/swagger-ui/blob/v2.1.2/dist/index.html
         /* jslint-ignore-begin */
-        local.utility2.assetsDict['/'] = '\
+        local.utility2.templateIndexHtml = '\
 <!doctype html>\n\
 <html lang="en">\n\
 <head>\n\
@@ -273,9 +306,9 @@ body > div {\n\
 <script src="assets.utility2.js"></script>\n\
 <script src="assets.swgg.lib.swagger-ui.js"></script>\n\
 <script src="assets.swgg.js"></script>\n\
-<script>window.petstoreSwaggerJson = {{petstoreSwaggerJson}}</script>\n\
+<script src="jsonp.swgg.stateInit.js"></script>\n\
 <script src="assets.example.js"></script>\n\
-<script src="assets.test.js"></script>\n\
+{{scriptExtra}}\n\
 <script>$(function () {\n\
 window.utility2.envDict = {\n\
     npm_package_description: "{{envDict.npm_package_description}}",\n\
@@ -330,11 +363,8 @@ window.swgg.api = window.swaggerUi.api;\n\
 ';
         /* jslint-ignore-end */
         local.utility2.assetsDict['/'] = local.utility2.stringFormat(
-            local.utility2.assetsDict['/'],
-            {
-                envDict: local.utility2.envDict,
-                petstoreSwaggerJson: JSON.stringify(local.global.petstoreSwaggerJson)
-            },
+            local.utility2.templateIndexHtml,
+            { envDict: local.utility2.envDict },
             ''
         );
         local.utility2.assetsDict['/assets.example.js'] =
@@ -347,11 +377,15 @@ window.swgg.api = window.swaggerUi.api;\n\
     // run shared js-env code
     (function () {
         // init petstore-api
-        local.swgg.apiUpdate(local.global.petstoreSwaggerJson);
+        local.swgg.apiUpdate(local.swgg.swaggerPetstoreJson);
         local.swgg.apiUpdate(local.utility2.objectSetOverride(local.swgg.swaggerJson, {
             definitions: {
                 Pet: {
-                    _pathObjectDefaultList: ['crudGetManyByQuery'],
+                    _pathObjectDefaultList: [
+                        'crudDeleteOneByKeyUnique.id',
+                        'crudGetManyByQuery',
+                        'crudCreateOrUpdateOneByKeyUnique.id'
+                    ],
                     _pathPrefix: 'pet',
                     properties: {
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
@@ -360,7 +394,10 @@ window.swgg.api = window.swaggerUi.api;\n\
                     }
                 },
                 Order: {
-                    _pathObjectDefaultList: ['crudGetManyByQuery'],
+                    _pathObjectDefaultList: [
+                        'crudDeleteOneByKeyUnique.id',
+                        'crudGetManyByQuery'
+                    ],
                     _pathPrefix: 'store',
                     properties: {
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
@@ -369,7 +406,9 @@ window.swgg.api = window.swaggerUi.api;\n\
                     }
                 },
                 User: {
-                    _pathObjectDefaultList: ['crudGetManyByQuery'],
+                    _pathObjectDefaultList: [
+                        'crudGetManyByQuery'
+                    ],
                     _pathPrefix: 'user',
                     properties: {
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
@@ -405,18 +444,15 @@ window.swgg.api = window.swaggerUi.api;\n\
                 },
                 '/pet/{petId}': {
                     delete: {
-                        _keyAlias: 'id',
-                        _operationId: 'crudDeleteOneByKeyUnique.petId',
+                        _operationId: 'crudDeleteOneByKeyUnique.id.petId',
                         _schemaName: 'Pet'
                     },
                     get: {
-                        _keyAlias: 'id',
-                        _operationId: 'crudGetOneByKeyUnique.petId',
+                        _operationId: 'crudGetOneByKeyUnique.id.petId',
                         _schemaName: 'Pet'
                     },
                     post: {
-                        _keyAlias: 'id',
-                        _operationId: 'crudCreateOrUpdateOneByKeyUnique.petId',
+                        _operationId: 'crudCreateOrUpdateOneByKeyUnique.id.petId',
                         _schemaName: 'Pet'
                     }
                 },
@@ -428,13 +464,11 @@ window.swgg.api = window.swaggerUi.api;\n\
                 },
                 '/store/order/{orderId}': {
                     delete: {
-                        _keyAlias: 'id',
-                        _operationId: 'crudDeleteOneByKeyUnique.orderId',
+                        _operationId: 'crudDeleteOneByKeyUnique.id.orderId',
                         _schemaName: 'Order'
                     },
                     get: {
-                        _keyAlias: 'id',
-                        _operationId: 'crudGetOneByKeyUnique.orderId',
+                        _operationId: 'crudGetOneByKeyUnique.id.orderId',
                         _schemaName: 'Order'
                     }
                 },
@@ -561,7 +595,10 @@ window.swgg.api = window.swaggerUi.api;\n\
                     '-' + local.ii,
                 photoUrls: [],
                 status: local.utility2.listShuffle(['available', 'pending', 'sold'])[0],
-                tags: [{ name: local.utility2.listShuffle(['female', 'male'])[0] }]
+                tags: [
+                    { name: local.utility2.listShuffle(['female', 'male'])[0] },
+                    { name: Math.random().toString(16).slice(2) }
+                ]
             });
         }
         local.utility2.onReady.counter += 1;
@@ -594,7 +631,8 @@ window.swgg.api = window.swaggerUi.api;\n\
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "utility2": "2016.1.4"
+        "nedb-lite": "2016.1.1",
+        "utility2": "2016.1.5"
     },
     "description": "lightweight standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -602,9 +640,11 @@ window.swgg.api = window.swaggerUi.api;\n\
     },
     "engines": { "node": ">=4.2" },
     "keywords": [
-        "api",
+        "api", "admin", "admin-ui",
         "browser",
         "cms", "crud",
+        "db",
+        "lite", "lightweight",
         "mongo", "mongodb",
         "nedb",
         "swagger", "swagger-ui",
@@ -621,51 +661,30 @@ window.swgg.api = window.swaggerUi.api;\n\
         "build-ci": "utility2 shRun shReadmeBuild",
         "build-doc": "MODE_LINENO=0 \
 utility2 shRun shReadmeExportFile package.json package.json && \
-utility2 shRun shDocApiCreate \"module.exports={\
-exampleFileList:['README.md','test.js','index.js'],\
-moduleDict:{\
-'swagger-lite':{aliasList:['swgg'],exports:require('./index.js')},\
-'swagger-lite.Nedb.prototype':{aliasList:['collection'],\
-exports:require('./index.js').Nedb.prototype},\
-'swagger-lite.api':{aliasList:['api'],exports:require('./index.js').api},\
-'swagger-lite.tools.v2':{aliasList:['tools.v2'],\
-exports:require('./index.js').tools.v2.__proto__}\
-}\
+utility2 shRun shDocApiCreate \"module.exports={ \
+exampleFileList:['README.md','test.js','index.js'], \
+moduleDict:{ \
+'swagger-lite':{aliasList:['swgg'],exports:require('./index.js')}, \
+'swagger-lite.Nedb.prototype':{aliasList:['collection'], \
+exports:require('./index.js').Nedb.prototype}, \
+'swagger-lite.api':{aliasList:['api'],exports:require('./index.js').api}, \
+'swagger-lite.tools.v2':{aliasList:['tools.v2'], \
+exports:require('./index.js').tools.v2.__proto__} \
+} \
 }\"",
         "postinstall": "node index.js postinstall",
         "start": "export PORT=${PORT:-8080} && \
 export npm_config_mode_auto_restart=1 && \
 utility2 shRun shIstanbulCover node test.js",
         "test": "export MODE_LINENO=0 && \
+export NODE_ENV=test && \
 utility2 shRun shReadmeExportFile package.json package.json && \
 export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js"
     },
-    "version": "2016.1.2"
+    "version": "2016.1.3"
 }
 ```
-
-
-
-# todo
-- design admin-ui resource
-- implement api POST /pet/{petId}/uploadImage
-- implement api GET /user/login
-- implement api GET /user/logout
-- add logging feature
-- add cached version crudGetManyByQueryCached
-- add swggUserLoginTokenCapped
-- none
-
-
-
-# change since be688f38
-- npm publish 2016.1.2
-- work-in-progress on experimental, swagger-based, admin-ui
-- add query macro for crudGetManyByQuery
-- add crud-tests for petstore api
-- move static assets to /external dir, which will be fetched during postinstall
-- none
 
 
 
@@ -692,10 +711,10 @@ shBuild() {(set -e
     (export npm_config_mode_coverage=1 &&
         shNpmTestPublished)
 
-    # test example js script
-    (export MODE_BUILD=testExampleJs &&
-        export npm_config_timeout_exit=10000 &&
-        shRunScreenCapture shReadmeTestJs example.js)
+    #!! # test example js script
+    #!! (export MODE_BUILD=testExampleJs &&
+        #!! export npm_config_timeout_exit=10000 &&
+        #!! shRunScreenCapture shReadmeTestJs example.js)
 
     # run npm-test
     (export MODE_BUILD=npmTest &&
