@@ -1,4 +1,3 @@
-<!-- https://github.com/twbs/bootstrap/blob/76d511e1131ddec184305a864c665afe4d1486cf/examples/dashboard/index.html -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -7,16 +6,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 <title>{{envDict.npm_package_name}} @ {{envDict.npm_package_version}}</title>
-<!-- init style -->
+<!-- init css -->
 <link href="assets.swgg.animate.css" rel="stylesheet">
 <link href="assets.swgg.bootstrap.css" rel="stylesheet">
+<link href="assets.swgg.bootstrap-datetimepicker.css" rel="stylesheet">
 <link href="assets.swgg.datatables.css" rel="stylesheet">
 <link href="assets.utility2.css" rel="stylesheet">
 <link href="assets.swgg.css" rel="stylesheet">
+<!-- init style -->
 <style>
 /* init css admin-ui */
 .dataTables_wrapper .paginate_button {
     padding: 0.1em 0.5em !important;
+}
+#dtTableContainer1 {
+border-top: 1px solid #000;
+margin-top: 20px;
+padding-top: 20px;
 }
 .nav-pills > li {
     padding-left: 5px;
@@ -28,9 +34,9 @@
     background-color: #ddf;
     border-radius: 0;
 }
-.nav-pills.swggDatatableViewContainer > li.active > a:focus,
-.nav-pills.swggDatatableViewContainer > li.active > a:hover,
-.nav-pills.swggDatatableViewContainer > li.active > a {
+.nav-pills.dtViewContainer > li.active > a:focus,
+.nav-pills.dtViewContainer > li.active > a:hover,
+.nav-pills.dtViewContainer > li.active > a {
     background-color: #99f;
 }
 .tab-content {
@@ -54,7 +60,7 @@
     <div class="ajaxProgressBarDiv ajaxProgressBarDivLoading">loading</div>
 </div>
 <!-- init dom alertContainer -->
-<div id="swggDatatableAlertContainer1" style="width=100%;"></div>
+<div id="dtAlertContainer1" style="width=100%;"></div>
 
 
 <!-- init dom navbar -->
@@ -80,7 +86,7 @@
 
 <!-- init dom tabbed-datatable-list -->
 <div>
-<ul class="nav nav-justified nav-pills" id="swggDatatableListContainer1" style="padding-bottom: 4px; padding-top: 5px;">
+<ul class="nav nav-justified nav-pills" id="dtListContainer1" style="padding-bottom: 4px; padding-top: 5px;">
     <li class="active"><a href="#">loading api ...</a></li>
 </ul>
 </div>
@@ -89,9 +95,9 @@
 
 <!-- Nav tabs -->
 <div>
-<ul class="nav nav-justified nav-pills swggDatatableViewContainer">
-<li><a data-toggle="tab" href="#swggDatatableViewTable1" id="swggDatatableNavTable1">table of records</a></li>
-<li><a data-toggle="tab" href="#swggDatatableViewRowCreateOrUpdate1" id="swggDatatableNavRowCreateOrUpdate1" onclick="local.swgg.dtFncOnClickRecordEdit()">create or update record</a></li>
+<ul class="dtViewContainer nav nav-justified nav-pills">
+<li><a data-toggle="tab" href="#dtViewTable1" id="dtNavTable1">table of records</a></li>
+<li><a data-toggle="tab" href="#dtViewRecordEdit1" id="dtNavRecordEdit1" onclick="local.swgg.dtFncOnClickRecordEdit()">create or update record</a></li>
 </ul>
 </div>
 
@@ -99,18 +105,29 @@
 
 <!-- Tab panes -->
 <div class="tab-content">
-<div class="active fade tab-pane" id="swggDatatableViewTable1">
+
+
+
+<div class="active fade tab-pane" id="dtViewTable1">
+<!-- init dom table-query-form -->
+<div class="container">
+    <form class="dtFormContainer form-horizontal" id="dtFormTableQuery1"></form>
+    <button class="btn btn-primary" id="dtButtonQuerySubmit1" onclick="local.swgg.dtFncOnClickQuerySubmit()">submit query</button>
+</div>
 <!-- init dom datatable -->
-<div id="swggDatatableContainer1"></div>
+<div id="dtTableContainer1"></div>
 </div>
 
 
 
-<!-- init dom row-create-or-edit-form -->
-<div class="fade tab-pane" id="swggDatatableViewRowCreateOrUpdate1">
-<form class="form-horizontal" id="swggDatatableFormRowCreateOrUpdate1">
-</form>
-<button class="btn btn-primary" onclick="local.swgg.dtFncOnClickRecordSave()">save</button>
+<!-- init dom row-edit-form -->
+<div class="container fade tab-pane" id="dtViewRecordEdit1">
+<form class="dtFormContainer form-horizontal" id="dtFormRecordEdit1"></form>
+<button class="btn btn-primary" id="dtButtonRecordSave1" onclick="local.swgg.dtFncOnClickRecordSave()">save</button>
+</div>
+
+
+
 </div>
 
 
@@ -118,6 +135,8 @@
 <!-- init lib -->
 <script src="assets.swgg.lib.jquery.js"></script>
 <script src="assets.swgg.lib.bootstrap.js"></script>
+<script src="assets.swgg.lib.moment.js"></script>
+<script src="assets.swgg.lib.bootstrap-datetimepicker.js"></script>
 <script src="assets.swgg.lib.datatables.js"></script>
 <!-- init lib swagger-lite -->
 <script src="assets.swgg.lib.nedb.js"></script>
@@ -132,16 +151,8 @@
 var local;
 // export local
 local = window.local = window.swgg.local;
-// init event-handling
-local.jQuery('#swggDatatableContainer1')
-    // click to edit row
-    .on('click', '.swggButtonRowEdit', local.swgg.dtFncOnClickRecordEdit)
-    // click to toggle row-selection
-    .on('click', 'tr', function () {
-        local.jQuery(this).toggleClass('selected');
-    });
 // init datatable-list
-local.swgg.dtFncListInit({{dtListJson json}});
+local.swgg.dtFncListInit();
 });</script>
 </body>
 </html>

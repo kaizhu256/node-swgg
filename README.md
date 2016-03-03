@@ -1,19 +1,19 @@
 swagger-lite
 ============
-lightweight standalone swagger-ui server backed by nedb
+standalone swagger-ui server backed by nedb
 
 [![NPM](https://img.shields.io/npm/v/swagger-lite.svg?style=flat-square)](https://www.npmjs.com/package/swagger-lite) [![NPM](https://img.shields.io/npm/dm/swagger-lite.svg?style=flat-square)](https://www.npmjs.com/package/swagger-lite)
 
 
 
 # todo
-- remove body-name dependency for body-param
-- replace crudCreateOrUpdateOne* with crudUpdateOneByKeyUnique
+- admin-ui - add property-option x-sortName
+- admin-ui - implement various input types
+- admin-ui - integrate jwt
+- admin-ui - merge all dt state-info into swgg.dtState
+- admin-ui - fix datatables crashing when rows are empty
 - admin-ui - remove uniqueKey = 'id' dependency
-- admin-ui - add feature to disable first-level required-validation-check for PATCH updates
-- add admin-ui crud CREATE
 - do not send readonly properties in swagger-client-request
-- design admin-ui resource
 - implement api POST /pet/{petId}/uploadImage
 - implement api GET /user/login
 - implement api GET /user/logout
@@ -24,24 +24,22 @@ lightweight standalone swagger-ui server backed by nedb
 
 
 
-# change since commit 3ed24df2
-- npm publish 2016.1.3
-- add dependency nedb-lite
-- admin-ui - integrate serverLocal into admin-ui
-- use jsonp to init default browser-state instead of with hard-coded template
-- split index.js into index.js and lib.admin-ui.js
-- admin-ui - hook utility2.assert and utility2.onErrorDefault with bootstrap alert;
-- admin-ui - add crud UPDATE
-- admin-ui - show swagger-property-type in thead / tfoot / form input
-- add keyAlias param in operationId
-- swgg.apiUpdate will now error-log schema-validation-errors instead of throwing them
-- add file-server
-- add admin-ui crud DELETE
+# change since b8db3ab4
+- npm publish 2016.1.4
+- add function swgg.isNullOrUndefined
+- add boolean/integer/number/string schema-properties as params in crudGetManyByQuery
+- admin-ui - implement boolean/date-time/enum input types
+- admin-ui - implement crud CREATE
+- allow arbitrary name for body-param in local.swgg.middlewareCrud
+- add 'x-notRequired' options to pathObject params to override 'required' option
+- add 'x-validateUnusedDefinition' option in swgg.validateBySwagger to ignore unused definitions
 - none
 
 
 
 # live test-server
+- [https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html)
+
 [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.githubDeploy.browser._2Fnode-swagger-lite_2Fbuild..alpha..travis-ci.org_2Fapp_2Findex.html.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html)
 
 
@@ -52,6 +50,7 @@ lightweight standalone swagger-ui server backed by nedb
 | git-branch : | [master](https://github.com/kaizhu256/node-swagger-lite/tree/master) | [beta](https://github.com/kaizhu256/node-swagger-lite/tree/beta) | [alpha](https://github.com/kaizhu256/node-swagger-lite/tree/alpha)|
 |--:|:--|:--|:--|
 | test-server : | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/app/index.html)|
+| test-admin-ui-server : | [![github.com test-admin-ui-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/app/assets.swgg.admin-ui.html) | [![github.com test-admin-ui-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swgg.admin-ui.html) | [![github.com test-admin-ui-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/app/assets.swgg.admin-ui.html)|
 | test-report : | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.html)|
 | coverage : | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.html/index.html)|
 | build-artifacts : | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..master..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..beta..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..alpha..travis-ci.org)|
@@ -83,6 +82,8 @@ lightweight standalone swagger-ui server backed by nedb
 
 
 # quickstart web example
+![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.testExampleJs.browser..png)
+
 #### to run this example, follow the instruction in the script below
 - example.js
 
@@ -90,7 +91,7 @@ lightweight standalone swagger-ui server backed by nedb
 /*
 example.js
 
-this node script will run a lightweight standalone swagger-ui server backed by nedb
+this node script will run a standalone swagger-ui server backed by nedb
 
 instruction
     1. save this script as example.js
@@ -377,15 +378,11 @@ window.swgg.api = window.swaggerUi.api;\n\
     // run shared js-env code
     (function () {
         // init petstore-api
-        local.swgg.apiUpdate(local.swgg.swaggerPetstoreJson);
+        local.swgg.apiUpdate(local.swgg.swaggerJsonPetstore);
         local.swgg.apiUpdate(local.utility2.objectSetOverride(local.swgg.swaggerJson, {
             definitions: {
                 Pet: {
-                    _pathObjectDefaultList: [
-                        'crudDeleteOneByKeyUnique.id',
-                        'crudGetManyByQuery',
-                        'crudCreateOrUpdateOneByKeyUnique.id'
-                    ],
+                    _pathObjectDefaultList: ['crudGetManyByQuery'],
                     _pathPrefix: 'pet',
                     properties: {
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
@@ -395,8 +392,8 @@ window.swgg.api = window.swaggerUi.api;\n\
                 },
                 Order: {
                     _pathObjectDefaultList: [
-                        'crudDeleteOneByKeyUnique.id',
-                        'crudGetManyByQuery'
+                        'crudGetManyByQuery',
+                        'crudCreateOrUpdateOneByKeyUnique.id'
                     ],
                     _pathPrefix: 'store',
                     properties: {
@@ -406,9 +403,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                     }
                 },
                 User: {
-                    _pathObjectDefaultList: [
-                        'crudGetManyByQuery'
-                    ],
+                    _pathObjectDefaultList: ['crudGetManyByQuery'],
                     _pathPrefix: 'user',
                     properties: {
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
@@ -444,15 +439,15 @@ window.swgg.api = window.swaggerUi.api;\n\
                 },
                 '/pet/{petId}': {
                     delete: {
-                        _operationId: 'crudDeleteOneByKeyUnique.id.petId',
+                        _operationId: 'crudDeleteOneByKeyUnique.petId.id',
                         _schemaName: 'Pet'
                     },
                     get: {
-                        _operationId: 'crudGetOneByKeyUnique.id.petId',
+                        _operationId: 'crudGetOneByKeyUnique.petId.id',
                         _schemaName: 'Pet'
                     },
                     post: {
-                        _operationId: 'crudCreateOrUpdateOneByKeyUnique.id.petId',
+                        _operationId: 'crudCreateOrUpdateOneByKeyUnique.petId.id',
                         _schemaName: 'Pet'
                     }
                 },
@@ -464,11 +459,11 @@ window.swgg.api = window.swaggerUi.api;\n\
                 },
                 '/store/order/{orderId}': {
                     delete: {
-                        _operationId: 'crudDeleteOneByKeyUnique.id.orderId',
+                        _operationId: 'crudDeleteOneByKeyUnique.orderId.id',
                         _schemaName: 'Order'
                     },
                     get: {
-                        _operationId: 'crudGetOneByKeyUnique.id.orderId',
+                        _operationId: 'crudGetOneByKeyUnique.orderId.id',
                         _schemaName: 'Order'
                     }
                 },
@@ -607,15 +602,16 @@ window.swgg.api = window.swaggerUi.api;\n\
 }());
 ```
 
-#### output from shell
-[![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.testExampleJs.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
-
 #### output from electron-lite
-[![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.testExampleJs.browser..png)](https://hrku01-swagger-lite-beta.herokuapp.com)
+![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.testExampleJs.browser..png)
+
+#### output from shell
+![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.testExampleJs.svg)
 
 
 
 # npm-dependencies
+- [nedb-lite](https://www.npmjs.com/package/nedb-lite)
 - [utility2](https://www.npmjs.com/package/utility2)
 
 
@@ -631,23 +627,23 @@ window.swgg.api = window.swaggerUi.api;\n\
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "nedb-lite": "2016.1.1",
+        "nedb-lite": "2016.1.2",
         "utility2": "2016.1.5"
     },
-    "description": "lightweight standalone swagger-ui server backed by nedb",
+    "description": "standalone swagger-ui server backed by nedb",
     "devDependencies": {
-        "electron-lite": "2015.12.3"
+        "electron-lite": "2015.12.4"
     },
-    "engines": { "node": ">=4.2" },
+    "engines": { "node": ">=4.0" },
     "keywords": [
         "api", "admin", "admin-ui",
         "browser",
         "cms", "crud",
         "db",
-        "lite", "lightweight",
+        "light", "lightweight", "lite",
         "mongo", "mongodb",
         "nedb",
-        "swagger", "swagger-ui",
+        "standalone", "swagger", "swagger-ui",
         "web"
     ],
     "license": "MIT",
@@ -677,12 +673,12 @@ exports:require('./index.js').tools.v2.__proto__} \
 export npm_config_mode_auto_restart=1 && \
 utility2 shRun shIstanbulCover node test.js",
         "test": "export MODE_LINENO=0 && \
-export NODE_ENV=test && \
 utility2 shRun shReadmeExportFile package.json package.json && \
 export PORT=$(utility2 shServerPortRandom) && \
-utility2 test node test.js"
+utility2 test node test.js",
+        "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.1.3"
+    "version": "2016.1.4"
 }
 ```
 
@@ -707,21 +703,21 @@ shBuild() {(set -e
     . node_modules/.bin/utility2 && shInit
 
     (set -e
-    # run npm-test on published package
-    (export npm_config_mode_coverage=1 &&
-        shNpmTestPublished)
-
     #!! # test example js script
     #!! (export MODE_BUILD=testExampleJs &&
         #!! export npm_config_timeout_exit=10000 &&
         #!! shRunScreenCapture shReadmeTestJs example.js)
+
+    # run npm-test on published package
+    (export MODE_BUILD=npmTestPublished &&
+        shRunScreenCapture npm run test-published --mode-coverage)
 
     # run npm-test
     (export MODE_BUILD=npmTest &&
         shRunScreenCapture npm test --mode-coverage)
 
     # create api-doc
-    npm run-script build-doc
+    npm run build-doc
 
     # if running legacy-node, then do not continue
     [ "$(node --version)" \< "v5.0" ] && exit || true

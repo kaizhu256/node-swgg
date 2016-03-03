@@ -15,7 +15,7 @@
 
 
 
-    // run browser js-env code - pre-init
+    // run shared js-env code - pre-init
     (function () {
         // init local
         local = {};
@@ -49,62 +49,209 @@
         /*
          * this function will create and return a form-input from options
          */
-            var dataOptions, html, readOnly, title;
+            var html, htmlInput, htmlInputText, htmlInputTextarea, readOnly;
+            options.uuid = local.utility2.uuidTimeCreate();
             readOnly = options.readOnly
-                ? 'readonly'
+                ? 'disabled'
                 : '';
-            title = options.name + '<br>(' + (options.format || options.type || 'object') + ')';
-            dataOptions = 'data-options="' + encodeURIComponent(JSON.stringify(options)) + '"';
-            html = '';
-            html += '<div class="form-group">';
-            html += '<label class="col-sm-2 control-label">' + title + '</label>';
+            html = '<div class="dtFormInputContainer form-group" data-options="' +
+                // init data-options
+                encodeURIComponent(JSON.stringify(options)) +
+                // init id
+                '" id="' + options.uuid + '">';
+            html += '<label class="col-sm-2 control-label">' +
+                // init title
+                (options.name + '<br>(' + (options.format || options.type || 'object') + ')') +
+                '</label>';
             html += '<div class="col-sm-10">';
-            html += '<input class="form-control swggDatatableFormInput" ' + dataOptions + ' ' +
-                readOnly + ' type="text">';
+            htmlInputText = '<input class="form-control" ' + readOnly + ' type="text">';
+            htmlInputTextarea = '<textarea class="form-control" ' + readOnly +
+                ' rows="4"></textarea>';
+            switch (options.type) {
+            // type - array
+            case 'array':
+                htmlInput = htmlInputTextarea;
+                break;
+            // type - boolean
+            case 'boolean':
+                htmlInput = ['true', 'false', 'null'].map(function (key) {
+                    return '<label class="radio-inline">' +
+                        '<input name="' + options.uuid + '" ' + readOnly + ' type="radio">' +
+                        key + '</label>';
+                }).join('');
+                break;
+            // type - string
+            case 'string':
+                switch (options.format) {
+                // format - date-time
+                case 'date':
+                case 'date-time':
+                    htmlInput = '<div class="date dtFormInputDatetime input-group">' +
+                            '<input class="form-control" ' + readOnly + ' type="text">' +
+                            '<span class="input-group-addon">' +
+                                '<span class="glyphicon glyphicon-calendar"></span>' +
+                            '</span>' +
+                        '</div>';
+                    break;
+                case 'byte':
+                case 'json':
+                    htmlInput = htmlInputTextarea;
+                    break;
+                default:
+                    htmlInput = htmlInputText;
+                }
+                break;
+            // type - default
+            default:
+                htmlInput = htmlInputText;
+            }
+            // dropdown - enum
+            if (options.enum) {
+                htmlInput = '<div class="btn-group">' +
+                    '<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" ' +
+                    readOnly + '>' +
+                    '<span>null</span> <span class="caret"></span>' +
+                    '</button>' +
+                    '<ul class="dropdown-menu">' +
+                    options.enum.map(function (data) {
+                        return '<li><a data-json="' +
+                            encodeURIComponent(JSON.stringify(data)) +
+                            '" href="#">' + data + '</a></li>';
+                    }).join('') +
+                    '<li class="divider"></li>' +
+                    '<li><a data-json="null" href="#">null</a></li>' +
+                    '</ul>' +
+                    '</div>';
+            }
+            html += htmlInput;
             html += '</div>';
             html += '</div>';
             return html;
         };
 
-        local.swgg.dtFncFormInputDataRead = function (options) {
+        local.swgg.dtFncFormInputDataRead = function (elementContainer) {
         /*
-         * this function will render the data with the given options
+         * this function will read and parse options.dataRead from the elementContainer
          */
-            return options.type === 'string'
-                ? options.inputValue || options.default
-                : options.inputValue === ''
+            var data, elementInput, options;
+            options = JSON.parse(decodeURIComponent(elementContainer.dataset.options));
+            elementInput = elementContainer.getElementsByTagName('textarea');
+            if (!elementInput.length) {
+                elementInput = elementContainer.getElementsByTagName('input');
+            }
+            if (elementInput.length) {
+                switch (options.type) {
+                // type - boolean
+                case 'boolean':
+                    data = elementInput[0].checked
+                        ? true
+                        : elementInput[1].checked
+                        ? false
+                        : null;
+                    break;
+                default:
+                    data = elementInput[0].value;
+                }
+            }
+            if (options.enum) {
+                data = JSON.parse(decodeURIComponent(elementContainer.dataset.json || 'null'));
+            }
+            options.dataRead = options.type === 'string'
+                ? data || options.default || null
+                : local.swgg.isNullOrUndefined(data) || data === '' || data === 'undefined'
                 ? options.default
-                : JSON.parse(options.inputValue);
+                : JSON.parse(data);
+            return options;
         };
 
-        local.swgg.dtFncFormInputDataWrite = function (options) {
+        local.swgg.dtFncFormInputDataWrite = function (elementContainer, options) {
         /*
-         * this function will render the data with the given options
+         * this function will write options.dataWrite to the given elementContainer
          */
-            var data;
-            data = options.data === undefined
-                ? options.default
-                : options.data;
-            return data === undefined
+            var data, elementInput;
+            options = options || elementContainer.dataset.options;
+            if (typeof options === 'string') {
+                options = JSON.parse(decodeURIComponent(options));
+            }
+            data = local.swgg.isNullOrUndefined(options.dataWrite)
+                ? options.default || null
+                : options.dataWrite;
+            // dropdown - enum
+            if (elementContainer && options.enum) {
+                elementContainer.dataset.json = local.swgg.isNullOrUndefined(data)
+                    ? ''
+                    : encodeURIComponent(JSON.stringify(data));
+                elementContainer.querySelector('span').textContent = String(data);
+                elementContainer = null;
+            }
+            data = local.swgg.isNullOrUndefined(data)
                 ? ''
                 : typeof data === 'string' && options.type === 'string'
                 ? data
                 : JSON.stringify(data);
+            switch (options.type) {
+            // type - string
+            case 'string':
+                switch (options.format) {
+                // format - date-time
+                case 'date':
+                case 'date-time':
+                    if (data) {
+                        data = new Date(data);
+                        data = new Date(
+                            data.getTime() - data.getTimezoneOffset() * 60 * 1000
+                        ).toISOString().slice(0, 19).replace('T', ' ');
+                    }
+                    break;
+                }
+                break;
+            }
+            options.dataRead = data;
+            // init elementInput.value
+            if (!elementContainer) {
+                return;
+            }
+            elementInput = elementContainer.getElementsByTagName('textarea');
+            if (elementInput.length) {
+                elementInput[0].value = options.dataRead;
+                return;
+            }
+            elementInput = elementContainer.getElementsByTagName('input');
+            if (elementInput.length) {
+                switch (options.type) {
+                // type - boolean
+                case 'boolean':
+                    elementInput[options.dataRead === 'true'
+                        ? 0
+                        : options.dataRead === 'false'
+                        ? 1
+                        : 2].checked = true;
+                    return;
+                default:
+                    // workaround bug - need to wait for bootstrap-datetimepicker to init
+                    setTimeout(function () {
+                        elementInput[0].value = options.dataRead;
+                    });
+                }
+            }
         };
 
-        local.swgg.dtFncInit = function (self) {
+        local.swgg.dtFncDatatableInit = function (self) {
         /*
-         * this function will init the ui-dom datatable-list
+         * this function will init the datatable-ui
          */
+            var options;
             // save self
             local.swgg.dtOptions = self;
             // reset swaggerJson
-            local.swgg.swaggerJson = local.swgg.swaggerJson$$Dummy = null;
+            local.swgg.swaggerJson = null;
             local.swgg.apiUpdate(local.swgg.dtSwaggerJson);
             // init crud-api
-            Object.keys(self.crudDict).forEach(function (key) {
-                local.swgg[key] =
-                    local.swgg.api[self.tagName][self.crudDict[key].replace((/\W/g), '_')];
+            Object.keys(self.crudDict).forEach(function (operationId) {
+                options = local.swgg[operationId.split('.')[0]] = (local.swgg.api[self.tagName][
+                    self.crudDict[operationId].replace((/\W/g), '_')
+                ] || local.utility2.nop).bind(null);
+                options.operationId = operationId;
             });
             // init self
             local.swgg.dtSchema = local.utility2.jsonCopy(
@@ -122,12 +269,11 @@
                 /*
                  * this function will render the edit-cell
                  */
-                    var options;
                     // jslint-hack
                     local.utility2.nop(data, type, row);
                     options = local.swgg.dtDatatableInstance.page.info();
                     options.ii = options.page * options.length + meta.row + 1;
-                    return '<button class="btn btn-xs swggButtonRowEdit">edit row ' +
+                    return '<button class="btn btn-xs dtButtonRecordEdit">edit row ' +
                         options.ii + '</button>';
                 },
                 title: ''
@@ -152,18 +298,16 @@
                         /*
                          * this function will render the data-cell
                          */
-                            var options;
+                            // jslint-hack
+                            local.utility2.nop(type, row);
                             options = local.utility2.jsonCopy(local.swgg.dtSchema.properties[
                                 local.swgg.dtDatatableOptions.columns[
                                     meta.col
                                 ].schemaPropertyName
                             ]);
-                            options.data = data;
-                            // jslint-hack
-                            local.utility2.nop(type, row);
-                            return local.utility2.stringHtmlSafe(
-                                local.swgg.dtFncFormInputDataWrite(options)
-                            );
+                            options.dataWrite = data;
+                            local.swgg.dtFncFormInputDataWrite(null, options);
+                            return local.utility2.stringHtmlSafe(options.dataRead);
                         },
                         title: local.utility2.stringHtmlSafe(key) + '<br>(' +
                             local.utility2.stringHtmlSafe(property.format ||
@@ -173,65 +317,17 @@
                     };
                 }));
             // init datatable
-            document.getElementById('swggDatatableContainer1').innerHTML = self.html ||
+            document.getElementById('dtTableContainer1').innerHTML = self.html ||
                 '<table class="display table table-responsive" ' +
-                'id="swggDatatable1" width="100%"><tfoot><tr>' +
+                'id="dtTable1" width="100%"><tfoot><tr>' +
                 local.swgg.dtDatatableOptions.columns.map(function (element) {
                     return '<th>' + element.title + '</th>';
                 }).join('') + '</tr></tfoot></table>';
             local.swgg.dtDatatableInstance =
-                local.jQuery('#swggDatatable1').DataTable(local.swgg.dtDatatableOptions);
-            // init event-handling
-            if (!local.swgg.dtInitialized) {
-                local.swgg.dtInitialized = true;
-                ['assert', 'onErrorDefault'].forEach(function (key) {
-                    // save old function
-                    local.utility2['_' + key] = local.utility2['_' + key] ||
-                        local.utility2[key];
-                    // override old function
-                    local.utility2[key] = function (error, data) {
-                        switch (key) {
-                        case 'assert':
-                            error = !error && data;
-                            break;
-                        }
-                        if (error) {
-                            // create alert
-                            document.getElementById('swggDatatableAlertContainer1').innerHTML +=
-                                '<div class="alert alert-danger fade in margin-0">' +
-                                error.message +
-                                '<button type="button" class="close" data-dismiss="alert">' +
-                                '<span>&times;</span>' +
-                                '</button>' +
-                                '</div>';
-                            // scroll to page-top to view alert
-                            local.jQuery('html, body').animate({ scrollTop: 0 }, 'fast');
-                        }
-                        local.utility2['_' + key].apply(null, arguments);
-                    };
-                });
-            }
-        };
-
-        local.swgg.dtFncOnClickRecordEdit = function (event) {
-        /*
-         * this function will handle the click-event to edit the record
-         */
-            var rowData;
-            rowData = {};
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-                if ((/\bswggButtonRowEdit\b/).test(event.currentTarget.className)) {
-                    // init rowData
-                    rowData = local.swgg.dtPageData.data[
-                        local.jQuery(event.currentTarget).parents('tr')[0].dataset.ii
-                    ];
-                }
-            }
-            // init row-edit-form
+                local.jQuery('#dtTable1').DataTable(local.swgg.dtDatatableOptions);
+            // init form-record-edit
             document.getElementById(
-                'swggDatatableFormRowCreateOrUpdate1'
+                'dtFormRecordEdit1'
             ).innerHTML = Object.keys(local.swgg.dtSchema.properties)
                 .sort(function (aa, bb) {
                     return aa === 'id'
@@ -245,25 +341,70 @@
                         : 0;
                 })
                 .map(function (key) {
-                    var options;
                     options = local.utility2.jsonCopy(local.swgg.dtSchema.properties[key]);
-                    options.data = rowData[key];
                     options.name = key;
-                    if (key === 'id' && options.data !== undefined) {
-                        options.readOnly = true;
-                    }
                     return local.swgg.dtFncFormInputCreate(options);
                 })
                 .join('');
-            Array.prototype.slice.call(document.querySelectorAll(
-                '#swggDatatableFormRowCreateOrUpdate1 .swggDatatableFormInput'
-            )).forEach(function (element) {
-                element.value = local.swgg.dtFncFormInputDataWrite(
-                    JSON.parse(decodeURIComponent(element.dataset.options))
-                );
+            // init form-table-query
+            document.getElementById('dtFormTableQuery1').innerHTML = JSON.parse(
+                local.swgg.cacheDict.pathObject[local.swgg.dtOptions.tagName + ' ' +
+                    local.swgg.dtOptions.crudDict.crudGetManyByQuery]
+            ).parameters
+                .filter(function (element) {
+                    return element.name[0] !== '_';
+                })
+                .sort(function (aa, bb) {
+                    return aa.name < bb.name
+                        ? -1
+                        : aa.name > bb.name
+                        ? 1
+                        : 0;
+                })
+                .map(local.swgg.dtFncFormInputCreate)
+                .join('');
+            // init .dtFormInputDatetime
+            local.jQuery('.dtFormInputDatetime').datetimepicker({
+                format: 'YYYY-MM-DD HH:mm:ss'
             });
-            // change to row-edit-view
-            local.jQuery('#swggDatatableNavRowCreateOrUpdate1').tab('show');
+            // update .dtFormInputContainer
+            Array.prototype.slice.call(
+                document.getElementsByClassName('dtFormInputContainer')
+            ).forEach(function (elementContainer) {
+                local.swgg.dtFncFormInputDataWrite(elementContainer);
+            });
+        };
+
+        local.swgg.dtFncOnClickRecordEdit = function (event) {
+        /*
+         * this function will handle the click-event to edit the record
+         */
+            var options, rowData, saveType;
+            rowData = {};
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                if ((/\bdtButtonRecordEdit\b/).test(this.className)) {
+                    // init rowData
+                    rowData = local.swgg.dtPageData.data[this.closest('tr').dataset.ii];
+                    saveType = 'edit';
+                }
+            }
+            // init saveType
+            document.getElementById('dtButtonRecordSave1').dataset.saveType = saveType;
+            // update .dtFormInputContainer
+            Array.prototype.slice.call(
+                document.querySelectorAll('#dtFormRecordEdit1 .dtFormInputContainer')
+            ).forEach(function (elementContainer) {
+                options = JSON.parse(decodeURIComponent(elementContainer.dataset.options));
+                options.dataWrite = rowData[options.name];
+                if (options.name === 'id' && saveType === 'edit') {
+                    options.readOnly = true;
+                }
+                local.swgg.dtFncFormInputDataWrite(elementContainer, options);
+            });
+            // change to view-row-edit
+            local.jQuery('#dtNavRecordEdit1').tab('show');
         };
 
         local.swgg.dtFncOnClickRecordSave = function () {
@@ -273,95 +414,101 @@
             var data, options;
             data = {};
             Array.prototype.slice.call(
-                document.querySelectorAll('.swggDatatableFormInput')
+                document.getElementsByClassName('dtFormInputContainer')
             ).forEach(function (element) {
-                options = JSON.parse(decodeURIComponent(element.dataset.options));
-                options.inputValue = element.value;
-                data[options.name] = local.swgg.dtFncFormInputDataRead(options);
+                options = local.swgg.dtFncFormInputDataRead(element);
+                data[options.name] = options.dataRead;
             });
-            local.swgg.crudUpdateOneById({ body: JSON.stringify(data), id: data.id }, {
+            (document.getElementById('dtButtonRecordSave1').dataset.saveType === 'edit'
+                ? local.swgg.crudUpdateOneByKeyUnique
+                : local.swgg.crudCreateOne)({ body: JSON.stringify(data), id: data.id }, {
                 modeErrorData: true
             }, function (error) {
                 // validate no error occurred
                 local.utility2.assert(!error, error);
-                local.jQuery('#swggDatatableNavTable1').tab('show');
+                local.jQuery('#dtNavTable1').tab('show');
                 local.swgg.dtDatatableInstance.ajax.reload(function () {
                     setTimeout(local.swgg.dtDatatableInstance.draw, 100);
                 }, true);
             });
         };
 
-        local.swgg.dtFncListInit = function (optionsList) {
+        local.swgg.dtFncListInit = function () {
         /*
-         * this function will init the ui-dom datatable-list
+         * this function will init the admin-ui from local.swgg.dtList
          */
-            // save optionsList
-            local.swgg.dtList = optionsList || [{
-                crudDict: {
-                    crudCreateOne: 'crudCreateOrReplaceOne',
-                    crudDeleteOneById: 'crudDeleteOneByKeyUnique.id',
-                    crudGetManyByQuery: 'crudGetManyByQuery',
-                    crudUpdateOneById: 'crudCreateOrUpdateOneByKeyUnique.id'
-                },
-                paginationCountTotal: 'paginationCountTotal',
-                schemaName: 'Pet',
-                tagName: 'pet',
-                urlSwaggerJson: 'api/v0/swagger.json'
-            }, {
-                crudDict: {
-                    crudCreateOne: 'crudCreateOrReplaceOne',
-                    crudDeleteOneById: 'crudDeleteOneByKeyUnique.id',
-                    crudGetManyByQuery: 'crudGetManyByQuery',
-                    crudUpdateOneById: 'crudCreateOrUpdateOneByKeyUnique.id'
-                },
-                paginationCountTotal: 'paginationCountTotal',
-                schemaName: 'Order',
-                tagName: 'store',
-                urlSwaggerJson: 'api/v0/swagger.json'
-            }, {
-                crudDict: {
-                    crudCreateOne: 'crudCreateOrReplaceOne',
-                    crudDeleteOneById: 'crudDeleteOneByKeyUnique.id',
-                    crudGetManyByQuery: 'crudGetManyByQuery',
-                    crudUpdateOneById: 'crudCreateOrUpdateOneByKeyUnique.id'
-                },
-                paginationCountTotal: 'paginationCountTotal',
-                schemaName: 'User',
-                tagName: 'user',
-                urlSwaggerJson: 'api/v0/swagger.json'
-            }];
-            document.getElementById('swggDatatableListContainer1').innerHTML =
+            // init dom tab-view-list of tables
+            document.getElementById('dtListContainer1').innerHTML =
                 local.swgg.dtList.map(function (options, ii) {
                     return '<li class="' + (ii
                         ? ''
                         : 'active') + '" data-ii="' + ii +
-                        '"><a data-toggle="tab" href="#swggDatatableViewTable1">' +
-                        options.tagName + ' api</a></li>\n';
+                        '"><a data-toggle="tab" href="#dtViewTable1">' +
+                        options.title + '</a></li>\n';
                 }).join('');
-            // init event-handling
-            if (!local.swgg.dtListInitialized) {
-                local.swgg.dtListInitialized = true;
-                local.jQuery('#swggDatatableListContainer1').on('click', 'li', function () {
-                    var options;
-                    // show table-view
-                    local.jQuery('#swggDatatableNavTable1').tab('show');
-                    options = local.swgg.dtList[this.dataset.ii];
-                    local.utility2.ajax({
-                        modeJsonParseResponseText: true,
-                        url: options.urlSwaggerJson
-                    }, function (error, xhr) {
-                        local.utility2.testTryCatch(function () {
-                            // validate no error occurred
-                            local.utility2.assert(!error, error);
-                            local.swgg.dtSwaggerJson = xhr.responseJson;
-                            // init the ui-dom datatable
-                            local.swgg.dtFncInit(options);
-                        }, local.utility2.onErrorDefault);
-                    });
+            // init click event-handling for selecting different tables
+            local.jQuery('#dtListContainer1').on('click', 'li', function () {
+                var options;
+                // show table-view
+                local.jQuery('#dtNavTable1').tab('show');
+                options = local.swgg.dtList[this.dataset.ii];
+                local.utility2.ajax({
+                    modeJsonParseResponseText: true,
+                    url: options.urlSwaggerJson
+                }, function (error, xhr) {
+                    local.utility2.testTryCatch(function () {
+                        // validate no error occurred
+                        local.utility2.assert(!error, error);
+                        local.swgg.dtSwaggerJson = xhr.responseJson;
+                        // init the datatable-ui
+                        local.swgg.dtFncDatatableInit(options);
+                    }, local.utility2.onErrorDefault);
                 });
-            }
-            // init datatable
-            local.jQuery('#swggDatatableListContainer1').find('li').first().click();
+            });
+            local.jQuery('#dtTableContainer1')
+                // init click event-handling to edit table-row
+                .on('click', '.dtButtonRecordEdit', local.swgg.dtFncOnClickRecordEdit)
+                // init click event-handling to toggle-select table-row
+                .on('click', 'tr', function () {
+                    local.jQuery(this).toggleClass('selected');
+                });
+            // http://stackoverflow.com/questions/13437446
+            // /how-to-display-selected-item-in-bootstrap-button-dropdown-title
+            // init click event-handling - select element in dropdown
+            local.jQuery('.dtFormContainer').on('click', '.dropdown-menu a', function (event) {
+                event.preventDefault();
+                this.closest('.dtFormInputContainer').dataset.json = this.dataset.json;
+                this.closest('div').querySelector('span').textContent = this.textContent;
+            });
+            // init uncaught-error alerts
+            ['assert', 'onErrorDefault'].forEach(function (key) {
+                // save old function
+                local.utility2['_' + key] = local.utility2['_' + key] ||
+                    local.utility2[key];
+                // override old function
+                local.utility2[key] = function (error, data) {
+                    switch (key) {
+                    case 'assert':
+                        error = !error && data;
+                        break;
+                    }
+                    if (error) {
+                        // create alert
+                        document.getElementById('dtAlertContainer1').innerHTML +=
+                            '<div class="alert alert-danger fade in margin-0">' +
+                            error.message +
+                            '<button type="button" class="close" data-dismiss="alert">' +
+                            '<span>&times;</span>' +
+                            '</button>' +
+                            '</div>';
+                        // scroll to page-top to view alert
+                        local.jQuery('html, body').animate({ scrollTop: 0 }, 'medium');
+                    }
+                    local.utility2['_' + key].apply(null, arguments);
+                };
+            });
+            // init first datatable
+            local.jQuery('#dtListContainer1').find('li').first().click();
         };
 
         local.swgg.dtFncOptionsDefaultCreate = function () {
@@ -383,7 +530,7 @@
                             .split('<br>')[0] + '":' + (options.order[0].dir === 'asc'
                             ? 1
                             : -1) + '}'
-                        : undefined
+                        : null
                 };
                 local.swgg.crudGetManyByQuery(options.data, {
                     modeErrorData: true
@@ -403,9 +550,11 @@
                 });
             };
             options.buttons = [{
+                className: 'dtButtonRecordEdit',
                 text: 'create new record',
                 action: local.swgg.dtFncOnClickRecordEdit
             }, {
+                className: 'dtButtonRecordCreate',
                 text: 'delete selected records',
                 action: function () {
                 /*
@@ -420,13 +569,14 @@
                     });
                     // do nothing if no selected-rows
                     Array.prototype.slice.call(
-                        document.querySelectorAll('#swggDatatable1 tbody tr.selected')
+                        document.querySelectorAll('#dtTable1 tbody tr.selected')
                     ).forEach(function (element) {
                         onParallel.counter += 1;
                         // delete row in parallel
-                        local.swgg.crudDeleteOneById({
-                            id: local.swgg.dtPageData.data[element.dataset.ii].id
-                        }, {
+                        local.swgg.crudDeleteOneByKeyUnique(local.swgg.keyUniqueInit({
+                            data: local.swgg.dtPageData.data[element.dataset.ii],
+                            operationId: local.swgg.crudDeleteOneByKeyUnique.operationId
+                        }).queryByKeyUnique, {
                             modeErrorData: true
                         }, onParallel);
                     });
@@ -436,8 +586,8 @@
                 text: 'export as excel'
             }, {
                 extend: 'csvHtml5',
-                fieldSeparator: '\t',
                 extension: '.tsv',
+                fieldSeparator: '\t',
                 text: 'export as tsv'
             }, {
                 extend: 'print',
@@ -458,4 +608,52 @@
             return options;
         };
     }());
+    switch (local.modeJs) {
+
+
+
+    // run node js-env code - post-init
+    case 'node':
+        // init dtListPetstore
+        local.swgg.dtListPetstore = [{
+            crudDict: {
+                crudCreateOne: 'addPet',
+                'crudDeleteOneByKeyUnique.petId.id': 'deletePet',
+                crudGetManyByQuery: 'crudGetManyByQuery',
+                'crudUpdateOneByKeyUnique.id': 'updatePet'
+            },
+            paginationCountTotal: 'paginationCountTotal',
+            schemaName: 'Pet',
+            tagName: 'pet',
+            title: 'pet api',
+            urlSwaggerJson: 'api/v0/swagger.json'
+        }, {
+            crudDict: {
+                crudCreateOne: 'placeOrder',
+                'crudDeleteOneByKeyUnique.orderId.id': 'deleteOrder',
+                crudGetManyByQuery: 'crudGetManyByQuery',
+                'crudUpdateOneByKeyUnique.id': 'crudCreateOrUpdateOneByKeyUnique.id'
+            },
+            paginationCountTotal: 'paginationCountTotal',
+            schemaName: 'Order',
+            tagName: 'store',
+            title: 'store api',
+            urlSwaggerJson: 'api/v0/swagger.json'
+        }, {
+            crudDict: {
+                crudCreateOne: 'createUser',
+                'crudDeleteOneByKeyUnique.username': 'deleteUser',
+                crudGetManyByQuery: 'crudGetManyByQuery',
+                'crudUpdateOneByKeyUnique.username': 'updateUser'
+            },
+            paginationCountTotal: 'paginationCountTotal',
+            schemaName: 'User',
+            tagName: 'user',
+            title: 'user api',
+            urlSwaggerJson: 'api/v0/swagger.json'
+        }];
+        // init dtList
+        local.swgg.dtList = local.utility2.jsonCopy(local.swgg.dtListPetstore);
+        break;
+    }
 }());

@@ -44,7 +44,7 @@
         local.swgg = { cacheDict: { collection: {}, pathObject: {} }, local: local };
         // init lib nedb
         local.swgg.Nedb = local.modeJs === 'browser'
-            ? local.global.Nedb || local.utility2.nop
+            ? local.global.Nedb
             : require('nedb-lite');
         local.utility2.testTryCatch(function () {
             // init lib swagger-tools
@@ -153,8 +153,8 @@
                     description: '{{_schemaName}} object',
                     in: 'body',
                     name: 'body',
-                    required: true,
-                    schema: { $ref: '#/definitions/{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/{{_schemaName}}' },
+                    'x-notRequired': true
                 }],
                 responses: {
                     200: {
@@ -183,7 +183,8 @@
                     in: 'body',
                     name: 'body',
                     required: true,
-                    schema: { $ref: '#/definitions/{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/{{_schemaName}}' },
+                    'x-notRequired': true
                 }],
                 responses: {
                     200: {
@@ -366,7 +367,6 @@
         local.swgg.templateSwaggerJson = JSON.stringify({
             basePath: '/api/v0',
             definitions: {
-                Array: { items: {}, type: 'array' },
                 // http://jsonapi.org/format/#document-structure-top-level
                 JsonapiResponse: {
                     properties: {
@@ -389,36 +389,8 @@
             },
             paths: {},
             swagger: '2.0',
+            'x-validateUnusedDefinition': false,
             tags: []
-        });
-        // hack - init template swaggerJson$$Dummy to pass validation warnings
-        // for auto-created schemas
-        local.swgg.templateSwaggerJson$$Dummy = JSON.stringify({
-            definitions: {
-                $$Dummy: {
-                    properties: {
-                        propArray: {
-                            items: { $ref: '#/definitions/Array' },
-                            type: 'array'
-                        }
-                    }
-                },
-                JsonapiResponse$$Dummy: {
-                    properties: { data: {
-                        items: { $ref: '#/definitions/$$Dummy' },
-                        type: 'array'
-                    } },
-                    'x-inheritList': [{ $ref: '#/definitions/JsonapiResponse' }]
-                }
-            },
-            paths: { '/$$Dummy': { get: {
-                responses: {
-                    200: {
-                        description: '',
-                        schema: { $ref: '#/definitions/JsonapiResponse$$Dummy' }
-                    }
-                }
-            } } }
         });
     }());
 
@@ -434,9 +406,6 @@
             // init swaggerJson
             local.swgg.swaggerJson = local.swgg.swaggerJson ||
                 JSON.parse(local.swgg.templateSwaggerJson);
-            // init swaggerJson$$Dummy
-            local.swgg.swaggerJson$$Dummy = local.swgg.swaggerJson$$Dummy ||
-                JSON.parse(local.swgg.templateSwaggerJson$$Dummy);
             options.definitions = options.definitions || {};
             options.paths = options.paths || {};
             // init pathObjectDefaultList
@@ -455,22 +424,9 @@
                         }
                     }
                 }).replace((/\{\{_schemaName\}\}/g), schemaName)), 2);
-                // hack - init swaggerJson$$Dummy,
-                // to pass validation warnings for auto-created schemas
-                tmp = local.swgg.swaggerJson$$Dummy;
-                local.utility2.objectSetOverride(tmp, JSON.parse(JSON.stringify({
-                    paths: { '/$$Dummy/{{_schemaName}}': { get: {
-                        responses: {
-                            200: {
-                                description: '',
-                                schema: { $ref:
-                                    '#/definitions/JsonapiResponse{{_schemaName}}' }
-                            }
-                        }
-                    } } }
-                }).replace((/\{\{_schemaName\}\}/g), schemaName)), 2);
                 // init pathObject
                 (schema._pathObjectDefaultList || []).forEach(function (pathObject) {
+                    // init keyUnique
                     keyUnique = (/ByKeyUnique\.(.*)/).exec(pathObject);
                     keyUnique = keyUnique && keyUnique[1];
                     keyUnique = keyUnique && keyUnique.split('.')[0];
@@ -490,10 +446,39 @@
                     pathObject._schemaName = schemaName;
                     options.paths[pathObject._path] = options.paths[pathObject._path] || {};
                     options.paths[pathObject._path][pathObject._method] = pathObject;
+                    // add extra params to crudGetManyByQuery
+                    switch (pathObject.operationId) {
+                    case 'crudGetManyByQuery':
+                        pathObject.parameters = pathObject.parameters.concat(Object.keys(
+                            schema.properties
+                        )
+                            .filter(function (key) {
+                                tmp = schema.properties[key];
+                                switch (tmp.type) {
+                                case 'boolean':
+                                case 'integer':
+                                case 'number':
+                                case 'string':
+                                    return !tmp.readOnly;
+                                }
+                            })
+                            .sort()
+                            .map(function (key) {
+                                tmp = schema.properties[key];
+                                return {
+                                    description: tmp.description,
+                                    enum: tmp.enum,
+                                    format: tmp.format,
+                                    in: 'query',
+                                    name: key,
+                                    type: tmp.type
+                                };
+                            }));
+                        break;
+                    }
                 });
-                // init keyUnique / pathObject / schemaName
+                // init pathPrefix / schemaName
                 schema = options.definitions[schemaName] = JSON.parse(JSON.stringify(schema)
-                    .replace((/\{\{_keyUnique\}\}/g), keyUnique)
                     .replace((/\{\{_pathPrefix\}\}/g), schema._pathPrefix)
                     .replace((/\{\{_schemaName\}\}/g), schema._schemaName));
             });
@@ -516,18 +501,21 @@
                         tags: []
                     }, 2);
                     // update cacheDict.pathObject
-                    tmp = method.toUpperCase() + ' ' + path.replace(
+                    pathObject._keyOperationId = pathObject.tags[0] + ' ' +
+                        pathObject.operationId;
+                    pathObject._keyPath = method.toUpperCase() + ' ' + path.replace(
                         (/\{.*/),
                         function (match0) {
                             return match0.replace((/[^\/]/g), '');
                         }
                     );
-                    local.swgg.cacheDict.pathObject[tmp] = JSON.stringify(
-                        local.utility2.objectSetDefault(
+                    local.swgg.cacheDict.pathObject[pathObject._keyOperationId] =
+                        local.swgg.cacheDict.pathObject[pathObject._keyPath] =
+                            JSON.stringify(local.utility2.objectSetDefault(
                             pathObject,
-                            JSON.parse(local.swgg.cacheDict.pathObject[tmp] || '{}')
-                        )
-                    );
+                            JSON.parse(local.swgg.cacheDict.pathObject[pathObject._keyPath] ||
+                                '{}')
+                        ));
                 });
             });
             // merge tags
@@ -586,11 +574,7 @@
             ));
             // validate swaggerJson
             local.utility2.testTryCatch(function () {
-                local.swgg.validateBySwagger(local.utility2.objectSetDefault(
-                    local.utility2.jsonCopy(local.swgg.swaggerJson),
-                    local.swgg.swaggerJson$$Dummy,
-                    2
-                ));
+                local.swgg.validateBySwagger(local.swgg.swaggerJson);
             }, local.utility2.onErrorDefault);
             // init SwaggerClient
             local.SwaggerClient = local.modeJs === 'browser'
@@ -608,9 +592,7 @@
          * this function will create a persistent nedb-collection from schemaName
          */
             var dir;
-            dir = 'tmp/nedb.collection.' + (local.modeJs === 'browser'
-                ? 'browser'
-                : process.NODE_ENV || 'development');
+            dir = 'tmp/nedb.collection.' + local.utility2.envDict.NODE_ENV;
             if (!local.swgg.cacheDict.collection[schemaName]) {
                 // https://github.com/louischatriot/nedb/issues/134
                 // workaround for issue - Error creating index when db does not exist #134
@@ -736,6 +718,36 @@
                 Math.random().toString(16).slice(-5), 16);
         };
 
+        local.swgg.isNullOrUndefined = function (value) {
+        /*
+         * this function will test if the value is null or undefined
+         */
+            return value === null || value === undefined;
+        };
+
+        local.swgg.keyUniqueInit = function (options) {
+        /*
+         * this function will init options.keyAlias, options.keyUnique,
+         * and options.queryByKeyUnique
+         */
+            var keyAlias, keyUnique;
+            // init keyUnique
+            options.keyAlias = options.operationId.split('.');
+            keyUnique = options.keyUnique = options.keyAlias[1] || 'id';
+            // init keyAlias
+            keyAlias = options.keyAlias = options.keyAlias[2] || options.keyUnique;
+            // invert queryByKeyUnique
+            if (options.modeQueryByKeyUniqueInvert) {
+                keyAlias = options.keyUnique;
+                keyUnique = options.keyAlias;
+            }
+            // init queryByKeyUnique
+            options.keyValue = options.keyValue || (options.data && options.data[keyAlias]);
+            options.queryByKeyUnique = {};
+            options.queryByKeyUnique[keyUnique] = options.keyValue;
+            return options;
+        };
+
         local.swgg.middlewareBodyParse = function (request, response, nextMiddleware) {
         /*
          * this function will run the middleware that will parse the request-body
@@ -784,6 +796,8 @@
                         onNext();
                         return;
                     }
+                    // init crud.body
+                    crud.body = local.utility2.jsonCopy(request.swggBody);
                     // init crud.data
                     crud.data = local.utility2.jsonCopy(request.swggParamDict);
                     // init crud.operationId
@@ -825,7 +839,7 @@
                     switch (crud.operationId) {
                     case 'crudCreateOrReplaceOne':
                     case 'crudCreateOrUpdateOne':
-                        crud.data.id = crud.data.id || (crud.data.body && crud.data.body.id);
+                        crud.data.id = crud.data.id || (crud.body && crud.body.id);
                         if (!crud.data.id) {
                             crud.data.id = local.utility2.uuidTimeCreate();
                             request.swggPathObject.parameters.forEach(function (param) {
@@ -844,17 +858,15 @@
                         }
                         break;
                     }
-                    // init crud.queryByKeyUnique
-                    crud.keyAlias = crud.operationId.split('.');
-                    crud.keyUnique = crud.keyAlias[1] || 'id';
-                    crud.keyAlias = crud.keyAlias[2] || crud.keyUnique;
-                    local.swgg.queryByKeyUniqueInit(crud);
+                    // init crud.keyUnique
+                    crud.modeQueryByKeyUniqueInvert = true;
+                    local.swgg.keyUniqueInit(crud);
                     switch (crud.operationId.split('.')[0]) {
                     case 'crudCountManyByQuery':
                         crud.collection.count(crud.queryQuery, onNext);
                         break;
                     case 'crudCreateOrReplaceMany':
-                        crud.collection.remove({ id: { $in: crud.data.body.map(function (doc) {
+                        crud.collection.remove({ id: { $in: crud.body.map(function (doc) {
                             return doc.id;
                         }) } }, { multi: true }, onNext);
                         break;
@@ -862,19 +874,16 @@
                     case 'crudCreateOrReplaceOneByKeyUnique':
                     case 'crudCreateOrUpdateOne':
                     case 'crudCreateOrUpdateOneByKeyUnique':
-                        crud.data.body = crud.data.body || local.utility2.jsonCopy(crud.data);
-                        delete crud.data.body.id;
-                        delete crud.data.body[crud.keyAlias];
-                        crud.data.body[crud.keyUnique] = crud.data[crud.keyAlias];
+                        crud.body = crud.body || local.utility2.jsonCopy(crud.data);
+                        // replace keyUnique with keyAlias in body
+                        delete crud.body.id;
+                        delete crud.body[crud.keyUnique];
+                        crud.body[crud.keyAlias] = crud.data[crud.keyUnique];
                         // replace doc
                         if (crud.operationId.indexOf('Replace') >= 0) {
-                            // https://github.com/louischatriot/nedb/issues/371
-                            // workaround for issue -
-                            // createdAt property removed when updating document #371
-                            crud.data.body.createdAt = new Date().toISOString();
                             crud.collection.update(
                                 crud.queryByKeyUnique,
-                                crud.data.body,
+                                crud.body,
                                 { returnUpdatedDocs: true, upsert: true },
                                 onNext
                             );
@@ -882,7 +891,7 @@
                         } else {
                             crud.collection.update(
                                 crud.queryByKeyUnique,
-                                { $set: crud.data.body },
+                                { $set: crud.body },
                                 { returnUpdatedDocs: true, upsert: true },
                                 onNext
                             );
@@ -928,7 +937,7 @@
                 case 2:
                     switch (crud.operationId.split('.')[0]) {
                     case 'crudCreateOrReplaceMany':
-                        crud.collection.insert(crud.data.body, onNext);
+                        crud.collection.insert(crud.body, onNext);
                         break;
                     case 'crudCreateOrReplaceOne':
                     case 'crudCreateOrReplaceOneByKeyUnique':
@@ -977,8 +986,10 @@
             if (request.urlParsed.pathname === '/jsonp.swgg.stateInit.js') {
                 response.end('window.swgg.stateInit(' +
                     JSON.stringify({
+                        dtList: local.swgg.dtList,
+                        dtListPetstore: local.swgg.dtListPetstore,
                         swaggerJson: local.swgg.swaggerJson,
-                        swaggerPetstoreJson: local.swgg.swaggerPetstoreJson
+                        swaggerJsonPetstore: local.swgg.swaggerJsonPetstore
                     }) + ');');
                 return;
             }
@@ -1049,7 +1060,7 @@
                         switch (paramDef.in) {
                         // parse body param
                         case 'body':
-                            request.swggParamDict[paramDef.name] =
+                            request.swggBody = request.swggParamDict[paramDef.name] =
                                 request.swggParamDict[paramDef.name] || request.swggBodyParsed;
                             break;
                         // parse formData param
@@ -1070,7 +1081,9 @@
                             break;
                         }
                         // init default param
-                        if (request.swggParamDict[paramDef.name] === undefined) {
+                        if (local.swgg.isNullOrUndefined(
+                                request.swggParamDict[paramDef.name]
+                            )) {
                             request.swggParamDict[paramDef.name] =
                                 local.utility2.jsonCopy(paramDef.default);
                         }
@@ -1103,7 +1116,7 @@
             pathObject.parameters.forEach(function (paramDef) {
                 tmp = data[paramDef.name];
                 // init default value
-                if (tmp === undefined) {
+                if (local.swgg.isNullOrUndefined(tmp)) {
                     tmp = local.utility2.jsonCopy(paramDef.default);
                 }
                 // parse csv array
@@ -1179,7 +1192,6 @@
                         });
                         error = local.utility2.jsonCopy(data[0]);
                         error.errors = data;
-                        error.statusCode = error.statusCode || 500;
                         return error;
                     }
                     return { data: data };
@@ -1203,16 +1215,6 @@
                 });
                 onError(data[0], data[1]);
             };
-        };
-
-        local.swgg.queryByKeyUniqueInit = function (options) {
-        /*
-         * this function will init the property options.queryByKeyUnique
-         */
-            options.keyAlias = options.keyAlias || options.keyUnique;
-            options.keyValue = options.keyValue || options.data[options.keyAlias];
-            options.queryByKeyUnique = {};
-            options.queryByKeyUnique[options.keyUnique] = options.keyValue;
         };
 
         local.swgg.schemaDereference = function ($ref) {
@@ -1273,12 +1275,13 @@
                 local.utility2.assert(data && typeof data === 'object', data);
                 (options.paramDefList || []).forEach(function (paramDef) {
                     key = paramDef.name;
+                    // recurse - validate param
                     local.swgg.validateByPropertyDef({
                         data: data[key],
-                        isNotRequired: options.isNotRequired,
                         key: key,
                         propertyDef: paramDef,
-                        required: paramDef.required
+                        required: paramDef.required,
+                        'x-notRequired': paramDef['x-notRequired']
                     });
                 });
             }, function (error) {
@@ -1297,8 +1300,8 @@
             data = options.data;
             propertyDef = options.propertyDef;
             // validate undefined data
-            if (data === null || data === undefined) {
-                if (!options.isNotRequired && options.required) {
+            if (local.swgg.isNullOrUndefined(data)) {
+                if (options.required && !options['x-notRequired']) {
                     throw new Error('required property ' + options.key + ':' +
                         (propertyDef.format || propertyDef.type) +
                         ' cannot be null or undefined');
@@ -1308,11 +1311,13 @@
             // validate schema
             tmp = propertyDef.$ref || (propertyDef.schema && propertyDef.schema.$ref);
             if (tmp) {
+                // recurse - validate schema-reference
                 local.swgg.validateBySchema({
                     circularList: options.circularList,
                     data: data,
                     key: tmp,
-                    schema: local.swgg.schemaDereference(tmp)
+                    schema: local.swgg.schemaDereference(tmp),
+                    'x-notRequired': options['x-notRequired']
                 });
                 return;
             }
@@ -1394,13 +1399,14 @@
                 switch (propertyDef.type) {
                 case 'array':
                     local.utility2.assert(Array.isArray(data) && propertyDef.items);
-                    // recurse - validate elements in list
                     data.forEach(function (element) {
+                        // recurse - validate element in list
                         local.swgg.validateByPropertyDef({
                             circularList: options.circularList,
                             data: element,
                             key: options.key,
-                            propertyDef: propertyDef.items
+                            propertyDef: propertyDef.items,
+                            'x-notRequired': options['x-notRequired']
                         });
                     });
                     break;
@@ -1432,6 +1438,7 @@
                         propertyDef.format === 'binary');
                     switch (propertyDef.format) {
                     // https://github.com/swagger-api/swagger-spec/issues/50
+                    // Clarify 'byte' format #50
                     case 'byte':
                         local.utility2.assert(!(/[^\n\r\+\/0-9\=A-Za-z]/).test(data));
                         break;
@@ -1481,14 +1488,15 @@
                 );
                 Object.keys(schema.properties || {}).forEach(function (_) {
                     key = _;
+                    // recurse - validate schema-reference
                     local.swgg.validateByPropertyDef({
                         circularList: options.circularList,
                         data: data[key],
                         depth: options.depth - 1,
-                        isNotRequired: options.isNotRequired,
                         key: key,
                         propertyDef: schema.properties[key],
-                        required: schema.required && schema.required.indexOf(key) >= 0
+                        required: schema.required && schema.required.indexOf(key) >= 0,
+                        'x-notRequired': options['x-notRequired']
                     });
                 });
             }, function (error) {
@@ -1510,6 +1518,11 @@
                     ['errors', 'undefined', 'warnings'].forEach(function (errorType) {
                         ((result && result[errorType]) || [
                         ]).slice(0, 8).forEach(function (element) {
+                            if (options['x-validateUnusedDefinition'] === false &&
+                                    errorType === 'warnings' &&
+                                    (element && element.code) === 'UNUSED_DEFINITION') {
+                                return;
+                            }
                             console.error('swagger schema - ' + errorType.slice(0, -1) + ' - ' +
                                 element.code + ' - ' + element.message + ' - ' +
                                 JSON.stringify(element.path));
@@ -1545,12 +1558,12 @@
         local.path = require('path');
         local.url = require('url');
         // init petstore-api
-        local.swgg.swaggerPetstoreJson = JSON.parse(local.fs.readFileSync(
+        local.swgg.swaggerJsonPetstore = JSON.parse(local.fs.readFileSync(
             local.swgg.__dirname + '/lib.swagger.petstore.json',
             'utf8'
         ));
-        delete local.swgg.swaggerPetstoreJson.basePath;
-        delete local.swgg.swaggerPetstoreJson.host;
+        delete local.swgg.swaggerJsonPetstore.basePath;
+        delete local.swgg.swaggerJsonPetstore.host;
         // init template assets.swgg.admin-ui.html
         local.swgg.templateAssetsSwggAdminUiHtml =
             local.fs.readFileSync(__dirname + '/assets.swgg.admin-ui.html', 'utf8');
@@ -1571,7 +1584,7 @@
         local.utility2.assetsDict['/assets.swgg.lib.admin-ui.js'] =
             local.fs.readFileSync(__dirname + '/lib.admin-ui.js', 'utf8');
         local.utility2.assetsDict['/assets.swgg.lib.nedb.js'] =
-            local.fs.readFileSync(local.swgg.Nedb.__dirname + '/index.js', 'utf8');
+            local.fs.readFileSync(local.swgg.Nedb.__dirname + '/nedb-lite.js', 'utf8');
         local.utility2.assetsDict['/assets.swgg.lib.swagger-ui.js'] =
             local.utility2.istanbulInstrumentInPackage(
                 local.fs.readFileSync(__dirname + '/lib.swagger-ui.js', 'utf8'),
@@ -1651,6 +1664,17 @@
                     file: 'external/assets.swgg.lib.bootstrap.js',
                     url: 'https://raw.githubusercontent.com' +
                         '/twbs/bootstrap/v3.3.6/dist/js/bootstrap.min.js'
+                // init lib bootstrap-datetimepicker
+                }, {
+                    file: 'external/assets.swgg.bootstrap-datetimepicker.css',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/Eonasdan/bootstrap-datetimepicker/4.17.37/build/css' +
+                        '/bootstrap-datetimepicker.css'
+                }, {
+                    file: 'external/assets.swgg.lib.bootstrap-datetimepicker.js',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/Eonasdan/bootstrap-datetimepicker/4.17.37/build/js' +
+                        '/bootstrap-datetimepicker.min.js'
                 // init lib datatables
                 }, {
                     file: 'external/assets.swgg.datatables.css',
@@ -1699,6 +1723,11 @@
                     file: 'external/assets.swgg.lib.jquery.js',
                     url: 'https://raw.githubusercontent.com' +
                         '/jquery/jquery/2.1.4/dist/jquery.min.js'
+                // init lib moment
+                }, {
+                    file: 'external/assets.swgg.lib.moment.js',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/moment/moment/2.11.2/min/moment.min.js'
                 // init lib swagger-tools
                 }, {
                     file: 'external/assets.swgg.lib.swagger-tools.js',
