@@ -16,13 +16,25 @@
 <!-- init style -->
 <style>
 /* init css admin-ui */
+* {
+    border-radius: 0 !important;
+}
 .dataTables_wrapper .paginate_button {
     padding: 0.1em 0.5em !important;
 }
+#dtAlertContainer1 {
+    bottom: 0px;
+    position: fixed;
+    width: 100%;
+    z-index: 99;
+}
 #dtTableContainer1 {
-border-top: 1px solid #000;
-margin-top: 20px;
-padding-top: 20px;
+    border-top: 1px solid #000;
+    margin-top: 20px;
+    padding-top: 20px;
+}
+.dtFormInputInvalid {
+    outline: #f00 solid 1px;
 }
 .nav-pills > li {
     padding-left: 5px;
@@ -60,7 +72,28 @@ padding-top: 20px;
     <div class="ajaxProgressBarDiv ajaxProgressBarDivLoading">loading</div>
 </div>
 <!-- init dom alertContainer -->
-<div id="dtAlertContainer1" style="width=100%;"></div>
+<div id="dtAlertContainer1"></div>
+<!-- modal login form -->
+<div class="modal fade" data-backdrop="static" id="userFormLogin" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-body">
+<form class="form-signin">
+    <h4>{{envDict.npm_package_name}} @ {{envDict.npm_package_version}}</h4>
+    <h2>login</h2>
+    <input type="text" id="userFormLoginInputUsername" class="form-control" placeholder="username">
+    <br>
+    <input type="password" id="userFormLoginInputPassword" class="form-control" placeholder="password" required>
+    <div class="checkbox">
+        <label><input type="checkbox" value="remember-me"> remember me</label>
+    </div>
+    <button class="btn btn-lg btn-primary btn-block" id="userButtonLogin">login</button>
+</form>
+</div>
+</div>
+</div>
+</div>
+
 
 
 <!-- init dom navbar -->
@@ -97,7 +130,7 @@ padding-top: 20px;
 <div>
 <ul class="dtViewContainer nav nav-justified nav-pills">
 <li><a data-toggle="tab" href="#dtViewTable1" id="dtNavTable1">table of records</a></li>
-<li><a data-toggle="tab" href="#dtViewRecordEdit1" id="dtNavRecordEdit1" onclick="local.swgg.dtFncOnClickRecordEdit()">create or update record</a></li>
+<li><a data-toggle="tab" href="#dtViewRecordEdit1" id="dtNavRecordEdit1" onclick="local.swgg.dtOnClickRecordEdit()">create or update record</a></li>
 </ul>
 </div>
 
@@ -112,7 +145,7 @@ padding-top: 20px;
 <!-- init dom table-query-form -->
 <div class="container">
     <form class="dtFormContainer form-horizontal" id="dtFormTableQuery1"></form>
-    <button class="btn btn-primary" id="dtButtonQuerySubmit1" onclick="local.swgg.dtFncOnClickQuerySubmit()">submit query</button>
+    <button class="btn btn-primary" id="dtButtonQuerySubmit1" onclick="local.swgg.dtOnClickQuerySubmit()">submit query</button>
 </div>
 <!-- init dom datatable -->
 <div id="dtTableContainer1"></div>
@@ -123,7 +156,7 @@ padding-top: 20px;
 <!-- init dom row-edit-form -->
 <div class="container fade tab-pane" id="dtViewRecordEdit1">
 <form class="dtFormContainer form-horizontal" id="dtFormRecordEdit1"></form>
-<button class="btn btn-primary" id="dtButtonRecordSave1" onclick="local.swgg.dtFncOnClickRecordSave()">save</button>
+<button class="btn btn-primary" id="dtButtonRecordSave1" onclick="local.swgg.dtOnClickRecordSave()">save</button>
 </div>
 
 
@@ -140,9 +173,9 @@ padding-top: 20px;
 <script src="assets.swgg.lib.datatables.js"></script>
 <!-- init lib swagger-lite -->
 <script src="assets.swgg.lib.nedb.js"></script>
-<script src="assets.swgg.lib.swagger-tools.js"></script>
+<script src="assets.utility2.lib.bcrypt.js"></script>
+<script src="assets.utility2.lib.cryptojs.js"></script>
 <script src="assets.utility2.js"></script>
-<script src="assets.swgg.lib.swagger-ui.js"></script>
 <script src="assets.swgg.js"></script>
 <script src="jsonp.swgg.stateInit.js"></script>
 {{scriptExtra}}
@@ -152,7 +185,7 @@ var local;
 // export local
 local = window.local = window.swgg.local;
 // init datatable-list
-local.swgg.dtFncListInit();
+local.swgg.dtListInit();
 });</script>
 </body>
 </html>

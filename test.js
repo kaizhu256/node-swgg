@@ -81,22 +81,22 @@
             onParallel = local.utility2.onParallel(onError);
             onParallel.counter += 1;
             [{
-                crudCreateOrReplaceOne: local.swgg.api.pet.addPet,
-                crudDeleteOneByKeyUnique: local.swgg.api.pet.deletePet,
-                crudGetOneByKeyUnique: local.swgg.api.pet.getPetById,
+                crudCreateOrReplaceOne: local.swgg.apiDict['pet addPet'],
+                crudDeleteOneByKeyUnique: local.swgg.apiDict['pet deletePet'],
+                crudGetOneByKeyUnique: local.swgg.apiDict['pet getPetById'],
                 data: { id: 10, name: 'name', photoUrls: ['photoUrls'] },
                 operationId: 'undefined.petId.id'
             }, {
-                crudCreateOrReplaceOne: local.swgg.api.store.placeOrder,
-                crudDeleteOneByKeyUnique: local.swgg.api.store.deleteOrder,
-                crudGetOneByKeyUnique: local.swgg.api.store.getOrderById,
+                crudCreateOrReplaceOne: local.swgg.apiDict['store placeOrder'],
+                crudDeleteOneByKeyUnique: local.swgg.apiDict['store deleteOrder'],
+                crudGetOneByKeyUnique: local.swgg.apiDict['store getOrderById'],
                 data: { id: 10 },
                 operationId: 'undefined.orderId.id'
             }, {
-                crudCreateOrReplaceOne: local.swgg.api.user.createUser,
-                crudDeleteOneByKeyUnique: local.swgg.api.user.deleteUser,
-                crudGetOneByKeyUnique: local.swgg.api.user.getUserByName,
-                data: { username: 'zz_test_crudCreateGetDeleteMany' },
+                crudCreateOrReplaceOne: local.swgg.apiDict['user createUser'],
+                crudDeleteOneByKeyUnique: local.swgg.apiDict['user deleteUser'],
+                crudGetOneByKeyUnique: local.swgg.apiDict['user getUserByName'],
+                data: { username: '00_test_crudCreateGetDeleteMany' },
                 operationId: 'undefined.username'
             }].forEach(function (options) {
                 onParallel.counter += 1;
@@ -112,23 +112,23 @@
             var modeNext, onNext;
             modeNext = 0;
             onNext = function (error, data) {
-                local.utility2.testTryCatch(function () {
+                local.utility2.tryCatchOnError(function () {
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     modeNext += 1;
                     switch (modeNext) {
                     case 1:
                         options = local.utility2.objectSetDefault(options || {}, {
-                            data: { id: 'zz_test_crudCreateGetDeleteOne', propRequired: true },
+                            data: { id: '00_test_crudCreateGetDeleteOne', propRequired: true },
                             operationId: 'undefined.id'
                         });
-                        // test create handling-behavior
+                        // test crudCreate handling-behavior
                         local.testCase_crudCreateOrReplaceOne_default(options, onNext);
                         break;
                     case 2:
                         // validate no error occurred
                         local.utility2.assert(!error, error);
-                        // test delete handling-behavior
+                        // test crudDelete handling-behavior
                         local.testCase_crudDeleteOneByKeyUnique_default(options, onNext);
                         break;
                     default:
@@ -146,24 +146,25 @@
             var modeNext, onNext;
             modeNext = 0;
             onNext = function (error, data) {
-                local.utility2.testTryCatch(function () {
+                local.utility2.tryCatchOnError(function () {
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     modeNext += 1;
                     switch (modeNext) {
                     case 1:
                         options = local.utility2.objectSetDefault(options || {}, {
-                            crudCreateOrReplaceOne: local.swgg.api._test.crudCreateOrReplaceOne,
+                            crudCreateOrReplaceOne:
+                                local.swgg.apiDict['_test crudCreateOrReplaceOne'],
                             data: {
-                                id: 'zz_test_crudCreateOrReplaceOneByKeyUnique',
+                                id: '00_test_crudCreateOrReplaceOne',
                                 propRequired: true
                             },
                             operationId: 'undefined.id'
                         });
                         local.swgg.keyUniqueInit(options);
-                        options.crudCreateOrReplaceOne({ body: JSON.stringify(options.data) }, {
-                            modeErrorData: true
-                        }, onNext);
+                        options.crudCreateOrReplaceOne({ swggParamDict: {
+                            body: options.data
+                        } }, onNext);
                         break;
                     case 2:
                         // validate no error occurred
@@ -186,7 +187,7 @@
             var modeNext, onNext;
             modeNext = 0;
             onNext = function (error, data) {
-                local.utility2.testTryCatch(function () {
+                local.utility2.tryCatchOnError(function () {
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     modeNext += 1;
@@ -194,30 +195,30 @@
                     case 1:
                         options = local.utility2.objectSetDefault(options || {}, {
                             crudDeleteOneByKeyUnique:
-                                local.swgg.api._test.crudDeleteOneByKeyUnique_id,
+                                local.swgg.apiDict['_test crudDeleteOneByKeyUnique.id'],
                             crudGetOneByKeyUnique:
-                                local.swgg.api._test.crudGetOneByKeyUnique_id,
+                                local.swgg.apiDict['_test crudGetOneByKeyUnique.id'],
                             operationId: 'undefined.id',
-                            keyValue: 'zz_test_crudDeleteOneByKeyUnique'
+                            keyValue: '00_test_crudDeleteOneByKeyUnique'
                         });
                         local.swgg.keyUniqueInit(options);
-                        options.crudDeleteOneByKeyUnique(options.queryByKeyUnique, {
-                            modeErrorData: true
+                        options.crudDeleteOneByKeyUnique({
+                            swggParamDict: options.queryByKeyUnique
                         }, onNext);
                         break;
                     case 2:
                         // validate no error occurred
                         local.utility2.assert(!error, error);
-                        options.crudGetOneByKeyUnique(options.queryByKeyUnique, {
-                            modeErrorData: true
+                        options.crudGetOneByKeyUnique({
+                            swggParamDict: options.queryByKeyUnique
                         }, onNext);
                         break;
                     case 3:
                         // validate no error occurred
                         local.utility2.assert(!error, error);
                         // validate data was deleted
-                        local.utility2.assert(data.obj.data.length === 1 &&
-                            data.obj.data[0] === null, data);
+                        local.utility2.assert(data.data.length === 1 &&
+                            data.data[0] === null, data);
                         onNext();
                         break;
                     default:
@@ -235,7 +236,7 @@
             var modeNext, onNext;
             modeNext = 0;
             onNext = function (error, data) {
-                local.utility2.testTryCatch(function () {
+                local.utility2.tryCatchOnError(function () {
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     modeNext += 1;
@@ -243,21 +244,21 @@
                     case 1:
                         options = {
                             crudExistsOneByKeyUnique:
-                                local.swgg.api._test.crudExistsOneByKeyUnique_id,
+                                local.swgg.apiDict['_test crudExistsOneByKeyUnique.id'],
                             operationId: 'undefined.id',
-                            keyValue: 'zz_test_crudExistsOneByKeyUnique'
+                            keyValue: '00_test_crudExistsOneByKeyUnique'
                         };
                         local.swgg.keyUniqueInit(options);
-                        options.crudExistsOneByKeyUnique(options.queryByKeyUnique, {
-                            modeErrorData: true
+                        options.crudExistsOneByKeyUnique({
+                            swggParamDict: options.queryByKeyUnique
                         }, onNext);
                         break;
                     case 2:
                         // validate no error occurred
                         local.utility2.assert(!error, error);
                         // validate data
-                        local.utility2.assert(data.obj.data.length === 1 &&
-                            data.obj.data[0] === true, data);
+                        local.utility2.assert(data.data.length === 1 &&
+                            data.data[0] === true, data);
                         onNext();
                         break;
                     default:
@@ -275,7 +276,7 @@
             var modeNext, onNext;
             modeNext = 0;
             onNext = function (error, data) {
-                local.utility2.testTryCatch(function () {
+                local.utility2.tryCatchOnError(function () {
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     modeNext += 1;
@@ -283,21 +284,22 @@
                     case 1:
                         options = local.utility2.objectSetDefault(options || {}, {
                             crudGetOneByKeyUnique:
-                                local.swgg.api._test.crudGetOneByKeyUnique_id,
+                                local.swgg.apiDict['_test crudGetOneByKeyUnique.id'],
                             operationId: 'undefined.id',
-                            keyValue: 'zz_test_crudGetOneByKeyUnique'
+                            keyValue: '00_test_crudGetOneByKeyUnique'
                         });
                         local.swgg.keyUniqueInit(options);
-                        options.crudGetOneByKeyUnique(options.queryByKeyUnique, {
-                            modeErrorData: true
+                        options.crudGetOneByKeyUnique({
+                            swggParamDict: options.queryByKeyUnique
                         }, onNext);
                         break;
                     case 2:
                         // validate no error occurred
                         local.utility2.assert(!error, error);
                         // validate data
-                        local.utility2.assert(data.obj.data.length === 1 &&
-                            data.obj.data[0][options.keyAlias] === options.keyValue, data);
+                        local.utility2.assert(data.data.length === 1 &&
+                            data.data[0][options.keyAlias] ===
+                            options.keyValue, data);
                         onNext();
                         break;
                     default:
@@ -341,7 +343,7 @@
             }].forEach(function (options) {
                 onParallel.counter += 1;
                 local.utility2.ajax(options, function (error, xhr) {
-                    local.utility2.testTryCatch(function () {
+                    local.utility2.tryCatchOnError(function () {
                         // validate error occurred
                         local.utility2.assert(error, error);
                         // validate statusCode
@@ -373,14 +375,14 @@
                 { data: ['hello'], meta: { isJsonapiResponse: true } }
             ].forEach(function (data) {
                 onParallel.counter += 1;
-                local.swgg.api._test.onErrorJsonapi({ data: JSON.stringify(data) }, {
-                    modeErrorData: true
-                }, function (error, data) {
-                    local.utility2.testTryCatch(function () {
+                local.swgg.apiDict['_test onErrorJsonapi']({ swggParamDict: {
+                    data: JSON.stringify(data)
+                } }, function (error, data) {
+                    local.utility2.tryCatchOnError(function () {
                         // validate no error occurred
                         local.utility2.assert(!error, error);
                         // validate data
-                        local.utility2.assert(data.obj.data[0] === 'hello', data);
+                        local.utility2.assert(data.data[0] === 'hello', data);
                         onParallel();
                     }, onError);
                 });
@@ -393,27 +395,23 @@
          * this function will test onErrorJsonapi's empty-array handling-behavior
          */
             var onParallel;
-            // jslint-hack
-            local.utility2.nop(options);
             onParallel = local.utility2.onParallel(onError);
             onParallel.counter += 1;
+            options = { swggParamDict: { data: '[]' } };
             onParallel.counter += 1;
-            local.swgg.api._test.onErrorJsonapi({ data: '[]' }, {
-                modeErrorData: true
-            }, function (error, data) {
-                local.utility2.testTryCatch(function () {
+            local.swgg.apiDict['_test onErrorJsonapi'](options, function (error, data) {
+                local.utility2.tryCatchOnError(function () {
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     // validate data
-                    local.utility2.assert(data.obj.data[0] === null, data);
+                    local.utility2.assert(data.data[0] === null, data);
                     onParallel();
                 }, onError);
             });
+            options = { swggParamDict: { error: '[]' } };
             onParallel.counter += 1;
-            local.swgg.api._test.onErrorJsonapi({ error: '[]' }, {
-                modeErrorData: true
-            }, function (error) {
-                local.utility2.testTryCatch(function () {
+            local.swgg.apiDict['_test onErrorJsonapi'](options, function (error) {
+                local.utility2.tryCatchOnError(function () {
                     // validate error occurred
                     local.utility2.assert(error, error);
                     // validate error
@@ -429,8 +427,6 @@
          * this function will test onErrorJsonapi's error handling-behavior
          */
             var onParallel;
-            // jslint-hack
-            local.utility2.nop(options);
             onParallel = local.utility2.onParallel(onError);
             onParallel.counter += 1;
             [
@@ -443,11 +439,10 @@
                     statusCode: 500
                 }
             ].forEach(function (data) {
+                options = { swggParamDict: { error: JSON.stringify(data) } };
                 onParallel.counter += 1;
-                local.swgg.api._test.onErrorJsonapi({ error: JSON.stringify(data) }, {
-                    modeErrorData: true
-                }, function (error) {
-                    local.utility2.testTryCatch(function () {
+                local.swgg.apiDict['_test onErrorJsonapi'](options, function (error) {
+                    local.utility2.tryCatchOnError(function () {
                         // validate error occurred
                         local.utility2.assert(error, error);
                         // validate error
@@ -463,12 +458,10 @@
         /*
          * this function will test validateByParamDefList's default handling-behavior
          */
-            // jslint-hack
-            local.utility2.nop(options);
             // test nop handling-behavior
             local.swgg.validateByParamDefList({ data: {} });
-            local.swgg.api._test.paramDefault({
-                id: 'zz_test_' + local.utility2.uuidTimeCreate(),
+            options = { swggParamDict: {
+                id: '00_test_' + local.utility2.uuidTimeCreate(),
                 // test array-csv-param handling-behavior
                 paramArrayCsv: 'aa,bb',
                 // test array-multi-param handling-behavior
@@ -491,12 +484,13 @@
                 paramPath: 'hello path',
                 // test required-param handling-behavior
                 paramRequired: 'hello required'
-            }, { modeErrorData: true }, function (error, data) {
-                local.utility2.testTryCatch(function () {
+            } };
+            local.swgg.apiDict['_test paramDefault'](options, function (error, data) {
+                local.utility2.tryCatchOnError(function () {
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     // validate object
-                    data = local.utility2.jsonStringifyOrdered(data.obj.data[0]);
+                    data = local.utility2.jsonStringifyOrdered(data.data[0]);
                     local.utility2.assert(data === JSON.stringify({
                         paramArrayCsv: ['aa', 'bb'],
                         paramArrayMulti: ['aa'],
@@ -519,18 +513,17 @@
         /*
          * this function will test validateByParamDefList's formData handling-behavior
          */
-            // jslint-hack
-            local.utility2.nop(options);
-            local.swgg.api._test.paramFormData({
-                id: 'zz_test_' + local.utility2.uuidTimeCreate(),
+            options = { swggParamDict: {
+                id: '00_test_' + local.utility2.uuidTimeCreate(),
                 paramFormData1: 'aa',
                 paramFormData2: 'bb'
-            }, { modeErrorData: true }, function (error, data) {
-                local.utility2.testTryCatch(function () {
+            } };
+            local.swgg.apiDict['_test paramFormData'](options, function (error, data) {
+                local.utility2.tryCatchOnError(function () {
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     // validate object
-                    data = local.utility2.jsonStringifyOrdered(data.obj.data[0]);
+                    data = local.utility2.jsonStringifyOrdered(data.data[0]);
                     local.utility2.assert(data === JSON.stringify({
                         paramFormData1: 'aa',
                         paramFormData2: 'bb'
@@ -557,10 +550,12 @@
                 { key: 'propInteger', value: 0 },
                 { key: 'propIntegerInt32', value: 0 },
                 { key: 'propIntegerInt64', value: 0 },
+                { key: 'propNumber', value: 0.5 },
                 { key: 'propNumberFloat', value: 0.5 },
                 { key: 'propNumberDouble', value: 0.5 },
-                { key: 'propObject', value: { foo: true } },
+                { key: 'propObject', value: { aa: true } },
                 { key: 'propObjectSubdoc', value: { propRequired: true } },
+                { key: 'propRequired', value: true },
                 { key: 'propString', value: 'hello' },
                 { key: 'propStringByte', value: local.modeJs === 'browser'
                     ? local.global.btoa(local.utility2.stringAsciiCharset)
@@ -569,9 +564,13 @@
                 { key: 'propStringDatetime', value: '1971-01-01T00:00:00Z' },
                 { key: 'propStringEmail', value: 'q@q.com' },
                 { key: 'propStringJson', value: 'null' },
+                { key: 'propUndefined', value: '' },
+                { key: 'propUndefined', value: 0 },
+                { key: 'propUndefined', value: false },
                 { key: 'propUndefined', value: null },
+                { key: 'propUndefined', value: true },
                 { key: 'propUndefined', value: undefined },
-                { key: 'propUndefined', value: true }
+                { key: 'propUndefined', value: {} }
             ].forEach(function (element) {
                 optionsCopy = local.utility2.jsonCopy(options.data);
                 optionsCopy[element.key] = element.value;
@@ -596,31 +595,39 @@
             [
                 { data: null },
                 { key: 'propArray', value: true },
+                { key: 'propArray', value: [null, null] },
                 { key: 'propArraySubdoc', value: [{ propRequired: null }] },
                 { key: 'propBoolean', value: 0 },
                 { key: 'propEnum', value: -1 },
+                { key: 'propInteger', value: 0.5 },
                 { key: 'propInteger', value: true },
                 { key: 'propInteger', value: Infinity },
                 { key: 'propInteger', value: NaN },
                 { key: 'propIntegerInt32', value: 0.5 },
                 { key: 'propIntegerInt64', value: 0.5 },
-                { key: 'propNumber', value: true },
+                { key: 'propNumber', value: -1 },
+                { key: 'propNumber', value: 0.25 },
+                { key: 'propNumber', value: 1 },
                 { key: 'propNumber', value: Infinity },
                 { key: 'propNumber', value: NaN },
+                { key: 'propNumber', value: true },
                 { key: 'propNumberFloat', value: true },
                 { key: 'propNumberDouble', value: true },
                 { key: 'propObject', value: true },
+                { key: 'propObject', value: {} },
+                { key: 'propObject', value: { aa: 1, bb: 2 } },
                 { key: 'propObjectSubdoc', value: 'non-object' },
                 { key: 'propRequired', value: null },
                 { key: 'propRequired', value: undefined },
                 { key: 'propString', value: true },
+                { key: 'propString', value: '01234567890123456789' },
                 { key: 'propStringByte', value: local.utility2.stringAsciiCharset },
                 { key: 'propStringDate', value: 'null' },
                 { key: 'propStringDatetime', value: 'null' },
                 { key: 'propStringEmail', value: 'null' },
                 { key: 'propStringJson', value: 'syntax error' }
             ].forEach(function (element) {
-                local.utility2.testTryCatch(function () {
+                local.utility2.tryCatchOnError(function () {
                     options.error = null;
                     optionsCopy = local.utility2.jsonCopy(options.data);
                     optionsCopy[element.key] = element.value;
@@ -649,7 +656,7 @@
                 [console, { error: local.utility2.nop }]
             ], function (onError) {
                 [null, {}].forEach(function (element) {
-                    local.utility2.testTryCatch(function () {
+                    local.utility2.tryCatchOnError(function () {
                         local.swgg.validateBySwagger(element);
                     }, function (error) {
                         options.data = error;
@@ -667,7 +674,8 @@
 
     // run browser js-env code - function
     case 'browser':
-        local.testCase_ui_default = function (options, onError) {
+        /* istanbul ignore next */
+        local.testCase2_ui_default = function (options, onError) {
         /*
          * this function will test the ui's default handling-behavior
          */
@@ -809,13 +817,12 @@
         /*
          * this function will test the test-page's default handling-behavior
          */
-            // jslint-hack
-            local.utility2.nop(options);
-            local.utility2.browserTest({
+            options = {
                 modeCoverageMerge: true,
                 url: local.utility2.serverLocalHost +
                     '/?modeTest=consoleLogResult#!/_test/paramDefault'
-            }, onError);
+            };
+            local.utility2.browserTest(options, onError);
         };
         break;
     }
@@ -824,8 +831,11 @@
 
     // run shared js-env code - post-init
     (function () {
+        // test null apiDictUpdate update handling-behavior
+        local.swgg.apiDictUpdate({});
         // init test api
-        local.swgg.apiUpdate({
+        local.swgg.apiDictUpdate({
+            _tagDict: { _test: { description: 'internal test-api' } },
             definitions: {
                 // init onErrorJsonapi schema
                 onErrorJsonapi: {
@@ -858,7 +868,7 @@
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
                         propArray: {
                             items: {},
-                            maxItems: 100,
+                            maxItems: 1,
                             minItems: 1,
                             type: 'array',
                             uniqueItems: true
@@ -884,15 +894,15 @@
                         propNumberDouble: { format: 'double', type: 'number' },
                         propNumberFloat: { format: 'float', type: 'number' },
                         propObject: {
-                            default: { foo: true },
-                            maxProperties: 100,
+                            default: { aa: true },
+                            maxProperties: 1,
                             minProperties: 1,
                             type: 'object'
                         },
                         propObjectSubdoc: { $ref: '#/definitions/TestNullModel' },
                         propRequired: { default: true },
                         propString: {
-                            maxLength: 100,
+                            maxLength: 10,
                             minLength: 1,
                             type: 'string'
                         },
@@ -1054,8 +1064,7 @@
                     summary: 'test form-data-param handling-behavior',
                     tags: ['_test']
                 } }
-            },
-            _tagDict: { _test: { description: 'internal test-api' } }
+            }
         });
         // test redundant http-body-parse-middleware handling-behavior
         local.middleware.middlewareList.push(local.swgg.middlewareBodyParse);
@@ -1100,13 +1109,13 @@
             name: 'TestCrudModel'
         }, {
             docList: [{
-                id: 'zz_test_crudDeleteOneByKeyUnique',
+                id: '00_test_crudDeleteOneByKeyUnique',
                 propRequired: true
             }, {
-                id: 'zz_test_crudExistsOneByKeyUnique',
+                id: '00_test_crudExistsOneByKeyUnique',
                 propRequired: true
             }, {
-                id: 'zz_test_crudGetOneByKeyUnique',
+                id: '00_test_crudGetOneByKeyUnique',
                 propRequired: true
             }],
             drop: true,
@@ -1127,26 +1136,38 @@
     // run node js-env code - post-init
     case 'node':
         // init dtList
-        local.swgg.dtList.unshift({
-            crudDict: {
-                crudCreateOne: 'crudCreateOrReplaceOneByKeyUnique.id',
-                'crudDeleteOneByKeyUnique.id': 'crudDeleteOneByKeyUnique.id',
-                crudGetManyByQuery: 'crudGetManyByQuery',
-                'crudUpdateOneByKeyUnique.id': 'crudCreateOrUpdateOneByKeyUnique.id'
+        local.swgg.apiDictUpdate({ 'x-dtList': [{
+            apiDict: {
+                crudCreateOne: '_test crudCreateOrReplaceOne',
+                'crudDeleteOneByKeyUnique.id': '_test crudDeleteOneByKeyUnique.id',
+                crudGetManyByQuery: '_test crudGetManyByQuery',
+                'crudUpdateOneByKeyUnique.id': '_test crudCreateOrUpdateOneByKeyUnique.id'
             },
             paginationCountTotal: 'paginationCountTotal',
             schemaName: 'TestCrudModel',
-            tagName: '_test',
             title: 'test api',
             urlSwaggerJson: 'api/v0/swagger.json'
-        });
+        }].concat(JSON.parse(local.swgg.templateDtListPetstore)) });
         // init assets
-        local.utility2.assetsDict['/'] = local.utility2.stringFormat(
+        local.utility2.assetsDict['/'] = local.utility2.templateRender(
             local.utility2.templateIndexHtml,
             {
                 envDict: local.utility2.envDict,
-                // add script assets.test.js
-                scriptExtra: '<script src="assets.test.js"></script>'
+                // add extra scripts
+                //!! scriptExtra: '<script src="assets.example.js"></script>' +
+                    //!! '<script src="assets.test.js"></script>'
+                scriptExtra: '<script src="assets.example.js"></script>'
+            },
+            ''
+        );
+        local.utility2.assetsDict['/assets.swgg.admin-ui.html'] = local.utility2.templateRender(
+            local.swgg.templateAssetsSwggAdminUiHtml,
+            {
+                envDict: local.utility2.envDict,
+                // add extra scripts
+                //!! scriptExtra: '<script src="assets.example.js"></script>' +
+                    //!! '<script src="assets.test.js"></script>'
+                scriptExtra: '<script src="assets.example.js"></script>'
             },
             ''
         );
@@ -1156,16 +1177,6 @@
                 local.swgg.__dirname + '/test.js',
                 'swagger-lite'
             );
-        local.utility2.assetsDict['/assets.swgg.admin-ui.html'] = local.utility2.stringFormat(
-            local.swgg.templateAssetsSwggAdminUiHtml,
-            {
-                envDict: local.utility2.envDict,
-                // add script assets.test.js
-                scriptExtra: '<script src="assets.example.js"></script>' +
-                    '<script src="assets.test.js"></script>'
-            },
-            ''
-        );
         // run validation test
         local.testCase_validateByParamDefList_default(null, local.utility2.onErrorDefault);
         local.testCase_validateBySchema_default(null, local.utility2.onErrorDefault);

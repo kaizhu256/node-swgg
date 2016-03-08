@@ -7,12 +7,12 @@ standalone swagger-ui server backed by nedb
 
 
 # todo
+- upgrade to utility2 @ 2016.1.6
+- npm publish 2016.1.5
+- add ability to reset db
+- replace swgg.api with swgg.apiDict
 - admin-ui - add property-option x-sortName
-- admin-ui - implement various input types
-- admin-ui - integrate jwt
-- admin-ui - merge all dt state-info into swgg.dtState
 - admin-ui - fix datatables crashing when rows are empty
-- admin-ui - remove uniqueKey = 'id' dependency
 - do not send readonly properties in swagger-client-request
 - implement api POST /pet/{petId}/uploadImage
 - implement api GET /user/login
@@ -24,15 +24,17 @@ standalone swagger-ui server backed by nedb
 
 
 
-# change since b8db3ab4
-- npm publish 2016.1.4
-- add function swgg.isNullOrUndefined
-- add boolean/integer/number/string schema-properties as params in crudGetManyByQuery
-- admin-ui - implement boolean/date-time/enum input types
-- admin-ui - implement crud CREATE
-- allow arbitrary name for body-param in local.swgg.middlewareCrud
-- add 'x-notRequired' options to pathObject params to override 'required' option
-- add 'x-validateUnusedDefinition' option in swgg.validateBySwagger to ignore unused definitions
+# change since 4bcc64ab
+- consolidate browser state-init into jsonp call stateInit
+- admin-ui - add swagger-form validation to form-inputs
+- admin-ui - implement date-time/dropdown/boolean form-inputs
+- admin-ui - integrate oauth-jwt user-login
+- admin-ui - merge all dt state-info into swgg.dt object
+- admin-ui - keyUnique crud operations can use arbitray keys, instead of only 'id' key
+- admin-ui - add x-title option for rendering labels for swagger params and property inputs
+- admin-ui - crud-keyUnique operations can depend on arbitrary unique-key (previously tied to 'id' key)
+- rename swgg.apiUpdate to swgg.apiDictUpdate
+- flatten swgg.cacheDict into swgg
 - none
 
 
@@ -158,6 +160,8 @@ instruction
             local.utility2.middlewareInit,
             // init cached-assets-middleware
             local.utility2.middlewareAssetsCached,
+            // init login-middleware
+            local.swgg.middlewareLogin,
             // init http-body-read-middleware
             local.utility2.middlewareBodyRead,
             // init http-body-parse-middleware
@@ -238,12 +242,15 @@ instruction
 
 
 
-    // run node js-env code
+    // run node js-env code - post-init
     case 'node':
         // export local
         module.exports = local;
-        local.path = require('path');
+        // init petstore-api
+        local.swgg.apiDictUpdate(JSON.parse(local.swgg.templateSwaggerJsonPetstore));
         // init assets
+        local.utility2.assetsDict['/assets.example.js'] =
+            local.fs.readFileSync(__dirname + '/example.js', 'utf8');
         // https://github.com/swagger-api/swagger-ui/blob/v2.1.2/dist/index.html
         /* jslint-ignore-begin */
         local.utility2.templateIndexHtml = '\
@@ -304,18 +311,17 @@ body > div {\n\
 <script src="assets.swgg.lib.jquery.js"></script>\n\
 <script src="assets.swgg.lib.nedb.js"></script>\n\
 <script src="assets.swgg.lib.swagger-tools.js"></script>\n\
+<script src="assets.utility2.lib.bcrypt.js"></script>\n\
+<script src="assets.utility2.lib.cryptojs.js"></script>\n\
 <script src="assets.utility2.js"></script>\n\
 <script src="assets.swgg.lib.swagger-ui.js"></script>\n\
 <script src="assets.swgg.js"></script>\n\
 <script src="jsonp.swgg.stateInit.js"></script>\n\
-<script src="assets.example.js"></script>\n\
 {{scriptExtra}}\n\
 <script>$(function () {\n\
-window.utility2.envDict = {\n\
-    npm_package_description: "{{envDict.npm_package_description}}",\n\
-    npm_package_name: "{{envDict.npm_package_name}}",\n\
-    npm_package_version: "{{envDict.npm_package_version}}"\n\
-};\n\
+window.utility2.envDict.npm_package_description = "{{envDict.npm_package_description}}";\n\
+window.utility2.envDict.npm_package_name = "{{envDict.npm_package_name}}";\n\
+window.utility2.envDict.npm_package_version = "{{envDict.npm_package_version}};"\n\
 var url = window.location.search.match(/url=([^&]+)/);\n\
 if (url && url.length > 1) {\n\
     url = decodeURIComponent(url[1]);\n\
@@ -363,23 +369,24 @@ window.swgg.api = window.swaggerUi.api;\n\
 </html>\n\
 ';
         /* jslint-ignore-end */
-        local.utility2.assetsDict['/'] = local.utility2.stringFormat(
+        local.utility2.assetsDict['/'] = local.utility2.templateRender(
             local.utility2.templateIndexHtml,
-            { envDict: local.utility2.envDict },
+            {
+                envDict: local.utility2.envDict,
+                // add extra scripts
+                scriptExtra: '<script src="assets.example.js"></script>'
+            },
             ''
         );
-        local.utility2.assetsDict['/assets.example.js'] =
-            local.fs.readFileSync(__dirname + '/example.js', 'utf8');
         break;
     }
 
 
 
-    // run shared js-env code
+    // run shared js-env code - post-init
     (function () {
         // init petstore-api
-        local.swgg.apiUpdate(local.swgg.swaggerJsonPetstore);
-        local.swgg.apiUpdate(local.utility2.objectSetOverride(local.swgg.swaggerJson, {
+        local.swgg.apiDictUpdate(local.utility2.objectSetOverride(local.swgg.swaggerJson, {
             definitions: {
                 Pet: {
                     _pathObjectDefaultList: ['crudGetManyByQuery'],
@@ -504,6 +511,25 @@ window.swgg.api = window.swaggerUi.api;\n\
         // init collectionList
         local.collectionList = [{
             docList: [{
+                id: 'jane.doe',
+                password: local.utility2.bcryptHashCreate('hello'),
+                username: 'jane.doe'
+            }, {
+                id: 'john.doe',
+                password: local.utility2.bcryptHashCreate('bye'),
+                username: 'john.doe'
+            }],
+            drop: true,
+            ensureIndexList: [{
+                fieldName: 'id',
+                unique: true
+            }, {
+                fieldName: 'username',
+                unique: true
+            }],
+            name: '_User'
+        }, {
+            docList: [{
                 id: 1,
                 name: 'birdie',
                 photoUrls: [],
@@ -586,13 +612,13 @@ window.swgg.api = window.swaggerUi.api;\n\
         for (local.ii = 100; local.ii < 200; local.ii += 1) {
             local.options.docList.push({
                 id: local.ii,
-                name: local.utility2.listShuffle(['birdie', 'doggie', 'fishie'])[0] +
+                name: local.utility2.listGetElementRandom(['birdie', 'doggie', 'fishie']) +
                     '-' + local.ii,
                 photoUrls: [],
-                status: local.utility2.listShuffle(['available', 'pending', 'sold'])[0],
+                status: local.utility2.listGetElementRandom(['available', 'pending', 'sold']),
                 tags: [
-                    { name: local.utility2.listShuffle(['female', 'male'])[0] },
-                    { name: Math.random().toString(16).slice(2) }
+                    { name: local.utility2.listGetElementRandom(['female', 'male']) },
+                    { name: Math.random().toString(36).slice(2) }
                 ]
             });
         }
@@ -628,7 +654,7 @@ window.swgg.api = window.swaggerUi.api;\n\
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "nedb-lite": "2016.1.2",
-        "utility2": "2016.1.5"
+        "utility2": "kaizhu256/node-utility2#alpha"
     },
     "description": "standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -678,7 +704,7 @@ export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.1.4"
+    "version": "2016.1.5"
 }
 ```
 
@@ -697,73 +723,90 @@ utility2 test node test.js",
 
 # this shell script will run the build for this package
 
-shBuild() {(set -e
-# this function will run the main build
-    # init env
-    . node_modules/.bin/utility2 && shInit
-
+shBuildCiDefault() {(set -e
+# this function will run the default build-ci
     (set -e
+        # run pre-test build
+        if (type shBuildCiTestPre > /dev/null 2>&1)
+        then
+            shBuildCiTestPre
+        fi
+        # run npm-test on published package
+        (export MODE_BUILD=npmTestPublished &&
+            shRunScreenCapture npm run test-published --mode-coverage)
+        # run npm-test
+        (export MODE_BUILD=npmTest &&
+            shRunScreenCapture npm test --mode-coverage)
+        # run post-test build
+        if (type shBuildCiTestPost > /dev/null 2>&1)
+        then
+            shBuildCiTestPost
+        fi
+        # create api-doc
+        npm run build-doc
+    )
+    # save exit-code
+    EXIT_CODE=$?
+    # create package-listing
+    (export MODE_BUILD=gitLsTree &&
+        shRunScreenCapture shGitLsTree)
+    # create recent changelog of last 50 commits
+    (export MODE_BUILD=gitLog &&
+        shRunScreenCapture git log -50 --pretty="%ai\u000a%B")
+    # if running legacy-node, then do not continue
+    [ "$(node --version)" \< "v5.0" ] && exit || true
+    # upload build-artifacts to github, and if number of commits > $COMMIT_LIMIT,
+    # then squash older commits
+    (export MODE_BUILD=githubUpload &&
+        shBuildGithubUpload)
+    # exit exit-code
+    exit "$EXIT_CODE"
+)}
+
+shBuildCiTestPre() {(set -e
+# this function will run the pre-test build
+    exit
     #!! # test example js script
     #!! (export MODE_BUILD=testExampleJs &&
         #!! export npm_config_timeout_exit=10000 &&
         #!! shRunScreenCapture shReadmeTestJs example.js)
+)}
 
-    # run npm-test on published package
-    (export MODE_BUILD=npmTestPublished &&
-        shRunScreenCapture npm run test-published --mode-coverage)
-
-    # run npm-test
-    (export MODE_BUILD=npmTest &&
-        shRunScreenCapture npm test --mode-coverage)
-
-    # create api-doc
-    npm run build-doc
-
-    # if running legacy-node, then do not continue
+shBuildCiTestPost() {(set -e
+# this function will run the post-test build
+    # if running legacy-node, then exit
     [ "$(node --version)" \< "v5.0" ] && exit || true
-
+    # if branch is not alpha, beta, or master, then exit
     if [ "$CI_BRANCH" = alpha ] ||
         [ "$CI_BRANCH" = beta ] ||
         [ "$CI_BRANCH" = master ]
     then
-        TEST_URL="https://$(printf "$GITHUB_REPO" | \
-            sed 's/\//.github.io\//')/build..$CI_BRANCH..travis-ci.org/app/index.html"
-        # deploy app to gh-pages
-        (export npm_config_file_test_report_merge="$npm_config_dir_build/test-report.json" &&
-            shGithubDeploy)
-        # test deployed app to gh-pages
-        (export MODE_BUILD=githubTest &&
-            export modeBrowserTest=test &&
-            export npm_config_file_test_report_merge="$npm_config_dir_build/test-report.json" &&
-            export url="$TEST_URL?modeTest=consoleLogResult&timeExit={{timeExit}}" &&
-            shBrowserTest)
+        exit
     fi
-    )
-
-    # save exit-code
-    EXIT_CODE=$?
-
-    # create package-listing
-    (export MODE_BUILD=gitLsTree &&
-        shRunScreenCapture shGitLsTree)
-
-    # create recent changelog of last 50 commits
-    (export MODE_BUILD=gitLog &&
-        shRunScreenCapture git log -50 --pretty="%ai\u000a%B")
-
-    # if running legacy-node, then do not continue
-    [ "$(node --version)" \< "v5.0" ] && exit || true
-
-    # cleanup remote build dir
-    # export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
-
-    # upload build-artifacts to github, and if number of commits > 16, then squash older commits
-    (export COMMIT_LIMIT=16 &&
-        export MODE_BUILD=githubUpload &&
-        shBuildGithubUpload)
-
-    # exit exit-code
-    exit "$EXIT_CODE"
+    TEST_URL="https://$(printf "$GITHUB_REPO" | \
+        sed 's/\//.github.io\//')/build..$CI_BRANCH..travis-ci.org/app/index.html"
+    # deploy app to gh-pages
+    (export npm_config_file_test_report_merge="$npm_config_dir_build/test-report.json" &&
+        shGithubDeploy)
+    # test deployed app to gh-pages
+    (export MODE_BUILD=githubTest &&
+        export modeBrowserTest=test &&
+        export npm_config_file_test_report_merge="$npm_config_dir_build/test-report.json" &&
+        export url="$TEST_URL?modeTest=consoleLogResult&timeExit={{timeExit}}" &&
+        shBrowserTest)
 )}
+
+shBuild() {
+# this function will run the main build
+    set -e
+    # init env
+    . node_modules/.bin/utility2 && shInit
+    # cleanup github-gh-pages dir
+    # export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
+    # init github-gh-pages commit-limit
+    export COMMIT_LIMIT=16
+    # run default build
+    shBuildCiDefault
+}
 shBuild
 ```

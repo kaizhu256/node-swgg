@@ -2355,7 +2355,7 @@
                             self.swaggerVersion = responseObj.swagger;
 
                             new Resolver().resolve(responseObj, self.url, function (response) {
-                                local.swgg.apiUpdate(response);
+                                local.swgg.apiDictUpdate(response);
                                 return self.buildFromSpec(response);
                             }, self);
 
