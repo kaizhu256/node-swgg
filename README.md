@@ -8,6 +8,7 @@ standalone swagger-ui server backed by nedb
 
 # todo
 - npm publish 2016.1.6
+- add regex pattern validation @ http://json-schema.org/latest/json-schema-validation.html#anchor33
 - add ability to reset db
 - admin-ui - add property-option x-sortName
 - admin-ui - fix datatables crashing when rows are empty
@@ -23,6 +24,7 @@ standalone swagger-ui server backed by nedb
 
 
 # change since becafb3f
+- admin-ui add x-queryRange ui
 - none
 
 

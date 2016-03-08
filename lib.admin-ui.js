@@ -248,14 +248,11 @@
          */
             var html,
                 htmlInput,
+                htmlInputDatetime,
                 htmlInputText,
                 htmlInputTextarea,
-                readOnly,
-                placeholderRequired;
+                readOnly;
             options.uuid = local.utility2.uuidTimeCreate();
-            placeholderRequired = options.required
-                ? 'placeholder="required"'
-                : '';
             readOnly = options.readOnly
                 ? 'disabled'
                 : '';
@@ -269,20 +266,48 @@
                 ((options['x-title'] || options.title || options.name) + '<br>(' +
                 (options.format || options.type || 'object') + ')') + '</label>';
             html += '<div class="col-sm-9">';
-            htmlInputText = '<input class="form-control" ' + placeholderRequired + ' ' +
+            htmlInputDatetime = '<div class="date dtFormInputDatetime input-group">' +
+                '<input class="form-control" placeholder="" ' + readOnly + ' type="text">' +
+                '<span class="input-group-addon">' +
+                    '<span class="glyphicon glyphicon-calendar"></span>' +
+                '</span>' +
+                '</div>';
+            htmlInputText = '<input class="form-control" placeholder="" ' +
                 readOnly + ' type="text">';
-            htmlInputTextarea = '<textarea class="form-control" ' + placeholderRequired + ' ' +
+            htmlInputTextarea = '<textarea class="form-control" placeholder="" ' +
                 readOnly + ' rows="4"></textarea>';
-            if (options['x-range']) {
+            if (options['x-queryRange']) {
+                // default
                 htmlInput = '<div class="row">' +
-                    '<div class="form-group col-sm-6">' +
-                        '<input type="text" class="form-control" placeholder="from">' +
-                    '</div>' +
-                    '<div class="form-group col-sm-6">' +
-                        '<input type="text" class="form-control" placeholder="to">' +
-                    '</div>' +
+                    '<div class="form-group col-sm-6">' + htmlInputText + '</div>' +
+                    '<div class="form-group col-sm-6">' + htmlInputText + '</div>' +
                     '</div>';
-
+                switch (options.type) {
+                // type - boolean
+                case 'boolean':
+                    htmlInput = ['true', 'false'].map(function (key) {
+                        return '<label class="checkbox-inline">' +
+                            '<input name="' + options.uuid + '" ' + readOnly +
+                            ' type="checkbox">' + key + '</label>';
+                    }).join('');
+                    break;
+                // type - string
+                case 'string':
+                    switch (options.format) {
+                    // format - date-time
+                    case 'date':
+                    case 'date-time':
+                        htmlInput = '<div class="row">' +
+                            '<div class="form-group col-sm-6">' + htmlInputDatetime + '</div>' +
+                            '<div class="form-group col-sm-6">' + htmlInputDatetime + '</div>' +
+                            '</div>';
+                        break;
+                    }
+                    break;
+                }
+                htmlInput = htmlInput
+                    .replace('placeholder=""', 'placeholder="from"')
+                    .replace('placeholder=""', 'placeholder="to"');
             // dropdown - enum
             } else if (options.enum) {
                 htmlInput = '<div class="btn-group">' +
@@ -301,6 +326,8 @@
                     '</ul>' +
                     '</div>';
             } else {
+                // default
+                htmlInput = htmlInputText;
                 switch (options.type) {
                 // type - array
                 case 'array':
@@ -320,26 +347,18 @@
                     // format - date-time
                     case 'date':
                     case 'date-time':
-                        htmlInput = '<div class="date dtFormInputDatetime input-group">' +
-                                '<input class="form-control" ' + placeholderRequired + ' ' +
-                                readOnly + ' type="text">' +
-                                '<span class="input-group-addon">' +
-                                    '<span class="glyphicon glyphicon-calendar"></span>' +
-                                '</span>' +
-                            '</div>';
+                        htmlInput = htmlInputDatetime;
                         break;
                     case 'byte':
                     case 'json':
                         htmlInput = htmlInputTextarea;
                         break;
-                    default:
-                        htmlInput = htmlInputText;
                     }
                     break;
-                // type - default
-                default:
-                    htmlInput = htmlInputText;
                 }
+            }
+            if (options.required) {
+                htmlInput = htmlInput.replace('placeholder=""', 'placeholder="required"');
             }
             html += htmlInput;
             html += '</div>';
@@ -415,6 +434,9 @@
             if (typeof options === 'string') {
                 options = JSON.parse(decodeURIComponent(options));
             }
+            if (options['x-queryRange']) {
+                return;
+            }
             data = local.utility2.isNullOrUndefined(options.dataWrite)
                 ? options.default || null
                 : options.dataWrite;
@@ -470,7 +492,7 @@
                         : 2].checked = true;
                     return;
                 default:
-                    // bug workaround - wait for bootstrap-datetimepicker init
+                    // bug workaround - wait for bootstrap-datetimepicker to init
                     setTimeout(function () {
                         elementInput[0].value = options.dataRead;
                     });
