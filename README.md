@@ -7,6 +7,7 @@ standalone swagger-ui server backed by nedb
 
 
 # todo
+- npm publish 2016.1.6
 - add ability to reset db
 - admin-ui - add property-option x-sortName
 - admin-ui - fix datatables crashing when rows are empty
@@ -21,10 +22,7 @@ standalone swagger-ui server backed by nedb
 
 
 
-# change since ecef9960
-- npm publish 2016.1.5
-- admin-ui - fix input validation bugs
-- replace swgg.api with swgg.apiDict
+# change since becafb3f
 - none
 
 
@@ -696,7 +694,7 @@ export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.1.5"
+    "version": "2016.1.6"
 }
 ```
 

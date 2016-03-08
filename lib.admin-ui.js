@@ -91,6 +91,27 @@
 
     // run shared js-env code - function
     (function () {
+        local.swgg.dtAlertErrorCreate = function (error) {
+        /*
+         * this function will create an error-alert
+         */
+            if (!(error && error.message)) {
+                return;
+            }
+            local.utility2.taskUpsert({ key: 'dtAlertErrorCreate' }, function (onError) {
+                // create alert
+                document.getElementById('dtAlertContainer1').innerHTML +=
+                    '<div class="alert alert-danger fade margin-0">' +
+                    error.message +
+                    '<button type="button" class="close" data-dismiss="alert">' +
+                    '<span>&times;</span>' +
+                    '</button>' +
+                    '</div>';
+                local.jQuery('.alert').addClass('in');
+                setTimeout(onError, 1000);
+            });
+        };
+
         local.swgg.dtDatatableInit = function (event) {
         /*
          * this function will init the datatable-ui
@@ -510,7 +531,22 @@
                         '"><a data-toggle="tab" href="#dtViewTable1">' +
                         options.title + '</a></li>\n';
                 }).join('');
-            // init uncaught-error alerts
+            // init dtAlertErrorCreate-hook in local.utility2.ajax
+            local.swgg.ajax = local.swgg.ajax || local.utility2.ajax;
+            local.utility2.ajax = function (options, onError) {
+                var onError2;
+                onError2 = function (error, xhr) {
+                    local.swgg.dtAlertErrorCreate(error);
+                    onError(error, xhr);
+                };
+                local.swgg.ajax(options, onError2);
+            };
+            // init dtAlertErrorCreate-hook in local.utility2.assert
+            local.swgg.assert = local.swgg.assert || local.utility2.assert;
+            local.utility2.assert = function (passed, message) {
+                local.swgg.dtAlertErrorCreate(!passed && message);
+                local.swgg.assert(passed, message);
+            };
             ['assert', 'onErrorDefault'].forEach(function (key) {
                 // save old function
                 local.utility2['_' + key] = local.utility2['_' + key] ||
@@ -522,23 +558,7 @@
                         error = !error && (data || 'error');
                         break;
                     }
-                    // alert error.message
-                    if (error && error.message) {
-                        local.utility2.taskUpsert({
-                            key: 'dtAlertErrorCreate'
-                        }, function (onError) {
-                            // create alert
-                            document.getElementById('dtAlertContainer1').innerHTML +=
-                                '<div class="alert alert-danger fade margin-0">' +
-                                error.message +
-                                '<button type="button" class="close" data-dismiss="alert">' +
-                                '<span>&times;</span>' +
-                                '</button>' +
-                                '</div>';
-                            local.jQuery('.alert').addClass('in');
-                            setTimeout(onError);
-                        });
-                    }
+                    local.swgg.dtAlertErrorCreate(error);
                     local.utility2['_' + key].apply(null, arguments);
                 };
             });
@@ -636,7 +656,7 @@
                             : -1) + '}'
                         : null
                 } }, function (error, data) {
-                    // validate no error occured
+                    // validate no error occurred
                     local.utility2.assert(!error, error);
                     local.swgg.dt.pageData = data.responseJSON;
                     callback({

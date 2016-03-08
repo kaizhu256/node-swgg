@@ -54,5 +54,5 @@
 
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.1.5"
+    "version": "2016.1.6"
 }
