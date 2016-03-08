@@ -7,10 +7,7 @@ standalone swagger-ui server backed by nedb
 
 
 # todo
-- upgrade to utility2 @ 2016.1.6
-- npm publish 2016.1.5
 - add ability to reset db
-- replace swgg.api with swgg.apiDict
 - admin-ui - add property-option x-sortName
 - admin-ui - fix datatables crashing when rows are empty
 - do not send readonly properties in swagger-client-request
@@ -24,17 +21,10 @@ standalone swagger-ui server backed by nedb
 
 
 
-# change since 4bcc64ab
-- consolidate browser state-init into jsonp call stateInit
-- admin-ui - add swagger-form validation to form-inputs
-- admin-ui - implement date-time/dropdown/boolean form-inputs
-- admin-ui - integrate oauth-jwt user-login
-- admin-ui - merge all dt state-info into swgg.dt object
-- admin-ui - keyUnique crud operations can use arbitray keys, instead of only 'id' key
-- admin-ui - add x-title option for rendering labels for swagger params and property inputs
-- admin-ui - crud-keyUnique operations can depend on arbitrary unique-key (previously tied to 'id' key)
-- rename swgg.apiUpdate to swgg.apiDictUpdate
-- flatten swgg.cacheDict into swgg
+# change since ecef9960
+- npm publish 2016.1.5
+- admin-ui - fix input validation bugs
+- replace swgg.api with swgg.apiDict
 - none
 
 
@@ -414,6 +404,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                     _pathPrefix: 'user',
                     properties: {
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
+                        email: { format: 'email' },
                         id: { default: 1, minimum: 1 },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
                     }
@@ -654,7 +645,7 @@ window.swgg.api = window.swaggerUi.api;\n\
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "nedb-lite": "2016.1.2",
-        "utility2": "kaizhu256/node-utility2#alpha"
+        "utility2": "2016.1.6"
     },
     "description": "standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -687,6 +678,7 @@ utility2 shRun shDocApiCreate \"module.exports={ \
 exampleFileList:['README.md','test.js','index.js'], \
 moduleDict:{ \
 'swagger-lite':{aliasList:['swgg'],exports:require('./index.js')}, \
+'swagger-lite.Nedb':{aliasList:['collection'],exports:require('./index.js').Nedb}, \
 'swagger-lite.Nedb.prototype':{aliasList:['collection'], \
 exports:require('./index.js').Nedb.prototype}, \
 'swagger-lite.api':{aliasList:['api'],exports:require('./index.js').api}, \
@@ -723,53 +715,13 @@ utility2 test node test.js",
 
 # this shell script will run the build for this package
 
-shBuildCiDefault() {(set -e
-# this function will run the default build-ci
-    (set -e
-        # run pre-test build
-        if (type shBuildCiTestPre > /dev/null 2>&1)
-        then
-            shBuildCiTestPre
-        fi
-        # run npm-test on published package
-        (export MODE_BUILD=npmTestPublished &&
-            shRunScreenCapture npm run test-published --mode-coverage)
-        # run npm-test
-        (export MODE_BUILD=npmTest &&
-            shRunScreenCapture npm test --mode-coverage)
-        # run post-test build
-        if (type shBuildCiTestPost > /dev/null 2>&1)
-        then
-            shBuildCiTestPost
-        fi
-        # create api-doc
-        npm run build-doc
-    )
-    # save exit-code
-    EXIT_CODE=$?
-    # create package-listing
-    (export MODE_BUILD=gitLsTree &&
-        shRunScreenCapture shGitLsTree)
-    # create recent changelog of last 50 commits
-    (export MODE_BUILD=gitLog &&
-        shRunScreenCapture git log -50 --pretty="%ai\u000a%B")
-    # if running legacy-node, then do not continue
-    [ "$(node --version)" \< "v5.0" ] && exit || true
-    # upload build-artifacts to github, and if number of commits > $COMMIT_LIMIT,
-    # then squash older commits
-    (export MODE_BUILD=githubUpload &&
-        shBuildGithubUpload)
-    # exit exit-code
-    exit "$EXIT_CODE"
-)}
-
 shBuildCiTestPre() {(set -e
 # this function will run the pre-test build
     exit
-    #!! # test example js script
-    #!! (export MODE_BUILD=testExampleJs &&
-        #!! export npm_config_timeout_exit=10000 &&
-        #!! shRunScreenCapture shReadmeTestJs example.js)
+    # test example js script
+    (export MODE_BUILD=testExampleJs &&
+        export npm_config_timeout_exit=10000 &&
+        shRunScreenCapture shReadmeTestJs example.js)
 )}
 
 shBuildCiTestPost() {(set -e
@@ -777,9 +729,9 @@ shBuildCiTestPost() {(set -e
     # if running legacy-node, then exit
     [ "$(node --version)" \< "v5.0" ] && exit || true
     # if branch is not alpha, beta, or master, then exit
-    if [ "$CI_BRANCH" = alpha ] ||
+    if !([ "$CI_BRANCH" = alpha ] ||
         [ "$CI_BRANCH" = beta ] ||
-        [ "$CI_BRANCH" = master ]
+        [ "$CI_BRANCH" = master ])
     then
         exit
     fi

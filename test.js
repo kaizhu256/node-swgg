@@ -217,8 +217,8 @@
                         // validate no error occurred
                         local.utility2.assert(!error, error);
                         // validate data was deleted
-                        local.utility2.assert(data.data.length === 1 &&
-                            data.data[0] === null, data);
+                        local.utility2.assert(data.responseJSON.data.length === 1 &&
+                            data.responseJSON.data[0] === null, data);
                         onNext();
                         break;
                     default:
@@ -257,8 +257,8 @@
                         // validate no error occurred
                         local.utility2.assert(!error, error);
                         // validate data
-                        local.utility2.assert(data.data.length === 1 &&
-                            data.data[0] === true, data);
+                        local.utility2.assert(data.responseJSON.data.length === 1 &&
+                            data.responseJSON.data[0] === true, data);
                         onNext();
                         break;
                     default:
@@ -297,8 +297,8 @@
                         // validate no error occurred
                         local.utility2.assert(!error, error);
                         // validate data
-                        local.utility2.assert(data.data.length === 1 &&
-                            data.data[0][options.keyAlias] ===
+                        local.utility2.assert(data.responseJSON.data.length === 1 &&
+                            data.responseJSON.data[0][options.keyAlias] ===
                             options.keyValue, data);
                         onNext();
                         break;
@@ -382,7 +382,7 @@
                         // validate no error occurred
                         local.utility2.assert(!error, error);
                         // validate data
-                        local.utility2.assert(data.data[0] === 'hello', data);
+                        local.utility2.assert(data.responseJSON.data[0] === 'hello', data);
                         onParallel();
                     }, onError);
                 });
@@ -404,18 +404,19 @@
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     // validate data
-                    local.utility2.assert(data.data[0] === null, data);
+                    local.utility2.assert(data.responseJSON.data[0] === null, data);
                     onParallel();
                 }, onError);
             });
             options = { swggParamDict: { error: '[]' } };
             onParallel.counter += 1;
-            local.swgg.apiDict['_test onErrorJsonapi'](options, function (error) {
+            local.swgg.apiDict['_test onErrorJsonapi'](options, function (error, data) {
                 local.utility2.tryCatchOnError(function () {
                     // validate error occurred
                     local.utility2.assert(error, error);
                     // validate error
-                    local.utility2.assert(error.errors[0].message === 'null', error);
+                    local.utility2.assert(data.responseJSON.errors[0].message ===
+                        'null', error);
                     onParallel();
                 }, onError);
             });
@@ -441,12 +442,13 @@
             ].forEach(function (data) {
                 options = { swggParamDict: { error: JSON.stringify(data) } };
                 onParallel.counter += 1;
-                local.swgg.apiDict['_test onErrorJsonapi'](options, function (error) {
+                local.swgg.apiDict['_test onErrorJsonapi'](options, function (error, data) {
                     local.utility2.tryCatchOnError(function () {
                         // validate error occurred
                         local.utility2.assert(error, error);
                         // validate error
-                        local.utility2.assert(error.errors[0].message === 'hello', error);
+                        local.utility2.assert(data.responseJSON.errors[0].message ===
+                            'hello', error);
                         onParallel();
                     }, onError);
                 });
@@ -490,7 +492,7 @@
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     // validate object
-                    data = local.utility2.jsonStringifyOrdered(data.data[0]);
+                    data = local.utility2.jsonStringifyOrdered(data.responseJSON.data[0]);
                     local.utility2.assert(data === JSON.stringify({
                         paramArrayCsv: ['aa', 'bb'],
                         paramArrayMulti: ['aa'],
@@ -523,7 +525,7 @@
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     // validate object
-                    data = local.utility2.jsonStringifyOrdered(data.data[0]);
+                    data = local.utility2.jsonStringifyOrdered(data.responseJSON.data[0]);
                     local.utility2.assert(data === JSON.stringify({
                         paramFormData1: 'aa',
                         paramFormData2: 'bb'
@@ -617,6 +619,7 @@
                 { key: 'propObject', value: {} },
                 { key: 'propObject', value: { aa: 1, bb: 2 } },
                 { key: 'propObjectSubdoc', value: 'non-object' },
+                { key: 'propObjectSubdoc', value: { propRequired: null } },
                 { key: 'propRequired', value: null },
                 { key: 'propRequired', value: undefined },
                 { key: 'propString', value: true },
@@ -783,6 +786,12 @@
                 file: '/assets.utility2.js',
                 url: '/assets.utility2.js'
             }, {
+                file: '/assets.utility2.lib.bcrypt.js',
+                url: '/assets.utility2.lib.bcrypt.js'
+            }, {
+                file: '/assets.utility2.lib.cryptojs.js',
+                url: '/assets.utility2.lib.cryptojs.js'
+            }, {
                 file: '/jsonp.swgg.stateInit.js',
                 url: '/jsonp.swgg.stateInit.js'
             }, {
@@ -899,7 +908,7 @@
                             minProperties: 1,
                             type: 'object'
                         },
-                        propObjectSubdoc: { $ref: '#/definitions/TestNullModel' },
+                        propObjectSubdoc: { $ref: '#/definitions/TestCrudModel' },
                         propRequired: { default: true },
                         propString: {
                             maxLength: 10,
@@ -916,9 +925,7 @@
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
                     },
                     required: ['propRequired']
-                },
-                // init TestNullModel schema
-                TestNullModel: {}
+                }
             },
             paths: {
                 // test undefined api handling-behavior
@@ -1154,9 +1161,8 @@
             {
                 envDict: local.utility2.envDict,
                 // add extra scripts
-                //!! scriptExtra: '<script src="assets.example.js"></script>' +
-                    //!! '<script src="assets.test.js"></script>'
-                scriptExtra: '<script src="assets.example.js"></script>'
+                scriptExtra: '<script src="assets.example.js"></script>' +
+                    '<script src="assets.test.js"></script>'
             },
             ''
         );
@@ -1165,9 +1171,8 @@
             {
                 envDict: local.utility2.envDict,
                 // add extra scripts
-                //!! scriptExtra: '<script src="assets.example.js"></script>' +
-                    //!! '<script src="assets.test.js"></script>'
-                scriptExtra: '<script src="assets.example.js"></script>'
+                scriptExtra: '<script src="assets.example.js"></script>' +
+                    '<script src="assets.test.js"></script>'
             },
             ''
         );

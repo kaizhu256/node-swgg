@@ -23,7 +23,6 @@
     padding: 0.1em 0.5em !important;
 }
 #dtAlertContainer1 {
-    bottom: 0px;
     position: fixed;
     width: 100%;
     z-index: 99;
@@ -144,7 +143,7 @@
 <div class="active fade tab-pane" id="dtViewTable1">
 <!-- init dom table-query-form -->
 <div class="container">
-    <form class="dtFormContainer form-horizontal" id="dtFormTableQuery1"></form>
+    <div class="dtFormContainer form-horizontal" id="dtFormTableQuery1"></div>
     <button class="btn btn-primary" id="dtButtonQuerySubmit1" onclick="local.swgg.dtOnClickQuerySubmit()">submit query</button>
 </div>
 <!-- init dom datatable -->
@@ -155,7 +154,7 @@
 
 <!-- init dom row-edit-form -->
 <div class="container fade tab-pane" id="dtViewRecordEdit1">
-<form class="dtFormContainer form-horizontal" id="dtFormRecordEdit1"></form>
+<div class="dtFormContainer form-horizontal" id="dtFormRecordEdit1"></div>
 <button class="btn btn-primary" id="dtButtonRecordSave1" onclick="local.swgg.dtOnClickRecordSave()">save</button>
 </div>
 

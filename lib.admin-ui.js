@@ -91,27 +91,6 @@
 
     // run shared js-env code - function
     (function () {
-        local.swgg.dtAlertErrorCreate = function (error) {
-        /*
-         * this function will create an error-alert
-         */
-            if (!(error && error.message)) {
-                return;
-            }
-            local.utility2.taskUpsert({ key: 'dtAlertErrorCreate' }, function (onError) {
-                // create alert
-                document.getElementById('dtAlertContainer1').innerHTML +=
-                    '<div class="alert alert-danger fade margin-0">' +
-                    error.message +
-                    '<button type="button" class="close" data-dismiss="alert">' +
-                    '<span>&times;</span>' +
-                    '</button>' +
-                    '</div>';
-                local.jQuery('.alert').addClass('in');
-                setTimeout(onError, 1000);
-            });
-        };
-
         local.swgg.dtDatatableInit = function (event) {
         /*
          * this function will init the datatable-ui
@@ -367,11 +346,11 @@
             options.dataRead = data;
             local.utility2.tryCatchOnError(function () {
                 options.dataRead = options.type === 'string'
-                    ? data || options.default || null
+                    ? data || null
                     : local.utility2.isNullOrUndefined(data) ||
                         data === '' ||
                         data === 'undefined'
-                    ? options.default
+                    ? null
                     : JSON.parse(data);
             }, local.utility2.nop);
             // validate data
@@ -381,11 +360,15 @@
                 local.swgg.validateByPropertyDef({
                     data: options.dataRead,
                     key: local.swgg.dt.schemaName,
-                    propertyDef: options
+                    propertyDef: options,
+                    required: options.required,
+                    'x-notRequired': options['x-notRequired']
                 });
             }, function (error) {
-                local.jQuery(elementContainer).find('.form-control')
-                    .addClass('animated dtFormInputInvalid shake');
+                setTimeout(function () {
+                    local.jQuery(elementContainer).find('.form-control')
+                        .addClass('animated dtFormInputInvalid shake');
+                });
                 // validate no error occurred
                 local.utility2.assert(!error, error);
             });
@@ -539,7 +522,23 @@
                         error = !error && (data || 'error');
                         break;
                     }
-                    local.swgg.dtAlertErrorCreate(error);
+                    // alert error.message
+                    if (error && error.message) {
+                        local.utility2.taskUpsert({
+                            key: 'dtAlertErrorCreate'
+                        }, function (onError) {
+                            // create alert
+                            document.getElementById('dtAlertContainer1').innerHTML +=
+                                '<div class="alert alert-danger fade margin-0">' +
+                                error.message +
+                                '<button type="button" class="close" data-dismiss="alert">' +
+                                '<span>&times;</span>' +
+                                '</button>' +
+                                '</div>';
+                            local.jQuery('.alert').addClass('in');
+                            setTimeout(onError);
+                        });
+                    }
                     local.utility2['_' + key].apply(null, arguments);
                 };
             });
@@ -639,7 +638,7 @@
                 } }, function (error, data) {
                     // validate no error occured
                     local.utility2.assert(!error, error);
-                    local.swgg.dt.pageData = data;
+                    local.swgg.dt.pageData = data.responseJSON;
                     callback({
                         recordsFiltered: local.swgg.dt.pageData.meta[
                             local.swgg.dt.paginationCountTotal

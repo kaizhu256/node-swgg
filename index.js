@@ -446,7 +446,6 @@
          * this function will send a swagger-api ajax-request with the pathObject self
          */
             var data;
-            onError = local.swgg.onErrorJsonapi(onError);
             // validate data
             local.utility2.tryCatchOnError(function () {
                 local.swgg.validateByParamDefList({
@@ -524,14 +523,7 @@
             options.url = options.schemes + '://' + options.host + options.basePath +
                 options.inPath + '?' + options.inQuery.slice(1);
             // send ajax-request
-            return local.utility2.ajax(options, function (error, data) {
-                data = data.responseJson;
-                // if data is also an error-object, then use it instead of error
-                onError(error && data && data.errors &&
-                    data.meta && data.meta.isJsonapiResponse
-                    ? data
-                    : error, data, data && data.meta);
-            });
+            return local.utility2.ajax(options, onError);
         };
 
         local.swgg.apiCreate = function (pathObject) {
@@ -1699,8 +1691,8 @@
                     break;
                 }
             }, function (error) {
-                error.message = error.message || 'invalid property ' + options.key + ':' +
-                    (propertyDef.format || propertyDef.type) + ' - ' + JSON.stringify(data) +
+                error.message = error.message || 'invalid property ' + options.key + ' (' +
+                    (propertyDef.format || propertyDef.type) + ') - ' + JSON.stringify(data) +
                     ' - ' + JSON.stringify(propertyDef);
                 throw error;
             });
