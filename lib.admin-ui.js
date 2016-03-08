@@ -220,14 +220,13 @@
                 local.swgg.dt.apiDict.crudGetManyByQuery.parameters
             )
                 .filter(function (element) {
-                    return element.name[0] !== '_';
+                    return element.name[0] !== '_' ||
+                        element.name.indexOf('_queryRange.') === 0;
                 })
                 .sort(function (aa, bb) {
                     return aa.name < bb.name
                         ? -1
-                        : aa.name > bb.name
-                        ? 1
-                        : 0;
+                        : 1;
                 })
                 .map(local.swgg.dtFormInputCreate)
                 .join('');
@@ -265,56 +264,27 @@
                 encodeURIComponent(JSON.stringify(options)) +
                 // init id
                 '" id="' + options.uuid + '">';
-            html += '<label class="col-sm-2 control-label">' +
+            html += '<label class="col-sm-3 control-label">' +
                 // init title
                 ((options['x-title'] || options.title || options.name) + '<br>(' +
                 (options.format || options.type || 'object') + ')') + '</label>';
-            html += '<div class="col-sm-10">';
+            html += '<div class="col-sm-9">';
             htmlInputText = '<input class="form-control" ' + placeholderRequired + ' ' +
                 readOnly + ' type="text">';
             htmlInputTextarea = '<textarea class="form-control" ' + placeholderRequired + ' ' +
                 readOnly + ' rows="4"></textarea>';
-            switch (options.type) {
-            // type - array
-            case 'array':
-                htmlInput = htmlInputTextarea;
-                break;
-            // type - boolean
-            case 'boolean':
-                htmlInput = ['true', 'false', 'null'].map(function (key) {
-                    return '<label class="radio-inline">' +
-                        '<input name="' + options.uuid + '" ' + readOnly + ' type="radio">' +
-                        key + '</label>';
-                }).join('');
-                break;
-            // type - string
-            case 'string':
-                switch (options.format) {
-                // format - date-time
-                case 'date':
-                case 'date-time':
-                    htmlInput = '<div class="date dtFormInputDatetime input-group">' +
-                            '<input class="form-control" ' + placeholderRequired + ' ' +
-                            readOnly + ' type="text">' +
-                            '<span class="input-group-addon">' +
-                                '<span class="glyphicon glyphicon-calendar"></span>' +
-                            '</span>' +
-                        '</div>';
-                    break;
-                case 'byte':
-                case 'json':
-                    htmlInput = htmlInputTextarea;
-                    break;
-                default:
-                    htmlInput = htmlInputText;
-                }
-                break;
-            // type - default
-            default:
-                htmlInput = htmlInputText;
-            }
+            if (options['x-range']) {
+                htmlInput = '<div class="row">' +
+                    '<div class="form-group col-sm-6">' +
+                        '<input type="text" class="form-control" placeholder="from">' +
+                    '</div>' +
+                    '<div class="form-group col-sm-6">' +
+                        '<input type="text" class="form-control" placeholder="to">' +
+                    '</div>' +
+                    '</div>';
+
             // dropdown - enum
-            if (options.enum) {
+            } else if (options.enum) {
                 htmlInput = '<div class="btn-group">' +
                     '<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" ' +
                     readOnly + '>' +
@@ -330,6 +300,46 @@
                     '<li><a data-json="null" href="#">null</a></li>' +
                     '</ul>' +
                     '</div>';
+            } else {
+                switch (options.type) {
+                // type - array
+                case 'array':
+                    htmlInput = htmlInputTextarea;
+                    break;
+                // type - boolean
+                case 'boolean':
+                    htmlInput = ['true', 'false', 'null'].map(function (key) {
+                        return '<label class="radio-inline">' +
+                            '<input name="' + options.uuid + '" ' + readOnly +
+                            ' type="radio">' + key + '</label>';
+                    }).join('');
+                    break;
+                // type - string
+                case 'string':
+                    switch (options.format) {
+                    // format - date-time
+                    case 'date':
+                    case 'date-time':
+                        htmlInput = '<div class="date dtFormInputDatetime input-group">' +
+                                '<input class="form-control" ' + placeholderRequired + ' ' +
+                                readOnly + ' type="text">' +
+                                '<span class="input-group-addon">' +
+                                    '<span class="glyphicon glyphicon-calendar"></span>' +
+                                '</span>' +
+                            '</div>';
+                        break;
+                    case 'byte':
+                    case 'json':
+                        htmlInput = htmlInputTextarea;
+                        break;
+                    default:
+                        htmlInput = htmlInputText;
+                    }
+                    break;
+                // type - default
+                default:
+                    htmlInput = htmlInputText;
+                }
             }
             html += htmlInput;
             html += '</div>';
@@ -522,7 +532,7 @@
             // init dtList
             local.swgg.dtList = local.utility2.jsonCopy(local.swgg.swaggerJson['x-dtList'] ||
                 JSON.parse(local.swgg.templateDtListPetstore));
-            // init dom tab-view-list of tables
+            // init dom element #dtListContainer1
             document.getElementById('dtListContainer1').innerHTML =
                 local.swgg.dtList.map(function (options, ii) {
                     return '<li class="' + (ii

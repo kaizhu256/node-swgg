@@ -613,6 +613,7 @@
                                     format: tmp.format,
                                     in: 'query',
                                     name: key,
+                                    'x-range': true,
                                     'x-title': tmp.title,
                                     type: tmp.type
                                 };

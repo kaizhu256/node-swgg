@@ -16,8 +16,8 @@
 <!-- init style -->
 <style>
 /* init css admin-ui */
-* {
-    border-radius: 0 !important;
+body {
+    margin: 1rem;
 }
 .dataTables_wrapper .paginate_button {
     padding: 0.1em 0.5em !important;
@@ -27,6 +27,9 @@
     width: 100%;
     z-index: 99;
 }
+.dtHeader {
+    margin-bottom: 1rem !important;
+}
 #dtTableContainer1 {
     border-top: 1px solid #000;
     margin-top: 20px;
@@ -35,28 +38,27 @@
 .dtFormInputInvalid {
     outline: #f00 solid 1px;
 }
+.dtFormInputContainer > .col-sm-9 {
+    margin-top: 1rem;
+}
+.form-group {
+    margin-right: 1rem !important;
+}
 .nav-pills > li {
-    padding-left: 5px;
+    padding-left: 1rem;
 }
 .nav-pills > li:first-child {
     padding-left: 0;
 }
 .nav-pills > li > a {
     background-color: #ddf;
-    border-radius: 0;
 }
 .nav-pills.dtViewContainer > li.active > a:focus,
 .nav-pills.dtViewContainer > li.active > a:hover,
 .nav-pills.dtViewContainer > li.active > a {
     background-color: #99f;
 }
-.tab-content {
-    margin: 10px;
-}
 /* init css custom */
-.border-radius-0 {
-    border-radius: 0;
-}
 .margin-0 {
     margin: 0;
 }
@@ -66,11 +68,32 @@
 </style>
 </head>
 <body>
-<!-- init dom ajaxProgress -->
+
+<!--!! <form class="form-horizontal"> -->
+  <!--!! <div class="form-group"> -->
+    <!--!! <label for="inputEmail3" class="col-sm-2 control-label">Email</label> -->
+    <!--!! <div class="col-sm-10"> -->
+
+<!--!! <div class="row"> -->
+  <!--!! <div class="form-group col-sm-6"> -->
+    <!--!! <input type="email" class="form-control" id="exampleInputEmail1" placeholder="from"> -->
+  <!--!! </div> -->
+  <!--!! <div class="form-group col-sm-6"> -->
+    <!--!! <input type="password" class="form-control" id="exampleInputPassword1" placeholder="to"> -->
+  <!--!! </div> -->
+<!--!! </div> -->
+
+
+    <!--!! </div> -->
+  <!--!! </div> -->
+<!--!! </form> -->
+
+
+<!-- init dom element .ajaxProgressDiv -->
 <div class="ajaxProgressDiv" style="display: block;">
     <div class="ajaxProgressBarDiv ajaxProgressBarDivLoading">loading</div>
 </div>
-<!-- init dom alertContainer -->
+<!-- init dom element #alertContainer -->
 <div id="dtAlertContainer1"></div>
 <!-- modal login form -->
 <div class="modal fade" data-backdrop="static" id="userFormLogin" tabindex="-1">
@@ -95,8 +118,8 @@
 
 
 
-<!-- init dom navbar -->
-<nav class="border-radius-0 margin-0 navbar navbar-inverse">
+<!-- init dom element navbar -->
+<nav class="dtHeader navbar navbar-inverse">
 <div class="container">
 <div class="navbar-header">
 <button type="button" class="collapsed navbar-toggle" data-toggle="collapse" data-target="#navbar">
@@ -116,9 +139,9 @@
 
 
 
-<!-- init dom tabbed-datatable-list -->
-<div>
-<ul class="nav nav-justified nav-pills" id="dtListContainer1" style="padding-bottom: 4px; padding-top: 5px;">
+<!-- init dom element tabbed-datatable-list -->
+<div class="dtHeader">
+<ul class="nav nav-justified nav-pills" id="dtListContainer1">
     <li class="active"><a href="#">loading api ...</a></li>
 </ul>
 </div>
@@ -126,7 +149,7 @@
 
 
 <!-- Nav tabs -->
-<div>
+<div class="dtHeader">
 <ul class="dtViewContainer nav nav-justified nav-pills">
 <li><a data-toggle="tab" href="#dtViewTable1" id="dtNavTable1">table of records</a></li>
 <li><a data-toggle="tab" href="#dtViewRecordEdit1" id="dtNavRecordEdit1" onclick="local.swgg.dtOnClickRecordEdit()">create or update record</a></li>
@@ -141,21 +164,31 @@
 
 
 <div class="active fade tab-pane" id="dtViewTable1">
-<!-- init dom table-query-form -->
+<!-- init dom element #dtFormTableQuery1 -->
 <div class="container">
-    <div class="dtFormContainer form-horizontal" id="dtFormTableQuery1"></div>
-    <button class="btn btn-primary" id="dtButtonQuerySubmit1" onclick="local.swgg.dtOnClickQuerySubmit()">submit query</button>
+<div class="dtFormContainer form-horizontal" id="dtFormTableQuery1"></div>
+<div class="form-horizontal">
+    <div class="form-group">
+    <div class="col-sm-3 control-label"><button class="btn btn-primary" id="dtButtonQuerySubmit1" onclick="local.swgg.dtOnClickQuerySubmit()">submit query</button></div>
+    </div>
 </div>
-<!-- init dom datatable -->
+</div>
+<!-- init dom element #dtTableContainer1 -->
 <div id="dtTableContainer1"></div>
 </div>
 
 
 
-<!-- init dom row-edit-form -->
+<!-- init dom element #dtViewRecordEdit1 -->
 <div class="container fade tab-pane" id="dtViewRecordEdit1">
 <div class="dtFormContainer form-horizontal" id="dtFormRecordEdit1"></div>
-<button class="btn btn-primary" id="dtButtonRecordSave1" onclick="local.swgg.dtOnClickRecordSave()">save</button>
+<div class="form-horizontal">
+    <div class="form-group">
+    <div class="col-sm-3 control-label"><button class="btn btn-primary" id="dtButtonRecordSave1" onclick="local.swgg.dtOnClickRecordSave()">save</button></div>
+    </div>
+</div>
+
+
 </div>
 
 
