@@ -275,7 +275,7 @@
             htmlInputText = '<input class="form-control" placeholder="" ' +
                 readOnly + ' type="text">';
             htmlInputTextarea = '<textarea class="form-control" placeholder="" ' +
-                readOnly + ' rows="4"></textarea>';
+                readOnly + '></textarea>';
             if (options['x-queryRange']) {
                 // default
                 htmlInput = '<div class="row">' +

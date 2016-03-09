@@ -1595,6 +1595,9 @@
                     if (propertyDef.minLength) {
                         local.utility2.assert(data.length >= propertyDef.minLength);
                     }
+                    if (propertyDef.pattern) {
+                        local.utility2.assert(new RegExp(propertyDef.pattern).test(data));
+                    }
                 // http://json-schema.org/latest/json-schema-validation.html#anchor36
                 // 5.3.  Validation keywords for arrays
                 } else if (Array.isArray(data)) {

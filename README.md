@@ -8,7 +8,9 @@ standalone swagger-ui server backed by nedb
 
 # todo
 - npm publish 2016.1.6
-- add regex pattern validation @ http://json-schema.org/latest/json-schema-validation.html#anchor33
+- add message-param to assertions in swgg.validateByPropertyDef
+- show login for 403 and 401
+- toggle login / logout button
 - add ability to reset db
 - admin-ui - add property-option x-sortName
 - admin-ui - fix datatables crashing when rows are empty
@@ -24,6 +26,7 @@ standalone swagger-ui server backed by nedb
 
 
 # change since becafb3f
+- in swgg.validateByPropertyDef, add regex pattern validation according to http://json-schema.org/latest/json-schema-validation.html#anchor33
 - admin-ui add x-queryRange ui
 - none
 
@@ -645,7 +648,7 @@ window.swgg.api = window.swaggerUi.api;\n\
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "nedb-lite": "2016.1.2",
-        "utility2": "2016.1.6"
+        "utility2": "kaizhu256/node-utility2#alpha"
     },
     "description": "standalone swagger-ui server backed by nedb",
     "devDependencies": {

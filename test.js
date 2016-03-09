@@ -623,6 +623,8 @@
                 { key: 'propRequired', value: null },
                 { key: 'propRequired', value: undefined },
                 { key: 'propString', value: true },
+                { key: 'propString', value: '' },
+                { key: 'propString', value: '!' },
                 { key: 'propString', value: '01234567890123456789' },
                 { key: 'propStringByte', value: local.utility2.stringAsciiCharset },
                 { key: 'propStringDate', value: 'null' },
@@ -913,6 +915,7 @@
                         propString: {
                             maxLength: 10,
                             minLength: 1,
+                            pattern: '^\\w*$',
                             type: 'string'
                         },
                         propStringByte: { format: 'byte', type: 'string' },
