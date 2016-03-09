@@ -516,8 +516,8 @@
                 local.swgg.userLoginByPassword({
                     username: document.getElementById("userFormLoginInputUsername").value,
                     password: document.getElementById("userFormLoginInputPassword").value
-                }, function () {
-                    if (local.swgg.jwt) {
+                }, function (error) {
+                    if (!error) {
                         local.jQuery('#userFormLogin').modal('hide');
                     }
                 });
@@ -548,7 +548,7 @@
                 this.closest('div').querySelector('span').textContent = this.textContent;
             });
             //!! // show login form
-            //!! if (!local.swgg.jwt) {
+            //!! if (!local.swgg.userJwtEncoded) {
                 //!! local.jQuery('#userFormLogin').modal('show');
             //!! }
             // init dtList

@@ -515,9 +515,9 @@
                 options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
             }
             // init headers - Authorization
-            if (local.swgg.jwt) {
+            if (local.swgg.userJwtEncoded) {
                 options.headers.Authorization = options.headers.Authorization ||
-                    'Bearer ' + local.swgg.jwt;
+                    'Bearer ' + local.swgg.userJwtEncoded;
             }
             // init url
             options.url = options.schemes + '://' + options.host + options.basePath +
@@ -1160,8 +1160,8 @@
                     request.swggLogin = request.swggLogin ||
                         local.utility2.jsonCopy(request.urlParsed.query) ||
                         {};
-                    if (!request.swggLogin.jwt && request.headers.authorization) {
-                        request.swggUser = local.utility2.jwtHs256Decode(
+                    if (!request.swggLogin.jwtEncoded && request.headers.authorization) {
+                        request.userJwt = local.utility2.jwtHs256Decode(
                             request.headers.authorization.replace('Bearer ', ''),
                             local.utility2.envDict.JWT_SECRET || ''
                         );
@@ -1186,15 +1186,15 @@
                                 request.swggLogin.password,
                                 data && data.password
                             )) {
-                            request.swggUser = {
+                            request.userJwt = {
                                 iat: Math.floor(Date.now() / 1000),
                                 jti: local.utility2.uuidTimeCreate(),
                                 roleList: data.roleList,
                                 sub: data.username
                             };
                             local.swgg.serverRespondJsonapi(request, response, null, {
-                                jwt: local.utility2.jwtHs256Encode(
-                                    request.swggUser,
+                                jwtEncoded: local.utility2.jwtHs256Encode(
+                                    request.userJwt,
                                     local.utility2.envDict.JWT_SECRET || ''
                                 )
                             });
@@ -1494,7 +1494,7 @@
                 username: options.username
             } }, function (error, data) {
                 if (!error && data) {
-                    local.swgg.jwt = data.data[0].jwt;
+                    local.swgg.userJwtEncoded = data.data[0].jwtEncoded;
                 }
                 onError(error, data);
             });
