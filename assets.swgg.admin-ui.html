@@ -4,16 +4,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 <title>{{envDict.npm_package_name}} @ {{envDict.npm_package_version}}</title>
-<!-- init css -->
 <link href="assets.swgg.animate.css" rel="stylesheet">
 <link href="assets.swgg.bootstrap.css" rel="stylesheet">
 <link href="assets.swgg.bootstrap-datetimepicker.css" rel="stylesheet">
+<link href="assets.swgg.bootstrap-fileinput.css" rel="stylesheet">
 <link href="assets.swgg.datatables.css" rel="stylesheet">
 <link href="assets.utility2.css" rel="stylesheet">
 <link href="assets.swgg.css" rel="stylesheet">
-<!-- init style -->
 <style>
 /* init css admin-ui */
 body {
@@ -71,38 +69,15 @@ textarea.form-control {
 </style>
 </head>
 <body>
-
-
-<div class="dtFormInputContainer2 form-group">
-<label class="col-sm-3 control-label">propEnum<br>(integer)</label>
-
-<div class="col-sm-9"><div class="btn-group">
-<!--!! <button class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span>null</span> <span class="caret"></span></button> -->
-<input class="btn btn-default" type="file" id="fileselect" name="fileselect[]">
-</div></div>
-
-<!--!! <div class="col-sm-9"> -->
-<!--!! <div class="row"> -->
-  <!--!! <div class="form-group col-sm-6"> -->
-      <!--!! <input class="form-control" placeholder="from" type="text"> -->
-  <!--!! </div> -->
-  <!--!! <div class="form-group col-sm-6"> -->
-      <!--!! <input class="form-control" placeholder="to" type="text"> -->
-  <!--!! </div> -->
-<!--!! </div> -->
-<!--!! </div> -->
-
-</div>
-
-
-
-<!-- init dom element .ajaxProgressDiv -->
+<!-- .ajaxProgressDiv begin -->
 <div class="ajaxProgressDiv" style="display: block;">
     <div class="ajaxProgressBarDiv ajaxProgressBarDivLoading">loading</div>
 </div>
-<!-- init dom element #alertContainer -->
+<!-- .ajaxProgressDiv end -->
+<!-- #alertContainer begin -->
 <div id="dtAlertContainer1"></div>
-<!-- modal login form -->
+<!-- #alertContainer end -->
+<!-- #userFormLogin begin -->
 <div class="modal fade" data-backdrop="static" id="userFormLogin" tabindex="-1">
 <div class="modal-dialog">
 <div class="modal-content">
@@ -122,10 +97,11 @@ textarea.form-control {
 </div>
 </div>
 </div>
+<!-- #userFormLogin end -->
 
 
 
-<!-- init dom element navbar -->
+<!-- .navbar begin -->
 <nav class="dtHeader navbar navbar-inverse">
 <div class="container">
 <div class="navbar-header">
@@ -143,35 +119,39 @@ textarea.form-control {
 </div>
 </div>
 </nav>
+<!-- .navbar end -->
 
 
 
-<!-- init dom element tabbed-datatable-list -->
+<!-- .dtHeader #dtListContainer begin -->
 <div class="dtHeader">
 <ul class="nav nav-justified nav-pills" id="dtListContainer1">
     <li class="active"><a href="#">loading api ...</a></li>
 </ul>
 </div>
+<!-- .dtHeader #dtListContainer end -->
 
 
 
-<!-- Nav tabs -->
+<!-- .dtHeader #dtViewContainer begin -->
 <div class="dtHeader">
 <ul class="dtViewContainer nav nav-justified nav-pills">
 <li><a data-toggle="tab" href="#dtViewTable1" id="dtNavTable1">table of records</a></li>
 <li><a data-toggle="tab" href="#dtViewRecordEdit1" id="dtNavRecordEdit1" onclick="local.swgg.dtOnClickRecordEdit()">create or update record</a></li>
 </ul>
 </div>
+<!-- .dtHeader #dtViewContainer end -->
 
 
 
-<!-- Tab panes -->
+<!-- .tab-content begin -->
 <div class="tab-content">
 
 
 
+<!-- #dtViewTable1 begin -->
 <div class="active fade tab-pane" id="dtViewTable1">
-<!-- init dom element #dtFormTableQuery1 -->
+<!-- #dtFormTableQuery1 begin -->
 <div class="container">
 <div class="dtFormContainer form-horizontal" id="dtFormTableQuery1"></div>
 <div class="form-horizontal">
@@ -180,13 +160,16 @@ textarea.form-control {
     </div>
 </div>
 </div>
-<!-- init dom element #dtTableContainer1 -->
+<!-- #dtFormTableQuery1 end -->
+<!-- #dtTableContainer1 begin -->
 <div id="dtTableContainer1"></div>
+<!-- #dtTableContainer1 end -->
 </div>
+<!-- #dtViewTable1 end -->
 
 
 
-<!-- init dom element #dtViewRecordEdit1 -->
+<!-- #dtViewRecordEdit1 begin -->
 <div class="container fade tab-pane" id="dtViewRecordEdit1">
 <div class="dtFormContainer form-horizontal" id="dtFormRecordEdit1"></div>
 <div class="form-horizontal">
@@ -194,13 +177,13 @@ textarea.form-control {
     <div class="col-sm-3 control-label"><button class="btn btn-primary" id="dtButtonRecordSave1" onclick="local.swgg.dtOnClickRecordSave()">save</button></div>
     </div>
 </div>
+</div>
+<!-- #dtViewRecordEdit1 end -->
+
 
 
 </div>
-
-
-
-</div>
+<!-- .tab-content end -->
 
 
 
@@ -209,6 +192,7 @@ textarea.form-control {
 <script src="assets.swgg.lib.bootstrap.js"></script>
 <script src="assets.swgg.lib.moment.js"></script>
 <script src="assets.swgg.lib.bootstrap-datetimepicker.js"></script>
+<script src="assets.swgg.lib.bootstrap-fileinput.js"></script>
 <script src="assets.swgg.lib.datatables.js"></script>
 <!-- init lib swagger-lite -->
 <script src="assets.swgg.lib.nedb.js"></script>
