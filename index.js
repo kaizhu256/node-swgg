@@ -601,7 +601,7 @@
                                 case 'integer':
                                 case 'number':
                                 case 'string':
-                                    return !tmp.readOnly;
+                                    return true;
                                 }
                             })
                             .sort()
@@ -694,13 +694,13 @@
                     }
                 });
             };
-            // remove first-level underscored keys from swaggerJson
+            // remove top-level underscored keys from swaggerJson
             tmp(local.swgg.swaggerJson);
-            // remove first-level underscored keys from swaggerJson.definitions
+            // remove top-level underscored keys from swaggerJson.definitions
             Object.keys(local.swgg.swaggerJson.definitions).forEach(function (key) {
                 tmp(local.swgg.swaggerJson.definitions[key]);
             });
-            // remove underscored keys from swaggerJson.paths
+            // remove top-underscored keys from swaggerJson.paths.<path>.<method>
             Object.keys(local.swgg.swaggerJson.paths).forEach(function (path) {
                 Object.keys(local.swgg.swaggerJson.paths[path]).forEach(function (method) {
                     tmp(local.swgg.swaggerJson.paths[path][method]);
@@ -1492,11 +1492,11 @@
                 modeLogin: 'loginByPassword',
                 password: options.password,
                 username: options.username
-            } }, function (error, data) {
-                if (!error && data) {
-                    local.swgg.userJwtEncoded = data.data[0].jwtEncoded;
+            } }, function (error, xhr) {
+                if (!error && xhr) {
+                    local.swgg.userJwtEncoded = xhr.responseJSON.data[0].jwtEncoded;
                 }
-                onError(error, data);
+                onError(error, xhr);
             });
         };
 
@@ -2044,6 +2044,25 @@
         local.swgg.apiDictUpdate({
             _tagDict: { '_user': { description: 'swagger-lite User model' } },
             definitions: {
+                _Image: {
+                    _pathObjectDefaultList: [
+                        'crudCreateOrReplaceOne',
+                        'crudCreateOrUpdateOneByKeyUnique.id',
+                        'crudDeleteOneByKeyUnique.id',
+                        'crudGetOneByKeyUnique.id',
+                        'crudGetManyByQuery'
+                    ],
+                    _pathPrefix: '_image',
+                    properties: {
+                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
+                        description: { type: 'string' },
+                        id: { type: 'string' },
+                        filename: { type: 'string' },
+                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' },
+                        url: { format: 'url-image-upload', type: 'string' }
+                    },
+                    required: ['description', 'url']
+                },
                 _User: {
                     _pathObjectDefaultList: [
                         'crudCreateOrReplaceOne',
@@ -2067,7 +2086,15 @@
         // init collection-list
         local.utility2.onReady.counter += 1;
         local.swgg.collectionListInit([{
-            drop: true,
+            ensureIndexList: [{
+                fieldName: 'id',
+                unique: true
+            }, {
+                fieldName: 'url',
+                unique: true
+            }],
+            name: '_Image'
+        }, {
             ensureIndexList: [{
                 fieldName: 'id',
                 unique: true

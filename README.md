@@ -505,6 +505,33 @@ window.swgg.api = window.swaggerUi.api;\n\
         // init collectionList
         local.collectionList = [{
             docList: [{
+                id: 'admin',
+                password: local.utility2.bcryptHashCreate('admin'),
+                username: 'admin'
+            }, {
+                id: 'jane.doe',
+                password: local.utility2.bcryptHashCreate('hello'),
+                username: 'jane.doe'
+            }, {
+                id: 'john.doe',
+                password: local.utility2.bcryptHashCreate('bye'),
+                username: 'john.doe'
+            }],
+            drop: true,
+            ensureIndexList: [{
+                fieldName: 'id',
+                unique: true
+            }, {
+                fieldName: 'username',
+                unique: true
+            }],
+            name: '_User'
+        }, {
+            docList: [{
+                id: 'admin',
+                password: local.utility2.bcryptHashCreate('admin'),
+                username: 'admin'
+            }, {
                 id: 'jane.doe',
                 password: local.utility2.bcryptHashCreate('hello'),
                 username: 'jane.doe'

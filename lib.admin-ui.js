@@ -42,6 +42,17 @@
         // init templateDtListPetstore
         local.swgg.templateDtListPetstore = JSON.stringify([{
             apiDict: {
+                crudCreateOne: '_image crudCreateOrReplaceOne',
+                'crudDeleteOneByKeyUnique.id': '_image crudDeleteOneByKeyUnique.id',
+                crudGetManyByQuery: '_image crudGetManyByQuery',
+                'crudUpdateOneByKeyUnique.id': '_image crudCreateOrUpdateOneByKeyUnique.id'
+            },
+            paginationCountTotal: 'paginationCountTotal',
+            schemaName: '_Image',
+            title: 'swagger-lite image api',
+            urlSwaggerJson: 'api/v0/swagger.json'
+        }, {
+            apiDict: {
                 crudCreateOne: '_user crudCreateOrReplaceOne',
                 'crudDeleteOneByKeyUnique.id': '_user crudDeleteOneByKeyUnique.id',
                 crudGetManyByQuery: '_user crudGetManyByQuery',
@@ -221,8 +232,7 @@
                 local.swgg.dt.apiDict.crudGetManyByQuery.parameters
             )
                 .filter(function (element) {
-                    return element.name[0] !== '_' ||
-                        element.name.indexOf('_queryRange.') === 0;
+                    return element.name[0] !== '_';
                 })
                 .sort(function (aa, bb) {
                     return aa.name < bb.name
@@ -666,6 +676,13 @@
                 // redraw table
                 local.swgg.dt.datatableInstance.draw();
             });
+        };
+
+        local.swgg.dtOnClickQuerySubmit = function () {
+        /*
+         * this function will handle the click-event to save the record
+         */
+            return;
         };
 
         local.swgg.dtOptionsDefaultCreate = function () {
