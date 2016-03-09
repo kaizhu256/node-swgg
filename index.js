@@ -1916,6 +1916,23 @@
                     url: 'https://raw.githubusercontent.com' +
                         '/Eonasdan/bootstrap-datetimepicker/4.17.37/build/js' +
                         '/bootstrap-datetimepicker.min.js'
+                // init lib bootstrap-fileinput
+                }, {
+                    file: 'external/assets.swgg.bootstrap-fileinput.img.loading-sm.gif',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/kartik-v/bootstrap-fileinput/v4.3.1/img/loading-sm.gif'
+                }, {
+                    file: 'external/assets.swgg.bootstrap-fileinput.img.loading.gif',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/kartik-v/bootstrap-fileinput/v4.3.1/img/loading.gif'
+                }, {
+                    file: 'external/assets.swgg.bootstrap-fileinput.css',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/kartik-v/bootstrap-fileinput/v4.3.1/css/fileinput.css'
+                }, {
+                    file: 'external/assets.swgg.lib.bootstrap-fileinput.js',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/kartik-v/bootstrap-fileinput/v4.3.1/js/fileinput.min.js'
                 // init lib datatables
                 }, {
                     file: 'external/assets.swgg.datatables.css',

@@ -117,8 +117,6 @@
          * this function will init the datatable-ui
          */
             var options, self, tmp;
-            // show table-view
-            local.jQuery('#dtNavTable1').tab('show');
             // save self
             local.swgg.dt = self = local.swgg.dtList[event.currentTarget.dataset.ii];
             // init crud-api
@@ -185,6 +183,9 @@
                         schemaPropertyName: key
                     };
                 }));
+            // show table-view
+            local.jQuery('.tab-content').hide();
+            local.jQuery('#dtNavTable1').tab('show');
             // init datatable
             document.getElementById('dtTableContainer1').innerHTML = self.html ||
                 '<table class="display table table-responsive" ' +
@@ -240,6 +241,7 @@
             ).forEach(function (elementContainer) {
                 local.swgg.dtFormInputDataWrite(elementContainer);
             });
+            local.jQuery('.tab-content').fadeIn();
         };
 
         local.swgg.dtFormInputCreate = function (options) {
@@ -662,8 +664,7 @@
                 // show table-view
                 local.jQuery('#dtNavTable1').tab('show');
                 // redraw table
-                // bug workaround - wait for table init
-                setTimeout(local.swgg.dt.datatableInstance.draw, 500);
+                local.swgg.dt.datatableInstance.draw();
             });
         };
 

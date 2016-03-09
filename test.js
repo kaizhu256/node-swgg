@@ -925,6 +925,7 @@
                             { default: 'a@a.com', format: 'email', type: 'string' },
                         propStringJson: { default: 'null', format: 'json', type: 'string' },
                         propUndefined: {},
+                        propStringUrlImage: { format: 'url-image', type: 'string' },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
                     },
                     required: ['propRequired']

@@ -68,28 +68,67 @@ textarea.form-control {
 .padding-0 {
     padding: 0;
 }
+
+
+#filedrag
+{
+	font-weight: bold;
+	text-align: center;
+	padding: 1em 0;
+	margin: 1em 0;
+	color: #555;
+	border: 2px dashed #555;
+	border-radius: 7px;
+	cursor: default;
+}
+
+#filedrag.hover
+{
+	color: #f00;
+	border-color: #f00;
+	border-style: solid;
+	box-shadow: inset 0 3px 4px #888;
+}
+
+
+
 </style>
 </head>
 <body>
 
-<!--!! <form class="form-horizontal"> -->
-  <!--!! <div class="form-group"> -->
-    <!--!! <label for="inputEmail3" class="col-sm-2 control-label">Email</label> -->
-    <!--!! <div class="col-sm-10"> -->
 
+<div class="dtFormInputContainer2 form-group">
+<label class="col-sm-3 control-label">propEnum<br>(integer)</label>
+
+<div class="col-sm-9"><div class="btn-group">
+<!--!! <button class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span>null</span> <span class="caret"></span></button> -->
+<input class="btn btn-default" type="file" id="fileselect" name="fileselect[]">
+</div></div>
+
+<!--!! <div class="col-sm-9"> -->
 <!--!! <div class="row"> -->
   <!--!! <div class="form-group col-sm-6"> -->
-    <!--!! <input type="email" class="form-control" id="exampleInputEmail1" placeholder="from"> -->
+      <!--!! <input class="form-control" placeholder="from" type="text"> -->
   <!--!! </div> -->
   <!--!! <div class="form-group col-sm-6"> -->
-    <!--!! <input type="password" class="form-control" id="exampleInputPassword1" placeholder="to"> -->
+      <!--!! <input class="form-control" placeholder="to" type="text"> -->
   <!--!! </div> -->
 <!--!! </div> -->
+<!--!! </div> -->
+
+</div>
+
+<br><br>
 
 
-    <!--!! </div> -->
-  <!--!! </div> -->
-<!--!! </form> -->
+<div class="upload">
+    <!--!! <input type="file" id="fileselect" name="fileselect[]" multiple="multiple" /> -->
+    <div id="filedrag">or drop files here</div>
+    <div id="messages">message</div>
+</div>
+
+
+
 
 
 <!-- init dom element .ajaxProgressDiv -->
@@ -221,6 +260,38 @@ var local;
 local = window.local = window.swgg.local;
 // init datatable-list
 local.swgg.dtListInit();
+
+
+
+// initialize
+function Init() {
+    // file select
+    document.getElementById("fileselect").addEventListener("change", FileDragHover, false);
+    // file drop
+    local.jQuery('.upload').on('dragover dragleave drop', '#filedrag', FileDragHover);
+}
+Init();
+// file drag hover
+function FileDragHover(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.target.className = (event.type == "dragover" ? "hover" : "");
+    if (event.type === 'drop' || event.type === 'change') {
+        // fetch FileList object
+        var files = event.target.files || event.originalEvent.dataTransfer.files;
+
+        // process all File objects
+        for (var i = 0, file; file = files[i]; i++) {
+            document.getElementById('messages').innerHTML = (
+                "<p>File information: <strong>" + file.name +
+                "</strong> type: <strong>" + file.type +
+                "</strong> size: <strong>" + file.size +
+                "</strong> bytes</p>"
+            ) + document.getElementById('messages').innerHTML;
+        }
+    }
+}
+
 });</script>
 </body>
 </html>
