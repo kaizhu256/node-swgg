@@ -880,7 +880,9 @@
                         'crudExistsOneByKeyUnique.id',
                         'crudGetManyByQuery',
                         'crudGetOneByQuery',
-                        'crudGetOneByKeyUnique.id'
+                        'crudGetOneByKeyUnique.id',
+                        'crudUploadManyByForm',
+                        'crudUploadOneByForm'
                     ],
                     _pathPrefix: '_test',
                     properties: {
@@ -1119,7 +1121,7 @@
             }
         });
         // init serverLocal
-        local.utility2.serverLocalUrlTest = function (url) {
+        local.utility2.serverLocalUrlTest = null && function (url) {
             url = local.utility2.urlParse(url).pathname;
             return local.modeJs === 'browser' &&
                 url.indexOf('/api/v0/swagger.json') < 0 &&

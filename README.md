@@ -25,6 +25,7 @@ standalone swagger-ui server backed by nedb
 
 # change since becafb3f
 - admin-ui - fix datatables crashing when rows are empty
+- add multipart/form-data handling in swgg.middlewareBodyParse
 - allow jsonapi's response.data to be an empty array
 - add '_Builtin' prefix to swagger-lite's builtin swagger-definition names
 - do not send readonly properties in swgg.apiDict clients

@@ -258,28 +258,6 @@
                 'check if one {{_schemaName}} object exists by {{_keyUnique}}',
             tags: ['{{_pathPrefix}}']
         };
-        local.swgg.templatePathObjectDefaultDict.crudFormUploadOne = {
-            _method: 'put',
-            _path: '/{{_pathPrefix}}/crudFormUploadOne',
-            _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudFormUploadOne',
-            parameters: [{
-                description: '{{_schemaName}} to form-upload',
-                in: 'formData',
-                name: 'file',
-                required: true,
-                type: 'file'
-            }],
-            responses: {
-                200: {
-                    description:
-                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
-                }
-            },
-            summary: '{{operationId}} - form upload one {{_schemaName}} object',
-            tags: ['{{_pathPrefix}}']
-        };
         local.swgg.templatePathObjectDefaultDict.crudGetManyByQuery = {
             _method: 'get',
             _path: '/{{_pathPrefix}}/crudGetManyByQuery',
@@ -422,6 +400,56 @@
                 }
             },
             summary: '{{operationId}} - login by password',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudUploadManyByForm = {
+            _method: 'post',
+            _path: '/{{_pathPrefix}}/crudUploadManyByForm',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudUploadManyByForm',
+            parameters: [{
+                description: '{{_schemaName}} object to form-upload',
+                in: 'formData',
+                name: 'file1',
+                required: true,
+                type: 'file'
+            }, {
+                description: '{{_schemaName}} object to form-upload',
+                in: 'formData',
+                name: 'file2',
+                required: true,
+                type: 'file'
+            }],
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
+                }
+            },
+            summary: '{{operationId}} - form-upload many {{_schemaName}} objects',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudUploadOneByForm = {
+            _method: 'post',
+            _path: '/{{_pathPrefix}}/crudUploadOneByForm',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudUploadOneByForm',
+            parameters: [{
+                description: '{{_schemaName}} object to form-upload',
+                in: 'formData',
+                name: 'file',
+                required: true,
+                type: 'file'
+            }],
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
+                }
+            },
+            summary: '{{operationId}} - form-upload one {{_schemaName}} object',
             tags: ['{{_pathPrefix}}']
         };
         // JSON.stringify templatePathObjectDefaultDict items to prevent side-effects
@@ -932,6 +960,7 @@
         /*
          * this function will run the middleware that will parse the request-body
          */
+            var ii, jj, options;
             // jslint-hack
             local.utility2.nop(response);
             // if request is already parsed, then goto nextMiddleware
@@ -964,6 +993,53 @@
             */
             case 'multipart/form-data':
                 request.swggBodyParsed = {};
+                request.swggBodyMeta = {};
+                options = {};
+                options.crlf = [0x0d, 0x0a];
+                // init boundary
+                ii = 0;
+                jj = local.swgg.bufferIndexOfSubBuffer(request.bodyRaw, options.crlf, ii);
+                if (jj <= 0) {
+                    return;
+                }
+                options.boundary = new local.global.Uint8Array(options.crlf.concat(
+                    Array.prototype.slice.call(request.bodyRaw.slice(ii, jj))
+                ));
+                ii = jj + 2;
+                while (true) {
+                    jj = local.swgg.bufferIndexOfSubBuffer(
+                        request.bodyRaw,
+                        options.boundary,
+                        ii
+                    );
+                    if (jj < 0) {
+                        break;
+                    }
+                    options.header = new local.utility2.StringView(
+                        request.bodyRaw.slice(ii, ii + 1024)
+                    ).toString().split('\r\n').slice(0, 2).join('\r\n');
+                    options.contentType = (/^content-type:(.*)/im).exec(options.header);
+                    options.contentType = options.contentType && options.contentType[1].trim();
+                    options.filename = (/^content-disposition:.*?\bfilename="([^"]+)/im)
+                        .exec(options.header);
+                    options.filename = options.filename && options.filename[1];
+                    options.name = (/^content-disposition:.*?\bname="([^"]+)/im)
+                        .exec(options.header);
+                    options.name = options.name && options.name[1];
+                    ii = local.swgg.bufferIndexOfSubBuffer(
+                        request.bodyRaw,
+                        [0x0d, 0x0a, 0x0d, 0x0a],
+                        ii + 2
+                    ) + 4;
+                    options.data = request.bodyRaw.slice(ii, jj);
+                    request.swggBodyParsed[options.name] = options.data;
+                    request.swggBodyMeta[options.name] = {
+                        contentType: options.contentType,
+                        filename: options.filename,
+                        name: options.name
+                    };
+                    ii = jj + options.boundary.length + 2;
+                }
                 break;
             default:
                 request.swggBodyParsed = String(request.bodyRaw);
@@ -991,57 +1067,6 @@
             }
             return -1;
         };
-
-        (function () {
-            var ii, jj, request, options;
-            request = null;
-            /* jslint-ignore-next-line */
-            request = { bodyParsed: '------WebKitFormBoundaryijAchkufJYd6C9ou\r\nContent-Disposition: form-data; name="file"; filename="a00.jpg"\r\nContent-Type: image/jpeg\r\n\r\ndata1\r\n------WebKitFormBoundaryijAchkufJYd6C9ou\r\nContent-Disposition: form-data; name="file2"; filename="a00.jpg"\r\nContent-Type: image/jpeg\r\n\r\ndata2\r\n------WebKitFormBoundaryijAchkufJYd6C9ou--\r\n' }
-            request.bodyRaw = new local.global.Uint8Array(new Buffer(request.bodyParsed));
-            options = {};
-            options.crlf = [0x0d, 0x0a];
-            // init boundary
-            ii = 0;
-            jj = local.swgg.bufferIndexOfSubBuffer(request.bodyRaw, options.crlf, ii);
-            if (jj <= 0) {
-                return;
-            }
-            options.boundary = new local.global.Uint8Array(
-                options.crlf.concat(Array.prototype.slice.call(request.bodyRaw.slice(ii, jj)))
-            );
-            ii = jj + 2;
-            while (true) {
-                jj = local.swgg.bufferIndexOfSubBuffer(request.bodyRaw, options.boundary, ii);
-                if (jj < 0) {
-                    break;
-                }
-                options.header = new local.utility2.StringView(
-                    request.bodyRaw.slice(ii, ii + 1024)
-                ).toString().split('\r\n').slice(0, 2).join('\r\n');
-                options.contentType = (/^content-type:(.*)/im).exec(options.header);
-                options.contentType = options.contentType && options.contentType[1].trim();
-                options.filename = (/^content-disposition:.*?\bfilename="([^"]+)/im)
-                    .exec(options.header);
-                options.filename = options.filename && options.filename[1];
-                options.name = (/^content-disposition:.*?\bname="([^"]+)/im)
-                    .exec(options.header);
-                options.name = options.name && options.name[1];
-                ii = local.swgg.bufferIndexOfSubBuffer(
-                    request.bodyRaw,
-                    [0x0d, 0x0a, 0x0d, 0x0a],
-                    ii + 2
-                ) + 4;
-                options.data = request.bodyRaw.slice(ii, jj);
-                debugPrint([
-                    options.header,
-                    options.contentType,
-                    options.filename,
-                    options.name,
-                    new local.utility2.StringView(options.data).toString()
-                ]);
-                ii = jj + options.boundary.length + 2;
-            }
-        }());
 
         local.swgg.middlewareCrud = function (request, response, nextMiddleware) {
         /*
@@ -2190,9 +2215,9 @@
                 _BuiltinFile: {
                     _pathObjectDefaultList: [
                         'crudDeleteOneByKeyUnique.id',
-                        'crudFormUploadOne',
                         'crudGetOneByKeyUnique.id',
-                        'crudGetManyByQuery'
+                        'crudGetManyByQuery',
+                        'crudUploadOneByForm'
                     ],
                     _pathPrefix: '_builtin-file',
                     properties: {
