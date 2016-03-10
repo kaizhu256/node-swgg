@@ -547,7 +547,7 @@
             var optionsCopy;
             options = {
                 data: { propRequired: true },
-                schema: local.swgg.swaggerJson.definitions.TestCrudModel
+                schema: local.swgg.swaggerJson.definitions.TestModelCrud
             };
             [
                 { key: 'propArray', value: [null] },
@@ -597,7 +597,7 @@
             var optionsCopy;
             options = {
                 data: { propRequired: true },
-                schema: local.swgg.swaggerJson.definitions.TestCrudModel
+                schema: local.swgg.swaggerJson.definitions.TestModelCrud
             };
             [
                 { data: null },
@@ -862,8 +862,8 @@
                         error: { default: {}, type: 'object' }
                     }
                 },
-                // init TestCrudModel schema
-                TestCrudModel: {
+                // init TestModelCrud schema
+                TestModelCrud: {
                     // init _pathObjectDefaultList
                     _pathObjectDefaultList: [
                         'crudCountManyByQuery',
@@ -892,7 +892,7 @@
                         },
                         propArraySubdoc: {
                             default: [{ propRequired: true }],
-                            items: { $ref: '#/definitions/TestCrudModel' },
+                            items: { $ref: '#/definitions/TestModelCrud' },
                             type: 'array'
                         },
                         propBoolean: { type: 'boolean' },
@@ -917,7 +917,7 @@
                             type: 'object'
                         },
                         // test null-schema-validation handling-behavior
-                        propObjectSubdoc: { $ref: '#/definitions/TestNullModel' },
+                        propObjectSubdoc: { $ref: '#/definitions/TestModelNull' },
                         propRequired: { default: true },
                         propString: {
                             maxLength: 10,
@@ -937,8 +937,8 @@
                     },
                     required: ['propRequired']
                 },
-                // init TestNullModel schema
-                TestNullModel: {}
+                // init TestModelNull schema
+                TestModelNull: {}
             },
             paths: {
                 // test undefined api handling-behavior
@@ -948,7 +948,7 @@
                 } },
                 // test undefined crud-api handling-behavior
                 '/_test/errorUndefinedCrud': { get: {
-                    _schemaName: 'TestCrudModel',
+                    _schemaName: 'TestModelCrud',
                     operationId: 'errorUndefinedCrud',
                     summary: 'test undefined crud-api handling-behavior',
                     tags: ['_test']
@@ -1126,7 +1126,7 @@
             drop: null,
             // test no-id-drop-index handling-behavior
             ensureIndexList: [{ fieldName: 'propInteger' }],
-            name: 'TestCrudModel'
+            name: 'TestModelCrud'
         }, {
             docList: [{
                 id: '00_test_crudDeleteOneByKeyUnique',
@@ -1140,7 +1140,7 @@
             }],
             drop: true,
             ensureIndexList: [{ fieldName: 'id', unique: true }],
-            name: 'TestCrudModel',
+            name: 'TestModelCrud',
             // test removeIndexList handling-behavior
             removeIndexList: ['undefined']
         }], local.utility2.onReady);
@@ -1164,7 +1164,7 @@
                 'crudUpdateOneByKeyUnique.id': '_test crudCreateOrUpdateOneByKeyUnique.id'
             },
             paginationCountTotal: 'paginationCountTotal',
-            schemaName: 'TestCrudModel',
+            schemaName: 'TestModelCrud',
             title: 'test api',
             urlSwaggerJson: 'api/v0/swagger.json'
         }].concat(JSON.parse(local.swgg.templateDtListPetstore)) });
