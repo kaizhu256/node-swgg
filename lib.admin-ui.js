@@ -42,11 +42,11 @@
         // init templateDtListPetstore
         local.swgg.templateDtListPetstore = JSON.stringify([{
             apiDict: {
-                crudCreateOne: '_builtin-image crudCreateOrReplaceOne',
-                'crudDeleteOneByKeyUnique.id': '_builtin-image crudDeleteOneByKeyUnique.id',
-                crudGetManyByQuery: '_builtin-image crudGetManyByQuery',
+                crudCreateOne: '_builtin-file crudCreateOrReplaceOne',
+                'crudDeleteOneByKeyUnique.id': '_builtin-file crudDeleteOneByKeyUnique.id',
+                crudGetManyByQuery: '_builtin-file crudGetManyByQuery',
                 'crudUpdateOneByKeyUnique.id':
-                    '_builtin-image crudCreateOrUpdateOneByKeyUnique.id'
+                    '_builtin-file crudCreateOrUpdateOneByKeyUnique.id'
             },
             paginationCountTotal: 'paginationCountTotal',
             schemaName: '_BuiltinFile',

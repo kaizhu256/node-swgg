@@ -362,6 +362,28 @@
             summary: 'get one {{_schemaName}} object by query',
             tags: ['{{_pathPrefix}}']
         };
+        local.swgg.templatePathObjectDefaultDict.crudUploadOne = {
+            _method: 'put',
+            _path: '/{{_pathPrefix}}/crudUploadOne',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudUploadOne',
+            parameters: [{
+                description: '{{_schemaName}} object',
+                in: 'body',
+                name: 'body',
+                required: true,
+                schema: { $ref: '#/definitions/{{_schemaName}}' }
+            }],
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
+                }
+            },
+            summary: 'create or replace one {{_schemaName}} object',
+            tags: ['{{_pathPrefix}}']
+        };
         local.swgg.templatePathObjectDefaultDict.crudUserLoginByPassword = {
             _method: 'get',
             _path: '/{{_pathPrefix}}/crudUserLoginByPassword',
@@ -2073,13 +2095,12 @@
             definitions: {
                 _BuiltinFile: {
                     _pathObjectDefaultList: [
-                        'crudCreateOrReplaceOne',
-                        'crudCreateOrUpdateOneByKeyUnique.id',
+                        'crudUploadOne',
                         'crudDeleteOneByKeyUnique.id',
                         'crudGetOneByKeyUnique.id',
                         'crudGetManyByQuery'
                     ],
-                    _pathPrefix: '_builtin-image',
+                    _pathPrefix: '_builtin-file',
                     properties: {
                         blob: { format: 'byte', type: 'string' },
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
@@ -2107,59 +2128,6 @@
                         roleList: { items: { type: 'string' }, type: 'array' },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' },
                         username: { type: 'string' }
-                    }
-                }
-            },
-            paths: {
-                '/_builtin-image/crudCreateOrReplaceOne': {
-                    post: {
-                        _method: 'put',
-                        _path: '/_builtin-image/crudCreateOrReplaceOne',
-                        _pathPrefix: '_builtin-image',
-                        operationId: 'crudCreateOrReplaceOne',
-                        consumes: [
-                            'multipart/form-data'
-                        ],
-                        description: '',
-                        parameters: [
-                            {
-                                description: 'ID of pet to update',
-                                format: 'int64',
-                                in: 'path',
-                                name: 'petId',
-                                required: true,
-                                type: 'integer'
-                            },
-                            {
-                                description: 'Additional data to pass to server',
-                                in: 'formData',
-                                name: 'additionalMetadata',
-                                required: false,
-                                type: 'string'
-                            },
-                            {
-                                description: 'file to upload',
-                                in: 'formData',
-                                name: 'file',
-                                required: false,
-                                type: 'file'
-                            }
-                        ],
-                        produces: [
-                            'application/json'
-                        ],
-                        responses: {
-                            200: {
-                                description: 'successful operation',
-                                schema: {
-                                    '$ref': '#/definitions/ApiResponse'
-                                }
-                            }
-                        },
-                        summary: 'uploads an image',
-                        tags: [
-                            'pet'
-                        ]
                     }
                 }
             }
