@@ -1170,7 +1170,7 @@
                     switch (request.swggLogin.modeLogin) {
                     case 'loginByPassword':
                         if (request.swggLogin.password && request.swggLogin.username) {
-                            local.swgg.collectionCreate('_User').findOne({
+                            local.swgg.collectionCreate('_BuiltinUser').findOne({
                                 username: request.swggLogin.username
                             }, onNext);
                             return;
@@ -2058,7 +2058,7 @@
         local.swgg.apiDictUpdate({
             _tagDict: { '_user': { description: 'swagger-lite User model' } },
             definitions: {
-                _Image: {
+                _BuiltinImage: {
                     _pathObjectDefaultList: [
                         'crudCreateOrReplaceOne',
                         'crudCreateOrUpdateOneByKeyUnique.id',
@@ -2069,15 +2069,14 @@
                     _pathPrefix: '_image',
                     properties: {
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
-                        description: { type: 'string' },
                         id: { type: 'string' },
                         filename: { type: 'string' },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' },
                         url: { format: 'url-image-upload', type: 'string' }
                     },
-                    required: ['description', 'url']
+                    required: ['url']
                 },
-                _User: {
+                _BuiltinUser: {
                     _pathObjectDefaultList: [
                         'crudCreateOrReplaceOne',
                         'crudCreateOrUpdateOneByKeyUnique.id',
@@ -2089,6 +2088,7 @@
                     properties: {
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
                         id: { type: 'string' },
+                        jwtEncoded: { type: 'string' },
                         roleList: { items: { type: 'string' }, type: 'array' },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' },
                         password: { format: 'password', type: 'string' },
@@ -2107,7 +2107,7 @@
                 fieldName: 'url',
                 unique: true
             }],
-            name: '_Image'
+            name: '_BuiltinImage'
         }, {
             ensureIndexList: [{
                 fieldName: 'id',
@@ -2116,7 +2116,7 @@
                 fieldName: 'username',
                 unique: true
             }],
-            name: '_User'
+            name: '_BuiltinUser'
         }], local.utility2.onReady);
     }());
 }());

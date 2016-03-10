@@ -25,6 +25,7 @@ standalone swagger-ui server backed by nedb
 
 
 # change since becafb3f
+- add '_Builtin' prefix to swagger-lite's builtin swagger-definition names
 - do not send readonly properties in swgg.apiDict clients
 - in swgg.validateByPropertyDef, add regex pattern validation according to http://json-schema.org/latest/json-schema-validation.html#anchor33
 - admin-ui add x-queryRange ui
@@ -525,7 +526,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                 fieldName: 'username',
                 unique: true
             }],
-            name: '_User'
+            name: '_BuiltinUser'
         }, {
             docList: [{
                 id: 'admin',
@@ -548,7 +549,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                 fieldName: 'username',
                 unique: true
             }],
-            name: '_User'
+            name: 'User'
         }, {
             docList: [{
                 id: 1,

@@ -48,7 +48,7 @@
                 'crudUpdateOneByKeyUnique.id': '_image crudCreateOrUpdateOneByKeyUnique.id'
             },
             paginationCountTotal: 'paginationCountTotal',
-            schemaName: '_Image',
+            schemaName: '_BuiltinImage',
             title: 'swagger-lite image api',
             urlSwaggerJson: 'api/v0/swagger.json'
         }, {
@@ -59,7 +59,7 @@
                 'crudUpdateOneByKeyUnique.id': '_user crudCreateOrUpdateOneByKeyUnique.id'
             },
             paginationCountTotal: 'paginationCountTotal',
-            schemaName: '_User',
+            schemaName: '_BuiltinUser',
             title: 'swagger-lite user api',
             urlSwaggerJson: 'api/v0/swagger.json'
         }, {
@@ -127,22 +127,20 @@
         /*
          * this function will init the datatable-ui
          */
-            var options, self, tmp;
-            // save self
-            local.swgg.dt = self = local.swgg.dtList[event.currentTarget.dataset.ii];
+            var options, tmp;
+            // init dt-instance
+            local.swgg.dt = local.swgg.dtList[event.currentTarget.dataset.ii];
             // init crud-api
-            Object.keys(self.apiDict).forEach(function (key) {
-                if (typeof self.apiDict[key] === 'string') {
-                    tmp = self.apiDict[key.split('.')[0]] = local.swgg.apiCreate(
-                        local.swgg.apiDict[self.apiDict[key]]
+            Object.keys(local.swgg.dt.apiDict).forEach(function (key) {
+                if (typeof local.swgg.dt.apiDict[key] === 'string') {
+                    tmp = local.swgg.dt.apiDict[key.split('.')[0]] = local.swgg.apiCreate(
+                        local.swgg.apiDict[local.swgg.dt.apiDict[key]]
                     );
                     tmp._operationId = key;
                 }
             });
-            // init self
-            local.swgg.dt.schema = local.utility2.jsonCopy(
-                local.swgg.swaggerJson.definitions[self.schemaName]
-            );
+            // init schema
+            local.swgg.dt.schema = local.swgg.swaggerJson.definitions[local.swgg.dt.schemaName];
             // init datatableOptions
             local.swgg.dt.datatableOptions = local.utility2.objectSetDefault(
                 local.swgg.dt.datatableOptions || {},
@@ -198,7 +196,7 @@
             local.jQuery('.tab-content').hide();
             local.jQuery('#dtNavTable1').tab('show');
             // init datatable
-            document.getElementById('dtTableContainer1').innerHTML = self.html ||
+            document.getElementById('dtTableContainer1').innerHTML = local.swgg.dt.html ||
                 '<table class="display table table-responsive" ' +
                 'id="dtTable1" width="100%"><tfoot><tr>' +
                 local.swgg.dt.datatableOptions.columns.map(function (element) {
