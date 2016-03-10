@@ -13,7 +13,6 @@ standalone swagger-ui server backed by nedb
 - toggle login / logout button
 - add ability to reset db
 - admin-ui - add property-option x-sortName
-- admin-ui - fix datatables crashing when rows are empty
 - implement api POST /pet/{petId}/uploadImage
 - implement api GET /user/login
 - implement api GET /user/logout
@@ -25,6 +24,7 @@ standalone swagger-ui server backed by nedb
 
 
 # change since becafb3f
+- admin-ui - fix datatables crashing when rows are empty
 - allow jsonapi's response.data to be an empty array
 - add '_Builtin' prefix to swagger-lite's builtin swagger-definition names
 - do not send readonly properties in swgg.apiDict clients

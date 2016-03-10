@@ -73,7 +73,7 @@
                 name: '_queryQuery',
                 type: 'string'
             }],
-            summary: 'count many {{_schemaName}} objects by query',
+            summary: '{{operationId}} - count many {{_schemaName}} objects by query',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudCreateOrReplaceMany = {
@@ -95,7 +95,7 @@
                     schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'create or replace many {{_schemaName}} objects',
+            summary: '{{operationId}} - create or replace many {{_schemaName}} objects',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudCreateOrReplaceOne = {
@@ -117,7 +117,7 @@
                     schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'create or replace one {{_schemaName}} object',
+            summary: '{{operationId}} - create or replace one {{_schemaName}} object',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudCreateOrReplaceOneByKeyUnique = {
@@ -146,7 +146,7 @@
                     schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'create or replace one {{_schemaName}} object',
+            summary: '{{operationId}} - create or replace one {{_schemaName}} object',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudCreateOrUpdateOne = {
@@ -168,7 +168,7 @@
                     schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'create or update one {{_schemaName}} object',
+            summary: '{{operationId}} - create or update one {{_schemaName}} object',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudCreateOrUpdateOneByKeyUnique = {
@@ -198,7 +198,7 @@
                     schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'create or update one {{_schemaName}} object',
+            summary: '{{operationId}} - create or update one {{_schemaName}} object',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudDeleteManyByQuery = {
@@ -222,7 +222,7 @@
                     schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
                 }
             },
-            summary: 'delete many {{_schemaName}} objects by query',
+            summary: '{{operationId}} - delete many {{_schemaName}} objects by query',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudDeleteOneByKeyUnique = {
@@ -238,7 +238,7 @@
                 required: true,
                 type: 'string'
             }],
-            summary: 'delete one {{_schemaName}} object by {{_keyUnique}}',
+            summary: '{{operationId}} - delete one {{_schemaName}} object by {{_keyUnique}}',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudExistsOneByKeyUnique = {
@@ -254,7 +254,30 @@
                 required: true,
                 type: 'string'
             }],
-            summary: 'check if one {{_schemaName}} object exists by {{_keyUnique}}',
+            summary: '{{operationId}} - ' +
+                'check if one {{_schemaName}} object exists by {{_keyUnique}}',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudFormUploadOne = {
+            _method: 'put',
+            _path: '/{{_pathPrefix}}/crudFormUploadOne',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudFormUploadOne',
+            parameters: [{
+                description: '{{_schemaName}} to form-upload',
+                in: 'formData',
+                name: 'file',
+                required: true,
+                type: 'file'
+            }],
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
+                }
+            },
+            summary: '{{operationId}} - form upload one {{_schemaName}} object',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudGetManyByQuery = {
@@ -305,7 +328,7 @@
                     schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'get many {{_schemaName}} objects by query',
+            summary: '{{operationId}} - get many {{_schemaName}} objects by query',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudGetOneByKeyUnique = {
@@ -328,7 +351,7 @@
                     schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'get one {{_schemaName}} object by {{_keyUnique}}',
+            summary: '{{operationId}} - get one {{_schemaName}} object by {{_keyUnique}}',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudGetOneByQuery = {
@@ -359,36 +382,14 @@
                     schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'get one {{_schemaName}} object by query',
+            summary: '{{operationId}} - get one {{_schemaName}} object by query',
             tags: ['{{_pathPrefix}}']
         };
-        local.swgg.templatePathObjectDefaultDict.crudUploadOne = {
-            _method: 'put',
-            _path: '/{{_pathPrefix}}/crudUploadOne',
-            _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudUploadOne',
-            parameters: [{
-                description: '{{_schemaName}} object',
-                in: 'body',
-                name: 'body',
-                required: true,
-                schema: { $ref: '#/definitions/{{_schemaName}}' }
-            }],
-            responses: {
-                200: {
-                    description:
-                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
-                }
-            },
-            summary: 'create or replace one {{_schemaName}} object',
-            tags: ['{{_pathPrefix}}']
-        };
-        local.swgg.templatePathObjectDefaultDict.crudUserLoginByPassword = {
+        local.swgg.templatePathObjectDefaultDict.crudLoginByPassword = {
             _method: 'get',
-            _path: '/{{_pathPrefix}}/crudUserLoginByPassword',
+            _path: '/{{_pathPrefix}}/crudLoginByPassword',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudUserLoginByPassword',
+            operationId: 'crudLoginByPassword',
             parameters: [
                 {
                     default: 'loginByPassword',
@@ -420,7 +421,7 @@
                     schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
                 }
             },
-            summary: 'login user',
+            summary: '{{operationId}} - login by password',
             tags: ['{{_pathPrefix}}']
         };
         // JSON.stringify templatePathObjectDefaultDict items to prevent side-effects
@@ -590,16 +591,19 @@
                     }
                 }).replace((/\{\{_schemaName\}\}/g), schemaName)), 2);
                 // init pathObject
-                (schema._pathObjectDefaultList || []).forEach(function (pathObject) {
+                (schema._pathObjectDefaultList || []).forEach(function (operationId) {
                     // init keyUnique
-                    keyUnique = (/ByKeyUnique\.(.*)/).exec(pathObject);
+                    keyUnique = (/ByKeyUnique\.(.*)/).exec(operationId);
                     keyUnique = keyUnique && keyUnique[1];
                     keyUnique = keyUnique && keyUnique.split('.')[0];
-                    pathObject = pathObject.replace('.' + keyUnique, '');
-                    pathObject = JSON.parse(local.swgg.templatePathObjectDefaultDict[pathObject]
+                    operationId = operationId.replace('.' + keyUnique, '');
+                    // init pathObject
+                    pathObject = local.swgg.templatePathObjectDefaultDict[operationId]
                         .replace((/\{\{_keyUnique\}\}/g), keyUnique)
                         .replace((/\{\{_pathPrefix\}\}/g), schema._pathPrefix)
-                        .replace((/\{\{_schemaName\}\}/g), schema._schemaName));
+                        .replace((/\{\{_schemaName\}\}/g), schema._schemaName)
+                        .replace((/\{\{operationId\}\}/g), operationId);
+                    pathObject = JSON.parse(pathObject);
                     // init keyUnique.format and keyUnique.type
                     pathObject.parameters.forEach(function (param) {
                         if (param.name === keyUnique) {
@@ -936,10 +940,29 @@
                 return;
             }
             request.swggBodyParsed = String(request.bodyRaw);
-            switch ((/[^;]*/).exec(request.headers['content-type'] || '')[0]) {
+            switch ((request.headers['content-type'] || '').split(';')[0]) {
+            // parse application/x-www-form-urlencoded, e.g.
+            // aa=hello%20world&bb=bye%20world
             case 'application/x-www-form-urlencoded':
                 request.swggBodyParsed =
                     local.utility2.urlParse('?' + request.swggBodyParsed, true).query;
+                break;
+            // https://tools.ietf.org/html/rfc7578
+            // parse multipart/form-data, e.g.
+            /*
+            ------Boundary\r\n
+            Content-Disposition: form-data; name="input1"; filename="file1.png"\r\n
+            Content-Type: image/jpeg\r\n
+            \r\n
+            <data1>\r\n
+            ------Boundary\r\n
+            Content-Disposition: form-data; name="input2"; filename="file2.png"\r\n
+            Content-Type: image/jpeg\r\n
+            \r\n
+            <data2>\r\n
+            ------Boundary--\r\n
+            */
+            case 'multipart/form-data':
                 break;
             default:
                 local.utility2.tryCatchOnError(function () {
@@ -1520,7 +1543,7 @@
          * and if succesful, will receive a jwt token
          */
             var self;
-            self = local.swgg.apiDict["GET /_builtin-user/crudUserLoginByPassword"];
+            self = local.swgg.apiDict["GET /_builtin-user/crudLoginByPassword"];
             self({ swggParamDict: {
                 modeLogin: 'loginByPassword',
                 password: options.password,
@@ -2095,17 +2118,18 @@
             definitions: {
                 _BuiltinFile: {
                     _pathObjectDefaultList: [
-                        'crudUploadOne',
                         'crudDeleteOneByKeyUnique.id',
+                        'crudFormUploadOne',
                         'crudGetOneByKeyUnique.id',
                         'crudGetManyByQuery'
                     ],
                     _pathPrefix: '_builtin-file',
                     properties: {
                         blob: { format: 'byte', type: 'string' },
+                        contentType: { type: 'string' },
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
-                        id: { type: 'string' },
                         filename: { type: 'string' },
+                        id: { type: 'string' },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' },
                         url: { format: 'url-image', type: 'string' }
                     },
@@ -2117,7 +2141,7 @@
                         'crudCreateOrUpdateOneByKeyUnique.id',
                         'crudDeleteOneByKeyUnique.id',
                         'crudGetManyByQuery',
-                        'crudUserLoginByPassword'
+                        'crudLoginByPassword'
                     ],
                     _pathPrefix: '_builtin-user',
                     properties: {
