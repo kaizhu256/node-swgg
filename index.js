@@ -939,11 +939,11 @@
                 nextMiddleware();
                 return;
             }
-            request.swggBodyParsed = String(request.bodyRaw);
             switch ((request.headers['content-type'] || '').split(';')[0]) {
             // parse application/x-www-form-urlencoded, e.g.
             // aa=hello%20world&bb=bye%20world
             case 'application/x-www-form-urlencoded':
+                request.swggBodyParsed = String(request.bodyRaw);
                 request.swggBodyParsed =
                     local.utility2.urlParse('?' + request.swggBodyParsed, true).query;
                 break;
@@ -963,14 +963,85 @@
             ------Boundary--\r\n
             */
             case 'multipart/form-data':
+                request.swggBodyParsed = {};
                 break;
             default:
+                request.swggBodyParsed = String(request.bodyRaw);
                 local.utility2.tryCatchOnError(function () {
                     request.swggBodyParsed = JSON.parse(request.swggBodyParsed);
                 }, local.utility2.nop);
             }
             nextMiddleware();
         };
+
+        local.swgg.bufferIndexOfSubBuffer = function (buffer, subBuffer, fromIndex) {
+        /*
+         * this function will search the buffer for the indexOf position of the subBuffer
+         */
+            var ii, jj;
+            for (ii = fromIndex || 0; ii < buffer.length; ii += 1) {
+                for (jj = 0; jj < subBuffer.length; ii += 1, jj += 1) {
+                    if (buffer[ii] !== subBuffer[jj]) {
+                        break;
+                    }
+                }
+                if (jj === subBuffer.length) {
+                    return ii - jj;
+                }
+            }
+            return -1;
+        };
+
+        (function () {
+            var ii, jj, request, options;
+            request = null;
+            /* jslint-ignore-next-line */
+            request = { bodyParsed: '------WebKitFormBoundaryijAchkufJYd6C9ou\r\nContent-Disposition: form-data; name="file"; filename="a00.jpg"\r\nContent-Type: image/jpeg\r\n\r\ndata1\r\n------WebKitFormBoundaryijAchkufJYd6C9ou\r\nContent-Disposition: form-data; name="file2"; filename="a00.jpg"\r\nContent-Type: image/jpeg\r\n\r\ndata2\r\n------WebKitFormBoundaryijAchkufJYd6C9ou--\r\n' }
+            request.bodyRaw = new local.global.Uint8Array(new Buffer(request.bodyParsed));
+            options = {};
+            options.crlf = [0x0d, 0x0a];
+            // init boundary
+            ii = 0;
+            jj = local.swgg.bufferIndexOfSubBuffer(request.bodyRaw, options.crlf, ii);
+            if (jj <= 0) {
+                return;
+            }
+            options.boundary = new local.global.Uint8Array(
+                options.crlf.concat(Array.prototype.slice.call(request.bodyRaw.slice(ii, jj)))
+            );
+            ii = jj + 2;
+            while (true) {
+                jj = local.swgg.bufferIndexOfSubBuffer(request.bodyRaw, options.boundary, ii);
+                if (jj < 0) {
+                    break;
+                }
+                options.header = new local.utility2.StringView(
+                    request.bodyRaw.slice(ii, ii + 1024)
+                ).toString().split('\r\n').slice(0, 2).join('\r\n');
+                options.contentType = (/^content-type:(.*)/im).exec(options.header);
+                options.contentType = options.contentType && options.contentType[1].trim();
+                options.filename = (/^content-disposition:.*?\bfilename="([^"]+)/im)
+                    .exec(options.header);
+                options.filename = options.filename && options.filename[1];
+                options.name = (/^content-disposition:.*?\bname="([^"]+)/im)
+                    .exec(options.header);
+                options.name = options.name && options.name[1];
+                ii = local.swgg.bufferIndexOfSubBuffer(
+                    request.bodyRaw,
+                    [0x0d, 0x0a, 0x0d, 0x0a],
+                    ii + 2
+                ) + 4;
+                options.data = request.bodyRaw.slice(ii, jj);
+                debugPrint([
+                    options.header,
+                    options.contentType,
+                    options.filename,
+                    options.name,
+                    new local.utility2.StringView(options.data).toString()
+                ]);
+                ii = jj + options.boundary.length + 2;
+            }
+        }());
 
         local.swgg.middlewareCrud = function (request, response, nextMiddleware) {
         /*

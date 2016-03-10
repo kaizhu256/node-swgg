@@ -308,6 +308,7 @@ body > div {\n\
 <script src="assets.swgg.lib.swagger-tools.js"></script>\n\
 <script src="assets.utility2.lib.bcrypt.js"></script>\n\
 <script src="assets.utility2.lib.cryptojs.js"></script>\n\
+<script src="assets.utility2.lib.stringview.js"></script>\n\
 <script src="assets.utility2.js"></script>\n\
 <script src="assets.swgg.lib.swagger-ui.js"></script>\n\
 <script src="assets.swgg.js"></script>\n\

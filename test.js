@@ -800,6 +800,9 @@
                 file: '/assets.utility2.lib.cryptojs.js',
                 url: '/assets.utility2.lib.cryptojs.js'
             }, {
+                file: '/assets.utility2.lib.stringview.js',
+                url: '/assets.utility2.lib.stringview.js'
+            }, {
                 file: '/jsonp.swgg.stateInit.js',
                 url: '/jsonp.swgg.stateInit.js'
             }, {
