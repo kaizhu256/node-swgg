@@ -561,7 +561,7 @@
                 { key: 'propNumberFloat', value: 0.5 },
                 { key: 'propNumberDouble', value: 0.5 },
                 { key: 'propObject', value: { aa: true } },
-                { key: 'propObjectSubdoc', value: { propRequired: true } },
+                { key: 'propObjectSubdoc', value: {} },
                 { key: 'propRequired', value: true },
                 { key: 'propString', value: 'hello' },
                 { key: 'propStringByte', value: local.modeJs === 'browser'
@@ -604,6 +604,8 @@
                 { key: 'propArray', value: true },
                 { key: 'propArray', value: [null, null] },
                 { key: 'propArraySubdoc', value: [{ propRequired: null }] },
+                { key: 'propArraySubdoc', value: [ 'non-object' ] },
+                { key: 'propArraySubdoc', value: [{ propRequired: null }] },
                 { key: 'propBoolean', value: 0 },
                 { key: 'propEnum', value: -1 },
                 { key: 'propInteger', value: 0.5 },
@@ -624,7 +626,6 @@
                 { key: 'propObject', value: {} },
                 { key: 'propObject', value: { aa: 1, bb: 2 } },
                 { key: 'propObjectSubdoc', value: 'non-object' },
-                { key: 'propObjectSubdoc', value: { propRequired: null } },
                 { key: 'propRequired', value: null },
                 { key: 'propRequired', value: undefined },
                 { key: 'propString', value: true },
@@ -915,7 +916,8 @@
                             minProperties: 1,
                             type: 'object'
                         },
-                        propObjectSubdoc: { $ref: '#/definitions/TestCrudModel' },
+                        // test null-schema-validation handling-behavior
+                        propObjectSubdoc: { $ref: '#/definitions/TestNullModel' },
                         propRequired: { default: true },
                         propString: {
                             maxLength: 10,
@@ -934,7 +936,9 @@
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
                     },
                     required: ['propRequired']
-                }
+                },
+                // init TestNullModel schema
+                TestNullModel: {}
             },
             paths: {
                 // test undefined api handling-behavior
