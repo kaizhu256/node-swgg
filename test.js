@@ -156,6 +156,8 @@
                             crudCreateOrReplaceOne:
                                 local.swgg.apiDict['_test crudCreateOrReplaceOne'],
                             data: {
+                                // test dataReadonlyRemove handling-behavior
+                                createdAt: '1970-01-01T00:00:00.000Z',
                                 id: '00_test_crudCreateOrReplaceOne',
                                 propRequired: true
                             },
@@ -169,6 +171,9 @@
                     case 2:
                         // validate no error occurred
                         local.utility2.assert(!error, error);
+                        // validate dataReadonlyRemove
+                        local.utility2.assert(data.responseJSON.data[0].createdAt >
+                            '1970-01-01T00:00:00.000Z', data.responseJSON);
                         // validate data was created
                         local.testCase_crudGetOneByKeyUnique_default(options, onNext);
                         break;

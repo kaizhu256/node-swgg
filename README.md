@@ -14,7 +14,6 @@ standalone swagger-ui server backed by nedb
 - add ability to reset db
 - admin-ui - add property-option x-sortName
 - admin-ui - fix datatables crashing when rows are empty
-- do not send readonly properties in swagger-client-request
 - implement api POST /pet/{petId}/uploadImage
 - implement api GET /user/login
 - implement api GET /user/logout
@@ -26,6 +25,7 @@ standalone swagger-ui server backed by nedb
 
 
 # change since becafb3f
+- do not send readonly properties in swgg.apiDict clients
 - in swgg.validateByPropertyDef, add regex pattern validation according to http://json-schema.org/latest/json-schema-validation.html#anchor33
 - admin-ui add x-queryRange ui
 - none

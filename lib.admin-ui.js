@@ -232,7 +232,8 @@
                 local.swgg.dt.apiDict.crudGetManyByQuery.parameters
             )
                 .filter(function (element) {
-                    return element.name[0] !== '_';
+                    return element.name[0] !== '_' ||
+                        element.name.indexOf('_queryRange.') === 0;
                 })
                 .sort(function (aa, bb) {
                     return aa.name < bb.name

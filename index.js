@@ -454,6 +454,7 @@
                         local.utility2.jsonCopy(options.swggParamDict),
                         self
                     ),
+                    dataReadonlyRemove: options.swggParamDict,
                     key: self.operationId,
                     paramDefList: self.parameters
                 });
@@ -1511,9 +1512,11 @@
                 local.utility2.assert(data && typeof data === 'object', data);
                 (options.paramDefList || []).forEach(function (paramDef) {
                     key = paramDef.name;
-                    // recurse - validate param
+                    // recurse - validateByPropertyDef
                     local.swgg.validateByPropertyDef({
                         data: data[key],
+                        dataReadonlyRemove: options.dataReadonlyRemove &&
+                            options.dataReadonlyRemove[key],
                         key: key,
                         propertyDef: paramDef,
                         required: paramDef.required,
@@ -1547,10 +1550,11 @@
             // validate schema
             tmp = propertyDef.$ref || (propertyDef.schema && propertyDef.schema.$ref);
             if (tmp) {
-                // recurse - validate schema-reference
+                // recurse - validateBySchema
                 local.swgg.validateBySchema({
                     circularList: options.circularList,
                     data: data,
+                    dataReadonlyRemove: options.dataReadonlyRemove,
                     key: tmp,
                     schema: local.swgg.schemaDereference(tmp),
                     'x-notRequired': options['x-notRequired']
@@ -1638,11 +1642,13 @@
                 switch (propertyDef.type) {
                 case 'array':
                     local.utility2.assert(Array.isArray(data) && propertyDef.items);
-                    data.forEach(function (element) {
-                        // recurse - validate element in list
+                    data.forEach(function (element, ii) {
+                        // recurse - validateByPropertyDef
                         local.swgg.validateByPropertyDef({
                             circularList: options.circularList,
                             data: element,
+                            dataReadonlyRemove: options.dataReadonlyRemove &&
+                                options.dataReadonlyRemove[ii],
                             key: options.key,
                             propertyDef: propertyDef.items,
                             'x-notRequired': options['x-notRequired']
@@ -1726,10 +1732,18 @@
                 );
                 Object.keys(schema.properties || {}).forEach(function (_) {
                     key = _;
-                    // recurse - validate schema-reference
+                    // delete options.dataReadonlyRemove[key]
+                    if (schema.properties[key].readOnly &&
+                            options.dataReadonlyRemove &&
+                            options.dataReadonlyRemove.hasOwnProperty(key)) {
+                        delete options.dataReadonlyRemove[key];
+                    }
+                    // recurse - validateByPropertyDef
                     local.swgg.validateByPropertyDef({
                         circularList: options.circularList,
                         data: data[key],
+                        dataReadonlyRemove: options.dataReadonlyRemove &&
+                            options.dataReadonlyRemove[key],
                         depth: options.depth - 1,
                         key: key,
                         propertyDef: schema.properties[key],
