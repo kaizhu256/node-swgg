@@ -409,7 +409,7 @@
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     // validate data
-                    local.utility2.assert(data.responseJSON.data[0] === null, data);
+                    local.utility2.assert(data.responseJSON.data[0] === undefined, data);
                     onParallel();
                 }, onError);
             });
@@ -932,11 +932,10 @@
                             { default: 'a@a.com', format: 'email', type: 'string' },
                         propStringJson: { default: 'null', format: 'json', type: 'string' },
                         propUndefined: {},
-                        propObjectSubdocImage: {
-                            $ref: '#/definitions/_BuiltinImage',
-                            'x-fileUploadImage': true
+                        propObjectSubdocFile: {
+                            $ref: '#/definitions/_BuiltinFile',
+                            'x-fileUpload': true
                         },
-                        //!! propStringUrlImage: { format: 'url-image', type: 'string' },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
                     },
                     required: ['propRequired']

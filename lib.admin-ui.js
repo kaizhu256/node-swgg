@@ -42,25 +42,27 @@
         // init templateDtListPetstore
         local.swgg.templateDtListPetstore = JSON.stringify([{
             apiDict: {
-                crudCreateOne: '_image crudCreateOrReplaceOne',
-                'crudDeleteOneByKeyUnique.id': '_image crudDeleteOneByKeyUnique.id',
-                crudGetManyByQuery: '_image crudGetManyByQuery',
-                'crudUpdateOneByKeyUnique.id': '_image crudCreateOrUpdateOneByKeyUnique.id'
+                crudCreateOne: '_builtin-image crudCreateOrReplaceOne',
+                'crudDeleteOneByKeyUnique.id': '_builtin-image crudDeleteOneByKeyUnique.id',
+                crudGetManyByQuery: '_builtin-image crudGetManyByQuery',
+                'crudUpdateOneByKeyUnique.id':
+                    '_builtin-image crudCreateOrUpdateOneByKeyUnique.id'
             },
             paginationCountTotal: 'paginationCountTotal',
-            schemaName: '_BuiltinImage',
-            title: 'swagger-lite image api',
+            schemaName: '_BuiltinFile',
+            title: 'builtin file api',
             urlSwaggerJson: 'api/v0/swagger.json'
         }, {
             apiDict: {
-                crudCreateOne: '_user crudCreateOrReplaceOne',
-                'crudDeleteOneByKeyUnique.id': '_user crudDeleteOneByKeyUnique.id',
-                crudGetManyByQuery: '_user crudGetManyByQuery',
-                'crudUpdateOneByKeyUnique.id': '_user crudCreateOrUpdateOneByKeyUnique.id'
+                crudCreateOne: '_builtin-user crudCreateOrReplaceOne',
+                'crudDeleteOneByKeyUnique.id': '_builtin-user crudDeleteOneByKeyUnique.id',
+                crudGetManyByQuery: '_builtin-user crudGetManyByQuery',
+                'crudUpdateOneByKeyUnique.id':
+                    '_builtin-user crudCreateOrUpdateOneByKeyUnique.id'
             },
             paginationCountTotal: 'paginationCountTotal',
             schemaName: '_BuiltinUser',
-            title: 'swagger-lite user api',
+            title: 'builtin user api',
             urlSwaggerJson: 'api/v0/swagger.json'
         }, {
             apiDict: {

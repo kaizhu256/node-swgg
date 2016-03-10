@@ -25,6 +25,7 @@ standalone swagger-ui server backed by nedb
 
 
 # change since becafb3f
+- allow jsonapi's response.data to be an empty array
 - add '_Builtin' prefix to swagger-lite's builtin swagger-definition names
 - do not send readonly properties in swgg.apiDict clients
 - in swgg.validateByPropertyDef, add regex pattern validation according to http://json-schema.org/latest/json-schema-validation.html#anchor33

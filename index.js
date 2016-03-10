@@ -92,7 +92,7 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
             summary: 'create or replace many {{_schemaName}} objects',
@@ -114,7 +114,7 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
             summary: 'create or replace one {{_schemaName}} object',
@@ -143,7 +143,7 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
             summary: 'create or replace one {{_schemaName}} object',
@@ -165,7 +165,7 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
             summary: 'create or update one {{_schemaName}} object',
@@ -195,7 +195,7 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
             summary: 'create or update one {{_schemaName}} object',
@@ -219,7 +219,7 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
                 }
             },
             summary: 'delete many {{_schemaName}} objects by query',
@@ -302,7 +302,7 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
             summary: 'get many {{_schemaName}} objects by query',
@@ -325,7 +325,7 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
             summary: 'get one {{_schemaName}} object by {{_keyUnique}}',
@@ -356,7 +356,7 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
             summary: 'get one {{_schemaName}} object by query',
@@ -395,7 +395,7 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
                 }
             },
             summary: 'login user',
@@ -411,7 +411,7 @@
             basePath: '/api/v0',
             definitions: {
                 // http://jsonapi.org/format/#document-structure-top-level
-                JsonapiResponse: {
+                _BuiltinJsonapiResponse: {
                     properties: {
                         data: {
                             items: { type: 'object' },
@@ -557,13 +557,13 @@
                 schema._schemaName = schemaName;
                 local.utility2.objectSetDefault(options, JSON.parse(JSON.stringify({
                     definitions: {
-                        // init JsonapiResponse{{_schemaName}}
-                        'JsonapiResponse{{_schemaName}}': {
+                        // init _BuiltinJsonapiResponse{{_schemaName}}
+                        '_BuiltinJsonapiResponse{{_schemaName}}': {
                             properties: { data: {
                                 items: { $ref: '#/definitions/{{_schemaName}}' },
                                 type: 'array'
                             } },
-                            'x-inheritList': [{ $ref: '#/definitions/JsonapiResponse' }]
+                            'x-inheritList': [{ $ref: '#/definitions/_BuiltinJsonapiResponse' }]
                         }
                     }
                 }).replace((/\{\{_schemaName\}\}/g), schemaName)), 2);
@@ -640,7 +640,7 @@
                             200: {
                                 description: 'ok - ' +
                                     'http://jsonapi.org/format/#document-top-level',
-                                schema: { $ref: '#/definitions/JsonapiResponse' }
+                                schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
                             }
                         },
                         tags: []
@@ -1133,6 +1133,15 @@
             local.swgg.serverRespondJsonapi(request, response, error);
         };
 
+        local.swgg.middlewareFileUpload = function (request, response, nextMiddleware) {
+        /*
+         * this function will handle file upload / delete
+         */
+            // jslint-hack
+            local.utility2.nop(request, response);
+            nextMiddleware();
+        };
+
         local.swgg.middlewareJsonpStateInit = function (request, response, nextMiddleware) {
         /*
          * this function will jsonp-init the browser-state
@@ -1188,7 +1197,7 @@
                                 data && data.password
                             )) {
                             request.userJwt = {
-                                iat: Math.floor(Date.now() / 1000),
+                                exp: Math.floor(Date.now() / 1000) + 3600,
                                 jti: local.utility2.uuidTimeCreate(),
                                 roleList: data.roleList,
                                 sub: data.username
@@ -1389,12 +1398,12 @@
                     if (!Array.isArray(data)) {
                         data = [data];
                     }
-                    // normalize data-list to be non-empty
-                    if (!data.length) {
-                        data.push(null);
-                    }
                     // normalize error-list to contain non-null objects
                     if (ii === 0) {
+                        // normalize error-list to be non-empty
+                        if (!data.length) {
+                            data.push(null);
+                        }
                         data = data.map(function (element) {
                             if (!(element && typeof element === 'object')) {
                                 element = { message: String(element) };
@@ -1417,16 +1426,17 @@
                     if (!data) {
                         return;
                     }
-                    data.meta = local.utility2.jsonCopy(meta
-                        ? (typeof meta === 'object'
-                            ? meta
-                            : { metaData: meta })
-                        : {});
+                    data.meta = local.utility2.jsonCopy(meta || {});
+                    // normalize meta-object
+                    if (typeof data.meta !== 'object') {
+                        data.meta = { metaData: meta };
+                    }
                     data.meta.isJsonapiResponse = true;
-                    data.meta.dataLength = ii === 0
-                        ? data.errors
-                        : data.data;
-                    data.meta.dataLength = (data.meta.dataLength || []).length;
+                    if (ii === 0) {
+                        data.meta.errorsLength = (data.errors && data.errors.length) | 0;
+                    } else {
+                        data.meta.dataLength = (data.data && data.data.length) | 0;
+                    }
                     data.meta.statusCode = data.meta.statusCode || data.statusCode || 0;
                 });
                 onError(data[0], data[1]);
@@ -1488,7 +1498,7 @@
          * and if succesful, will receive a jwt token
          */
             var self;
-            self = local.swgg.apiDict["GET /_user/crudUserLoginByPassword"];
+            self = local.swgg.apiDict["GET /_builtin-user/crudUserLoginByPassword"];
             self({ swggParamDict: {
                 modeLogin: 'loginByPassword',
                 password: options.password,
@@ -2056,9 +2066,12 @@
     (function () {
         // init api
         local.swgg.apiDictUpdate({
-            _tagDict: { '_user': { description: 'swagger-lite User model' } },
+            _tagDict: {
+                '_builtin-file': { description: 'builtin File model' },
+                '_builtin-user': { description: 'builtin User model' }
+            },
             definitions: {
-                _BuiltinImage: {
+                _BuiltinFile: {
                     _pathObjectDefaultList: [
                         'crudCreateOrReplaceOne',
                         'crudCreateOrUpdateOneByKeyUnique.id',
@@ -2066,13 +2079,14 @@
                         'crudGetOneByKeyUnique.id',
                         'crudGetManyByQuery'
                     ],
-                    _pathPrefix: '_image',
+                    _pathPrefix: '_builtin-image',
                     properties: {
+                        blob: { format: 'byte', type: 'string' },
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
                         id: { type: 'string' },
                         filename: { type: 'string' },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' },
-                        url: { format: 'url-image-upload', type: 'string' }
+                        url: { format: 'url-image', type: 'string' }
                     },
                     required: ['url']
                 },
@@ -2084,15 +2098,68 @@
                         'crudGetManyByQuery',
                         'crudUserLoginByPassword'
                     ],
-                    _pathPrefix: '_user',
+                    _pathPrefix: '_builtin-user',
                     properties: {
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
                         id: { type: 'string' },
                         jwtEncoded: { type: 'string' },
+                        password: { format: 'password', type: 'string' },
                         roleList: { items: { type: 'string' }, type: 'array' },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' },
-                        password: { format: 'password', type: 'string' },
                         username: { type: 'string' }
+                    }
+                }
+            },
+            paths: {
+                '/_builtin-image/crudCreateOrReplaceOne': {
+                    post: {
+                        _method: 'put',
+                        _path: '/_builtin-image/crudCreateOrReplaceOne',
+                        _pathPrefix: '_builtin-image',
+                        operationId: 'crudCreateOrReplaceOne',
+                        consumes: [
+                            'multipart/form-data'
+                        ],
+                        description: '',
+                        parameters: [
+                            {
+                                description: 'ID of pet to update',
+                                format: 'int64',
+                                in: 'path',
+                                name: 'petId',
+                                required: true,
+                                type: 'integer'
+                            },
+                            {
+                                description: 'Additional data to pass to server',
+                                in: 'formData',
+                                name: 'additionalMetadata',
+                                required: false,
+                                type: 'string'
+                            },
+                            {
+                                description: 'file to upload',
+                                in: 'formData',
+                                name: 'file',
+                                required: false,
+                                type: 'file'
+                            }
+                        ],
+                        produces: [
+                            'application/json'
+                        ],
+                        responses: {
+                            200: {
+                                description: 'successful operation',
+                                schema: {
+                                    '$ref': '#/definitions/ApiResponse'
+                                }
+                            }
+                        },
+                        summary: 'uploads an image',
+                        tags: [
+                            'pet'
+                        ]
                     }
                 }
             }
@@ -2107,7 +2174,7 @@
                 fieldName: 'url',
                 unique: true
             }],
-            name: '_BuiltinImage'
+            name: '_BuiltinFile'
         }, {
             ensureIndexList: [{
                 fieldName: 'id',
