@@ -258,6 +258,29 @@
                 'check if one {{_schemaName}} object exists by {{_keyUnique}}',
             tags: ['{{_pathPrefix}}']
         };
+        local.swgg.templatePathObjectDefaultDict.crudFileGetOneByKeyUnique = {
+            _keyUnique: '{{_keyUnique}}',
+            _method: 'get',
+            _path: '/{{_pathPrefix}}/crudFileGetOneByKeyUnique/{{{_keyUnique}}}',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudFileGetOneByKeyUnique.{{_keyUnique}}',
+            parameters: [{
+                description: '{{_schemaName}} {{_keyUnique}}',
+                in: 'path',
+                name: '{{_keyUnique}}',
+                required: true,
+                type: 'string'
+            }],
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
+                }
+            },
+            summary: '{{operationId}} - get one {{_schemaName}} file by {{_keyUnique}}',
+            tags: ['{{_pathPrefix}}']
+        };
         local.swgg.templatePathObjectDefaultDict.crudFileUploadManyByForm = {
             _method: 'post',
             _path: '/{{_pathPrefix}}/crudFileUploadManyByForm',
@@ -265,12 +288,12 @@
             consumes: ['multipart/form-data'],
             operationId: 'crudFileUploadManyByForm',
             parameters: [{
-                description: '{{_schemaName}} object to form-upload',
+                description: '{{_schemaName}} file to form-upload',
                 in: 'formData',
                 name: 'file1',
                 type: 'file'
             }, {
-                description: '{{_schemaName}} object to form-upload',
+                description: '{{_schemaName}} file to form-upload',
                 in: 'formData',
                 name: 'file2',
                 type: 'file'
@@ -282,7 +305,7 @@
                     schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: '{{operationId}} - form-upload many {{_schemaName}} objects',
+            summary: '{{operationId}} - form-upload many {{_schemaName}} files',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudFileUploadOneByForm = {
@@ -292,7 +315,7 @@
             consumes: ['multipart/form-data'],
             operationId: 'crudFileUploadOneByForm',
             parameters: [{
-                description: '{{_schemaName}} object to form-upload',
+                description: '{{_schemaName}} file to form-upload',
                 in: 'formData',
                 name: 'file',
                 type: 'file'
@@ -304,7 +327,7 @@
                     schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: '{{operationId}} - form-upload one {{_schemaName}} object',
+            summary: '{{operationId}} - form-upload one {{_schemaName}} file',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudGetManyByQuery = {
@@ -1209,6 +1232,9 @@
                     case 'crudExistsOneByKeyUnique':
                         crud.collection.findOne(crud.queryByKeyUnique, { $: 1 }, onNext);
                         break;
+                    case 'crudFileGetOneByKeyUnique':
+                        crud.collection.findOne(crud.queryByKeyUnique, onNext);
+                        break;
                     case 'crudFileUploadManyByForm':
                     case 'crudFileUploadOneByForm':
                         crud.body = Object.keys(request.swggBodyParsed).map(function (key, ii) {
@@ -1220,6 +1246,9 @@
                                 fileFilename: request.swggBodyMeta[key].filename,
                                 fileInputName: request.swggBodyMeta[key].name,
                                 fileSize: request.swggBodyMeta[key].contentType.length,
+                                fileUrl: local.swgg.swaggerJson.basePath + '/' +
+                                    request.swggPathObject._pathPrefix +
+                                    '/crudFileGetOneByKeyUnique/' + (crud.data.id + ii),
                                 id: crud.data.id + ii
                             };
                         });
@@ -1263,19 +1292,39 @@
                     case 'crudCreateOrUpdateOneByKeyUnique':
                         onNext(null, meta, data);
                         break;
+                    case 'crudExistsOneByKeyUnique':
+                        onNext(null, !!data);
+                        break;
+                    case 'crudFileGetOneByKeyUnique':
+                        crud.collection.findOne(crud.queryByKeyUnique, onNext);
+                        break;
+                    case 'crudFileUploadManyByForm':
+                    case 'crudFileUploadOneByForm':
+                        onNext(null, data.map(function (element) {
+                            delete element.fileBlob;
+                            return element;
+                        }));
+                        break;
                     case 'crudGetManyByQuery':
                         onNext(null, crud.queryData, {
                             paginationCountTotal: crud.paginationCountTotal
                         });
-                        break;
-                    case 'crudExistsOneByKeyUnique':
-                        onNext(null, !!data);
                         break;
                     default:
                         onNext(null, data);
                     }
                     break;
                 case 3:
+                    switch (crud.operationId.split('.')[0]) {
+                    case 'crudFileGetOneByKeyUnique':
+                        local.utility2.serverRespondHeadSet(request, response, null, {
+                            'Content-Type': data.fileContentType
+                        });
+                        response.end(local.modeJs === 'browser'
+                            ? local.utility2.StringView.base64ToBytes(data.fileBlob)
+                            : new Buffer(data.fileBlob, 'base64'));
+                        return;
+                    }
                     local.swgg.serverRespondJsonapi(request, response, null, data, meta);
                     break;
                 default:
@@ -2243,6 +2292,7 @@
                     _pathObjectDefaultList: [
                         'crudCountManyByQuery',
                         'crudDeleteOneByKeyUnique.id',
+                        'crudFileGetOneByKeyUnique.id',
                         'crudFileUploadManyByForm',
                         'crudFileUploadOneByForm',
                         'crudGetOneByKeyUnique.id',

@@ -878,6 +878,7 @@
                         'crudDeleteManyByQuery',
                         'crudDeleteOneByKeyUnique.id',
                         'crudExistsOneByKeyUnique.id',
+                        'crudFileGetOneByKeyUnique.id',
                         'crudFileUploadManyByForm',
                         'crudFileUploadOneByForm',
                         'crudGetManyByQuery',
@@ -1142,6 +1143,10 @@
                 propRequired: true
             }, {
                 id: '00_test_crudExistsOneByKeyUnique',
+                propRequired: true
+            }, {
+                id: '00_test_crudFileGetOneByKeyUnique',
+                fileBlob: new local.utility2.StringView('hello').toBase64(),
                 propRequired: true
             }, {
                 id: '00_test_crudGetOneByKeyUnique',

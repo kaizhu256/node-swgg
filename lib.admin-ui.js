@@ -129,13 +129,17 @@
             var options, tmp;
             // init dt-instance
             local.swgg.dt = local.swgg.dtList[event.currentTarget.dataset.ii];
-            // init crud-api
+            // init apiDict
             Object.keys(local.swgg.dt.apiDict).forEach(function (key) {
-                if (typeof local.swgg.dt.apiDict[key] === 'string') {
-                    tmp = local.swgg.dt.apiDict[key.split('.')[0]] = local.swgg.apiCreate(
-                        local.swgg.apiDict[local.swgg.dt.apiDict[key]]
-                    );
-                    tmp._operationId = key;
+                tmp = local.swgg.dt.apiDict[key];
+                if (typeof tmp === 'string') {
+                    local.swgg.dt.apiDict[key] = null;
+                    if (local.swgg.apiDict[tmp]) {
+                        tmp = local.swgg.dt.apiDict[key.split('.')[0]] = local.swgg.apiCreate(
+                            local.swgg.apiDict[tmp]
+                        );
+                        tmp._operationId = key;
+                    }
                 }
             });
             // init schema
@@ -482,7 +486,7 @@
                 switch (options.format) {
                 case 'binary':
                 case 'byte':
-                    data = '<' + options.format + ' object>';
+                    data = data && '<blob object>';
                     break;
                 case 'date':
                 case 'date-time':
