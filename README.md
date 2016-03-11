@@ -509,6 +509,13 @@ window.swgg.api = window.swaggerUi.api;\n\
         // init collectionList
         local.collectionList = [{
             docList: [{
+                id: '00_test_crudFileGetOneByKeyUnique',
+                fileBlob: local.swgg.templateSwaggerLogoSmallBase64
+            }],
+            drop: true,
+            name: '_BuiltinFile'
+        }, {
+            docList: [{
                 id: 'admin',
                 password: local.utility2.bcryptHashCreate('admin'),
                 username: 'admin'

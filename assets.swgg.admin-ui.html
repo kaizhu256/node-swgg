@@ -187,17 +187,17 @@ textarea.form-control {
 
 
 
-<!--!! <div> -->
+<!--!! <div><div><div><div> -->
 
 <!--!! image upload -->
 <!--!! <div class="form-group"> -->
 <!--!! <label class="col-sm-3 control-label">createdAt<br>(date-time)</label> -->
 <!--!! <div class="col-sm-9"> -->
-<!--!! <input id="fileUploadImage1" type="file" class="file-loading"> -->
+<!--!! <input class="file-loading" id="fileUploadImage1" multiple type="file"> -->
 <!--!! </div> -->
 <!--!! </div> -->
 
-<!--!! </div> -->
+<!--!! <div><div></div></div> -->
 
 
 
@@ -228,7 +228,7 @@ local.swgg.dtListInit();
 
 
 //!! $("#fileUploadImage1").fileinput({
-    //!! uploadUrl: "http://localhost/file-upload-single/1", // server upload action
+    //!! uploadUrl: "/api/v0/_builtin-file/crudNullPost", // server upload action
     //!! minFileCount: 1,
     //!! maxFileCount: 5,
     //!! overwriteInitial: false,
@@ -237,7 +237,7 @@ local.swgg.dtListInit();
         //!! "<img style='height:160px' src='http://loremflickr.com/200/150/people?random=2'>",
     //!! ],
     //!! initialPreviewConfig: [
-        //!! {caption: "People-1.jpg", width: "120px", url: "https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.githubDeploy.browser._2Fnode-swagger-lite_2Fbuild..alpha..travis-ci.org_2Fapp_2Findex.html.png", key: 1},
+        //!! {caption: "People-1.jpg", width: "120px", url: "/api/v0/_builtin-file/crudNullPost", key: 1},
         //!! {caption: "People-2.jpg", width: "120px", url: "/site/file-delete", key: 2},
     //!! ],
     //!! uploadExtraData: {
@@ -246,6 +246,10 @@ local.swgg.dtListInit();
     //!! }
 //!! });
 
+
+//!! setTimeout(function () {
+    //!! $('#dtNavRecordEdit1').click();
+//!! }, 100);
 
 </script>
 </body>

@@ -356,6 +356,10 @@
                 switch (options.type) {
                 // type - array
                 case 'array':
+                    if (options['x-fileUpload']) {
+                        htmlInput = htmlInputText;
+                        break;
+                    }
                     htmlInput = htmlInputTextarea;
                     break;
                 // type - boolean

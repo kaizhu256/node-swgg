@@ -474,6 +474,81 @@
             summary: '{{operationId}} - login by password',
             tags: ['{{_pathPrefix}}']
         };
+        local.swgg.templatePathObjectDefaultDict.crudNullDelete = {
+            _method: 'delete',
+            _path: '/{{_pathPrefix}}/crudNullDelete',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudNullDelete',
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
+                }
+            },
+            summary: '{{operationId}} - return null response',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudNullGet = {
+            _method: 'get',
+            _path: '/{{_pathPrefix}}/crudNullGet',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudNullGet',
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
+                }
+            },
+            summary: '{{operationId}} - return null response',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudNullPatch = {
+            _method: 'patch',
+            _path: '/{{_pathPrefix}}/crudNullPatch',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudNullPatch',
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
+                }
+            },
+            summary: '{{operationId}} - return null response',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudNullPost = {
+            _method: 'post',
+            _path: '/{{_pathPrefix}}/crudNullPost',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudNullPost',
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
+                }
+            },
+            summary: '{{operationId}} - return null response',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudNullPut = {
+            _method: 'put',
+            _path: '/{{_pathPrefix}}/crudNullPut',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudNullPut',
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
+                }
+            },
+            summary: '{{operationId}} - return null response',
+            tags: ['{{_pathPrefix}}']
+        };
         // JSON.stringify templatePathObjectDefaultDict items to prevent side-effects
         Object.keys(local.swgg.templatePathObjectDefaultDict).forEach(function (key) {
             local.swgg.templatePathObjectDefaultDict[key] =
@@ -508,6 +583,67 @@
             'x-validateUnusedDefinition': false,
             tags: []
         });
+        // init templateSwaggerJsonExtra
+        local.swgg.templateSwaggerJsonExtra = JSON.stringify({
+            _tagDict: {
+                '_builtin-file': { description: 'builtin File model' },
+                '_builtin-user': { description: 'builtin User model' }
+            },
+            definitions: {
+                _BuiltinFile: {
+                    _pathObjectDefaultList: [
+                        'crudCountManyByQuery',
+                        'crudDeleteOneByKeyUnique.id',
+                        'crudFileGetOneByKeyUnique.id',
+                        'crudFileUploadManyByForm',
+                        'crudFileUploadOneByForm',
+                        'crudGetOneByKeyUnique.id',
+                        'crudGetManyByQuery',
+                        'crudNullDelete',
+                        'crudNullGet',
+                        'crudNullPatch',
+                        'crudNullPost',
+                        'crudNullPut'
+                    ],
+                    _pathPrefix: '_builtin-file',
+                    properties: {
+                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
+                        fileBlob: { format: 'byte', type: 'string' },
+                        fileContentType: { type: 'string' },
+                        fileFilename: { type: 'string' },
+                        fileInputName: { type: 'string' },
+                        fileSize: { type: 'integer' },
+                        fileUrl: { type: 'string' },
+                        id: { type: 'string' },
+                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
+                    }
+                },
+                _BuiltinUser: {
+                    _pathObjectDefaultList: [
+                        'crudCountManyByQuery',
+                        'crudCreateOrReplaceOne',
+                        'crudCreateOrUpdateOneByKeyUnique.id',
+                        'crudDeleteOneByKeyUnique.id',
+                        'crudGetManyByQuery',
+                        'crudLoginByPassword'
+                    ],
+                    _pathPrefix: '_builtin-user',
+                    properties: {
+                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
+                        id: { type: 'string' },
+                        jwtEncoded: { type: 'string' },
+                        password: { format: 'password', type: 'string' },
+                        roleList: { items: { type: 'string' }, type: 'array' },
+                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' },
+                        username: { type: 'string' }
+                    }
+                }
+            }
+        });
+        local.swgg.templateSwaggerLogoSmallBase64 = String() +
+            /* jslint-ignore-next-line */
+            'iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAqRJREFUeNrEVz1s00AUfnGXii5maMXoEUEHVwIpEkPNgkBdMnQoU5ytiKHJwpp2Q2JIO8DCUDOxIJFIVOoWZyJSh3pp1Q2PVVlcCVBH3ufeVZZ9Zye1Ay86nXV+ue/9fO/lheg/Se02X1rvksmbnTiKvuxQMBNgBnN4a/LCbmnUAP6JV58NCUsBC8CuAJxGPF47OgNqBaA93tolUhnx6jC4NxGwyOEwlccyAs+3kwdzKq0HDn2vEBTi8J2XpyMaywNDE157BhXUE3zJhlq8GKq+Zd2zaWHepPA8oN9XkfLmRdOiJV4XUUg/IyWncLjCYY/SHndV2u7zHr3bPKZtdxgboJOnthvrfGj/oMf3G0r7JVmNlLfKklmrt2MvvcNO7LFOhoFHfuAJI5o6ta10jpt5CQLgwXhXG2YIwvu+34qf78ybOjWTnWwkgR36d7JqJOrW0hHmNrKg9xhiS4+1jFmrxymh03B0w+6kURIAu3yHtOD5oaUNojMnGgbcctNvwdAnyxvxRR+/vaJnjzbpzcZX+nN1SdGv85i9eH8w3qPO+mdm/y4dnQ1iI8Fq6Nf4cxL6GWSjiFDSs0VRnxC5g0xSB2cgHpaseTxfqOv5uoHkNQ6Ha/N1Yz9mNMppEkEkYKj79q6uCq4bCHcSX3fJ0Vk/k9siASjCm1N6gZH6Ec9IXt2WkFES2K/ixoIyktJPAu/ptOA1SgO5zqtr6KASJPF0nMV8dgMsRhRPOcMwqQAOoi0VAIMLAEWJ6YYC1c8ibj1GP51RqwzYwZVMHQuvOzMCBUtb2tGHx5NAdLKqp5AX7Ng4d+Zi8AGDI9z1ijx9yaCH04y3GCP2S+QcvaGl+pcxyUBvinFlawoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=' +
+            String();
     }());
 
 
@@ -655,7 +791,7 @@
                         .replace((/\{\{operationId\}\}/g), operationId);
                     pathObject = JSON.parse(pathObject);
                     // init keyUnique.format and keyUnique.type
-                    pathObject.parameters.forEach(function (param) {
+                    (pathObject.parameters || []).forEach(function (param) {
                         if (param.name === keyUnique) {
                             param.format = schema.properties[keyUnique].format;
                             param.type = schema.properties[keyUnique].type;
@@ -1107,8 +1243,6 @@
                     : modeNext + 1;
                 switch (modeNext) {
                 case 1:
-                    // init onParallel
-                    onParallel = local.utility2.onParallel(onNext);
                     // init crud
                     crud = request.crud = {};
                     // init crud.collection
@@ -1255,6 +1389,7 @@
                         crud.collection.insert(crud.body, onNext);
                         break;
                     case 'crudGetManyByQuery':
+                        onParallel = local.utility2.onParallel(onNext);
                         onParallel.counter += 1;
                         crud.collection.find(crud.queryQuery, crud.queryFields)
                             .sort(crud.querySort)
@@ -1275,6 +1410,13 @@
                         break;
                     case 'crudGetOneByQuery':
                         crud.collection.findOne(crud.queryQuery, crud.queryFields, onNext);
+                        break;
+                    case 'crudNullDelete':
+                    case 'crudNullGet':
+                    case 'crudNullPatch':
+                    case 'crudNullPost':
+                    case 'crudNullPut':
+                        onNext();
                         break;
                     default:
                         modeNext = Infinity;
@@ -2282,57 +2424,7 @@
     // run shared js-env code - post-init
     (function () {
         // init api
-        local.swgg.apiDictUpdate({
-            _tagDict: {
-                '_builtin-file': { description: 'builtin File model' },
-                '_builtin-user': { description: 'builtin User model' }
-            },
-            definitions: {
-                _BuiltinFile: {
-                    _pathObjectDefaultList: [
-                        'crudCountManyByQuery',
-                        'crudDeleteOneByKeyUnique.id',
-                        'crudFileGetOneByKeyUnique.id',
-                        'crudFileUploadManyByForm',
-                        'crudFileUploadOneByForm',
-                        'crudGetOneByKeyUnique.id',
-                        'crudGetManyByQuery'
-                    ],
-                    _pathPrefix: '_builtin-file',
-                    properties: {
-                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
-                        fileBlob: { format: 'byte', type: 'string' },
-                        fileContentType: { type: 'string' },
-                        fileFilename: { type: 'string' },
-                        fileInputName: { type: 'string' },
-                        fileSize: { type: 'integer' },
-                        fileUrl: { format: 'url-image', type: 'string' },
-                        id: { type: 'string' },
-                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
-                    }
-                },
-                _BuiltinUser: {
-                    _pathObjectDefaultList: [
-                        'crudCountManyByQuery',
-                        'crudCreateOrReplaceOne',
-                        'crudCreateOrUpdateOneByKeyUnique.id',
-                        'crudDeleteOneByKeyUnique.id',
-                        'crudGetManyByQuery',
-                        'crudLoginByPassword'
-                    ],
-                    _pathPrefix: '_builtin-user',
-                    properties: {
-                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
-                        id: { type: 'string' },
-                        jwtEncoded: { type: 'string' },
-                        password: { format: 'password', type: 'string' },
-                        roleList: { items: { type: 'string' }, type: 'array' },
-                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' },
-                        username: { type: 'string' }
-                    }
-                }
-            }
-        });
+        local.swgg.apiDictUpdate(JSON.parse(local.swgg.templateSwaggerJsonExtra));
         // init collection-list
         local.utility2.onReady.counter += 1;
         local.swgg.collectionListInit([{

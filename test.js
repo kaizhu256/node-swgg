@@ -883,7 +883,12 @@
                         'crudFileUploadOneByForm',
                         'crudGetManyByQuery',
                         'crudGetOneByQuery',
-                        'crudGetOneByKeyUnique.id'
+                        'crudGetOneByKeyUnique.id',
+                        'crudNullDelete',
+                        'crudNullGet',
+                        'crudNullPatch',
+                        'crudNullPost',
+                        'crudNullPut'
                     ],
                     _pathPrefix: '_test',
                     properties: {
@@ -900,6 +905,11 @@
                             default: [{ propRequired: true }],
                             items: { $ref: '#/definitions/TestModelCrud' },
                             type: 'array'
+                        },
+                        propArraySubdocFile: {
+                            items: { $ref: '#/definitions/_BuiltinFile' },
+                            type: 'array',
+                            'x-fileUpload': true
                         },
                         propBoolean: { type: 'boolean' },
                         propEnum: { enum: [0, 1], type: 'integer' },
@@ -1146,7 +1156,7 @@
                 propRequired: true
             }, {
                 id: '00_test_crudFileGetOneByKeyUnique',
-                fileBlob: new local.utility2.StringView('hello').toBase64(),
+                fileBlob: local.swgg.templateSwaggerLogoSmallBase64,
                 propRequired: true
             }, {
                 id: '00_test_crudGetOneByKeyUnique',
