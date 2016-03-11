@@ -258,6 +258,55 @@
                 'check if one {{_schemaName}} object exists by {{_keyUnique}}',
             tags: ['{{_pathPrefix}}']
         };
+        local.swgg.templatePathObjectDefaultDict.crudFileUploadManyByForm = {
+            _method: 'post',
+            _path: '/{{_pathPrefix}}/crudFileUploadManyByForm',
+            _pathPrefix: '{{_pathPrefix}}',
+            consumes: ['multipart/form-data'],
+            operationId: 'crudFileUploadManyByForm',
+            parameters: [{
+                description: '{{_schemaName}} object to form-upload',
+                in: 'formData',
+                name: 'file1',
+                type: 'file'
+            }, {
+                description: '{{_schemaName}} object to form-upload',
+                in: 'formData',
+                name: 'file2',
+                type: 'file'
+            }],
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
+                }
+            },
+            summary: '{{operationId}} - form-upload many {{_schemaName}} objects',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudFileUploadOneByForm = {
+            _method: 'post',
+            _path: '/{{_pathPrefix}}/crudFileUploadOneByForm',
+            _pathPrefix: '{{_pathPrefix}}',
+            consumes: ['multipart/form-data'],
+            operationId: 'crudFileUploadOneByForm',
+            parameters: [{
+                description: '{{_schemaName}} object to form-upload',
+                in: 'formData',
+                name: 'file',
+                type: 'file'
+            }],
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
+                }
+            },
+            summary: '{{operationId}} - form-upload one {{_schemaName}} object',
+            tags: ['{{_pathPrefix}}']
+        };
         local.swgg.templatePathObjectDefaultDict.crudGetManyByQuery = {
             _method: 'get',
             _path: '/{{_pathPrefix}}/crudGetManyByQuery',
@@ -400,56 +449,6 @@
                 }
             },
             summary: '{{operationId}} - login by password',
-            tags: ['{{_pathPrefix}}']
-        };
-        local.swgg.templatePathObjectDefaultDict.crudUploadManyByForm = {
-            _method: 'post',
-            _path: '/{{_pathPrefix}}/crudUploadManyByForm',
-            _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudUploadManyByForm',
-            parameters: [{
-                description: '{{_schemaName}} object to form-upload',
-                in: 'formData',
-                name: 'file1',
-                required: true,
-                type: 'file'
-            }, {
-                description: '{{_schemaName}} object to form-upload',
-                in: 'formData',
-                name: 'file2',
-                required: true,
-                type: 'file'
-            }],
-            responses: {
-                200: {
-                    description:
-                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
-                }
-            },
-            summary: '{{operationId}} - form-upload many {{_schemaName}} objects',
-            tags: ['{{_pathPrefix}}']
-        };
-        local.swgg.templatePathObjectDefaultDict.crudUploadOneByForm = {
-            _method: 'post',
-            _path: '/{{_pathPrefix}}/crudUploadOneByForm',
-            _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudUploadOneByForm',
-            parameters: [{
-                description: '{{_schemaName}} object to form-upload',
-                in: 'formData',
-                name: 'file',
-                required: true,
-                type: 'file'
-            }],
-            responses: {
-                200: {
-                    description:
-                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
-                }
-            },
-            summary: '{{operationId}} - form-upload one {{_schemaName}} object',
             tags: ['{{_pathPrefix}}']
         };
         // JSON.stringify templatePathObjectDefaultDict items to prevent side-effects
@@ -655,7 +654,13 @@
                                 case 'boolean':
                                 case 'integer':
                                 case 'number':
+                                    return true;
                                 case 'string':
+                                    switch (tmp.format) {
+                                    case 'binary':
+                                    case 'byte':
+                                        break;
+                                    }
                                     return true;
                                 }
                             })
@@ -763,10 +768,9 @@
             });
             // init properties from x-inheritList
             [0, 1, 2, 3].forEach(function () {
-                Object.keys(local.swgg.swaggerJson.definitions).forEach(function (schema) {
-                    schema = local.swgg.swaggerJson.definitions[schema];
+                Object.keys(local.swgg.swaggerJson.definitions).forEach(function (schemaName) {
+                    schema = local.swgg.swaggerJson.definitions[schemaName];
                     local.utility2.jsonCopy(schema['x-inheritList'] || [])
-                        .reverse()
                         .forEach(function (element) {
                             local.utility2.objectSetDefault(schema, {
                                 properties:
@@ -800,6 +804,24 @@
                 });
                 local.swgg.api.buildFromSpec(local.utility2.jsonCopy(local.swgg.swaggerJson));
             }, local.utility2.nop);
+        };
+
+        local.swgg.bufferIndexOfSubBuffer = function (buffer, subBuffer, fromIndex) {
+        /*
+         * this function will search the buffer for the indexOf-like position of the subBuffer
+         */
+            var ii, jj;
+            for (ii = fromIndex || 0; ii < buffer.length; ii += 1) {
+                for (jj = 0; jj < subBuffer.length; ii += 1, jj += 1) {
+                    if (buffer[ii] !== subBuffer[jj]) {
+                        break;
+                    }
+                }
+                if (jj === subBuffer.length) {
+                    return ii - jj;
+                }
+            }
+            return -1;
         };
 
         local.swgg.collectionCreate = function (schemaName) {
@@ -1050,24 +1072,6 @@
             nextMiddleware();
         };
 
-        local.swgg.bufferIndexOfSubBuffer = function (buffer, subBuffer, fromIndex) {
-        /*
-         * this function will search the buffer for the indexOf position of the subBuffer
-         */
-            var ii, jj;
-            for (ii = fromIndex || 0; ii < buffer.length; ii += 1) {
-                for (jj = 0; jj < subBuffer.length; ii += 1, jj += 1) {
-                    if (buffer[ii] !== subBuffer[jj]) {
-                        break;
-                    }
-                }
-                if (jj === subBuffer.length) {
-                    return ii - jj;
-                }
-            }
-            return -1;
-        };
-
         local.swgg.middlewareCrud = function (request, response, nextMiddleware) {
         /*
          * this function will run the middleware that will implement the backend db using nedb
@@ -1080,6 +1084,8 @@
                     : modeNext + 1;
                 switch (modeNext) {
                 case 1:
+                    // init onParallel
+                    onParallel = local.utility2.onParallel(onNext);
                     // init crud
                     crud = request.crud = {};
                     // init crud.collection
@@ -1134,6 +1140,8 @@
                     switch (crud.operationId) {
                     case 'crudCreateOrReplaceOne':
                     case 'crudCreateOrUpdateOne':
+                    case 'crudFileUploadManyByForm':
+                    case 'crudFileUploadOneByForm':
                         crud.data.id = crud.data.id || (crud.body && crud.body.id);
                         if (!crud.data.id) {
                             crud.data.id = local.utility2.uuidTimeCreate();
@@ -1201,8 +1209,23 @@
                     case 'crudExistsOneByKeyUnique':
                         crud.collection.findOne(crud.queryByKeyUnique, { $: 1 }, onNext);
                         break;
+                    case 'crudFileUploadManyByForm':
+                    case 'crudFileUploadOneByForm':
+                        crud.body = Object.keys(request.swggBodyParsed).map(function (key, ii) {
+                            return {
+                                fileBlob: local.utility2.StringView.bytesToBase64(
+                                    request.swggBodyParsed[key]
+                                ),
+                                fileContentType: request.swggBodyMeta[key].contentType,
+                                fileFilename: request.swggBodyMeta[key].filename,
+                                fileInputName: request.swggBodyMeta[key].name,
+                                fileSize: request.swggBodyMeta[key].contentType.length,
+                                id: crud.data.id + ii
+                            };
+                        });
+                        crud.collection.insert(crud.body, onNext);
+                        break;
                     case 'crudGetManyByQuery':
-                        onParallel = local.utility2.onParallel(onNext);
                         onParallel.counter += 1;
                         crud.collection.find(crud.queryQuery, crud.queryFields)
                             .sort(crud.querySort)
@@ -1431,9 +1454,13 @@
                             break;
                         // parse formData param
                         case 'formData':
-                            request.swggParamDict[paramDef.name] =
-                                request.swggParamDict[paramDef.name] ||
-                                request.swggBodyParsed[paramDef.name];
+                            switch ((request.headers['content-type'] || '').split(';')[0]) {
+                            case 'application/x-www-form-urlencoded':
+                                request.swggParamDict[paramDef.name] =
+                                    request.swggParamDict[paramDef.name] ||
+                                    request.swggBodyParsed[paramDef.name];
+                                break;
+                            }
                             break;
                         // parse header param
                         case 'header':
@@ -2214,25 +2241,29 @@
             definitions: {
                 _BuiltinFile: {
                     _pathObjectDefaultList: [
+                        'crudCountManyByQuery',
                         'crudDeleteOneByKeyUnique.id',
+                        'crudFileUploadManyByForm',
+                        'crudFileUploadOneByForm',
                         'crudGetOneByKeyUnique.id',
-                        'crudGetManyByQuery',
-                        'crudUploadOneByForm'
+                        'crudGetManyByQuery'
                     ],
                     _pathPrefix: '_builtin-file',
                     properties: {
-                        blob: { format: 'byte', type: 'string' },
-                        contentType: { type: 'string' },
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
-                        filename: { type: 'string' },
+                        fileBlob: { format: 'byte', type: 'string' },
+                        fileContentType: { type: 'string' },
+                        fileFilename: { type: 'string' },
+                        fileInputName: { type: 'string' },
+                        fileSize: { type: 'integer' },
+                        fileUrl: { format: 'url-image', type: 'string' },
                         id: { type: 'string' },
-                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' },
-                        url: { format: 'url-image', type: 'string' }
-                    },
-                    required: ['url']
+                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
+                    }
                 },
                 _BuiltinUser: {
                     _pathObjectDefaultList: [
+                        'crudCountManyByQuery',
                         'crudCreateOrReplaceOne',
                         'crudCreateOrUpdateOneByKeyUnique.id',
                         'crudDeleteOneByKeyUnique.id',

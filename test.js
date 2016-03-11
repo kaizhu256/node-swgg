@@ -878,11 +878,11 @@
                         'crudDeleteManyByQuery',
                         'crudDeleteOneByKeyUnique.id',
                         'crudExistsOneByKeyUnique.id',
+                        'crudFileUploadManyByForm',
+                        'crudFileUploadOneByForm',
                         'crudGetManyByQuery',
                         'crudGetOneByQuery',
-                        'crudGetOneByKeyUnique.id',
-                        'crudUploadManyByForm',
-                        'crudUploadOneByForm'
+                        'crudGetOneByKeyUnique.id'
                     ],
                     _pathPrefix: '_test',
                     properties: {
@@ -943,7 +943,8 @@
                         },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
                     },
-                    required: ['propRequired']
+                    required: ['propRequired'],
+                    'x-inheritList': [{ $ref: '#/definitions/_BuiltinFile' }]
                 },
                 // init TestModelNull schema
                 TestModelNull: {}

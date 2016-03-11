@@ -42,11 +42,8 @@
         // init templateDtListPetstore
         local.swgg.templateDtListPetstore = JSON.stringify([{
             apiDict: {
-                crudCreateOne: '_builtin-file crudCreateOrReplaceOne',
                 'crudDeleteOneByKeyUnique.id': '_builtin-file crudDeleteOneByKeyUnique.id',
-                crudGetManyByQuery: '_builtin-file crudGetManyByQuery',
-                'crudUpdateOneByKeyUnique.id':
-                    '_builtin-file crudCreateOrUpdateOneByKeyUnique.id'
+                crudGetManyByQuery: '_builtin-file crudGetManyByQuery'
             },
             paginationCountTotal: 'paginationCountTotal',
             schemaName: '_BuiltinFile',
@@ -159,8 +156,10 @@
                     local.utility2.nop(data, type, row);
                     options = local.swgg.dt.datatableInstance.page.info();
                     options.ii = options.page * options.length + meta.row + 1;
-                    return '<button class="btn btn-xs dtButtonRecordEdit">edit row ' +
-                        options.ii + '</button>';
+                    return '<button class="btn btn-xs dtButtonRecordEdit" style="' +
+                        (local.swgg.dt.apiDict.crudUpdateOneByKeyUnique
+                        ? ''
+                        : 'display: none;') + '">edit row ' + options.ii + '</button>';
                 },
                 title: ''
             }].concat(Object.keys(local.swgg.dt.schema.properties)
@@ -265,6 +264,16 @@
                 htmlInputText,
                 htmlInputTextarea,
                 readOnly;
+            switch (options.type) {
+            case 'string':
+                switch (options.format) {
+                case 'binary':
+                case 'byte':
+                    options.readOnly = true;
+                    break;
+                }
+                break;
+            }
             options.uuid = local.utility2.uuidTimeCreate();
             readOnly = options.readOnly
                 ? 'disabled'
@@ -307,7 +316,6 @@
                 // type - string
                 case 'string':
                     switch (options.format) {
-                    // format - date-time
                     case 'date':
                     case 'date-time':
                         htmlInput = '<div class="row">' +
@@ -357,12 +365,10 @@
                 // type - string
                 case 'string':
                     switch (options.format) {
-                    // format - date-time
                     case 'date':
                     case 'date-time':
                         htmlInput = htmlInputDatetime;
                         break;
-                    case 'byte':
                     case 'json':
                         htmlInput = htmlInputTextarea;
                         break;
@@ -385,6 +391,10 @@
          */
             var data, elementInput, options;
             options = JSON.parse(decodeURIComponent(elementContainer.dataset.options));
+            if (options.readOnly) {
+                delete options.dataRead;
+                return options;
+            }
             elementInput = elementContainer.getElementsByTagName('textarea');
             if (!elementInput.length) {
                 elementInput = elementContainer.getElementsByTagName('input');
@@ -470,7 +480,10 @@
             // type - string
             case 'string':
                 switch (options.format) {
-                // format - date-time
+                case 'binary':
+                case 'byte':
+                    data = '<' + options.format + ' object>';
+                    break;
                 case 'date':
                 case 'date-time':
                     if (data) {
