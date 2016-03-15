@@ -73,7 +73,7 @@
                 name: '_queryQuery',
                 type: 'string'
             }],
-            summary: 'count many {{_schemaName}} objects by query',
+            summary: '{{operationId}} - count many {{_schemaName}} objects by query',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudCreateOrReplaceMany = {
@@ -92,10 +92,10 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'create or replace many {{_schemaName}} objects',
+            summary: '{{operationId}} - create or replace many {{_schemaName}} objects',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudCreateOrReplaceOne = {
@@ -114,10 +114,10 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'create or replace one {{_schemaName}} object',
+            summary: '{{operationId}} - create or replace one {{_schemaName}} object',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudCreateOrReplaceOneByKeyUnique = {
@@ -143,10 +143,10 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'create or replace one {{_schemaName}} object',
+            summary: '{{operationId}} - create or replace one {{_schemaName}} object',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudCreateOrUpdateOne = {
@@ -165,10 +165,10 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'create or update one {{_schemaName}} object',
+            summary: '{{operationId}} - create or update one {{_schemaName}} object',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudCreateOrUpdateOneByKeyUnique = {
@@ -195,10 +195,10 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'create or update one {{_schemaName}} object',
+            summary: '{{operationId}} - create or update one {{_schemaName}} object',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudDeleteManyByQuery = {
@@ -219,10 +219,10 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
                 }
             },
-            summary: 'delete many {{_schemaName}} objects by query',
+            summary: '{{operationId}} - delete many {{_schemaName}} objects by query',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudDeleteOneByKeyUnique = {
@@ -238,7 +238,7 @@
                 required: true,
                 type: 'string'
             }],
-            summary: 'delete one {{_schemaName}} object by {{_keyUnique}}',
+            summary: '{{operationId}} - delete one {{_schemaName}} object by {{_keyUnique}}',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudExistsOneByKeyUnique = {
@@ -254,7 +254,80 @@
                 required: true,
                 type: 'string'
             }],
-            summary: 'check if one {{_schemaName}} object exists by {{_keyUnique}}',
+            summary: '{{operationId}} - ' +
+                'check if one {{_schemaName}} object exists by {{_keyUnique}}',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudFileGetOneByKeyUnique = {
+            _keyUnique: '{{_keyUnique}}',
+            _method: 'get',
+            _path: '/{{_pathPrefix}}/crudFileGetOneByKeyUnique/{{{_keyUnique}}}',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudFileGetOneByKeyUnique.{{_keyUnique}}',
+            parameters: [{
+                description: '{{_schemaName}} {{_keyUnique}}',
+                in: 'path',
+                name: '{{_keyUnique}}',
+                required: true,
+                type: 'string'
+            }],
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
+                }
+            },
+            summary: '{{operationId}} - get one {{_schemaName}} file by {{_keyUnique}}',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudFileUploadManyByForm = {
+            _method: 'post',
+            _path: '/{{_pathPrefix}}/crudFileUploadManyByForm',
+            _pathPrefix: '{{_pathPrefix}}',
+            consumes: ['multipart/form-data'],
+            operationId: 'crudFileUploadManyByForm',
+            parameters: [{
+                description: '{{_schemaName}} file to form-upload',
+                in: 'formData',
+                name: 'file1',
+                type: 'file'
+            }, {
+                description: '{{_schemaName}} file to form-upload',
+                in: 'formData',
+                name: 'file2',
+                type: 'file'
+            }],
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
+                }
+            },
+            summary: '{{operationId}} - form-upload many {{_schemaName}} files',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudFileUploadOneByForm = {
+            _method: 'post',
+            _path: '/{{_pathPrefix}}/crudFileUploadOneByForm',
+            _pathPrefix: '{{_pathPrefix}}',
+            consumes: ['multipart/form-data'],
+            operationId: 'crudFileUploadOneByForm',
+            parameters: [{
+                description: '{{_schemaName}} file to form-upload',
+                in: 'formData',
+                name: 'file',
+                type: 'file'
+            }],
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
+                }
+            },
+            summary: '{{operationId}} - form-upload one {{_schemaName}} file',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudGetManyByQuery = {
@@ -302,10 +375,10 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'get many {{_schemaName}} objects by query',
+            summary: '{{operationId}} - get many {{_schemaName}} objects by query',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudGetOneByKeyUnique = {
@@ -325,10 +398,10 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'get one {{_schemaName}} object by {{_keyUnique}}',
+            summary: '{{operationId}} - get one {{_schemaName}} object by {{_keyUnique}}',
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudGetOneByQuery = {
@@ -356,17 +429,17 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse{{_schemaName}}' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'get one {{_schemaName}} object by query',
+            summary: '{{operationId}} - get one {{_schemaName}} object by query',
             tags: ['{{_pathPrefix}}']
         };
-        local.swgg.templatePathObjectDefaultDict.crudUserLoginByPassword = {
+        local.swgg.templatePathObjectDefaultDict.crudLoginByPassword = {
             _method: 'get',
-            _path: '/{{_pathPrefix}}/crudUserLoginByPassword',
+            _path: '/{{_pathPrefix}}/crudLoginByPassword',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudUserLoginByPassword',
+            operationId: 'crudLoginByPassword',
             parameters: [
                 {
                     default: 'loginByPassword',
@@ -395,10 +468,85 @@
                 200: {
                     description:
                         '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/JsonapiResponse' }
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
                 }
             },
-            summary: 'login user',
+            summary: '{{operationId}} - login by password',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudNullDelete = {
+            _method: 'delete',
+            _path: '/{{_pathPrefix}}/crudNullDelete',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudNullDelete',
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
+                }
+            },
+            summary: '{{operationId}} - return null response',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudNullGet = {
+            _method: 'get',
+            _path: '/{{_pathPrefix}}/crudNullGet',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudNullGet',
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
+                }
+            },
+            summary: '{{operationId}} - return null response',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudNullPatch = {
+            _method: 'patch',
+            _path: '/{{_pathPrefix}}/crudNullPatch',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudNullPatch',
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
+                }
+            },
+            summary: '{{operationId}} - return null response',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudNullPost = {
+            _method: 'post',
+            _path: '/{{_pathPrefix}}/crudNullPost',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudNullPost',
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
+                }
+            },
+            summary: '{{operationId}} - return null response',
+            tags: ['{{_pathPrefix}}']
+        };
+        local.swgg.templatePathObjectDefaultDict.crudNullPut = {
+            _method: 'put',
+            _path: '/{{_pathPrefix}}/crudNullPut',
+            _pathPrefix: '{{_pathPrefix}}',
+            operationId: 'crudNullPut',
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
+                }
+            },
+            summary: '{{operationId}} - return null response',
             tags: ['{{_pathPrefix}}']
         };
         // JSON.stringify templatePathObjectDefaultDict items to prevent side-effects
@@ -411,7 +559,7 @@
             basePath: '/api/v0',
             definitions: {
                 // http://jsonapi.org/format/#document-structure-top-level
-                JsonapiResponse: {
+                _BuiltinJsonapiResponse: {
                     properties: {
                         data: {
                             items: { type: 'object' },
@@ -435,6 +583,67 @@
             'x-validateUnusedDefinition': false,
             tags: []
         });
+        // init templateSwaggerJsonExtra
+        local.swgg.templateSwaggerJsonExtra = JSON.stringify({
+            _tagDict: {
+                '_builtin-file': { description: 'builtin File model' },
+                '_builtin-user': { description: 'builtin User model' }
+            },
+            definitions: {
+                _BuiltinFile: {
+                    _pathObjectDefaultList: [
+                        'crudCountManyByQuery',
+                        'crudDeleteOneByKeyUnique.id',
+                        'crudFileGetOneByKeyUnique.id',
+                        'crudFileUploadManyByForm',
+                        'crudFileUploadOneByForm',
+                        'crudGetOneByKeyUnique.id',
+                        'crudGetManyByQuery',
+                        'crudNullDelete',
+                        'crudNullGet',
+                        'crudNullPatch',
+                        'crudNullPost',
+                        'crudNullPut'
+                    ],
+                    _pathPrefix: '_builtin-file',
+                    properties: {
+                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
+                        fileBlob: { format: 'byte', type: 'string' },
+                        fileContentType: { type: 'string' },
+                        fileFilename: { type: 'string' },
+                        fileInputName: { type: 'string' },
+                        fileSize: { type: 'integer' },
+                        fileUrl: { type: 'string' },
+                        id: { type: 'string' },
+                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
+                    }
+                },
+                _BuiltinUser: {
+                    _pathObjectDefaultList: [
+                        'crudCountManyByQuery',
+                        'crudCreateOrReplaceOne',
+                        'crudCreateOrUpdateOneByKeyUnique.id',
+                        'crudDeleteOneByKeyUnique.id',
+                        'crudGetManyByQuery',
+                        'crudLoginByPassword'
+                    ],
+                    _pathPrefix: '_builtin-user',
+                    properties: {
+                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
+                        id: { type: 'string' },
+                        jwtEncoded: { type: 'string' },
+                        password: { format: 'password', type: 'string' },
+                        roleList: { items: { type: 'string' }, type: 'array' },
+                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' },
+                        username: { type: 'string' }
+                    }
+                }
+            }
+        });
+        local.swgg.templateSwaggerLogoSmallBase64 = String() +
+            /* jslint-ignore-next-line */
+            'iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAqRJREFUeNrEVz1s00AUfnGXii5maMXoEUEHVwIpEkPNgkBdMnQoU5ytiKHJwpp2Q2JIO8DCUDOxIJFIVOoWZyJSh3pp1Q2PVVlcCVBH3ufeVZZ9Zye1Ay86nXV+ue/9fO/lheg/Se02X1rvksmbnTiKvuxQMBNgBnN4a/LCbmnUAP6JV58NCUsBC8CuAJxGPF47OgNqBaA93tolUhnx6jC4NxGwyOEwlccyAs+3kwdzKq0HDn2vEBTi8J2XpyMaywNDE157BhXUE3zJhlq8GKq+Zd2zaWHepPA8oN9XkfLmRdOiJV4XUUg/IyWncLjCYY/SHndV2u7zHr3bPKZtdxgboJOnthvrfGj/oMf3G0r7JVmNlLfKklmrt2MvvcNO7LFOhoFHfuAJI5o6ta10jpt5CQLgwXhXG2YIwvu+34qf78ybOjWTnWwkgR36d7JqJOrW0hHmNrKg9xhiS4+1jFmrxymh03B0w+6kURIAu3yHtOD5oaUNojMnGgbcctNvwdAnyxvxRR+/vaJnjzbpzcZX+nN1SdGv85i9eH8w3qPO+mdm/y4dnQ1iI8Fq6Nf4cxL6GWSjiFDSs0VRnxC5g0xSB2cgHpaseTxfqOv5uoHkNQ6Ha/N1Yz9mNMppEkEkYKj79q6uCq4bCHcSX3fJ0Vk/k9siASjCm1N6gZH6Ec9IXt2WkFES2K/ixoIyktJPAu/ptOA1SgO5zqtr6KASJPF0nMV8dgMsRhRPOcMwqQAOoi0VAIMLAEWJ6YYC1c8ibj1GP51RqwzYwZVMHQuvOzMCBUtb2tGHx5NAdLKqp5AX7Ng4d+Zi8AGDI9z1ijx9yaCH04y3GCP2S+QcvaGl+pcxyUBvinFlawoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=' +
+            String();
     }());
 
 
@@ -454,6 +663,7 @@
                         local.utility2.jsonCopy(options.swggParamDict),
                         self
                     ),
+                    dataReadonlyRemove: options.swggParamDict,
                     key: self.operationId,
                     paramDefList: self.parameters
                 });
@@ -515,9 +725,9 @@
                 options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
             }
             // init headers - Authorization
-            if (local.swgg.jwt) {
+            if (local.swgg.userJwtEncoded) {
                 options.headers.Authorization = options.headers.Authorization ||
-                    'Bearer ' + local.swgg.jwt;
+                    'Bearer ' + local.swgg.userJwtEncoded;
             }
             // init url
             options.url = options.schemes + '://' + options.host + options.basePath +
@@ -556,29 +766,32 @@
                 schema._schemaName = schemaName;
                 local.utility2.objectSetDefault(options, JSON.parse(JSON.stringify({
                     definitions: {
-                        // init JsonapiResponse{{_schemaName}}
-                        'JsonapiResponse{{_schemaName}}': {
+                        // init _BuiltinJsonapiResponse{{_schemaName}}
+                        '_BuiltinJsonapiResponse{{_schemaName}}': {
                             properties: { data: {
                                 items: { $ref: '#/definitions/{{_schemaName}}' },
                                 type: 'array'
                             } },
-                            'x-inheritList': [{ $ref: '#/definitions/JsonapiResponse' }]
+                            'x-inheritList': [{ $ref: '#/definitions/_BuiltinJsonapiResponse' }]
                         }
                     }
                 }).replace((/\{\{_schemaName\}\}/g), schemaName)), 2);
                 // init pathObject
-                (schema._pathObjectDefaultList || []).forEach(function (pathObject) {
+                (schema._pathObjectDefaultList || []).forEach(function (operationId) {
                     // init keyUnique
-                    keyUnique = (/ByKeyUnique\.(.*)/).exec(pathObject);
+                    keyUnique = (/ByKeyUnique\.(.*)/).exec(operationId);
                     keyUnique = keyUnique && keyUnique[1];
                     keyUnique = keyUnique && keyUnique.split('.')[0];
-                    pathObject = pathObject.replace('.' + keyUnique, '');
-                    pathObject = JSON.parse(local.swgg.templatePathObjectDefaultDict[pathObject]
+                    operationId = operationId.replace('.' + keyUnique, '');
+                    // init pathObject
+                    pathObject = local.swgg.templatePathObjectDefaultDict[operationId]
                         .replace((/\{\{_keyUnique\}\}/g), keyUnique)
                         .replace((/\{\{_pathPrefix\}\}/g), schema._pathPrefix)
-                        .replace((/\{\{_schemaName\}\}/g), schema._schemaName));
+                        .replace((/\{\{_schemaName\}\}/g), schema._schemaName)
+                        .replace((/\{\{operationId\}\}/g), operationId);
+                    pathObject = JSON.parse(pathObject);
                     // init keyUnique.format and keyUnique.type
-                    pathObject.parameters.forEach(function (param) {
+                    (pathObject.parameters || []).forEach(function (param) {
                         if (param.name === keyUnique) {
                             param.format = schema.properties[keyUnique].format;
                             param.type = schema.properties[keyUnique].type;
@@ -600,8 +813,14 @@
                                 case 'boolean':
                                 case 'integer':
                                 case 'number':
+                                    return true;
                                 case 'string':
-                                    return !tmp.readOnly;
+                                    switch (tmp.format) {
+                                    case 'binary':
+                                    case 'byte':
+                                        break;
+                                    }
+                                    return true;
                                 }
                             })
                             .sort()
@@ -613,6 +832,7 @@
                                     format: tmp.format,
                                     in: 'query',
                                     name: key,
+                                    'x-queryRange': true,
                                     'x-title': tmp.title,
                                     type: tmp.type
                                 };
@@ -638,7 +858,7 @@
                             200: {
                                 description: 'ok - ' +
                                     'http://jsonapi.org/format/#document-top-level',
-                                schema: { $ref: '#/definitions/JsonapiResponse' }
+                                schema: { $ref: '#/definitions/_BuiltinJsonapiResponse' }
                             }
                         },
                         tags: []
@@ -693,13 +913,13 @@
                     }
                 });
             };
-            // remove first-level underscored keys from swaggerJson
+            // remove top-level underscored keys from swaggerJson
             tmp(local.swgg.swaggerJson);
-            // remove first-level underscored keys from swaggerJson.definitions
+            // remove top-level underscored keys from swaggerJson.definitions
             Object.keys(local.swgg.swaggerJson.definitions).forEach(function (key) {
                 tmp(local.swgg.swaggerJson.definitions[key]);
             });
-            // remove underscored keys from swaggerJson.paths
+            // remove top-underscored keys from swaggerJson.paths.<path>.<method>
             Object.keys(local.swgg.swaggerJson.paths).forEach(function (path) {
                 Object.keys(local.swgg.swaggerJson.paths[path]).forEach(function (method) {
                     tmp(local.swgg.swaggerJson.paths[path][method]);
@@ -707,10 +927,9 @@
             });
             // init properties from x-inheritList
             [0, 1, 2, 3].forEach(function () {
-                Object.keys(local.swgg.swaggerJson.definitions).forEach(function (schema) {
-                    schema = local.swgg.swaggerJson.definitions[schema];
+                Object.keys(local.swgg.swaggerJson.definitions).forEach(function (schemaName) {
+                    schema = local.swgg.swaggerJson.definitions[schemaName];
                     local.utility2.jsonCopy(schema['x-inheritList'] || [])
-                        .reverse()
                         .forEach(function (element) {
                             local.utility2.objectSetDefault(schema, {
                                 properties:
@@ -744,6 +963,24 @@
                 });
                 local.swgg.api.buildFromSpec(local.utility2.jsonCopy(local.swgg.swaggerJson));
             }, local.utility2.nop);
+        };
+
+        local.swgg.bufferIndexOfSubBuffer = function (buffer, subBuffer, fromIndex) {
+        /*
+         * this function will search the buffer for the indexOf-like position of the subBuffer
+         */
+            var ii, jj;
+            for (ii = fromIndex || 0; ii < buffer.length; ii += 1) {
+                for (jj = 0; jj < subBuffer.length; ii += 1, jj += 1) {
+                    if (buffer[ii] !== subBuffer[jj]) {
+                        break;
+                    }
+                }
+                if (jj === subBuffer.length) {
+                    return ii - jj;
+                }
+            }
+            return -1;
         };
 
         local.swgg.collectionCreate = function (schemaName) {
@@ -904,6 +1141,7 @@
         /*
          * this function will run the middleware that will parse the request-body
          */
+            var ii, jj, options;
             // jslint-hack
             local.utility2.nop(response);
             // if request is already parsed, then goto nextMiddleware
@@ -911,13 +1149,81 @@
                 nextMiddleware();
                 return;
             }
-            request.swggBodyParsed = String(request.bodyRaw);
-            switch ((/[^;]*/).exec(request.headers['content-type'] || '')[0]) {
+            switch ((request.headers['content-type'] || '').split(';')[0]) {
+            // parse application/x-www-form-urlencoded, e.g.
+            // aa=hello%20world&bb=bye%20world
             case 'application/x-www-form-urlencoded':
+                request.swggBodyParsed = String(request.bodyRaw);
                 request.swggBodyParsed =
                     local.utility2.urlParse('?' + request.swggBodyParsed, true).query;
                 break;
+            // https://tools.ietf.org/html/rfc7578
+            // parse multipart/form-data, e.g.
+            /*
+            ------Boundary\r\n
+            Content-Disposition: form-data; name="input1"; filename="file1.png"\r\n
+            Content-Type: image/jpeg\r\n
+            \r\n
+            <data1>\r\n
+            ------Boundary\r\n
+            Content-Disposition: form-data; name="input2"; filename="file2.png"\r\n
+            Content-Type: image/jpeg\r\n
+            \r\n
+            <data2>\r\n
+            ------Boundary--\r\n
+            */
+            case 'multipart/form-data':
+                request.swggBodyParsed = {};
+                request.swggBodyMeta = {};
+                options = {};
+                options.crlf = [0x0d, 0x0a];
+                // init boundary
+                ii = 0;
+                jj = local.swgg.bufferIndexOfSubBuffer(request.bodyRaw, options.crlf, ii);
+                if (jj <= 0) {
+                    return;
+                }
+                options.boundary = new local.global.Uint8Array(options.crlf.concat(
+                    Array.prototype.slice.call(request.bodyRaw.slice(ii, jj))
+                ));
+                ii = jj + 2;
+                while (true) {
+                    jj = local.swgg.bufferIndexOfSubBuffer(
+                        request.bodyRaw,
+                        options.boundary,
+                        ii
+                    );
+                    if (jj < 0) {
+                        break;
+                    }
+                    options.header = new local.utility2.StringView(
+                        request.bodyRaw.slice(ii, ii + 1024)
+                    ).toString().split('\r\n').slice(0, 2).join('\r\n');
+                    options.contentType = (/^content-type:(.*)/im).exec(options.header);
+                    options.contentType = options.contentType && options.contentType[1].trim();
+                    options.filename = (/^content-disposition:.*?\bfilename="([^"]+)/im)
+                        .exec(options.header);
+                    options.filename = options.filename && options.filename[1];
+                    options.name = (/^content-disposition:.*?\bname="([^"]+)/im)
+                        .exec(options.header);
+                    options.name = options.name && options.name[1];
+                    ii = local.swgg.bufferIndexOfSubBuffer(
+                        request.bodyRaw,
+                        [0x0d, 0x0a, 0x0d, 0x0a],
+                        ii + 2
+                    ) + 4;
+                    options.data = request.bodyRaw.slice(ii, jj);
+                    request.swggBodyParsed[options.name] = options.data;
+                    request.swggBodyMeta[options.name] = {
+                        contentType: options.contentType,
+                        filename: options.filename,
+                        name: options.name
+                    };
+                    ii = jj + options.boundary.length + 2;
+                }
+                break;
             default:
+                request.swggBodyParsed = String(request.bodyRaw);
                 local.utility2.tryCatchOnError(function () {
                     request.swggBodyParsed = JSON.parse(request.swggBodyParsed);
                 }, local.utility2.nop);
@@ -991,6 +1297,8 @@
                     switch (crud.operationId) {
                     case 'crudCreateOrReplaceOne':
                     case 'crudCreateOrUpdateOne':
+                    case 'crudFileUploadManyByForm':
+                    case 'crudFileUploadOneByForm':
                         crud.data.id = crud.data.id || (crud.body && crud.body.id);
                         if (!crud.data.id) {
                             crud.data.id = local.utility2.uuidTimeCreate();
@@ -1058,6 +1366,28 @@
                     case 'crudExistsOneByKeyUnique':
                         crud.collection.findOne(crud.queryByKeyUnique, { $: 1 }, onNext);
                         break;
+                    case 'crudFileGetOneByKeyUnique':
+                        crud.collection.findOne(crud.queryByKeyUnique, onNext);
+                        break;
+                    case 'crudFileUploadManyByForm':
+                    case 'crudFileUploadOneByForm':
+                        crud.body = Object.keys(request.swggBodyParsed).map(function (key, ii) {
+                            return {
+                                fileBlob: local.utility2.StringView.bytesToBase64(
+                                    request.swggBodyParsed[key]
+                                ),
+                                fileContentType: request.swggBodyMeta[key].contentType,
+                                fileFilename: request.swggBodyMeta[key].filename,
+                                fileInputName: request.swggBodyMeta[key].name,
+                                fileSize: request.swggBodyMeta[key].contentType.length,
+                                fileUrl: local.swgg.swaggerJson.basePath + '/' +
+                                    request.swggPathObject._pathPrefix +
+                                    '/crudFileGetOneByKeyUnique/' + (crud.data.id + ii),
+                                id: crud.data.id + ii
+                            };
+                        });
+                        crud.collection.insert(crud.body, onNext);
+                        break;
                     case 'crudGetManyByQuery':
                         onParallel = local.utility2.onParallel(onNext);
                         onParallel.counter += 1;
@@ -1081,6 +1411,13 @@
                     case 'crudGetOneByQuery':
                         crud.collection.findOne(crud.queryQuery, crud.queryFields, onNext);
                         break;
+                    case 'crudNullDelete':
+                    case 'crudNullGet':
+                    case 'crudNullPatch':
+                    case 'crudNullPost':
+                    case 'crudNullPut':
+                        onNext();
+                        break;
                     default:
                         modeNext = Infinity;
                         onNext();
@@ -1097,19 +1434,39 @@
                     case 'crudCreateOrUpdateOneByKeyUnique':
                         onNext(null, meta, data);
                         break;
+                    case 'crudExistsOneByKeyUnique':
+                        onNext(null, !!data);
+                        break;
+                    case 'crudFileGetOneByKeyUnique':
+                        crud.collection.findOne(crud.queryByKeyUnique, onNext);
+                        break;
+                    case 'crudFileUploadManyByForm':
+                    case 'crudFileUploadOneByForm':
+                        onNext(null, data.map(function (element) {
+                            delete element.fileBlob;
+                            return element;
+                        }));
+                        break;
                     case 'crudGetManyByQuery':
                         onNext(null, crud.queryData, {
                             paginationCountTotal: crud.paginationCountTotal
                         });
-                        break;
-                    case 'crudExistsOneByKeyUnique':
-                        onNext(null, !!data);
                         break;
                     default:
                         onNext(null, data);
                     }
                     break;
                 case 3:
+                    switch (crud.operationId.split('.')[0]) {
+                    case 'crudFileGetOneByKeyUnique':
+                        local.utility2.serverRespondHeadSet(request, response, null, {
+                            'Content-Type': data.fileContentType
+                        });
+                        response.end(local.modeJs === 'browser'
+                            ? local.utility2.StringView.base64ToBytes(data.fileBlob)
+                            : new Buffer(data.fileBlob, 'base64'));
+                        return;
+                    }
                     local.swgg.serverRespondJsonapi(request, response, null, data, meta);
                     break;
                 default:
@@ -1129,6 +1486,15 @@
                 error.statusCode = 404;
             }
             local.swgg.serverRespondJsonapi(request, response, error);
+        };
+
+        local.swgg.middlewareFileUpload = function (request, response, nextMiddleware) {
+        /*
+         * this function will handle file upload / delete
+         */
+            // jslint-hack
+            local.utility2.nop(request, response);
+            nextMiddleware();
         };
 
         local.swgg.middlewareJsonpStateInit = function (request, response, nextMiddleware) {
@@ -1159,8 +1525,8 @@
                     request.swggLogin = request.swggLogin ||
                         local.utility2.jsonCopy(request.urlParsed.query) ||
                         {};
-                    if (!request.swggLogin.jwt && request.headers.authorization) {
-                        request.swggUser = local.utility2.jwtHs256Decode(
+                    if (!request.swggLogin.jwtEncoded && request.headers.authorization) {
+                        request.userJwt = local.utility2.jwtHs256Decode(
                             request.headers.authorization.replace('Bearer ', ''),
                             local.utility2.envDict.JWT_SECRET || ''
                         );
@@ -1168,7 +1534,7 @@
                     switch (request.swggLogin.modeLogin) {
                     case 'loginByPassword':
                         if (request.swggLogin.password && request.swggLogin.username) {
-                            local.swgg.collectionCreate('_User').findOne({
+                            local.swgg.collectionCreate('_BuiltinUser').findOne({
                                 username: request.swggLogin.username
                             }, onNext);
                             return;
@@ -1185,15 +1551,15 @@
                                 request.swggLogin.password,
                                 data && data.password
                             )) {
-                            request.swggUser = {
-                                iat: Math.floor(Date.now() / 1000),
+                            request.userJwt = {
+                                exp: Math.floor(Date.now() / 1000) + 3600,
                                 jti: local.utility2.uuidTimeCreate(),
                                 roleList: data.roleList,
                                 sub: data.username
                             };
                             local.swgg.serverRespondJsonapi(request, response, null, {
-                                jwt: local.utility2.jwtHs256Encode(
-                                    request.swggUser,
+                                jwtEncoded: local.utility2.jwtHs256Encode(
+                                    request.userJwt,
                                     local.utility2.envDict.JWT_SECRET || ''
                                 )
                             });
@@ -1279,9 +1645,13 @@
                             break;
                         // parse formData param
                         case 'formData':
-                            request.swggParamDict[paramDef.name] =
-                                request.swggParamDict[paramDef.name] ||
-                                request.swggBodyParsed[paramDef.name];
+                            switch ((request.headers['content-type'] || '').split(';')[0]) {
+                            case 'application/x-www-form-urlencoded':
+                                request.swggParamDict[paramDef.name] =
+                                    request.swggParamDict[paramDef.name] ||
+                                    request.swggBodyParsed[paramDef.name];
+                                break;
+                            }
                             break;
                         // parse header param
                         case 'header':
@@ -1387,12 +1757,12 @@
                     if (!Array.isArray(data)) {
                         data = [data];
                     }
-                    // normalize data-list to be non-empty
-                    if (!data.length) {
-                        data.push(null);
-                    }
                     // normalize error-list to contain non-null objects
                     if (ii === 0) {
+                        // normalize error-list to be non-empty
+                        if (!data.length) {
+                            data.push(null);
+                        }
                         data = data.map(function (element) {
                             if (!(element && typeof element === 'object')) {
                                 element = { message: String(element) };
@@ -1415,16 +1785,17 @@
                     if (!data) {
                         return;
                     }
-                    data.meta = local.utility2.jsonCopy(meta
-                        ? (typeof meta === 'object'
-                            ? meta
-                            : { metaData: meta })
-                        : {});
+                    data.meta = local.utility2.jsonCopy(meta || {});
+                    // normalize meta-object
+                    if (typeof data.meta !== 'object') {
+                        data.meta = { metaData: meta };
+                    }
                     data.meta.isJsonapiResponse = true;
-                    data.meta.dataLength = ii === 0
-                        ? data.errors
-                        : data.data;
-                    data.meta.dataLength = (data.meta.dataLength || []).length;
+                    if (ii === 0) {
+                        data.meta.errorsLength = (data.errors && data.errors.length) | 0;
+                    } else {
+                        data.meta.dataLength = (data.data && data.data.length) | 0;
+                    }
                     data.meta.statusCode = data.meta.statusCode || data.statusCode || 0;
                 });
                 onError(data[0], data[1]);
@@ -1486,16 +1857,16 @@
          * and if succesful, will receive a jwt token
          */
             var self;
-            self = local.swgg.apiDict["GET /_user/crudUserLoginByPassword"];
+            self = local.swgg.apiDict["GET /_builtin-user/crudLoginByPassword"];
             self({ swggParamDict: {
                 modeLogin: 'loginByPassword',
                 password: options.password,
                 username: options.username
-            } }, function (error, data) {
-                if (!error && data) {
-                    local.swgg.jwt = data.data[0].jwt;
+            } }, function (error, xhr) {
+                if (!error && xhr) {
+                    local.swgg.userJwtEncoded = xhr.responseJSON.data[0].jwtEncoded;
                 }
-                onError(error, data);
+                onError(error, xhr);
             });
         };
 
@@ -1510,9 +1881,11 @@
                 local.utility2.assert(data && typeof data === 'object', data);
                 (options.paramDefList || []).forEach(function (paramDef) {
                     key = paramDef.name;
-                    // recurse - validate param
+                    // recurse - validateByPropertyDef
                     local.swgg.validateByPropertyDef({
                         data: data[key],
+                        dataReadonlyRemove: options.dataReadonlyRemove &&
+                            options.dataReadonlyRemove[key],
                         key: key,
                         propertyDef: paramDef,
                         required: paramDef.required,
@@ -1546,10 +1919,11 @@
             // validate schema
             tmp = propertyDef.$ref || (propertyDef.schema && propertyDef.schema.$ref);
             if (tmp) {
-                // recurse - validate schema-reference
+                // recurse - validateBySchema
                 local.swgg.validateBySchema({
                     circularList: options.circularList,
                     data: data,
+                    dataReadonlyRemove: options.dataReadonlyRemove,
                     key: tmp,
                     schema: local.swgg.schemaDereference(tmp),
                     'x-notRequired': options['x-notRequired']
@@ -1594,6 +1968,9 @@
                     if (propertyDef.minLength) {
                         local.utility2.assert(data.length >= propertyDef.minLength);
                     }
+                    if (propertyDef.pattern) {
+                        local.utility2.assert(new RegExp(propertyDef.pattern).test(data));
+                    }
                 // http://json-schema.org/latest/json-schema-validation.html#anchor36
                 // 5.3.  Validation keywords for arrays
                 } else if (Array.isArray(data)) {
@@ -1634,11 +2011,13 @@
                 switch (propertyDef.type) {
                 case 'array':
                     local.utility2.assert(Array.isArray(data) && propertyDef.items);
-                    data.forEach(function (element) {
-                        // recurse - validate element in list
+                    data.forEach(function (element, ii) {
+                        // recurse - validateByPropertyDef
                         local.swgg.validateByPropertyDef({
                             circularList: options.circularList,
                             data: element,
+                            dataReadonlyRemove: options.dataReadonlyRemove &&
+                                options.dataReadonlyRemove[ii],
                             key: options.key,
                             propertyDef: propertyDef.items,
                             'x-notRequired': options['x-notRequired']
@@ -1722,10 +2101,18 @@
                 );
                 Object.keys(schema.properties || {}).forEach(function (_) {
                     key = _;
-                    // recurse - validate schema-reference
+                    // delete options.dataReadonlyRemove[key]
+                    if (schema.properties[key].readOnly &&
+                            options.dataReadonlyRemove &&
+                            options.dataReadonlyRemove.hasOwnProperty(key)) {
+                        delete options.dataReadonlyRemove[key];
+                    }
+                    // recurse - validateByPropertyDef
                     local.swgg.validateByPropertyDef({
                         circularList: options.circularList,
                         data: data[key],
+                        dataReadonlyRemove: options.dataReadonlyRemove &&
+                            options.dataReadonlyRemove[key],
                         depth: options.depth - 1,
                         key: key,
                         propertyDef: schema.properties[key],
@@ -1912,6 +2299,23 @@
                     url: 'https://raw.githubusercontent.com' +
                         '/Eonasdan/bootstrap-datetimepicker/4.17.37/build/js' +
                         '/bootstrap-datetimepicker.min.js'
+                // init lib bootstrap-fileinput
+                }, {
+                    file: 'external/assets.swgg.bootstrap-fileinput.img.loading-sm.gif',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/kartik-v/bootstrap-fileinput/v4.3.1/img/loading-sm.gif'
+                }, {
+                    file: 'external/assets.swgg.bootstrap-fileinput.img.loading.gif',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/kartik-v/bootstrap-fileinput/v4.3.1/img/loading.gif'
+                }, {
+                    file: 'external/assets.swgg.bootstrap-fileinput.css',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/kartik-v/bootstrap-fileinput/v4.3.1/css/fileinput.css'
+                }, {
+                    file: 'external/assets.swgg.lib.bootstrap-fileinput.js',
+                    url: 'https://raw.githubusercontent.com' +
+                        '/kartik-v/bootstrap-fileinput/v4.3.1/js/fileinput.min.js'
                 // init lib datatables
                 }, {
                     file: 'external/assets.swgg.datatables.css',
@@ -2020,33 +2424,19 @@
     // run shared js-env code - post-init
     (function () {
         // init api
-        local.swgg.apiDictUpdate({
-            _tagDict: { '_user': { description: 'swagger-lite User model' } },
-            definitions: {
-                _User: {
-                    _pathObjectDefaultList: [
-                        'crudCreateOrReplaceOne',
-                        'crudCreateOrUpdateOneByKeyUnique.id',
-                        'crudDeleteOneByKeyUnique.id',
-                        'crudGetManyByQuery',
-                        'crudUserLoginByPassword'
-                    ],
-                    _pathPrefix: '_user',
-                    properties: {
-                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
-                        id: { type: 'string' },
-                        roleList: { items: { type: 'string' }, type: 'array' },
-                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' },
-                        password: { format: 'password', type: 'string' },
-                        username: { type: 'string' }
-                    }
-                }
-            }
-        });
+        local.swgg.apiDictUpdate(JSON.parse(local.swgg.templateSwaggerJsonExtra));
         // init collection-list
         local.utility2.onReady.counter += 1;
         local.swgg.collectionListInit([{
-            drop: true,
+            ensureIndexList: [{
+                fieldName: 'id',
+                unique: true
+            }, {
+                fieldName: 'url',
+                unique: true
+            }],
+            name: '_BuiltinFile'
+        }, {
             ensureIndexList: [{
                 fieldName: 'id',
                 unique: true
@@ -2054,7 +2444,7 @@
                 fieldName: 'username',
                 unique: true
             }],
-            name: '_User'
+            name: '_BuiltinUser'
         }], local.utility2.onReady);
     }());
 }());

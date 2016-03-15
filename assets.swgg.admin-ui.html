@@ -4,20 +4,18 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 <title>{{envDict.npm_package_name}} @ {{envDict.npm_package_version}}</title>
-<!-- init css -->
 <link href="assets.swgg.animate.css" rel="stylesheet">
 <link href="assets.swgg.bootstrap.css" rel="stylesheet">
 <link href="assets.swgg.bootstrap-datetimepicker.css" rel="stylesheet">
+<link href="assets.swgg.bootstrap-fileinput.css" rel="stylesheet">
 <link href="assets.swgg.datatables.css" rel="stylesheet">
 <link href="assets.utility2.css" rel="stylesheet">
 <link href="assets.swgg.css" rel="stylesheet">
-<!-- init style -->
 <style>
 /* init css admin-ui */
-* {
-    border-radius: 0 !important;
+body {
+    margin: 1rem;
 }
 .dataTables_wrapper .paginate_button {
     padding: 0.1em 0.5em !important;
@@ -27,6 +25,9 @@
     width: 100%;
     z-index: 99;
 }
+.dtHeader {
+    margin-bottom: 1rem !important;
+}
 #dtTableContainer1 {
     border-top: 1px solid #000;
     margin-top: 20px;
@@ -35,28 +36,30 @@
 .dtFormInputInvalid {
     outline: #f00 solid 1px;
 }
+.dtFormInputContainer > .col-sm-9 {
+    margin-top: 1rem;
+}
+textarea.form-control {
+    height: 8rem;
+}
+.form-group {
+    padding-right: 5rem !important;
+}
 .nav-pills > li {
-    padding-left: 5px;
+    padding-left: 1rem;
 }
 .nav-pills > li:first-child {
     padding-left: 0;
 }
 .nav-pills > li > a {
     background-color: #ddf;
-    border-radius: 0;
 }
 .nav-pills.dtViewContainer > li.active > a:focus,
 .nav-pills.dtViewContainer > li.active > a:hover,
 .nav-pills.dtViewContainer > li.active > a {
     background-color: #99f;
 }
-.tab-content {
-    margin: 10px;
-}
 /* init css custom */
-.border-radius-0 {
-    border-radius: 0;
-}
 .margin-0 {
     margin: 0;
 }
@@ -66,13 +69,15 @@
 </style>
 </head>
 <body>
-<!-- init dom ajaxProgress -->
+<!-- .ajaxProgressDiv begin -->
 <div class="ajaxProgressDiv" style="display: block;">
     <div class="ajaxProgressBarDiv ajaxProgressBarDivLoading">loading</div>
 </div>
-<!-- init dom alertContainer -->
+<!-- .ajaxProgressDiv end -->
+<!-- #alertContainer begin -->
 <div id="dtAlertContainer1"></div>
-<!-- modal login form -->
+<!-- #alertContainer end -->
+<!-- #userFormLogin begin -->
 <div class="modal fade" data-backdrop="static" id="userFormLogin" tabindex="-1">
 <div class="modal-dialog">
 <div class="modal-content">
@@ -92,11 +97,12 @@
 </div>
 </div>
 </div>
+<!-- #userFormLogin end -->
 
 
 
-<!-- init dom navbar -->
-<nav class="border-radius-0 margin-0 navbar navbar-inverse">
+<!-- .navbar begin -->
+<nav class="dtHeader navbar navbar-inverse">
 <div class="container">
 <div class="navbar-header">
 <button type="button" class="collapsed navbar-toggle" data-toggle="collapse" data-target="#navbar">
@@ -113,54 +119,85 @@
 </div>
 </div>
 </nav>
+<!-- .navbar end -->
 
 
 
-<!-- init dom tabbed-datatable-list -->
-<div>
-<ul class="nav nav-justified nav-pills" id="dtListContainer1" style="padding-bottom: 4px; padding-top: 5px;">
+<!-- .dtHeader #dtListContainer begin -->
+<div class="dtHeader">
+<ul class="nav nav-justified nav-pills" id="dtListContainer1">
     <li class="active"><a href="#">loading api ...</a></li>
 </ul>
 </div>
+<!-- .dtHeader #dtListContainer end -->
 
 
 
-<!-- Nav tabs -->
-<div>
+<!-- .dtHeader #dtViewContainer begin -->
+<div class="dtHeader">
 <ul class="dtViewContainer nav nav-justified nav-pills">
 <li><a data-toggle="tab" href="#dtViewTable1" id="dtNavTable1">table of records</a></li>
 <li><a data-toggle="tab" href="#dtViewRecordEdit1" id="dtNavRecordEdit1" onclick="local.swgg.dtOnClickRecordEdit()">create or update record</a></li>
 </ul>
 </div>
+<!-- .dtHeader #dtViewContainer end -->
 
 
 
-<!-- Tab panes -->
+<!-- .tab-content begin -->
 <div class="tab-content">
 
 
 
+<!-- #dtViewTable1 begin -->
 <div class="active fade tab-pane" id="dtViewTable1">
-<!-- init dom table-query-form -->
+<!-- #dtFormTableQuery1 begin -->
 <div class="container">
-    <div class="dtFormContainer form-horizontal" id="dtFormTableQuery1"></div>
-    <button class="btn btn-primary" id="dtButtonQuerySubmit1" onclick="local.swgg.dtOnClickQuerySubmit()">submit query</button>
+<div class="dtFormContainer form-horizontal" id="dtFormTableQuery1"></div>
+<div class="form-horizontal">
+    <div class="form-group">
+    <div class="col-sm-3 control-label"><button class="btn btn-primary" id="dtButtonQuerySubmit1" onclick="local.swgg.dtOnClickQuerySubmit()">submit query</button></div>
+    </div>
 </div>
-<!-- init dom datatable -->
+</div>
+<!-- #dtFormTableQuery1 end -->
+<!-- #dtTableContainer1 begin -->
 <div id="dtTableContainer1"></div>
+<!-- #dtTableContainer1 end -->
 </div>
+<!-- #dtViewTable1 end -->
 
 
 
-<!-- init dom row-edit-form -->
+<!-- #dtViewRecordEdit1 begin -->
 <div class="container fade tab-pane" id="dtViewRecordEdit1">
 <div class="dtFormContainer form-horizontal" id="dtFormRecordEdit1"></div>
-<button class="btn btn-primary" id="dtButtonRecordSave1" onclick="local.swgg.dtOnClickRecordSave()">save</button>
+<div class="form-horizontal">
+    <div class="form-group">
+    <div class="col-sm-3 control-label"><button class="btn btn-primary" id="dtButtonRecordSave1" onclick="local.swgg.dtOnClickRecordSave()">save</button></div>
+    </div>
 </div>
+</div>
+<!-- #dtViewRecordEdit1 end -->
 
 
 
 </div>
+<!-- .tab-content end -->
+
+
+
+<!--!! <div><div><div><div> -->
+
+<!--!! image upload -->
+<!--!! <div class="form-group"> -->
+<!--!! <label class="col-sm-3 control-label">createdAt<br>(date-time)</label> -->
+<!--!! <div class="col-sm-9"> -->
+<!--!! <input class="file-loading" id="fileUploadImage1" multiple type="file"> -->
+<!--!! </div> -->
+<!--!! </div> -->
+
+<!--!! <div><div></div></div> -->
 
 
 
@@ -169,6 +206,7 @@
 <script src="assets.swgg.lib.bootstrap.js"></script>
 <script src="assets.swgg.lib.moment.js"></script>
 <script src="assets.swgg.lib.bootstrap-datetimepicker.js"></script>
+<script src="assets.swgg.lib.bootstrap-fileinput.js"></script>
 <script src="assets.swgg.lib.datatables.js"></script>
 <!-- init lib swagger-lite -->
 <script src="assets.swgg.lib.nedb.js"></script>
@@ -185,6 +223,34 @@ var local;
 local = window.local = window.swgg.local;
 // init datatable-list
 local.swgg.dtListInit();
-});</script>
+});
+
+
+
+//!! $("#fileUploadImage1").fileinput({
+    //!! uploadUrl: "/api/v0/_builtin-file/crudNullPost", // server upload action
+    //!! minFileCount: 1,
+    //!! maxFileCount: 5,
+    //!! overwriteInitial: false,
+    //!! initialPreview: [
+        //!! "<img style='height:160px' src='http://loremflickr.com/200/150/people?random=1'>",
+        //!! "<img style='height:160px' src='http://loremflickr.com/200/150/people?random=2'>",
+    //!! ],
+    //!! initialPreviewConfig: [
+        //!! {caption: "People-1.jpg", width: "120px", url: "/api/v0/_builtin-file/crudNullPost", key: 1},
+        //!! {caption: "People-2.jpg", width: "120px", url: "/site/file-delete", key: 2},
+    //!! ],
+    //!! uploadExtraData: {
+        //!! img_key: "1000",
+        //!! img_keywords: "happy, people",
+    //!! }
+//!! });
+
+
+//!! setTimeout(function () {
+    //!! $('#dtNavRecordEdit1').click();
+//!! }, 100);
+
+</script>
 </body>
 </html>

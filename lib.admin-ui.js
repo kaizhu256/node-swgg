@@ -42,14 +42,24 @@
         // init templateDtListPetstore
         local.swgg.templateDtListPetstore = JSON.stringify([{
             apiDict: {
-                crudCreateOne: '_user crudCreateOrReplaceOne',
-                'crudDeleteOneByKeyUnique.id': '_user crudDeleteOneByKeyUnique.id',
-                crudGetManyByQuery: '_user crudGetManyByQuery',
-                'crudUpdateOneByKeyUnique.id': '_user crudCreateOrUpdateOneByKeyUnique.id'
+                'crudDeleteOneByKeyUnique.id': '_builtin-file crudDeleteOneByKeyUnique.id',
+                crudGetManyByQuery: '_builtin-file crudGetManyByQuery'
             },
             paginationCountTotal: 'paginationCountTotal',
-            schemaName: '_User',
-            title: 'swagger-lite user api',
+            schemaName: '_BuiltinFile',
+            title: 'builtin file api',
+            urlSwaggerJson: 'api/v0/swagger.json'
+        }, {
+            apiDict: {
+                crudCreateOne: '_builtin-user crudCreateOrReplaceOne',
+                'crudDeleteOneByKeyUnique.id': '_builtin-user crudDeleteOneByKeyUnique.id',
+                crudGetManyByQuery: '_builtin-user crudGetManyByQuery',
+                'crudUpdateOneByKeyUnique.id':
+                    '_builtin-user crudCreateOrUpdateOneByKeyUnique.id'
+            },
+            paginationCountTotal: 'paginationCountTotal',
+            schemaName: '_BuiltinUser',
+            title: 'builtin user api',
             urlSwaggerJson: 'api/v0/swagger.json'
         }, {
             apiDict: {
@@ -91,28 +101,49 @@
 
     // run shared js-env code - function
     (function () {
+        local.swgg.dtAlertErrorCreate = function (error) {
+        /*
+         * this function will create an error-alert
+         */
+            if (!(error && error.message)) {
+                return;
+            }
+            local.utility2.taskUpsert({ key: 'dtAlertErrorCreate' }, function (onError) {
+                // create alert
+                document.getElementById('dtAlertContainer1').innerHTML +=
+                    '<div class="alert alert-danger fade margin-0">' +
+                    error.message +
+                    '<button type="button" class="close" data-dismiss="alert">' +
+                    '<span>&times;</span>' +
+                    '</button>' +
+                    '</div>';
+                local.jQuery('.alert').addClass('in');
+                setTimeout(onError, 1000);
+            });
+        };
+
         local.swgg.dtDatatableInit = function (event) {
         /*
          * this function will init the datatable-ui
          */
-            var options, self, tmp;
-            // show table-view
-            local.jQuery('#dtNavTable1').tab('show');
-            // save self
-            local.swgg.dt = self = local.swgg.dtList[event.currentTarget.dataset.ii];
-            // init crud-api
-            Object.keys(self.apiDict).forEach(function (key) {
-                if (typeof self.apiDict[key] === 'string') {
-                    tmp = self.apiDict[key.split('.')[0]] = local.swgg.apiCreate(
-                        local.swgg.apiDict[self.apiDict[key]]
-                    );
-                    tmp._operationId = key;
+            var options, tmp;
+            // init dt-instance
+            local.swgg.dt = local.swgg.dtList[event.currentTarget.dataset.ii];
+            // init apiDict
+            Object.keys(local.swgg.dt.apiDict).forEach(function (key) {
+                tmp = local.swgg.dt.apiDict[key];
+                if (typeof tmp === 'string') {
+                    local.swgg.dt.apiDict[key] = null;
+                    if (local.swgg.apiDict[tmp]) {
+                        tmp = local.swgg.dt.apiDict[key.split('.')[0]] = local.swgg.apiCreate(
+                            local.swgg.apiDict[tmp]
+                        );
+                        tmp._operationId = key;
+                    }
                 }
             });
-            // init self
-            local.swgg.dt.schema = local.utility2.jsonCopy(
-                local.swgg.swaggerJson.definitions[self.schemaName]
-            );
+            // init schema
+            local.swgg.dt.schema = local.swgg.swaggerJson.definitions[local.swgg.dt.schemaName];
             // init datatableOptions
             local.swgg.dt.datatableOptions = local.utility2.objectSetDefault(
                 local.swgg.dt.datatableOptions || {},
@@ -129,8 +160,10 @@
                     local.utility2.nop(data, type, row);
                     options = local.swgg.dt.datatableInstance.page.info();
                     options.ii = options.page * options.length + meta.row + 1;
-                    return '<button class="btn btn-xs dtButtonRecordEdit">edit row ' +
-                        options.ii + '</button>';
+                    return '<button class="btn btn-xs dtButtonRecordEdit" style="' +
+                        (local.swgg.dt.apiDict.crudUpdateOneByKeyUnique
+                        ? ''
+                        : 'display: none;') + '">edit row ' + options.ii + '</button>';
                 },
                 title: ''
             }].concat(Object.keys(local.swgg.dt.schema.properties)
@@ -164,8 +197,11 @@
                         schemaPropertyName: key
                     };
                 }));
+            // show table-view
+            local.jQuery('.tab-content').hide();
+            local.jQuery('#dtNavTable1').tab('show');
             // init datatable
-            document.getElementById('dtTableContainer1').innerHTML = self.html ||
+            document.getElementById('dtTableContainer1').innerHTML = local.swgg.dt.html ||
                 '<table class="display table table-responsive" ' +
                 'id="dtTable1" width="100%"><tfoot><tr>' +
                 local.swgg.dt.datatableOptions.columns.map(function (element) {
@@ -199,14 +235,13 @@
                 local.swgg.dt.apiDict.crudGetManyByQuery.parameters
             )
                 .filter(function (element) {
-                    return element.name[0] !== '_';
+                    return element.name[0] !== '_' ||
+                        element.name.indexOf('_queryRange.') === 0;
                 })
                 .sort(function (aa, bb) {
                     return aa.name < bb.name
                         ? -1
-                        : aa.name > bb.name
-                        ? 1
-                        : 0;
+                        : 1;
                 })
                 .map(local.swgg.dtFormInputCreate)
                 .join('');
@@ -220,6 +255,7 @@
             ).forEach(function (elementContainer) {
                 local.swgg.dtFormInputDataWrite(elementContainer);
             });
+            local.jQuery('.tab-content').fadeIn();
         };
 
         local.swgg.dtFormInputCreate = function (options) {
@@ -228,14 +264,21 @@
          */
             var html,
                 htmlInput,
+                htmlInputDatetime,
                 htmlInputText,
                 htmlInputTextarea,
-                readOnly,
-                placeholderRequired;
+                readOnly;
+            switch (options.type) {
+            case 'string':
+                switch (options.format) {
+                case 'binary':
+                case 'byte':
+                    options.readOnly = true;
+                    break;
+                }
+                break;
+            }
             options.uuid = local.utility2.uuidTimeCreate();
-            placeholderRequired = options.required
-                ? 'placeholder="required"'
-                : '';
             readOnly = options.readOnly
                 ? 'disabled'
                 : '';
@@ -244,56 +287,54 @@
                 encodeURIComponent(JSON.stringify(options)) +
                 // init id
                 '" id="' + options.uuid + '">';
-            html += '<label class="col-sm-2 control-label">' +
+            html += '<label class="col-sm-3 control-label">' +
                 // init title
                 ((options['x-title'] || options.title || options.name) + '<br>(' +
                 (options.format || options.type || 'object') + ')') + '</label>';
-            html += '<div class="col-sm-10">';
-            htmlInputText = '<input class="form-control" ' + placeholderRequired + ' ' +
+            html += '<div class="col-sm-9">';
+            htmlInputDatetime = '<div class="date dtFormInputDatetime input-group">' +
+                '<input class="form-control" placeholder="" ' + readOnly + ' type="text">' +
+                '<span class="input-group-addon">' +
+                    '<span class="glyphicon glyphicon-calendar"></span>' +
+                '</span>' +
+                '</div>';
+            htmlInputText = '<input class="form-control" placeholder="" ' +
                 readOnly + ' type="text">';
-            htmlInputTextarea = '<textarea class="form-control" ' + placeholderRequired + ' ' +
-                readOnly + ' rows="4"></textarea>';
-            switch (options.type) {
-            // type - array
-            case 'array':
-                htmlInput = htmlInputTextarea;
-                break;
-            // type - boolean
-            case 'boolean':
-                htmlInput = ['true', 'false', 'null'].map(function (key) {
-                    return '<label class="radio-inline">' +
-                        '<input name="' + options.uuid + '" ' + readOnly + ' type="radio">' +
-                        key + '</label>';
-                }).join('');
-                break;
-            // type - string
-            case 'string':
-                switch (options.format) {
-                // format - date-time
-                case 'date':
-                case 'date-time':
-                    htmlInput = '<div class="date dtFormInputDatetime input-group">' +
-                            '<input class="form-control" ' + placeholderRequired + ' ' +
-                            readOnly + ' type="text">' +
-                            '<span class="input-group-addon">' +
-                                '<span class="glyphicon glyphicon-calendar"></span>' +
-                            '</span>' +
-                        '</div>';
+            htmlInputTextarea = '<textarea class="form-control" placeholder="" ' +
+                readOnly + '></textarea>';
+            if (options['x-queryRange']) {
+                // default
+                htmlInput = '<div class="row">' +
+                    '<div class="form-group col-sm-6">' + htmlInputText + '</div>' +
+                    '<div class="form-group col-sm-6">' + htmlInputText + '</div>' +
+                    '</div>';
+                switch (options.type) {
+                // type - boolean
+                case 'boolean':
+                    htmlInput = ['true', 'false'].map(function (key) {
+                        return '<label class="checkbox-inline">' +
+                            '<input name="' + options.uuid + '" ' + readOnly +
+                            ' type="checkbox">' + key + '</label>';
+                    }).join('');
                     break;
-                case 'byte':
-                case 'json':
-                    htmlInput = htmlInputTextarea;
+                // type - string
+                case 'string':
+                    switch (options.format) {
+                    case 'date':
+                    case 'date-time':
+                        htmlInput = '<div class="row">' +
+                            '<div class="form-group col-sm-6">' + htmlInputDatetime + '</div>' +
+                            '<div class="form-group col-sm-6">' + htmlInputDatetime + '</div>' +
+                            '</div>';
+                        break;
+                    }
                     break;
-                default:
-                    htmlInput = htmlInputText;
                 }
-                break;
-            // type - default
-            default:
-                htmlInput = htmlInputText;
-            }
+                htmlInput = htmlInput
+                    .replace('placeholder=""', 'placeholder="from"')
+                    .replace('placeholder=""', 'placeholder="to"');
             // dropdown - enum
-            if (options.enum) {
+            } else if (options.enum) {
                 htmlInput = '<div class="btn-group">' +
                     '<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" ' +
                     readOnly + '>' +
@@ -309,6 +350,42 @@
                     '<li><a data-json="null" href="#">null</a></li>' +
                     '</ul>' +
                     '</div>';
+            } else {
+                // default
+                htmlInput = htmlInputText;
+                switch (options.type) {
+                // type - array
+                case 'array':
+                    if (options['x-fileUpload']) {
+                        htmlInput = htmlInputText;
+                        break;
+                    }
+                    htmlInput = htmlInputTextarea;
+                    break;
+                // type - boolean
+                case 'boolean':
+                    htmlInput = ['true', 'false', 'null'].map(function (key) {
+                        return '<label class="radio-inline">' +
+                            '<input name="' + options.uuid + '" ' + readOnly +
+                            ' type="radio">' + key + '</label>';
+                    }).join('');
+                    break;
+                // type - string
+                case 'string':
+                    switch (options.format) {
+                    case 'date':
+                    case 'date-time':
+                        htmlInput = htmlInputDatetime;
+                        break;
+                    case 'json':
+                        htmlInput = htmlInputTextarea;
+                        break;
+                    }
+                    break;
+                }
+            }
+            if (options.required) {
+                htmlInput = htmlInput.replace('placeholder=""', 'placeholder="required"');
             }
             html += htmlInput;
             html += '</div>';
@@ -322,6 +399,10 @@
          */
             var data, elementInput, options;
             options = JSON.parse(decodeURIComponent(elementContainer.dataset.options));
+            if (options.readOnly) {
+                delete options.dataRead;
+                return options;
+            }
             elementInput = elementContainer.getElementsByTagName('textarea');
             if (!elementInput.length) {
                 elementInput = elementContainer.getElementsByTagName('input');
@@ -384,6 +465,9 @@
             if (typeof options === 'string') {
                 options = JSON.parse(decodeURIComponent(options));
             }
+            if (options['x-queryRange']) {
+                return;
+            }
             data = local.utility2.isNullOrUndefined(options.dataWrite)
                 ? options.default || null
                 : options.dataWrite;
@@ -404,7 +488,10 @@
             // type - string
             case 'string':
                 switch (options.format) {
-                // format - date-time
+                case 'binary':
+                case 'byte':
+                    data = data && '<blob object>';
+                    break;
                 case 'date':
                 case 'date-time':
                     if (data) {
@@ -439,7 +526,7 @@
                         : 2].checked = true;
                     return;
                 default:
-                    // bug workaround - wait for bootstrap-datetimepicker init
+                    // bug workaround - wait for bootstrap-datetimepicker to init
                     setTimeout(function () {
                         elementInput[0].value = options.dataRead;
                     });
@@ -463,8 +550,8 @@
                 local.swgg.userLoginByPassword({
                     username: document.getElementById("userFormLoginInputUsername").value,
                     password: document.getElementById("userFormLoginInputPassword").value
-                }, function () {
-                    if (local.swgg.jwt) {
+                }, function (error) {
+                    if (!error) {
                         local.jQuery('#userFormLogin').modal('hide');
                     }
                 });
@@ -495,13 +582,13 @@
                 this.closest('div').querySelector('span').textContent = this.textContent;
             });
             //!! // show login form
-            //!! if (!local.swgg.jwt) {
+            //!! if (!local.swgg.userJwtEncoded) {
                 //!! local.jQuery('#userFormLogin').modal('show');
             //!! }
             // init dtList
             local.swgg.dtList = local.utility2.jsonCopy(local.swgg.swaggerJson['x-dtList'] ||
                 JSON.parse(local.swgg.templateDtListPetstore));
-            // init dom tab-view-list of tables
+            // init dom element #dtListContainer1
             document.getElementById('dtListContainer1').innerHTML =
                 local.swgg.dtList.map(function (options, ii) {
                     return '<li class="' + (ii
@@ -510,7 +597,22 @@
                         '"><a data-toggle="tab" href="#dtViewTable1">' +
                         options.title + '</a></li>\n';
                 }).join('');
-            // init uncaught-error alerts
+            // init dtAlertErrorCreate-hook in local.utility2.ajax
+            local.swgg.ajax = local.swgg.ajax || local.utility2.ajax;
+            local.utility2.ajax = function (options, onError) {
+                var onError2;
+                onError2 = function (error, xhr) {
+                    local.swgg.dtAlertErrorCreate(error);
+                    onError(error, xhr);
+                };
+                local.swgg.ajax(options, onError2);
+            };
+            // init dtAlertErrorCreate-hook in local.utility2.assert
+            local.swgg.assert = local.swgg.assert || local.utility2.assert;
+            local.utility2.assert = function (passed, message) {
+                local.swgg.dtAlertErrorCreate(!passed && message);
+                local.swgg.assert(passed, message);
+            };
             ['assert', 'onErrorDefault'].forEach(function (key) {
                 // save old function
                 local.utility2['_' + key] = local.utility2['_' + key] ||
@@ -522,23 +624,7 @@
                         error = !error && (data || 'error');
                         break;
                     }
-                    // alert error.message
-                    if (error && error.message) {
-                        local.utility2.taskUpsert({
-                            key: 'dtAlertErrorCreate'
-                        }, function (onError) {
-                            // create alert
-                            document.getElementById('dtAlertContainer1').innerHTML +=
-                                '<div class="alert alert-danger fade margin-0">' +
-                                error.message +
-                                '<button type="button" class="close" data-dismiss="alert">' +
-                                '<span>&times;</span>' +
-                                '</button>' +
-                                '</div>';
-                            local.jQuery('.alert').addClass('in');
-                            setTimeout(onError);
-                        });
-                    }
+                    local.swgg.dtAlertErrorCreate(error);
                     local.utility2['_' + key].apply(null, arguments);
                 };
             });
@@ -610,9 +696,15 @@
                 // show table-view
                 local.jQuery('#dtNavTable1').tab('show');
                 // redraw table
-                // bug workaround - wait for table init
-                setTimeout(local.swgg.dt.datatableInstance.draw, 500);
+                local.swgg.dt.datatableInstance.draw();
             });
+        };
+
+        local.swgg.dtOnClickQuerySubmit = function () {
+        /*
+         * this function will handle the click-event to save the record
+         */
+            return;
         };
 
         local.swgg.dtOptionsDefaultCreate = function () {
@@ -636,7 +728,7 @@
                             : -1) + '}'
                         : null
                 } }, function (error, data) {
-                    // validate no error occured
+                    // validate no error occurred
                     local.utility2.assert(!error, error);
                     local.swgg.dt.pageData = data.responseJSON;
                     callback({

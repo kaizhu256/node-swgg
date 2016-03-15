@@ -156,6 +156,8 @@
                             crudCreateOrReplaceOne:
                                 local.swgg.apiDict['_test crudCreateOrReplaceOne'],
                             data: {
+                                // test dataReadonlyRemove handling-behavior
+                                createdAt: '1970-01-01T00:00:00.000Z',
                                 id: '00_test_crudCreateOrReplaceOne',
                                 propRequired: true
                             },
@@ -169,6 +171,9 @@
                     case 2:
                         // validate no error occurred
                         local.utility2.assert(!error, error);
+                        // validate dataReadonlyRemove
+                        local.utility2.assert(data.responseJSON.data[0].createdAt >
+                            '1970-01-01T00:00:00.000Z', data.responseJSON);
                         // validate data was created
                         local.testCase_crudGetOneByKeyUnique_default(options, onNext);
                         break;
@@ -404,7 +409,7 @@
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     // validate data
-                    local.utility2.assert(data.responseJSON.data[0] === null, data);
+                    local.utility2.assert(data.responseJSON.data[0] === undefined, data);
                     onParallel();
                 }, onError);
             });
@@ -542,7 +547,7 @@
             var optionsCopy;
             options = {
                 data: { propRequired: true },
-                schema: local.swgg.swaggerJson.definitions.TestCrudModel
+                schema: local.swgg.swaggerJson.definitions.TestModelCrud
             };
             [
                 { key: 'propArray', value: [null] },
@@ -556,7 +561,7 @@
                 { key: 'propNumberFloat', value: 0.5 },
                 { key: 'propNumberDouble', value: 0.5 },
                 { key: 'propObject', value: { aa: true } },
-                { key: 'propObjectSubdoc', value: { propRequired: true } },
+                { key: 'propObjectSubdoc', value: {} },
                 { key: 'propRequired', value: true },
                 { key: 'propString', value: 'hello' },
                 { key: 'propStringByte', value: local.modeJs === 'browser'
@@ -592,12 +597,14 @@
             var optionsCopy;
             options = {
                 data: { propRequired: true },
-                schema: local.swgg.swaggerJson.definitions.TestCrudModel
+                schema: local.swgg.swaggerJson.definitions.TestModelCrud
             };
             [
                 { data: null },
                 { key: 'propArray', value: true },
                 { key: 'propArray', value: [null, null] },
+                { key: 'propArraySubdoc', value: [{ propRequired: null }] },
+                { key: 'propArraySubdoc', value: [ 'non-object' ] },
                 { key: 'propArraySubdoc', value: [{ propRequired: null }] },
                 { key: 'propBoolean', value: 0 },
                 { key: 'propEnum', value: -1 },
@@ -619,10 +626,11 @@
                 { key: 'propObject', value: {} },
                 { key: 'propObject', value: { aa: 1, bb: 2 } },
                 { key: 'propObjectSubdoc', value: 'non-object' },
-                { key: 'propObjectSubdoc', value: { propRequired: null } },
                 { key: 'propRequired', value: null },
                 { key: 'propRequired', value: undefined },
                 { key: 'propString', value: true },
+                { key: 'propString', value: '' },
+                { key: 'propString', value: '!' },
                 { key: 'propString', value: '01234567890123456789' },
                 { key: 'propStringByte', value: local.utility2.stringAsciiCharset },
                 { key: 'propStringDate', value: 'null' },
@@ -792,6 +800,9 @@
                 file: '/assets.utility2.lib.cryptojs.js',
                 url: '/assets.utility2.lib.cryptojs.js'
             }, {
+                file: '/assets.utility2.lib.stringview.js',
+                url: '/assets.utility2.lib.stringview.js'
+            }, {
                 file: '/jsonp.swgg.stateInit.js',
                 url: '/jsonp.swgg.stateInit.js'
             }, {
@@ -854,8 +865,8 @@
                         error: { default: {}, type: 'object' }
                     }
                 },
-                // init TestCrudModel schema
-                TestCrudModel: {
+                // init TestModelCrud schema
+                TestModelCrud: {
                     // init _pathObjectDefaultList
                     _pathObjectDefaultList: [
                         'crudCountManyByQuery',
@@ -867,9 +878,17 @@
                         'crudDeleteManyByQuery',
                         'crudDeleteOneByKeyUnique.id',
                         'crudExistsOneByKeyUnique.id',
+                        'crudFileGetOneByKeyUnique.id',
+                        'crudFileUploadManyByForm',
+                        'crudFileUploadOneByForm',
                         'crudGetManyByQuery',
                         'crudGetOneByQuery',
-                        'crudGetOneByKeyUnique.id'
+                        'crudGetOneByKeyUnique.id',
+                        'crudNullDelete',
+                        'crudNullGet',
+                        'crudNullPatch',
+                        'crudNullPost',
+                        'crudNullPut'
                     ],
                     _pathPrefix: '_test',
                     properties: {
@@ -884,8 +903,13 @@
                         },
                         propArraySubdoc: {
                             default: [{ propRequired: true }],
-                            items: { $ref: '#/definitions/TestCrudModel' },
+                            items: { $ref: '#/definitions/TestModelCrud' },
                             type: 'array'
+                        },
+                        propArraySubdocFile: {
+                            items: { $ref: '#/definitions/_BuiltinFile' },
+                            type: 'array',
+                            'x-fileUpload': true
                         },
                         propBoolean: { type: 'boolean' },
                         propEnum: { enum: [0, 1], type: 'integer' },
@@ -908,11 +932,13 @@
                             minProperties: 1,
                             type: 'object'
                         },
-                        propObjectSubdoc: { $ref: '#/definitions/TestCrudModel' },
+                        // test null-schema-validation handling-behavior
+                        propObjectSubdoc: { $ref: '#/definitions/TestModelNull' },
                         propRequired: { default: true },
                         propString: {
                             maxLength: 10,
                             minLength: 1,
+                            pattern: '^\\w*$',
                             type: 'string'
                         },
                         propStringByte: { format: 'byte', type: 'string' },
@@ -922,10 +948,17 @@
                             { default: 'a@a.com', format: 'email', type: 'string' },
                         propStringJson: { default: 'null', format: 'json', type: 'string' },
                         propUndefined: {},
+                        propObjectSubdocFile: {
+                            $ref: '#/definitions/_BuiltinFile',
+                            'x-fileUpload': true
+                        },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
                     },
-                    required: ['propRequired']
-                }
+                    required: ['propRequired'],
+                    'x-inheritList': [{ $ref: '#/definitions/_BuiltinFile' }]
+                },
+                // init TestModelNull schema
+                TestModelNull: {}
             },
             paths: {
                 // test undefined api handling-behavior
@@ -935,7 +968,7 @@
                 } },
                 // test undefined crud-api handling-behavior
                 '/_test/errorUndefinedCrud': { get: {
-                    _schemaName: 'TestCrudModel',
+                    _schemaName: 'TestModelCrud',
                     operationId: 'errorUndefinedCrud',
                     summary: 'test undefined crud-api handling-behavior',
                     tags: ['_test']
@@ -1113,7 +1146,7 @@
             drop: null,
             // test no-id-drop-index handling-behavior
             ensureIndexList: [{ fieldName: 'propInteger' }],
-            name: 'TestCrudModel'
+            name: 'TestModelCrud'
         }, {
             docList: [{
                 id: '00_test_crudDeleteOneByKeyUnique',
@@ -1122,12 +1155,16 @@
                 id: '00_test_crudExistsOneByKeyUnique',
                 propRequired: true
             }, {
+                id: '00_test_crudFileGetOneByKeyUnique',
+                fileBlob: local.swgg.templateSwaggerLogoSmallBase64,
+                propRequired: true
+            }, {
                 id: '00_test_crudGetOneByKeyUnique',
                 propRequired: true
             }],
             drop: true,
             ensureIndexList: [{ fieldName: 'id', unique: true }],
-            name: 'TestCrudModel',
+            name: 'TestModelCrud',
             // test removeIndexList handling-behavior
             removeIndexList: ['undefined']
         }], local.utility2.onReady);
@@ -1151,7 +1188,7 @@
                 'crudUpdateOneByKeyUnique.id': '_test crudCreateOrUpdateOneByKeyUnique.id'
             },
             paginationCountTotal: 'paginationCountTotal',
-            schemaName: 'TestCrudModel',
+            schemaName: 'TestModelCrud',
             title: 'test api',
             urlSwaggerJson: 'api/v0/swagger.json'
         }].concat(JSON.parse(local.swgg.templateDtListPetstore)) });

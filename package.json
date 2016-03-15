@@ -3,7 +3,7 @@
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "nedb-lite": "2016.1.2",
-        "utility2": "2016.1.6"
+        "utility2": "2016.1.7"
     },
     "description": "standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -54,5 +54,5 @@
 
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.1.5"
+    "version": "2016.1.6"
 }

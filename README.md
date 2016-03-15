@@ -7,10 +7,11 @@ standalone swagger-ui server backed by nedb
 
 
 # todo
+- add message-param to assertions in swgg.validateByPropertyDef
+- show login for 403 and 401
+- toggle login / logout button
 - add ability to reset db
 - admin-ui - add property-option x-sortName
-- admin-ui - fix datatables crashing when rows are empty
-- do not send readonly properties in swagger-client-request
 - implement api POST /pet/{petId}/uploadImage
 - implement api GET /user/login
 - implement api GET /user/logout
@@ -21,10 +22,16 @@ standalone swagger-ui server backed by nedb
 
 
 
-# change since ecef9960
-- npm publish 2016.1.5
-- admin-ui - fix input validation bugs
-- replace swgg.api with swgg.apiDict
+# change since becafb3f
+- npm publish 2016.1.6
+- admin-ui - fix datatables crashing when rows are empty
+- add api crudFileGetOneByKeyUnique, crudFileUploadManyByForm, crudFileUploadOneByForm
+- add multipart/form-data handling in swgg.middlewareBodyParse
+- allow jsonapi's response.data to be an empty array
+- add '_Builtin' prefix to swagger-lite's builtin swagger-definition names
+- do not send readonly properties in swgg.apiDict clients
+- in swgg.validateByPropertyDef, add regex pattern validation according to http://json-schema.org/latest/json-schema-validation.html#anchor33
+- admin-ui add x-queryRange ui
 - none
 
 
@@ -303,6 +310,7 @@ body > div {\n\
 <script src="assets.swgg.lib.swagger-tools.js"></script>\n\
 <script src="assets.utility2.lib.bcrypt.js"></script>\n\
 <script src="assets.utility2.lib.cryptojs.js"></script>\n\
+<script src="assets.utility2.lib.stringview.js"></script>\n\
 <script src="assets.utility2.js"></script>\n\
 <script src="assets.swgg.lib.swagger-ui.js"></script>\n\
 <script src="assets.swgg.js"></script>\n\
@@ -502,6 +510,17 @@ window.swgg.api = window.swaggerUi.api;\n\
         // init collectionList
         local.collectionList = [{
             docList: [{
+                id: '00_test_crudFileGetOneByKeyUnique',
+                fileBlob: local.swgg.templateSwaggerLogoSmallBase64
+            }],
+            drop: true,
+            name: '_BuiltinFile'
+        }, {
+            docList: [{
+                id: 'admin',
+                password: local.utility2.bcryptHashCreate('admin'),
+                username: 'admin'
+            }, {
                 id: 'jane.doe',
                 password: local.utility2.bcryptHashCreate('hello'),
                 username: 'jane.doe'
@@ -518,7 +537,30 @@ window.swgg.api = window.swaggerUi.api;\n\
                 fieldName: 'username',
                 unique: true
             }],
-            name: '_User'
+            name: '_BuiltinUser'
+        }, {
+            docList: [{
+                id: 'admin',
+                password: local.utility2.bcryptHashCreate('admin'),
+                username: 'admin'
+            }, {
+                id: 'jane.doe',
+                password: local.utility2.bcryptHashCreate('hello'),
+                username: 'jane.doe'
+            }, {
+                id: 'john.doe',
+                password: local.utility2.bcryptHashCreate('bye'),
+                username: 'john.doe'
+            }],
+            drop: true,
+            ensureIndexList: [{
+                fieldName: 'id',
+                unique: true
+            }, {
+                fieldName: 'username',
+                unique: true
+            }],
+            name: 'User'
         }, {
             docList: [{
                 id: 1,
@@ -645,7 +687,7 @@ window.swgg.api = window.swaggerUi.api;\n\
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "nedb-lite": "2016.1.2",
-        "utility2": "2016.1.6"
+        "utility2": "2016.1.7"
     },
     "description": "standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -696,7 +738,7 @@ export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.1.5"
+    "version": "2016.1.6"
 }
 ```
 
