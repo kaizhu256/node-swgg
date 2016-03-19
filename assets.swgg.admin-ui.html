@@ -154,11 +154,11 @@ textarea.form-control {
 <!-- #dtFormTableQuery1 begin -->
 <div class="container">
 <div class="dtFormContainer form-horizontal" id="dtFormTableQuery1"></div>
-<div class="form-horizontal">
-    <div class="form-group">
-    <div class="col-sm-3 control-label"><button class="btn btn-primary" id="dtButtonQuerySubmit1" onclick="local.swgg.dtOnClickQuerySubmit()">submit query</button></div>
-    </div>
-</div>
+<!--!! <div class="form-horizontal"> -->
+    <!--!! <div class="form-group"> -->
+    <!--!! <div class="col-sm-3 control-label"><button class="btn btn-primary" id="dtButtonQuerySubmit1" onclick="local.swgg.dtOnClickQuerySubmit()">submit query</button></div> -->
+    <!--!! </div> -->
+<!--!! </div> -->
 </div>
 <!-- #dtFormTableQuery1 end -->
 <!-- #dtTableContainer1 begin -->
@@ -210,9 +210,7 @@ textarea.form-control {
 <script src="assets.swgg.lib.datatables.js"></script>
 <!-- init lib swagger-lite -->
 <script src="assets.swgg.lib.nedb.js"></script>
-<script src="assets.utility2.lib.bcrypt.js"></script>
-<script src="assets.utility2.lib.cryptojs.js"></script>
-<script src="assets.utility2.js"></script>
+<script src="assets.utility2.rollup.js"></script>
 <script src="assets.swgg.js"></script>
 <script src="jsonp.swgg.stateInit.js"></script>
 {{scriptExtra}}
@@ -228,7 +226,7 @@ local.swgg.dtListInit();
 
 
 //!! $("#fileUploadImage1").fileinput({
-    //!! uploadUrl: "/api/v0/_builtin-file/crudNullPost", // server upload action
+    //!! uploadUrl: "/api/v0/builtin-file/crudNullPost", // server upload action
     //!! minFileCount: 1,
     //!! maxFileCount: 5,
     //!! overwriteInitial: false,
@@ -237,7 +235,7 @@ local.swgg.dtListInit();
         //!! "<img style='height:160px' src='http://loremflickr.com/200/150/people?random=2'>",
     //!! ],
     //!! initialPreviewConfig: [
-        //!! {caption: "People-1.jpg", width: "120px", url: "/api/v0/_builtin-file/crudNullPost", key: 1},
+        //!! {caption: "People-1.jpg", width: "120px", url: "/api/v0/builtin-file/crudNullPost", key: 1},
         //!! {caption: "People-2.jpg", width: "120px", url: "/site/file-delete", key: 2},
     //!! ],
     //!! uploadExtraData: {

@@ -2,8 +2,8 @@
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "nedb-lite": "2016.1.2",
-        "utility2": "2016.1.7"
+        "nedb-lite": "2016.1.3",
+        "utility2": "2016.1.9"
     },
     "description": "standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -30,7 +30,9 @@
     },
     "scripts": {
         "build-ci": "utility2 shRun shReadmeBuild",
-        "build-doc": "MODE_LINENO=0 utility2 shRun shReadmeExportFile package.json package.json && utility2 shRun shDocApiCreate \"module.exports={ exampleFileList:['README.md','test.js','index.js'], moduleDict:{ 'swagger-lite':{aliasList:['swgg'],exports:require('./index.js')}, 'swagger-lite.Nedb':{aliasList:['collection'],exports:require('./index.js').Nedb}, 'swagger-lite.Nedb.prototype':{aliasList:['collection'], exports:require('./index.js').Nedb.prototype}, 'swagger-lite.api':{aliasList:['api'],exports:require('./index.js').api}, 'swagger-lite.tools.v2':{aliasList:['tools.v2'], exports:require('./index.js').tools.v2.__proto__} } }\"",
+        "build-doc": "MODE_LINENO=0 utility2 shRun shReadmeExportFile package.json package.json && utility2 shRun shDocApiCreate \"module.exports={ exampleFileList:['README.md','test.js','index.js'], moduleDict:{ 'swagger-lite':{aliasList:['swgg'],exports:require('./index.js')}, 'swagger-lite.Nedb':{aliasList:['Nedb','collection'],exports:require('./index.js').Nedb}, 'swagger-lite.Nedb.prototype':{aliasList:['collection'], exports:require('./index.js').Nedb.prototype}, 'swagger-lite.Nedb.storage':{aliasList:['storage'], exports:require('./index.js').Nedb.storage}, 'swagger-lite.api':{aliasList:['api'],exports:require('./index.js').api}, 'swagger-lite.tools.v2':{aliasList:['tools.v2'], exports:require('./index.js').tools.v2.__proto__} } }\"",
+
+
 
 
 
@@ -54,5 +56,5 @@
 
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.1.6"
+    "version": "2016.2.1"
 }

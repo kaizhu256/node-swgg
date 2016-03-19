@@ -7,31 +7,29 @@ standalone swagger-ui server backed by nedb
 
 
 # todo
+- add function swgg.recordRandomCreate to create random collection record
+- add crudGetManyByQuery extra params
 - add message-param to assertions in swgg.validateByPropertyDef
+- auto-fix unique index constraint violation in nedb
 - show login for 403 and 401
-- toggle login / logout button
-- add ability to reset db
-- admin-ui - add property-option x-sortName
+- admin-ui toggle login / logout button
+- admin-ui - add property-option x-swgg-sortName
 - implement api POST /pet/{petId}/uploadImage
 - implement api GET /user/login
 - implement api GET /user/logout
 - add logging feature
 - add cached version crudGetManyByQueryCached
-- add swggUserLoginTokenCapped
 - none
 
 
 
-# change since becafb3f
-- npm publish 2016.1.6
-- admin-ui - fix datatables crashing when rows are empty
-- add api crudFileGetOneByKeyUnique, crudFileUploadManyByForm, crudFileUploadOneByForm
-- add multipart/form-data handling in swgg.middlewareBodyParse
-- allow jsonapi's response.data to be an empty array
-- add '_Builtin' prefix to swagger-lite's builtin swagger-definition names
-- do not send readonly properties in swgg.apiDict clients
-- in swgg.validateByPropertyDef, add regex pattern validation according to http://json-schema.org/latest/json-schema-validation.html#anchor33
-- admin-ui add x-queryRange ui
+# change since 461ed021
+- npm publish 2016.2.1
+- cleanup Backbone and Handlebars in lib.swagger-ui.js
+- fix file-upload for serverLocal
+- add function swgg.jwtEncodedDecodeAndDecrypt, swgg.nedbReset
+- use rolled-up asset /assets.utility2.rollup.js
+- move request.swgg* objects to namespace request.swgg
 - none
 
 
@@ -151,14 +149,59 @@ instruction
         });
         // init utility2
         local.utility2 = local.swgg.local.utility2;
+        // init petstore-crud-middleware
+        local.middlewareCrudPetstore = function (request, response, nextMiddleware) {
+        /*
+         * this function will run petstore-specific crud-operations
+         */
+            var modeNext, onNext, result;
+            modeNext = 0;
+            onNext = function (error, data) {
+                modeNext = error
+                    ? Infinity
+                    : modeNext + 1;
+                switch (modeNext) {
+                case 1:
+                    switch (request.swgg.pathname) {
+                    case 'GET /store/inventory':
+                        local.swgg.collectionCreate('Order').find({}, { status: 1 }, onNext);
+                        break;
+                    default:
+                        modeNext = Infinity;
+                        onNext();
+                    }
+                    break;
+                case 2:
+                    switch (request.swgg.pathname) {
+                    case 'GET /store/inventory':
+                        result = {};
+                        data.forEach(function (element) {
+                            result[element.status] = result[element.status] || 0;
+                            result[element.status] += 1;
+                        });
+                        onNext(null, result);
+                        break;
+                    default:
+                        onNext(null, data);
+                    }
+                    break;
+                case 3:
+                    local.swgg.serverRespondJsonapi(request, response, error, data);
+                    break;
+                default:
+                    nextMiddleware(error, data);
+                }
+            };
+            onNext();
+        };
         // init middleware
         local.middleware = local.utility2.middlewareGroupCreate([
             // init init-middleware
-            local.utility2.middlewareInit,
+            local.swgg.middlewareInit,
             // init cached-assets-middleware
             local.utility2.middlewareAssetsCached,
-            // init login-middleware
-            local.swgg.middlewareLogin,
+            // init user-login-middleware
+            local.swgg.middlewareUserLogin,
             // init http-body-read-middleware
             local.utility2.middlewareBodyRead,
             // init http-body-parse-middleware
@@ -185,51 +228,11 @@ instruction
             },
             // init swagger-validation-middleware
             local.swgg.middlewareValidate,
-            // init crud-middleware
+            // init petstore-crud-middleware
+            local.middlewareCrudPetstore,
+            // init crud-middleware,
             local.swgg.middlewareCrud
         ]);
-        // init petstore-middleware
-        local.middleware.middlewareList.push(function (request, response, nextMiddleware) {
-            var modeNext, onNext, result;
-            modeNext = 0;
-            onNext = function (error, data) {
-                modeNext = error
-                    ? Infinity
-                    : modeNext + 1;
-                switch (modeNext) {
-                case 1:
-                    switch (request.swggPathname) {
-                    case 'GET /store/inventory':
-                        local.swgg.collectionCreate('Order').find({}, { status: 1 }, onNext);
-                        break;
-                    default:
-                        modeNext = Infinity;
-                        onNext();
-                    }
-                    break;
-                case 2:
-                    switch (request.swggPathname) {
-                    case 'GET /store/inventory':
-                        result = {};
-                        data.forEach(function (element) {
-                            result[element.status] = result[element.status] || 0;
-                            result[element.status] += 1;
-                        });
-                        onNext(null, result);
-                        break;
-                    default:
-                        onNext(null, data);
-                    }
-                    break;
-                case 3:
-                    local.swgg.serverRespondJsonapi(request, response, error, data);
-                    break;
-                default:
-                    nextMiddleware(error, data);
-                }
-            };
-            onNext();
-        });
         // init error-middleware
         local.middlewareError = local.swgg.middlewareError;
         // run server-test
@@ -258,6 +261,10 @@ instruction
 <title>\n\
 {{envDict.npm_package_name}} @ {{envDict.npm_package_version}}\n\
 </title>\n\
+<link href="assets.swgg.animate.css" media="screen" rel="stylesheet" type="text/css">\n\
+<link href="assets.swgg.swagger-ui.favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">\n\
+<link href="assets.swgg.swagger-ui.favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">\n\
+<link href="assets.swgg.css" media="screen" rel="stylesheet" type="text/css">\n\
 <link href="assets.utility2.css" rel="stylesheet">\n\
 <style>\n\
 * {\n\
@@ -274,10 +281,6 @@ body > div {\n\
     display: none;\n\
 }\n\
 </style>\n\
-\n\
-<link href="assets.swgg.swagger-ui.favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">\n\
-<link href="assets.swgg.swagger-ui.favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">\n\
-<link href="assets.swgg.css" media="screen" rel="stylesheet" type="text/css">\n\
 </head>\n\
 <body>\n\
     <div class="ajaxProgressDiv" style="display: block;">\n\
@@ -308,10 +311,7 @@ body > div {\n\
 <script src="assets.swgg.lib.jquery.js"></script>\n\
 <script src="assets.swgg.lib.nedb.js"></script>\n\
 <script src="assets.swgg.lib.swagger-tools.js"></script>\n\
-<script src="assets.utility2.lib.bcrypt.js"></script>\n\
-<script src="assets.utility2.lib.cryptojs.js"></script>\n\
-<script src="assets.utility2.lib.stringview.js"></script>\n\
-<script src="assets.utility2.js"></script>\n\
+<script src="assets.utility2.rollup.js"></script>\n\
 <script src="assets.swgg.lib.swagger-ui.js"></script>\n\
 <script src="assets.swgg.js"></script>\n\
 <script src="jsonp.swgg.stateInit.js"></script>\n\
@@ -415,7 +415,8 @@ window.swgg.api = window.swaggerUi.api;\n\
                         email: { format: 'email' },
                         id: { default: 1, minimum: 1 },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
-                    }
+                    },
+                    'x-swgg-inheritList': [{ $ref: '#/definitions/BuiltinUser' }]
                 }
             },
             paths: {
@@ -514,19 +515,19 @@ window.swgg.api = window.swaggerUi.api;\n\
                 fileBlob: local.swgg.templateSwaggerLogoSmallBase64
             }],
             drop: true,
-            name: '_BuiltinFile'
+            name: 'BuiltinFile'
         }, {
             docList: [{
                 id: 'admin',
-                password: local.utility2.bcryptHashCreate('admin'),
+                password: local.utility2.bcryptHashCreate('admin', 1),
                 username: 'admin'
             }, {
                 id: 'jane.doe',
-                password: local.utility2.bcryptHashCreate('hello'),
+                password: local.utility2.bcryptHashCreate('hello', 1),
                 username: 'jane.doe'
             }, {
                 id: 'john.doe',
-                password: local.utility2.bcryptHashCreate('bye'),
+                password: local.utility2.bcryptHashCreate('bye', 1),
                 username: 'john.doe'
             }],
             drop: true,
@@ -537,19 +538,19 @@ window.swgg.api = window.swaggerUi.api;\n\
                 fieldName: 'username',
                 unique: true
             }],
-            name: '_BuiltinUser'
+            name: 'BuiltinUser'
         }, {
             docList: [{
                 id: 'admin',
-                password: local.utility2.bcryptHashCreate('admin'),
+                password: local.utility2.bcryptHashCreate('admin', 1),
                 username: 'admin'
             }, {
                 id: 'jane.doe',
-                password: local.utility2.bcryptHashCreate('hello'),
+                password: local.utility2.bcryptHashCreate('hello', 1),
                 username: 'jane.doe'
             }, {
                 id: 'john.doe',
-                password: local.utility2.bcryptHashCreate('bye'),
+                password: local.utility2.bcryptHashCreate('bye', 1),
                 username: 'john.doe'
             }],
             drop: true,
@@ -686,8 +687,8 @@ window.swgg.api = window.swaggerUi.api;\n\
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "nedb-lite": "2016.1.2",
-        "utility2": "2016.1.7"
+        "nedb-lite": "2016.1.3",
+        "utility2": "2016.1.9"
     },
     "description": "standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -720,9 +721,11 @@ utility2 shRun shDocApiCreate \"module.exports={ \
 exampleFileList:['README.md','test.js','index.js'], \
 moduleDict:{ \
 'swagger-lite':{aliasList:['swgg'],exports:require('./index.js')}, \
-'swagger-lite.Nedb':{aliasList:['collection'],exports:require('./index.js').Nedb}, \
+'swagger-lite.Nedb':{aliasList:['Nedb','collection'],exports:require('./index.js').Nedb}, \
 'swagger-lite.Nedb.prototype':{aliasList:['collection'], \
 exports:require('./index.js').Nedb.prototype}, \
+'swagger-lite.Nedb.storage':{aliasList:['storage'], \
+exports:require('./index.js').Nedb.storage}, \
 'swagger-lite.api':{aliasList:['api'],exports:require('./index.js').api}, \
 'swagger-lite.tools.v2':{aliasList:['tools.v2'], \
 exports:require('./index.js').tools.v2.__proto__} \
@@ -738,7 +741,7 @@ export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.1.6"
+    "version": "2016.2.1"
 }
 ```
 
@@ -759,7 +762,6 @@ utility2 test node test.js",
 
 shBuildCiTestPre() {(set -e
 # this function will run the pre-test build
-    exit
     # test example js script
     (export MODE_BUILD=testExampleJs &&
         export npm_config_timeout_exit=10000 &&

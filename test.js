@@ -164,7 +164,7 @@
                             operationId: 'undefined.id'
                         });
                         local.swgg.keyUniqueInit(options);
-                        options.crudCreateOrReplaceOne({ swggParamDict: {
+                        options.crudCreateOrReplaceOne({ paramDict: {
                             body: options.data
                         } }, onNext);
                         break;
@@ -208,14 +208,14 @@
                         });
                         local.swgg.keyUniqueInit(options);
                         options.crudDeleteOneByKeyUnique({
-                            swggParamDict: options.queryByKeyUnique
+                            paramDict: options.queryByKeyUnique
                         }, onNext);
                         break;
                     case 2:
                         // validate no error occurred
                         local.utility2.assert(!error, error);
                         options.crudGetOneByKeyUnique({
-                            swggParamDict: options.queryByKeyUnique
+                            paramDict: options.queryByKeyUnique
                         }, onNext);
                         break;
                     case 3:
@@ -255,7 +255,7 @@
                         };
                         local.swgg.keyUniqueInit(options);
                         options.crudExistsOneByKeyUnique({
-                            swggParamDict: options.queryByKeyUnique
+                            paramDict: options.queryByKeyUnique
                         }, onNext);
                         break;
                     case 2:
@@ -295,7 +295,7 @@
                         });
                         local.swgg.keyUniqueInit(options);
                         options.crudGetOneByKeyUnique({
-                            swggParamDict: options.queryByKeyUnique
+                            paramDict: options.queryByKeyUnique
                         }, onNext);
                         break;
                     case 2:
@@ -380,7 +380,7 @@
                 { data: ['hello'], meta: { isJsonapiResponse: true } }
             ].forEach(function (data) {
                 onParallel.counter += 1;
-                local.swgg.apiDict['_test onErrorJsonapi']({ swggParamDict: {
+                local.swgg.apiDict['_test onErrorJsonapi']({ paramDict: {
                     data: JSON.stringify(data)
                 } }, function (error, data) {
                     local.utility2.tryCatchOnError(function () {
@@ -402,7 +402,7 @@
             var onParallel;
             onParallel = local.utility2.onParallel(onError);
             onParallel.counter += 1;
-            options = { swggParamDict: { data: '[]' } };
+            options = { paramDict: { data: '[]' } };
             onParallel.counter += 1;
             local.swgg.apiDict['_test onErrorJsonapi'](options, function (error, data) {
                 local.utility2.tryCatchOnError(function () {
@@ -413,7 +413,7 @@
                     onParallel();
                 }, onError);
             });
-            options = { swggParamDict: { error: '[]' } };
+            options = { paramDict: { error: '[]' } };
             onParallel.counter += 1;
             local.swgg.apiDict['_test onErrorJsonapi'](options, function (error, data) {
                 local.utility2.tryCatchOnError(function () {
@@ -445,7 +445,7 @@
                     statusCode: 500
                 }
             ].forEach(function (data) {
-                options = { swggParamDict: { error: JSON.stringify(data) } };
+                options = { paramDict: { error: JSON.stringify(data) } };
                 onParallel.counter += 1;
                 local.swgg.apiDict['_test onErrorJsonapi'](options, function (error, data) {
                     local.utility2.tryCatchOnError(function () {
@@ -467,7 +467,7 @@
          */
             // test nop handling-behavior
             local.swgg.validateByParamDefList({ data: {} });
-            options = { swggParamDict: {
+            options = { paramDict: {
                 id: '00_test_' + local.utility2.uuidTimeCreate(),
                 // test array-csv-param handling-behavior
                 paramArrayCsv: 'aa,bb',
@@ -486,7 +486,7 @@
                 // test header-param handling-behavior
                 paramHeader: 'hello header',
                 // test json-param handling-behavior
-                paramJson: '1',
+                paramJson: '"hello json"',
                 // test path-param handling-behavior
                 paramPath: 'hello path',
                 // test required-param handling-behavior
@@ -497,8 +497,9 @@
                     // validate no error occurred
                     local.utility2.assert(!error, error);
                     // validate object
-                    data = local.utility2.jsonStringifyOrdered(data.responseJSON.data[0]);
-                    local.utility2.assert(data === JSON.stringify({
+                    options.result =
+                        local.utility2.jsonStringifyOrdered(data.responseJSON.data[0]);
+                    local.utility2.assert(options.result === JSON.stringify({
                         paramArrayCsv: ['aa', 'bb'],
                         paramArrayMulti: ['aa'],
                         paramArrayPipes: ['aa', 'bb'],
@@ -507,20 +508,55 @@
                         paramBody: 'hello body',
                         paramEnum: 0,
                         paramHeader: 'hello header',
-                        paramJson: '1',
+                        paramJson: '"hello json"',
                         paramPath: 'hello path',
                         paramRequired: 'hello required'
-                    }), data);
+                    }), options);
                     onError();
                 }, onError);
             });
+        };
+
+        local.testCase_validateByParamDefList_error = function (options, onError) {
+        /*
+         * this function will test validateByParamDefList's error handling-behavior
+         */
+            var onParallel;
+            onParallel = local.utility2.onParallel(onError);
+            onParallel.counter += 1;
+            options = { paramPath: 'hello path', paramRequired: 'hello required' };
+            [
+                { key: 'paramArrayCsv', value: true },
+                { key: 'paramArrayMulti', value: true },
+                { key: 'paramArrayPipes', value: true },
+                { key: 'paramArraySsv', value: true },
+                { key: 'paramArrayTsv', value: true },
+                { key: 'paramEnum', value: true },
+                { key: 'paramHeader', value: true },
+                { key: 'paramJson', value: true },
+                { key: 'paramOptional', value: true },
+                { key: 'paramPath', value: true },
+                { key: 'paramRequired', value: true }
+            ].forEach(function (element) {
+                element.paramDict = local.utility2.jsonCopy(options);
+                element.paramDict[element.key] = element.value;
+                onParallel.counter += 1;
+                local.swgg.apiDict['_test paramDefault'](element, function (error) {
+                    local.utility2.tryCatchOnError(function () {
+                        // validate error occurred
+                        local.utility2.assert(error, element);
+                        onParallel();
+                    }, onError);
+                });
+            });
+            onParallel();
         };
 
         local.testCase_validateByParamDefList_formData = function (options, onError) {
         /*
          * this function will test validateByParamDefList's formData handling-behavior
          */
-            options = { swggParamDict: {
+            options = { paramDict: {
                 id: '00_test_' + local.utility2.uuidTimeCreate(),
                 paramFormData1: 'aa',
                 paramFormData2: 'bb'
@@ -544,7 +580,6 @@
         /*
          * this function will test validateBySchema's default handling-behavior
          */
-            var optionsCopy;
             options = {
                 data: { propRequired: true },
                 schema: local.swgg.swaggerJson.definitions.TestModelCrud
@@ -564,13 +599,14 @@
                 { key: 'propObjectSubdoc', value: {} },
                 { key: 'propRequired', value: true },
                 { key: 'propString', value: 'hello' },
+                { key: 'propStringBinary', value: '\u1234' },
                 { key: 'propStringByte', value: local.modeJs === 'browser'
                     ? local.global.btoa(local.utility2.stringAsciiCharset)
                     : new Buffer(local.utility2.stringAsciiCharset).toString('base64') },
                 { key: 'propStringDate', value: '1971-01-01' },
                 { key: 'propStringDatetime', value: '1971-01-01T00:00:00Z' },
                 { key: 'propStringEmail', value: 'q@q.com' },
-                { key: 'propStringJson', value: 'null' },
+                { key: 'propStringJson', value: 'true' },
                 { key: 'propUndefined', value: '' },
                 { key: 'propUndefined', value: 0 },
                 { key: 'propUndefined', value: false },
@@ -579,13 +615,14 @@
                 { key: 'propUndefined', value: undefined },
                 { key: 'propUndefined', value: {} }
             ].forEach(function (element) {
-                optionsCopy = local.utility2.jsonCopy(options.data);
-                optionsCopy[element.key] = element.value;
+                element.data = local.utility2.jsonCopy(options.data);
+                element.data[element.key] = element.value;
+                element.schema = options.schema;
                 // test circular-reference handling-behavior
-                optionsCopy.propArraySubdoc = optionsCopy.propArraySubdoc || [optionsCopy];
-                optionsCopy.propObject = optionsCopy.propObject || optionsCopy;
-                optionsCopy.propObjectSubdoc = optionsCopy.propObjectSubdoc || optionsCopy;
-                local.swgg.validateBySchema({ data: optionsCopy, schema: options.schema });
+                element.data.propArraySubdoc = element.data.propArraySubdoc || [element.data];
+                element.data.propObject = element.data.propObject || element.data;
+                element.data.propObjectSubdoc = element.data.propObjectSubdoc || element.data;
+                local.swgg.validateBySchema(element);
             });
             onError();
         };
@@ -594,7 +631,9 @@
         /*
          * this function will test validateBySchema's error handling-behavior
          */
-            var optionsCopy;
+            var onParallel;
+            onParallel = local.utility2.onParallel(onError);
+            onParallel.counter += 1;
             options = {
                 data: { propRequired: true },
                 schema: local.swgg.swaggerJson.definitions.TestModelCrud
@@ -638,23 +677,20 @@
                 { key: 'propStringEmail', value: 'null' },
                 { key: 'propStringJson', value: 'syntax error' }
             ].forEach(function (element) {
+                onParallel.counter += 1;
                 local.utility2.tryCatchOnError(function () {
-                    options.error = null;
-                    optionsCopy = local.utility2.jsonCopy(options.data);
-                    optionsCopy[element.key] = element.value;
-                    local.swgg.validateBySchema({
-                        data: element.data === null
-                            ? null
-                            : optionsCopy,
-                        schema: options.schema
-                    });
+                    if (element.data === undefined) {
+                        element.data = local.utility2.jsonCopy(options.data);
+                        element.data[element.key] = element.value;
+                    }
+                    local.swgg.validateBySchema(element);
                 }, function (error) {
-                    options.error = error;
+                    // validate error occurred
+                    local.utility2.assert(error, element);
+                    onParallel();
                 });
-                // validate error occurred
-                local.utility2.assert(options.error, element);
             });
-            onError();
+            onParallel();
         };
 
         local.testCase_validateBySwagger_default = function (options, onError) {
@@ -685,13 +721,17 @@
 
     // run browser js-env code - function
     case 'browser':
-        /* istanbul ignore next */
-        local.testCase2_ui_default = function (options, onError) {
+        local.testCase_ui_default = function (options, onError) {
         /*
          * this function will test the ui's default handling-behavior
          */
             options = {};
-            options.onParallel = local.utility2.onParallel(onError);
+            options.onParallel = local.utility2.onParallel(function () {
+                setTimeout(function () {
+                    local.jQuery('[data-id="_test"].expandResource').click();
+                    setTimeout(onError);
+                });
+            });
             options.onParallel.counter += 1;
             [1, -1].forEach(function (ii) {
                 Object.keys(local.global.SwaggerUi.Views).sort(function () {
@@ -791,17 +831,8 @@
                 file: '/assets.utility2.css',
                 url: '/assets.utility2.css'
             }, {
-                file: '/assets.utility2.js',
-                url: '/assets.utility2.js'
-            }, {
-                file: '/assets.utility2.lib.bcrypt.js',
-                url: '/assets.utility2.lib.bcrypt.js'
-            }, {
-                file: '/assets.utility2.lib.cryptojs.js',
-                url: '/assets.utility2.lib.cryptojs.js'
-            }, {
-                file: '/assets.utility2.lib.stringview.js',
-                url: '/assets.utility2.lib.stringview.js'
+                file: '/assets.utility2.rollup.js',
+                url: '/assets.utility2.rollup.js'
             }, {
                 file: '/jsonp.swgg.stateInit.js',
                 url: '/jsonp.swgg.stateInit.js'
@@ -907,9 +938,9 @@
                             type: 'array'
                         },
                         propArraySubdocFile: {
-                            items: { $ref: '#/definitions/_BuiltinFile' },
+                            items: { $ref: '#/definitions/BuiltinFile' },
                             type: 'array',
-                            'x-fileUpload': true
+                            'x-swgg-fileUpload': true
                         },
                         propBoolean: { type: 'boolean' },
                         propEnum: { enum: [0, 1], type: 'integer' },
@@ -941,6 +972,7 @@
                             pattern: '^\\w*$',
                             type: 'string'
                         },
+                        propStringBinary: { format: 'binary', type: 'string' },
                         propStringByte: { format: 'byte', type: 'string' },
                         propStringDate: { format: 'date', type: 'string' },
                         propStringDatetime: { format: 'date-time', type: 'string' },
@@ -949,13 +981,13 @@
                         propStringJson: { default: 'null', format: 'json', type: 'string' },
                         propUndefined: {},
                         propObjectSubdocFile: {
-                            $ref: '#/definitions/_BuiltinFile',
-                            'x-fileUpload': true
+                            $ref: '#/definitions/BuiltinFile',
+                            'x-swgg-fileUpload': true
                         },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
                     },
                     required: ['propRequired'],
-                    'x-inheritList': [{ $ref: '#/definitions/_BuiltinFile' }]
+                    'x-swgg-inheritList': [{ $ref: '#/definitions/BuiltinFile' }]
                 },
                 // init TestModelNull schema
                 TestModelNull: {}
@@ -1112,20 +1144,25 @@
         local.middleware.middlewareList.push(function (request, response, nextMiddleware) {
             local.request = request;
             local.response = response;
-            switch (request.swggPathObject && request.swggPathObject.operationId) {
+            switch (request.swgg.pathObject && request.swgg.pathObject.operationId) {
             case 'onErrorJsonapi':
                 // test redundant onErrorJsonapi handling-behavior
                 local.swgg.onErrorJsonapi(function (error, data) {
                     local.swgg.serverRespondJsonapi(request, response, error, data);
                 })(
-                    JSON.parse(request.swggParamDict.error || 'null'),
-                    JSON.parse(request.swggParamDict.data || 'null')
+                    JSON.parse(request.swgg.paramDict.error || 'null'),
+                    JSON.parse(request.swgg.paramDict.data || 'null')
                 );
                 break;
             case 'paramDefault':
             case 'paramFormData':
                 // test redundant onErrorJsonapi handling-behavior
-                local.swgg.serverRespondJsonapi(request, response, null, request.swggParamDict);
+                local.swgg.serverRespondJsonapi(
+                    request,
+                    response,
+                    null,
+                    request.swgg.paramDict
+                );
                 break;
             default:
                 // serve file
@@ -1180,7 +1217,7 @@
     // run node js-env code - post-init
     case 'node':
         // init dtList
-        local.swgg.apiDictUpdate({ 'x-dtList': [{
+        local.swgg.apiDictUpdate({ 'x-swgg-dtList': [{
             apiDict: {
                 crudCreateOne: '_test crudCreateOrReplaceOne',
                 'crudDeleteOneByKeyUnique.id': '_test crudDeleteOneByKeyUnique.id',

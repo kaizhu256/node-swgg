@@ -42,23 +42,23 @@
         // init templateDtListPetstore
         local.swgg.templateDtListPetstore = JSON.stringify([{
             apiDict: {
-                'crudDeleteOneByKeyUnique.id': '_builtin-file crudDeleteOneByKeyUnique.id',
-                crudGetManyByQuery: '_builtin-file crudGetManyByQuery'
+                'crudDeleteOneByKeyUnique.id': 'builtin-file crudDeleteOneByKeyUnique.id',
+                crudGetManyByQuery: 'builtin-file crudGetManyByQuery'
             },
             paginationCountTotal: 'paginationCountTotal',
-            schemaName: '_BuiltinFile',
+            schemaName: 'BuiltinFile',
             title: 'builtin file api',
             urlSwaggerJson: 'api/v0/swagger.json'
         }, {
             apiDict: {
-                crudCreateOne: '_builtin-user crudCreateOrReplaceOne',
-                'crudDeleteOneByKeyUnique.id': '_builtin-user crudDeleteOneByKeyUnique.id',
-                crudGetManyByQuery: '_builtin-user crudGetManyByQuery',
+                crudCreateOne: 'builtin-user crudCreateOrReplaceOne',
+                'crudDeleteOneByKeyUnique.id': 'builtin-user crudDeleteOneByKeyUnique.id',
+                crudGetManyByQuery: 'builtin-user crudGetManyByQuery',
                 'crudUpdateOneByKeyUnique.id':
-                    '_builtin-user crudCreateOrUpdateOneByKeyUnique.id'
+                    'builtin-user crudCreateOrUpdateOneByKeyUnique.id'
             },
             paginationCountTotal: 'paginationCountTotal',
-            schemaName: '_BuiltinUser',
+            schemaName: 'BuiltinUser',
             title: 'builtin user api',
             urlSwaggerJson: 'api/v0/swagger.json'
         }, {
@@ -289,7 +289,7 @@
                 '" id="' + options.uuid + '">';
             html += '<label class="col-sm-3 control-label">' +
                 // init title
-                ((options['x-title'] || options.title || options.name) + '<br>(' +
+                ((options['x-swgg-title'] || options.title || options.name) + '<br>(' +
                 (options.format || options.type || 'object') + ')') + '</label>';
             html += '<div class="col-sm-9">';
             htmlInputDatetime = '<div class="date dtFormInputDatetime input-group">' +
@@ -302,7 +302,7 @@
                 readOnly + ' type="text">';
             htmlInputTextarea = '<textarea class="form-control" placeholder="" ' +
                 readOnly + '></textarea>';
-            if (options['x-queryRange']) {
+            if (options['x-swgg-queryRange']) {
                 // default
                 htmlInput = '<div class="row">' +
                     '<div class="form-group col-sm-6">' + htmlInputText + '</div>' +
@@ -356,7 +356,7 @@
                 switch (options.type) {
                 // type - array
                 case 'array':
-                    if (options['x-fileUpload']) {
+                    if (options['x-swgg-fileUpload']) {
                         htmlInput = htmlInputText;
                         break;
                     }
@@ -437,18 +437,19 @@
             // validate data
             local.utility2.tryCatchOnError(function () {
                 local.jQuery(elementContainer).find('.form-control')
-                    .removeClass('animated dtFormInputInvalid shake');
+                    .removeClass('dtFormInputInvalid');
                 local.swgg.validateByPropertyDef({
                     data: options.dataRead,
                     key: local.swgg.dt.schemaName,
                     propertyDef: options,
                     required: options.required,
-                    'x-notRequired': options['x-notRequired']
+                    'x-swgg-notRequired': options['x-swgg-notRequired']
                 });
             }, function (error) {
                 setTimeout(function () {
                     local.jQuery(elementContainer).find('.form-control')
-                        .addClass('animated dtFormInputInvalid shake');
+                        .addClass('dtFormInputInvalid');
+                    local.swgg.domElementWiggle(elementContainer);
                 });
                 // validate no error occurred
                 local.utility2.assert(!error, error);
@@ -465,7 +466,7 @@
             if (typeof options === 'string') {
                 options = JSON.parse(decodeURIComponent(options));
             }
-            if (options['x-queryRange']) {
+            if (options['x-swgg-queryRange']) {
                 return;
             }
             data = local.utility2.isNullOrUndefined(options.dataWrite)
@@ -586,8 +587,9 @@
                 //!! local.jQuery('#userFormLogin').modal('show');
             //!! }
             // init dtList
-            local.swgg.dtList = local.utility2.jsonCopy(local.swgg.swaggerJson['x-dtList'] ||
-                JSON.parse(local.swgg.templateDtListPetstore));
+            local.swgg.dtList =
+                local.utility2.jsonCopy(local.swgg.swaggerJson['x-swgg-dtList'] ||
+                    JSON.parse(local.swgg.templateDtListPetstore));
             // init dom element #dtListContainer1
             document.getElementById('dtListContainer1').innerHTML =
                 local.swgg.dtList.map(function (options, ii) {
@@ -677,17 +679,17 @@
                 data[options.name] = options.dataRead;
             });
             crudUpdate = local.swgg.dt.apiDict.crudCreateOne;
-            options = { swggParamDict: {} };
+            options = { paramDict: {} };
             if (document.getElementById('dtButtonRecordSave1').dataset.saveType === 'edit') {
                 crudUpdate = local.swgg.dt.apiDict.crudUpdateOneByKeyUnique;
-                options.swggParamDict = local.swgg.keyUniqueInit({
+                options.paramDict = local.swgg.keyUniqueInit({
                     data: data,
                     operationId: crudUpdate._operationId
                 }).queryByKeyUnique;
             }
             crudUpdate.parameters.forEach(function (paramDef) {
                 if (paramDef.in === 'body') {
-                    options.swggParamDict[paramDef.name] = data;
+                    options.paramDict[paramDef.name] = data;
                 }
             });
             crudUpdate(options, function (error) {
@@ -717,7 +719,7 @@
             /*
              * this function will send an ajax request for page-data
              */
-                local.swgg.dt.apiDict.crudGetManyByQuery({ swggParamDict: {
+                local.swgg.dt.apiDict.crudGetManyByQuery({ paramDict: {
                     _queryLimit: options.length,
                     _querySkip: options.start,
                     _querySort: options.order.length
@@ -768,7 +770,7 @@
                         onParallel.counter += 1;
                         // delete row in parallel
                         crudDelete({
-                            swggParamDict: local.swgg.keyUniqueInit({
+                            paramDict: local.swgg.keyUniqueInit({
                                 data: local.swgg.dt.pageData.data[element.dataset.ii],
                                 operationId: crudDelete._operationId
                             }).queryByKeyUnique
