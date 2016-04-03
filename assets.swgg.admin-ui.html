@@ -136,8 +136,8 @@ textarea.form-control {
 <!-- .dtHeader #dtViewContainer begin -->
 <div class="dtHeader">
 <ul class="dtViewContainer nav nav-justified nav-pills">
-<li><a data-toggle="tab" href="#dtViewTable1" id="dtNavTable1">table of records</a></li>
-<li><a data-toggle="tab" href="#dtViewRecordEdit1" id="dtNavRecordEdit1" onclick="local.swgg.dtOnClickRecordEdit()">create or update record</a></li>
+<li><a data-toggle="tab" href="#dtViewTable1" id="dtNavTable1">table of collectDoc</a></li>
+<li><a data-toggle="tab" href="#dtViewCollectDocEdit1" id="dtNavCollectDocEdit1" onclick="local.swgg.dtOnClickCollectDocEdit()">create or update collectDoc</a></li>
 </ul>
 </div>
 <!-- .dtHeader #dtViewContainer end -->
@@ -169,16 +169,16 @@ textarea.form-control {
 
 
 
-<!-- #dtViewRecordEdit1 begin -->
-<div class="container fade tab-pane" id="dtViewRecordEdit1">
-<div class="dtFormContainer form-horizontal" id="dtFormRecordEdit1"></div>
+<!-- #dtViewCollectDocEdit1 begin -->
+<div class="container fade tab-pane" id="dtViewCollectDocEdit1">
+<div class="dtFormContainer form-horizontal" id="dtFormCollectDocEdit1"></div>
 <div class="form-horizontal">
     <div class="form-group">
-    <div class="col-sm-3 control-label"><button class="btn btn-primary" id="dtButtonRecordSave1" onclick="local.swgg.dtOnClickRecordSave()">save</button></div>
+    <div class="col-sm-3 control-label"><button class="btn btn-primary" id="dtButtonCollectDocSave1" onclick="local.swgg.dtOnClickCollectDocSave()">save</button></div>
     </div>
 </div>
 </div>
-<!-- #dtViewRecordEdit1 end -->
+<!-- #dtViewCollectDocEdit1 end -->
 
 
 
@@ -246,7 +246,7 @@ local.swgg.dtListInit();
 
 
 //!! setTimeout(function () {
-    //!! $('#dtNavRecordEdit1').click();
+    //!! $('#dtNavCollectDocEdit1').click();
 //!! }, 100);
 
 </script>

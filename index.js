@@ -66,7 +66,6 @@
             _method: 'get',
             _path: '/{{_pathPrefix}}/crudCountManyByQuery',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudCountManyByQuery',
             parameters: [{
                 default: '{}',
                 description: 'query param',
@@ -82,7 +81,6 @@
             _method: 'put',
             _path: '/{{_pathPrefix}}/crudCreateOrReplaceMany',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudCreateOrReplaceMany',
             parameters: [{
                 description: '{{_schemaName}} object',
                 in: 'body',
@@ -104,7 +102,6 @@
             _method: 'put',
             _path: '/{{_pathPrefix}}/crudCreateOrReplaceOne',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudCreateOrReplaceOne',
             parameters: [{
                 description: '{{_schemaName}} object',
                 in: 'body',
@@ -127,7 +124,6 @@
             _method: 'put',
             _path: '/{{_pathPrefix}}/crudCreateOrReplaceOneByKeyUnique/{{{_keyUnique}}}',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudCreateOrReplaceOneByKeyUnique.{{_keyUnique}}',
             parameters: [{
                 description: '{{_schemaName}} {{_keyUnique}}',
                 in: 'path',
@@ -155,7 +151,6 @@
             _method: 'patch',
             _path: '/{{_pathPrefix}}/crudCreateOrUpdateOne',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudCreateOrUpdateOne',
             parameters: [{
                 description: '{{_schemaName}} object',
                 in: 'body',
@@ -178,7 +173,6 @@
             _method: 'patch',
             _path: '/{{_pathPrefix}}/crudCreateOrUpdateOneByKeyUnique/{{{_keyUnique}}}',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudCreateOrUpdateOneByKeyUnique.{{_keyUnique}}',
             parameters: [{
                 description: '{{_schemaName}} {{_keyUnique}}',
                 in: 'path',
@@ -207,7 +201,6 @@
             _method: 'delete',
             _path: '/{{_pathPrefix}}/crudDeleteManyByQuery',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudDeleteManyByQuery',
             parameters: [{
                 default: '{"id":"undefined"}',
                 description: 'query param',
@@ -232,7 +225,6 @@
             _method: 'delete',
             _path: '/{{_pathPrefix}}/crudDeleteOneByKeyUnique/{{{_keyUnique}}}',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudDeleteOneByKeyUnique.{{_keyUnique}}',
             parameters: [{
                 description: '{{_schemaName}} {{_keyUnique}}',
                 in: 'path',
@@ -248,7 +240,6 @@
             _method: 'get',
             _path: '/{{_pathPrefix}}/crudExistsOneByKeyUnique/{{{_keyUnique}}}',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudExistsOneByKeyUnique.{{_keyUnique}}',
             parameters: [{
                 description: '{{_schemaName}} {{_keyUnique}}',
                 in: 'path',
@@ -265,7 +256,6 @@
             _method: 'get',
             _path: '/{{_pathPrefix}}/crudFileGetOneByKeyUnique/{{{_keyUnique}}}',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudFileGetOneByKeyUnique.{{_keyUnique}}',
             parameters: [{
                 description: '{{_schemaName}} {{_keyUnique}}',
                 in: 'path',
@@ -273,6 +263,7 @@
                 required: true,
                 type: 'string'
             }],
+            produces: ['application/octet-stream'],
             responses: {
                 200: {
                     description:
@@ -284,20 +275,15 @@
             tags: ['{{_pathPrefix}}']
         };
         local.swgg.templatePathObjectDefaultDict.crudFileUploadManyByForm = {
+            _fileUploadNumber: '{{_fileUploadNumber}}',
             _method: 'post',
             _path: '/{{_pathPrefix}}/crudFileUploadManyByForm',
             _pathPrefix: '{{_pathPrefix}}',
             consumes: ['multipart/form-data'],
-            operationId: 'crudFileUploadManyByForm',
             parameters: [{
                 description: '{{_schemaName}} file to form-upload',
                 in: 'formData',
                 name: 'file1',
-                type: 'file'
-            }, {
-                description: '{{_schemaName}} file to form-upload',
-                in: 'formData',
-                name: 'file2',
                 type: 'file'
             }],
             responses: {
@@ -310,33 +296,10 @@
             summary: '{{operationId}} - form-upload many {{_schemaName}} files',
             tags: ['{{_pathPrefix}}']
         };
-        local.swgg.templatePathObjectDefaultDict.crudFileUploadOneByForm = {
-            _method: 'post',
-            _path: '/{{_pathPrefix}}/crudFileUploadOneByForm',
-            _pathPrefix: '{{_pathPrefix}}',
-            consumes: ['multipart/form-data'],
-            operationId: 'crudFileUploadOneByForm',
-            parameters: [{
-                description: '{{_schemaName}} file to form-upload',
-                in: 'formData',
-                name: 'file',
-                type: 'file'
-            }],
-            responses: {
-                200: {
-                    description:
-                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/BuiltinJsonapiResponse{{_schemaName}}' }
-                }
-            },
-            summary: '{{operationId}} - form-upload one {{_schemaName}} file',
-            tags: ['{{_pathPrefix}}']
-        };
         local.swgg.templatePathObjectDefaultDict.crudGetManyByQuery = {
             _method: 'get',
             _path: '/{{_pathPrefix}}/crudGetManyByQuery',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudGetManyByQuery',
             parameters: [{
                 default: '{"_id":{"$exists":true}}',
                 description: 'query param',
@@ -388,7 +351,6 @@
             _method: 'get',
             _path: '/{{_pathPrefix}}/crudGetOneByKeyUnique/{{{_keyUnique}}}',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudGetOneByKeyUnique.{{_keyUnique}}',
             parameters: [{
                 description: '{{_schemaName}} {{_keyUnique}}',
                 in: 'path',
@@ -410,7 +372,6 @@
             _method: 'get',
             _path: '/{{_pathPrefix}}/crudGetOneByQuery',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudGetOneByQuery',
             parameters: [{
                 default: '{}',
                 description: 'query param',
@@ -441,7 +402,6 @@
             _method: 'delete',
             _path: '/{{_pathPrefix}}/crudNullDelete',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudNullDelete',
             responses: {
                 200: {
                     description:
@@ -456,7 +416,6 @@
             _method: 'get',
             _path: '/{{_pathPrefix}}/crudNullGet',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudNullGet',
             responses: {
                 200: {
                     description:
@@ -471,7 +430,6 @@
             _method: 'patch',
             _path: '/{{_pathPrefix}}/crudNullPatch',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudNullPatch',
             responses: {
                 200: {
                     description:
@@ -486,7 +444,6 @@
             _method: 'post',
             _path: '/{{_pathPrefix}}/crudNullPost',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudNullPost',
             responses: {
                 200: {
                     description:
@@ -501,7 +458,6 @@
             _method: 'put',
             _path: '/{{_pathPrefix}}/crudNullPut',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudNullPut',
             responses: {
                 200: {
                     description:
@@ -516,7 +472,6 @@
             _method: 'get',
             _path: '/{{_pathPrefix}}/crudUserLoginByPassword',
             _pathPrefix: '{{_pathPrefix}}',
-            operationId: 'crudUserLoginByPassword',
             parameters: [
                 {
                     default: 'password',
@@ -581,6 +536,7 @@
                 version: '0'
             },
             paths: {},
+            securityDefinitions: {},
             swagger: '2.0',
             'x-swgg-validateUnusedDefinition': false,
             tags: []
@@ -598,7 +554,6 @@
                         'crudDeleteOneByKeyUnique.id',
                         'crudFileGetOneByKeyUnique.id',
                         'crudFileUploadManyByForm',
-                        'crudFileUploadOneByForm',
                         'crudGetOneByKeyUnique.id',
                         'crudGetManyByQuery',
                         'crudNullDelete',
@@ -609,6 +564,7 @@
                     ],
                     _pathPrefix: 'builtin-file',
                     properties: {
+                        _id: { readOnly: true, type: 'string' },
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
                         fileBlob: { format: 'byte', type: 'string' },
                         fileContentType: { type: 'string' },
@@ -631,6 +587,7 @@
                     ],
                     _pathPrefix: 'builtin-user',
                     properties: {
+                        _id: { readOnly: true, type: 'string' },
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
                         id: { type: 'string' },
                         jwtEncoded: { type: 'string' },
@@ -671,7 +628,8 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         /*
          * this function will send a swagger-api ajax-request with the pathObject self
          */
-            var tmp;
+            var isMultipartFormData, tmp;
+            isMultipartFormData = (self.consumes && self.consumes[0]) === 'multipart/form-data';
             // validate data
             local.utility2.tryCatchOnError(function () {
                 local.swgg.validateByParamDefList({
@@ -690,17 +648,18 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             }
             // init options-defaults
             local.utility2.objectSetDefault(options, {
-                basePath: local.swgg.swaggerJson.basePath,
-                inForm: '',
+                inForm: isMultipartFormData
+                    ? new local.utility2.FormData()
+                    : '',
                 inHeader: {},
                 inPath: self._path,
                 inQuery: '',
                 headers: {},
-                host: local.swgg.swaggerJson.host || local.utility2.urlParse('').host,
                 method: self._method.toUpperCase(),
-                modeJson: true,
-                schemes: local.swgg.swaggerJson.schemes ||
-                    local.utility2.urlParse('').protocol.slice(0, -1)
+                responseType: self.produces &&
+                        self.produces[0].indexOf('application/octet-stream') === 0
+                    ? 'arraybuffer'
+                    : ''
             });
             // init paramDict
             self.parameters.forEach(function (paramDef) {
@@ -709,7 +668,8 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     return;
                 }
                 if (!(paramDef.type === 'string' ||
-                        (paramDef.type === 'array' && typeof tmp === 'string'))) {
+                        (paramDef.type === 'array' && typeof tmp === 'string') ||
+                        tmp instanceof local.utility2.Blob)) {
                     tmp = JSON.stringify(tmp);
                 }
                 switch (paramDef.in) {
@@ -717,6 +677,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     options.inBody = tmp;
                     break;
                 case 'formData':
+                    if (isMultipartFormData) {
+                        options.inForm.append(paramDef.name, tmp, tmp && tmp.name);
+                        break;
+                    }
                     options.inForm += '&' + encodeURIComponent(paramDef.name) + '=' +
                         encodeURIComponent(tmp);
                     break;
@@ -734,12 +698,16 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 }
             });
             // init data
-            options.data = options.inBody || options.inForm.slice(1);
+            options.data = options.inBody || (isMultipartFormData
+                ? options.inForm
+                : options.inForm.slice(1));
             // init headers
             local.utility2.objectSetOverride(options.headers, options.inHeader);
             // init headers - Content-Type
             if (options.inForm) {
-                options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+                options.headers['Content-Type'] = isMultipartFormData
+                    ? 'multipart/form-data'
+                    : 'application/x-www-form-urlencoded';
             }
             // init headers - Authorization
             if (local.modeJs === 'browser') {
@@ -751,10 +719,14 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     'Bearer ' + options.jwtEncoded;
             }
             // init url
-            options.url = options.schemes + '://' + options.host + options.basePath +
-                options.inPath + '?' + options.inQuery.slice(1);
+            options.url = local.swgg.urlBaseGet() + options.inPath + '?' +
+                options.inQuery.slice(1);
             // send ajax-request
             return local.utility2.ajax(options, function (error, xhr) {
+                // init responseJson
+                local.utility2.tryCatchOnError(function () {
+                    xhr.responseJson = JSON.parse(xhr.responseText);
+                }, local.utility2.nop);
                 // set jwtEncoded-cookie
                 if (local.modeJs === 'browser' && !(xhr instanceof XMLHttpRequest)) {
                     tmp = (/\b(jwtEncoded=.+)/).exec(xhr.getResponseHeader('set-cookie'));
@@ -784,7 +756,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         /*
          * this function will update the swagger-api dict of api-calls
          */
-            var keyUnique, pathObject, schema, tmp;
+            var fileUploadNumber, ii, keyUnique, pathObject, schema, tmp;
             // init swaggerJson
             local.swgg.swaggerJson = local.swgg.swaggerJson ||
                 JSON.parse(local.swgg.templateSwaggerJson);
@@ -809,18 +781,28 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 }).replace((/\{\{_schemaName\}\}/g), schemaName)), 2);
                 // init pathObject
                 (schema._pathObjectDefaultList || []).forEach(function (operationId) {
+                    // init fileUploadNumber
+                    fileUploadNumber = 1;
+                    tmp = (/^crudFileUploadManyByForm\.(\d+)/).exec(operationId);
+                    if (tmp) {
+                        fileUploadNumber = tmp[1];
+                    }
                     // init keyUnique
-                    keyUnique = (/ByKeyUnique\.(.*)/).exec(operationId);
-                    keyUnique = keyUnique && keyUnique[1];
-                    keyUnique = keyUnique && keyUnique.split('.')[0];
-                    operationId = operationId.replace('.' + keyUnique, '');
+                    keyUnique = '';
+                    tmp = (/ByKeyUnique\.([^.]+)/).exec(operationId);
+                    if (tmp) {
+                        keyUnique = tmp[1];
+                    }
                     // init pathObject
-                    pathObject = local.swgg.templatePathObjectDefaultDict[operationId]
+                    pathObject =
+                        local.swgg.templatePathObjectDefaultDict[operationId.split('.')[0]]
+                        .replace((/\{\{_fileUploadNumber\}\}/g), fileUploadNumber)
                         .replace((/\{\{_keyUnique\}\}/g), keyUnique)
                         .replace((/\{\{_pathPrefix\}\}/g), schema._pathPrefix)
                         .replace((/\{\{_schemaName\}\}/g), schema._schemaName)
                         .replace((/\{\{operationId\}\}/g), operationId);
                     pathObject = JSON.parse(pathObject);
+                    pathObject.operationId = operationId;
                     // init keyUnique.format and keyUnique.type
                     (pathObject.parameters || []).forEach(function (param) {
                         if (param.name === keyUnique) {
@@ -833,7 +815,14 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     options.paths[pathObject._path] = options.paths[pathObject._path] || {};
                     options.paths[pathObject._path][pathObject._method] = pathObject;
                     // add schema-properties as extra params to crudGetManyByQuery
-                    switch (pathObject.operationId) {
+                    switch (pathObject.operationId.split('.')[0]) {
+                    case 'crudFileUploadManyByForm':
+                        for (ii = 0; ii < fileUploadNumber; ii += 1) {
+                            pathObject.parameters[ii] =
+                                local.utility2.jsonCopy(pathObject.parameters[0]);
+                            pathObject.parameters[ii].name = 'file' + (ii + 1);
+                        }
+                        break;
                     case '!crudGetManyByQuery':
                         pathObject.parameters = pathObject.parameters.concat(Object.keys(
                             schema.properties
@@ -898,12 +887,8 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     // update templatePathObjectDict
                     pathObject._keyOperationId = pathObject.tags[0] + ' ' +
                         pathObject.operationId;
-                    pathObject._keyPath = method.toUpperCase() + ' ' + path.replace(
-                        (/\{.*/),
-                        function (match0) {
-                            return match0.replace((/[^\/]/g), '');
-                        }
-                    );
+                    pathObject._keyPath = method.toUpperCase() + ' ' + path
+                        .replace((/\{.*?\}/g), '');
                     local.swgg.templatePathObjectDict[pathObject._keyOperationId] =
                         local.swgg.templatePathObjectDict[pathObject._keyPath] =
                             JSON.stringify(local.utility2.objectSetDefault(
@@ -997,6 +982,93 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             }, local.utility2.nop);
         };
 
+        local.swgg.collectDocRandomCreate = function (options) {
+        /*
+         * this function will create a random collectDoc
+         */
+            var collectDoc, propertyDef, max, min, stringRandom;
+            collectDoc = {};
+            stringRandom = function () {
+                return local.utility2.listGetElementRandom('abcdefghijklmnopqrstuvwxyz') +
+                    Math.random().toString(36).slice(2, 10);
+            };
+            Object.keys(options.properties).forEach(function (key) {
+                propertyDef = options.properties[key];
+                if (propertyDef.readOnly) {
+                    return;
+                }
+                if (propertyDef.enum) {
+                    collectDoc[key] = local.utility2.listGetElementRandom(propertyDef.enum);
+                    return;
+                }
+                switch (propertyDef.type) {
+                case 'array':
+                    collectDoc[key] = [];
+                    break;
+                case 'boolean':
+                    collectDoc[key] = local.utility2.listGetElementRandom([false, true]);
+                    break;
+                case 'integer':
+                    max = typeof propertyDef.maximum === 'number'
+                        ? propertyDef.maximum
+                        : 999;
+                    min = typeof propertyDef.minimum === 'number'
+                        ? propertyDef.minimum
+                        : -999;
+                    if (propertyDef.exclusiveMaximum) {
+                        max -= 1;
+                    }
+                    if (propertyDef.exclusiveMinimum) {
+                        min += 1;
+                    }
+                    collectDoc[key] = Math.floor(min + Math.random() * (max - min));
+                    break;
+                case 'number':
+                    max = typeof propertyDef.maximum === 'number'
+                        ? propertyDef.maximum
+                        : 999;
+                    min = typeof propertyDef.minimum === 'number'
+                        ? propertyDef.minimum
+                        : -999;
+                    if (propertyDef.exclusiveMinimum) {
+                        min = min < 0
+                            ? min * 0.99999
+                            : min * 1.00001 + 0.00001;
+                    }
+                    if (propertyDef.exclusiveMaximum) {
+                        max = max > 0
+                            ? max * 0.99999
+                            : max * 1.00001 - 0.00001;
+                    }
+                    collectDoc[key] = Math.random() * (max - min) + min;
+                    break;
+                case 'string':
+                    switch (propertyDef.format) {
+                    case 'byte':
+                        collectDoc[key] =
+                            local.utility2.stringToBase64(stringRandom());
+                        break;
+                    case 'date':
+                    case 'date-time':
+                        collectDoc[key] = new Date(0x10000000000 * Math.random()).toISOString();
+                        break;
+                    case 'email':
+                        collectDoc[key] = stringRandom() + '@' + stringRandom() + '.com';
+                        break;
+                    case 'json':
+                        collectDoc[key] =
+                            JSON.stringify({ aa: stringRandom(), bb: stringRandom() });
+                        break;
+                    default:
+                        collectDoc[key] = stringRandom();
+                        break;
+                    }
+                    break;
+                }
+            });
+            return local.utility2.objectSetOverride(collectDoc, options.override || {});
+        };
+
         local.swgg.collectionCreate = function (schemaName) {
         /*
          * this function will create a persistent nedb-collection from schemaName
@@ -1040,7 +1112,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     onParallel = local.utility2.onParallel(onNext);
                     onParallel.counter += 1;
                     local.utility2.objectSetDefault(options, {
-                        docList: [],
+                        collectDocList: [],
                         ensureIndexList: [],
                         removeIndexList: []
                     });
@@ -1086,10 +1158,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     break;
                 case 4:
                     onParallel.counter += 1;
-                    // upsert documents
-                    options.docList.forEach(function (doc) {
+                    // upsert collectDoc
+                    options.collectDocList.forEach(function (collectDoc) {
                         onParallel.counter += 1;
-                        collection.update({ id: doc.id }, doc, {
+                        collection.update({ id: collectDoc.id }, collectDoc, {
                             upsert: true
                         }, onParallel);
                     });
@@ -1207,7 +1279,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             // jslint-hack
             local.utility2.nop(response);
             // if request is already parsed, then goto nextMiddleware
-            if (request.swgg.bodyParsed) {
+            if (!local.utility2.isNullOrUndefined(request.swgg.bodyParsed)) {
                 nextMiddleware();
                 return;
             }
@@ -1215,7 +1287,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             // parse application/x-www-form-urlencoded, e.g.
             // aa=hello%20world&bb=bye%20world
             case 'application/x-www-form-urlencoded':
-                request.swgg.bodyParsed = String(request.bodyRaw);
+                request.swgg.bodyParsed = local.utility2.bufferToString(request.bodyRaw);
                 request.swgg.bodyParsed =
                     local.utility2.urlParse('?' + request.swgg.bodyParsed, true).query;
                 break;
@@ -1239,10 +1311,11 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
              * --Boundary--\r\n
              */
             case 'multipart/form-data':
+                request.swgg.isMultipartFormData = true;
                 request.swgg.bodyParsed = {};
                 request.swgg.bodyMeta = {};
                 options = {};
-                options.crlf = new local.global.Uint8Array([0x0d, 0x0a]);
+                options.crlf = local.utility2.bufferCreate([0x0d, 0x0a]);
                 // init boundary
                 ii = 0;
                 jj = local.utility2.bufferIndexOfSubBuffer(request.bodyRaw, options.crlf, ii);
@@ -1263,9 +1336,9 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     if (jj < 0) {
                         break;
                     }
-                    options.header = new local.utility2.StringView(
+                    options.header = local.utility2.bufferToString(
                         request.bodyRaw.slice(ii, ii + 1024)
-                    ).toString().split('\r\n').slice(0, 2).join('\r\n');
+                    ).split('\r\n').slice(0, 2).join('\r\n');
                     options.contentType = (/^content-type:(.*)/im).exec(options.header);
                     options.contentType = options.contentType && options.contentType[1].trim();
                     options.filename = (/^content-disposition:.*?\bfilename="([^"]+)/im)
@@ -1290,7 +1363,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 }
                 break;
             default:
-                request.swgg.bodyParsed = String(request.bodyRaw);
+                request.swgg.bodyParsed = local.utility2.bufferToString(request.bodyRaw || '');
                 local.utility2.tryCatchOnError(function () {
                     request.swgg.bodyParsed = JSON.parse(request.swgg.bodyParsed);
                 }, local.utility2.nop);
@@ -1302,7 +1375,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         /*
          * this function will run the builtin crud-operations, using nedb as the default backend
          */
-            var crud, modeNext, onNext, onParallel;
+            var crud, modeNext, onNext, onParallel, tmp;
             modeNext = 0;
             onNext = function (error, data, meta) {
                 modeNext = error
@@ -1320,9 +1393,11 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         crud.collection.count(crud.queryQuery, onNext);
                         break;
                     case 'crudCreateOrReplaceMany':
-                        crud.collection.remove({ id: { $in: crud.body.map(function (doc) {
-                            return doc.id;
-                        }) } }, { multi: true }, onNext);
+                        crud.collection.remove({ id: {
+                            $in: crud.body.map(function (collectDoc) {
+                                return collectDoc.id;
+                            })
+                        } }, { multi: true }, onNext);
                         break;
                     case 'crudCreateOrReplaceOne':
                     case 'crudCreateOrReplaceOneByKeyUnique':
@@ -1333,7 +1408,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         delete crud.body.id;
                         delete crud.body[crud.keyUnique];
                         crud.body[crud.keyAlias] = crud.data[crud.keyUnique];
-                        // replace doc
+                        // replace collectDoc
                         if (crud.operationId.indexOf('Replace') >= 0) {
                             crud.collection.update(
                                 crud.queryByKeyUnique,
@@ -1341,7 +1416,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                                 { returnUpdatedDocs: true, upsert: true },
                                 onNext
                             );
-                        // update doc
+                        // update collectDoc
                         } else {
                             crud.collection.update(
                                 crud.queryByKeyUnique,
@@ -1364,13 +1439,12 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         crud.collection.findOne(crud.queryByKeyUnique, onNext);
                         break;
                     case 'crudFileUploadManyByForm':
-                    case 'crudFileUploadOneByForm':
-                        crud.body = Object.keys(
-                            request.swgg.bodyParsed
-                        ).map(function (key, ii) {
+                        crud.body = Object.keys(request.swgg.bodyParsed).map(function (key) {
+                            tmp = local.utility2.uuidTimeCreate();
                             return {
-                                fileBlob: local.utility2.StringView.bytesToBase64(
-                                    request.swgg.bodyParsed[key]
+                                fileBlob: local.utility2.bufferToString(
+                                    request.swgg.bodyParsed[key],
+                                    'base64'
                                 ),
                                 fileContentType: request.swgg.bodyMeta[key].contentType,
                                 fileFilename: request.swgg.bodyMeta[key].filename,
@@ -1378,8 +1452,8 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                                 fileSize: request.swgg.bodyParsed[key].length,
                                 fileUrl: local.swgg.swaggerJson.basePath + '/' +
                                     request.swgg.pathObject._pathPrefix +
-                                    '/crudFileGetOneByKeyUnique/' + (crud.data.id + ii),
-                                id: crud.data.id + ii
+                                    '/crudFileGetOneByKeyUnique/' + tmp,
+                                id: tmp
                             };
                         });
                         crud.collection.insert(crud.body, onNext);
@@ -1433,11 +1507,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     case 'crudExistsOneByKeyUnique':
                         onNext(null, !!data);
                         break;
-                    case 'crudFileGetOneByKeyUnique':
-                        crud.collection.findOne(crud.queryByKeyUnique, onNext);
-                        break;
                     case 'crudFileUploadManyByForm':
-                    case 'crudFileUploadOneByForm':
                         onNext(null, data.map(function (element) {
                             delete element.fileBlob;
                             return element;
@@ -1455,15 +1525,14 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 case 3:
                     switch (crud.operationId.split('.')[0]) {
                     case 'crudFileGetOneByKeyUnique':
-                        if (data) {
-                            local.utility2.serverRespondHeadSet(request, response, null, {
-                                'Content-Type': data.fileContentType
-                            });
-                            response.end(local.modeJs === 'browser'
-                                ? local.utility2.StringView.base64ToBytes(data.fileBlob)
-                                : new Buffer(data.fileBlob, 'base64'));
+                        if (!data) {
+                            local.utility2.serverRespondDefault(request, response, 404);
                             return;
                         }
+                        local.utility2.serverRespondHeadSet(request, response, null, {
+                            'Content-Type': data.fileContentType
+                        });
+                        response.end(local.utility2.bufferCreate(data.fileBlob, 'base64'));
                         break;
                     }
                     local.swgg.serverRespondJsonapi(request, response, null, data, meta);
@@ -1485,15 +1554,6 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 error.statusCode = 404;
             }
             local.swgg.serverRespondJsonapi(request, response, error);
-        };
-
-        local.swgg.middlewareFileUpload = function (request, response, nextMiddleware) {
-        /*
-         * this function will handle file upload / delete
-         */
-            // jslint-hack
-            local.utility2.nop(request, response);
-            nextMiddleware();
         };
 
         local.swgg.middlewareInit = function (request, response, nextMiddleware) {
@@ -1666,22 +1726,26 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     // init pathObject
                     while (true) {
                         request.swgg.pathObject =
-                            local.swgg.templatePathObjectDict[request.swgg.pathname];
+                            local.swgg.templatePathObjectDict[request.swgg.pathname] ||
+                            // handle /foo/{id}/bar case
+                            local.swgg.templatePathObjectDict[request.swgg.pathname
+                                .replace((/\/[^\/]+\/([^\/]*?)$/), '//$1')];
                         // if pathObject exists, then break and continue
                         if (request.swgg.pathObject) {
                             request.swgg.pathObject = JSON.parse(request.swgg.pathObject);
-                            onNext();
-                            break;
-                        }
-                        // if cannot init pathObject, then default to nextMiddleware
-                        if (request.swgg.pathname === tmp) {
-                            modeNext = Infinity;
+                            request.swgg.pathname = request.swgg.pathObject._keyPath;
                             onNext();
                             break;
                         }
                         tmp = request.swgg.pathname;
                         request.swgg.pathname = request.swgg.pathname
                             .replace((/\/[^\/]+?(\/*?)$/), '/$1');
+                        // if cannot init pathObject, then default to nextMiddleware
+                        if (request.swgg.pathname === tmp) {
+                            modeNext = Infinity;
+                            onNext();
+                            break;
+                        }
                     }
                     break;
                 case 2:
@@ -1755,7 +1819,9 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         return;
                     }
                     // init crud.body
-                    crud.body = local.utility2.jsonCopy(request.swgg.bodyParsed);
+                    if (!request.swgg.isMultipartFormData) {
+                        crud.body = local.utility2.jsonCopy(request.swgg.bodyParsed);
+                    }
                     // init crud.data
                     crud.data = local.utility2.jsonCopy(request.swgg.paramDict);
                     // init crud.operationId
@@ -1794,11 +1860,9 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         ) || element.value;
                     });
                     // init crud.data.id
-                    switch (crud.operationId) {
+                    switch (crud.operationId.split('.')[0]) {
                     case 'crudCreateOrReplaceOne':
                     case 'crudCreateOrUpdateOne':
-                    case 'crudFileUploadManyByForm':
-                    case 'crudFileUploadOneByForm':
                         crud.data.id = crud.data.id || (crud.body && crud.body.id);
                         if (!crud.data.id) {
                             crud.data.id = local.utility2.uuidTimeCreate();
@@ -1893,11 +1957,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     }
                 }
                 // JSON.parse paramDict
-                if (paramDef.type !== 'string' &&
-                        (typeof tmp === 'string' ||
-                        (local.modeJs === 'node' && Buffer.isBuffer(tmp)))) {
+                if (!(paramDef.type === 'file' || paramDef.type === 'string') &&
+                        (typeof tmp === 'string' || tmp instanceof local.global.Uint8Array)) {
                     local.utility2.tryCatchOnError(function () {
-                        tmp = JSON.parse(tmp);
+                        tmp = JSON.parse(local.utility2.bufferToString(tmp));
                     }, local.utility2.nop);
                 }
                 data[paramDef.name] = tmp;
@@ -2018,6 +2081,16 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             local.swgg.apiDictUpdate(local.swgg.swaggerJson);
         };
 
+        local.swgg.urlBaseGet = function () {
+        /*
+         * this function will return the base swagger url
+         */
+            return (local.swgg.swaggerJson.schemes ||
+                local.utility2.urlParse('').protocol.slice(0, -1)) + '://' +
+                (local.swgg.swaggerJson.host || local.utility2.urlParse('').host) +
+                local.swgg.swaggerJson.basePath;
+        };
+
         local.swgg.userLoginByPassword = function (options, onError) {
         /*
          * this function will send a user-login-request by password,
@@ -2029,7 +2102,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 username: options.username
             } }, function (error, xhr) {
                 if (!error && xhr) {
-                    local.swgg.userJwtEncoded = xhr.responseJSON.data[0].jwtEncoded;
+                    local.swgg.userJwtEncoded = xhr.responseJson.data[0].jwtEncoded;
                 }
                 onError(error, xhr);
             });
@@ -2111,15 +2184,15 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 // http://json-schema.org/latest/json-schema-validation.html#anchor13
                 // 5.1.  Validation keywords for numeric instances (number and integer)
                 if (typeof data === 'number') {
-                    if (propertyDef.multipleOf) {
+                    if (typeof propertyDef.multipleOf === 'number') {
                         local.utility2.assert(data % propertyDef.multipleOf === 0);
                     }
-                    if (propertyDef.maximum) {
+                    if (typeof propertyDef.maximum === 'number') {
                         local.utility2.assert(propertyDef.exclusiveMaximum
                             ? data < propertyDef.maximum
                             : data <= propertyDef.maximum);
                     }
-                    if (propertyDef.minimum) {
+                    if (typeof propertyDef.minimum === 'number') {
                         local.utility2.assert(propertyDef.exclusiveMinimum
                             ? data > propertyDef.minimum
                             : data >= propertyDef.minimum);
@@ -2266,7 +2339,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 );
                 Object.keys(schema.properties || {}).forEach(function (_) {
                     key = _;
-                    // delete options.dataReadonlyRemove[key]
+                    // remove options.dataReadonlyRemove[key]
                     if (schema.properties[key].readOnly &&
                             options.dataReadonlyRemove &&
                             options.dataReadonlyRemove.hasOwnProperty(key)) {
@@ -2330,9 +2403,11 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         // init exports
         local.global.swgg = local.swgg;
         // init $NODE_ENV
-        if (local.utility2.modeTest) {
-            local.utility2.envDict.NODE_ENV = local.utility2.envDict.NODE_ENV || 'test';
-        }
+        [local.utility2.modeTest, null].forEach(function (element) {
+            if (element) {
+                local.utility2.envDict.NODE_ENV = local.utility2.envDict.NODE_ENV || 'test';
+            }
+        });
         break;
 
 

@@ -6,31 +6,39 @@ standalone swagger-ui server backed by nedb
 
 
 
-# todo
-- add function swgg.recordRandomCreate to create random collection record
+# documentation
+#### todo
 - add crudGetManyByQuery extra params
 - add message-param to assertions in swgg.validateByPropertyDef
 - auto-fix unique index constraint violation in nedb
 - show login for 403 and 401
 - admin-ui toggle login / logout button
 - admin-ui - add property-option x-swgg-sortName
-- implement api POST /pet/{petId}/uploadImage
 - implement api GET /user/login
 - implement api GET /user/logout
 - add logging feature
 - add cached version crudGetManyByQueryCached
 - none
 
-
-
-# change since 461ed021
-- npm publish 2016.2.1
-- cleanup Backbone and Handlebars in lib.swagger-ui.js
-- fix file-upload for serverLocal
-- add function swgg.jwtEncodedDecodeAndDecrypt, swgg.nedbReset
-- use rolled-up asset /assets.utility2.rollup.js
-- move request.swgg* objects to namespace request.swgg
+#### change since 73eb0c50
+- npm publish 2016.2.2
+- implement api POST /pet/{petId}/uploadImage
+- fix Uncaught TypeError: this.trigger is not a function
+- fix curl example missing body
+- add multipart/form-data ability to swgg.apiAjax
+- add function swgg.collectDocRandomCreate to create random collectDoc
+- merge crudFileUploadOneByForm into crudFileUploadManyByForm
+- add function swgg.urlBaseGet
+- cover example.js
 - none
+
+#### this package requires
+- darwin or linux os
+
+#### api-doc
+- [https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html](https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html)
+
+[![api-doc](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.docApiCreate.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swagger-lite_2Ftmp_2Fbuild_2Fdoc.api.html.png)](https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html)
 
 
 
@@ -64,17 +72,6 @@ standalone swagger-ui server backed by nedb
 - unstable branch
 - HEAD is arbitrary
 - commit history may be rewritten
-
-
-
-# documentation
-#### this package requires
-- darwin or linux os
-
-#### api-doc
-- [https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html](https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html)
-
-[![api-doc](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.docApiCreate.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swagger-lite_2Ftmp_2Fbuild_2Fdoc.api.html.png)](https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html)
 
 
 
@@ -154,17 +151,22 @@ instruction
         /*
          * this function will run petstore-specific crud-operations
          */
-            var modeNext, onNext, result;
+            var crud, modeNext, onNext, result;
             modeNext = 0;
-            onNext = function (error, data) {
+            onNext = function (error, data, meta) {
                 modeNext = error
                     ? Infinity
                     : modeNext + 1;
                 switch (modeNext) {
                 case 1:
+                    crud = request.swgg.crud;
                     switch (request.swgg.pathname) {
                     case 'GET /store/inventory':
-                        local.swgg.collectionCreate('Order').find({}, { status: 1 }, onNext);
+                        crud.collection.find({}, { status: 1 }, onNext);
+                        break;
+                    case 'POST /pet//uploadImage':
+                        crud.queryByKeyUnique = { id: crud.data.petId };
+                        crud.collection.findOne(crud.queryByKeyUnique, onNext);
                         break;
                     default:
                         modeNext = Infinity;
@@ -181,11 +183,39 @@ instruction
                         });
                         onNext(null, result);
                         break;
+                    case 'POST /pet//uploadImage':
+                        if (!data || !request.swgg.bodyParsed.file) {
+                            onNext(null, null, data);
+                            break;
+                        }
+                        data.photoUrls = ['data:' +
+                            (request.swgg.bodyMeta.file.contentType || '') + ';base64,' +
+                            local.utility2.bufferToString(
+                                request.swgg.bodyParsed.file,
+                                'base64'
+                            )];
+                        // replace doc
+                        crud.collection.update(
+                            crud.queryByKeyUnique,
+                            data,
+                            { returnUpdatedDocs: true, upsert: true },
+                            onNext
+                        );
+                        break;
                     default:
                         onNext(null, data);
                     }
                     break;
                 case 3:
+                    switch (request.swgg.pathname) {
+                    case 'POST /pet//uploadImage':
+                        onNext(null, meta, data);
+                        break;
+                    default:
+                        onNext(null, data);
+                    }
+                    break;
+                case 4:
                     local.swgg.serverRespondJsonapi(request, response, error, data);
                     break;
                 default:
@@ -249,10 +279,11 @@ instruction
         // init petstore-api
         local.swgg.apiDictUpdate(JSON.parse(local.swgg.templateSwaggerJsonPetstore));
         // init assets
-        local.utility2.assetsDict['/assets.example.js'] =
-            local.fs.readFileSync(__dirname + '/example.js', 'utf8');
-        // https://github.com/swagger-api/swagger-ui/blob/v2.1.2/dist/index.html
+        /* istanbul ignore next */
+        local.utility2.assetsDict['/assets.example.js'] = local.global.assetsExampleJs ||
+            local.fs.readFileSync(__filename, 'utf8');
         /* jslint-ignore-begin */
+        // https://github.com/swagger-api/swagger-ui/blob/v2.1.2/dist/index.html
         local.utility2.templateIndexHtml = '\
 <!doctype html>\n\
 <html lang="en">\n\
@@ -390,6 +421,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                     _pathObjectDefaultList: ['crudGetManyByQuery'],
                     _pathPrefix: 'pet',
                     properties: {
+                        _id: { readOnly: true, type: 'string' },
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
                         id: { default: 1, minimum: 1 },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
@@ -402,6 +434,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                     ],
                     _pathPrefix: 'store',
                     properties: {
+                        _id: { readOnly: true, type: 'string' },
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
                         id: { default: 1, minimum: 1 },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
@@ -411,6 +444,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                     _pathObjectDefaultList: ['crudGetManyByQuery'],
                     _pathPrefix: 'user',
                     properties: {
+                        _id: { readOnly: true, type: 'string' },
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
                         email: { format: 'email' },
                         id: { default: 1, minimum: 1 },
@@ -456,6 +490,16 @@ window.swgg.api = window.swaggerUi.api;\n\
                     post: {
                         _operationId: 'crudCreateOrUpdateOneByKeyUnique.petId.id',
                         _schemaName: 'Pet'
+                    }
+                },
+                '/pet/{petId}/uploadImage': {
+                    post: {
+                        _schemaName: 'Pet'
+                    }
+                },
+                '/store/inventory': {
+                    get: {
+                        _schemaName: 'Order'
                     }
                 },
                 '/store/order': {
@@ -510,14 +554,15 @@ window.swgg.api = window.swaggerUi.api;\n\
         }, 10));
         // init collectionList
         local.collectionList = [{
-            docList: [{
+            collectDocList: [{
                 id: '00_test_crudFileGetOneByKeyUnique',
-                fileBlob: local.swgg.templateSwaggerLogoSmallBase64
+                fileBlob: local.swgg.templateSwaggerLogoSmallBase64,
+                fileContentType: 'image/png'
             }],
             drop: true,
             name: 'BuiltinFile'
         }, {
-            docList: [{
+            collectDocList: [{
                 id: 'admin',
                 password: local.utility2.bcryptHashCreate('admin', 1),
                 username: 'admin'
@@ -540,7 +585,7 @@ window.swgg.api = window.swaggerUi.api;\n\
             }],
             name: 'BuiltinUser'
         }, {
-            docList: [{
+            collectDocList: [{
                 id: 'admin',
                 password: local.utility2.bcryptHashCreate('admin', 1),
                 username: 'admin'
@@ -563,7 +608,7 @@ window.swgg.api = window.swaggerUi.api;\n\
             }],
             name: 'User'
         }, {
-            docList: [{
+            collectDocList: [{
                 id: 1,
                 name: 'birdie',
                 photoUrls: [],
@@ -589,7 +634,7 @@ window.swgg.api = window.swaggerUi.api;\n\
             }],
             name: 'Pet'
         }, {
-            docList: [{
+            collectDocList: [{
                 id: 1,
                 status: 'available'
             }, {
@@ -606,12 +651,12 @@ window.swgg.api = window.swaggerUi.api;\n\
             }],
             name: 'Order'
         }, {
-            docList: [{
+            collectDocList: [{
                 email: 'jane@doe.com',
                 firstName: 'jane',
                 id: 1,
                 lastName: 'doe',
-                password: 'hello',
+                password: 'secret1',
                 phone: '1234-5678',
                 username: 'jane.doe'
             }, {
@@ -619,7 +664,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                 firstName: 'john',
                 id: 2,
                 lastName: 'doe',
-                password: 'bye',
+                password: 'secret2',
                 phone: '8765-4321',
                 username: 'john.doe'
             }],
@@ -641,20 +686,44 @@ window.swgg.api = window.swaggerUi.api;\n\
         }];
         // init 100 extra random pets
         local.ii = 0;
-        local.options = { docList: [], name: 'Pet' };
+        local.options = { collectDocList: [], name: 'Pet' };
         local.collectionList.push(local.options);
         for (local.ii = 100; local.ii < 200; local.ii += 1) {
-            local.options.docList.push({
-                id: local.ii,
-                name: local.utility2.listGetElementRandom(['birdie', 'doggie', 'fishie']) +
-                    '-' + local.ii,
-                photoUrls: [],
-                status: local.utility2.listGetElementRandom(['available', 'pending', 'sold']),
-                tags: [
-                    { name: local.utility2.listGetElementRandom(['female', 'male']) },
-                    { name: Math.random().toString(36).slice(2) }
-                ]
-            });
+            local.options.collectDocList.push(local.swgg.collectDocRandomCreate({
+                override: {
+                    id: local.ii,
+                    name: local.utility2.listGetElementRandom(['birdie', 'doggie', 'fishie']) +
+                        '-' + local.ii,
+                    tags: [
+                        { name: local.utility2.listGetElementRandom(['female', 'male']) },
+                        { name: Math.random().toString(36).slice(2) }
+                    ]
+                },
+                properties: local.swgg.swaggerJson.definitions.Pet.properties
+            }));
+        }
+        local.utility2.onReady.counter += 1;
+        local.swgg.collectionListInit(local.collectionList, local.utility2.onReady);
+        // init 100 extra random users
+        local.ii = 0;
+        local.options = { collectDocList: [], name: 'User' };
+        local.collectionList.push(local.options);
+        for (local.ii = 100; local.ii < 200; local.ii += 1) {
+            local.options.collectDocList.push(local.swgg.collectDocRandomCreate({
+                override: {
+                    firstName:
+                        local.utility2.listGetElementRandom(['alice', 'bob', 'jane', 'john']) +
+                        '-' + local.ii,
+                    id: local.ii,
+                    lastName: local.utility2.listGetElementRandom(['doe', 'smith']) +
+                        '-' + local.ii,
+                    tags: [
+                        { name: local.utility2.listGetElementRandom(['female', 'male']) },
+                        { name: Math.random().toString(36).slice(2) }
+                    ]
+                },
+                properties: local.swgg.swaggerJson.definitions.User.properties
+            }));
         }
         local.utility2.onReady.counter += 1;
         local.swgg.collectionListInit(local.collectionList, local.utility2.onReady);
@@ -688,7 +757,7 @@ window.swgg.api = window.swaggerUi.api;\n\
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "nedb-lite": "2016.1.3",
-        "utility2": "2016.1.9"
+        "utility2": "2016.2.2"
     },
     "description": "standalone swagger-ui server backed by nedb",
     "devDependencies": {
@@ -741,7 +810,7 @@ export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.2.1"
+    "version": "2016.2.2"
 }
 ```
 

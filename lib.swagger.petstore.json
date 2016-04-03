@@ -218,6 +218,14 @@
                         "description": "Invalid input"
                     }
                 },
+                "security": [
+                    {
+                        "petstore_auth": [
+                            "write:pets",
+                            "read:pets"
+                        ]
+                    }
+                ],
                 "summary": "Add a new pet to the store",
                 "tags": [
                     "pet"
@@ -256,6 +264,14 @@
                         "description": "Validation exception"
                     }
                 },
+                "security": [
+                    {
+                        "petstore_auth": [
+                            "write:pets",
+                            "read:pets"
+                        ]
+                    }
+                ],
                 "summary": "Update an existing pet",
                 "tags": [
                     "pet"
@@ -303,6 +319,14 @@
                         "description": "Invalid status value"
                     }
                 },
+                "security": [
+                    {
+                        "petstore_auth": [
+                            "write:pets",
+                            "read:pets"
+                        ]
+                    }
+                ],
                 "summary": "Finds Pets by status",
                 "tags": [
                     "pet"
@@ -345,6 +369,14 @@
                         "description": "Invalid tag value"
                     }
                 },
+                "security": [
+                    {
+                        "petstore_auth": [
+                            "write:pets",
+                            "read:pets"
+                        ]
+                    }
+                ],
                 "summary": "Finds Pets by tags",
                 "tags": [
                     "pet"
@@ -383,6 +415,14 @@
                         "description": "Pet not found"
                     }
                 },
+                "security": [
+                    {
+                        "petstore_auth": [
+                            "write:pets",
+                            "read:pets"
+                        ]
+                    }
+                ],
                 "summary": "Deletes a pet",
                 "tags": [
                     "pet"
@@ -468,6 +508,14 @@
                         "description": "Invalid input"
                     }
                 },
+                "security": [
+                    {
+                        "petstore_auth": [
+                            "write:pets",
+                            "read:pets"
+                        ]
+                    }
+                ],
                 "summary": "Updates a pet in the store with form data",
                 "tags": [
                     "pet"
@@ -516,6 +564,14 @@
                         }
                     }
                 },
+                "security": [
+                    {
+                        "petstore_auth": [
+                            "write:pets",
+                            "read:pets"
+                        ]
+                    }
+                ],
                 "summary": "uploads an image",
                 "tags": [
                     "pet"
@@ -942,6 +998,15 @@
             "in": "header",
             "name": "api_key",
             "type": "apiKey"
+        },
+        "petstore_auth": {
+            "authorizationUrl": "http://petstore.swagger.io/oauth/dialog",
+            "flow": "implicit",
+            "scopes": {
+                "read:pets": "read your pets",
+                "write:pets": "modify pets in your account"
+            },
+            "type": "oauth2"
         }
     },
     "swagger": "2.0",

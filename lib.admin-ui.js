@@ -160,7 +160,7 @@
                     local.utility2.nop(data, type, row);
                     options = local.swgg.dt.datatableInstance.page.info();
                     options.ii = options.page * options.length + meta.row + 1;
-                    return '<button class="btn btn-xs dtButtonRecordEdit" style="' +
+                    return '<button class="btn btn-xs dtButtonCollectDocEdit" style="' +
                         (local.swgg.dt.apiDict.crudUpdateOneByKeyUnique
                         ? ''
                         : 'display: none;') + '">edit row ' + options.ii + '</button>';
@@ -209,9 +209,9 @@
                 }).join('') + '</tr></tfoot></table>';
             local.swgg.dt.datatableInstance =
                 local.jQuery('#dtTable1').DataTable(local.swgg.dt.datatableOptions);
-            // init form-record-edit
+            // init dtFormCollectDocEdit1
             document.getElementById(
-                'dtFormRecordEdit1'
+                'dtFormCollectDocEdit1'
             ).innerHTML = Object.keys(local.swgg.dt.schema.properties)
                 .sort(function (aa, bb) {
                     return aa === 'id'
@@ -561,7 +561,7 @@
             local.jQuery('#dtListContainer1').on('click', 'li', local.swgg.dtDatatableInit);
             local.jQuery('#dtTableContainer1')
                 // init click event-handling to edit table-row
-                .on('click', '.dtButtonRecordEdit', local.swgg.dtOnClickRecordEdit)
+                .on('click', '.dtButtonCollectDocEdit', local.swgg.dtOnClickCollectDocEdit)
                 // init click event-handling to toggle-select table-row
                 .on('click', 'tr', function () {
                     local.jQuery(this).toggleClass('selected');
@@ -634,26 +634,26 @@
             local.jQuery('#dtListContainer1').find('li').first().click();
         };
 
-        local.swgg.dtOnClickRecordEdit = function (event) {
+        local.swgg.dtOnClickCollectDocEdit = function (event) {
         /*
-         * this function will handle the click-event to edit the record
+         * this function will handle the click-event to edit the collectDoc
          */
             var options, rowData, saveType;
             rowData = {};
             if (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                if ((/\bdtButtonRecordEdit\b/).test(this.className)) {
+                if ((/\bdtButtonCollectDocEdit\b/).test(this.className)) {
                     // init rowData
                     rowData = local.swgg.dt.pageData.data[this.closest('tr').dataset.ii];
                     saveType = 'edit';
                 }
             }
             // init saveType
-            document.getElementById('dtButtonRecordSave1').dataset.saveType = saveType;
+            document.getElementById('dtButtonCollectDocSave1').dataset.saveType = saveType;
             // update .dtFormInputContainer
             Array.prototype.slice.call(
-                document.querySelectorAll('#dtFormRecordEdit1 .dtFormInputContainer')
+                document.querySelectorAll('#dtFormCollectDocEdit1 .dtFormInputContainer')
             ).forEach(function (elementContainer) {
                 options = JSON.parse(decodeURIComponent(elementContainer.dataset.options));
                 options.dataWrite = rowData[options.name];
@@ -663,12 +663,12 @@
                 local.swgg.dtFormInputDataWrite(elementContainer, options);
             });
             // change to view-row-edit
-            local.jQuery('#dtNavRecordEdit1').tab('show');
+            local.jQuery('#dtNavCollectDocEdit1').tab('show');
         };
 
-        local.swgg.dtOnClickRecordSave = function () {
+        local.swgg.dtOnClickCollectDocSave = function () {
         /*
-         * this function will handle the click-event to save the record
+         * this function will handle the click-event to save the collectDoc
          */
             var crudUpdate, data, options;
             data = {};
@@ -680,7 +680,8 @@
             });
             crudUpdate = local.swgg.dt.apiDict.crudCreateOne;
             options = { paramDict: {} };
-            if (document.getElementById('dtButtonRecordSave1').dataset.saveType === 'edit') {
+            if (document.getElementById('dtButtonCollectDocSave1').dataset.saveType ===
+                    'edit') {
                 crudUpdate = local.swgg.dt.apiDict.crudUpdateOneByKeyUnique;
                 options.paramDict = local.swgg.keyUniqueInit({
                     data: data,
@@ -704,7 +705,7 @@
 
         local.swgg.dtOnClickQuerySubmit = function () {
         /*
-         * this function will handle the click-event to save the record
+         * this function will handle the click-event to save the collectDoc
          */
             return;
         };
@@ -732,7 +733,7 @@
                 } }, function (error, data) {
                     // validate no error occurred
                     local.utility2.assert(!error, error);
-                    local.swgg.dt.pageData = data.responseJSON;
+                    local.swgg.dt.pageData = data.responseJson;
                     callback({
                         recordsFiltered: local.swgg.dt.pageData.meta[
                             local.swgg.dt.paginationCountTotal
@@ -745,12 +746,12 @@
                 });
             };
             options.buttons = [local.swgg.dt.apiDict.crudCreateOne && {
-                className: 'dtButtonRecordCreate',
-                text: 'create new record',
-                action: local.swgg.dtOnClickRecordEdit
+                className: 'dtButtonCollectDocCreate',
+                text: 'create new collectDoc',
+                action: local.swgg.dtOnClickCollectDocEdit
             }, local.swgg.dt.apiDict.crudDeleteOneByKeyUnique && {
-                className: 'dtButtonRecordDelete',
-                text: 'delete selected records',
+                className: 'dtButtonCollectDocDelete',
+                text: 'delete selected collectDoc',
                 action: function () {
                 /*
                  * this function will delete the row
@@ -768,7 +769,7 @@
                         document.querySelectorAll('#dtTable1 tbody tr.selected')
                     ).forEach(function (element) {
                         onParallel.counter += 1;
-                        // delete row in parallel
+                        // remove row in parallel
                         crudDelete({
                             paramDict: local.swgg.keyUniqueInit({
                                 data: local.swgg.dt.pageData.data[element.dataset.ii],
