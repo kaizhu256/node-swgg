@@ -1,4 +1,5 @@
 /*jslint
+    bitwise: true,
     browser: true,
     maxerr: 8,
     maxlen: 96,
@@ -194,6 +195,7 @@
             }].forEach(function (_) {
                 options = _;
                 onParallel.counter += 1;
+                // test crudCreateGetDeleteOne's default handling-behavior
                 local.testCase_crudCreateGetDeleteOne_default(options, onParallel);
             });
             onParallel();
@@ -222,8 +224,8 @@
                     case 2:
                         // validate no error occurred
                         local.utility2.assert(!error, error);
-                        // test crudDeleteOneByKeyUnique's default handling-behavior
-                        local.testCase_crudDeleteOneByKeyUnique_default(options, onNext);
+                        // test crudGetDeleteOneByKeyUnique's default handling-behavior
+                        local.testCase_crudGetDeleteOneByKeyUnique_default(options, onNext);
                         break;
                     default:
                         onError(error, data);
@@ -269,7 +271,7 @@
                         // validate dataReadonlyRemove
                         local.utility2.assert(data.responseJson.data[0].createdAt >
                             '1970-01-01T00:00:00.000Z', data.responseJson);
-                        // validate data was created
+                        // test crudGetOneByKeyUnique's default handling-behavior
                         local.testCase_crudGetOneByKeyUnique_default(options, onNext);
                         break;
                     default:
@@ -337,7 +339,6 @@
                         options = local.utility2.objectSetDefault(options || {}, {
                             crudDeleteOneByKeyUnique:
                                 local.swgg.apiDict['_test crudDeleteOneByKeyUnique.id'],
-                            crudGetManyByQuery: local.swgg.apiDict['_test crudGetManyByQuery'],
                             crudGetOneByKeyUnique:
                                 local.swgg.apiDict['_test crudGetOneByKeyUnique.id'],
                             operationId: 'undefined.id',
@@ -373,6 +374,33 @@
             onNext();
         };
 
+        local.testCase_crudErrorXxx_default = function (options, onError) {
+        /*
+         * this function will test crudErrorXxx's default handling-behavior
+         */
+            var onParallel;
+            onParallel = local.utility2.onParallel(onError);
+            onParallel.counter += 1;
+            options = {};
+            [
+                '_test crudErrorDelete',
+                '_test crudErrorGet',
+                '_test crudErrorPatch',
+                '_test crudErrorPost',
+                '_test crudErrorPut'
+            ].forEach(function (key) {
+                onParallel.counter += 1;
+                local.swgg.apiDict[key](options, function (error) {
+                    local.utility2.tryCatchOnError(function () {
+                        // validate error occurred
+                        local.utility2.assert(error, error);
+                        onParallel();
+                    }, onError);
+                });
+            });
+            onParallel();
+        };
+
         local.testCase_crudExistsOneByKeyUnique_default = function (options, onError) {
         /*
          * this function will test crudExistsOneByKeyUnique's default handling-behavior
@@ -401,7 +429,7 @@
                     case 2:
                         // validate no error occurred
                         local.utility2.assert(!error, error);
-                        // validate data
+                        // validate data exists
                         local.utility2.assert(data.responseJson.data.length === 1 &&
                             data.responseJson.data[0] === true, data);
                         onNext();
@@ -507,11 +535,75 @@
                     case 3:
                         // validate no error occurred
                         local.utility2.assert(!error, error);
+                        // test crudGetDeleteOneByKeyUnique's default handling-behavior
+                        local.testCase_crudGetDeleteOneByKeyUnique_default(options, onNext);
+                        break;
+                    default:
+                        onError(error);
+                    }
+                }, onError);
+            };
+            onNext();
+        };
+
+        local.testCase_crudFileUploadManyByForm_nullCase = function (options, onError) {
+        /*
+         * this function will test crudFileUploadManyByForm's null-case handling-behavior
+         */
+            var modeNext, onNext;
+            modeNext = 0;
+            onNext = function (error, data) {
+                local.utility2.tryCatchOnError(function () {
+                    modeNext += 1;
+                    switch (modeNext) {
+                    case 1:
+                        options = {};
+                        // ajax - crudFileUploadManyByForm
+                        local.swgg.apiDict['_test crudFileUploadManyByForm.2'](options, onNext);
+                        break;
+                    case 2:
+                        // validate no error occurred
+                        local.utility2.assert(!error, error);
+                        options.data = data.responseJson.data;
+                        // validate data
+                        local.utility2.assert(options.data.length === 0, options.data);
+                        onNext();
+                        break;
+                    default:
+                        onError(error);
+                    }
+                }, onError);
+            };
+            onNext();
+        };
+
+        local.testCase_crudGetDeleteOneByKeyUnique_default = function (options, onError) {
+        /*
+         * this function will test crudGetDeleteOneByKeyUnique's default handling-behavior
+         */
+            var modeNext, onNext;
+            modeNext = 0;
+            onNext = function (error, data) {
+                local.utility2.tryCatchOnError(function () {
+                    // validate no error occurred
+                    local.utility2.assert(!error, error);
+                    modeNext += 1;
+                    switch (modeNext) {
+                    case 1:
+                        options = local.utility2.objectSetDefault(options || {}, {
+                            keyValue: '00_test_crudGetDeleteOneByKeyUnique'
+                        });
+                        // test crudGetOneByKeyUnique's default handling-behavior
+                        local.testCase_crudGetOneByKeyUnique_default(options, onNext);
+                        break;
+                    case 2:
+                        // validate no error occurred
+                        local.utility2.assert(!error, error);
                         // test crudDeleteOneByKeyUnique's default handling-behavior
                         local.testCase_crudDeleteOneByKeyUnique_default(options, onNext);
                         break;
                     default:
-                        onError(error);
+                        onError(error, data);
                     }
                 }, onError);
             };
@@ -649,7 +741,7 @@
             var onParallel;
             onParallel = local.utility2.onParallel(onError);
             onParallel.counter += 1;
-            options = { paramDict: {} };
+            options = {};
             [
                 '_test crudNullDelete',
                 '_test crudNullGet',
@@ -661,6 +753,25 @@
                 local.swgg.apiDict[key](options, onParallel);
             });
             onParallel();
+        };
+
+        local.testCase_nedbReset_default = function (options, onError) {
+        /*
+         * this function will test nedbReset's default handling-behavior
+         */
+            options = [
+                [local.swgg, {
+                    collectionDict: { aa: { loadDatabase : function (onError) {
+                        onError();
+                    } } },
+                    Nedb: { fileReset: function (onError) {
+                        onError();
+                    } }
+                }]
+            ];
+            local.utility2.testMock(options, function (onError) {
+                local.swgg.nedbReset(onError);
+            }, onError);
         };
 
         local.testCase_onErrorJsonapi_default = function (options, onError) {
@@ -757,6 +868,13 @@
             });
             onParallel();
         };
+
+        //!! local.testCase_userLoginByPassword_default = function (options, onError) {
+        //!! /*
+         //!! * this function will test validateByParamDefList's default handling-behavior
+         //!! */
+            //!! onError();
+        //!! };
 
         local.testCase_validateByParamDefList_default = function (options, onError) {
         /*
@@ -883,19 +1001,25 @@
             };
             [
                 { key: 'propArray', value: [null] },
+                { key: 'propArray2', value: [null] },
                 { key: 'propArraySubdoc', value: [{ propRequired: true }] },
                 { key: 'propBoolean', value: true },
                 { key: 'propEnum', value: 0 },
                 { key: 'propInteger', value: 0 },
+                { key: 'propInteger2', value: 0 },
                 { key: 'propIntegerInt32', value: 0 },
                 { key: 'propIntegerInt64', value: 0 },
                 { key: 'propNumber', value: 0.5 },
-                { key: 'propNumberDouble', value: -0.5 },
+                { key: 'propNumber2', value: -0.5 },
+                { key: 'propNumber3', value: 0.5 },
+                { key: 'propNumberDouble', value: 0.5 },
                 { key: 'propNumberFloat', value: 0.5 },
                 { key: 'propObject', value: { aa: true } },
+                { key: 'propObject2', value: { aa: true } },
                 { key: 'propObjectSubdoc', value: {} },
                 { key: 'propRequired', value: true },
                 { key: 'propString', value: 'hello' },
+                { key: 'propString2', value: 'hello' },
                 { key: 'propStringBinary', value: '\u1234' },
                 { key: 'propStringByte', value:
                     local.utility2.stringToBase64(local.utility2.stringAsciiCharset) },
@@ -937,40 +1061,44 @@
             [
                 { data: null },
                 { key: 'propArray', value: true },
-                { key: 'propArray', value: [null, null] },
+                { key: 'propArray2', value: [] },
+                { key: 'propArray2', value: [null, null] },
                 { key: 'propArraySubdoc', value: [{ propRequired: null }] },
                 { key: 'propArraySubdoc', value: [ 'non-object' ] },
                 { key: 'propArraySubdoc', value: [{ propRequired: null }] },
                 { key: 'propBoolean', value: 0 },
                 { key: 'propEnum', value: -1 },
                 { key: 'propInteger', value: 0.5 },
-                { key: 'propInteger', value: true },
                 { key: 'propInteger', value: Infinity },
                 { key: 'propInteger', value: NaN },
+                { key: 'propInteger', value: true },
+                { key: 'propInteger2', value: -2 },
+                { key: 'propInteger2', value: -1 },
+                { key: 'propInteger2', value: 1 },
+                { key: 'propInteger2', value: 2 },
                 { key: 'propIntegerInt32', value: 0.5 },
                 { key: 'propIntegerInt64', value: 0.5 },
-                { key: 'propNumber', value: 0 },
-                { key: 'propNumber', value: 0.25 },
-                { key: 'propNumber', value: 1 },
                 { key: 'propNumber', value: Infinity },
                 { key: 'propNumber', value: NaN },
                 { key: 'propNumber', value: true },
-                { key: 'propNumberDouble', value: -1 },
-                { key: 'propNumberDouble', value: 0 },
-                { key: 'propNumberDouble', value: Infinity },
-                { key: 'propNumberDouble', value: NaN },
+                { key: 'propNumber2', value: -1 },
+                { key: 'propNumber3', value: -0.25 },
+                { key: 'propNumber2', value: 0 },
+                { key: 'propNumber3', value: 0 },
+                { key: 'propNumber3', value: 0.25 },
+                { key: 'propNumber3', value: 1 },
                 { key: 'propNumberDouble', value: true },
                 { key: 'propNumberFloat', value: true },
                 { key: 'propObject', value: true },
-                { key: 'propObject', value: {} },
-                { key: 'propObject', value: { aa: 1, bb: 2 } },
+                { key: 'propObject2', value: {} },
+                { key: 'propObject2', value: { aa: 1, bb: 2 } },
                 { key: 'propObjectSubdoc', value: 'non-object' },
                 { key: 'propRequired', value: null },
                 { key: 'propRequired', value: undefined },
                 { key: 'propString', value: true },
-                { key: 'propString', value: '' },
-                { key: 'propString', value: '!' },
-                { key: 'propString', value: '01234567890123456789' },
+                { key: 'propString2', value: '' },
+                { key: 'propString2', value: '!' },
+                { key: 'propString2', value: '01234567890123456789' },
                 { key: 'propStringByte', value: local.utility2.stringAsciiCharset },
                 { key: 'propStringDate', value: 'null' },
                 { key: 'propStringDatetime', value: 'null' },
@@ -985,6 +1113,8 @@
                     }
                     element.schema = options.schema;
                     local.swgg.validateBySchema(element);
+                    /* istanbul ignore next */
+                    onParallel(new Error(JSON.stringify(element.data)));
                 }, function (error) {
                     // validate error occurred
                     local.utility2.assert(error, element);
@@ -1022,6 +1152,16 @@
 
     // run browser js-env code - function
     case 'browser':
+        local.testCase_domElementWiggle_default = function (options, onError) {
+        /*
+         * this function will test domElementWiggle's default handling-behavior
+         */
+            options = {};
+            options.element = document.querySelector('div');
+            local.swgg.domElementWiggle(options.element);
+            setTimeout(onError, 1500);
+        };
+
         /* istanbul ignore next */
         local._testCase_ui_default = function (options, onError) {
         /*
@@ -1210,6 +1350,11 @@
                         'crudCreateOrUpdateOneByKeyUnique.id',
                         'crudDeleteManyByQuery',
                         'crudDeleteOneByKeyUnique.id',
+                        'crudErrorDelete',
+                        'crudErrorGet',
+                        'crudErrorPatch',
+                        'crudErrorPost',
+                        'crudErrorPut',
                         'crudExistsOneByKeyUnique.id',
                         'crudFileGetOneByKeyUnique.id',
                         'crudFileUploadManyByForm.2',
@@ -1227,7 +1372,8 @@
                         _id: { readOnly: true, type: 'string' },
                         id: { type: 'string' },
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
-                        propArray: {
+                        propArray: { items: {}, type: 'array' },
+                        propArray2: {
                             items: {},
                             maxItems: 1,
                             minItems: 1,
@@ -1246,16 +1392,27 @@
                         },
                         propBoolean: { type: 'boolean' },
                         propEnum: { enum: [0, 1], type: 'integer' },
-                        propInteger: {
+                        propInteger: { type: 'integer' },
+                        propInteger2: {
                             exclusiveMaximum: true,
                             exclusiveMinimum: true,
-                            maximum: 999,
-                            minimum: -999,
+                            maximum: 2,
+                            minimum: -2,
+                            multipleOf: 2,
                             type: 'integer'
                         },
                         propIntegerInt32: { format: 'int32', type: 'integer' },
                         propIntegerInt64: { format: 'int64', type: 'integer' },
-                        propNumber: {
+                        propNumber: { type: 'number' },
+                        propNumber2: {
+                            exclusiveMaximum: true,
+                            exclusiveMinimum: true,
+                            maximum: 0,
+                            minimum: -1,
+                            multipleOf: 0.5,
+                            type: 'number'
+                        },
+                        propNumber3: {
                             exclusiveMaximum: true,
                             exclusiveMinimum: true,
                             maximum: 1,
@@ -1263,25 +1420,15 @@
                             multipleOf: 0.5,
                             type: 'number'
                         },
-                        propNumberDouble: {
-                            exclusiveMaximum: true,
-                            exclusiveMinimum: true,
-                            maximum: 0,
-                            minimum: -1,
-                            format: 'double',
-                            type: 'number'
-                        },
+                        propNumberDouble: { format: 'double', type: 'number' },
                         propNumberFloat: { format: 'float', type: 'number' },
-                        propObject: {
-                            default: { aa: true },
-                            maxProperties: 1,
-                            minProperties: 1,
-                            type: 'object'
-                        },
+                        propObject: { default: { aa: true }, type: 'object' },
+                        propObject2: { maxProperties: 1, minProperties: 1, type: 'object' },
                         // test null-schema-validation handling-behavior
                         propObjectSubdoc: { $ref: '#/definitions/TestModelNull' },
                         propRequired: { default: true },
-                        propString: {
+                        propString: { type: 'string' },
+                        propString2: {
                             maxLength: 10,
                             minLength: 1,
                             pattern: '^\\w*$',
@@ -1302,7 +1449,7 @@
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
                     },
                     required: ['propRequired'],
-                    'x-swgg-inheritList': [{ $ref: '#/definitions/BuiltinFile' }]
+                    'x-swgg-inherit': { $ref: '#/definitions/BuiltinFile' }
                 },
                 // init TestModelNull schema
                 TestModelNull: {}
@@ -1457,8 +1604,6 @@
         local.middleware.middlewareList.push(local.swgg.middlewareBodyParse);
         // init test-middleware
         local.middleware.middlewareList.push(function (request, response, nextMiddleware) {
-            local.request = request;
-            local.response = response;
             switch (request.swgg.pathObject && request.swgg.pathObject.operationId) {
             case 'onErrorJsonapi':
                 // test redundant onErrorJsonapi handling-behavior
@@ -1491,7 +1636,7 @@
                 url.indexOf('/api/v0/swagger.json') < 0 &&
                 (/\/api\/v0\/|\/test\./).test(url);
         };
-        // init collection-list
+        // init collectionList-fixtures
         local.utility2.onReady.counter += 1;
         local.swgg.collectionListInit([{
             // test no-drop handling-behavior
@@ -1500,41 +1645,46 @@
             ensureIndexList: [{ fieldName: 'propInteger' }],
             name: 'TestModelCrud'
         }, {
-            collectDocList: [local.swgg.collectDocRandomCreate({
-                override: {
-                    id: '00_test_collectDocRandomCreate',
+            collectDocList: local.swgg.collectDocListRandomCreate({
+                collectDocList: [{
+                    id: '00_test_crudCountManyByQuery',
                     propRequired: true
+                }, {
+                    id: '00_test_crudDeleteOneByKeyUnique',
+                    propRequired: true
+                }, {
+                    id: '00_test_crudDeleteManyByQuery',
+                    propRequired: true
+                }, {
+                    id: '00_test_crudExistsOneByKeyUnique',
+                    propRequired: true
+                }, {
+                    id: '00_test_crudFileGetOneByKeyUnique',
+                    fileBlob: local.swgg.templateSwaggerLogoSmallBase64,
+                    fileContentType: 'image/png',
+                    propRequired: true
+                }, {
+                    id: '00_test_crudGetDeleteOneByKeyUnique',
+                    propRequired: true
+                }, {
+                    id: '00_test_crudGetManyByQuery',
+                    propRequired: true
+                }, {
+                    id: '00_test_crudGetOneByKeyUnique',
+                    propRequired: true
+                }, {
+                    id: '00_test_crudGetOneByQuery',
+                    propRequired: true
+                }],
+                // init 100 extra random objects
+                length: 100,
+                override: function (options) {
+                    return {
+                        id: '00_test_collectDocListRandomCreate_' + (options.ii + 100)
+                    };
                 },
                 properties: local.swgg.swaggerJson.definitions.TestModelCrud.properties
-            }), local.swgg.collectDocRandomCreate({
-                properties: local.swgg.swaggerJson.definitions.TestModelCrud.properties
-            }), {
-                id: '00_test_crudCountManyByQuery',
-                propRequired: true
-            }, {
-                id: '00_test_crudDeleteOneByKeyUnique',
-                propRequired: true
-            }, {
-                id: '00_test_crudDeleteManyByQuery',
-                propRequired: true
-            }, {
-                id: '00_test_crudExistsOneByKeyUnique',
-                propRequired: true
-            }, {
-                id: '00_test_crudFileGetOneByKeyUnique',
-                fileBlob: local.swgg.templateSwaggerLogoSmallBase64,
-                fileContentType: 'image/png',
-                propRequired: true
-            }, {
-                id: '00_test_crudGetManyByQuery',
-                propRequired: true
-            }, {
-                id: '00_test_crudGetOneByKeyUnique',
-                propRequired: true
-            }, {
-                id: '00_test_crudGetOneByQuery',
-                propRequired: true
-            }],
+            }),
             drop: true,
             ensureIndexList: [{ fieldName: 'id', unique: true }],
             name: 'TestModelCrud',
@@ -1594,7 +1744,9 @@
             );
         // run validation test
         local.testCase_validateByParamDefList_default(null, local.utility2.onErrorDefault);
+        local.testCase_validateByParamDefList_error(null, local.utility2.onErrorDefault);
         local.testCase_validateBySchema_default(null, local.utility2.onErrorDefault);
+        local.testCase_validateBySchema_error(null, local.utility2.onErrorDefault);
         local.testCase_validateBySwagger_default(null, local.utility2.onErrorDefault);
         // debug dir
         [

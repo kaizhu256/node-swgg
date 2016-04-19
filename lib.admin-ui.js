@@ -42,27 +42,6 @@
         // init templateDtListPetstore
         local.swgg.templateDtListPetstore = JSON.stringify([{
             apiDict: {
-                'crudDeleteOneByKeyUnique.id': 'builtin-file crudDeleteOneByKeyUnique.id',
-                crudGetManyByQuery: 'builtin-file crudGetManyByQuery'
-            },
-            paginationCountTotal: 'paginationCountTotal',
-            schemaName: 'BuiltinFile',
-            title: 'builtin file api',
-            urlSwaggerJson: 'api/v0/swagger.json'
-        }, {
-            apiDict: {
-                crudCreateOne: 'builtin-user crudCreateOrReplaceOne',
-                'crudDeleteOneByKeyUnique.id': 'builtin-user crudDeleteOneByKeyUnique.id',
-                crudGetManyByQuery: 'builtin-user crudGetManyByQuery',
-                'crudUpdateOneByKeyUnique.id':
-                    'builtin-user crudCreateOrUpdateOneByKeyUnique.id'
-            },
-            paginationCountTotal: 'paginationCountTotal',
-            schemaName: 'BuiltinUser',
-            title: 'builtin user api',
-            urlSwaggerJson: 'api/v0/swagger.json'
-        }, {
-            apiDict: {
                 crudCreateOne: 'pet addPet',
                 'crudDeleteOneByKeyUnique.petId.id': 'pet deletePet',
                 crudGetManyByQuery: 'pet crudGetManyByQuery',

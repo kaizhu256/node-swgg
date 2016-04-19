@@ -8,6 +8,7 @@ standalone swagger-ui server backed by nedb
 
 # documentation
 #### todo
+- fix admin-ui datatable-refresh not having persistent query-state
 - add crudGetManyByQuery extra params
 - add message-param to assertions in swgg.validateByPropertyDef
 - auto-fix unique index constraint violation in nedb
@@ -20,16 +21,13 @@ standalone swagger-ui server backed by nedb
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 73eb0c50
-- npm publish 2016.2.2
-- implement api POST /pet/{petId}/uploadImage
-- fix Uncaught TypeError: this.trigger is not a function
-- fix curl example missing body
-- add multipart/form-data ability to swgg.apiAjax
-- add function swgg.collectDocRandomCreate to create random collectDoc
-- merge crudFileUploadOneByForm into crudFileUploadManyByForm
-- add function swgg.urlBaseGet
-- cover example.js
+#### change since eb3c1530
+- npm publish 2016.2.3
+- split swgg.middlewareValidate into swgg.middlewareRouter and swgg.middlewareValidate
+- merge collection BuiltinFile into collection TestModelCrud in example.js
+- merge collection BuiltinUser into collection User in example.js
+- add 'multipleOf' number-constraint to function swgg.collectDocRandomCreate
+- add function swgg.collectDocListRandomCreate
 - none
 
 #### this package requires
@@ -227,9 +225,11 @@ instruction
         // init middleware
         local.middleware = local.utility2.middlewareGroupCreate([
             // init init-middleware
-            local.swgg.middlewareInit,
+            local.utility2.middlewareInit,
             // init cached-assets-middleware
             local.utility2.middlewareAssetsCached,
+            // init router-middleware
+            local.swgg.middlewareRouter,
             // init user-login-middleware
             local.swgg.middlewareUserLogin,
             // init http-body-read-middleware
@@ -256,7 +256,7 @@ instruction
                 }
                 nextMiddleware();
             },
-            // init swagger-validation-middleware
+            // init swagger-validate-middleware
             local.swgg.middlewareValidate,
             // init petstore-crud-middleware
             local.middlewareCrudPetstore,
@@ -424,6 +424,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                         _id: { readOnly: true, type: 'string' },
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
                         id: { default: 1, minimum: 1 },
+                        quantity: { minimum: 0 },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
                     }
                 },
@@ -441,7 +442,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                     }
                 },
                 User: {
-                    _pathObjectDefaultList: ['crudGetManyByQuery'],
+                    _pathObjectDefaultList: ['crudGetManyByQuery', 'crudUserLoginByPassword'],
                     _pathPrefix: 'user',
                     properties: {
                         _id: { readOnly: true, type: 'string' },
@@ -450,7 +451,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                         id: { default: 1, minimum: 1 },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
                     },
-                    'x-swgg-inheritList': [{ $ref: '#/definitions/BuiltinUser' }]
+                    'x-swgg-inherit': { $ref: '#/definitions/BuiltinUser' }
                 }
             },
             paths: {
@@ -552,81 +553,45 @@ window.swgg.api = window.swaggerUi.api;\n\
                 }
             }
         }, 10));
-        // init collectionList
-        local.collectionList = [{
-            collectDocList: [{
-                id: '00_test_crudFileGetOneByKeyUnique',
-                fileBlob: local.swgg.templateSwaggerLogoSmallBase64,
-                fileContentType: 'image/png'
-            }],
-            drop: true,
-            name: 'BuiltinFile'
-        }, {
-            collectDocList: [{
-                id: 'admin',
-                password: local.utility2.bcryptHashCreate('admin', 1),
-                username: 'admin'
-            }, {
-                id: 'jane.doe',
-                password: local.utility2.bcryptHashCreate('hello', 1),
-                username: 'jane.doe'
-            }, {
-                id: 'john.doe',
-                password: local.utility2.bcryptHashCreate('bye', 1),
-                username: 'john.doe'
-            }],
-            drop: true,
-            ensureIndexList: [{
-                fieldName: 'id',
-                unique: true
-            }, {
-                fieldName: 'username',
-                unique: true
-            }],
-            name: 'BuiltinUser'
-        }, {
-            collectDocList: [{
-                id: 'admin',
-                password: local.utility2.bcryptHashCreate('admin', 1),
-                username: 'admin'
-            }, {
-                id: 'jane.doe',
-                password: local.utility2.bcryptHashCreate('hello', 1),
-                username: 'jane.doe'
-            }, {
-                id: 'john.doe',
-                password: local.utility2.bcryptHashCreate('bye', 1),
-                username: 'john.doe'
-            }],
-            drop: true,
-            ensureIndexList: [{
-                fieldName: 'id',
-                unique: true
-            }, {
-                fieldName: 'username',
-                unique: true
-            }],
-            name: 'User'
-        }, {
-            collectDocList: [{
-                id: 1,
-                name: 'birdie',
-                photoUrls: [],
-                status: 'available',
-                tags: [{ name: 'bird'}]
-            }, {
-                id: 2,
-                name: 'doggie',
-                status: 'pending',
-                photoUrls: [],
-                tags: [{ name: 'dog'}]
-            }, {
-                id: 3,
-                name: 'fishie',
-                photoUrls: [],
-                status: 'sold',
-                tags: [{ name: 'fish'}]
-            }],
+        // init collectionList-fixtures
+        local.utility2.onReady.counter += 1;
+        local.swgg.collectionListInit([{
+            collectDocList: local.swgg.collectDocListRandomCreate({
+                collectDocList: [{
+                    id: 1,
+                    name: 'birdie',
+                    photoUrls: [],
+                    status: 'available',
+                    tags: [{ name: 'bird'}]
+                }, {
+                    id: 2,
+                    name: 'doggie',
+                    status: 'pending',
+                    photoUrls: [],
+                    tags: [{ name: 'dog'}]
+                }, {
+                    id: 3,
+                    name: 'fishie',
+                    photoUrls: [],
+                    status: 'sold',
+                    tags: [{ name: 'fish'}]
+                }],
+                // init 100 extra random pets
+                length: 100,
+                override: function (options) {
+                    return {
+                        id: options.ii + 100,
+                        name: local.utility2.listGetElementRandom(
+                            ['birdie', 'doggie', 'fishie']
+                        ) + '-' + (options.ii + 100),
+                        tags: [
+                            { name: local.utility2.listGetElementRandom(['female', 'male']) },
+                            { name: Math.random().toString(36).slice(2) }
+                        ]
+                    };
+                },
+                properties: local.swgg.swaggerJson.definitions.Pet.properties
+            }),
             drop: true,
             ensureIndexList: [{
                 fieldName: 'id',
@@ -634,16 +599,30 @@ window.swgg.api = window.swaggerUi.api;\n\
             }],
             name: 'Pet'
         }, {
-            collectDocList: [{
-                id: 1,
-                status: 'available'
-            }, {
-                id: 2,
-                status: 'pending'
-            }, {
-                id: 3,
-                status: 'sold'
-            }],
+            collectDocList: local.swgg.collectDocListRandomCreate({
+                collectDocList: [{
+                    id: 1,
+                    petId: 1,
+                    status: 'available'
+                }, {
+                    id: 2,
+                    petId: 2,
+                    status: 'pending'
+                }, {
+                    id: 3,
+                    petId: 3,
+                    status: 'sold'
+                }],
+                // init 100 extra random users
+                length: 100,
+                override: function (options) {
+                    return {
+                        id: options.ii + 100,
+                        petId: options.ii + 100
+                    };
+                },
+                properties: local.swgg.swaggerJson.definitions.Order.properties
+            }),
             drop: true,
             ensureIndexList: [{
                 fieldName: 'id',
@@ -651,23 +630,51 @@ window.swgg.api = window.swaggerUi.api;\n\
             }],
             name: 'Order'
         }, {
-            collectDocList: [{
-                email: 'jane@doe.com',
-                firstName: 'jane',
-                id: 1,
-                lastName: 'doe',
-                password: 'secret1',
-                phone: '1234-5678',
-                username: 'jane.doe'
-            }, {
-                email: 'john@doe.com',
-                firstName: 'john',
-                id: 2,
-                lastName: 'doe',
-                password: 'secret2',
-                phone: '8765-4321',
-                username: 'john.doe'
-            }],
+            collectDocList: local.swgg.collectDocListRandomCreate({
+                collectDocList: [{
+                    email: 'admin@admin.com',
+                    firstName: 'admin',
+                    id: 1,
+                    lastName: '',
+                    password: local.utility2.bcryptHashCreate('secret1', 1),
+                    phone: '1234-5678',
+                    username: 'admin'
+                }, {
+                    email: 'jane@doe.com',
+                    firstName: 'jane',
+                    id: 2,
+                    lastName: 'doe',
+                    password: local.utility2.bcryptHashCreate('secret2', 1),
+                    phone: '1234-5678',
+                    username: 'jane.doe'
+                }, {
+                    email: 'john@doe.com',
+                    firstName: 'john',
+                    id: 3,
+                    lastName: 'doe',
+                    password: local.utility2.bcryptHashCreate('secret3', 1),
+                    phone: '1234-5678',
+                    username: 'john.doe'
+                }],
+                // init 100 extra random users
+                length: 100,
+                override: function (options) {
+                    return {
+                        firstName: local.utility2.listGetElementRandom(
+                            ['alice', 'bob', 'jane', 'john']
+                        ) + '-' + (options.ii + 100),
+                        id: options.ii + 100,
+                        lastName: local.utility2.listGetElementRandom(['doe', 'smith']) +
+                            '-' + (options.ii + 100),
+                        password: local.utility2.bcryptHashCreate('secret' + options.ii, 1),
+                        tags: [
+                            { name: local.utility2.listGetElementRandom(['female', 'male']) },
+                            { name: Math.random().toString(36).slice(2) }
+                        ]
+                    };
+                },
+                properties: local.swgg.swaggerJson.definitions.User.properties
+            }),
             drop: true,
             ensureIndexList: [{
                 fieldName: 'email',
@@ -676,57 +683,11 @@ window.swgg.api = window.swaggerUi.api;\n\
                 fieldName: 'id',
                 unique: true
             }, {
-                fieldName: 'phone',
-                unique: true
-            }, {
                 fieldName: 'username',
                 unique: true
             }],
             name: 'User'
-        }];
-        // init 100 extra random pets
-        local.ii = 0;
-        local.options = { collectDocList: [], name: 'Pet' };
-        local.collectionList.push(local.options);
-        for (local.ii = 100; local.ii < 200; local.ii += 1) {
-            local.options.collectDocList.push(local.swgg.collectDocRandomCreate({
-                override: {
-                    id: local.ii,
-                    name: local.utility2.listGetElementRandom(['birdie', 'doggie', 'fishie']) +
-                        '-' + local.ii,
-                    tags: [
-                        { name: local.utility2.listGetElementRandom(['female', 'male']) },
-                        { name: Math.random().toString(36).slice(2) }
-                    ]
-                },
-                properties: local.swgg.swaggerJson.definitions.Pet.properties
-            }));
-        }
-        local.utility2.onReady.counter += 1;
-        local.swgg.collectionListInit(local.collectionList, local.utility2.onReady);
-        // init 100 extra random users
-        local.ii = 0;
-        local.options = { collectDocList: [], name: 'User' };
-        local.collectionList.push(local.options);
-        for (local.ii = 100; local.ii < 200; local.ii += 1) {
-            local.options.collectDocList.push(local.swgg.collectDocRandomCreate({
-                override: {
-                    firstName:
-                        local.utility2.listGetElementRandom(['alice', 'bob', 'jane', 'john']) +
-                        '-' + local.ii,
-                    id: local.ii,
-                    lastName: local.utility2.listGetElementRandom(['doe', 'smith']) +
-                        '-' + local.ii,
-                    tags: [
-                        { name: local.utility2.listGetElementRandom(['female', 'male']) },
-                        { name: Math.random().toString(36).slice(2) }
-                    ]
-                },
-                properties: local.swgg.swaggerJson.definitions.User.properties
-            }));
-        }
-        local.utility2.onReady.counter += 1;
-        local.swgg.collectionListInit(local.collectionList, local.utility2.onReady);
+        }], local.utility2.onReady);
     }());
 }());
 ```
@@ -810,7 +771,7 @@ export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.2.2"
+    "version": "2016.2.3"
 }
 ```
 
