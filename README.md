@@ -1,37 +1,40 @@
 swagger-lite
 ============
-standalone swagger-ui server backed by nedb
+this package will run a standalone swagger-ui server backed by nedb
 
-[![NPM](https://img.shields.io/npm/v/swagger-lite.svg?style=flat-square)](https://www.npmjs.com/package/swagger-lite) [![NPM](https://img.shields.io/npm/dm/swagger-lite.svg?style=flat-square)](https://www.npmjs.com/package/swagger-lite)
+[![NPM](https://img.shields.io/npm/v/swagger-lite.svg?style=flat-square)](https://www.npmjs.com/package/swagger-lite) [![NPM](https://img.shields.io/npm/dm/swagger-lite.svg?style=flat-square)](https://www.npmjs.com/package/swagger-lite) [![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swagger-lite.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
 
 
 
 # documentation
 #### todo
+- display operationId for endpoints in ui
 - fix admin-ui datatable-refresh not having persistent query-state
-- add crudGetManyByQuery extra params
 - add message-param to assertions in swgg.validateByPropertyDef
 - auto-fix unique index constraint violation in nedb
-- show login for 403 and 401
 - admin-ui toggle login / logout button
 - admin-ui - add property-option x-swgg-sortName
-- implement api GET /user/login
-- implement api GET /user/logout
 - add logging feature
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since eb3c1530
-- npm publish 2016.2.3
-- split swgg.middlewareValidate into swgg.middlewareRouter and swgg.middlewareValidate
-- merge collection BuiltinFile into collection TestModelCrud in example.js
-- merge collection BuiltinUser into collection User in example.js
-- add 'multipleOf' number-constraint to function swgg.collectDocRandomCreate
-- add function swgg.collectDocListRandomCreate
+#### change since 8d8c7a79
+- npm publish 2016.3.1
+- implement api GET /user/login
+- implement api GET /user/logout
+- add api crudUserLogout
+- encode arrays as json-string in query-param
+- fix crudFileGetOneByKeyUnique for serverLocal
+- fix 0 statusCode in userLoginByPassword and userLogout api
+- remove external dependency animate.css
 - none
 
 #### this package requires
 - darwin or linux os
+
+#### differences from swagger-spec @ https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
+- content-type "application/xml" is not currently supported
+- array-parameters are serialized using JSON.stringify, and the "collectionFormat" field is ignored
 
 #### api-doc
 - [https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html](https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html)
@@ -53,7 +56,7 @@ standalone swagger-ui server backed by nedb
 | git-branch : | [master](https://github.com/kaizhu256/node-swagger-lite/tree/master) | [beta](https://github.com/kaizhu256/node-swagger-lite/tree/beta) | [alpha](https://github.com/kaizhu256/node-swagger-lite/tree/alpha)|
 |--:|:--|:--|:--|
 | test-server : | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/app/index.html)|
-| test-admin-ui-server : | [![github.com test-admin-ui-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/app/assets.swgg.admin-ui.html) | [![github.com test-admin-ui-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swgg.admin-ui.html) | [![github.com test-admin-ui-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/app/assets.swgg.admin-ui.html)|
+| admin-ui test-server : | [![github.com admin-ui test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/app/assets.swgg.admin-ui.html) | [![github.com admin-ui test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swgg.admin-ui.html) | [![github.com admin-ui test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/app/assets.swgg.admin-ui.html)|
 | test-report : | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.html)|
 | coverage : | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.html/index.html)|
 | build-artifacts : | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..master..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..beta..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..alpha..travis-ci.org)|
@@ -78,7 +81,6 @@ standalone swagger-ui server backed by nedb
 
 #### to run this example, follow the instruction in the script below
 - example.js
-
 ```javascript
 /*
 example.js
@@ -292,7 +294,6 @@ instruction
 <title>\n\
 {{envDict.npm_package_name}} @ {{envDict.npm_package_version}}\n\
 </title>\n\
-<link href="assets.swgg.animate.css" media="screen" rel="stylesheet" type="text/css">\n\
 <link href="assets.swgg.swagger-ui.favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">\n\
 <link href="assets.swgg.swagger-ui.favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">\n\
 <link href="assets.swgg.css" media="screen" rel="stylesheet" type="text/css">\n\
@@ -550,6 +551,18 @@ window.swgg.api = window.swaggerUi.api;\n\
                         _operationId: 'crudCreateOrReplaceMany',
                         _schemaName: 'User'
                     }
+                },
+                '/user/login': {
+                    get: {
+                        _operationId: 'crudUserLoginByPassword',
+                        _schemaName: 'User'
+                    }
+                },
+                '/user/logout': {
+                    get: {
+                        _operationId: 'crudUserLogout',
+                        _schemaName: 'User'
+                    }
                 }
             }
         }, 10));
@@ -636,7 +649,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                     firstName: 'admin',
                     id: 1,
                     lastName: '',
-                    password: local.utility2.bcryptHashCreate('secret1', 1),
+                    password: local.utility2.bcryptHashCreate('secret', 1),
                     phone: '1234-5678',
                     username: 'admin'
                 }, {
@@ -644,7 +657,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                     firstName: 'jane',
                     id: 2,
                     lastName: 'doe',
-                    password: local.utility2.bcryptHashCreate('secret2', 1),
+                    password: local.utility2.bcryptHashCreate('secret', 1),
                     phone: '1234-5678',
                     username: 'jane.doe'
                 }, {
@@ -652,7 +665,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                     firstName: 'john',
                     id: 3,
                     lastName: 'doe',
-                    password: local.utility2.bcryptHashCreate('secret3', 1),
+                    password: local.utility2.bcryptHashCreate('secret', 1),
                     phone: '1234-5678',
                     username: 'john.doe'
                 }],
@@ -666,7 +679,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                         id: options.ii + 100,
                         lastName: local.utility2.listGetElementRandom(['doe', 'smith']) +
                             '-' + (options.ii + 100),
-                        password: local.utility2.bcryptHashCreate('secret' + options.ii, 1),
+                        password: local.utility2.bcryptHashCreate('secret', 1),
                         tags: [
                             { name: local.utility2.listGetElementRandom(['female', 'male']) },
                             { name: Math.random().toString(36).slice(2) }
@@ -714,15 +727,16 @@ window.swgg.api = window.swaggerUi.api;\n\
 # package.json
 ```json
 {
+    "package.json": true,
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "nedb-lite": "2016.1.3",
-        "utility2": "2016.2.2"
+        "utility2": "2016.3.4"
     },
-    "description": "standalone swagger-ui server backed by nedb",
+    "description": "this package will run a standalone swagger-ui server backed by nedb",
     "devDependencies": {
-        "electron-lite": "2015.12.4"
+        "electron-lite": "2016.3.3"
     },
     "engines": { "node": ">=4.0" },
     "keywords": [
@@ -745,8 +759,9 @@ window.swgg.api = window.swaggerUi.api;\n\
     },
     "scripts": {
         "build-ci": "utility2 shRun shReadmeBuild",
-        "build-doc": "MODE_LINENO=0 \
-utility2 shRun shReadmeExportFile package.json package.json && \
+        "build-doc": ". node_modules/.bin/utility2 && \
+shReadmeExportScripts && \
+cp $(shFileTrimLeft tmp/README.package.json) package.json && \
 utility2 shRun shDocApiCreate \"module.exports={ \
 exampleFileList:['README.md','test.js','index.js'], \
 moduleDict:{ \
@@ -765,13 +780,14 @@ exports:require('./index.js').tools.v2.__proto__} \
         "start": "export PORT=${PORT:-8080} && \
 export npm_config_mode_auto_restart=1 && \
 utility2 shRun shIstanbulCover node test.js",
-        "test": "export MODE_LINENO=0 && \
-utility2 shRun shReadmeExportFile package.json package.json && \
+        "test": ". node_modules/.bin/utility2 && \
+shReadmeExportScripts && \
+cp $(shFileTrimLeft tmp/README.package.json) package.json && \
 export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.2.3"
+    "version": "2016.3.1"
 }
 ```
 
@@ -784,7 +800,6 @@ utility2 test node test.js",
 
 # internal build-script
 - build.sh
-
 ```shell
 # build.sh
 
@@ -802,13 +817,6 @@ shBuildCiTestPost() {(set -e
 # this function will run the post-test build
     # if running legacy-node, then exit
     [ "$(node --version)" \< "v5.0" ] && exit || true
-    # if branch is not alpha, beta, or master, then exit
-    if !([ "$CI_BRANCH" = alpha ] ||
-        [ "$CI_BRANCH" = beta ] ||
-        [ "$CI_BRANCH" = master ])
-    then
-        exit
-    fi
     TEST_URL="https://$(printf "$GITHUB_REPO" | \
         sed 's/\//.github.io\//')/build..$CI_BRANCH..travis-ci.org/app/index.html"
     # deploy app to gh-pages
@@ -822,17 +830,21 @@ shBuildCiTestPost() {(set -e
         shBrowserTest)
 )}
 
-shBuild() {
+shBuild() {(set -e
 # this function will run the main build
-    set -e
     # init env
     . node_modules/.bin/utility2 && shInit
     # cleanup github-gh-pages dir
     # export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
     # init github-gh-pages commit-limit
     export COMMIT_LIMIT=16
-    # run default build
-    shBuildCiDefault
-}
+    # if branch is alpha, beta, or master, then run default build
+    if [ "$CI_BRANCH" = alpha ] ||
+        [ "$CI_BRANCH" = beta ] ||
+        [ "$CI_BRANCH" = master ]
+    then
+        shBuildCiDefault
+    fi
+)}
 shBuild
 ```

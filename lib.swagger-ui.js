@@ -14,7 +14,7 @@
 
 
 
-    // run shared js-env code
+    // run shared js-env code - pre-init
     (function () {
         // init nop
         nop = function () {
@@ -46,7 +46,24 @@
         local.utility2 = local.modeJs === 'browser'
             ? local.global.utility2
             : require('utility2');
-        // init functions
+/* jslint-ignore-begin */
+local.templateResponse = '\
+<h4>Curl Request</h4>\n\
+<pre>{{curl htmlSafe}}</pre>\n\
+<h4>Response Code</h4>\n\
+<pre>{{statusCode htmlSafe}}</pre>\n\
+<h4>Response Headers</h4>\n\
+<pre>{{responseHeaders htmlSafe}}</pre>\n\
+<h4>Response Body</h4>\n\
+{{responseBody}}\n\
+';
+/* jslint-ignore-end */
+    }());
+
+
+
+    // run shared js-env code - function
+    (function () {
         local.forEach = function (list, onEach) {
             list = list || [];
             if (Array.isArray(list)) {
@@ -57,184 +74,173 @@
                 onEach(list[key], key);
             });
         };
-        local.getInputMap = function (endpoint, paramDefList) {
-            var map, paramDef, result;
-            map = {};
-            local.utility2.domElementQuerySelectorAll(
-                endpoint.querySelector('.sandbox'),
-                'input,select,textarea'
-            ).forEach(function (element) {
-                switch (element.tagName) {
-                case 'INPUT':
-                    if (element.type === 'file') {
-                        map[element.name] = element.files[0];
-                        return;
-                    }
-                    if ((element.value || '').trim()) {
-                        map[element.name] = element.value;
-                    }
-                    break;
-                case 'SELECT':
-                    if (!element.multiple && element.value) {
-                        map[element.name] = element.value;
-                        return;
-                    }
-                    result = Array.prototype.slice.call(
-                        element.options
-                    ).filter(function (element) {
-                        return element.selected;
-                    });
-                    if (result.length) {
-                        map[element.name] = result;
-                    }
-                    break;
-                case 'TEXTAREA':
-                    result = (element.value || '').trim();
-                    if (!result) {
-                        return;
-                    }
-                    (paramDefList || []).some(function (element2) {
-                        if (element2.name === element.name) {
-                            paramDef = element2;
-                            return true;
-                        }
-                    });
-                    if (paramDef && paramDef.type && paramDef.type === 'array') {
-                        switch (paramDef.collectionFormat) {
-                        case 'multi':
-                            result = result.split('\n');
-                            break;
-                        case 'pipes':
-                            result = result.replace((/\n/g), '|');
-                            break;
-                        case 'ssv':
-                            result = result.replace((/\n/g), ' ');
-                            break;
-                        case 'tsv':
-                            result = result.replace((/\n/g), '\t');
-                            break;
-                        // default to csv
-                        default:
-                            result = result.replace((/\n/g), ',');
-                        }
-                    }
-                    map[element.name] = result;
-                    break;
-                }
-            });
-            return map;
-        };
         local.isObject = function (value) {
             return value && (typeof value === 'function' || typeof value === 'object');
         };
         local.onClickSubmitOperation = function (event) {
-            var elementEndpoint, onErrorData, options, paramDict, results, self;
+            var modeNext,
+                onNext,
+                options,
+                self,
+                tmp;
             self = this;
-            window.self = self; // debugPrint
-            event.preventDefault();
-            event.stopPropagation();
-            elementEndpoint = event.currentTarget.closest('.endpoint');
-            paramDict = local.getInputMap(elementEndpoint, self.model.parameters);
-            options = { parent: self };
-            // file-upload
-            if (local.utility2.domElementQuerySelectorAll(
-                    elementEndpoint.querySelector('.sandbox'),
-                    'input'
-                ).some(function (element) {
-                    return element.type === 'file';
-                })) {
-                paramDict.parameterContentType = 'multipart/form-data';
-            }
-
-            // init options
-            options.headers = local.utility2.objectSetDefault(
-                self.model.setContentTypes(paramDict, options),
-                self.model.getHeaderParams(paramDict)
-            );
-            options.data = self.model.getBody(options.headers, paramDict, options);
-            options.method = self.model.method.toUpperCase();
-            options.url = self.model.urlify(paramDict);
-            self.model.clientAuthorizations.apply(options, self.model.operation.security);
-
-            //adds curl output
-            results = [];
-            results.push('-X ' + self.model.method.toUpperCase());
-            if (options.headers) {
-                Object.keys(options.headers).forEach(function (key) {
-                    results.push('--header "' + key + ': ' + options.headers[key] + '"');
-                });
-            }
-            if (options.data) {
-                results.push('-d "' + (typeof options.data === 'object'
-                    ? JSON.stringify(options.data)
-                    : options.data).replace(/"/g, '\\"') + '"');
-            }
-            self.el.querySelector('.curl').innerHTML = '<pre>curl ' +
-                (results.join(' ') + ' "' + options.url + '"')
-                .replace('!', '&#33;') + '</pre>';
-
-            paramDict = paramDict || {};
-            // init onErrorData
-            onErrorData = function (error, xhr) {
-                var data;
-                // jslint-hack
-                nop(error);
-                xhr = xhr || {};
-                data = {};
-                data.data = data.statusText = xhr.responseText;
-                data.headers = {
-                    'content-type': 'application/json'
-                };
-                ((xhr.getAllResponseHeaders && xhr.getAllResponseHeaders()) || '').replace(
-                    (/.+/g),
-                    function (item) {
-                        item = item.split(':');
-                        data.headers[item[0].trim().toLowerCase()] =
-                            item.slice(1).join(':').trim();
-                    }
-                );
-                data.method = xhr.method;
-                data.obj = {};
-                try {
-                    data.obj = JSON.parse(xhr.responseText);
-                } catch (ignore) {}
-                data.status = xhr.statusCode;
-                data.url = xhr.url;
-                self.showStatus(data);
-            };
-            // validate data
-            try {
-                local.swgg.validateByParamDefList({
-                    data: local.swgg.normalizeParamDictSwagger(
-                        local.utility2.jsonCopy(paramDict),
-                        self.model
-                    ),
-                    key: self.model.operation.operationId,
-                    paramDefList: self.model.parameters
-                });
-            } catch (errorCaught) {
-                local.swgg.onErrorJsonapi(function (error) {
-                    onErrorData(error, {
-                        responseText: JSON.stringify(error),
-                        method: options.method,
-                        obj: error,
-                        statusCode: 400,
-                        url: options.url
-                    });
-                })(errorCaught);
-                // wiggle input on Error
-                if (self && local.jQuery) {
-                    local.jQuery(".sandbox", self.el)
-                        .find("input[type='text'],select.parameter,textarea.body-textarea")
-                        .each(function () {
-                            local.jQuery(this).addClass("error");
-                            local.swgg.domElementWiggle(this);
+            modeNext = 0;
+            onNext = function (error, data) {
+                modeNext += 1;
+                switch (modeNext) {
+                case 1:
+                    event.preventDefault();
+                    event.stopPropagation();
+                    // init options
+                    options = {};
+                    options.api = local.swgg.apiDict[self.model.operation.tags[0] + ' ' +
+                        self.model.operation.operationId];
+                    options.elementEndpoint = event.currentTarget.closest('.endpoint');
+                    options.headers = {};
+                    options.paramDefList = self.model.parameters;
+                    options.paramDict = {};
+                    local.utility2.domElementQuerySelectorAll(
+                        options.elementEndpoint.querySelector('.sandbox'),
+                        'input,select,textarea'
+                    ).forEach(function (element) {
+                        options.paramDef = {};
+                        (options.paramDefList).some(function (element2) {
+                            if (element2.name === element.name) {
+                                options.paramDef = element2;
+                                return true;
+                            }
                         });
+                        tmp = element.value;
+                        switch (element.tagName) {
+                        case 'INPUT':
+                            if (!tmp) {
+                                break;
+                            }
+                            options.paramDict[element.name] = element.type === 'file'
+                                ? element.files[0]
+                                : tmp;
+                            break;
+                        case 'SELECT':
+                            if (element.multiple) {
+                                tmp = Array.prototype.slice.call(element.options)
+                                    .filter(function (element) {
+                                        return element.selected;
+                                    });
+                                if (!tmp.length) {
+                                    break;
+                                }
+                            }
+                            if (!tmp) {
+                                break;
+                            }
+                            options.paramDict[element.name] = tmp;
+                            break;
+                        case 'TEXTAREA':
+                            if (!tmp) {
+                                break;
+                            }
+                            options.paramDict[element.name] = options.paramDef.type === 'array'
+                                ? JSON.stringify((tmp && tmp.split('\n')) || [])
+                                : tmp;
+                            if (options.paramDef.in === 'body') {
+                                local.utility2.tryCatchOnError(function () {
+                                    options.paramDict[element.name] =
+                                        JSON.parse(options.paramDict[element.name]);
+                                }, local.utility2.nop);
+                            }
+                            break;
+                        }
+                    });
+                    // normalize paramDict
+                    local.swgg.normalizeParamDictSwagger(
+                        options.paramDict,
+                        { parameters: options.paramDefList }
+                    );
+                    options.api(options, onNext);
+                    break;
+                default:
+                    if (options.errorValidate) {
+                        // wiggle input on Error
+                        local.utility2.domElementQuerySelectorAll(
+                            options.elementEndpoint.querySelector('.sandbox'),
+                            'input[type="text"],select.parameter,textarea.body-textarea'
+                        ).forEach(function (element) {
+                            local.jQuery(element).addClass('error');
+                            local.swgg.domElementShake(element);
+                        });
+                        data = {
+                            responseText: error.message,
+                            statusCode: 400
+                        };
+                    }
+                    // init responseHeaders
+                    data.responseHeaders = {};
+                    (
+                        (data.getAllResponseHeaders && data.getAllResponseHeaders()) || ''
+                    ).replace(
+                        (/.+/g),
+                        function (item) {
+                            item = item.split(':');
+                            data.responseHeaders[item[0].trim().toLowerCase()] =
+                                item.slice(1).join(':').trim();
+                        }
+                    );
+                    // init contentType
+                    data.contentType =
+                        String(data.responseHeaders['content-type']).split(';')[0];
+                    // init responseBody
+                    switch (data.contentType.split('/')[0]) {
+                    case 'audio':
+                    case 'video':
+                        data.responseBody = '<' + data.contentType.split('/')[0] +
+                            ' controls><source src="data:' + data.contentType + ';base64,' +
+                            local.utility2.bufferToString(data.response, 'base64') +
+                            '" type="' + data.contentType + '"></' +
+                            data.contentType.split('/')[0] + '>';
+                        break;
+                    case 'image':
+                        data.responseBody = '<img src="data:' + data.contentType + ';base64,' +
+                            local.utility2.bufferToString(data.response, 'base64') + '">';
+                        break;
+                    default:
+                        data.responseBody = '<pre>' + local.utility2.stringHtmlSafe(
+                            data.responseJson
+                                ? JSON.stringify(data.responseJson, null, 4)
+                                : data.responseText
+                        ) + '</pre>';
+                    }
+                    // init curl
+                    local.utility2.tryCatchOnError(function () {
+                        options.data = JSON.stringify(JSON.parse(options.data), null, 4);
+                    }, local.utility2.nop);
+                    data.curl = 'curl \\\n' +
+                        '--request ' + options.api._method.toUpperCase() + ' \\\n' +
+                        Object.keys(options.headers).map(function (key) {
+                            return "--header '" + key + ': ' + options.headers[key] + "' \\\n";
+                        }).join('') + '--data ' + (typeof options.data === 'string'
+                            ? "'" + options.data.replace(/'/g, "'\"'\"'") + "'"
+                            : '<blob>') + ' "' + options.url + '"';
+                    // init response
+                    options.elementEndpoint.querySelector(
+                        '.response'
+                    ).innerHTML = local.utility2.templateRender(local.templateResponse, {
+                        curl: options.errorValidate
+                            ? 'n/a'
+                            : data.curl,
+                        responseHeaders: options.errorValidate
+                            ? 'n/a'
+                            : data.getAllResponseHeaders().trim(),
+                        responseBody: data.responseBody,
+                        statusCode: data.statusCode
+                    });
+                    break;
                 }
-                return;
-            }
-            local.utility2.ajax(options, onErrorData);
+            };
+            onNext();
         };
+
+
+
 
 
 
@@ -255,14 +261,12 @@
                 SwaggerClient,
                 SwaggerAuthorizations,
                 auth,
-                getStringSignature,
                 helpers,
                 optionHtml,
                 reservedApiTags,
                 reservedClientTags,
                 schemaToHTML,
-                schemaToJSON,
-                typeFromJsonSchema;
+                schemaToJSON;
             // We have to keep track of the function/property names to avoid collisions for tag names which are used to allow the
             // following usage: 'client.{tagName}'
             reservedClientTags = [
@@ -334,7 +338,7 @@
             /**
              * SwaggerAuthorizations applys the correct authorization to an operation being executed
              */
-            SwaggerAuthorizations = auth.SwaggerAuthorizations = function (authz) {
+            SwaggerAuthorizations = function (authz) {
                 this.authz = authz || {};
             };
             /**
@@ -475,47 +479,6 @@
                     }
                 }
                 return output;
-            };
-            getStringSignature = function (obj, baseComponent) {
-                var str = '';
-                if (obj.$ref) {
-                    str += helpers.simpleRef(obj.$ref);
-                } else if (obj.type === undefined) {
-                    str += 'object';
-                } else if (obj.type === 'array') {
-                    if (baseComponent) {
-                        str += getStringSignature((obj.items || obj.$ref || {}));
-                    } else {
-                        str += 'Array[';
-                        str += getStringSignature((obj.items || obj.$ref || {}));
-                        str += ']';
-                    }
-                } else if (obj.type === 'integer' && obj.format === 'int32') {
-                    str += 'integer';
-                } else if (obj.type === 'integer' && obj.format === 'int64') {
-                    str += 'long';
-                } else if (obj.type === 'integer' && obj.format === undefined) {
-                    str += 'long';
-                } else if (obj.type === 'string' && obj.format === 'date-time') {
-                    str += 'date-time';
-                } else if (obj.type === 'string' && obj.format === 'date') {
-                    str += 'date';
-                } else if (obj.type === 'string' && obj.format === undefined) {
-                    str += 'string';
-                } else if (obj.type === 'number' && obj.format === 'float') {
-                    str += 'float';
-                } else if (obj.type === 'number' && obj.format === 'double') {
-                    str += 'double';
-                } else if (obj.type === 'number' && obj.format === undefined) {
-                    str += 'double';
-                } else if (obj.type === 'boolean') {
-                    str += 'boolean';
-                } else if (obj.$ref) {
-                    str += helpers.simpleRef(obj.$ref);
-                } else {
-                    str += obj.type;
-                }
-                return str;
             };
             schemaToHTML = function (name, schema, models, modelPropertyMacro) {
                 var addReference,
@@ -809,39 +772,11 @@
 
             SchemaMarkup = {};
             SchemaMarkup.optionHtml = optionHtml;
-            SchemaMarkup.typeFromJsonSchema = typeFromJsonSchema;
-            SchemaMarkup.getStringSignature = getStringSignature;
             SchemaMarkup.schemaToHTML = schemaToHTML;
             SchemaMarkup.schemaToJSON = schemaToJSON;
 
             optionHtml = function (label, value) {
                 return '<tr><td class="optionName">' + label + ':</td><td>' + value + '</td></tr>';
-            };
-
-            typeFromJsonSchema = function (type, format) {
-                var str;
-                if (type === 'integer' && format === 'int32') {
-                    str = 'integer';
-                } else if (type === 'integer' && format === 'int64') {
-                    str = 'long';
-                } else if (type === 'integer' && format === undefined) {
-                    str = 'long';
-                } else if (type === 'string' && format === 'date-time') {
-                    str = 'date-time';
-                } else if (type === 'string' && format === 'date') {
-                    str = 'date';
-                } else if (type === 'number' && format === 'float') {
-                    str = 'float';
-                } else if (type === 'number' && format === 'double') {
-                    str = 'double';
-                } else if (type === 'number' && format === undefined) {
-                    str = 'double';
-                } else if (type === 'boolean') {
-                    str = 'boolean';
-                } else if (type === 'string') {
-                    str = 'string';
-                }
-                return str;
             };
 
 
@@ -912,7 +847,7 @@
                         for (i = 0; i < allOf.length; i += 1) {
                             property = allOf[i];
                             location = '/definitions/' + name + '/allOf';
-                            self.resolveInline(null, spec, property, resolutionTable, unresolvedRefs, location);
+                            self.resolveInline(null, property, resolutionTable, location);
                         }
                     }
                 });
@@ -924,7 +859,7 @@
                         if (method === '$ref') {
                             // location = path[method];
                             location = '/paths' + name;
-                            self.resolveInline(root, spec, path, resolutionTable, unresolvedRefs, location);
+                            self.resolveInline(root, path, resolutionTable, location);
                         } else {
                             operation = path[method];
                             operation.parameters.forEach(function (parameter) {
@@ -934,7 +869,7 @@
                                 }
                                 if (parameter.$ref) {
                                     // parameter reference
-                                    self.resolveInline(root, spec, parameter, resolutionTable, unresolvedRefs, parameter.$ref);
+                                    self.resolveInline(root, parameter, resolutionTable, parameter.$ref);
                                 }
                             });
                             Object.keys(operation.responses).forEach(function (responseCode) {
@@ -943,7 +878,7 @@
                                 if (local.isObject(response)) {
                                     if (response.$ref) {
                                         // response reference
-                                        self.resolveInline(root, spec, response, resolutionTable, unresolvedRefs, location);
+                                        self.resolveInline(root, response, resolutionTable, location);
                                     }
                                     if (response.schema) {
                                         self.resolveTo(root, response.schema, resolutionTable, location);
@@ -1169,11 +1104,13 @@
                 });
                 return unresolvedKeys.length;
             };
-/* jslint-ignore-begin */
+
+
 
             Resolver.prototype.retainRoot = function (obj, root) {
+                var self = this;
                 // walk object and look for relative $refs
-                for (var key in obj) {
+                Object.keys(obj).forEach(function (key) {
                     var item = obj[key];
                     if (key === '$ref' && typeof item === 'string') {
                         // stop and inspect
@@ -1185,9 +1122,9 @@
                             obj[key] = item;
                         }
                     } else if (local.isObject(item)) {
-                        this.retainRoot(item, root);
+                        self.retainRoot(item, root);
                     }
-                }
+                });
                 return obj;
             };
 
@@ -1195,11 +1132,15 @@
              * immediately in-lines local refs, queues remote refs
              * for inline resolution
              */
-            Resolver.prototype.resolveInline = function (root, spec, property, resolutionTable, unresolvedRefs, location) {
+            Resolver.prototype.resolveInline = function (root, property, resolutionTable, location) {
                 var key = property.$ref,
                     ref = property.$ref,
-                    i, p, p2, rs;
-                var rootTrimmed = false;
+                    i,
+                    k,
+                    p,
+                    p2,
+                    rs,
+                    rootTrimmed = false;
                 if (ref) {
                     if (ref.indexOf('../') === 0) {
                         // reset root
@@ -1236,7 +1177,7 @@
                                 p2 = p2.slice(0, p2.length - 1);
                                 if (!rootTrimmed) {
                                     root = '';
-                                    for (var k = 0; k < p2.length; k += 1) {
+                                    for (k = 0; k < p2.length; k += 1) {
                                         if (k > 0) {
                                             root += '/';
                                         }
@@ -1287,7 +1228,7 @@
             };
 
             Resolver.prototype.resolveTo = function (root, property, resolutionTable, location) {
-                var ref = property.$ref;
+                var ref = property.$ref, items;
                 if (ref) {
                     if (ref.indexOf('#') >= 0) {
                         location = ref.split('#')[1];
@@ -1300,88 +1241,90 @@
                         location: location
                     });
                 } else if (property.type === 'array') {
-                    var items = property.items;
+                    items = property.items;
                     this.resolveTo(root, items, resolutionTable, location);
                 }
             };
 
             Resolver.prototype.resolveAllOf = function (spec, obj, depth) {
+                var self = this;
                 depth = depth || 0;
                 obj = obj || spec;
-                var name;
-                for (var key in obj) {
-                    var item = obj[key];
+                Object.keys(obj).forEach(function (key) {
+                    var a,
+                        allOf,
+                        item = obj[key],
+                        k,
+                        j,
+                        output,
+                        properties,
+                        resolvedFrom,
+                        source;
                     if (item === null) {
-                        throw new TypeError("Swagger 2.0 does not support null types (" + obj + ").  See https://github.com/swagger-api/swagger-spec/issues/229.")
+                        throw new TypeError("Swagger 2.0 does not support null types (" + obj + ").  See https://github.com/swagger-api/swagger-spec/issues/229.");
                     }
                     if (typeof item === 'object') {
-                        this.resolveAllOf(spec, item, depth + 1);
+                        self.resolveAllOf(spec, item, depth + 1);
                     }
                     if (item && item.allOf !== undefined) {
-                        var allOf = item.allOf;
+                        allOf = item.allOf;
                         if (Array.isArray(allOf)) {
-                            var output = {};
+                            output = {};
                             output['x-composed'] = true;
                             if (item['x-resolved-from'] !== undefined) {
                                 output['x-resolved-from'] = item['x-resolved-from'];
                             }
                             output.properties = {};
-                            for (var i = 0; i < allOf.length; i += 1) {
-                                var component = allOf[i];
-                                var source = 'self';
+                            allOf.forEach(function (component) {
+                                source = 'self';
                                 if (component['x-resolved-from'] !== undefined) {
                                     source = component['x-resolved-from'][0];
                                 }
-                                for (var part in component) {
+                                Object.keys(component).forEach(function (part) {
                                     if (!output.hasOwnProperty(part)) {
                                         output[part] = JSON.parse(JSON.stringify(component[part]));
                                         if (part === 'properties') {
-                                            for (name in output[part]) {
+                                            Object.keys(output[part]).forEach(function (name) {
                                                 output[part][name]['x-resolved-from'] = source;
-                                            }
+                                            });
                                         }
                                     } else {
                                         if (part === 'properties') {
-                                            var properties = component[part];
-                                            for (name in properties) {
+                                            properties = component[part];
+                                            Object.keys(properties).forEach(function (name) {
                                                 output.properties[name] = JSON.parse(JSON.stringify(properties[name]));
-                                                var resolvedFrom = properties[name]['x-resolved-from'];
+                                                resolvedFrom = properties[name]['x-resolved-from'];
                                                 if (resolvedFrom === undefined || resolvedFrom === 'self') {
                                                     resolvedFrom = source;
                                                 }
                                                 output.properties[name]['x-resolved-from'] = resolvedFrom;
-                                            }
+                                            });
                                         } else if (part === 'required') {
                                             // merge & dedup the required array
-                                            var a = output.required.concat(component[part]);
-                                            for (var k = 0; k < a.length; k += 1) {
-                                                for (var j = k + 1; j < a.length; j += 1) {
+                                            a = output.required.concat(component[part]);
+                                            for (k = 0; k < a.length; k += 1) {
+                                                for (j = k + 1; j < a.length; j += 1) {
                                                     if (a[k] === a[j]) {
-                                                        a.splice(j--, 1);
+                                                        j -= 1;
+                                                        a.splice(j, 1);
                                                     }
                                                 }
                                             }
                                             output.required = a;
                                         } else if (part === 'x-resolved-from') {
                                             output['x-resolved-from'].push(source);
-                                        } else {
-                                            // TODO: need to merge this property
-                                            // console.log('what to do with ' + part)
                                         }
                                     }
-                                }
-                            }
+                                });
+                            });
                             obj[key] = output;
                         }
                     }
                     if (local.isObject(item)) {
-                        this.resolveAllOf(spec, item, depth + 1);
+                        self.resolveAllOf(spec, item, depth + 1);
                     }
-                }
+                });
             };
-/* jslint-ignore-end */
-
-
 
 
 
@@ -1561,13 +1504,16 @@
                     }
                 }
             };
-/* jslint-ignore-begin */
+
+
 
             Operation.prototype.getType = function (param) {
-                var type = param.type;
-                var format = param.format;
-                var isArray = false;
-                var str;
+                var format = param.format,
+                    isArray = false,
+                    ref,
+                    schema,
+                    str,
+                    type = param.type;
                 if (type === 'integer' && format === 'int32') {
                     str = 'integer';
                 } else if (type === 'integer' && format === 'int64') {
@@ -1599,29 +1545,26 @@
                 if (param.$ref) {
                     str = helpers.simpleRef(param.$ref);
                 }
-                var schema = param.schema;
+                schema = param.schema;
                 if (schema) {
-                    var ref = schema.$ref;
+                    ref = schema.$ref;
                     if (ref) {
                         ref = helpers.simpleRef(ref);
                         if (isArray) {
                             return [ref];
-                        } else {
-                            return ref;
                         }
-                    } else {
-                        // If inline schema, we add it our interal hash -> which gives us it's ID (int)
-                        if (schema.type === 'object') {
-                            return this.addInlineModel(schema);
-                        }
-                        return this.getType(schema);
+                        return ref;
                     }
+                    // If inline schema, we add it our interal hash -> which gives us it's ID (int)
+                    if (schema.type === 'object') {
+                        return this.addInlineModel(schema);
+                    }
+                    return this.getType(schema);
                 }
                 if (isArray) {
                     return [str];
-                } else {
-                    return str;
                 }
+                return str;
             };
 
             /**
@@ -1630,8 +1573,8 @@
              * @return {number} the ID of the schema being added, or null
              **/
             Operation.prototype.addInlineModel = function (schema) {
-                var len = this.inlineModels.length;
-                var model = this.resolveModel(schema, {});
+                var len = this.inlineModels.length,
+                    model = this.resolveModel(schema, {});
                 if (model) {
                     this.inlineModels.push(model);
                     return 'Inline Model ' + len; // return string ref of the inline model (used with #getInlineModel)
@@ -1646,9 +1589,7 @@
              **/
             Operation.prototype.getInlineModel = function (inlineStr) {
                 if (/^Inline Model \d+$/.test(inlineStr)) {
-                    var id = parseInt(inlineStr.substr('Inline Model'.length).trim(), 10); //
-                    var model = this.inlineModels[id];
-                    return model;
+                    return this.inlineModels[parseInt(inlineStr.substr('Inline Model'.length).trim(), 10)];
                 }
                 // I'm returning null here, should I rather throw an error?
                 return null;
@@ -1665,7 +1606,7 @@
                     }
                     // schema must at least be an object to get resolved to an inline Model
                 } else if (schema && typeof schema === 'object' &&
-                    (schema.type === 'object' || local.utility2.isNullOrUndefined(schema.type))) {
+                        (schema.type === 'object' || local.utility2.isNullOrUndefined(schema.type))) {
                     return new Model(undefined, schema, this.models, this.parent.modelPropertyMacro);
                 }
                 return null;
@@ -1695,16 +1636,13 @@
                 if (isPrimitive) {
                     if (listType) {
                         return 'Array[' + type + ']';
-                    } else {
-                        return type.toString();
                     }
-                } else {
-                    if (listType) {
-                        return 'Array[' + type.getMockSignature() + ']';
-                    } else {
-                        return type.getMockSignature();
-                    }
+                    return type.toString();
                 }
+                if (listType) {
+                    return 'Array[' + type.getMockSignature() + ']';
+                }
+                return type.getMockSignature();
             };
 
             Operation.prototype.supportHeaderParams = function () {
@@ -1715,140 +1653,11 @@
                 return this.parent.supportedSubmitMethods;
             };
 
-            Operation.prototype.getHeaderParams = function (args) {
-                var headers = this.setContentTypes(args, {});
-                for (var i = 0; i < this.parameters.length; i += 1) {
-                    var param = this.parameters[i];
-                    if (args[param.name] !== undefined) {
-                        if (param.in === 'header') {
-                            var value = args[param.name];
-                            if (Array.isArray(value)) {
-                                value = value.toString();
-                            }
-                            headers[param.name] = value;
-                        }
-                    }
-                }
-                return headers;
-            };
-
-            Operation.prototype.urlify = function (args) {
-                var formParams = {};
-                var requestUrl = this.path;
-                var querystring = ''; // grab params from the args, build the querystring along the way
-                for (var i = 0; i < this.parameters.length; i += 1) {
-                    var param = this.parameters[i];
-                    if (args[param.name] !== undefined) {
-                        if (param.in === 'path') {
-                            var reg = new RegExp('\{' + param.name + '\}', 'gi');
-                            var value = args[param.name];
-                            if (Array.isArray(value)) {
-                                value = this.encodePathCollection(param.collectionFormat, param.name, value);
-                            } else {
-                                value = this.encodePathParam(value);
-                            }
-                            requestUrl = requestUrl.replace(reg, value);
-                        } else if (param.in === 'query' && args[param.name] !== undefined) {
-                            if (querystring === '') {
-                                querystring += '?';
-                            } else {
-                                querystring += '&';
-                            }
-                            if (param.collectionFormat !== undefined) {
-                                var qp = args[param.name];
-                                if (Array.isArray(qp)) {
-                                    querystring += this.encodeQueryCollection(param.collectionFormat, param.name, qp);
-                                } else {
-                                    querystring += this.encodeQueryParam(param.name) + '=' + this.encodeQueryParam(args[param.name]);
-                                }
-                            } else {
-                                querystring += this.encodeQueryParam(param.name) + '=' + this.encodeQueryParam(args[param.name]);
-                            }
-                        } else if (param.in === 'formData') {
-                            formParams[param.name] = args[param.name];
-                        }
-                    }
-                }
-                return local.swgg.urlBaseGet() + requestUrl + querystring;
-            };
-
-            Operation.prototype.getMissingParams = function (args) {
-                var missingParams = []; // check required params, track the ones that are missing
-                var i;
-                for (i = 0; i < this.parameters.length; i += 1) {
-                    var param = this.parameters[i];
-                    if (param.required === true) {
-                        if (args[param.name] === undefined) {
-                            missingParams = param.name;
-                        }
-                    }
-                }
-                return missingParams;
-            };
-
-            Operation.prototype.getBody = function (headers, args, opts) {
-                var formParams = {},
-                    body, key, value, hasBody = false;
-                for (var i = 0; i < this.parameters.length; i += 1) {
-                    var param = this.parameters[i];
-                    if (args[param.name] !== undefined) {
-                        if (param.in === 'body') {
-                            body = args[param.name];
-                        } else if (param.in === 'formData') {
-                            formParams[param.name] = args[param.name];
-                        }
-                    } else {
-                        if (param.in === 'body') {
-                            hasBody = true;
-                        }
-                    }
-                }
-                // if body is null and hasBody is true, AND a JSON body is requested, send empty {}
-                if (hasBody && body === undefined) {
-                    var contentType = headers['Content-Type'];
-                    if (contentType && contentType.indexOf('application/json') === 0) {
-                        body = '{}';
-                    }
-                }
-                // handle form params
-                if (headers['Content-Type'] === 'application/x-www-form-urlencoded') {
-                    var encoded = '';
-                    for (key in formParams) {
-                        value = formParams[key];
-                        if (value !== undefined) {
-                            if (encoded !== '') {
-                                encoded += '&';
-                            }
-                            encoded += encodeURIComponent(key) + '=' + encodeURIComponent(value);
-                        }
-                    }
-                    body = encoded;
-                } else if (headers['Content-Type'] && headers['Content-Type'].indexOf('multipart/form-data') >= 0) {
-                    // hack - use custom FormData for serverLocal
-                    body = new local.utility2.FormData();
-                    body.type = 'formData';
-                    window.formParams = formParams; // debugPrint
-                    Object.keys(formParams).forEach(function (key) {
-                        value = args[key];
-                        if (value !== undefined) {
-                            // required for jquery file upload
-                            if (value.type === 'file' && value.value) {
-                                delete headers['Content-Type'];
-                                body.append(key, value.value);
-                            } else {
-                                body.append(key, value);
-                            }
-                        }
-                    });
-                }
-                return body;
-            };
-
             /**
              * gets sample response for a single operation
              **/
             Operation.prototype.getModelSampleJSON = function (type, models) {
-                var listType, sampleJson, innerType;
+                var listType, sampleJson, innerType, t, xmlString;
                 models = models || {};
                 listType = (type instanceof Array);
                 innerType = listType ? type[0] : type;
@@ -1861,178 +1670,24 @@
                     sampleJson = listType ? [sampleJson] : sampleJson;
                     if (typeof sampleJson === 'string') {
                         return sampleJson;
-                    } else if (local.isObject(sampleJson)) {
-                        var t = sampleJson;
+                    }
+                    if (local.isObject(sampleJson)) {
+                        t = sampleJson;
                         if (sampleJson instanceof Array && sampleJson.length > 0) {
                             t = sampleJson[0];
                         }
                         if (t.nodeName) {
-                            var xmlString = new XMLSerializer().serializeToString(t);
+                            xmlString = new window.XMLSerializer().serializeToString(t);
                             return xmlString;
-                        } else {
-                            return JSON.stringify(sampleJson, null, 2);
                         }
-                    } else {
-                        return sampleJson;
+                        return JSON.stringify(sampleJson, null, 4);
                     }
+                    return sampleJson;
                 }
-            };
-
-            Operation.prototype.setContentTypes = function (args, opts) {
-                // default type
-                var allDefinedParams = this.parameters;
-                var body;
-                var consumes = args.parameterContentType || 'application/json';
-                var accepts = 'application/json';
-                var definedFileParams = [];
-                var definedFormParams = [];
-                var headers = {};
-                var i;
-                // get params from the operation and set them in definedFileParams, definedFormParams, headers
-                for (i = 0; i < allDefinedParams.length; i += 1) {
-                    var param = allDefinedParams[i];
-                    if (param.in === 'formData') {
-                        if (param.type === 'file') {
-                            definedFileParams.push(param);
-                        } else {
-                            definedFormParams.push(param);
-                        }
-                    } else if (param.in === 'header' && opts) {
-                        var key = param.name;
-                        var headerValue = opts[param.name];
-                        if (opts[param.name] !== undefined) {
-                            headers[key] = headerValue;
-                        }
-                    } else if (param.in === 'body' && args[param.name] !== undefined) {
-                        body = args[param.name];
-                    }
-                }
-                // if there's a body, need to set the consumes header
-                if (this.method === 'post' || this.method === 'put' || this.method === 'patch' ||
-                    (this.method === 'delete' && body)) {
-                    // if any form params, content type must be set
-                    if (definedFormParams.length > 0) {
-                        if (definedFileParams.length > 0) { // if a file, must be multipart/form-data
-                            consumes = 'multipart/form-data';
-                        } else { // default to x-www-from-urlencoded
-                            consumes = 'application/x-www-form-urlencoded';
-                        }
-                    }
-                } else {
-                    consumes = null;
-                }
-                if (consumes && this.consumes) {
-                    if (this.consumes.indexOf(consumes) === -1) {
-                        console.log('server doesn\'t consume ' + consumes + ', try ' + JSON.stringify(this.consumes));
-                    }
-                }
-                if (!this.matchesAccept(accepts)) {
-                    console.log('server can\'t produce ' + accepts);
-                }
-                if ((consumes && body !== '') || (consumes === 'application/x-www-form-urlencoded')) {
-                    headers['Content-Type'] = consumes;
-                }
-                if (accepts) {
-                    headers.Accept = accepts;
-                }
-                return headers;
-            };
-
-            /**
-             * Returns true if the request accepts header matches anything in this.produces.
-             *  If this.produces contains * / *, ignore the accept header.
-             * @param {string=} accepts The client request accept header.
-             * @return {boolean}
-             */
-            Operation.prototype.matchesAccept = function (accepts) {
-                // no accepts or produces, no problem!
-                if (!accepts || !this.produces) {
-                    return true;
-                }
-                return this.produces.indexOf(accepts) !== -1 || this.produces.indexOf('*/*') !== -1;
-            };
-
-            Operation.prototype.encodePathCollection = function (type, name, value) {
-                var encoded = '';
-                var i;
-                var separator = '';
-                if (type === 'ssv') {
-                    separator = '%20';
-                } else if (type === 'tsv') {
-                    separator = '\\t';
-                } else if (type === 'pipes') {
-                    separator = '|';
-                } else {
-                    separator = ',';
-                }
-                for (i = 0; i < value.length; i += 1) {
-                    if (i === 0) {
-                        encoded = this.encodeQueryParam(value[i]);
-                    } else {
-                        encoded += separator + this.encodeQueryParam(value[i]);
-                    }
-                }
-                return encoded;
-            };
-
-            Operation.prototype.encodeQueryCollection = function (type, name, value) {
-                var encoded = '';
-                var i;
-                if (type === 'default' || type === 'multi') {
-                    for (i = 0; i < value.length; i += 1) {
-                        if (i > 0) {
-                            encoded += '&';
-                        }
-                        encoded += this.encodeQueryParam(name) + '=' + this.encodeQueryParam(value[i]);
-                    }
-                } else {
-                    var separator = '';
-                    if (type === 'csv') {
-                        separator = ',';
-                    } else if (type === 'ssv') {
-                        separator = '%20';
-                    } else if (type === 'tsv') {
-                        separator = '\\t';
-                    } else if (type === 'pipes') {
-                        separator = '|';
-                    } else if (type === 'brackets') {
-                        for (i = 0; i < value.length; i += 1) {
-                            if (i !== 0) {
-                                encoded += '&';
-                            }
-                            encoded += this.encodeQueryParam(name) + '[]=' + this.encodeQueryParam(value[i]);
-                        }
-                    }
-                    if (separator !== '') {
-                        for (i = 0; i < value.length; i += 1) {
-                            if (i === 0) {
-                                encoded = this.encodeQueryParam(name) + '=' + this.encodeQueryParam(value[i]);
-                            } else {
-                                encoded += separator + this.encodeQueryParam(value[i]);
-                            }
-                        }
-                    }
-                }
-                return encoded;
-            };
-
-            Operation.prototype.encodeQueryParam = function (arg) {
-                return encodeURIComponent(arg);
-            };
-
-            /**
-             * TODO revisit, might not want to leave '/'
-             **/
-            Operation.prototype.encodePathParam = function (pathParam) {
-                return encodeURIComponent(pathParam);
             };
 
 
 
-
-
-
-/* jslint-ignore-end */
             SwaggerClient = function (options) {
                 var obj, self;
                 self = this;
@@ -2043,7 +1698,7 @@
                 self.modelsArray = [];
                 self.resourceCount = 0;
                 self.swaggerObject = {};
-                self.clientAuthorizations = new auth.SwaggerAuthorizations();
+                self.clientAuthorizations = new SwaggerAuthorizations();
                 // initialize
                 self.models = {};
                 self.sampleModels = {};
@@ -2073,32 +1728,6 @@
                     method: 'get',
                     headers: {
                         accept: self.swaggerRequestHeaders
-                    },
-                    on: {
-                        error: function (response) {
-                            if (self.url.substring(0, 4) !== 'http') {
-                                return self.fail('Please specify the protocol for ' + self.url);
-                            }
-                            if (response.status === 0) {
-                                return self.fail('Can\'t read from server.  It may not have the appropriate access-control-origin settings.');
-                            }
-                            if (response.status === 404) {
-                                return self.fail('Can\'t read swagger JSON from ' + self.url);
-                            }
-                            return self.fail(response.status + ' : ' + response.statusText + ' ' + self.url);
-                        },
-                        response: function (resp) {
-                            var responseObj = resp.obj;
-                            if (!responseObj) {
-                                return self.fail('failed to parse JSON response');
-                            }
-                            self.swaggerObject = responseObj;
-                            new Resolver().resolve(responseObj, self.url, function (response) {
-                                local.swgg.apiDictUpdate(response);
-                                return self.buildFromSpec(response);
-                            }, self);
-                            self.isValid = true;
-                        }
                     }
                 };
                 self.clientAuthorizations.apply(obj);
@@ -2116,10 +1745,23 @@
                     response.status = xhr.statusCode;
                     response.statusText = xhr.responseText;
                     if (error) {
-                        obj.on.error(response);
-                        return;
+                        if (self.url.substring(0, 4) !== 'http') {
+                            return self.fail('Please specify the protocol for ' + self.url);
+                        }
+                        if (response.status === 0) {
+                            return self.fail('Can\'t read from server.  It may not have the appropriate access-control-origin settings.');
+                        }
+                        if (response.status === 404) {
+                            return self.fail('Can\'t read swagger JSON from ' + self.url);
+                        }
+                        return self.fail(response.status + ' : ' + response.statusText + ' ' + self.url);
                     }
-                    obj.on.response(response);
+                    self.swaggerObject = response.obj;
+                    new Resolver().resolve(response.obj, self.url, function (response) {
+                        local.swgg.apiDictUpdate(response);
+                        return self.buildFromSpec(response);
+                    }, self);
+                    self.isValid = true;
                 });
             };
 
@@ -2484,7 +2126,7 @@
              * @link http://swagger.io
              * @license Apache-2.0
              */
-            var SwaggerUi;
+            var Docs = null, SwaggerUi;
             SwaggerUi = window.SwaggerUi = function (options) {
                 options = options || {};
                 // Allow dom_id to be overridden
@@ -2550,8 +2192,7 @@
                 headerView: null,
                 mainView: null,
                 // SwaggerUi accepts all the same options as SwaggerApi
-                initialize: function (options) {
-                },
+                initialize: nop,
                 // Set an option after initializing
                 setOption: function (option, value) {
                     this.options[option] = value;
@@ -2581,10 +2222,6 @@
                     this.options.url = url;
                     this.headerView.update(url);
                     this.api = new SwaggerClient(this.options);
-                },
-                // collapse all sections
-                collapseAll: function () {
-                    Docs.collapseEndpointListForResource('');
                 },
                 // list operations for all sections
                 listAll: function () {
@@ -2727,20 +2364,11 @@
                         local.jQuery(this).css('width', p_width - p_padding - this_padding);
                     });
                 };
-                local.jQuery('form.formtastic li.string input, form.formtastic textarea').stretchFormtasticInputWidthToParent();
                 // Vertically center these paragraphs
                 // Parent may need a min-height for this to work..
                 local.jQuery('ul.downplayed li div.content p').vAlign();
             });
-            function clippyCopiedCallback() {
-                local.jQuery('#api_key_copied').fadeIn().delay(1000).fadeOut();
-                // var b = local.jQuery("#clippy_tooltip_" + a);
-                // b.length != 0 && (b.attr("title", "copied!").trigger("tipsy.reload"), setTimeout(function () {
-                //   b.attr("title", "copy to clipboard")
-                // },
-                // 500))
-            }
-            window.Docs = {
+            Docs = {
                 shebang: function () {
                     // If shebang has an operation nickname in it..
                     // e.g. /docs/#!/words/get_search
@@ -2884,7 +2512,7 @@
             local.Handlebars.templates.main = local.Handlebars.template({
                 "1": function (depth0, helpers, partials, data) {
                     var stack1, lambda = this.lambda,
-                        buffer = "  <div class=\"info_title\">" + local.utility2.stringHtmlSafe(lambda(((stack1 = local.swgg.swaggerJson.info) != null ? stack1.title : stack1), depth0)) + "</div>\n  <div class=\"info_description markdown\">";
+                        buffer = "  <h1 class=\"info_title\">" + local.utility2.stringHtmlSafe(lambda(((stack1 = local.swgg.swaggerJson.info) != null ? stack1.title : stack1), depth0)) + "</h1>\n  <div class=\"info_description\">";
                     stack1 = lambda(((stack1 = local.swgg.swaggerJson.info) != null ? stack1.description : stack1), depth0);
                     if (stack1 != null) {
                         buffer += stack1;
@@ -3015,7 +2643,7 @@
                 },
                 "5": function (depth0, helpers, partials, data) {
                     var stack1, helper, functionType = "function",
-                        buffer = "        <h4>Implementation Notes</h4>\n        <div class=\"markdown\">";
+                        buffer = "        <h4>Implementation Notes</h4>\n        <div>";
                     stack1 = ((helper = (helper = helpers.description || (depth0 != null ? depth0.description : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
                         "name": "description",
                         "hash": {},
@@ -3035,19 +2663,16 @@
                     }) : helper))) + ")</h4>\n          <p><span class=\"model-signature\" /></p>\n          <br/>\n          <div class=\"response-content-type\" />\n";
                 },
                 "18": function (depth0, helpers, partials, data) {
-                    return "          <h4>Parameters</h4>\n          <table class='fullwidth'>\n          <thead>\n            <tr>\n            <th style=\"width: 100px; max-width: 100px\">Parameter</th>\n            <th style=\"width: 310px; max-width: 310px\">Value</th>\n            <th style=\"width: 200px; max-width: 200px\">Description</th>\n            <th style=\"width: 100px; max-width: 100px\">Parameter Type</th>\n            <th style=\"width: 220px; max-width: 230px\">Data Type</th>\n            </tr>\n          </thead>\n          <tbody class=\"operation-params\">\n\n          </tbody>\n          </table>\n";
+                    return "          <h4>Parameters</h4>\n          <table class='width100'>\n          <thead>\n            <tr>\n            <th style=\"width: 100px; max-width: 100px\">Parameter</th>\n            <th style=\"width: 310px; max-width: 310px\">Value</th>\n            <th style=\"width: 200px; max-width: 200px\">Description</th>\n            <th style=\"width: 100px; max-width: 100px\">Parameter Type</th>\n            <th style=\"width: 220px; max-width: 230px\">Data Type</th>\n            </tr>\n          </thead>\n          <tbody class=\"operation-params\">\n\n          </tbody>\n          </table>\n";
                 },
                 "20": function (depth0, helpers, partials, data) {
-                    return "          <div style='margin:0;padding:0;display:inline'></div>\n          <h4>Response Messages</h4>\n          <table class='fullwidth'>\n            <thead>\n            <tr>\n              <th>HTTP Status Code</th>\n              <th>Reason</th>\n              <th>Response Model</th>\n              <th>Headers</th>\n            </tr>\n            </thead>\n            <tbody class=\"operation-status\">\n\n            </tbody>\n          </table>\n";
+                    return "          <div style='margin:0;padding:0;display:inline'></div>\n          <h4>Response Messages</h4>\n          <table class='width100'>\n            <thead>\n            <tr>\n              <th>HTTP Status Code</th>\n              <th>Reason</th>\n              <th>Response Model</th>\n              <th>Headers</th>\n            </tr>\n            </thead>\n            <tbody class=\"operation-status\">\n\n            </tbody>\n          </table>\n";
                 },
                 "22": function (depth0, helpers, partials, data) {
                     return "";
                 },
                 "24": function (depth0, helpers, partials, data) {
-                    return "          <div class='sandbox_header'>\n            <input class='submit' type='button' value='Try it out!'/>\n            <a href='#' class='response_hider' style='display:none'>Hide Response</a>\n          </div>\n";
-                },
-                "26": function (depth0, helpers, partials, data) {
-                    return "          <h4>Request Headers</h4>\n          <div class='block request_headers'></div>\n";
+                    return "          <div class='sandbox_header'>\n            <input class='submit' type='button' value='Try it out!'/>\n          </div>\n";
                 },
                 "main": function (depth0, helpers, partials, data) {
                     var stack1, helper, options, functionType = "function",
@@ -3180,17 +2805,7 @@
                     if (stack1 != null) {
                         buffer += stack1;
                     }
-                    buffer += "        </form>\n        <div class='response' style='display:none'>\n          <h4>Curl</h4>\n          <div class='block curl'></div>\n          <h4>Request URL</h4>\n          <div class='block request_url'></div>\n";
-                    stack1 = helpers.if.call(depth0, (depth0 != null ? depth0.showRequestHeaders : depth0), {
-                        "name": "if",
-                        "hash": {},
-                        "fn": this.program(26, data),
-                        "data": data
-                    });
-                    if (stack1 != null) {
-                        buffer += stack1;
-                    }
-                    return buffer + "          <h4>Response Body</h4>\n          <div class='block response_body'></div>\n          <h4>Response Code</h4>\n          <div class='block response_code'></div>\n          <h4>Response Headers</h4>\n          <div class='block response_headers'></div>\n        </div>\n      </div>\n    </li>\n  </ul>\n";
+                    return buffer + "        </form>\n        <div class='response'>\n        </div>\n      </div>\n    </li>\n  </ul>\n";
                 },
                 "useData": true
             });
@@ -3295,7 +2910,7 @@
                 },
                 "main": function (depth0, helpers, partials, data) {
                     var stack1, helper, functionType = "function",
-                        buffer = "<td class='code'><label for='" + local.utility2.stringHtmlSafe(((helper = (helper = helpers.valueId || (depth0 != null ? depth0.valueId : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
+                        buffer = "<td><label for='" + local.utility2.stringHtmlSafe(((helper = (helper = helpers.valueId || (depth0 != null ? depth0.valueId : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
                             "name": "valueId",
                             "hash": {},
                             "data": data
@@ -3314,7 +2929,7 @@
                     if (stack1 != null) {
                         buffer += stack1;
                     }
-                    buffer += "\n</td>\n<td class=\"markdown\">";
+                    buffer += "\n</td>\n<td>";
                     stack1 = ((helper = (helper = helpers.description || (depth0 != null ? depth0.description : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
                         "name": "description",
                         "hash": {},
@@ -3408,7 +3023,7 @@
                 },
                 "main": function (depth0, helpers, partials, data) {
                     var stack1, helper, functionType = "function",
-                        buffer = "<td class='code";
+                        buffer = "<td class='";
                     stack1 = helpers.if.call(depth0, (depth0 != null ? depth0.required : depth0), {
                         "name": "if",
                         "hash": {},
@@ -3474,7 +3089,7 @@
                     if (stack1 != null) {
                         buffer += stack1;
                     }
-                    buffer += "\n  </select>\n</td>\n<td class=\"markdown\">";
+                    buffer += "\n  </select>\n</td>\n<td>";
                     stack1 = helpers.if.call(depth0, (depth0 != null ? depth0.required : depth0), {
                         "name": "if",
                         "hash": {},
@@ -3558,7 +3173,7 @@
                 },
                 "main": function (depth0, helpers, partials, data) {
                     var stack1, helper, functionType = "function",
-                        buffer = "<td class='code'><label for='" + local.utility2.stringHtmlSafe(((helper = (helper = helpers.valueId || (depth0 != null ? depth0.valueId : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
+                        buffer = "<td><label for='" + local.utility2.stringHtmlSafe(((helper = (helper = helpers.valueId || (depth0 != null ? depth0.valueId : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
                             "name": "valueId",
                             "hash": {},
                             "data": data
@@ -3577,7 +3192,7 @@
                     if (stack1 != null) {
                         buffer += stack1;
                     }
-                    buffer += "</td>\n<td class=\"markdown\">";
+                    buffer += "</td>\n<td>";
                     stack1 = ((helper = (helper = helpers.description || (depth0 != null ? depth0.description : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
                         "name": "description",
                         "hash": {},
@@ -3643,7 +3258,7 @@
                 },
                 "main": function (depth0, helpers, partials, data) {
                     var stack1, helper, functionType = "function",
-                        buffer = "<td class='code required'><label for='" + local.utility2.stringHtmlSafe(((helper = (helper = helpers.valueId || (depth0 != null ? depth0.valueId : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
+                        buffer = "<td class='required'><label for='" + local.utility2.stringHtmlSafe(((helper = (helper = helpers.valueId || (depth0 != null ? depth0.valueId : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
                             "name": "valueId",
                             "hash": {},
                             "data": data
@@ -3662,7 +3277,7 @@
                     if (stack1 != null) {
                         buffer += stack1;
                     }
-                    buffer += "</td>\n<td class=\"markdown\">";
+                    buffer += "</td>\n<td>";
                     stack1 = ((helper = (helper = helpers.description || (depth0 != null ? depth0.description : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
                         "name": "description",
                         "hash": {},
@@ -3797,7 +3412,7 @@
                 },
                 "main": function (depth0, helpers, partials, data) {
                     var stack1, helper, functionType = "function",
-                        buffer = "<td class='code required'><label for='" + local.utility2.stringHtmlSafe(((helper = (helper = helpers.valueId || (depth0 != null ? depth0.valueId : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
+                        buffer = "<td class='required'><label for='" + local.utility2.stringHtmlSafe(((helper = (helper = helpers.valueId || (depth0 != null ? depth0.valueId : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
                             "name": "valueId",
                             "hash": {},
                             "data": data
@@ -3816,7 +3431,7 @@
                     if (stack1 != null) {
                         buffer += stack1;
                     }
-                    buffer += "</td>\n<td>\n	<strong><span class=\"markdown\">";
+                    buffer += "</td>\n<td>\n	<strong><span>";
                     stack1 = ((helper = (helper = helpers.description || (depth0 != null ? depth0.description : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
                         "name": "description",
                         "hash": {},
@@ -4032,11 +3647,11 @@
                     if (stack1 != null) {
                         buffer += stack1;
                     }
-                    return buffer + "\n  </div>\n\n  <div class=\"snippet\">\n    <pre><code>" + local.utility2.stringHtmlSafe(((helper = (helper = helpers.sampleJSON || (depth0 != null ? depth0.sampleJSON : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
+                    return buffer + "\n  </div>\n\n  <div class=\"snippet\">\n    <pre>" + local.utility2.stringHtmlSafe(((helper = (helper = helpers.sampleJSON || (depth0 != null ? depth0.sampleJSON : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
                         "name": "sampleJSON",
                         "hash": {},
                         "data": data
-                    }) : helper))) + "</code></pre>\n    <small class=\"notice\"></small>\n  </div>\n</div>\n\n";
+                    }) : helper))) + "</pre>\n    <small class=\"notice\"></small>\n  </div>\n</div>\n\n";
                 },
                 "useData": true
             });
@@ -4047,11 +3662,11 @@
                 },
                 "main": function (depth0, helpers, partials, data) {
                     var stack1, helper, functionType = "function",
-                        buffer = "<td width='15%' class='code'>" + local.utility2.stringHtmlSafe(((helper = (helper = helpers.code || (depth0 != null ? depth0.code : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
+                        buffer = "<td width='15%'>" + local.utility2.stringHtmlSafe(((helper = (helper = helpers.code || (depth0 != null ? depth0.code : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
                             "name": "code",
                             "hash": {},
                             "data": data
-                        }) : helper))) + "</td>\n<td class=\"markdown\">";
+                        }) : helper))) + "</td>\n<td>";
                     stack1 = ((helper = (helper = helpers.message || (depth0 != null ? depth0.message : depth0)) != null ? helper : nop), (typeof helper === functionType ? helper.call(depth0, {
                         "name": "message",
                         "hash": {},
@@ -4203,14 +3818,14 @@
                     this.$el.html('');
                 }
             });
-/* jslint-ignore-begin */
+
+
+
             SwaggerUi.Views.OperationView = local.Backbone.View.extend({
                 events: {
                     'submit .sandbox': 'onClickSubmitOperation',
                     'click .submit': 'onClickSubmitOperation',
-                    'click .response_hider': 'hideResponse',
-                    'click .toggleOperation': 'toggleOperationContent',
-                    'dblclick .curl': 'selectText',
+                    'click .operations .heading': 'toggleOperationContent'
                 },
                 initialize: function (opts) {
                     opts = opts || {};
@@ -4220,47 +3835,57 @@
                     this.model.encodedParentId = encodeURIComponent(this.parentId);
                     return this;
                 },
-                selectText: function (event) {
-                    var doc = document,
-                        text = event.target.firstChild,
-                        range,
-                        selection;
-                    if (doc.body.createTextRange) {
-                        range = document.body.createTextRange();
-                        range.moveToElementText(text);
-                        range.select();
-                    } else if (window.getSelection) {
-                        selection = window.getSelection();
-                        range = document.createRange();
-                        range.selectNodeContents(text);
-                        selection.removeAllRanges();
-                        selection.addRange(range);
-                    }
-                },
                 // Note: copied from CoffeeScript compiled file
-                // TODO: redactor
                 render: function () {
-                    var a, auth, auths, code, contentTypeModel, isMethodSubmissionSupported, k, key, l, len, len1, len2, len3, len4, m, modelAuths, n, o, p, param, q, ref, ref1, ref2, ref3, ref4, ref5, responseContentTypeView, responseSignatureView, schema, schemaObj, scopeIndex, signatureModel, statusCode, successResponse, type, v, value;
-                    isMethodSubmissionSupported = local.jQuery.inArray(this.model.method, this.model.supportedSubmitMethods()) >= 0;
+                    var contentTypeModel,
+                        isMethodSubmissionSupported,
+                        len1,
+                        len2,
+                        len3,
+                        len4,
+                        m,
+                        modelAuths,
+                        n,
+                        o,
+                        p,
+                        param,
+                        q,
+                        ref,
+                        ref1,
+                        ref2,
+                        ref3,
+                        ref4,
+                        ref5,
+                        responseContentTypeView,
+                        responseSignatureView,
+                        schema,
+                        schemaObj,
+                        scopeIndex,
+                        self = this,
+                        signatureModel,
+                        statusCode,
+                        successResponse,
+                        type,
+                        v,
+                        value;
+                    isMethodSubmissionSupported = local.jQuery.inArray(self.model.method, self.model.supportedSubmitMethods()) >= 0;
                     if (!isMethodSubmissionSupported) {
-                        this.model.isReadOnly = true;
+                        self.model.isReadOnly = true;
                     }
-                    this.model.description = this.model.description || this.model.notes;
-                    this.model.oauth = null;
-                    modelAuths = this.model.authorizations || this.model.security;
+                    self.model.description = self.model.description || self.model.notes;
+                    self.model.oauth = null;
+                    modelAuths = self.model.authorizations || self.model.security;
                     if (modelAuths) {
                         if (Array.isArray(modelAuths)) {
-                            for (l = 0, len = modelAuths.length; l < len; l += 1) {
-                                auths = modelAuths[l];
-                                for (key in auths) {
-                                    for (a in this.auths) {
-                                        auth = this.auths[a];
+                            modelAuths.forEach(function (auths) {
+                                Object.keys(auths).forEach(function (key) {
+                                    Object.keys(self.auths).forEach(function (auth) {
                                         if (key === auth.name) {
                                             if (auth.type === 'oauth2') {
-                                                this.model.oauth = {};
-                                                this.model.oauth.scopes = [];
+                                                self.model.oauth = {};
+                                                self.model.oauth.scopes = [];
                                                 ref1 = auth.value.scopes;
-                                                for (k in ref1) {
+                                                Object.keys(ref1).forEach(function (k) {
                                                     v = ref1[k];
                                                     scopeIndex = auths[key].indexOf(k);
                                                     if (scopeIndex >= 0) {
@@ -4268,97 +3893,93 @@
                                                             scope: k,
                                                             description: v
                                                         };
-                                                        this.model.oauth.scopes.push(o);
+                                                        self.model.oauth.scopes.push(o);
                                                     }
-                                                }
+                                                });
                                             }
                                         }
-                                    }
-                                }
-                            }
+                                    });
+                                });
+                            });
                         } else {
-                            for (k in modelAuths) {
+                            Object.keys(modelAuths).forEach(function (k) {
                                 v = modelAuths[k];
                                 if (k === 'oauth2') {
-                                    if (this.model.oauth === null) {
-                                        this.model.oauth = {};
+                                    if (self.model.oauth === null) {
+                                        self.model.oauth = {};
                                     }
-                                    if (this.model.oauth.scopes === void 0) {
-                                        this.model.oauth.scopes = [];
+                                    if (self.model.oauth.scopes === undefined) {
+                                        self.model.oauth.scopes = [];
                                     }
                                     for (m = 0, len1 = v.length; m < len1; m += 1) {
                                         o = v[m];
-                                        this.model.oauth.scopes.push(o);
+                                        self.model.oauth.scopes.push(o);
                                     }
                                 }
-                            }
+                            });
                         }
                     }
-                    if (this.model.responses !== undefined) {
-                        this.model.responseMessages = [];
-                        ref2 = this.model.responses;
-                        for (code in ref2) {
+                    if (self.model.responses !== undefined) {
+                        self.model.responseMessages = [];
+                        ref2 = self.model.responses;
+                        Object.keys(ref2).forEach(function (code) {
                             value = ref2[code];
                             schema = null;
-                            schemaObj = this.model.responses[code].schema;
+                            schemaObj = self.model.responses[code].schema;
                             if (schemaObj && schemaObj.$ref) {
                                 schema = schemaObj.$ref;
                                 if (schema.indexOf('#/definitions/') !== -1) {
                                     schema = schema.replace(/^.*#\/definitions\//, '');
                                 }
                             }
-                            this.model.responseMessages.push({
+                            self.model.responseMessages.push({
                                 code: code,
                                 message: value.description,
                                 responseModel: schema
                             });
-                        }
+                        });
                     }
-                    if (this.model.responseMessages === undefined) {
-                        this.model.responseMessages = [];
+                    if (self.model.responseMessages === undefined) {
+                        self.model.responseMessages = [];
                     }
                     signatureModel = null;
-                    if (this.model.successResponse) {
-                        successResponse = this.model.successResponse;
-                        for (key in successResponse) {
+                    if (self.model.successResponse) {
+                        successResponse = self.model.successResponse;
+                        Object.keys(successResponse).forEach(function (key) {
                             value = successResponse[key];
-                            this.model.successCode = key;
+                            self.model.successCode = key;
                             if (typeof value === 'object' && typeof value.createJSONSample === 'function') {
                                 signatureModel = {
-                                    sampleJSON: JSON.stringify(value.createJSONSample(), void 0, 2),
+                                    sampleJSON: JSON.stringify(value.createJSONSample(), undefined, 4),
                                     isParam: false,
                                     signature: value.getMockSignature()
                                 };
                             }
-                        }
-                    } else if (this.model.responseClassSignature && this.model.responseClassSignature !== 'string') {
+                        });
+                    } else if (self.model.responseClassSignature && self.model.responseClassSignature !== 'string') {
                         signatureModel = {
-                            sampleJSON: this.model.responseSampleJSON,
+                            sampleJSON: self.model.responseSampleJSON,
                             isParam: false,
-                            signature: this.model.responseClassSignature
+                            signature: self.model.responseClassSignature
                         };
                     }
-                    var opts = this.options.swaggerOptions;
-                    if (opts.showRequestHeaders) {
-                        this.model.showRequestHeaders = true;
-                    }
-                    this.$el.html(local.Handlebars.templates.operation(this.model));
+                    self.$el.html(local.Handlebars.templates.operation(self.model));
                     if (signatureModel) {
                         responseSignatureView = new SwaggerUi.Views.SignatureView({
                             model: signatureModel,
                             tagName: 'div'
                         });
-                        local.jQuery('.model-signature', this.$el).append(responseSignatureView.render().el);
+                        local.jQuery('.model-signature', self.$el).append(responseSignatureView.render().el);
                     } else {
-                        this.model.responseClassSignature = 'string';
-                        local.jQuery('.model-signature', this.$el).html(this.model.type);
+                        self.model.responseClassSignature = 'string';
+                        local.jQuery('.model-signature', self.$el).html(self.model.type);
                     }
                     contentTypeModel = {
                         isParam: false
                     };
-                    contentTypeModel.consumes = this.model.consumes;
-                    contentTypeModel.produces = this.model.produces;
-                    ref3 = this.model.parameters;
+                    contentTypeModel.consumes = self.model.consumes;
+                    contentTypeModel.produces = self.model.produces;
+                    ref3 = self.model.parameters;
                     for (n = 0, len2 = ref3.length; n < len2; n += 1) {
                         param = ref3[n];
                         type = param.type || param.dataType || '';
@@ -4381,20 +4002,20 @@
                         param.type = type;
                     }
                     responseContentTypeView = new SwaggerUi.Views.ResponseContentTypeView({
-                        model: contentTypeModel,
+                        model: contentTypeModel
                     });
-                    local.jQuery('.response-content-type', this.$el).append(responseContentTypeView.render().el);
-                    ref4 = this.model.parameters;
+                    local.jQuery('.response-content-type', self.$el).append(responseContentTypeView.render().el);
+                    ref4 = self.model.parameters;
                     for (p = 0, len3 = ref4.length; p < len3; p += 1) {
                         param = ref4[p];
-                        this.addParameter(param, contentTypeModel.consumes);
+                        self.addParameter(param, contentTypeModel.consumes);
                     }
-                    ref5 = this.model.responseMessages;
+                    ref5 = self.model.responseMessages;
                     for (q = 0, len4 = ref5.length; q < len4; q += 1) {
                         statusCode = ref5[q];
-                        this.addStatusCode(statusCode);
+                        self.addStatusCode(statusCode);
                     }
-                    return this;
+                    return self;
                 },
                 addParameter: function (param, consumes) {
                     // Render a parameter
@@ -4410,131 +4031,16 @@
                     // Render status codes
                     var statusCodeView = new SwaggerUi.Views.StatusCodeView({
                         model: statusCode,
-                        tagName: 'tr',
+                        tagName: 'tr'
                     });
                     local.jQuery('.operation-status', this.$el).append(statusCodeView.render().el);
                 },
                 // Note: copied from CoffeeScript compiled file
-                // TODO: redactor
                 onClickSubmitOperation: local.onClickSubmitOperation,
-                // handler for hide response link
-                hideResponse: function (e) {
-                    if (e) {
-                        e.preventDefault();
-                    }
-                    local.jQuery('.response', this.$el).slideUp();
-                    local.jQuery('.response_hider', this.$el).fadeOut();
-                },
                 // Show response from server
                 showResponse: function (response) {
                     var prettyJson = JSON.stringify(response, null, '\t').replace(/\n/g, '<br>');
                     this.el.querySelector('.response_body').innerHTML = local.utility2.stringHtmlSafe(prettyJson);
-                },
-                // puts the response data in UI
-                showStatus: function (response) {
-                    var url, content;
-                    if (response.content === undefined) {
-                        content = response.data;
-                        url = response.url;
-                    } else {
-                        content = response.content.data;
-                        url = response.request.url;
-                    }
-                    var headers = response.headers;
-                    content = local.jQuery.trim(content);
-                    // if server is nice, and sends content-type back, we can use it
-                    var contentType = null;
-                    if (headers) {
-                        contentType = headers['Content-Type'] || headers['content-type'];
-                        if (contentType) {
-                            contentType = contentType.split(';')[0].trim();
-                        }
-                    }
-                    local.jQuery('.response_body', this.$el).removeClass('json');
-                    local.jQuery('.response_body', this.$el).removeClass('xml');
-                    var supportsAudioPlayback = function (contentType) {
-                        var audioElement = document.createElement('audio');
-                        return !!(audioElement.canPlayType && audioElement.canPlayType(contentType).replace(/no/, ''));
-                    };
-                    var pre;
-                    var code;
-                    if (!content) {
-                        code = local.jQuery('<code />').text('no content');
-                        pre = local.jQuery('<pre class="json" />').append(code);
-                        // JSON
-                    } else if (contentType === 'application/json' || /\+json$/.test(contentType)) {
-                        var json = null;
-                        try {
-                            json = JSON.stringify(JSON.parse(content), null, '  ');
-                        } catch (_error) {
-                            json = 'can\'t parse JSON.  Raw result:\n\n' + content;
-                        }
-                        code = local.jQuery('<code />').text(json);
-                        pre = local.jQuery('<pre class="json" />').append(code);
-                        // XML
-                    } else if (contentType === 'application/xml' || /\+xml$/.test(contentType)) {
-                        code = local.jQuery('<code />').text(content);
-                        pre = local.jQuery('<pre class="xml" />').append(code);
-                        // HTML
-                    } else if (contentType === 'text/html') {
-                        code = local.jQuery('<code />').html(local.utility2.stringHtmlSafe(content));
-                        pre = local.jQuery('<pre class="xml" />').append(code);
-                        // Plain Text
-                    } else if (/text\/plain/.test(contentType)) {
-                        code = local.jQuery('<code />').text(content);
-                        pre = local.jQuery('<pre class="plain" />').append(code);
-                        // Image
-                    } else if (/^image\//.test(contentType)) {
-                        pre = local.jQuery('<img>').attr('src', url);
-                        // Audio
-                    } else if (/^audio\//.test(contentType) && supportsAudioPlayback(contentType)) {
-                        pre = local.jQuery('<audio controls>').append(local.jQuery('<source>').attr('src', url).attr('type', contentType));
-                        // Download
-                    } else if (headers['Content-Disposition'] && (/attachment/).test(headers['Content-Disposition']) ||
-                        headers['content-disposition'] && (/attachment/).test(headers['content-disposition']) ||
-                        headers['Content-Description'] && (/File Transfer/).test(headers['Content-Description']) ||
-                        headers['content-description'] && (/File Transfer/).test(headers['content-description'])) {
-                        if ('Blob' in window) {
-                            var type = contentType || 'text/html';
-                            var blob = new Blob([content], {
-                                type: type
-                            });
-                            var a = document.createElement('a');
-                            var href = window.URL.createObjectURL(blob);
-                            var fileName = response.url.substr(response.url.lastIndexOf('/') + 1);
-                            var download = [type, fileName, href].join(':');
-                            a.setAttribute('href', href);
-                            a.setAttribute('download', download);
-                            a.innerText = 'Download ' + fileName;
-                            pre = local.jQuery('<div/>').append(a);
-                        } else {
-                            pre = local.jQuery('<pre class="json" />').append('Download headers detected but your browser does not support downloading binary via XHR (Blob).');
-                        }
-                        // Location header based redirect download
-                    } else if (headers.location || headers.Location) {
-                        window.location = response.url;
-                        // Anything else (CORS)
-                    } else {
-                        code = local.jQuery('<code />').text(content);
-                        pre = local.jQuery('<pre class="json" />').append(code);
-                    }
-                    var response_body = pre;
-                    local.jQuery('.request_url', this.$el).html('<pre></pre>');
-                    local.jQuery('.request_url pre', this.$el).text(url);
-                    local.jQuery('.response_code', this.$el).html('<pre>' + response.status + '</pre>');
-                    local.jQuery('.response_body', this.$el).html(response_body);
-                    local.jQuery('.response_headers', this.$el).html('<pre>' + local.utility2.stringHtmlSafe(JSON.stringify(response.headers, null, '  ')).replace(/\n/g, '<br>') + '</pre>');
-                    local.jQuery('.response', this.$el).slideDown();
-                    local.jQuery('.response_hider', this.$el).show();
-                    // only highlight the response if response is less than threshold, default state is highlight response
-                    var opts = this.options.swaggerOptions;
-                    if (opts.showRequestHeaders) {
-                        var map = local.getInputMap(this.el, this.model.parameters),
-                            requestHeaders = this.model.getHeaderParams(map);
-                        delete requestHeaders['Content-Type'];
-                        local.jQuery('.request_headers', this.$el).html('<pre>' + local.utility2.stringHtmlSafe(JSON.stringify(requestHeaders, null, '  ')).replace(/\n/g, '<br>') + '</pre>');
-                    }
-                    return local.jQuery('.response_body', this.$el)[0];
                 },
                 toggleOperationContent: function (event) {
                     var elem = local.jQuery('#' + Docs.escapeResourceName(this.parentId + '_' + this.nickname + '_content'));
@@ -4557,17 +4063,25 @@
                     local.Handlebars.registerHelper('isArray', function (param, opts) {
                         if (param.type.toLowerCase() === 'array' || param.allowMultiple) {
                             return opts.fn(this);
-                        } else {
-                            return (opts.inverse || nop)(this);
                         }
+                        return (opts.inverse || nop)(this);
                     });
                 },
                 render: function () {
-                    var type = this.model.type || this.model.dataType;
+                    var contentTypeModel,
+                        isParam,
+                        parameterContentTypeView,
+                        ref,
+                        responseContentTypeView,
+                        schema,
+                        signatureModel,
+                        signatureView,
+                        template,
+                        type = this.model.type || this.model.dataType;
                     if (type === undefined) {
-                        var schema = this.model.schema;
+                        schema = this.model.schema;
                         if (schema && schema.$ref) {
-                            var ref = schema.$ref;
+                            ref = schema.$ref;
                             if (ref.indexOf('#/definitions/') === 0) {
                                 type = ref.substring('#/definitions/'.length);
                             } else {
@@ -4588,15 +4102,15 @@
                     if (this.model.allowableValues) {
                         this.model.isList = true;
                     }
-                    var template = this.template();
+                    template = this.template();
                     this.$el.html(template(this.model));
-                    var signatureModel = {
+                    signatureModel = {
                         sampleJSON: this.model.sampleJSON,
                         isParam: true,
                         signature: this.model.signature
                     };
                     if (this.model.sampleJSON) {
-                        var signatureView = new SwaggerUi.Views.SignatureView({
+                        signatureView = new SwaggerUi.Views.SignatureView({
                             model: signatureModel,
                             tagName: 'div'
                         });
@@ -4604,21 +4118,21 @@
                     } else {
                         local.jQuery('.model-signature', this.$el).html(this.model.signature);
                     }
-                    var isParam = false;
+                    isParam = false;
                     if (this.model.isBody) {
                         isParam = true;
                     }
-                    var contentTypeModel = {
+                    contentTypeModel = {
                         isParam: isParam
                     };
                     contentTypeModel.consumes = this.model.consumes;
                     if (isParam) {
-                        var parameterContentTypeView = new SwaggerUi.Views.ParameterContentTypeView({
+                        parameterContentTypeView = new SwaggerUi.Views.ParameterContentTypeView({
                             model: contentTypeModel
                         });
                         local.jQuery('.parameter-content-type', this.$el).append(parameterContentTypeView.render().el);
                     } else {
-                        var responseContentTypeView = new SwaggerUi.Views.ResponseContentTypeView({
+                        responseContentTypeView = new SwaggerUi.Views.ResponseContentTypeView({
                             model: contentTypeModel
                         });
                         local.jQuery('.response-content-type', this.$el).append(responseContentTypeView.render().el);
@@ -4629,21 +4143,17 @@
                 template: function () {
                     if (this.model.isList) {
                         return local.Handlebars.templates.param_list;
-                    } else {
-                        if (this.options.readOnly) {
-                            if (this.model.required) {
-                                return local.Handlebars.templates.param_readonly_required;
-                            } else {
-                                return local.Handlebars.templates.param_readonly;
-                            }
-                        } else {
-                            if (this.model.required) {
-                                return local.Handlebars.templates.param_required;
-                            } else {
-                                return local.Handlebars.templates.param;
-                            }
-                        }
                     }
+                    if (this.options.readOnly) {
+                        if (this.model.required) {
+                            return local.Handlebars.templates.param_readonly_required;
+                        }
+                        return local.Handlebars.templates.param_readonly;
+                    }
+                    if (this.model.required) {
+                        return local.Handlebars.templates.param_required;
+                    }
+                    return local.Handlebars.templates.param;
                 }
             });
             SwaggerUi.Views.ResourceView = local.Backbone.View.extend({
@@ -4658,13 +4168,13 @@
                     }
                 },
                 render: function () {
-                    var methods = {};
-                    var self = this;
+                    var methods = {},
+                        self = this;
                     self.$el.html(local.Handlebars.templates.resource(self.model));
                     // Render each operation
                     self.model.operationsArray.forEach(function (operation) {
-                        var counter = 0;
-                        var id = operation.nickname;
+                        var counter = 0,
+                            id = operation.nickname;
                         while (methods[id] !== undefined) {
                             id = id + '_' + counter;
                             counter += 1;
@@ -4710,8 +4220,7 @@
                     'click a.snippet-link': 'switchToSnippet',
                     'mousedown .snippet': 'snippetToTextArea'
                 },
-                initialize: function () {
-                },
+                initialize: nop,
                 render: function () {
                     this.$el.html(local.Handlebars.templates.signature(this.model));
                     this.switchToSnippet();
@@ -4765,7 +4274,6 @@
                     return this;
                 }
             });
-/* jslint-ignore-end */
         }());
         break;
     }

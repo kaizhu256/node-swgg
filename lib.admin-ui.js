@@ -428,7 +428,7 @@
                 setTimeout(function () {
                     local.jQuery(elementContainer).find('.form-control')
                         .addClass('dtFormInputInvalid');
-                    local.swgg.domElementWiggle(elementContainer);
+                    local.swgg.domElementShake(elementContainer);
                 });
                 // validate no error occurred
                 local.utility2.assert(!error, error);
