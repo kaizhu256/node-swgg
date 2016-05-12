@@ -428,7 +428,7 @@
                 setTimeout(function () {
                     local.jQuery(elementContainer).find('.form-control')
                         .addClass('dtFormInputInvalid');
-                    local.swgg.domElementShake(elementContainer);
+                    local.utility2.domAnimateShake(elementContainer);
                 });
                 // validate no error occurred
                 local.utility2.assert(!error, error);
@@ -561,10 +561,6 @@
                 this.closest('.dtFormInputContainer').dataset.json = this.dataset.json;
                 this.closest('div').querySelector('span').textContent = this.textContent;
             });
-            //!! // show login form
-            //!! if (!local.swgg.userJwtEncoded) {
-                //!! local.jQuery('#userFormLogin').modal('show');
-            //!! }
             // init dtList
             local.swgg.dtList =
                 local.utility2.jsonCopy(local.swgg.swaggerJson['x-swgg-dtList'] ||

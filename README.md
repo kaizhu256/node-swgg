@@ -1,6 +1,6 @@
 swagger-lite
 ============
-this package will run a standalone swagger-ui server backed by nedb
+this package will run a virtual swagger-ui server with persistent storage in the browser (in-place of a real backend), that your webapp can talk to
 
 [![NPM](https://img.shields.io/npm/v/swagger-lite.svg?style=flat-square)](https://www.npmjs.com/package/swagger-lite) [![NPM](https://img.shields.io/npm/dm/swagger-lite.svg?style=flat-square)](https://www.npmjs.com/package/swagger-lite) [![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swagger-lite.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
 
@@ -8,29 +8,31 @@ this package will run a standalone swagger-ui server backed by nedb
 
 # documentation
 #### todo
-- display operationId for endpoints in ui
-- fix admin-ui datatable-refresh not having persistent query-state
+- merge admin-ui into swagger-ui
+- rename collectDoc to something better
+- change api crudCreateOrReplaceMany to crudCreateOrReplaceManyByKeyUnique
+- fix missing param error-message in 400 validation-error
+- add api crudUserPasswordChange
 - add message-param to assertions in swgg.validateByPropertyDef
-- auto-fix unique index constraint violation in nedb
-- admin-ui toggle login / logout button
-- admin-ui - add property-option x-swgg-sortName
+- ui - display operationId for endpoints
 - add logging feature
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 8d8c7a79
-- npm publish 2016.3.1
-- implement api GET /user/login
-- implement api GET /user/logout
-- add api crudUserLogout
-- encode arrays as json-string in query-param
-- fix crudFileGetOneByKeyUnique for serverLocal
-- fix 0 statusCode in userLoginByPassword and userLogout api
-- remove external dependency animate.css
+#### change since 93be1493
+- npm publish 2016.4.1
+- fix bug when a document's id is zero
+- streamline ui
+- remove Backbone, Handlebars, and jQuery dependencies from lib.swagger-ui.js
+- enable multiple api endpoints with same operationId, but unique keyUnique
+- add hooks middlewareCrudPre and middlewareCrudPost
+- merge api crudCreateOrReplaceOne into crudCreateOrReplaceOneByKeyUnique
+- merge api crudCreateOrUpdateOne and crudCreateOrUpdateOneByKeyUnique into crudUpdateOneByKeyUnique
 - none
 
 #### this package requires
 - darwin or linux os
+- chromium-based browser or firefox browser
 
 #### differences from swagger-spec @ https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
 - content-type "application/xml" is not currently supported
@@ -56,7 +58,6 @@ this package will run a standalone swagger-ui server backed by nedb
 | git-branch : | [master](https://github.com/kaizhu256/node-swagger-lite/tree/master) | [beta](https://github.com/kaizhu256/node-swagger-lite/tree/beta) | [alpha](https://github.com/kaizhu256/node-swagger-lite/tree/alpha)|
 |--:|:--|:--|:--|
 | test-server : | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/app/index.html)|
-| admin-ui test-server : | [![github.com admin-ui test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/app/assets.swgg.admin-ui.html) | [![github.com admin-ui test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swgg.admin-ui.html) | [![github.com admin-ui test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/app/assets.swgg.admin-ui.html)|
 | test-report : | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.html)|
 | coverage : | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.html/index.html)|
 | build-artifacts : | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..master..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..beta..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..alpha..travis-ci.org)|
@@ -90,7 +91,7 @@ this node script will run a standalone swagger-ui server backed by nedb
 instruction
     1. save this script as example.js
     2. run the shell command:
-        $ npm install swagger-lite && export PORT=1337 && node example.js
+        $ npm install "kaizhu256/node-swagger-lite#alpha" && export PORT=1337 && node example.js
     3. open a browser to http://localhost:1337
     4. interact with the swagger-ui crud-api
 */
@@ -146,27 +147,27 @@ instruction
         });
         // init utility2
         local.utility2 = local.swgg.local.utility2;
-        // init petstore-crud-middleware
-        local.middlewareCrudPetstore = function (request, response, nextMiddleware) {
+        // init crud-middleware-pre
+        local.middlewareCrudPre = function (request, response, nextMiddleware) {
         /*
-         * this function will run petstore-specific crud-operations
+         * this function will run the middleware for petstore-specific crud-operations
          */
             var crud, modeNext, onNext, result;
             modeNext = 0;
-            onNext = function (error, data, meta) {
+            onNext = function (error, data) {
                 modeNext = error
                     ? Infinity
                     : modeNext + 1;
                 switch (modeNext) {
                 case 1:
                     crud = request.swgg.crud;
-                    switch (request.swgg.pathname) {
-                    case 'GET /store/inventory':
+                    switch (crud.operationId.split('.')[0]) {
+                    // coverage-hack - test error handling-behavior
+                    case 'crudErrorPre':
+                        onNext(local.utility2.errorDefault);
+                        return;
+                    case 'getInventory':
                         crud.collection.find({}, { status: 1 }, onNext);
-                        break;
-                    case 'POST /pet//uploadImage':
-                        crud.queryByKeyUnique = { id: crud.data.petId };
-                        crud.collection.findOne(crud.queryByKeyUnique, onNext);
                         break;
                     default:
                         modeNext = Infinity;
@@ -174,8 +175,8 @@ instruction
                     }
                     break;
                 case 2:
-                    switch (request.swgg.pathname) {
-                    case 'GET /store/inventory':
+                    switch (crud.operationId.split('.')[0]) {
+                    case 'getInventory':
                         result = {};
                         data.forEach(function (element) {
                             result[element.status] = result[element.status] || 0;
@@ -183,39 +184,9 @@ instruction
                         });
                         onNext(null, result);
                         break;
-                    case 'POST /pet//uploadImage':
-                        if (!data || !request.swgg.bodyParsed.file) {
-                            onNext(null, null, data);
-                            break;
-                        }
-                        data.photoUrls = ['data:' +
-                            (request.swgg.bodyMeta.file.contentType || '') + ';base64,' +
-                            local.utility2.bufferToString(
-                                request.swgg.bodyParsed.file,
-                                'base64'
-                            )];
-                        // replace doc
-                        crud.collection.update(
-                            crud.queryByKeyUnique,
-                            data,
-                            { returnUpdatedDocs: true, upsert: true },
-                            onNext
-                        );
-                        break;
-                    default:
-                        onNext(null, data);
                     }
                     break;
                 case 3:
-                    switch (request.swgg.pathname) {
-                    case 'POST /pet//uploadImage':
-                        onNext(null, meta, data);
-                        break;
-                    default:
-                        onNext(null, data);
-                    }
-                    break;
-                case 4:
                     local.swgg.serverRespondJsonapi(request, response, error, data);
                     break;
                 default:
@@ -260,10 +231,12 @@ instruction
             },
             // init swagger-validate-middleware
             local.swgg.middlewareValidate,
-            // init petstore-crud-middleware
-            local.middlewareCrudPetstore,
-            // init crud-middleware,
-            local.swgg.middlewareCrud
+            // init crud-middleware-pre
+            local.middlewareCrudPre,
+            // init crud-middleware-builtin
+            local.swgg.middlewareCrudBuiltin,
+            // init crud-middleware-end
+            local.swgg.middlewareCrudEnd
         ]);
         // init error-middleware
         local.middlewareError = local.swgg.middlewareError;
@@ -285,7 +258,7 @@ instruction
         local.utility2.assetsDict['/assets.example.js'] = local.global.assetsExampleJs ||
             local.fs.readFileSync(__filename, 'utf8');
         /* jslint-ignore-begin */
-        // https://github.com/swagger-api/swagger-ui/blob/v2.1.2/dist/index.html
+        // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/dist/index.html
         local.utility2.templateIndexHtml = '\
 <!doctype html>\n\
 <html lang="en">\n\
@@ -296,7 +269,7 @@ instruction
 </title>\n\
 <link href="assets.swgg.swagger-ui.favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">\n\
 <link href="assets.swgg.swagger-ui.favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">\n\
-<link href="assets.swgg.css" media="screen" rel="stylesheet" type="text/css">\n\
+<link href="assets.swgg.css" rel="stylesheet">\n\
 <link href="assets.utility2.css" rel="stylesheet">\n\
 <style>\n\
 * {\n\
@@ -304,7 +277,8 @@ instruction
 }\n\
 body {\n\
     background-color: #fff;\n\
-    font-family: Helvetical Neue, Helvetica, Arial, sans-serif;\n\
+    font-family: Helvetica Neue,Helvetica,Arial,sans-serif;\n\
+    padding: 10px;\n\
 }\n\
 body > div {\n\
     margin-top: 20px;\n\
@@ -322,79 +296,26 @@ body > div {\n\
     <h3>{{envDict.npm_package_description}}</h3>\n\
     <div class="testReportDiv"></div>\n\
 \n\
-    <div class="swagger-section">\n\
-    <div id="header">\n\
-        <div class="swagger-ui-wrap">\n\
-        <a id="logo" href="http://swagger.io">swagger</a>\n\
-        <form id="api_selector">\n\
-        <div class="input">\n\
-        <input placeholder="http://example.com/api" id="input_baseUrl" name="baseUrl" type="text"/>\n\
-        </div>\n\
-        <div class="input">\n\
-        <input placeholder="api_key" id="input_apiKey" name="apiKey" type="text"/>\n\
-        </div>\n\
-        <div class="input"><a id="explore" href="#">Explore</a></div>\n\
-        </form>\n\
-        </div>\n\
+    <div class="swggUiContainer">\n\
+    <form action="" class="eventDelegateSubmit header onEventReload tr">\n\
+        <a class="td1" href="http://swagger.io" target="_blank">swagger</a>\n\
+        <input class="td2" placeholder="http://petstore.swagger.io/v2/swagger.json" type="text" value="api/v0/swagger.json"/>\n\
+        <input class="td3" type="submit" value="Explore">\n\
+    </form>\n\
     </div>\n\
-    <div id="message-bar" class="swagger-ui-wrap">&nbsp;</div>\n\
-    <div id="swagger-ui-container" class="swagger-ui-wrap"></div>\n\
-    </div>\n\
-<script src="assets.swgg.lib.jquery.js"></script>\n\
 <script src="assets.swgg.lib.nedb.js"></script>\n\
 <script src="assets.swgg.lib.swagger-tools.js"></script>\n\
 <script src="assets.utility2.rollup.js"></script>\n\
-<script src="assets.swgg.lib.swagger-ui.js"></script>\n\
 <script src="assets.swgg.js"></script>\n\
+<script src="assets.swgg.lib.swagger-ui.js"></script>\n\
 <script src="jsonp.swgg.stateInit.js"></script>\n\
 {{scriptExtra}}\n\
-<script>$(function () {\n\
+<script>(function () {\n\
 window.utility2.envDict.npm_package_description = "{{envDict.npm_package_description}}";\n\
 window.utility2.envDict.npm_package_name = "{{envDict.npm_package_name}}";\n\
 window.utility2.envDict.npm_package_version = "{{envDict.npm_package_version}};"\n\
-var url = window.location.search.match(/url=([^&]+)/);\n\
-if (url && url.length > 1) {\n\
-    url = decodeURIComponent(url[1]);\n\
-} else {\n\
-    url = location.pathname.replace((/\\/[^\\/]*?$/), "") + "/api/v0/swagger.json";\n\
-}\n\
-window.utility2.onReady.counter += 1;\n\
-window.swaggerUi = new SwaggerUi({\n\
-    url: url,\n\
-    dom_id: "swagger-ui-container",\n\
-    supportedSubmitMethods: ["get", "post", "put", "delete", "patch"],\n\
-    onComplete: function(swaggerApi, swaggerUi){\n\
-        if(typeof initOAuth == "function") {\n\
-            initOAuth({\n\
-                clientId: "your-client-id",\n\
-                clientSecret: "your-client-secret",\n\
-                realm: "your-realms",\n\
-                appName: "your-app-name",\n\
-                scopeSeparator: ","\n\
-            });\n\
-        }\n\
-        addApiKeyAuthorization();\n\
-        window.utility2.onReady();\n\
-    },\n\
-    onFailure: function(data) {\n\
-        console.log("Unable to Load SwaggerUI");\n\
-    },\n\
-    docExpansion: "none",\n\
-    apisSorter: "alpha",\n\
-    showRequestHeaders: false\n\
-});\n\
-function addApiKeyAuthorization(){\n\
-    var key = encodeURIComponent($("#input_apiKey")[0].value);\n\
-    if(key && key.trim() != "") {\n\
-        var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("api_key", key, "query");\n\
-        window.swaggerUi.api.clientAuthorizations.add("api_key", apiKeyAuth);\n\
-        console.log("added key " + key);\n\
-    }\n\
-}\n\
-$("#input_apiKey").change(addApiKeyAuthorization);\n\
-window.swaggerUi.load();\n\
-window.swgg.api = window.swaggerUi.api;\n\
-});</script>\n\
+window.swgg.uiReload();\n\
+}());</script>\n\
 </body>\n\
 </html>\n\
 ';
@@ -405,8 +326,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                 envDict: local.utility2.envDict,
                 // add extra scripts
                 scriptExtra: '<script src="assets.example.js"></script>'
-            },
-            ''
+            }
         );
         break;
     }
@@ -418,6 +338,19 @@ window.swgg.api = window.swaggerUi.api;\n\
         // init petstore-api
         local.swgg.apiDictUpdate(local.utility2.objectSetOverride(local.swgg.swaggerJson, {
             definitions: {
+                File: {
+                    _pathObjectDefaultList: [
+                        'crudCountManyByQuery',
+                        'crudCreateOrReplaceOneByKeyUnique.id',
+                        'crudDeleteOneByKeyUnique.id',
+                        'crudGetManyByQuery',
+                        'crudFileGetOneByKeyUnique.id',
+                        'crudFileUploadManyByForm.1',
+                        'crudUpdateOneByKeyUnique.id'
+                    ],
+                    _pathPrefix: 'file',
+                    'x-swgg-inherit': { $ref: '#/definitions/BuiltinFile' }
+                },
                 Pet: {
                     _pathObjectDefaultList: ['crudGetManyByQuery'],
                     _pathPrefix: 'pet',
@@ -432,7 +365,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                 Order: {
                     _pathObjectDefaultList: [
                         'crudGetManyByQuery',
-                        'crudCreateOrUpdateOneByKeyUnique.id'
+                        'crudUpdateOneByKeyUnique.id'
                     ],
                     _pathPrefix: 'store',
                     properties: {
@@ -443,12 +376,20 @@ window.swgg.api = window.swaggerUi.api;\n\
                     }
                 },
                 User: {
-                    _pathObjectDefaultList: ['crudGetManyByQuery', 'crudUserLoginByPassword'],
+                    _pathObjectDefaultList: [
+                        'crudCountManyByQuery',
+                        'crudCreateOrReplaceOneByKeyUnique.username',
+                        'crudDeleteOneByKeyUnique.username',
+                        'crudGetManyByQuery',
+                        'crudUpdateOneByKeyUnique.username',
+                        'crudUserLoginByPassword',
+                        'crudUserLogout'
+                    ],
                     _pathPrefix: 'user',
                     properties: {
                         _id: { readOnly: true, type: 'string' },
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
-                        email: { format: 'email' },
+                        email: { default: 'a@a.com', format: 'email' },
                         id: { default: 1, minimum: 1 },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
                     },
@@ -458,11 +399,11 @@ window.swgg.api = window.swaggerUi.api;\n\
             paths: {
                 '/pet': {
                     post: {
-                        _operationId: 'crudCreateOrReplaceOne',
+                        _operationId: 'crudCreateOrReplaceOneByKeyUnique.id',
                         _schemaName: 'Pet'
                     },
                     put: {
-                        _operationId: 'crudCreateOrUpdateOne',
+                        _operationId: 'crudUpdateOneByKeyUnique.id',
                         _schemaName: 'Pet'
                     }
                 },
@@ -490,13 +431,14 @@ window.swgg.api = window.swaggerUi.api;\n\
                         _schemaName: 'Pet'
                     },
                     post: {
-                        _operationId: 'crudCreateOrUpdateOneByKeyUnique.petId.id',
+                        _operationId: 'crudUpdateOneByKeyUnique.petId.id',
                         _schemaName: 'Pet'
                     }
                 },
                 '/pet/{petId}/uploadImage': {
                     post: {
-                        _schemaName: 'Pet'
+                        _operationId: 'crudFileUploadManyByForm',
+                        _schemaName: 'User'
                     }
                 },
                 '/store/inventory': {
@@ -506,7 +448,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                 },
                 '/store/order': {
                     post: {
-                        _operationId: 'crudCreateOrReplaceOne',
+                        _operationId: 'crudCreateOrReplaceOneByKeyUnique.id',
                         _schemaName: 'Order'
                     }
                 },
@@ -522,7 +464,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                 },
                 '/user': {
                     post: {
-                        _operationId: 'crudCreateOrReplaceOne',
+                        _operationId: 'crudCreateOrReplaceOneByKeyUnique.id',
                         _schemaName: 'User'
                     }
                 },
@@ -536,7 +478,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                         _schemaName: 'User'
                     },
                     put: {
-                        _operationId: 'crudCreateOrUpdateOneByKeyUnique.username',
+                        _operationId: 'crudUpdateOneByKeyUnique.username',
                         _schemaName: 'User'
                     }
                 },
@@ -564,26 +506,43 @@ window.swgg.api = window.swaggerUi.api;\n\
                         _schemaName: 'User'
                     }
                 }
+            },
+            'x-swgg-tagDict': {
+                file: { description: 'builtin-file model', name: 'file' }
             }
         }, 10));
         // init collectionList-fixtures
         local.utility2.onReady.counter += 1;
         local.swgg.collectionListInit([{
+            collectDocList: [{
+                id: '00_test_swaggerLogoSmall',
+                fileBlob: local.swgg.templateSwaggerLogoSmallBase64,
+                fileContentType: 'image/png',
+                fileFilename: 'swaggerLogoSmall.png',
+                propRequired: true
+            }],
+            drop: true,
+            ensureIndexList: [{
+                fieldName: 'id',
+                unique: true
+            }],
+            name: 'File'
+        }, {
             collectDocList: local.swgg.collectDocListRandomCreate({
                 collectDocList: [{
-                    id: 1,
+                    id: 0,
                     name: 'birdie',
                     photoUrls: [],
                     status: 'available',
                     tags: [{ name: 'bird'}]
                 }, {
-                    id: 2,
+                    id: 1,
                     name: 'doggie',
                     status: 'pending',
                     photoUrls: [],
                     tags: [{ name: 'dog'}]
                 }, {
-                    id: 3,
+                    id: 2,
                     name: 'fishie',
                     photoUrls: [],
                     status: 'sold',
@@ -614,16 +573,16 @@ window.swgg.api = window.swaggerUi.api;\n\
         }, {
             collectDocList: local.swgg.collectDocListRandomCreate({
                 collectDocList: [{
+                    id: 0,
+                    petId: 0,
+                    status: 'available'
+                }, {
                     id: 1,
                     petId: 1,
-                    status: 'available'
+                    status: 'pending'
                 }, {
                     id: 2,
                     petId: 2,
-                    status: 'pending'
-                }, {
-                    id: 3,
-                    petId: 3,
                     status: 'sold'
                 }],
                 // init 100 extra random users
@@ -647,7 +606,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                 collectDocList: [{
                     email: 'admin@admin.com',
                     firstName: 'admin',
-                    id: 1,
+                    id: 0,
                     lastName: '',
                     password: local.utility2.bcryptHashCreate('secret', 1),
                     phone: '1234-5678',
@@ -655,7 +614,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                 }, {
                     email: 'jane@doe.com',
                     firstName: 'jane',
-                    id: 2,
+                    id: 1,
                     lastName: 'doe',
                     password: local.utility2.bcryptHashCreate('secret', 1),
                     phone: '1234-5678',
@@ -663,7 +622,7 @@ window.swgg.api = window.swaggerUi.api;\n\
                 }, {
                     email: 'john@doe.com',
                     firstName: 'john',
-                    id: 3,
+                    id: 2,
                     lastName: 'doe',
                     password: local.utility2.bcryptHashCreate('secret', 1),
                     phone: '1234-5678',
@@ -731,10 +690,11 @@ window.swgg.api = window.swaggerUi.api;\n\
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "nedb-lite": "2016.1.3",
-        "utility2": "2016.3.4"
+        "nedb-lite": "2016.4.2",
+        "utility2": "2016.3.5"
     },
-    "description": "this package will run a standalone swagger-ui server backed by nedb",
+    "description": "this package will run a virtual swagger-ui server with persistent storage \
+in the browser (in-place of a real backend), that your webapp can talk to",
     "devDependencies": {
         "electron-lite": "2016.3.3"
     },
@@ -771,7 +731,6 @@ moduleDict:{ \
 exports:require('./index.js').Nedb.prototype}, \
 'swagger-lite.Nedb.storage':{aliasList:['storage'], \
 exports:require('./index.js').Nedb.storage}, \
-'swagger-lite.api':{aliasList:['api'],exports:require('./index.js').api}, \
 'swagger-lite.tools.v2':{aliasList:['tools.v2'], \
 exports:require('./index.js').tools.v2.__proto__} \
 } \
@@ -787,7 +746,7 @@ export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.3.1"
+    "version": "2016.4.1"
 }
 ```
 
