@@ -1,6 +1,6 @@
 swagger-lite
 ============
-this package will run a virtual swagger-ui server with persistent storage in the browser (in-place of a real backend), that your webapp can talk to
+this package will run a virtual swagger-ui server with persistent storage in the browser, that your webapp can use (in-place of a real backend)
 
 [![NPM](https://img.shields.io/npm/v/swagger-lite.svg?style=flat-square)](https://www.npmjs.com/package/swagger-lite) [![NPM](https://img.shields.io/npm/dm/swagger-lite.svg?style=flat-square)](https://www.npmjs.com/package/swagger-lite) [![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swagger-lite.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
 
@@ -8,33 +8,40 @@ this package will run a virtual swagger-ui server with persistent storage in the
 
 # documentation
 #### todo
+- add notification system
+- force empty string to be null
+- force empty array to be null
+- add post-crud-middleware for pet photoUrl
 - merge admin-ui into swagger-ui
 - rename collectDoc to something better
 - change api crudCreateOrReplaceMany to crudCreateOrReplaceManyByKeyUnique
 - fix missing param error-message in 400 validation-error
-- add api crudUserPasswordChange
-- add message-param to assertions in swgg.validateByPropertyDef
+- add api userPasswordChange
+- add message-param to assertions in swgg.validateByPropDef
 - ui - display operationId for endpoints
 - add logging feature
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 93be1493
-- npm publish 2016.4.1
-- fix bug when a document's id is zero
-- streamline ui
-- remove Backbone, Handlebars, and jQuery dependencies from lib.swagger-ui.js
-- enable multiple api endpoints with same operationId, but unique keyUnique
-- add hooks middlewareCrudPre and middlewareCrudPost
-- merge api crudCreateOrReplaceOne into crudCreateOrReplaceOneByKeyUnique
-- merge api crudCreateOrUpdateOne and crudCreateOrUpdateOneByKeyUnique into crudUpdateOneByKeyUnique
+#### change since 95d7c357
+- npm publish 2016.4.2
+- replace swagger-tools dependency with function swgg.validateBySwagger
+- validation - validate schema.default
+- validation - validate schema.anyOf
+- validation - replace x-swgg-inherit with schema.allOf
+- rename operation crudFile* to file*
+- rename operation crudUser* to user*
+- add file lib.swagger.schema.json from http://swagger.io/v2/schema.json
+- add extra constraints to function swgg.collectDocListRandomCreate
+- ui - input element's valueEncoded can only be '', null, or undefined
+- replace function swgg.schemaDereference with swgg.schemaNormalize
 - none
 
 #### this package requires
 - darwin or linux os
 - chromium-based browser or firefox browser
 
-#### differences from swagger-spec @ https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
+#### differences from swagger-spec @ https://github.com/OAI/OpenAPI-Specification/blob/394ffd3ff3e2fe0029a821170937a8154b04e0ba/versions/2.0.md
 - content-type "application/xml" is not currently supported
 - array-parameters are serialized using JSON.stringify, and the "collectionFormat" field is ignored
 
@@ -91,7 +98,7 @@ this node script will run a standalone swagger-ui server backed by nedb
 instruction
     1. save this script as example.js
     2. run the shell command:
-        $ npm install "kaizhu256/node-swagger-lite#alpha" && export PORT=1337 && node example.js
+        $ npm install swagger-lite && export PORT=1337 && node example.js
     3. open a browser to http://localhost:1337
     4. interact with the swagger-ui crud-api
 */
@@ -240,6 +247,13 @@ instruction
         ]);
         // init error-middleware
         local.middlewareError = local.swgg.middlewareError;
+        // init serverLocal
+        local.utility2.serverLocalUrlTest = function (url) {
+            url = local.utility2.urlParse(url).pathname;
+            return local.modeJs === 'browser' &&
+                url.indexOf('/api/v0/swagger.json') < 0 &&
+                (/\/api\/v0\/|\/test\./).test(url);
+        };
         // run server-test
         local.utility2.testRunServer(local);
     }());
@@ -252,7 +266,11 @@ instruction
         // export local
         module.exports = local;
         // init petstore-api
-        local.swgg.apiDictUpdate(JSON.parse(local.swgg.templateSwaggerJsonPetstore));
+        local.tmp = local.utility2.jsonCopy(local.swgg.swaggerPetstoreJson);
+        delete local.tmp.basePath;
+        delete local.tmp.host;
+        delete local.tmp.schemes;
+        local.swgg.apiDictUpdate(local.tmp);
         // init assets
         /* istanbul ignore next */
         local.utility2.assetsDict['/assets.example.js'] = local.global.assetsExampleJs ||
@@ -267,8 +285,6 @@ instruction
 <title>\n\
 {{envDict.npm_package_name}} @ {{envDict.npm_package_version}}\n\
 </title>\n\
-<link href="assets.swgg.swagger-ui.favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">\n\
-<link href="assets.swgg.swagger-ui.favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">\n\
 <link href="assets.swgg.css" rel="stylesheet">\n\
 <link href="assets.utility2.css" rel="stylesheet">\n\
 <style>\n\
@@ -278,7 +294,6 @@ instruction
 body {\n\
     background-color: #fff;\n\
     font-family: Helvetica Neue,Helvetica,Arial,sans-serif;\n\
-    padding: 10px;\n\
 }\n\
 body > div {\n\
     margin-top: 20px;\n\
@@ -297,14 +312,12 @@ body > div {\n\
     <div class="testReportDiv"></div>\n\
 \n\
     <div class="swggUiContainer">\n\
-    <form action="" class="eventDelegateSubmit header onEventReload tr">\n\
+    <form class="header tr">\n\
         <a class="td1" href="http://swagger.io" target="_blank">swagger</a>\n\
-        <input class="td2" placeholder="http://petstore.swagger.io/v2/swagger.json" type="text" value="api/v0/swagger.json"/>\n\
-        <input class="td3" type="submit" value="Explore">\n\
+        <input class="td2" placeholder="http://petstore.swagger.io/v2/swagger.json" readonly type="text" value="api/v0/swagger.json"/>\n\
     </form>\n\
     </div>\n\
 <script src="assets.swgg.lib.nedb.js"></script>\n\
-<script src="assets.swgg.lib.swagger-tools.js"></script>\n\
 <script src="assets.utility2.rollup.js"></script>\n\
 <script src="assets.swgg.js"></script>\n\
 <script src="assets.swgg.lib.swagger-ui.js"></script>\n\
@@ -344,12 +357,12 @@ window.swgg.uiReload();\n\
                         'crudCreateOrReplaceOneByKeyUnique.id',
                         'crudDeleteOneByKeyUnique.id',
                         'crudGetManyByQuery',
-                        'crudFileGetOneByKeyUnique.id',
-                        'crudFileUploadManyByForm.1',
-                        'crudUpdateOneByKeyUnique.id'
+                        'crudUpdateOneByKeyUnique.id',
+                        'fileGetOneByKeyUnique.id',
+                        'fileUploadManyByForm.1'
                     ],
                     _pathPrefix: 'file',
-                    'x-swgg-inherit': { $ref: '#/definitions/BuiltinFile' }
+                    allOf: [{ $ref: '#/definitions/BuiltinFile' }]
                 },
                 Pet: {
                     _pathObjectDefaultList: ['crudGetManyByQuery'],
@@ -382,18 +395,18 @@ window.swgg.uiReload();\n\
                         'crudDeleteOneByKeyUnique.username',
                         'crudGetManyByQuery',
                         'crudUpdateOneByKeyUnique.username',
-                        'crudUserLoginByPassword',
-                        'crudUserLogout'
+                        'userLoginByPassword',
+                        'userLogout'
                     ],
                     _pathPrefix: 'user',
+                    allOf: [{ $ref: '#/definitions/BuiltinUser' }],
                     properties: {
                         _id: { readOnly: true, type: 'string' },
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
                         email: { default: 'a@a.com', format: 'email' },
                         id: { default: 1, minimum: 1 },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
-                    },
-                    'x-swgg-inherit': { $ref: '#/definitions/BuiltinUser' }
+                    }
                 }
             },
             paths: {
@@ -437,7 +450,7 @@ window.swgg.uiReload();\n\
                 },
                 '/pet/{petId}/uploadImage': {
                     post: {
-                        _operationId: 'crudFileUploadManyByForm',
+                        _operationId: 'fileUploadManyByForm',
                         _schemaName: 'User'
                     }
                 },
@@ -496,13 +509,13 @@ window.swgg.uiReload();\n\
                 },
                 '/user/login': {
                     get: {
-                        _operationId: 'crudUserLoginByPassword',
+                        _operationId: 'userLoginByPassword',
                         _schemaName: 'User'
                     }
                 },
                 '/user/logout': {
                     get: {
-                        _operationId: 'crudUserLogout',
+                        _operationId: 'userLogout',
                         _schemaName: 'User'
                     }
                 }
@@ -515,10 +528,10 @@ window.swgg.uiReload();\n\
         local.utility2.onReady.counter += 1;
         local.swgg.collectionListInit([{
             collectDocList: [{
-                id: '00_test_swaggerLogoSmall',
-                fileBlob: local.swgg.templateSwaggerLogoSmallBase64,
+                id: '00_test_swaggerUiLogoSmall',
+                fileBlob: local.swgg.templateSwaggerUiLogoSmallBase64,
                 fileContentType: 'image/png',
-                fileFilename: 'swaggerLogoSmall.png',
+                fileFilename: 'swaggerUiLogoSmall.png',
                 propRequired: true
             }],
             drop: true,
@@ -691,10 +704,10 @@ window.swgg.uiReload();\n\
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "nedb-lite": "2016.4.2",
-        "utility2": "2016.3.5"
+        "utility2": "2016.3.6"
     },
     "description": "this package will run a virtual swagger-ui server with persistent storage \
-in the browser (in-place of a real backend), that your webapp can talk to",
+in the browser, that your webapp can use (in-place of a real backend)",
     "devDependencies": {
         "electron-lite": "2016.3.3"
     },
@@ -730,9 +743,7 @@ moduleDict:{ \
 'swagger-lite.Nedb.prototype':{aliasList:['collection'], \
 exports:require('./index.js').Nedb.prototype}, \
 'swagger-lite.Nedb.storage':{aliasList:['storage'], \
-exports:require('./index.js').Nedb.storage}, \
-'swagger-lite.tools.v2':{aliasList:['tools.v2'], \
-exports:require('./index.js').tools.v2.__proto__} \
+exports:require('./index.js').Nedb.storage} \
 } \
 }\"",
         "postinstall": "node index.js postinstall",
@@ -746,7 +757,7 @@ export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.4.1"
+    "version": "2016.4.2"
 }
 ```
 

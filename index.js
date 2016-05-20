@@ -47,6 +47,7 @@
             eventListenerDict: {},
             idDomElementDict: {},
             local: local,
+            swaggerSchemaJson: {},
             templatePathObjectDict: {},
             templatePathObjectDefaultDict: {}
         };
@@ -54,13 +55,6 @@
         local.swgg.Nedb = local.modeJs === 'browser'
             ? local.global.Nedb
             : require('nedb-lite');
-        local.utility2.tryCatchOnError(function () {
-            // init lib swagger-tools
-            local.swgg.tools = { v2: { validate: local.utility2.nop } };
-            local.swgg.tools = local.modeJs === 'browser'
-                ? local.global.SwaggerTools.specs
-                : require('./external/assets.swgg.lib.swagger-tools.js');
-        }, local.utility2.nop);
         // init templatePathObjectDefaultDict
         local.swgg.templatePathObjectDefaultDict.crudCountManyByQuery = {
             _method: 'get',
@@ -274,52 +268,6 @@
             }],
             summary: 'check if one {{_schemaName}} object exists by {{_keyUnique}}'
         };
-        local.swgg.templatePathObjectDefaultDict.crudFileGetOneByKeyUnique = {
-            _keyUnique: '{{_keyUnique}}',
-            _method: 'get',
-            _path: '/{{_pathPrefix}}/crudFileGetOneByKeyUnique',
-            parameters: [{
-                description: '{{_schemaName}} {{_keyUnique}}',
-                in: 'query',
-                name: '{{_keyUnique}}',
-                required: true,
-                type: 'string'
-            }],
-            produces: ['application/octet-stream'],
-            responses: {
-                200: {
-                    description:
-                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/BuiltinJsonapiResponse{{_schemaName}}' }
-                }
-            },
-            summary: 'get one {{_schemaName}} file by {{_keyUnique}}'
-        };
-        local.swgg.templatePathObjectDefaultDict.crudFileUploadManyByForm = {
-            _fileUploadNumber: '{{_fileUploadNumber}}',
-            _method: 'post',
-            _path: '/{{_pathPrefix}}/crudFileUploadManyByForm',
-            consumes: ['multipart/form-data'],
-            parameters: [{
-                description: '{{_schemaName}} file description',
-                in: 'formData',
-                name: 'fileDescription',
-                type: 'string'
-            }, {
-                description: '{{_schemaName}} file to form-upload',
-                in: 'formData',
-                name: 'file1',
-                type: 'file'
-            }],
-            responses: {
-                200: {
-                    description:
-                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/BuiltinJsonapiResponse{{_schemaName}}' }
-                }
-            },
-            summary: 'form-upload many {{_schemaName}} files'
-        };
         local.swgg.templatePathObjectDefaultDict.crudGetManyByQuery = {
             _method: 'get',
             _path: '/{{_pathPrefix}}/crudGetManyByQuery',
@@ -526,9 +474,55 @@
             },
             summary: 'create or update one {{_schemaName}} object by {{_keyUnique}}'
         };
-        local.swgg.templatePathObjectDefaultDict.crudUserLoginByPassword = {
+        local.swgg.templatePathObjectDefaultDict.fileGetOneByKeyUnique = {
+            _keyUnique: '{{_keyUnique}}',
             _method: 'get',
-            _path: '/{{_pathPrefix}}/crudUserLoginByPassword',
+            _path: '/{{_pathPrefix}}/fileGetOneByKeyUnique',
+            parameters: [{
+                description: '{{_schemaName}} {{_keyUnique}}',
+                in: 'query',
+                name: '{{_keyUnique}}',
+                required: true,
+                type: 'string'
+            }],
+            produces: ['application/octet-stream'],
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { type: 'file' }
+                }
+            },
+            summary: 'get one {{_schemaName}} file by {{_keyUnique}}'
+        };
+        local.swgg.templatePathObjectDefaultDict.fileUploadManyByForm = {
+            _fileUploadNumber: '{{_fileUploadNumber}}',
+            _method: 'post',
+            _path: '/{{_pathPrefix}}/fileUploadManyByForm',
+            consumes: ['multipart/form-data'],
+            parameters: [{
+                description: '{{_schemaName}} file description',
+                in: 'formData',
+                name: 'fileDescription',
+                type: 'string'
+            }, {
+                description: '{{_schemaName}} file to form-upload',
+                in: 'formData',
+                name: 'file1',
+                type: 'file'
+            }],
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/BuiltinJsonapiResponse{{_schemaName}}' }
+                }
+            },
+            summary: 'form-upload many {{_schemaName}} files'
+        };
+        local.swgg.templatePathObjectDefaultDict.userLoginByPassword = {
+            _method: 'get',
+            _path: '/{{_pathPrefix}}/userLoginByPassword',
             parameters: [
                 {
                     description: 'The user name for login',
@@ -554,9 +548,9 @@
             },
             summary: 'login by password'
         };
-        local.swgg.templatePathObjectDefaultDict.crudUserLogout = {
+        local.swgg.templatePathObjectDefaultDict.userLogout = {
             _method: 'get',
-            _path: '/{{_pathPrefix}}/crudUserLogout',
+            _path: '/{{_pathPrefix}}/userLogout',
             responses: {
                 200: {
                     description:
@@ -624,11 +618,11 @@
             paths: {},
             securityDefinitions: {},
             swagger: '2.0',
-            tags: [],
-            'x-swgg-validateUnusedDefinition': false
+            tags: []
         });
 /* jslint-ignore-begin */
-        local.swgg.templateSwaggerLogoSmallBase64 = '\
+// https://github.com/swagger-api/swagger-ui/blob/v2.1.3/dist/images/logo_small.png
+local.swgg.templateSwaggerUiLogoSmallBase64 = '\
 iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFn\
 ZVJlYWR5ccllPAAAAqRJREFUeNrEVz1s00AUfnGXii5maMXoEUEHVwIpEkPNgkBdMnQoU5ytiKHJwpp2\
 Q2JIO8DCUDOxIJFIVOoWZyJSh3pp1Q2PVVlcCVBH3ufeVZZ9Zye1Ay86nXV+ue/9fO/lheg/Se02X1rv\
@@ -677,7 +671,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 options.errorValidate = error;
                 onError(error);
             });
-            if (local.utility2.tryCatchErrorCaught) {
+            if (options.errorValidate) {
                 return;
             }
             // init options-defaults
@@ -773,7 +767,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         /*
          * this function will update the swagger-api dict of api-calls
          */
-            var fileUploadNumber, ii, inherit, keyUnique, pathObject, schema, tmp;
+            var fileUploadNumber, ii, keyUnique, pathObject, schema, tmp;
             // init swaggerJson
             local.swgg.swaggerJson = local.swgg.swaggerJson ||
                 JSON.parse(local.swgg.templateSwaggerJson);
@@ -786,23 +780,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             local.utility2.objectSetOverride(local.swgg.swaggerJson, {
                 definitions: options.definitions
             }, 10);
-            // init schema.properties from x-swgg-inherit
-            inherit = function (schema) {
-                if (schema['x-swgg-inherit'] && tmp.indexOf(schema) < 0) {
-                    tmp.push(schema);
-                    local.utility2.objectSetDefault(schema, { properties:
-                        local.utility2.jsonCopy(
-                            // recurse - inherit
-                            inherit(local.swgg.schemaDereference(
-                                schema['x-swgg-inherit'].$ref
-                            )).properties
-                        ) });
-                }
-                return schema;
-            };
-            tmp = [];
             Object.keys(local.swgg.swaggerJson.definitions).forEach(function (schemaName) {
-                inherit(local.swgg.swaggerJson.definitions[schemaName]);
+                // normalize definition
+                local.swgg.swaggerJson.definitions[schemaName] =
+                    local.swgg.schemaNormalize(local.swgg.swaggerJson.definitions[schemaName]);
             });
             // init pathObjectDefaultList
             Object.keys(options.definitions).forEach(function (schemaName) {
@@ -818,7 +799,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                                 items: { $ref: '#/definitions/{{_schemaName}}' },
                                 type: 'array'
                             } },
-                            'x-swgg-inherit': { $ref: '#/definitions/BuiltinJsonapiResponse' }
+                            allOf: [{ $ref: '#/definitions/BuiltinJsonapiResponse' }]
                         }
                     }
                 }).replace((/\{\{_schemaName\}\}/g), schemaName)), 2);
@@ -826,7 +807,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 (schema._pathObjectDefaultList || []).forEach(function (operationId) {
                     // init fileUploadNumber
                     fileUploadNumber = 1;
-                    tmp = (/^crudFileUploadManyByForm\.(\d+)/).exec(operationId);
+                    tmp = (/^fileUploadManyByForm\.(\d+)/).exec(operationId);
                     if (tmp) {
                         fileUploadNumber = tmp[1];
                     }
@@ -864,7 +845,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     options.paths[pathObject._path][pathObject._method] = pathObject;
                     switch (pathObject.operationId.split('.')[0]) {
                     // add extra file-upload forms
-                    case 'crudFileUploadManyByForm':
+                    case 'fileUploadManyByForm':
                         for (ii = 1; ii <= fileUploadNumber; ii += 1) {
                             pathObject.parameters[ii] =
                                 local.utility2.jsonCopy(pathObject.parameters[1]);
@@ -985,101 +966,109 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         /*
          * this function will return a random collectDoc
          */
-            var collectDoc, propertyDef, max, min, stringRandom, tmp;
+            var collectDoc, ii, max, min, propDef, tmp;
             collectDoc = {};
-            stringRandom = function () {
-                return local.utility2.listGetElementRandom('abcdefghijklmnopqrstuvwxyz') +
-                    Math.random().toString(36).slice(2, 10);
-            };
             Object.keys(options.properties).forEach(function (key) {
-                propertyDef = options.properties[key];
-                if (propertyDef.readOnly) {
+                propDef = options.properties[key];
+                if (propDef.readOnly) {
                     return;
                 }
-                if (propertyDef.enum) {
-                    collectDoc[key] = local.utility2.listGetElementRandom(propertyDef.enum);
+                if (propDef.enum) {
+                    collectDoc[key] = local.utility2.listGetElementRandom(propDef.enum);
                     return;
                 }
-                switch (propertyDef.type) {
+                // http://json-schema.org/latest/json-schema-validation.html#anchor13
+                // 5.1.  Validation keywords for numeric instances (number and integer)
+                max = isFinite(propDef.maximum)
+                    ? propDef.maximum
+                    : 999;
+                min = isFinite(propDef.maximum)
+                    ? propDef.minimum
+                    : -999;
+                switch (propDef.type) {
                 case 'array':
                     tmp = [];
+                    // http://json-schema.org/latest/json-schema-validation.html#anchor36
+                    // 5.3.  Validation keywords for arrays
+                    for (ii = 0; ii < (propDef.minItems || 0); ii += 1) {
+                        tmp.push(null);
+                    }
                     break;
                 case 'boolean':
                     tmp = local.utility2.listGetElementRandom([false, true]);
                     break;
                 case 'integer':
-                    max = typeof propertyDef.maximum === 'number'
-                        ? propertyDef.maximum
-                        : 999;
-                    min = typeof propertyDef.minimum === 'number'
-                        ? propertyDef.minimum
-                        : -999;
-                    if (propertyDef.exclusiveMaximum) {
+                    if (propDef.exclusiveMaximum) {
                         max -= 1;
                     }
-                    if (propertyDef.exclusiveMinimum) {
+                    if (propDef.exclusiveMinimum) {
                         min += 1;
                     }
                     tmp = Math.floor(min + Math.random() * (max - min));
-                    if (propertyDef.multipleOf) {
-                        tmp = propertyDef.multipleOf * Math.floor(tmp / propertyDef.multipleOf);
-                        if (tmp < min) {
-                            tmp += propertyDef.multipleOf;
-                        }
+                    break;
+                case 'object':
+                    tmp = {};
+                    // http://json-schema.org/latest/json-schema-validation.html#anchor53
+                    // 5.4.  Validation keywords for objects
+                    for (ii = 0; ii < (propDef.minProperties || 0); ii += 1) {
+                        tmp['property' + ii] = null;
                     }
                     break;
                 case 'number':
-                    max = typeof propertyDef.maximum === 'number'
-                        ? propertyDef.maximum
-                        : 999;
-                    min = typeof propertyDef.minimum === 'number'
-                        ? propertyDef.minimum
-                        : -999;
-                    if (propertyDef.exclusiveMinimum) {
+                    if (propDef.exclusiveMinimum) {
                         min = min < 0
                             ? min * 0.99999
                             : min * 1.00001 + 0.00001;
                     }
-                    if (propertyDef.exclusiveMaximum) {
+                    if (propDef.exclusiveMaximum) {
                         max = max > 0
                             ? max * 0.99999
                             : max * 1.00001 - 0.00001;
                     }
-                    tmp = Math.random() * (max - min) + min;
-                    if (propertyDef.multipleOf) {
-                        tmp = propertyDef.multipleOf * Math.floor(tmp / propertyDef.multipleOf);
-                        if (tmp < min) {
-                            tmp += propertyDef.multipleOf;
-                        }
-                    }
+                    tmp = min + Math.random() * (max - min);
                     break;
                 case 'string':
-                    switch (propertyDef.format) {
+                    switch (propDef.format) {
                     case 'byte':
-                        tmp = local.utility2.stringToBase64(stringRandom());
+                        tmp = local.utility2.stringToBase64(Math.random(16).toString());
                         break;
                     case 'date':
                     case 'date-time':
                         tmp = new Date(0x10000000000 * Math.random()).toISOString();
                         break;
                     case 'email':
-                        tmp = stringRandom() + '@' + stringRandom() + '.com';
+                        tmp = local.utility2.listGetElementRandom(['jane', 'john']) +
+                            Math.random().toString(16).slice(1) + '@random.com';
                         break;
                     case 'json':
-                        tmp = JSON.stringify({ aa: stringRandom(), bb: stringRandom() });
+                        tmp = JSON.stringify({ random: Math.random() });
                         break;
                     default:
-                        tmp = stringRandom();
+                        tmp = 'random_' + Math.random().toString(16).slice(2);
                         break;
+                    }
+                    // http://json-schema.org/latest/json-schema-validation.html#anchor25
+                    // 5.2.  Validation keywords for strings
+                    tmp = tmp.slice(0, propDef.maxLength || Infinity);
+                    while (tmp.length < (propDef.minLength || 0)) {
+                        tmp += Math.random().toString(16).slice(2);
                     }
                     break;
                 }
+                // http://json-schema.org/latest/json-schema-validation.html#anchor13
+                // 5.1.  Validation keywords for numeric instances (number and integer)
+                if (propDef.multipleOf) {
+                    tmp = propDef.multipleOf * Math.floor(tmp / propDef.multipleOf);
+                    if (tmp < min) {
+                        tmp += propDef.multipleOf;
+                    }
+                }
                 // try to validate data
                 local.utility2.tryCatchOnError(function () {
-                    local.swgg.validateByPropertyDef({
+                    local.swgg.validateByPropDef({
                         data: tmp,
-                        key: propertyDef.name,
-                        propertyDef: propertyDef
+                        key: propDef.name,
+                        schema: propDef
                     });
                     collectDoc[key] = tmp;
                 }, local.utility2.nop);
@@ -1510,43 +1499,6 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     case 'crudExistsOneByKeyUnique':
                         crud.collection.findOne(crud.queryByKeyUnique, { $: 1 }, onNext);
                         break;
-                    case 'crudFileGetOneByKeyUnique':
-                        local.swgg.collectionFile = local.swgg.collectionCreate('File');
-                        local.swgg.collectionFile.findOne(crud.queryByKeyUnique, onNext);
-                        break;
-                    case 'crudFileUploadManyByForm':
-                        local.swgg.collectionFile = local.swgg.collectionCreate('File');
-                        request.swgg.paramDict = {};
-                        Object.keys(request.swgg.bodyMeta).forEach(function (key) {
-                            if (typeof request.swgg.bodyMeta[key].filename !== 'string') {
-                                request.swgg.paramDict[key] =
-                                    local.utility2.bufferToString(request.swgg.bodyParsed[key]);
-                            }
-                        });
-                        crud.body = Object.keys(request.swgg.bodyMeta)
-                            .filter(function (key) {
-                                return typeof request.swgg.bodyMeta[key].filename === 'string';
-                            })
-                            .map(function (key) {
-                                tmp = local.utility2.jsonCopy(request.swgg.paramDict);
-                                tmp.id = local.utility2.uuidTimeCreate();
-                                local.utility2.objectSetOverride(tmp, {
-                                    fileBlob: local.utility2.bufferToString(
-                                        request.swgg.bodyParsed[key],
-                                        'base64'
-                                    ),
-                                    fileContentType: request.swgg.bodyMeta[key].contentType,
-                                    fileFilename: request.swgg.bodyMeta[key].filename,
-                                    fileInputName: request.swgg.bodyMeta[key].name,
-                                    fileSize: request.swgg.bodyParsed[key].length,
-                                    fileUrl: local.swgg.swaggerJson.basePath + '/' +
-                                        request.swgg.pathObject._pathPrefix +
-                                        '/crudFileGetOneByKeyUnique/' + tmp.id
-                                });
-                                return tmp;
-                            });
-                        local.swgg.collectionFile.insert(crud.body, onNext);
-                        break;
                     case 'crudGetManyByQuery':
                         onParallel = local.utility2.onParallel(onNext);
                         onParallel.counter += 1;
@@ -1579,8 +1531,45 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     case 'crudNullPut':
                         onNext();
                         break;
-                    case 'crudUserLoginByPassword':
-                    case 'crudUserLogout':
+                    case 'fileGetOneByKeyUnique':
+                        local.swgg.collectionFile = local.swgg.collectionCreate('File');
+                        local.swgg.collectionFile.findOne(crud.queryByKeyUnique, onNext);
+                        break;
+                    case 'fileUploadManyByForm':
+                        local.swgg.collectionFile = local.swgg.collectionCreate('File');
+                        request.swgg.paramDict = {};
+                        Object.keys(request.swgg.bodyMeta).forEach(function (key) {
+                            if (typeof request.swgg.bodyMeta[key].filename !== 'string') {
+                                request.swgg.paramDict[key] =
+                                    local.utility2.bufferToString(request.swgg.bodyParsed[key]);
+                            }
+                        });
+                        crud.body = Object.keys(request.swgg.bodyMeta)
+                            .filter(function (key) {
+                                return typeof request.swgg.bodyMeta[key].filename === 'string';
+                            })
+                            .map(function (key) {
+                                tmp = local.utility2.jsonCopy(request.swgg.paramDict);
+                                tmp.id = local.utility2.uuidTimeCreate();
+                                local.utility2.objectSetOverride(tmp, {
+                                    fileBlob: local.utility2.bufferToString(
+                                        request.swgg.bodyParsed[key],
+                                        'base64'
+                                    ),
+                                    fileContentType: request.swgg.bodyMeta[key].contentType,
+                                    fileFilename: request.swgg.bodyMeta[key].filename,
+                                    fileInputName: request.swgg.bodyMeta[key].name,
+                                    fileSize: request.swgg.bodyParsed[key].length,
+                                    fileUrl: local.swgg.swaggerJson.basePath + '/' +
+                                        request.swgg.pathObject._pathPrefix +
+                                        '/fileGetOneByKeyUnique/' + tmp.id
+                                });
+                                return tmp;
+                            });
+                        local.swgg.collectionFile.insert(crud.body, onNext);
+                        break;
+                    case 'userLoginByPassword':
+                    case 'userLogout':
                         // respond with 401 Unauthorized
                         if (!user.isAuthenticated) {
                             local.utility2.serverRespondHeadSet(request, response, 401, {});
@@ -1608,21 +1597,21 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     case 'crudExistsOneByKeyUnique':
                         onNext(null, !!data);
                         break;
-                    case 'crudFileUploadManyByForm':
-                        onNext(null, data.map(function (element) {
-                            delete element.fileBlob;
-                            return element;
-                        }));
-                        break;
                     case 'crudGetManyByQuery':
                         onNext(null, crud.queryData, {
                             paginationCountTotal: crud.paginationCountTotal
                         });
                         break;
-                    case 'crudUserLoginByPassword':
+                    case 'fileUploadManyByForm':
+                        onNext(null, data.map(function (element) {
+                            delete element.fileBlob;
+                            return element;
+                        }));
+                        break;
+                    case 'userLoginByPassword':
                         onNext(null, { jwtEncoded: user.jwtEncoded });
                         break;
-                    case 'crudUserLogout':
+                    case 'userLogout':
                         crud.collection.update(
                             { username: user.username },
                             { $unset: { jwtEncoded: true } },
@@ -1636,7 +1625,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     break;
                 case 3:
                     switch (crud.operationId.split('.')[0]) {
-                    case 'crudFileGetOneByKeyUnique':
+                    case 'fileGetOneByKeyUnique':
                         if (!data) {
                             local.utility2.serverRespondDefault(request, response, 404);
                             return;
@@ -1646,7 +1635,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         });
                         response.end(local.utility2.bufferCreate(data.fileBlob, 'base64'));
                         break;
-                    case 'crudUserLogout':
+                    case 'userLogout':
                         onNext();
                         break;
                     default:
@@ -1682,7 +1671,8 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
          */
             if (request.urlParsed.pathname === '/jsonp.swgg.stateInit.js') {
                 response.end('window.swgg.stateInit(' + JSON.stringify({
-                    swaggerJson: local.swgg.swaggerJson
+                    swaggerJson: local.swgg.swaggerJson,
+                    swaggerSchemaJson: local.swgg.swaggerSchemaJson
                 }) + ');');
                 return;
             }
@@ -1757,7 +1747,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     case 'crudErrorLogin':
                         onNext(local.utility2.errorDefault);
                         return;
-                    case 'crudUserLoginByPassword':
+                    case 'userLoginByPassword':
                         user.password = request.urlParsed.query.password;
                         user.username = request.urlParsed.query.username;
                         if (user.password && user.username) {
@@ -1782,7 +1772,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     break;
                 case 2:
                     switch (crud.operationId.split('.')[0]) {
-                    case 'crudUserLoginByPassword':
+                    case 'userLoginByPassword':
                         user.data = data;
                         if (!local.utility2.bcryptPasswordValidate(
                                 user.password,
@@ -1978,7 +1968,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                             // try to init id
                             local.utility2.tryCatchOnError(function () {
                                 switch (param.in === 'body' &&
-                                    local.swgg.schemaDereference(param.schema.$ref)
+                                    local.swgg.schemaNormalize(param.schema)
                                     .properties[crud.keyUnique].type) {
                                 // use integer id
                                 case 'integer':
@@ -2111,17 +2101,50 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             };
         };
 
-        local.swgg.schemaDereference = function ($ref) {
+        local.swgg.schemaNormalize = function (schema) {
         /*
-         * this function will try to dereference the schema from $ref
+         * this function will normalize the schema
          */
-            var result;
-            local.utility2.tryCatchOnError(function () {
-                result = local.swgg.swaggerJson.definitions[
-                    (/^\#\/definitions\/([^\/]+)$/).exec($ref)[1]
-                ];
-            }, local.utility2.nop);
-            return result;
+            var tmp;
+            // dereference $ref
+            if (schema.$ref) {
+                [
+                    local.swgg.swaggerJson,
+                    local.swgg.swaggerSchemaJson
+                ].some(function (options) {
+                    local.utility2.tryCatchOnError(function () {
+                        schema.$ref.replace(
+                            (/#\/(.*?)\/(.*?)$/),
+                            function (match0, match1, match2) {
+                                // jslint-hack - nop
+                                local.utility2.nop(match0);
+                                tmp = options[match1][match2];
+                            }
+                        );
+                    }, local.utility2.nop);
+                    return tmp;
+                });
+                // validate schema
+                local.utility2.assert(tmp, schema.$ref);
+                // recurse
+                tmp = local.swgg.schemaNormalize(tmp);
+                schema = tmp;
+            }
+            // inherit allOf
+            if (schema.allOf) {
+                tmp = local.utility2.jsonCopy(schema);
+                delete tmp.allOf;
+                schema.allOf.reverse().forEach(function (element) {
+                    local.utility2.objectSetDefault(
+                        tmp,
+                        // recurse
+                        local.swgg.schemaNormalize(element),
+                        2
+                    );
+                });
+                schema = tmp;
+            }
+            return schema;
         };
 
         local.swgg.serverRespondJsonapi = function (request, response, error, data, meta) {
@@ -2176,7 +2199,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         /*
          * this function will send a login-by-password request
          */
-            local.swgg.apiDict["GET /user/crudUserLoginByPassword"]({ paramDict: {
+            local.swgg.apiDict["GET /user/userLoginByPassword"]({ paramDict: {
                 password: options.password,
                 username: options.username
             } }, onError);
@@ -2186,7 +2209,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         /*
          * this function will send a logout request
          */
-            local.swgg.apiDict["GET /user/crudUserLogout"](options, onError);
+            local.swgg.apiDict["GET /user/userLogout"](options, onError);
         };
 
         local.swgg.validateByParamDefList = function (options) {
@@ -2200,13 +2223,13 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 local.utility2.assert(data && typeof data === 'object', data);
                 (options.paramDefList || []).forEach(function (paramDef) {
                     key = paramDef.name;
-                    // recurse - validateByPropertyDef
-                    local.swgg.validateByPropertyDef({
+                    // recurse - validateByPropDef
+                    local.swgg.validateByPropDef({
+                        circularList: options.circularList,
                         data: data[key],
-                        dataReadonlyRemove: options.dataReadonlyRemove &&
-                            options.dataReadonlyRemove[key],
+                        dataReadonlyRemove: (options.dataReadonlyRemove || {})[key],
                         key: key,
-                        propertyDef: paramDef,
+                        schema: paramDef,
                         required: paramDef.required,
                         'x-swgg-notRequired': paramDef['x-swgg-notRequired']
                     });
@@ -2214,135 +2237,194 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             }, function (error) {
                 error.statusCode = error.statusCode || 400;
                 local.utility2.errorMessagePrepend(error, options.key + '.' + key +
-                    ' - ');
+                    ' -> ');
                 throw error;
             });
         };
 
-        local.swgg.validateByPropertyDef = function (options) {
+        local.swgg.validateByPropDef = function (options) {
         /*
-         * this function will validate options.data against options.propertyDef
+         * this function will validate options.data against options.schema
          */
-            var data, propertyDef, tmp;
-            data = options.data;
-            propertyDef = options.propertyDef;
-            // validate undefined data
-            if (local.utility2.isNullOrUndefined(data)) {
-                if (options.required && !options['x-swgg-notRequired']) {
-                    throw new Error('required property ' + options.key + ':' +
-                        (propertyDef.format || propertyDef.type) +
-                        ' cannot be null or undefined');
-                }
-                return;
-            }
-            // validate schema
-            tmp = propertyDef.$ref || (propertyDef.schema && propertyDef.schema.$ref);
-            if (tmp) {
-                // recurse - validateBySchema
-                local.swgg.validateBySchema({
-                    circularList: options.circularList,
-                    data: data,
-                    dataReadonlyRemove: options.dataReadonlyRemove,
-                    key: tmp,
-                    schema: local.swgg.schemaDereference(tmp),
-                    'x-swgg-notRequired': options['x-swgg-notRequired']
-                });
-                return;
-            }
-            // init circularList
-            if (data && typeof data === 'object') {
-                options.circularList = options.circularList || [];
-                if (options.circularList.indexOf(data) >= 0) {
+            var data, prefix, propDef, tmp;
+            local.utility2.tryCatchOnError(function () {
+                data = options.data;
+                prefix = 'property ' + options.key;
+                propDef = options.schema;
+                // validate undefined data
+                if (local.utility2.isNullOrUndefined(data)) {
+                    if (options.required && !options['x-swgg-notRequired']) {
+                        tmp = new Error(prefix + ' cannot be null or undefined');
+                        tmp.options = options;
+                        throw tmp;
+                    }
                     return;
                 }
-                options.circularList.push(data);
-            }
-            // validate propertyDef embedded in propertyDef.schema.type
-            if (!propertyDef.type && propertyDef.schema && propertyDef.schema.type) {
-                propertyDef = propertyDef.schema;
-            }
-            local.utility2.tryCatchOnError(function () {
+                // handle $ref
+                tmp = propDef.$ref || (propDef.schema && propDef.schema.$ref);
+                if (tmp) {
+                    // recurse - validateBySchema
+                    local.swgg.validateBySchema({
+                        circularList: options.circularList,
+                        data: data,
+                        dataReadonlyRemove: options.dataReadonlyRemove,
+                        key: tmp,
+                        schema: local.swgg.schemaNormalize({ $ref: tmp }),
+                        'x-swgg-notRequired': options['x-swgg-notRequired']
+                    });
+                    return;
+                }
+                // handle anyOf
+                if (propDef.anyOf) {
+                    tmp = propDef.anyOf.some(function (element) {
+                        local.utility2.tryCatchOnError(function () {
+                            // recurse - validateBySchema
+                            local.swgg.validateBySchema({
+                                circularList: options.circularList,
+                                data: data,
+                                key: 'anyOf',
+                                schema: local.swgg.schemaNormalize(element),
+                                'x-swgg-notRequired': options['x-swgg-notRequired']
+                            });
+                        }, local.utility2.nop);
+                        return !local.utility2.tryCatchErrorCaught;
+                    });
+                    local.utility2.assert(tmp, local.utility2.tryCatchErrorCaught);
+                    return;
+                }
+                // normalize propDef
+                propDef = local.swgg.schemaNormalize(options.schema);
+                // init circularList
+                if (data && typeof data === 'object') {
+                    options.circularList = options.circularList || [];
+                    if (options.circularList.indexOf(data) >= 0) {
+                        return;
+                    }
+                    options.circularList.push(data);
+                }
+                // validate propDef embedded in propDef.schema.type
+                if (!propDef.type && propDef.schema && propDef.schema.type) {
+                    propDef = propDef.schema;
+                }
                 // http://json-schema.org/latest/json-schema-validation.html#anchor13
                 // 5.1.  Validation keywords for numeric instances (number and integer)
                 if (typeof data === 'number') {
-                    if (typeof propertyDef.multipleOf === 'number') {
-                        local.utility2.assert(data % propertyDef.multipleOf === 0);
+                    if (typeof propDef.multipleOf === 'number') {
+                        local.utility2.assert(
+                            data % propDef.multipleOf === 0,
+                            prefix + ' must be a multiple of ' + propDef.multipleOf
+                        );
                     }
-                    if (typeof propertyDef.maximum === 'number') {
-                        local.utility2.assert(propertyDef.exclusiveMaximum
-                            ? data < propertyDef.maximum
-                            : data <= propertyDef.maximum);
+                    if (typeof propDef.maximum === 'number') {
+                        local.utility2.assert(
+                            propDef.exclusiveMaximum
+                                ? data < propDef.maximum
+                                : data <= propDef.maximum,
+                            prefix + ' must be ' + (propDef.exclusiveMaximum
+                                ? '< '
+                                : '<= ') + propDef.maximum
+                        );
                     }
-                    if (typeof propertyDef.minimum === 'number') {
-                        local.utility2.assert(propertyDef.exclusiveMinimum
-                            ? data > propertyDef.minimum
-                            : data >= propertyDef.minimum);
+                    if (typeof propDef.minimum === 'number') {
+                        local.utility2.assert(
+                            propDef.exclusiveMinimum
+                                ? data > propDef.minimum
+                                : data >= propDef.minimum,
+                            prefix + ' must be ' + (propDef.exclusiveMinimum
+                                ? '> '
+                                : '>= ') + propDef.minimum
+                        );
                     }
                 // http://json-schema.org/latest/json-schema-validation.html#anchor25
                 // 5.2.  Validation keywords for strings
                 } else if (typeof data === 'string') {
-                    if (propertyDef.maxLength) {
-                        local.utility2.assert(data.length <= propertyDef.maxLength);
+                    if (propDef.maxLength) {
+                        local.utility2.assert(
+                            data.length <= propDef.maxLength,
+                            prefix + ' must have <= ' + propDef.maxLength + ' characters'
+                        );
                     }
-                    if (propertyDef.minLength) {
-                        local.utility2.assert(data.length >= propertyDef.minLength);
+                    if (propDef.minLength) {
+                        local.utility2.assert(
+                            data.length >= propDef.minLength,
+                            prefix + ' must have >= ' + propDef.minLength + ' characters'
+                        );
                     }
-                    if (propertyDef.pattern) {
-                        local.utility2.assert(new RegExp(propertyDef.pattern).test(data));
+                    if (propDef.pattern) {
+                        local.utility2.assert(
+                            new RegExp(propDef.pattern).test(data),
+                            prefix + ' must match regex pattern /' + propDef.pattern + '/'
+                        );
                     }
                 // http://json-schema.org/latest/json-schema-validation.html#anchor36
                 // 5.3.  Validation keywords for arrays
                 } else if (Array.isArray(data)) {
-                    if (propertyDef.maxItems) {
-                        local.utility2.assert(data.length <= propertyDef.maxItems);
+                    if (propDef.maxItems) {
+                        local.utility2.assert(
+                            data.length <= propDef.maxItems,
+                            prefix + ' must have <= ' + propDef.maxItems + ' items'
+                        );
                     }
-                    if (propertyDef.minItems) {
-                        local.utility2.assert(data.length >= propertyDef.minItems);
+                    if (propDef.minItems) {
+                        local.utility2.assert(
+                            data.length >= propDef.minItems,
+                            prefix + ' must have >= ' + propDef.minItems + ' items'
+                        );
                     }
-                    if (propertyDef.uniqueItems) {
+                    if (propDef.uniqueItems) {
                         tmp = {};
                         data.forEach(function (element) {
                             element = JSON.stringify(element);
-                            local.utility2.assert(!tmp[element]);
+                            local.utility2.assert(
+                                !tmp[element],
+                                prefix + ' must have only unique items'
+                            );
                             tmp[element] = true;
                         });
                     }
                 // http://json-schema.org/latest/json-schema-validation.html#anchor53
                 // 5.4.  Validation keywords for objects
                 } else if (typeof data === 'object') {
-                    if (propertyDef.maxProperties) {
-                        local.utility2.assert(Object.keys(data).length <=
-                            propertyDef.maxProperties);
+                    if (propDef.maxProperties) {
+                        local.utility2.assert(
+                            Object.keys(data).length <= propDef.maxProperties,
+                            prefix + ' must have <= ' + propDef.maxProperties + ' items'
+                        );
                     }
-                    if (propertyDef.minProperties) {
-                        local.utility2.assert(Object.keys(data).length >=
-                            propertyDef.minProperties);
+                    if (propDef.minProperties) {
+                        local.utility2.assert(
+                            Object.keys(data).length >= propDef.minProperties,
+                            prefix + ' must have >= ' + propDef.minProperties + ' items'
+                        );
                     }
                 }
                 // http://json-schema.org/latest/json-schema-validation.html#anchor75
                 // 5.5.  Validation keywords for any instance type
-                if (propertyDef.enum) {
+                if (propDef.enum) {
                     (Array.isArray(data)
                         ? data
                         : [data]).forEach(function (element) {
-                        local.utility2.assert(propertyDef.enum.indexOf(element) >= 0);
+                        local.utility2.assert(
+                            propDef.enum.indexOf(element) >= 0,
+                            prefix + ' must only have items in the list ' +
+                                JSON.stringify(propDef.enum)
+                        );
                     });
                 }
                 // https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md
                 // #data-types
-                // validate propertyDef.type
-                switch (propertyDef.type) {
+                // validate schema.type
+                switch (propDef.type) {
                 case 'array':
-                    local.utility2.assert(Array.isArray(data) && propertyDef.items);
+                    local.utility2.assert(Array.isArray(data) && propDef.items);
                     data.forEach(function (element, ii) {
-                        // recurse - validateByPropertyDef
-                        local.swgg.validateByPropertyDef({
+                        // recurse - validateByPropDef
+                        local.swgg.validateByPropDef({
                             circularList: options.circularList,
                             data: element,
-                            dataReadonlyRemove: options.dataReadonlyRemove &&
-                                options.dataReadonlyRemove[ii],
-                            key: options.key,
-                            propertyDef: propertyDef.items,
+                            dataReadonlyRemove: (options.dataReadonlyRemove || {})[ii],
+                            key: ii,
+                            schema: propDef.items,
                             'x-swgg-notRequired': options['x-swgg-notRequired']
                         });
                     });
@@ -2350,10 +2432,12 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 case 'boolean':
                     local.utility2.assert(typeof data === 'boolean');
                     break;
+                case 'file':
+                    break;
                 case 'integer':
                     local.utility2.assert(typeof data === 'number' && isFinite(data) &&
                         Math.floor(data) === data);
-                    switch (propertyDef.format) {
+                    switch (propDef.format) {
                     case 'int32':
                     case 'int64':
                         break;
@@ -2361,7 +2445,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     break;
                 case 'number':
                     local.utility2.assert(typeof data === 'number' && isFinite(data));
-                    switch (propertyDef.format) {
+                    switch (propDef.format) {
                     case 'double':
                     case 'float':
                         break;
@@ -2372,8 +2456,8 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     break;
                 case 'string':
                     local.utility2.assert(typeof data === 'string' ||
-                        propertyDef.format === 'binary');
-                    switch (propertyDef.format) {
+                        propDef.format === 'binary');
+                    switch (propDef.format) {
                     // https://github.com/swagger-api/swagger-spec/issues/50
                     // Clarify 'byte' format #50
                     case 'byte':
@@ -2391,11 +2475,18 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         break;
                     }
                     break;
+                default:
+                    local.utility2.assert(
+                        propDef.type === undefined,
+                        prefix + ' has invalid type ' + propDef.type
+                    );
                 }
             }, function (error) {
-                error.message = error.message || 'invalid property ' + options.key + ' (' +
-                    (propertyDef.format || propertyDef.type) + ') - ' + JSON.stringify(data) +
-                    ' - ' + JSON.stringify(propertyDef);
+                error.message = error.message || prefix + ' is not a valid ' + propDef.type +
+                    (propDef.format
+                    ? ' (' + propDef.format + ')'
+                    : '');
+                error.options = options;
                 throw error;
             });
         };
@@ -2404,48 +2495,76 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         /*
          * this function will validate options.data against options.schema
          */
-            var data, key, schema;
+            var data, key, prefix, propDefDict, schema, tmp, validateByPropDef;
+            // recurse - validateByPropDef
+            local.swgg.validateByPropDef(options);
             local.utility2.tryCatchOnError(function () {
                 data = options.data;
-                // init circularList
-                if (data && typeof data === 'object') {
-                    options.circularList = options.circularList || [];
-                    if (options.circularList.indexOf(data) >= 0) {
-                        return;
-                    }
-                    options.circularList.push(data);
-                }
-                local.utility2.assert(data && typeof data === 'object', 'invalid data ' + data);
+                prefix = 'schema ' + options.key;
                 schema = options.schema;
                 // validate schema
                 local.utility2.assert(
                     schema && typeof schema === 'object',
-                    'invalid schema ' + schema
+                    prefix + ' must be an object (not ' + typeof schema + ')'
                 );
-                Object.keys(schema.properties || {}).forEach(function (_) {
-                    key = _;
+                // init propDefDict
+                propDefDict = schema.properties || {};
+                // validate data
+                local.utility2.assert(
+                    (data && typeof data === 'object') || !Object.keys(propDefDict).length,
+                    'data for ' + prefix + ' must be an object (not ' + typeof data + ')'
+                );
+                if (typeof data !== 'object') {
+                    return;
+                }
+                validateByPropDef = function (propDef) {
                     // remove options.dataReadonlyRemove[key]
-                    if (schema.properties[key].readOnly &&
-                            options.dataReadonlyRemove &&
-                            options.dataReadonlyRemove.hasOwnProperty(key)) {
+                    if (propDef.readOnly &&
+                            (options.dataReadonlyRemove || {}).hasOwnProperty(key)) {
                         delete options.dataReadonlyRemove[key];
                     }
-                    // recurse - validateByPropertyDef
-                    local.swgg.validateByPropertyDef({
+                    // recurse - validateByPropDef
+                    local.swgg.validateByPropDef({
                         circularList: options.circularList,
                         data: data[key],
-                        dataReadonlyRemove: options.dataReadonlyRemove &&
-                            options.dataReadonlyRemove[key],
-                        depth: options.depth - 1,
+                        dataReadonlyRemove: (options.dataReadonlyRemove || {})[key],
                         key: key,
-                        propertyDef: schema.properties[key],
+                        schema: propDef,
                         required: schema.required && schema.required.indexOf(key) >= 0,
                         'x-swgg-notRequired': options['x-swgg-notRequired']
                     });
+                };
+                Object.keys(propDefDict).forEach(function (_) {
+                    key = _;
+                    validateByPropDef(propDefDict[key]);
+                });
+                Object.keys(data).forEach(function (_) {
+                    key = _;
+                    if (propDefDict[key]) {
+                        return;
+                    }
+                    tmp = Object.keys(schema.patternProperties || {}).some(function (_) {
+                        if (new RegExp(_).test(key)) {
+                            validateByPropDef(schema.patternProperties[_]);
+                            return true;
+                        }
+                    });
+                    if (tmp) {
+                        return;
+                    }
+                    // https://tools.ietf.org/html/draft-fge-json-schema-validation-00
+                    // #section-5.4.4
+                    // validate additionalProperties
+                    local.utility2.assert(
+                        schema.additionalProperties !== false,
+                        prefix + ' must not have additionalProperties - ' + key
+                    );
+                    if (schema.additionalProperties) {
+                        validateByPropDef(schema.additionalProperties);
+                    }
                 });
             }, function (error) {
-                local.utility2.errorMessagePrepend(error, options.key + '.' + key +
-                    ' - ');
+                local.utility2.errorMessagePrepend(error, options.key + '.' + key + ' -> ');
                 throw error;
             });
         };
@@ -2454,29 +2573,44 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         /*
          * this function will validate the entire swagger json object
          */
-            local.swgg.tools.v2.validate(
-                options,
-                function (error, result) {
-                    // validate no error occurred
-                    local.utility2.assert(!error, error);
-                    ['errors', 'undefined', 'warnings'].forEach(function (errorType) {
-                        ((result && result[errorType]) || [
-                        ]).slice(0, 8).forEach(function (element) {
-                            if (options['x-swgg-validateUnusedDefinition'] === false &&
-                                    errorType === 'warnings' &&
-                                    (element && element.code) === 'UNUSED_DEFINITION') {
-                                return;
-                            }
-                            console.error('swagger schema - ' + errorType.slice(0, -1) + ' - ' +
-                                element.code + ' - ' + element.message + ' - ' +
-                                JSON.stringify(element.path));
-                        });
-                    });
-                    error = result && result.errors && result.errors[0];
-                    // validate no error occurred
-                    local.utility2.assert(!error, new Error(error && error.message));
+            var key, schema, tmp, validateDefault;
+            local.swgg.validateBySchema({
+                data: options,
+                key: 'swaggerJson',
+                schema: local.swgg.swaggerSchemaJson
+            });
+            // validate default
+            validateDefault = function () {
+                if (local.utility2.isNullOrUndefined(schema.default)) {
+                    return;
                 }
-            );
+                local.swgg.validateByPropDef({
+                    data: schema.default,
+                    key: key + '.default',
+                    schema: schema
+                });
+            };
+            Object.keys(options.definitions).forEach(function (schemaName) {
+                schema = options.definitions[schemaName];
+                key = schemaName;
+                validateDefault();
+                Object.keys(options.definitions[schemaName].properties || {
+                }).forEach(function (propName) {
+                    schema = options.definitions[schemaName].properties[propName];
+                    key = schemaName + '.' + propName;
+                    validateDefault();
+                });
+            });
+            Object.keys(options.paths).forEach(function (pathName) {
+                Object.keys(options.paths[pathName]).forEach(function (methodName) {
+                    tmp = options.paths[pathName][methodName];
+                    Object.keys(tmp.parameters).forEach(function (paramName) {
+                        schema = tmp.parameters[paramName];
+                        key = tmp.tags[0] + '.' + tmp.operationId + '.' + paramName;
+                        validateDefault();
+                    });
+                });
+            });
         };
     }());
     switch (local.modeJs) {
@@ -2501,17 +2635,18 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         local.fs = require('fs');
         local.path = require('path');
         local.url = require('url');
-        // init petstore-api
-        local.swgg.templateSwaggerJsonPetstore = JSON.parse(local.fs.readFileSync(
-            local.swgg.__dirname + '/lib.swagger.petstore.json',
-            'utf8'
-        ));
-        delete local.swgg.templateSwaggerJsonPetstore.basePath;
-        delete local.swgg.templateSwaggerJsonPetstore.host;
-        delete local.swgg.templateSwaggerJsonPetstore.schemes;
-        local.swgg.templateSwaggerJsonPetstore =
-            JSON.stringify(local.swgg.templateSwaggerJsonPetstore);
-        // init templateAssetsSwggAdminUiHtml
+        // https://petstore.swagger.io/v2/swagger.json
+        // init swaggerPetstoreJson
+        local.swgg.swaggerPetstoreJson =
+            local.utility2.jsonCopy(require('./lib.swagger.petstore.json'));
+        // https://json-schema.org/draft-04/schema
+        // https://swagger.io/v2/schema.json
+        // init swaggerSchemaJson
+        local.swgg.swaggerSchemaJson = local.utility2.objectSetOverride(
+            local.utility2.jsonCopy(require('./lib.json-schema.schema.json')),
+            local.utility2.jsonCopy(require('./lib.swagger.schema.json')),
+            2
+        );
         local.swgg.templateAssetsSwggAdminUiHtml =
             local.fs.readFileSync(__dirname + '/assets.swgg.admin-ui.html', 'utf8');
         // init assets
@@ -2686,32 +2821,6 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     file: 'external/assets.swgg.lib.moment.js',
                     url: 'https://raw.githubusercontent.com' +
                         '/moment/moment/2.11.2/min/moment.min.js'
-                // init lib swagger-tools
-                }, {
-                    file: 'external/assets.swgg.lib.swagger-tools.js',
-                    url: 'https://raw.githubusercontent.com/apigee-127' +
-                        '/swagger-tools/v0.9.14/browser/swagger-tools-standalone-min.js'
-                // init lib swagger-ui
-                }, {
-                    file: 'external/assets.swgg.swagger-ui.explorer_icons.png',
-                    url: 'https://raw.githubusercontent.com' +
-                        '/swagger-api/swagger-ui/v2.1.3/dist/images/explorer_icons.png'
-                }, {
-                    file: 'external/assets.swgg.swagger-ui.favicon-16x16.png',
-                    url: 'https://raw.githubusercontent.com' +
-                        '/swagger-api/swagger-ui/v2.1.3/dist/images/favicon-16x16.png'
-                }, {
-                    file: 'external/assets.swgg.swagger-ui.favicon-32x32.png',
-                    url: 'https://raw.githubusercontent.com' +
-                        '/swagger-api/swagger-ui/v2.1.3/dist/images/favicon-32x32.png'
-                }, {
-                    file: 'external/assets.swgg.swagger-ui.logo_small.png',
-                    url: 'https://raw.githubusercontent.com' +
-                        '/swagger-api/swagger-ui/v2.1.3/dist/images/logo_small.png'
-                }, {
-                    file: 'external/assets.swgg.swagger-ui.throbber.gif',
-                    url: 'https://raw.githubusercontent.com' +
-                        '/swagger-api/swagger-ui/v2.1.3/dist/images/throbber.gif'
                 }].forEach(function (options) {
                     console.log('fetching ' + options.url);
                     onParallel.counter += 1;
@@ -2740,6 +2849,14 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
 
     // run shared js-env code - post-init
     (function () {
+        // init assets
+        local.utility2.assetsDict['/assets.swgg.swagger-ui.logo_small.png'] =
+            local.utility2.bufferToNodeBuffer(
+                local.utility2.bufferCreate(
+                    local.swgg.templateSwaggerUiLogoSmallBase64,
+                    'base64'
+                )
+            );
         // init api
         local.swgg.apiDictUpdate({});
     }());

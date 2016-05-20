@@ -21,10 +21,9 @@
 /* jslint-ignore-begin */
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/main.handlebars
 local.swgg.templateUiMain = '\
-<form action="" class="eventDelegateSubmit header onEventReload tr">\n\
+<form class="header tr">\n\
     <a class="td1" href="http://swagger.io" target="_blank">swagger</a>\n\
-    <input class="td2" placeholder="http://petstore.swagger.io/v2/swagger.json" type="text" value="{{url}}"/>\n\
-    <input class="td3" type="submit" value="Explore">\n\
+    <input class="td2" placeholder="http://petstore.swagger.io/v2/swagger.json" readonly type="text" value="{{url}}"/>\n\
 </form>\n\
 <div class="info">\n\
     {{#if info}}\n\
@@ -128,20 +127,20 @@ local.swgg.templateUiParam = '\
 <span class="td2">{{#if type2}}{{type2}}{{#if format2}} ({{format2}}){{/if format2}}{{/if type2}}</span>\n\
 <span class="td3">\n\
     {{#if isTextarea}}\n\
-    <textarea placeholder="{{placeholder}}"></textarea>\n\
+    <textarea class="input" placeholder="{{placeholder}}"></textarea>\n\
     {{/if isTextarea}}\n\
     {{#if isFile}}\n\
-    <input type="file">\n\
+    <input class="input" type="file">\n\
     {{/if isFile}}\n\
     {{#if isSelect}}\n\
-    <select {{#if isSelectMultiple}}multiple{{/if isSelectMultiple}}>\n\
+    <select class="input" {{#if isSelectMultiple}}multiple{{/if isSelectMultiple}}>\n\
         {{#each selectOptionList}}\n\
         <option id={{id}} {{selected}}>{{valueEncoded htmlSafe}}</option>\n\
         {{/each selectOptionList}}\n\
     </select>\n\
     {{/if isSelect}}\n\
     {{#if isInputText}}\n\
-    <input placeholder="{{placeholder}}" type="text">\n\
+    <input class="input" placeholder="{{placeholder}}" type="text">\n\
     {{/if isInputText}}\n\
 </span>\n\
 <span class="td4">{{#if schemaText}}<pre>{{schemaText}}</pre>{{/if schemaText}}</span>\n\
@@ -193,7 +192,6 @@ local.swgg.templateUiResponseAjax = '\
         /*
          * this function will scrollTo the element
          */
-            window.element = element;
             var ii, timerInterval;
             ii = 0;
             timerInterval = setInterval(function () {
@@ -272,10 +270,6 @@ local.swgg.templateUiResponseAjax = '\
             });
         };
 
-        local.swgg.eventListenerDict['.onEventReload'] = function () {
-            local.swgg.uiReload();
-        };
-
         local.swgg.eventListenerDict['.onEventOperationAjax'] = function (event) {
             var modeNext, onNext, options, tmp;
             modeNext = 0;
@@ -293,69 +287,79 @@ local.swgg.templateUiResponseAjax = '\
                     options.paramDefList = options.api.parameters;
                     options.paramDict = {};
                     options.paramDefList.forEach(function (paramDef) {
-                        tmp = options.domOperationContent.querySelector(
-                            '.paramDef[name=' + paramDef.name + '] > .td3'
-                        ).children[0];
-                        switch (tmp.tagName) {
-                        case 'INPUT':
-                            tmp = tmp.type === 'file'
-                                ? tmp.files && tmp.files[0]
-                                : local.swgg.paramValueDecode(tmp, {
-                                    type: paramDef.type,
-                                    valueEncoded: tmp.value
-                                }).valueDecoded;
-                            break;
-                        case 'SELECT':
-                            tmp = Array.prototype.slice.call(tmp.options)
-                                .filter(function (element) {
-                                    return element.selected;
-                                })
-                                .map(function (element) {
-                                    return local.swgg.paramValueDecode(element, {
-                                        type: paramDef.type || paramDef.items.type,
-                                        valueEncoded: element.value
+                        local.utility2.tryCatchOnError(function () {
+                            tmp = options.domOperationContent.querySelector(
+                                '.paramDef[name=' + paramDef.name + '] > .td3'
+                            ).children[0];
+                            switch (tmp.tagName) {
+                            case 'INPUT':
+                                tmp = tmp.type === 'file'
+                                    ? tmp.files && tmp.files[0]
+                                    : local.swgg.paramValueDecode(tmp, {
+                                        type: paramDef.type,
+                                        valueEncoded: tmp.value
                                     }).valueDecoded;
-                                });
-                            if (!tmp.length || tmp[0] === undefined) {
-                                return;
+                                break;
+                            case 'SELECT':
+                                tmp = Array.prototype.slice.call(tmp.options)
+                                    .filter(function (element) {
+                                        return element.selected;
+                                    })
+                                    .map(function (element) {
+                                        return local.swgg.paramValueDecode(element, {
+                                            type: paramDef.type || paramDef.items.type,
+                                            valueEncoded: element.value
+                                        }).valueDecoded;
+                                    });
+                                if (!tmp.length || tmp[0] === undefined) {
+                                    return;
+                                }
+                                if (paramDef.type !== 'array') {
+                                    tmp = tmp[0];
+                                }
+                                break;
+                            case 'TEXTAREA':
+                                tmp = paramDef.in === 'body'
+                                    ? local.swgg.paramValueDecode(tmp, {
+                                        type: paramDef.type,
+                                        valueEncoded: tmp.value
+                                    }).valueDecoded
+                                    : !tmp.value
+                                    ? undefined
+                                    : tmp.value.split('\n').map(function (element) {
+                                        return local.swgg.paramValueDecode(null, {
+                                            type: paramDef.items.type,
+                                            valueEncoded: element
+                                        }).valueDecoded;
+                                    });
+                                break;
                             }
-                            if (paramDef.type !== 'array') {
-                                tmp = tmp[0];
-                            }
-                            break;
-                        case 'TEXTAREA':
-                            tmp = paramDef.in === 'body'
-                                ? local.swgg.paramValueDecode(tmp, {
-                                    type: paramDef.type,
-                                    valueEncoded: tmp.value
-                                }).valueDecoded
-                                : !tmp.value
-                                ? undefined
-                                : tmp.value.split('\n').map(function (element) {
-                                    return local.swgg.paramValueDecode(null, {
-                                        type: paramDef.items.type,
-                                        valueEncoded: element
-                                    }).valueDecoded;
-                                });
-                            break;
-                        }
-                        options.paramDict[paramDef.name] = tmp;
-                    });
-                    // remove previous error
-                    local.utility2.domQuerySelectorAll(
-                        options.domOperationContent,
-                        '.paramDef > .td3'
-                    ).forEach(function (element) {
-                        element.classList.remove('error');
+                            options.paramDict[paramDef.name] = tmp;
+                        }, function (error) {
+                            options.errorValidate = error;
+                            options.errorValidate.options = { key: paramDef.name };
+                            onNext(error);
+                        });
                     });
                     options.api(options, onNext);
                     break;
                 default:
+                    if (options.done) {
+                        return;
+                    }
+                    options.done = true;
+                    // remove previous error
+                    local.utility2.domQuerySelectorAll(
+                        options.domOperationContent,
+                        '.paramDef .input'
+                    ).forEach(function (element) {
+                        element.classList.remove('error');
+                    });
                     if (options.errorValidate) {
                         // shake input on Error
                         local.utility2.domQuerySelectorAll(
                             options.domOperationContent,
-                            '.paramDef > .td3'
+                            '.paramDef[name=' + options.errorValidate.options.key + '] .input'
                         ).forEach(function (element) {
                             element.classList.add('error');
                             local.swgg.domAnimateShake(element);
@@ -694,7 +698,7 @@ local.swgg.templateUiResponseAjax = '\
                 ].some(function (element) {
                     local.utility2.tryCatchOnError(function () {
                         paramDef.schema2 = paramDef.schema2 ||
-                            local.swgg.schemaDereference(element.$ref).properties;
+                            local.swgg.schemaNormalize(element).properties;
                     }, local.utility2.nop);
                     return paramDef.schema2;
                 });
@@ -837,7 +841,9 @@ local.swgg.templateUiResponseAjax = '\
             // save options
             input.dataset.swgg_param_value_options = encodeURIComponent(JSON.stringify({
                 type: options.type,
-                valueDecodedDefault: aa
+                valueDecodedDefault: aa === null || aa === ''
+                    ? aa
+                    : undefined
             }));
             if (local.utility2.isNullOrUndefined(aa)) {
                 bb = aa === null && options.type !== 'string'

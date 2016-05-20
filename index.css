@@ -115,6 +115,10 @@
 .swggUiContainer .resource:first-child {
     border-top: 0;
 }
+/* border-error*/
+.swggUiContainer .error {
+    border: 5px solid #b00;
+}
 
 
 

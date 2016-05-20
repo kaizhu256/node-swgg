@@ -16,6 +16,8 @@
 
     // run shared js-env code - pre-init
     (function () {
+        // init Error.stackTraceLimit
+        Error.stackTraceLimit = Infinity;
         // init local
         local = {};
         // init modeJs
@@ -540,142 +542,6 @@
             onNext();
         };
 
-        local.testCase_crudFileGetOneByKeyUnique_default = function (options, onError) {
-        /*
-         * this function will test crudFileGetOneByKeyUnique's default handling-behavior
-         */
-            var modeNext, onNext;
-            modeNext = 0;
-            onNext = function (error, data) {
-                local.utility2.tryCatchOnError(function () {
-                    modeNext += 1;
-                    switch (modeNext) {
-                    case 1:
-                        options = local.utility2.objectSetDefault(options || {}, {
-                            crudFileGetOneByKeyUnique:
-                                local.swgg.apiDict['file crudFileGetOneByKeyUnique.id'],
-                            operationId: 'undefined.id',
-                            keyValue: '00_test_crudFileGetOneByKeyUnique'
-                        });
-                        local.swgg.keyUniqueInit(options);
-                        // ajax - crudFileGetOneByKeyUnique
-                        options.crudFileGetOneByKeyUnique({
-                            paramDict: options.queryByKeyUnique
-                        }, onNext);
-                        break;
-                    case 2:
-                        // validate no error occurred
-                        local.utility2.assert(!error, error);
-                        // validate Content-Type
-                        options.data = data.getResponseHeader('content-type');
-                        local.utility2.assertJsonEqual(options.data, 'image/png');
-                        // validate response
-                        options.data = local.utility2.bufferToString(data.response, 'base64');
-                        local.utility2.assert(options.data ===
-                            local.swgg.templateSwaggerLogoSmallBase64, options.data);
-                        // test crudFileGetOneByKeyUnique's 404 handling-behavior
-                        local.swgg.apiDict['file crudFileGetOneByKeyUnique.id']({ paramDict: {
-                            id: local.utility2.uuidTimeCreate()
-                        } }, onNext);
-                        break;
-                    case 3:
-                        // validate error occurred
-                        local.utility2.assert(error, error);
-                        // validate statusCode
-                        local.utility2.assertJsonEqual(data.statusCode, 404);
-                        onNext();
-                        break;
-                    default:
-                        onError(error, data);
-                    }
-                }, onError);
-            };
-            onNext();
-        };
-
-        local.testCase_crudFileUploadManyByForm_default = function (options, onError) {
-        /*
-         * this function will test crudFileUploadManyByForm's default handling-behavior
-         */
-            var modeNext, onNext;
-            modeNext = 0;
-            onNext = function (error, data) {
-                local.utility2.tryCatchOnError(function () {
-                    // validate no error occurred
-                    local.utility2.assert(!error, [modeNext, error]);
-                    modeNext += 1;
-                    switch (modeNext) {
-                    case 1:
-                        options = {};
-                        options.blob = new local.utility2.Blob([local.utility2.bufferCreate(
-                            local.swgg.templateSwaggerLogoSmallBase64,
-                            'base64'
-                        )], { type: 'image/png' });
-                        options.blob.name = 'a00.png';
-                        // ajax - crudFileUploadManyByForm
-                        local.swgg.apiDict['file crudFileUploadManyByForm.2']({ paramDict: {
-                            fileDescription: 'hello',
-                            file1: options.blob,
-                            file2: options.blob,
-                            file3: options.blob
-                        } }, onNext);
-                        break;
-                    case 2:
-                        // validate data
-                        local.utility2.assertJsonEqual(data.responseJson.data.length, 2);
-                        local.utility2.assertJsonEqual(
-                            data.responseJson.data[0].fileDescription,
-                            'hello'
-                        );
-                        // init queryByKeyUnique
-                        options.keyValue = data.responseJson.data[0].id;
-                        options.operationId = 'undefined.id';
-                        local.swgg.keyUniqueInit(options);
-                        // test crudFileGetOneByKeyUnique's default handling-behavior
-                        local.testCase_crudFileGetOneByKeyUnique_default(options, onNext);
-                        break;
-                    case 3:
-                        // test crudDeleteOneByKeyUnique's default handling-behavior
-                        local.testCase_crudDeleteOneByKeyUnique_default(options, onNext);
-                        break;
-                    default:
-                        onError(error);
-                    }
-                }, onError);
-            };
-            onNext();
-        };
-
-        local.testCase_crudFileUploadManyByForm_nullCase = function (options, onError) {
-        /*
-         * this function will test crudFileUploadManyByForm's null-case handling-behavior
-         */
-            var modeNext, onNext;
-            modeNext = 0;
-            onNext = function (error, data) {
-                local.utility2.tryCatchOnError(function () {
-                    // validate no error occurred
-                    local.utility2.assert(!error, [modeNext, error]);
-                    modeNext += 1;
-                    switch (modeNext) {
-                    case 1:
-                        options = {};
-                        // ajax - crudFileUploadManyByForm
-                        local.swgg.apiDict['file crudFileUploadManyByForm.2'](options, onNext);
-                        break;
-                    case 2:
-                        // validate data
-                        local.utility2.assertJsonEqual(data.responseJson.data.length, 0);
-                        onNext();
-                        break;
-                    default:
-                        onError(error);
-                    }
-                }, onError);
-            };
-            onNext();
-        };
-
         local.testCase_crudGetManyByQuery_default = function (options, onError) {
         /*
          * this function will test crudGetManyByQuery's default handling-behavior
@@ -887,6 +753,143 @@
                         break;
                     default:
                         onError(error, data);
+                    }
+                }, onError);
+            };
+            onNext();
+        };
+
+        local.testCase_fileGetOneByKeyUnique_default = function (options, onError) {
+        /*
+         * this function will test fileGetOneByKeyUnique's default handling-behavior
+         */
+            var modeNext, onNext;
+            modeNext = 0;
+            onNext = function (error, data) {
+                local.utility2.tryCatchOnError(function () {
+                    modeNext += 1;
+                    switch (modeNext) {
+                    case 1:
+                        options = local.utility2.objectSetDefault(options || {}, {
+                            fileGetOneByKeyUnique:
+                                local.swgg.apiDict['file fileGetOneByKeyUnique.id'],
+                            operationId: 'undefined.id',
+                            keyValue: '00_test_fileGetOneByKeyUnique'
+                        });
+                        local.swgg.keyUniqueInit(options);
+                        // ajax - fileGetOneByKeyUnique
+                        options.fileGetOneByKeyUnique({
+                            paramDict: options.queryByKeyUnique
+                        }, onNext);
+                        break;
+                    case 2:
+                        // validate no error occurred
+                        local.utility2.assert(!error, error);
+                        // validate Content-Type
+                        options.data = data.getResponseHeader('content-type');
+                        local.utility2.assertJsonEqual(options.data, 'image/png');
+                        // validate response
+                        options.data = local.utility2.bufferToString(data.response, 'base64');
+                        local.utility2.assert(options.data ===
+                            local.swgg.templateSwaggerUiLogoSmallBase64, options.data);
+                        // test fileGetOneByKeyUnique's 404 handling-behavior
+                        local.swgg.apiDict['file fileGetOneByKeyUnique.id']({ paramDict: {
+                            id: local.utility2.uuidTimeCreate()
+                        } }, onNext);
+                        break;
+                    case 3:
+                        // validate error occurred
+                        local.utility2.assert(error, error);
+                        // validate statusCode
+                        local.utility2.assertJsonEqual(data.statusCode, 404);
+                        onNext();
+                        break;
+                    default:
+                        onError(error, data);
+                    }
+                }, onError);
+            };
+            onNext();
+        };
+
+        local.testCase_fileUploadManyByForm_default = function (options, onError) {
+        /*
+         * this function will test fileUploadManyByForm's default handling-behavior
+         */
+            var modeNext, onNext;
+            modeNext = 0;
+            onNext = function (error, data) {
+                local.utility2.tryCatchOnError(function () {
+                    // validate no error occurred
+                    local.utility2.assert(!error, [modeNext, error]);
+                    modeNext += 1;
+                    switch (modeNext) {
+                    case 1:
+                        options = {};
+                        options.blob = new local.utility2.Blob([
+                            local.utility2.assetsDict[
+                                '/assets.swgg.swagger-ui.logo_small.png'
+                            ]
+                        ], { type: 'image/png' });
+                        options.blob.name = 'a00.png';
+                        // ajax - fileUploadManyByForm
+                        local.swgg.apiDict['file fileUploadManyByForm.2']({ paramDict: {
+                            fileDescription: 'hello',
+                            file1: options.blob,
+                            file2: options.blob,
+                            file3: options.blob
+                        } }, onNext);
+                        break;
+                    case 2:
+                        // validate data
+                        local.utility2.assertJsonEqual(data.responseJson.data.length, 2);
+                        local.utility2.assertJsonEqual(
+                            data.responseJson.data[0].fileDescription,
+                            'hello'
+                        );
+                        // init queryByKeyUnique
+                        options.keyValue = data.responseJson.data[0].id;
+                        options.operationId = 'undefined.id';
+                        local.swgg.keyUniqueInit(options);
+                        // test fileGetOneByKeyUnique's default handling-behavior
+                        local.testCase_fileGetOneByKeyUnique_default(options, onNext);
+                        break;
+                    case 3:
+                        // test crudDeleteOneByKeyUnique's default handling-behavior
+                        local.testCase_crudDeleteOneByKeyUnique_default(options, onNext);
+                        break;
+                    default:
+                        onError(error);
+                    }
+                }, onError);
+            };
+            onNext();
+        };
+
+        local.testCase_fileUploadManyByForm_nullCase = function (options, onError) {
+        /*
+         * this function will test fileUploadManyByForm's null-case handling-behavior
+         */
+            var modeNext, onNext;
+            modeNext = 0;
+            onNext = function (error, data) {
+                local.utility2.tryCatchOnError(function () {
+                    // validate no error occurred
+                    local.utility2.assert(!error, [modeNext, error]);
+                    modeNext += 1;
+                    switch (modeNext) {
+                    case 1:
+                        options = {};
+                        // ajax - fileUploadManyByForm
+                        local.swgg.apiDict['file fileUploadManyByForm.2'](options, onNext);
+                        break;
+                    case 2:
+                        // validate data
+                        local.utility2.assertJsonEqual(data.responseJson.data.length, 0);
+                        onNext();
+                        break;
+                    default:
+                        onError(error);
                     }
                 }, onError);
             };
@@ -1129,7 +1132,7 @@
                         local.utility2.assertJsonEqual(data.statusCode, 401);
                         // test userLoginByPassword's 400 handling-behavior
                         local.utility2.ajax({
-                            url: '/api/v0/user/crudUserLoginByPassword?password=1'
+                            url: '/api/v0/user/userLoginByPassword?password=1'
                         }, onNext);
                         break;
                     case 8:
@@ -1306,21 +1309,14 @@
                 { key: 'propObjectSubdoc', value: {} },
                 { key: 'propRequired', value: true },
                 { key: 'propString', value: 'hello' },
-                { key: 'propString2', value: 'hello' },
+                { key: 'propString2', value: 'hello_0123456789_0123456789' },
                 { key: 'propStringBinary', value: '\u1234' },
                 { key: 'propStringByte', value:
                     local.utility2.stringToBase64(local.utility2.stringAsciiCharset) },
                 { key: 'propStringDate', value: '1971-01-01' },
                 { key: 'propStringDatetime', value: '1971-01-01T00:00:00Z' },
                 { key: 'propStringEmail', value: 'a@a.com' },
-                { key: 'propStringJson', value: 'true' },
-                { key: 'propUndefined', value: '' },
-                { key: 'propUndefined', value: 0 },
-                { key: 'propUndefined', value: false },
-                { key: 'propUndefined', value: null },
-                { key: 'propUndefined', value: true },
-                { key: 'propUndefined', value: undefined },
-                { key: 'propUndefined', value: {} }
+                { key: 'propStringJson', value: 'true' }
             ].forEach(function (element) {
                 element.data = local.utility2.jsonCopy(options.data);
                 element.data[element.key] = element.value;
@@ -1338,9 +1334,6 @@
         /*
          * this function will test validateBySchema's error handling-behavior
          */
-            var onParallel;
-            onParallel = local.utility2.onParallel(onError);
-            onParallel.counter += 1;
             options = {
                 data: { propRequired: true },
                 schema: local.swgg.swaggerJson.definitions.TestCrud
@@ -1379,20 +1372,18 @@
                 { key: 'propObject', value: true },
                 { key: 'propObject2', value: {} },
                 { key: 'propObject2', value: { aa: 1, bb: 2 } },
-                { key: 'propObjectSubdoc', value: 'non-object' },
                 { key: 'propRequired', value: null },
                 { key: 'propRequired', value: undefined },
                 { key: 'propString', value: true },
                 { key: 'propString2', value: '' },
                 { key: 'propString2', value: '!' },
-                { key: 'propString2', value: '01234567890123456789' },
+                { key: 'propString2', value: local.utility2.stringAsciiCharset },
                 { key: 'propStringByte', value: local.utility2.stringAsciiCharset },
                 { key: 'propStringDate', value: 'null' },
                 { key: 'propStringDatetime', value: 'null' },
                 { key: 'propStringEmail', value: 'null' },
                 { key: 'propStringJson', value: 'syntax error' }
             ].forEach(function (element) {
-                onParallel.counter += 1;
                 local.utility2.tryCatchOnError(function () {
                     if (element.data === undefined) {
                         element.data = local.utility2.jsonCopy(options.data);
@@ -1400,35 +1391,94 @@
                     }
                     element.schema = options.schema;
                     local.swgg.validateBySchema(element);
-                }, function (error) {
-                    // validate error occurred
-                    local.utility2.assert(error, element);
-                    onParallel();
-                });
+                }, local.utility2.nop);
+                // validate error occurred
+                local.utility2.assert(local.utility2.tryCatchErrorCaught, element.data);
             });
-            onParallel();
+            onError();
         };
-
         local.testCase_validateBySwagger_default = function (options, onError) {
         /*
          * this function will test validateBySwagger's default handling-behavior
          */
             options = {};
-            local.utility2.testMock([
-                // suppress console.error
-                [console, { error: local.utility2.nop }]
-            ], function (onError) {
-                [null, {}].forEach(function (element) {
-                    local.utility2.tryCatchOnError(function () {
-                        local.swgg.validateBySwagger(element);
-                    }, function (error) {
-                        options.data = error;
-                    });
-                    // validate error occurred
-                    local.utility2.assert(options.data, options.data);
-                });
-                onError();
-            }, onError);
+            // test null-case handling-behavior
+            [null, undefined, {}].forEach(function (element) {
+                local.utility2.tryCatchOnError(function () {
+                    local.swgg.validateBySwagger(element);
+                }, local.utility2.nop);
+                // validate error occurred
+                local.utility2.assert(local.utility2.tryCatchErrorCaught, element);
+            });
+            options.templateData = JSON.stringify({
+                definitions: {
+                    Test: {
+                        // https://github.com/OAI/OpenAPI-Specification/blob/master/versions
+                        // /2.0.md#schema-object
+                        $ref: '#/definitions/definitions',
+                        additionalProperties: true,
+                        allOf: [null],
+                        default: {},
+                        description: 'hello',
+                        format: 'undefined',
+                        exclusiveMaximum: true,
+                        exclusiveMinimum: true,
+                        items: {},
+                        maxItems: 100,
+                        maxProperties: 100,
+                        maximum: 100,
+                        minItems: 0,
+                        minProperties: 0,
+                        minimum: -100,
+                        multipleOf: 1,
+                        pattern: 'undefined',
+                        properties: {},
+                        required: [null],
+                        title: 'hello',
+                        type: 'object',
+                        uniqueItems: true
+                    }
+                },
+                info: { title: '', version: '' },
+                paths: {},
+                swagger: '2.0'
+            });
+            // validate templateData
+            // test error handling-behavior
+            local.swgg.validateBySwagger(JSON.parse(options.templateData));
+            [
+                { propUndefined: {} },
+                { definitions: { Test: { $ref: true } } },
+                { definitions: { Test: { allOf: [] } } },
+                { definitions: { Test: { description: true } } },
+                { definitions: { Test: { format: true } } },
+                { definitions: { Test: { exclusiveMaximum: 1 } } },
+                { definitions: { Test: { exclusiveMinimum: 1 } } },
+                { definitions: { Test: { items: true } } },
+                { definitions: { Test: { maxItems: true } } },
+                { definitions: { Test: { maxProperties: true } } },
+                { definitions: { Test: { maximum: true } } },
+                { definitions: { Test: { minItems: -1 } } },
+                { definitions: { Test: { minProperties: -1 } } },
+                { definitions: { Test: { minimum: true } } },
+                { definitions: { Test: { multipleOf: true } } },
+                { definitions: { Test: { pattern: true } } },
+                { definitions: { Test: { properties: true } } },
+                { definitions: { Test: { required: [] } } },
+                { definitions: { Test: { title: true } } },
+                { definitions: { Test: { type: true } } },
+                { definitions: { Test: { uniqueItems: 'undefined' } } }
+            ].forEach(function (element) {
+                local.utility2.tryCatchOnError(function () {
+                    local.swgg.validateBySwagger(local.utility2.objectSetOverride(
+                        JSON.parse(options.templateData),
+                        element
+                    ), 10);
+                }, local.utility2.nop);
+                // validate error occurred
+                local.utility2.assert(local.utility2.tryCatchErrorCaught, element);
+            });
+            onError();
         };
     }());
     switch (local.modeJs) {
@@ -1589,11 +1639,9 @@
                 },
                 // init File schema
                 File: {
-                    _pathObjectDefaultList: [
-                        'crudFileUploadManyByForm.2'
-                    ],
+                    _pathObjectDefaultList: ['fileUploadManyByForm.2'],
                     _pathPrefix: 'file',
-                    'x-swgg-inherit': { $ref: '#/definitions/BuiltinFile' }
+                    allOf: [{ $ref: '#/definitions/BuiltinFile' }]
                 },
                 // init TestCrud schema
                 TestCrud: {
@@ -1645,11 +1693,6 @@
                             items: { $ref: '#/definitions/TestCrud' },
                             type: 'array'
                         },
-                        propArraySubdocFile: {
-                            items: { $ref: '#/definitions/BuiltinFile' },
-                            type: 'array',
-                            'x-swgg-fileUpload': true
-                        },
                         propBoolean: { type: 'boolean' },
                         propEnum: { enum: [0, 1], type: 'integer' },
                         propInteger: { type: 'integer' },
@@ -1693,11 +1736,11 @@
                         },
                         // test null-schema-validation handling-behavior
                         propObjectSubdoc: { $ref: '#/definitions/TestNull' },
-                        propRequired: { default: true },
+                        propRequired: { default: true, type: 'boolean' },
                         propString: { type: 'string' },
                         propString2: {
-                            maxLength: 10,
-                            minLength: 1,
+                            maxLength: 50,
+                            minLength: 20,
                             pattern: '^\\w*$',
                             type: 'string'
                         },
@@ -1709,15 +1752,9 @@
                             { default: 'a@a.com', format: 'email', type: 'string' },
                         propStringJson: { default: 'null', format: 'json', type: 'string' },
                         propStringUnique: { type: 'string' },
-                        propUndefined: {},
-                        propObjectSubdocFile: {
-                            $ref: '#/definitions/BuiltinFile',
-                            'x-swgg-fileUpload': true
-                        },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
                     },
-                    required: ['propRequired'],
-                    'x-swgg-inherit': { $ref: '#/definitions/BuiltinFile' }
+                    required: ['propRequired']
                 },
                 // init TestNull schema
                 TestNull: {}
@@ -1892,13 +1929,6 @@
                 local.utility2.middlewareFileServer(request, response, nextMiddleware);
             }
         });
-        // init serverLocal
-        local.utility2.serverLocalUrlTest = function (url) {
-            url = local.utility2.urlParse(url).pathname;
-            return local.modeJs === 'browser' &&
-                url.indexOf('/api/v0/swagger.json') < 0 &&
-                (/\/api\/v0\/|\/test\./).test(url);
-        };
         // init collectionList-fixtures
         local.utility2.onReady.counter += 1;
         local.swgg.collectionListInit([{
@@ -1951,8 +1981,8 @@
             removeIndexList: ['undefined']
         }, {
             collectDocList: [{
-                id: '00_test_crudFileGetOneByKeyUnique',
-                fileBlob: local.swgg.templateSwaggerLogoSmallBase64,
+                id: '00_test_fileGetOneByKeyUnique',
+                fileBlob: local.swgg.templateSwaggerUiLogoSmallBase64,
                 fileContentType: 'image/png',
                 propRequired: true
             }],
@@ -2008,11 +2038,13 @@
                 'swagger-lite'
             );
         // run validation test
-        local.testCase_validateByParamDefList_default(null, local.utility2.onErrorDefault);
-        local.testCase_validateByParamDefList_error(null, local.utility2.onErrorDefault);
-        local.testCase_validateBySchema_default(null, local.utility2.onErrorDefault);
-        local.testCase_validateBySchema_error(null, local.utility2.onErrorDefault);
-        local.testCase_validateBySwagger_default(null, local.utility2.onErrorDefault);
+        local.utility2.tryCatchOnError(function () {
+            local.testCase_validateByParamDefList_default(null, local.utility2.onErrorDefault);
+            local.testCase_validateByParamDefList_error(null, local.utility2.onErrorDefault);
+            local.testCase_validateBySchema_default(null, local.utility2.onErrorDefault);
+            local.testCase_validateBySchema_error(null, local.utility2.onErrorDefault);
+            local.testCase_validateBySwagger_default(null, local.utility2.onErrorDefault);
+        }, local.utility2.onErrorDefault);
         // debug dir
         [
             local.utility2.__dirname,

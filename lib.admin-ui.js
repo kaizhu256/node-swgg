@@ -417,10 +417,10 @@
             local.utility2.tryCatchOnError(function () {
                 local.jQuery(elementContainer).find('.form-control')
                     .removeClass('dtFormInputInvalid');
-                local.swgg.validateByPropertyDef({
+                local.swgg.validateByPropDef({
                     data: options.dataRead,
                     key: local.swgg.dt.schemaName,
-                    propertyDef: options,
+                    propDef: options,
                     required: options.required,
                     'x-swgg-notRequired': options['x-swgg-notRequired']
                 });
