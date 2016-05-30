@@ -83,11 +83,9 @@
          * this function will test ajax's error handling-behavior
          */
             var onParallel;
-            // jslint-hack
-            local.utility2.nop(options);
             onParallel = local.utility2.onParallel(onError);
             onParallel.counter += 1;
-            [{
+            options = [{
                 method: 'POST',
                 // test 400 param-parse-error handling-behavior
                 statusCode: 400,
@@ -104,7 +102,8 @@
                 // test 404 undefined-map-file handling-behavior
                 statusCode: 404,
                 url: '/api/v0/_test/undefined.map'
-            }].forEach(function (options) {
+            }];
+            options.forEach(function (options) {
                 onParallel.counter += 1;
                 local.utility2.ajax(options, function (error, xhr) {
                     local.utility2.tryCatchOnError(function () {
@@ -149,7 +148,7 @@
                         local.swgg.keyUniqueInit(options);
                         // ajax - crudCountManyByQuery
                         options.crudCountManyByQuery({
-                            paramDict: { _queryQuery: JSON.stringify(options.queryByKeyUnique) }
+                            paramDict: { _queryWhere: JSON.stringify(options.queryByKeyUnique) }
                         }, onNext);
                         break;
                     case 2:
@@ -402,7 +401,7 @@
                         local.swgg.keyUniqueInit(options);
                         // ajax - crudDeleteManyByQuery
                         options.crudDeleteManyByQuery({
-                            paramDict: { _queryQuery: JSON.stringify(options.queryByKeyUnique) }
+                            paramDict: { _queryWhere: JSON.stringify(options.queryByKeyUnique) }
                         }, onNext);
                         break;
                     case 2:
@@ -563,7 +562,7 @@
                         local.swgg.keyUniqueInit(options);
                         // ajax - crudGetManyByQuery
                         options.crudGetManyByQuery({
-                            paramDict: { _queryQuery: JSON.stringify(options.queryByKeyUnique) }
+                            paramDict: { _queryWhere: JSON.stringify(options.queryByKeyUnique) }
                         }, onNext);
                         break;
                     case 2:
@@ -652,7 +651,7 @@
                         local.swgg.keyUniqueInit(options);
                         // ajax - crudGetOneByQuery
                         options.crudGetOneByQuery({
-                            paramDict: { _queryQuery: JSON.stringify(options.queryByKeyUnique) }
+                            paramDict: { _queryWhere: JSON.stringify(options.queryByKeyUnique) }
                         }, onNext);
                         break;
                     case 2:
@@ -1181,6 +1180,8 @@
                 paramEnumSingle: 0,
                 // test header-param handling-behavior
                 paramHeader: 'hello header',
+                // test integer-param handling-behavior
+                paramInteger: 0,
                 // test json-param handling-behavior
                 paramJson: '"hello json"',
                 // test path-param handling-behavior
@@ -1201,6 +1202,7 @@
                         paramEnumMultiple: [0, 1],
                         paramEnumSingle: 0,
                         paramHeader: 'hello header',
+                        paramInteger: 0,
                         paramJson: '"hello json"',
                         paramPath: 'hello path',
                         paramRequired: 'hello required'
@@ -1240,6 +1242,7 @@
                 { key: 'paramArray', value: true },
                 { key: 'paramEnumSingle', value: true },
                 { key: 'paramHeader', value: true },
+                { key: 'paramInteger', value: true },
                 { key: 'paramJson', value: true },
                 { key: 'paramOptional', value: true },
                 { key: 'paramPath', value: true },
@@ -1493,38 +1496,97 @@
          */
             options = {};
             options.element = document.querySelector('div');
-            local.swgg.domAnimateShake(options.element);
+            local.swgg.uiAnimateShake(options.element);
             setTimeout(onError, 1500);
         };
 
-        /* istanbul ignore next */
         local.testCase_ui_default = function (options, onError) {
         /*
          * this function will test the ui's default handling-behavior
          */
+            var onParallel;
             options = {};
-            options.onParallel = local.utility2.onParallel(onError);
-            options.onParallel.counter += 1;
-            Object.keys(local.swgg.eventListenerDict).sort().forEach(function (selector) {
+            onParallel = local.utility2.onParallel(function (error) {
+                setTimeout(function () {
+                    // hide onEventModalHide's default handling-behavior
+                    local.swgg.uiElementClick({
+                        target: document.querySelector('.onEventModalHide')
+                    });
+                }, 500);
+                onError(error);
+            });
+            onParallel.counter += 1;
+            Object.keys(local.swgg.uiEventListenerDict).sort().forEach(function (selector) {
                 local.utility2.domQuerySelectorAll(
                     document,
                     selector
                 ).forEach(function (element, ii, list) {
                     [null, null].forEach(function () {
-                        options.onParallel.counter += 1;
+                        onParallel.counter += 1;
                         setTimeout(function () {
-                            options.onParallel();
-                            local.swgg.eventDelegate({
-                                currentTarget: element.closest('.eventDelegateClick'),
-                                preventDefault: local.utility2.nop,
-                                stopPropagation: local.utility2.nop,
-                                target: element
-                            });
+                            local.swgg.uiElementClick({ target: element });
+                            onParallel();
                         }, ii * 1000 / list.length);
                     });
                 });
             });
-            options.onParallel();
+            // test onEventModalHide's null-case handling-behavior
+            options = {
+                target: document.querySelector('.onEventModalHide').children[0]
+            };
+            local.swgg.uiElementClick(options);
+            // test onEventOperationAjax's error handling-behavior
+            document.querySelector('#swgg_id_paramInteger .input').value = 'syntax error';
+            options = {
+                target: document.querySelector('#swgg_id_paramDefault .onEventOperationAjax')
+            };
+            local.swgg.uiElementClick(options);
+            onParallel();
+        };
+
+        local.testCase_ui_fileMedia = function (options, onError) {
+        /*
+         * this function will test the ui's file-media handling-behavior
+         */
+            options = [
+                '00_test_fileMediaAudioNull',
+                '00_test_fileMediaImageNull',
+                '00_test_fileMediaVideoNull'
+            ];
+            options.forEach(function (id) {
+                document.querySelector('#swgg_id_fileGetOneByKeyUnique_id .input').value = id;
+                local.swgg.uiElementClick({
+                    target: document.querySelector(
+                        '#swgg_id_fileGetOneByKeyUnique_id .onEventOperationAjax'
+                    )
+                });
+            });
+            onError();
+        };
+
+        local.testCase_uiScrollTo = function (options, onError) {
+        /*
+         * this function will test the uiScrollTo's default handling-behavior
+         */
+            options = [
+                [location, {
+                    hash: ''
+                }]
+            ];
+            local.utility2.testMock(options, function (onError) {
+                [
+                    '',
+                    '#!/swgg_id_pet',
+                    '#!/swgg_id_pet/undefined',
+                    '#!/swgg_id_pet/undefined/undefined',
+                    '#!/swgg_id_pet/swgg_datatable',
+                    '#!/swgg_id_pet/swgg_id_addPet'
+                ].forEach(function (hash) {
+                    location.hash = hash;
+                    local.swgg.uiScrollTo();
+                });
+                onError();
+            }, onError);
         };
         break;
 
@@ -1537,11 +1599,9 @@
          * this function will test build's asset handling-behavior
          */
             var onParallel;
-            // jslint-hack
-            local.utility2.nop(options);
             onParallel = local.utility2.onParallel(onError);
             onParallel.counter += 1;
-            [{
+            options = [{
                 file: '/index.html',
                 url: '/'
             }, {
@@ -1569,6 +1629,9 @@
                 file: '/assets.swgg.lib.swagger-ui.js',
                 url: '/assets.swgg.lib.swagger-ui.js'
             }, {
+                file: '/assets.swgg.swagger-ui.logo_small.png',
+                url: '/assets.swgg.swagger-ui.logo_small.png'
+            }, {
                 file: '/assets.test.js',
                 url: '/assets.test.js'
             }, {
@@ -1579,11 +1642,12 @@
                 url: '/assets.utility2.rollup.js'
             }, {
                 file: '/jsonp.swgg.stateInit.js',
-                url: '/jsonp.swgg.stateInit.js'
+                url: '/jsonp.swgg.stateInit.js?callback=window.swgg.stateInit'
             }, {
                 file: '/swagger-ui.html',
                 url: '/swagger-ui.html'
-            }].forEach(function (options) {
+            }];
+            options.forEach(function (options) {
                 onParallel.counter += 1;
                 local.utility2.ajax(options, function (error, xhr) {
                     // validate no error occurred
@@ -1811,6 +1875,8 @@
                         type: 'boolean'
                     }, {
                         // test enum-multiple-param handling-behavior
+                        // coverage-hack - test default multi-select handling-behavio
+                        default: [0],
                         description: 'enum-multiple-param',
                         enum: [null, 0, 1, 2, 3, 4],
                         in: 'query',
@@ -1830,6 +1896,12 @@
                         in: 'header',
                         name: 'paramHeader',
                         type: 'string'
+                    }, {
+                        // test integer-param handling-behavior
+                        description: 'integer-param',
+                        in: 'query',
+                        name: 'paramInteger',
+                        type: 'integer'
                     }, {
                         // test json-param handling-behavior
                         description: 'json-param',
@@ -1897,7 +1969,19 @@
             tags: [{
                 name: '_test',
                 description: 'internal test-api'
-            }]
+            }],
+            'x-swgg-datatableDict': {
+                _test: {
+                    crudCreateOrReplaceOneByKeyUnique:
+                        '_test crudCreateOrReplaceOneByKeyUnique.id',
+                    crudDeleteOneByKeyUnique:
+                        '_test crudDeleteOneByKeyUnique.id',
+                    crudGetManyByQuery: '_test crudGetManyByQuery',
+                    keyUnique: 'id',
+                    queryLimit: 20,
+                    schema: { $ref: '#/definitions/TestCrud' }
+                }
+            }
         });
         // test redundant http-body-parse-middleware handling-behavior
         local.middleware.middlewareList.push(local.swgg.middlewareBodyParse);
@@ -1930,7 +2014,7 @@
             }
         });
         // init collectionList-fixtures
-        local.utility2.onReady.counter += 1;
+        local.utility2.onReadyBefore.counter += 1;
         local.swgg.collectionListInit([{
             collectDocList: local.swgg.collectDocListRandomCreate({
                 collectDocList: [{
@@ -1985,9 +2069,27 @@
                 fileBlob: local.swgg.templateSwaggerUiLogoSmallBase64,
                 fileContentType: 'image/png',
                 propRequired: true
+            }, {
+                id: '00_test_fileMediaAudioNull',
+                fileBlob: '',
+                fileContentType: 'audio/wav',
+                fileDescription: 'null audio file',
+                fileFilename: '00_test_fileMediaAudioNull.wav'
+            }, {
+                id: '00_test_fileMediaImageNull',
+                fileBlob: '',
+                fileContentType: 'image/bmp',
+                fileDescription: 'null image file',
+                fileFilename: '00_test_fileMediaImageNull.wav'
+            }, {
+                id: '00_test_fileMediaVideoNull',
+                fileBlob: '',
+                fileContentType: 'video/mpeg',
+                fileDescription: 'null video file',
+                fileFilename: '00_test_fileMediaVideoNull.mpg'
             }],
             name: 'File'
-        }], local.utility2.onReady);
+        }], local.utility2.onReadyBefore);
         local.swgg.collectionListInit([{
             // test error handling-behavior
             error: local.utility2.errorDefault
@@ -1999,19 +2101,6 @@
 
     // run node js-env code - post-init
     case 'node':
-        // init dtList
-        local.swgg.apiDictUpdate({ 'x-swgg-dtList': [{
-            apiDict: {
-                crudCreateOne: '_test crudCreateOrReplaceOneByKeyUnique',
-                'crudDeleteOneByKeyUnique.id': '_test crudDeleteOneByKeyUnique.id',
-                crudGetManyByQuery: '_test crudGetManyByQuery',
-                'crudUpdateOneByKeyUnique.id': '_test crudUpdateOneByKeyUnique.id'
-            },
-            paginationCountTotal: 'paginationCountTotal',
-            schemaName: 'TestCrud',
-            title: 'test api',
-            urlSwaggerJson: 'api/v0/swagger.json'
-        }].concat(JSON.parse(local.swgg.templateDtListPetstore)) });
         // init assets
         local.utility2.assetsDict['/'] = local.utility2.templateRender(
             local.utility2.templateIndexHtml,

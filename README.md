@@ -9,32 +9,21 @@ this package will run a virtual swagger-ui server with persistent storage in the
 # documentation
 #### todo
 - add notification system
-- force empty string to be null
-- force empty array to be null
 - add post-crud-middleware for pet photoUrl
 - merge admin-ui into swagger-ui
 - rename collectDoc to something better
 - change api crudCreateOrReplaceMany to crudCreateOrReplaceManyByKeyUnique
-- fix missing param error-message in 400 validation-error
 - add api userPasswordChange
 - add message-param to assertions in swgg.validateByPropDef
-- ui - display operationId for endpoints
 - add logging feature
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 95d7c357
-- npm publish 2016.4.2
-- replace swagger-tools dependency with function swgg.validateBySwagger
-- validation - validate schema.default
-- validation - validate schema.anyOf
-- validation - replace x-swgg-inherit with schema.allOf
-- rename operation crudFile* to file*
-- rename operation crudUser* to user*
-- add file lib.swagger.schema.json from http://swagger.io/v2/schema.json
-- add extra constraints to function swgg.collectDocListRandomCreate
-- ui - input element's valueEncoded can only be '', null, or undefined
-- replace function swgg.schemaDereference with swgg.schemaNormalize
+#### change since 1bdc477b
+- npm publish 2016.4.3
+- datatable - add datatable resource-view
+- datatable - add pagination
+- datatable - add row deletion
 - none
 
 #### this package requires
@@ -314,21 +303,23 @@ body > div {\n\
     <div class="swggUiContainer">\n\
     <form class="header tr">\n\
         <a class="td1" href="http://swagger.io" target="_blank">swagger</a>\n\
-        <input class="td2" placeholder="http://petstore.swagger.io/v2/swagger.json" readonly type="text" value="api/v0/swagger.json"/>\n\
+        <input class="flex1 td2" placeholder="http://petstore.swagger.io/v2/swagger.json" readonly type="text" value="api/v0/swagger.json"/>\n\
     </form>\n\
     </div>\n\
-<script src="assets.swgg.lib.nedb.js"></script>\n\
 <script src="assets.utility2.rollup.js"></script>\n\
+<script src="assets.swgg.lib.nedb.js"></script>\n\
 <script src="assets.swgg.js"></script>\n\
 <script src="assets.swgg.lib.swagger-ui.js"></script>\n\
-<script src="jsonp.swgg.stateInit.js"></script>\n\
+<script src="jsonp.swgg.stateInit.js?callback=window.swgg.stateInit"></script>\n\
 {{scriptExtra}}\n\
-<script>(function () {\n\
+<script>\n\
+(function () {\n\
 window.utility2.envDict.npm_package_description = "{{envDict.npm_package_description}}";\n\
 window.utility2.envDict.npm_package_name = "{{envDict.npm_package_name}}";\n\
 window.utility2.envDict.npm_package_version = "{{envDict.npm_package_version}};"\n\
-window.swgg.uiReload();\n\
-}());</script>\n\
+window.swgg.uiRender();\n\
+}());\n\
+</script>\n\
 </body>\n\
 </html>\n\
 ';
@@ -423,14 +414,14 @@ window.swgg.uiReload();\n\
                 '/pet/findByStatus': {
                     get: {
                         _operationId: 'crudGetManyByQuery',
-                        _queryQuery: '{"status":{"$in":{{status json}}}}',
+                        _queryWhere: '{"status":{"$in":{{status json}}}}',
                         _schemaName: 'Pet'
                     }
                 },
                 '/pet/findByTags': {
                     get: {
                         _operationId: 'crudGetManyByQuery',
-                        _queryQuery: '{"tags.name":{"$in":{{tags json}}}}',
+                        _queryWhere: '{"tags.name":{"$in":{{tags json}}}}',
                         _schemaName: 'Pet'
                     }
                 },
@@ -477,7 +468,7 @@ window.swgg.uiReload();\n\
                 },
                 '/user': {
                     post: {
-                        _operationId: 'crudCreateOrReplaceOneByKeyUnique.id',
+                        _operationId: 'crudCreateOrReplaceOneByKeyUnique.username',
                         _schemaName: 'User'
                     }
                 },
@@ -520,19 +511,55 @@ window.swgg.uiReload();\n\
                     }
                 }
             },
+            'x-swgg-datatableDict': {
+                file: {
+                    crudCreateOrReplaceOneByKeyUnique:
+                        'file crudCreateOrReplaceOneByKeyUnique.id',
+                    crudDeleteOneByKeyUnique:
+                        'file crudDeleteOneByKeyUnique.id',
+                    crudGetManyByQuery: 'file crudGetManyByQuery',
+                    keyUnique: 'id',
+                    queryLimit: 20,
+                    schema: { $ref: '#/definitions/File' }
+                },
+                pet: {
+                    crudCreateOrReplaceOneByKeyUnique: 'pet addPet',
+                    crudDeleteOneByKeyUnique: 'pet deletePet',
+                    crudGetManyByQuery: 'pet crudGetManyByQuery',
+                    keyUnique: 'id',
+                    queryLimit: 20,
+                    schema: { $ref: '#/definitions/Pet' }
+                },
+                store: {
+                    crudCreateOrReplaceOneByKeyUnique: 'store placeOrder',
+                    crudDeleteOneByKeyUnique: 'store deleteOrder',
+                    crudGetManyByQuery: 'store crudGetManyByQuery',
+                    keyUnique: 'id',
+                    queryLimit: 20,
+                    schema: { $ref: '#/definitions/Order' }
+                },
+                user: {
+                    crudCreateOrReplaceOneByKeyUnique: 'user createUser',
+                    crudDeleteOneByKeyUnique: 'user deleteUser',
+                    crudGetManyByQuery: 'user crudGetManyByQuery',
+                    keyUnique: 'username',
+                    queryLimit: 20,
+                    schema: { $ref: '#/definitions/User' }
+                }
+            },
             'x-swgg-tagDict': {
                 file: { description: 'builtin-file model', name: 'file' }
             }
         }, 10));
         // init collectionList-fixtures
-        local.utility2.onReady.counter += 1;
+        local.utility2.onReadyBefore.counter += 1;
         local.swgg.collectionListInit([{
             collectDocList: [{
                 id: '00_test_swaggerUiLogoSmall',
                 fileBlob: local.swgg.templateSwaggerUiLogoSmallBase64,
                 fileContentType: 'image/png',
-                fileFilename: 'swaggerUiLogoSmall.png',
-                propRequired: true
+                fileDescription: 'swagger-ui logo',
+                fileFilename: 'swaggerUiLogoSmall.png'
             }],
             drop: true,
             ensureIndexList: [{
@@ -672,7 +699,7 @@ window.swgg.uiReload();\n\
                 unique: true
             }],
             name: 'User'
-        }], local.utility2.onReady);
+        }], local.utility2.onReadyBefore);
     }());
 }());
 ```
@@ -704,12 +731,12 @@ window.swgg.uiReload();\n\
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
         "nedb-lite": "2016.4.2",
-        "utility2": "2016.3.6"
+        "utility2": "2016.4.2"
     },
     "description": "this package will run a virtual swagger-ui server with persistent storage \
 in the browser, that your webapp can use (in-place of a real backend)",
     "devDependencies": {
-        "electron-lite": "2016.3.3"
+        "electron-lite": "2016.4.3"
     },
     "engines": { "node": ">=4.0" },
     "keywords": [
@@ -757,7 +784,7 @@ export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.4.2"
+    "version": "2016.4.3"
 }
 ```
 

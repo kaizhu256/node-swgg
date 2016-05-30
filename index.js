@@ -44,12 +44,12 @@
         local.swgg = {
             apiDict: {},
             collectionDict: {},
-            eventListenerDict: {},
             idDomElementDict: {},
             local: local,
             swaggerSchemaJson: {},
             templatePathObjectDict: {},
-            templatePathObjectDefaultDict: {}
+            templatePathObjectDefaultDict: {},
+            uiEventListenerDict: {}
         };
         // init lib nedb
         local.swgg.Nedb = local.modeJs === 'browser'
@@ -64,7 +64,7 @@
                 description: 'query param',
                 format: 'json',
                 in: 'query',
-                name: '_queryQuery',
+                name: '_queryWhere',
                 type: 'string'
             }],
             summary: 'count many {{_schemaName}} objects by query'
@@ -121,7 +121,7 @@
                 description: 'query param',
                 format: 'json',
                 in: 'query',
-                name: '_queryQuery',
+                name: '_queryWhere',
                 required: true,
                 type: 'string'
             }],
@@ -276,7 +276,7 @@
                 description: 'query param',
                 format: 'json',
                 in: 'query',
-                name: '_queryQuery',
+                name: '_queryWhere',
                 required: true,
                 type: 'string'
             }, {
@@ -344,7 +344,7 @@
                 description: 'query param',
                 format: 'json',
                 in: 'query',
-                name: '_queryQuery',
+                name: '_queryWhere',
                 required: true,
                 type: 'string'
             }, {
@@ -783,7 +783,9 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             Object.keys(local.swgg.swaggerJson.definitions).forEach(function (schemaName) {
                 // normalize definition
                 local.swgg.swaggerJson.definitions[schemaName] =
-                    local.swgg.schemaNormalize(local.swgg.swaggerJson.definitions[schemaName]);
+                    local.swgg.schemaNormalizeAndCopy(
+                        local.swgg.swaggerJson.definitions[schemaName]
+                    );
             });
             // init pathObjectDefaultList
             Object.keys(options.definitions).forEach(function (schemaName) {
@@ -1135,12 +1137,16 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                             collection.loadDatabase(function () {
                                 onParallel.counter += 1;
                                 collection.remove({}, { multi: true }, onParallel);
-                                Object.keys(collection.indexes).forEach(function (key) {
-                                    if (key !== '_id') {
-                                        onParallel.counter += 1;
-                                        collection.removeIndex(key, onParallel);
-                                    }
-                                });
+                                // drop indexes
+                                Object.keys(collection.indexes)
+                                    // coverage-hack - test removeIndex handling-behavior
+                                    .concat('undefined')
+                                    .forEach(function (key) {
+                                        if (key !== '_id') {
+                                            onParallel.counter += 1;
+                                            collection.removeIndex(key, onParallel);
+                                        }
+                                    });
                                 onParallel();
                             });
                         });
@@ -1202,16 +1208,6 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 onError(error);
             };
             onNext();
-        };
-
-        local.swgg.domAnimateShake = function (element) {
-        /*
-         * this function will shake the dom-element
-         */
-            element.classList.add('swggAnimateShake');
-            setTimeout(function () {
-                element.classList.remove('swggAnimateShake');
-            }, 1000);
         };
 
         local.swgg.idDomElementCreate = function (seed) {
@@ -1447,7 +1443,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     user = request.swgg.user;
                     switch (crud.operationId.split('.')[0]) {
                     case 'crudCountManyByQuery':
-                        crud.collection.count(crud.queryQuery, onNext);
+                        crud.collection.count(crud.queryWhere, onNext);
                         break;
                     case 'crudCreateOrReplaceMany':
                         crud.collection.remove({ id: {
@@ -1481,7 +1477,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         }
                         break;
                     case 'crudDeleteManyByQuery':
-                        crud.collection.remove(crud.queryQuery, { multi: true }, onNext);
+                        crud.collection.remove(crud.queryWhere, { multi: true }, onNext);
                         break;
                     case 'crudDeleteOneByKeyUnique':
                         crud.collection.remove(crud.queryByKeyUnique, onNext);
@@ -1502,7 +1498,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     case 'crudGetManyByQuery':
                         onParallel = local.utility2.onParallel(onNext);
                         onParallel.counter += 1;
-                        crud.collection.find(crud.queryQuery, crud.queryFields)
+                        crud.collection.find(crud.queryWhere, crud.queryFields)
                             .sort(crud.querySort)
                             .skip(crud.querySkip)
                             .limit(crud.queryLimit)
@@ -1520,7 +1516,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         crud.collection.findOne(crud.queryByKeyUnique, onNext);
                         break;
                     case 'crudGetOneByQuery':
-                        crud.collection.findOne(crud.queryQuery, crud.queryFields, onNext);
+                        crud.collection.findOne(crud.queryWhere, crud.queryFields, onNext);
                         break;
                     case 'crudNullDelete':
                     case 'crudNullGet':
@@ -1670,7 +1666,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
          * this function will jsonp-init the browser-state
          */
             if (request.urlParsed.pathname === '/jsonp.swgg.stateInit.js') {
-                response.end('window.swgg.stateInit(' + JSON.stringify({
+                response.end(request.urlParsed.query.callback + '(' + JSON.stringify({
                     swaggerJson: local.swgg.swaggerJson,
                     swaggerSchemaJson: local.swgg.swaggerSchemaJson
                 }) + ');');
@@ -1933,14 +1929,14 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         key: 'queryLimit',
                         value: 100
                     }, {
-                        key: 'queryQuery',
-                        value: {}
-                    }, {
                         key: 'querySkip',
                         value: 0
                     }, {
                         key: 'querySort',
                         value: { updatedAt: -1 }
+                    }, {
+                        key: 'queryWhere',
+                        value: {}
                     }].forEach(function (element) {
                         crud[element.key] = crud.data['_' + element.key] || JSON.parse(
                             local.utility2.templateRender(
@@ -1968,7 +1964,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                             // try to init id
                             local.utility2.tryCatchOnError(function () {
                                 switch (param.in === 'body' &&
-                                    local.swgg.schemaNormalize(param.schema)
+                                    local.swgg.schemaNormalizeAndCopy(param.schema)
                                     .properties[crud.keyUnique].type) {
                                 // use integer id
                                 case 'integer':
@@ -2101,9 +2097,9 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             };
         };
 
-        local.swgg.schemaNormalize = function (schema) {
+        local.swgg.schemaNormalizeAndCopy = function (schema) {
         /*
-         * this function will normalize the schema
+         * this function will return a normalized copy the schema
          */
             var tmp;
             // dereference $ref
@@ -2127,7 +2123,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 // validate schema
                 local.utility2.assert(tmp, schema.$ref);
                 // recurse
-                tmp = local.swgg.schemaNormalize(tmp);
+                tmp = local.swgg.schemaNormalizeAndCopy(tmp);
                 schema = tmp;
             }
             // inherit allOf
@@ -2138,13 +2134,13 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     local.utility2.objectSetDefault(
                         tmp,
                         // recurse
-                        local.swgg.schemaNormalize(element),
+                        local.swgg.schemaNormalizeAndCopy(element),
                         2
                     );
                 });
                 schema = tmp;
             }
-            return schema;
+            return local.utility2.jsonCopy(schema);
         };
 
         local.swgg.serverRespondJsonapi = function (request, response, error, data, meta) {
@@ -2269,7 +2265,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         data: data,
                         dataReadonlyRemove: options.dataReadonlyRemove,
                         key: tmp,
-                        schema: local.swgg.schemaNormalize({ $ref: tmp }),
+                        schema: local.swgg.schemaNormalizeAndCopy({ $ref: tmp }),
                         'x-swgg-notRequired': options['x-swgg-notRequired']
                     });
                     return;
@@ -2283,7 +2279,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                                 circularList: options.circularList,
                                 data: data,
                                 key: 'anyOf',
-                                schema: local.swgg.schemaNormalize(element),
+                                schema: local.swgg.schemaNormalizeAndCopy(element),
                                 'x-swgg-notRequired': options['x-swgg-notRequired']
                             });
                         }, local.utility2.nop);
@@ -2293,7 +2289,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     return;
                 }
                 // normalize propDef
-                propDef = local.swgg.schemaNormalize(options.schema);
+                propDef = local.swgg.schemaNormalizeAndCopy(options.schema);
                 // init circularList
                 if (data && typeof data === 'object') {
                     options.circularList = options.circularList || [];
@@ -2581,7 +2577,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             });
             // validate default
             validateDefault = function () {
-                if (local.utility2.isNullOrUndefined(schema.default)) {
+                if (schema.default !== undefined) {
                     return;
                 }
                 local.swgg.validateByPropDef({
