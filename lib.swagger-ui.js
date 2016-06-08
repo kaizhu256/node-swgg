@@ -32,7 +32,7 @@ local.swgg.templateUiDatatable = '\
     </button>\n\
     {{/each pageList}}\n\
 </div>\n\
-<table>\n\
+<table class="borderBottom borderTop">\n\
     <thead>\n\
         <tr>\n\
             <th style="padding-left: {{iiPadding}}rem; padding-right: {{iiPadding}}rem;">\n\
@@ -72,16 +72,14 @@ local.swgg.templateUiDatatable = '\
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/main.handlebars
 local.swgg.templateUiMain = '\
 <div class="eventDelegateClick modal onEventModalHide" style="display: none; opacity: 0;">\n\
-    <form class="eventDelegateClick flex1">\n\
-        <div class="datatable borderBottomBold borderTopBold"></div>\n\
-    </form>\n\
+    <form class="datatable eventDelegateClick flex1"></form>\n\
 </div>\n\
 <div class="eventDelegateClick popup" style="display: none;"></div>\n\
-<form class="header tr">\n\
+<form class="eventDelegateSubmit header onEventUiReload tr">\n\
     <a class="td1" href="http://swagger.io" target="_blank">swagger</a>\n\
-    <input class="flex1 td2" placeholder="http://petstore.swagger.io/v2/swagger.json" readonly type="text" value="{{url}}"/>\n\
+    <input class="flex1 td2" placeholder="http://petstore.swagger.io/v2/swagger.json" type="text" value="{{url}}"/>\n\
 </form>\n\
-<div class="info">\n\
+<div class="info reset">\n\
     {{#if info}}\n\
     <div class="bold">{{info.title htmlSafe}}</div>\n\
     {{#if info.description}}\n\
@@ -112,8 +110,8 @@ local.swgg.templateUiMain = '\
     </ul>\n\
     {{/if info}}\n\
 </div>\n\
-<div class="resourceList"></div>\n\
-<div class="color777 footer">\n\
+<div class="reset resourceList"></div>\n\
+<div class="color777 footer reset">\n\
     <div>[ <span>base url</span>: {{basePath}}, <span>api version</span>: {{info.version}} ]</div>\n\
 </div>\n\
 ';
@@ -179,7 +177,7 @@ local.swgg.templateUiParam = '\
     {{name}}<br>\n\
     <span class="color777">{{description}}</span>\n\
 </span>\n\
-<span class="td2">{{#if type2}}{{type2}}{{#if format2}} ({{format2}}){{/if format2}}{{/if type2}}</span>\n\
+<span class="td2">{{type2}}{{#if format2}} ({{format2}}){{/if format2}}</span>\n\
 <span class="td3">\n\
     {{#if isTextarea}}\n\
     <textarea class="input" placeholder="{{placeholder}}"></textarea>\n\
@@ -214,7 +212,7 @@ local.swgg.templateUiResource = '\
         <a class="color777 onEventResourceDisplayAction td2" href="#">Show / Hide</a>\n\
         <a class="color777 onEventResourceDisplayAction td3" href="#">List Operations</a>\n\
         <a class="color777 onEventResourceDisplayAction td4" href="#">Expand Operations</a>\n\
-        <a class="color777 {{#unless crudGetManyByQuery}}fontLineThrough{{/unless crudGetManyByQuery}} onEventDatatableReload td5" data-resource-name="{{name}}" href="#">Datatable</a>\n\
+        <a class="color777 onEventDatatableReload td5" data-resource-name="{{name}}" href="#">Datatable</a>\n\
     </div>\n\
     <div class="operationList" style="display: none;"></div>\n\
 </div>\n\
@@ -460,6 +458,7 @@ local.swgg.templateUiResponseAjax = '\
                 switch (event.target.tagName) {
                 case 'A':
                 case 'BUTTON':
+                case 'FORM':
                     event.preventDefault();
                     break;
                 }
@@ -516,7 +515,9 @@ local.swgg.templateUiResponseAjax = '\
                 _queryWhere: options.queryWhere
             };
             // request data
-            local.swgg.apiDict[options.crudGetManyByQuery](options, function (error, options) {
+            local.swgg.apiDict[
+                options.crudGetManyByQuery
+            ]._ajax(options, function (error, options) {
                 // validate no error occurred
                 local.utility2.assert(!error, error);
                 local.swgg.uiDatatableRender(options);
@@ -537,7 +538,7 @@ local.swgg.templateUiResponseAjax = '\
                 // delete data
                 local.swgg.apiDict[
                     local.swgg.uiState.datatable.crudDeleteOneByKeyUnique
-                ](local.utility2.objectLiteralize({
+                ]._ajax(local.utility2.objectLiteralize({
                     paramDict: { '$[]': [
                         local.swgg.uiState.datatable.keyUnique,
                         element.dataset.id
@@ -575,6 +576,9 @@ local.swgg.templateUiResponseAjax = '\
         };
 
         local.swgg.uiEventListenerDict['.onEventOperationAjax'] = function (event) {
+        /*
+         * this function will return submit the operation to the backend
+         */
             var modeNext, onNext, options, tmp;
             modeNext = 0;
             onNext = function (error, data) {
@@ -646,7 +650,7 @@ local.swgg.templateUiResponseAjax = '\
                             onNext(error);
                         });
                     });
-                    options.api(options, onNext);
+                    options.api._ajax(options, onNext);
                     break;
                 default:
                     // remove previous error
@@ -732,6 +736,9 @@ local.swgg.templateUiResponseAjax = '\
         };
 
         local.swgg.uiEventListenerDict['.onEventOperationDisplayToggle'] = function (event) {
+        /*
+         * this function will toggle the display of the operation
+         */
             var tmp;
             location.hash = '!/' + event.target.closest('.resource').id + '/' +
                 event.target.closest('.operation').id;
@@ -751,7 +758,38 @@ local.swgg.templateUiResponseAjax = '\
             }
         };
 
+        local.swgg.uiEventListenerDict['.onEventUiReload'] = function () {
+        /*
+         * this function will reload the ui
+         */
+            // reset ui
+            local.utility2.domQuerySelectorAll(
+                document,
+                '.swggUiContainer > .reset'
+            ).forEach(function (element) {
+                element.remove();
+            });
+            // normalize url
+            document.querySelector('.swggUiContainer > .header > .td2').value =
+                local.utility2.urlParse(
+                    document.querySelector('.swggUiContainer > .header > .td2').value
+                ).href;
+            local.utility2.ajax({
+                url: document.querySelector('.swggUiContainer > .header > .td2').value
+            }, function (error, xhr) {
+                // validate no error occurred
+                local.utility2.assert(!error, error);
+                // reset state
+                local.swgg.apiDict = local.swgg.swaggerJson = null;
+                local.swgg.apiDictUpdate(JSON.parse(xhr.responseText));
+                local.swgg.uiRender();
+            });
+        };
+
         local.swgg.uiEventListenerDict['.onEventResourceDisplayAction'] = function (event) {
+        /*
+         * this function will toggle the display of the resource
+         */
             var tmp;
             location.hash = '!/' + event.target.closest('.resource').id;
             tmp = event.currentTarget.querySelector('.operationList');
@@ -884,6 +922,7 @@ local.swgg.templateUiResponseAjax = '\
                 }, local.utility2.nop);
                 return paramDef.type2;
             });
+            paramDef.type2 = paramDef.type2 || 'object';
             // init schema2
             [
                 paramDef.items,
@@ -946,9 +985,7 @@ local.swgg.templateUiResponseAjax = '\
             local.swgg.idDomElementDict = {};
             self = local.swgg.uiState = local.utility2.jsonCopy(local.swgg.swaggerJson);
             // init url
-            self.url = local.utility2.urlParse(document.querySelector(
-                '.swggUiContainer > .header > .td2'
-            ).value).href;
+            self.url = document.querySelector('.swggUiContainer > .header > .td2').value;
             // templateRender main
             self.uiFragment = local.utility2.domFragmentRender(local.swgg.templateUiMain, self);
             local.utility2.objectSetDefault(self, {
@@ -962,9 +999,9 @@ local.swgg.templateUiResponseAjax = '\
                 self.tagDict[tag.name] = tag;
             });
             // init operationDict
-            Object.keys(local.swgg.templatePathObjectDict).sort().forEach(function (operation) {
+            Object.keys(local.swgg.apiDict).sort().forEach(function (operation) {
                 // init operation
-                operation = JSON.parse(local.swgg.templatePathObjectDict[operation]);
+                operation = local.utility2.jsonCopy(local.swgg.apiDict[operation]);
                 if (!operation.tags[0] || self.operationDict[operation._keyOperationId]) {
                     return;
                 }
@@ -974,14 +1011,6 @@ local.swgg.templateUiResponseAjax = '\
                 if (!resource && self.tagDict[operation.tags[0]]) {
                     resource = self.resourceDict[operation.tags[0]] =
                         self.tagDict[operation.tags[0]];
-                    // init datatable
-                    [
-                        'crudGetManyByQuery'
-                    ].forEach(function (element) {
-                        resource[element] = local.swgg.templatePathObjectDict[
-                            resource.name + ' ' + element
-                        ] && resource.name + ' ' + element;
-                    });
                     local.utility2.objectSetDefault(resource, {
                         description: 'no description available',
                         id: local.swgg.idDomElementCreate('swgg_id_' + operation.tags[0]),

@@ -38,7 +38,6 @@
 /* general */
 .swggUiContainer,
 .swggUiContainer * {
-    border-radius: 0;
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -55,8 +54,8 @@
 .swggUiContainer a {
     text-decoration: none;
 }
-.swggUiContainer .cursorPointer {
-    cursor: pointer;
+.swggUiContainer a:hover {
+    color: black;
 }
 .swggUiContainer a,
 .swggUiContainer input,
@@ -71,6 +70,9 @@
 }
 .swggUiContainer .color777 {
     color: #777;
+}
+.swggUiContainer .cursorPointer {
+    cursor: pointer;
 }
 .swggUiContainer .flex1 {
     flex: 1;
@@ -138,7 +140,7 @@
 .swggUiContainer .tr > * {
     margin-left: 1rem;
     overflow: auto;
-    padding-top: 0.25rem;
+    padding-top: 0.2rem;
     word-wrap: break-word;
 }
 .swggUiContainer .tr > *:first-child {
@@ -225,7 +227,10 @@
 
 /* section */
 .swggUiContainer .datatable {
-    border-collapse: collapse;
+    background-color: white;
+    margin: 2rem;
+    overflow: auto;
+    padding: 1rem;
 }
 .swggUiContainer .datatable input[type=checkbox] {
     width: 1.5rem;
@@ -245,7 +250,6 @@
 }
 .swggUiContainer > .header {
     background-color: #8c0;
-    border: 1px solid black;
     padding: 0.5rem;
 }
 .swggUiContainer > .header > .td1 {
@@ -255,8 +259,6 @@
     color: white;
 }
 .swggUiContainer > .header > .td2 {
-    background-color: #ddd;
-    border-color: #ddd;
     font-size: medium;
     height: 2rem;
 }
@@ -285,13 +287,6 @@
     top: 0;
     width: 100%;
     z-index: 1;
-}
-.swggUiContainer > .modal > form {
-    background-color: white;
-    border-radius: 5px;
-    margin: 2rem;
-    overflow: auto;
-    padding: 1rem;
 }
 .swggUiContainer .operation {
     background-color: #dfd;
@@ -356,9 +351,6 @@
 }
 .swggUiContainer .operation .responseList > .td2 {
     flex: 4;
-}
-.swggUiContainer .resource > .header > a:hover {
-    color: black;
 }
 .swggUiContainer .resource > .header > .td1 {
     font-size: large;

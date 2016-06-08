@@ -8,9 +8,9 @@ this package will run a virtual swagger-ui server with persistent storage in the
 
 # documentation
 #### todo
+- datatable - add sort-by-field
 - add notification system
 - add post-crud-middleware for pet photoUrl
-- merge admin-ui into swagger-ui
 - rename collectDoc to something better
 - change api crudCreateOrReplaceMany to crudCreateOrReplaceManyByKeyUnique
 - add api userPasswordChange
@@ -19,11 +19,12 @@ this package will run a virtual swagger-ui server with persistent storage in the
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 1bdc477b
-- npm publish 2016.4.3
-- datatable - add datatable resource-view
-- datatable - add pagination
-- datatable - add row deletion
+#### change since 18ba3ca5
+- npm publish 2016.5.1
+- merge admin-ui into swagger-ui
+- ui - re-implement reload feature
+- move all swagger-backend-config into top-level swagger-property 'x-swgg-apiDict'
+- remove unused postinstall script
 - none
 
 #### this package requires
@@ -254,12 +255,6 @@ instruction
     case 'node':
         // export local
         module.exports = local;
-        // init petstore-api
-        local.tmp = local.utility2.jsonCopy(local.swgg.swaggerPetstoreJson);
-        delete local.tmp.basePath;
-        delete local.tmp.host;
-        delete local.tmp.schemes;
-        local.swgg.apiDictUpdate(local.tmp);
         // init assets
         /* istanbul ignore next */
         local.utility2.assetsDict['/assets.example.js'] = local.global.assetsExampleJs ||
@@ -303,8 +298,9 @@ body > div {\n\
     <div class="swggUiContainer">\n\
     <form class="header tr">\n\
         <a class="td1" href="http://swagger.io" target="_blank">swagger</a>\n\
-        <input class="flex1 td2" placeholder="http://petstore.swagger.io/v2/swagger.json" readonly type="text" value="api/v0/swagger.json"/>\n\
+        <input class="flex1 td2" placeholder="http://petstore.swagger.io/v2/swagger.json" type="text" value="api/v0/swagger.json"/>\n\
     </form>\n\
+    <div class="reset"></div>\n\
     </div>\n\
 <script src="assets.utility2.rollup.js"></script>\n\
 <script src="assets.swgg.lib.nedb.js"></script>\n\
@@ -317,7 +313,7 @@ body > div {\n\
 window.utility2.envDict.npm_package_description = "{{envDict.npm_package_description}}";\n\
 window.utility2.envDict.npm_package_name = "{{envDict.npm_package_name}}";\n\
 window.utility2.envDict.npm_package_version = "{{envDict.npm_package_version}};"\n\
-window.swgg.uiRender();\n\
+local.swgg.uiEventListenerDict[".onEventUiReload"]();\n\
 }());\n\
 </script>\n\
 </body>\n\
@@ -339,39 +335,27 @@ window.swgg.uiRender();\n\
 
     // run shared js-env code - post-init
     (function () {
-        // init petstore-api
-        local.swgg.apiDictUpdate(local.utility2.objectSetOverride(local.swgg.swaggerJson, {
+        // init petstore-api - frontend
+        local.tmp = local.utility2.jsonCopy(local.swgg.swaggerPetstoreJson);
+        delete local.tmp.basePath;
+        delete local.tmp.host;
+        delete local.tmp.schemes;
+        local.swgg.apiDictUpdate(local.tmp);
+        // init petstore-api - backend
+        local.swgg.apiDictUpdate({
             definitions: {
                 File: {
-                    _pathObjectDefaultList: [
-                        'crudCountManyByQuery',
-                        'crudCreateOrReplaceOneByKeyUnique.id',
-                        'crudDeleteOneByKeyUnique.id',
-                        'crudGetManyByQuery',
-                        'crudUpdateOneByKeyUnique.id',
-                        'fileGetOneByKeyUnique.id',
-                        'fileUploadManyByForm.1'
-                    ],
-                    _pathPrefix: 'file',
                     allOf: [{ $ref: '#/definitions/BuiltinFile' }]
                 },
                 Pet: {
-                    _pathObjectDefaultList: ['crudGetManyByQuery'],
-                    _pathPrefix: 'pet',
                     properties: {
                         _id: { readOnly: true, type: 'string' },
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
                         id: { default: 1, minimum: 1 },
-                        quantity: { minimum: 0 },
                         updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
                     }
                 },
                 Order: {
-                    _pathObjectDefaultList: [
-                        'crudGetManyByQuery',
-                        'crudUpdateOneByKeyUnique.id'
-                    ],
-                    _pathPrefix: 'store',
                     properties: {
                         _id: { readOnly: true, type: 'string' },
                         createdAt: { format: 'date-time', readOnly: true, type: 'string' },
@@ -380,16 +364,6 @@ window.swgg.uiRender();\n\
                     }
                 },
                 User: {
-                    _pathObjectDefaultList: [
-                        'crudCountManyByQuery',
-                        'crudCreateOrReplaceOneByKeyUnique.username',
-                        'crudDeleteOneByKeyUnique.username',
-                        'crudGetManyByQuery',
-                        'crudUpdateOneByKeyUnique.username',
-                        'userLoginByPassword',
-                        'userLogout'
-                    ],
-                    _pathPrefix: 'user',
                     allOf: [{ $ref: '#/definitions/BuiltinUser' }],
                     properties: {
                         _id: { readOnly: true, type: 'string' },
@@ -400,123 +374,147 @@ window.swgg.uiRender();\n\
                     }
                 }
             },
-            paths: {
-                '/pet': {
-                    post: {
-                        _operationId: 'crudCreateOrReplaceOneByKeyUnique.id',
-                        _schemaName: 'Pet'
-                    },
-                    put: {
-                        _operationId: 'crudUpdateOneByKeyUnique.id',
-                        _schemaName: 'Pet'
-                    }
+            tags: [{ description: 'builtin-file model', name: 'file' }],
+            'x-swgg-apiDict': {
+                'file crudCountManyByQuery': {
+                    _schemaName: 'File'
                 },
-                '/pet/findByStatus': {
-                    get: {
-                        _operationId: 'crudGetManyByQuery',
-                        _queryWhere: '{"status":{"$in":{{status json}}}}',
-                        _schemaName: 'Pet'
-                    }
+                'file crudCreateOrReplaceOneByKeyUnique.id.id': {
+                    _schemaName: 'File'
                 },
-                '/pet/findByTags': {
-                    get: {
-                        _operationId: 'crudGetManyByQuery',
-                        _queryWhere: '{"tags.name":{"$in":{{tags json}}}}',
-                        _schemaName: 'Pet'
-                    }
+                'file crudDeleteOneByKeyUnique.id.id': {
+                    _schemaName: 'File'
                 },
-                '/pet/{petId}': {
-                    delete: {
-                        _operationId: 'crudDeleteOneByKeyUnique.petId.id',
-                        _schemaName: 'Pet'
-                    },
-                    get: {
-                        _operationId: 'crudGetOneByKeyUnique.petId.id',
-                        _schemaName: 'Pet'
-                    },
-                    post: {
-                        _operationId: 'crudUpdateOneByKeyUnique.petId.id',
-                        _schemaName: 'Pet'
-                    }
+                'file crudGetManyByQuery': {
+                    _schemaName: 'File'
                 },
-                '/pet/{petId}/uploadImage': {
-                    post: {
-                        _operationId: 'fileUploadManyByForm',
-                        _schemaName: 'User'
-                    }
+                'file crudUpdateOneByKeyUnique.id.id': {
+                    _schemaName: 'File'
                 },
-                '/store/inventory': {
-                    get: {
-                        _schemaName: 'Order'
-                    }
+                'file fileGetOneByKeyUnique.id.id': {
+                    _schemaName: 'File'
                 },
-                '/store/order': {
-                    post: {
-                        _operationId: 'crudCreateOrReplaceOneByKeyUnique.id',
-                        _schemaName: 'Order'
-                    }
+                'file fileUploadManyByForm.1': {
+                    _schemaName: 'File'
                 },
-                '/store/order/{orderId}': {
-                    delete: {
-                        _operationId: 'crudDeleteOneByKeyUnique.orderId.id',
-                        _schemaName: 'Order'
-                    },
-                    get: {
-                        _operationId: 'crudGetOneByKeyUnique.orderId.id',
-                        _schemaName: 'Order'
-                    }
+                'pet addPet': {
+                    _operationId: 'crudCreateOrReplaceOneByKeyUnique.petId.id',
+                    _schemaName: 'Pet'
                 },
-                '/user': {
-                    post: {
-                        _operationId: 'crudCreateOrReplaceOneByKeyUnique.username',
-                        _schemaName: 'User'
-                    }
+                'pet crudGetManyByQuery': {
+                    _schemaName: 'Pet'
                 },
-                '/user/{username}': {
-                    delete: {
-                        _operationId: 'crudDeleteOneByKeyUnique.username',
-                        _schemaName: 'User'
-                    },
-                    get: {
-                        _operationId: 'crudGetOneByKeyUnique.username',
-                        _schemaName: 'User'
-                    },
-                    put: {
-                        _operationId: 'crudUpdateOneByKeyUnique.username',
-                        _schemaName: 'User'
-                    }
+                'pet deletePet': {
+                    _operationId: 'crudDeleteOneByKeyUnique.petId.id',
+                    _schemaName: 'Pet'
                 },
-                '/user/createWithArray': {
-                    post: {
-                        _operationId: 'crudCreateOrReplaceMany',
-                        _schemaName: 'User'
-                    }
+                'pet findPetsByStatus': {
+                    _operationId: 'crudGetManyByQuery',
+                    _queryWhere: '{"status":{"$in":{{status jsonStringify}}}}',
+                    _schemaName: 'Pet'
                 },
-                '/user/createWithList': {
-                    post: {
-                        _operationId: 'crudCreateOrReplaceMany',
-                        _schemaName: 'User'
-                    }
+                'pet findPetsByTags': {
+                    _operationId: 'crudGetManyByQuery',
+                    _queryWhere: '{"tags.name":{"$in":{{tags jsonStringify}}}}',
+                    _schemaName: 'Pet'
                 },
-                '/user/login': {
-                    get: {
-                        _operationId: 'userLoginByPassword',
-                        _schemaName: 'User'
-                    }
+                'pet getPetById': {
+                    _operationId: 'crudGetOneByKeyUnique.petId.id',
+                    _schemaName: 'Pet'
                 },
-                '/user/logout': {
-                    get: {
-                        _operationId: 'userLogout',
-                        _schemaName: 'User'
-                    }
+                'pet updatePet': {
+                    _operationId: 'crudUpdateOneByKeyUnique.petId.id',
+                    _schemaName: 'Pet'
+                },
+                'pet updatePetWithForm': {
+                    _operationId: 'crudUpdateOneByKeyUnique.petId.id',
+                    _schemaName: 'Pet'
+                },
+                'pet uploadFile': {
+                    _operationId: 'fileUploadManyByForm',
+                    _schemaName: 'User'
+                },
+                'store crudGetManyByQuery': {
+                    _schemaName: 'Order'
+                },
+                'store crudUpdateOneByKeyUnique.id.id': {
+                    _schemaName: 'Order'
+                },
+                'store deleteOrder': {
+                    _operationId: 'crudDeleteOneByKeyUnique.orderId.id',
+                    _schemaName: 'Order'
+                },
+                'store getInventory': {
+                    _schemaName: 'Order'
+                },
+                'store getOrderById': {
+                    _operationId: 'crudGetOneByKeyUnique.orderId.id',
+                    _schemaName: 'Order'
+                },
+                'store placeOrder': {
+                    _operationId: 'crudCreateOrReplaceOneByKeyUnique.orderId.id',
+                    _schemaName: 'Order'
+                },
+                'user createUser': {
+                    _operationId: 'crudCreateOrReplaceOneByKeyUnique.username.username',
+                    _schemaName: 'User'
+                },
+                'user createUsersWithArrayInput': {
+                    _operationId: 'crudCreateOrReplaceMany',
+                    _schemaName: 'User'
+                },
+                'user createUsersWithListInput': {
+                    _operationId: 'crudCreateOrReplaceMany',
+                    _schemaName: 'User'
+                },
+                'user crudCountManyByQuery': {
+                    _schemaName: 'User'
+                },
+                'user crudCreateOrReplaceOneByKeyUnique.username.username': {
+                    _schemaName: 'User'
+                },
+                'user crudDeleteOneByKeyUnique.username.username': {
+                    _schemaName: 'User'
+                },
+                'user crudGetManyByQuery': {
+                    _schemaName: 'User'
+                },
+                'user crudUpdateOneByKeyUnique.username.username': {
+                    _schemaName: 'User'
+                },
+                'user deleteUser': {
+                    _operationId: 'crudDeleteOneByKeyUnique.username.username',
+                    _schemaName: 'User'
+                },
+                'user getUserByName': {
+                    _operationId: 'crudGetOneByKeyUnique.username.username',
+                    _schemaName: 'User'
+                },
+                'user loginUser': {
+                    _operationId: 'userLoginByPassword',
+                    _schemaName: 'User'
+                },
+                'user logoutUser': {
+                    _operationId: 'userLogout',
+                    _schemaName: 'User'
+                },
+                'user updateUser': {
+                    _operationId: 'crudUpdateOneByKeyUnique.username.username',
+                    _schemaName: 'User'
+                },
+                'user userLoginByPassword': {
+                    _schemaName: 'User'
+                },
+                'user userLogout': {
+                    _schemaName: 'User'
                 }
             },
             'x-swgg-datatableDict': {
                 file: {
                     crudCreateOrReplaceOneByKeyUnique:
-                        'file crudCreateOrReplaceOneByKeyUnique.id',
+                        'file crudCreateOrReplaceOneByKeyUnique.id.id',
                     crudDeleteOneByKeyUnique:
-                        'file crudDeleteOneByKeyUnique.id',
+                        'file crudDeleteOneByKeyUnique.id.id',
                     crudGetManyByQuery: 'file crudGetManyByQuery',
                     keyUnique: 'id',
                     queryLimit: 20,
@@ -546,11 +544,8 @@ window.swgg.uiRender();\n\
                     queryLimit: 20,
                     schema: { $ref: '#/definitions/User' }
                 }
-            },
-            'x-swgg-tagDict': {
-                file: { description: 'builtin-file model', name: 'file' }
             }
-        }, 10));
+        });
         // init collectionList-fixtures
         local.utility2.onReadyBefore.counter += 1;
         local.swgg.collectionListInit([{
@@ -625,7 +620,7 @@ window.swgg.uiRender();\n\
                     petId: 2,
                     status: 'sold'
                 }],
-                // init 100 extra random users
+                // init 100 extra random orders
                 length: 100,
                 override: function (options) {
                     return {
@@ -773,10 +768,9 @@ exports:require('./index.js').Nedb.prototype}, \
 exports:require('./index.js').Nedb.storage} \
 } \
 }\"",
-        "postinstall": "node index.js postinstall",
         "start": "export PORT=${PORT:-8080} && \
 export npm_config_mode_auto_restart=1 && \
-utility2 shRun shIstanbulCover node test.js",
+utility2 shRun shIstanbulCover ${NODE_BIN:-node} test.js",
         "test": ". node_modules/.bin/utility2 && \
 shReadmeExportScripts && \
 cp $(shFileTrimLeft tmp/README.package.json) package.json && \
@@ -784,7 +778,7 @@ export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.4.3"
+    "version": "2016.5.1"
 }
 ```
 
@@ -832,7 +826,7 @@ shBuild() {(set -e
     # init env
     . node_modules/.bin/utility2 && shInit
     # cleanup github-gh-pages dir
-    # export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
+    export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
     # init github-gh-pages commit-limit
     export COMMIT_LIMIT=16
     # if branch is alpha, beta, or master, then run default build

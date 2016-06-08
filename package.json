@@ -46,8 +46,7 @@
 
 
 
-        "postinstall": "node index.js postinstall",
-        "start": "export PORT=${PORT:-8080} && export npm_config_mode_auto_restart=1 && utility2 shRun shIstanbulCover node test.js",
+        "start": "export PORT=${PORT:-8080} && export npm_config_mode_auto_restart=1 && utility2 shRun shIstanbulCover ${NODE_BIN:-node} test.js",
 
 
         "test": ". node_modules/.bin/utility2 && shReadmeExportScripts && cp $(shFileTrimLeft tmp/README.package.json) package.json && export PORT=$(utility2 shServerPortRandom) && utility2 test node test.js",
@@ -57,5 +56,5 @@
 
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.4.3"
+    "version": "2016.5.1"
 }
