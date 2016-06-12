@@ -8,6 +8,7 @@ this package will run a virtual swagger-ui server with persistent storage in the
 
 # documentation
 #### todo
+- add middlewareAcl
 - datatable - add sort-by-field
 - add notification system
 - add post-crud-middleware for pet photoUrl
@@ -19,12 +20,10 @@ this package will run a virtual swagger-ui server with persistent storage in the
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 18ba3ca5
-- npm publish 2016.5.1
-- merge admin-ui into swagger-ui
-- ui - re-implement reload feature
-- move all swagger-backend-config into top-level swagger-property 'x-swgg-apiDict'
-- remove unused postinstall script
+#### change since 16c2e225
+- npm publish 2016.5.2
+- add standalone-app download-link in test-page
+- ui - add button to reset nedb database
 - none
 
 #### this package requires
@@ -86,10 +85,10 @@ example.js
 this node script will run a standalone swagger-ui server backed by nedb
 
 instruction
-    1. save this script as example.js
+    1. save this js script as example.js
     2. run the shell command:
-        $ npm install swagger-lite && export PORT=1337 && node example.js
-    3. open a browser to http://localhost:1337
+        $ npm install swagger-lite && export PORT=8081 && node example.js
+    3. open a browser to http://localhost:8081
     4. interact with the swagger-ui crud-api
 */
 
@@ -128,26 +127,18 @@ instruction
                     'node';
             }
         }());
-        // init global
-        local.global = local.modeJs === 'browser'
-            ? window
-            : global;
+        /* istanbul ignore next */
+        // init local
+        local = local.modeJs === 'browser'
+            ? window.swgg.local
+            : module.isRollup
+            ? module
+            : require('swagger-lite').local;
         // export local
         local.global.local = local;
-        // init swagger-lite
-        local.swgg = local.modeJs === 'browser'
-            ? window.swgg
-            : require('swagger-lite');
-        // import swgg.local
-        Object.keys(local.swgg.local).forEach(function (key) {
-            local[key] = local[key] || local.swgg.local[key];
-        });
-        // init utility2
-        local.utility2 = local.swgg.local.utility2;
-        // init crud-middleware-pre
-        local.middlewareCrudPre = function (request, response, nextMiddleware) {
+        local.middlewareCrudCustom = function (request, response, nextMiddleware) {
         /*
-         * this function will run the middleware for petstore-specific crud-operations
+         * this function will run the middleware that will run custom-crud-operations
          */
             var crud, modeNext, onNext, result;
             modeNext = 0;
@@ -192,47 +183,39 @@ instruction
             };
             onNext();
         };
+        local.middlewareInitCustom = function (request, response, nextMiddleware) {
+        /*
+         * this function will run the middleware that will custom-init the request and response
+         */
+            // enable cors
+            // http://en.wikipedia.org/wiki/Cross-origin_resource_sharing
+            response.setHeader(
+                'Access-Control-Allow-Methods',
+                'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'
+            );
+            response.setHeader('Access-Control-Allow-Origin', '*');
+            // init content-type
+            response.setHeader('Content-Type', 'application/json; charset=UTF-8');
+            // ignore .map files
+            if (request.urlParsed.pathname.slice(-4) === '.map') {
+                local.utility2.serverRespondDefault(request, response, 404);
+                return;
+            }
+            nextMiddleware();
+        };
         // init middleware
         local.middleware = local.utility2.middlewareGroupCreate([
-            // init init-middleware
             local.utility2.middlewareInit,
-            // init cached-assets-middleware
             local.utility2.middlewareAssetsCached,
-            // init router-middleware
             local.swgg.middlewareRouter,
-            // init user-login-middleware
             local.swgg.middlewareUserLogin,
-            // init http-body-read-middleware
+            local.middlewareInitCustom,
+            local.swgg.middlewareJsonpStateGet,
             local.utility2.middlewareBodyRead,
-            // init http-body-parse-middleware
             local.swgg.middlewareBodyParse,
-            // init jsonp-state-init-middleware
-            local.swgg.middlewareJsonpStateInit,
-            // init swagger-init-middleware
-            function (request, response, nextMiddleware) {
-                // enable cors
-                // http://en.wikipedia.org/wiki/Cross-origin_resource_sharing
-                response.setHeader(
-                    'Access-Control-Allow-Methods',
-                    'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'
-                );
-                response.setHeader('Access-Control-Allow-Origin', '*');
-                // init content-type
-                response.setHeader('Content-Type', 'application/json; charset=UTF-8');
-                // ignore .map files
-                if (request.urlParsed.pathname.slice(-4) === '.map') {
-                    local.utility2.serverRespondDefault(request, response, 404);
-                    return;
-                }
-                nextMiddleware();
-            },
-            // init swagger-validate-middleware
             local.swgg.middlewareValidate,
-            // init crud-middleware-pre
-            local.middlewareCrudPre,
-            // init crud-middleware-builtin
+            local.middlewareCrudCustom,
             local.swgg.middlewareCrudBuiltin,
-            // init crud-middleware-end
             local.swgg.middlewareCrudEnd
         ]);
         // init error-middleware
@@ -279,8 +262,8 @@ body {\n\
     background-color: #fff;\n\
     font-family: Helvetica Neue,Helvetica,Arial,sans-serif;\n\
 }\n\
-body > div {\n\
-    margin-top: 20px;\n\
+body > * {\n\
+    margin-bottom: 1rem;\n\
 }\n\
 .testReportDiv {\n\
     display: none;\n\
@@ -291,10 +274,20 @@ body > div {\n\
     <div class="ajaxProgressDiv" style="display: block;">\n\
         <div class="ajaxProgressBarDiv ajaxProgressBarDivLoading">loading</div>\n\
     </div>\n\
-    <h1>{{envDict.npm_package_name}} @ {{envDict.npm_package_version}}</h1>\n\
+    <h1>\n\
+        <a\n\
+            {{#if envDict.npm_package_homepage}}\n\
+            href="{{envDict.npm_package_homepage}}"\n\
+            {{/if envDict.npm_package_homepage}}\n\
+        >\n\
+            {{envDict.npm_package_name}} @ {{envDict.npm_package_version}}\n\
+        </a>\n\
+    </h1>\n\
     <h3>{{envDict.npm_package_description}}</h3>\n\
-    <div class="testReportDiv"></div>\n\
+    <h4><a href="assets.app.js">download standalone app</a></h4>\n\
+    <div class="testReportDiv" style="display: none;"></div>\n\
 \n\
+    <button id="swggButtonNedbReset">reset nedb database</button>\n\
     <div class="swggUiContainer">\n\
     <form class="header tr">\n\
         <a class="td1" href="http://swagger.io" target="_blank">swagger</a>\n\
@@ -302,18 +295,27 @@ body > div {\n\
     </form>\n\
     <div class="reset"></div>\n\
     </div>\n\
+{{#if isRollup}}\n\
+<script src="assets.app.js"></script>\n\
+{{#unless isRollup}}\n\
 <script src="assets.utility2.rollup.js"></script>\n\
 <script src="assets.swgg.lib.nedb.js"></script>\n\
 <script src="assets.swgg.js"></script>\n\
 <script src="assets.swgg.lib.swagger-ui.js"></script>\n\
-<script src="jsonp.swgg.stateInit.js?callback=window.swgg.stateInit"></script>\n\
-{{scriptExtra}}\n\
+<script src="jsonp.swgg.stateGet?callback=window.swgg.stateInit"></script>\n\
+<script>window.utility2.onReadyBefore.counter += 1;</script>\n\
+<script src="assets.example.js"></script>\n\
+<script src="assets.test.js"></script>\n\
+<script>window.utility2.onReadyBefore();</script>\n\
+{{/if isRollup}}\n\
 <script>\n\
 (function () {\n\
-window.utility2.envDict.npm_package_description = "{{envDict.npm_package_description}}";\n\
-window.utility2.envDict.npm_package_name = "{{envDict.npm_package_name}}";\n\
-window.utility2.envDict.npm_package_version = "{{envDict.npm_package_version}};"\n\
 local.swgg.uiEventListenerDict[".onEventUiReload"]();\n\
+document.querySelector("#swggButtonNedbReset").addEventListener("click", function () {\n\
+    window.swgg.nedbReset(function () {\n\
+        location.reload();\n\
+    });\n\
+});\n\
 }());\n\
 </script>\n\
 </body>\n\
@@ -322,11 +324,7 @@ local.swgg.uiEventListenerDict[".onEventUiReload"]();\n\
         /* jslint-ignore-end */
         local.utility2.assetsDict['/'] = local.utility2.templateRender(
             local.utility2.templateIndexHtml,
-            {
-                envDict: local.utility2.envDict,
-                // add extra scripts
-                scriptExtra: '<script src="assets.example.js"></script>'
-            }
+            { envDict: local.utility2.envDict }
         );
         break;
     }
@@ -336,7 +334,8 @@ local.swgg.uiEventListenerDict[".onEventUiReload"]();\n\
     // run shared js-env code - post-init
     (function () {
         // init petstore-api - frontend
-        local.tmp = local.utility2.jsonCopy(local.swgg.swaggerPetstoreJson);
+        local.tmp =
+            JSON.parse(local.utility2.assetsDict['/assets.swgg.lib.swagger.petstore.json']);
         delete local.tmp.basePath;
         delete local.tmp.host;
         delete local.tmp.schemes;
@@ -725,15 +724,16 @@ local.swgg.uiEventListenerDict[".onEventUiReload"]();\n\
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "nedb-lite": "2016.4.2",
-        "utility2": "2016.4.2"
+        "nedb-lite": "2016.5.1",
+        "utility2": "2016.5.3"
     },
     "description": "this package will run a virtual swagger-ui server with persistent storage \
 in the browser, that your webapp can use (in-place of a real backend)",
     "devDependencies": {
-        "electron-lite": "2016.4.3"
+        "electron-lite": "kaizhu256/node-electron-lite#alpha"
     },
     "engines": { "node": ">=4.0" },
+    "homepage": "https://github.com/kaizhu256/node-swagger-lite",
     "keywords": [
         "api", "admin", "admin-ui",
         "browser",
@@ -753,32 +753,24 @@ in the browser, that your webapp can use (in-place of a real backend)",
         "url": "https://github.com/kaizhu256/node-swagger-lite.git"
     },
     "scripts": {
+        "build-app": "npm test --mode-test-case=testCase_build_app",
         "build-ci": "utility2 shRun shReadmeBuild",
-        "build-doc": ". node_modules/.bin/utility2 && \
-shReadmeExportScripts && \
+        "build-doc": "npm test --mode-test-case=testCase_build_doc",
+        "example.js": "\
+. node_modules/.bin/utility2 && shInit && shReadmeExportScripts && \
 cp $(shFileTrimLeft tmp/README.package.json) package.json && \
-utility2 shRun shDocApiCreate \"module.exports={ \
-exampleFileList:['README.md','test.js','index.js'], \
-moduleDict:{ \
-'swagger-lite':{aliasList:['swgg'],exports:require('./index.js')}, \
-'swagger-lite.Nedb':{aliasList:['Nedb','collection'],exports:require('./index.js').Nedb}, \
-'swagger-lite.Nedb.prototype':{aliasList:['collection'], \
-exports:require('./index.js').Nedb.prototype}, \
-'swagger-lite.Nedb.storage':{aliasList:['storage'], \
-exports:require('./index.js').Nedb.storage} \
-} \
-}\"",
+shRunScreenCapture shReadmeTestJs example.js",
         "start": "export PORT=${PORT:-8080} && \
 export npm_config_mode_auto_restart=1 && \
-utility2 shRun shIstanbulCover ${NODE_BIN:-node} test.js",
-        "test": ". node_modules/.bin/utility2 && \
-shReadmeExportScripts && \
+utility2 shRun shIstanbulCover node test.js",
+        "test": "\
+. node_modules/.bin/utility2 && shInit && shReadmeExportScripts && \
 cp $(shFileTrimLeft tmp/README.package.json) package.json && \
 export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.5.1"
+    "version": "2016.5.2"
 }
 ```
 
@@ -801,7 +793,7 @@ shBuildCiTestPre() {(set -e
     # test example js script
     (export MODE_BUILD=testExampleJs &&
         export npm_config_timeout_exit=10000 &&
-        shRunScreenCapture shReadmeTestJs example.js)
+        npm run example.js)
 )}
 
 shBuildCiTestPost() {(set -e
@@ -811,12 +803,11 @@ shBuildCiTestPost() {(set -e
     TEST_URL="https://$(printf "$GITHUB_REPO" | \
         sed 's/\//.github.io\//')/build..$CI_BRANCH..travis-ci.org/app/index.html"
     # deploy app to gh-pages
-    (export npm_config_file_test_report_merge="$npm_config_dir_build/test-report.json" &&
+    (export MODE_BUILD=githubTest &&
         shGithubDeploy)
     # test deployed app to gh-pages
     (export MODE_BUILD=githubTest &&
         export modeBrowserTest=test &&
-        export npm_config_file_test_report_merge="$npm_config_dir_build/test-report.json" &&
         export url="$TEST_URL?modeTest=consoleLogResult&timeExit={{timeExit}}" &&
         shBrowserTest)
 )}

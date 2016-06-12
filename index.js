@@ -8,30 +8,18 @@
     regexp: true,
     stupid: true
 */
-(function () {
+(function (local) {
     'use strict';
-    var local;
+    var require;
 
 
 
     // run shared js-env code - pre-init
     (function () {
-        // init local
-        local = {};
-        // init modeJs
-        local.modeJs = (function () {
-            try {
-                return typeof navigator.userAgent === 'string' &&
-                    typeof document.querySelector('body') === 'object' &&
-                    typeof XMLHttpRequest.prototype.open === 'function' &&
-                    'browser';
-            } catch (errorCaughtBrowser) {
-                return module.exports &&
-                    typeof process.versions.node === 'string' &&
-                    typeof require('http').createServer === 'function' &&
-                    'node';
-            }
-        }());
+        // init require
+        require = function (key) {
+            return local[key] || local.require2(key);
+        };
         // init global
         local.global = local.modeJs === 'browser'
             ? window
@@ -41,7 +29,7 @@
             ? local.global.utility2
             : require('utility2');
         // init lib swagger-lite
-        local.swgg = {
+        local.swgg = local.utility2.local.swgg = {
             collectionDict: {},
             idDomElementDict: {},
             local: local,
@@ -504,7 +492,7 @@
                 name: 'fileDescription',
                 type: 'string'
             }, {
-                description: '{{_schemaName}} file to form-upload',
+                description: '{{_schemaName}} file to upload by form',
                 in: 'formData',
                 name: 'file1',
                 type: 'file'
@@ -516,7 +504,7 @@
                     schema: { $ref: '#/definitions/BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'form-upload many {{_schemaName}} files'
+            summary: 'upload many {{_schemaName}} files by form'
         };
         local.swgg.templateApiDict.userLoginByPassword = {
             _method: 'get',
@@ -636,6 +624,17 @@ HQuvOzMCBUtb2tGHx5NAdLKqp5AX7Ng4d+Zi8AGDI9z1ijx9yaCH04y3GCP2S+QcvaGl+pcxyUBvinFl
 awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
 ';
 /* jslint-ignore-end */
+        // init assets
+        local.utility2.assetsDict['/assets.swgg.lib.json-schema.schema.json'] = '{}';
+        local.utility2.assetsDict['/assets.swgg.lib.swagger.schema.json'] = '{}';
+        local.utility2.assetsDict['/assets.swgg.swagger-ui.logo_small.png'] =
+            local.utility2.assetsDict['/favicon.ico'] =
+            local.utility2.bufferToNodeBuffer(
+                local.utility2.bufferCreate(
+                    local.swgg.templateSwaggerUiLogoSmallBase64,
+                    'base64'
+                )
+            );
     }());
 
 
@@ -766,6 +765,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
          * this function will update the swagger-api dict of api-calls
          */
             var tmp;
+            options = options || {};
             // init apiDict
             local.swgg.apiDict = local.swgg.apiDict || {};
             // init swaggerJson
@@ -1002,7 +1002,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     break;
                 case 'string':
                     tmp = 'random_' + Date.now().toString(36) +
-                        Math.random().toString(36).slice(2, 6);
+                        Math.random().toString(36).slice(2, 10);
                     switch (propDef.format) {
                     case 'byte':
                         tmp = local.utility2.stringToBase64(tmp);
@@ -1193,17 +1193,17 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             return id;
         };
 
-        local.swgg.idInt53TimeCreate = function () {
+        local.swgg.idIntTimeCreate = function () {
         /*
          * this function will return a unique (until 2109), time-based-53-bit integer,
          * that can be used as an integer id
          */
             var id;
             id = Date.now() * 0x80;
-            local.swgg.idInt53TimeMin = id <= local.swgg.idInt53TimeMin
-                ? local.swgg.idInt53TimeMin + 1
+            local.swgg.idIntTimeMin = id <= local.swgg.idIntTimeMin
+                ? local.swgg.idIntTimeMin + 1
                 : id;
-            return local.swgg.idInt53TimeMin;
+            return local.swgg.idIntTimeMin;
         };
 
         local.swgg.jwtEncodedDecodeAndDecrypt = function (user) {
@@ -1287,7 +1287,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
 
         local.swgg.middlewareBodyParse = function (request, response, nextMiddleware) {
         /*
-         * this function will run the middleware that will parse the request-body
+         * this function will run the middleware that will parse request.bodyRaw
          */
             var ii, jj, options;
             // jslint-hack
@@ -1402,7 +1402,8 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
 
         local.swgg.middlewareCrudBuiltin = function (request, response, nextMiddleware) {
         /*
-         * this function will run the middleware for the builtin crud-operations, backe by nedb
+         * this function will run the middleware that will
+         * run the builtin crud-operations backed by nedb
          */
             var crud, modeNext, onNext, onParallel, tmp, user;
             modeNext = 0;
@@ -1519,7 +1520,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                             })
                             .map(function (key) {
                                 tmp = local.utility2.jsonCopy(request.swgg.paramDict);
-                                tmp.id = tmp.id || local.swgg.idInt53TimeCreate().toString(36);
+                                tmp.id = tmp.id || local.swgg.idIntTimeCreate().toString(36);
                                 local.utility2.objectSetOverride(tmp, {
                                     fileBlob: local.utility2.bufferToString(
                                         request.swgg.bodyParsed[key],
@@ -1624,8 +1625,8 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
 
         local.swgg.middlewareError = function (error, request, response) {
         /*
-         * this function will run the middleware that will handle errors according to
-         * http://jsonapi.org/format/#errors
+         * this function will run the middleware that will
+         * handle errors according to http://jsonapi.org/format/#errors
          */
             if (!error) {
                 error = new Error('404 Not Found');
@@ -1634,15 +1635,43 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             local.swgg.serverRespondJsonapi(request, response, error);
         };
 
-        local.swgg.middlewareJsonpStateInit = function (request, response, nextMiddleware) {
+        local.swgg.middlewareJsonpStateGet = function (request, response, nextMiddleware) {
         /*
-         * this function will jsonp-init the browser-state
+         * this function will run the middleware that will
+         * serve the browser-state wrapped in the given request.jsonp-callback
          */
-            if (request.urlParsed.pathname === '/jsonp.swgg.stateInit.js') {
-                response.end(request.urlParsed.query.callback + '(' + JSON.stringify({
-                    swaggerPetstoreJson: local.swgg.swaggerPetstoreJson,
-                    swaggerSchemaJson: local.swgg.swaggerSchemaJson
-                }) + ');');
+            var isRequest, state;
+            isRequest = request.urlParsed &&
+                request.urlParsed.pathname === '/jsonp.swgg.stateGet';
+            state = { utility2: { assetsDict: {}, envDict: {} } };
+            if (request.configGet || isRequest) {
+                [
+                    '/assets.swgg.lib.json-schema.schema.json',
+                    '/assets.swgg.lib.swagger.petstore.json',
+                    '/assets.swgg.lib.swagger.schema.json'
+                ].forEach(function (key) {
+                    state.utility2.assetsDict[key] = local.utility2.assetsDict[key];
+                });
+                if (request.configGet) {
+                    return state;
+                }
+            }
+            if (request.stateGet || isRequest) {
+                [
+                    'npm_package_description',
+                    'npm_package_homepage',
+                    'npm_package_name',
+                    'npm_package_version'
+                ].forEach(function (key) {
+                    state.utility2.envDict[key] = local.utility2.envDict[key];
+                });
+                if (request.stateGet) {
+                    return state;
+                }
+            }
+            if (isRequest) {
+                response.end(request.urlParsed.query.callback + '(' + JSON.stringify(state) +
+                    ');');
                 return;
             }
             nextMiddleware();
@@ -1650,8 +1679,8 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
 
         local.swgg.middlewareRouter = function (request, response, nextMiddleware) {
         /*
-         * this function will run the middleware that will route the method-path
-         * to the swagger-operationId
+         * this function will run the middleware that will
+         * map the request's method-path to swagger's tags[0]-operationId
          */
             var tmp;
             // jslint-hack
@@ -1693,7 +1722,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
 
         local.swgg.middlewareUserLogin = function (request, response, nextMiddleware) {
         /*
-         * this function will handle user login / logout
+         * this function will run the middleware that will handle user login
          */
             var modeNext, onNext, crud, user;
             modeNext = 0;
@@ -1931,7 +1960,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         if (!local.utility2.isNullOrUndefined(crud.data[crud.keyUnique])) {
                             break;
                         }
-                        crud.data[crud.keyUnique] = local.swgg.idInt53TimeCreate().toString(36);
+                        crud.data[crud.keyUnique] = local.swgg.idIntTimeCreate().toString(36);
                         request.swgg.pathObject.parameters.forEach(function (param) {
                             // try to init id
                             local.utility2.tryCatchOnError(function () {
@@ -2143,13 +2172,21 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             })(error, data, meta);
         };
 
-        local.swgg.stateInit = function (state) {
+        local.swgg.stateInit = function (options) {
         /*
-         * this function will init the swgg-state
+         * this function will init the state-options
          */
-            Object.keys(state).forEach(function (key) {
-                local.swgg[key] = state[key];
-            });
+            local.utility2.objectSetOverride(local, options, 10);
+            // init swaggerSchemaJson
+            local.swgg.swaggerSchemaJson = local.utility2.objectSetOverride(
+                JSON.parse(
+                    local.utility2.assetsDict['/assets.swgg.lib.json-schema.schema.json']
+                ),
+                JSON.parse(
+                    local.utility2.assetsDict['/assets.swgg.lib.swagger.schema.json']
+                ),
+                2
+            );
             // init api
             local.swgg.apiDictUpdate(local.swgg.swaggerJson);
         };
@@ -2597,49 +2634,95 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
     // run node js-env code - post-init
     case 'node':
         // init exports
-        module.exports = local.swgg;
+        module.exports = module['swagger-lite'] = local.swgg;
         module.exports.__dirname = __dirname;
         // require modules
         local.fs = require('fs');
         local.path = require('path');
         local.url = require('url');
-        // https://petstore.swagger.io/v2/swagger.json
-        // init swaggerPetstoreJson
-        local.swgg.swaggerPetstoreJson =
-            local.utility2.jsonCopy(require('./lib.swagger.petstore.json'));
-        // https://json-schema.org/draft-04/schema
-        // https://swagger.io/v2/schema.json
-        // init swaggerSchemaJson
-        local.swgg.swaggerSchemaJson = local.utility2.objectSetOverride(
-            local.utility2.jsonCopy(require('./lib.json-schema.schema.json')),
-            local.utility2.jsonCopy(require('./lib.swagger.schema.json')),
-            2
-        );
+        /* istanbul ignore next */
+        if (module.isRollup) {
+            break;
+        }
+        require('./lib.swagger-ui.js');
         // init assets
-        local.utility2.assetsDict['/assets.swgg.css'] =
-            local.fs.readFileSync(__dirname + '/index.css', 'utf8');
-        local.utility2.assetsDict['/assets.swgg.js'] =
-            local.utility2.istanbulInstrumentInPackage(
-                local.fs.readFileSync(__filename, 'utf8'),
-                __filename,
-                'swagger-lite'
-            );
-        local.utility2.assetsDict['/assets.swgg.lib.nedb.js'] =
-            local.fs.readFileSync(local.swgg.Nedb.__dirname + '/nedb-lite.js', 'utf8');
-        local.utility2.assetsDict['/assets.swgg.lib.swagger-ui.js'] =
-            local.utility2.istanbulInstrumentInPackage(
-                local.fs.readFileSync(__dirname + '/lib.swagger-ui.js', 'utf8'),
-                __dirname + '/lib.swagger-ui.js',
-                'swagger-lite'
-            );
-        local.utility2.assetsDict['/swagger-ui.html'] = local.utility2.templateRender(
-            local.fs.readFileSync(__dirname + '/README.md', 'utf8')
-                .replace((/[\S\s]*?<!doctype html>/), '<!doctype html>')
-                .replace((/<\/html>[\S\s]*/), '</html>')
-                .replace((/\\n\\$/gm), '')
-                .replace((/\\\\/g), '\\'),
-            { envDict: local.utility2.envDict }
-        );
+        [
+            'index.css',
+            'index.js',
+            // https://json-schema.org/draft-04/schema
+            'lib.json-schema.schema.json',
+            'lib.nedb.js',
+            // https://petstore.swagger.io/v2/swagger.json
+            'lib.swagger.petstore.json',
+            'lib.swagger-ui.js',
+            // https://swagger.io/v2/schema.json
+            'lib.swagger.schema.json'
+        ].forEach(function (key) {
+            switch (key) {
+            case 'index.css':
+                local.utility2.assetsDict['/assets.swgg.css'] =
+                    local.fs.readFileSync(__dirname + '/' + key, 'utf8');
+                break;
+            case 'index.js':
+                local.utility2.assetsDict['/assets.swgg.js'] =
+                    local.utility2.istanbulInstrumentInPackage(
+                        local.fs.readFileSync(__dirname + '/' + key, 'utf8')
+                            .replace((/^#!/), '//'),
+                        __dirname + '/' + key,
+                        'swagger-lite'
+                    );
+                break;
+            case 'lib.json-schema.schema.json':
+            case 'lib.swagger.petstore.json':
+            case 'lib.swagger.schema.json':
+                local.utility2.assetsDict['/assets.swgg.' + key] =
+                    local.fs.readFileSync(__dirname + '/' + key, 'utf8');
+                break;
+            case 'lib.nedb.js':
+                local.utility2.assetsDict['/assets.swgg.' + key] =
+                    local.fs.readFileSync(local.swgg.Nedb.__dirname + '/nedb-lite.js', 'utf8');
+                break;
+            case 'lib.swagger-ui.js':
+                local.utility2.assetsDict['/assets.swgg.' + key] =
+                    local.utility2.istanbulInstrumentInPackage(
+                        local.fs.readFileSync(__dirname + '/' + key, 'utf8')
+                            .replace((/^#!/), '//'),
+                        __dirname + '/' + key,
+                        'swagger-lite'
+                    );
+                break;
+            }
+        });
+        local.utility2.assetsDict['/assets.swgg.rollup.js'] = [
+            '/assets.utility2.rollup.js',
+            '/assets.swgg.css',
+            '/assets.swgg.lib.nedb.js',
+            '/assets.swgg.js',
+            '/assets.swgg.lib.swagger-ui.js',
+            'local.swgg.stateInit'
+        ].map(function (key) {
+            switch (local.path.extname(key)) {
+            case '.js':
+                return '// ' + key + '\n' + local.utility2.assetsDict[key];
+            case '.stateInit':
+                return '// ' + key + '\n' +
+                    local.utility2.assetsDict['/assets.utility2.rollup.content.js']
+                    .replace(
+                        '/* utility2.rollup.js content */',
+                        key + '(' + JSON.stringify(
+                            local.swgg.middlewareJsonpStateGet({ configGet: true })
+                        ) + ');'
+                    );
+            default:
+                return '// ' + key + '\n' +
+                    local.utility2.assetsDict['/assets.utility2.rollup.content.js']
+                    .replace(
+                        '/* utility2.rollup.js content */',
+                        'local.utility2.assetsDict[' + JSON.stringify(key) + '] = ' +
+                            JSON.stringify(local.utility2.assetsDict[key])
+                    );
+            }
+        }).join('\n\n\n\n');
         break;
     }
 
@@ -2647,15 +2730,35 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
 
     // run shared js-env code - post-init
     (function () {
-        // init assets
-        local.utility2.assetsDict['/assets.swgg.swagger-ui.logo_small.png'] =
-            local.utility2.bufferToNodeBuffer(
-                local.utility2.bufferCreate(
-                    local.swgg.templateSwaggerUiLogoSmallBase64,
-                    'base64'
-                )
-            );
-        // init api
-        local.swgg.apiDictUpdate({});
+        // init state
+        local.swgg.stateInit({});
     }());
-}());
+}(
+    (function () {
+        'use strict';
+        var local;
+        // init local
+        local = {};
+        // init modeJs
+        local.modeJs = (function () {
+            try {
+                return typeof navigator.userAgent === 'string' &&
+                    typeof document.querySelector('body') === 'object' &&
+                    typeof XMLHttpRequest.prototype.open === 'function' &&
+                    'browser';
+            } catch (errorCaughtBrowser) {
+                return module.exports &&
+                    typeof process.versions.node === 'string' &&
+                    typeof require('http').createServer === 'function' &&
+                    'node';
+            }
+        }());
+        // init module
+        if (local.modeJs === 'node') {
+            local = module;
+            local.modeJs = 'node';
+            local.require2 = require;
+        }
+        return local;
+    }())
+));

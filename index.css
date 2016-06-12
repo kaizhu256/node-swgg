@@ -62,9 +62,6 @@
 .swggUiContainer span {
     min-height: 1.5rem;
 }
-.swggUiContainer .bold {
-    font-weight: bold;
-}
 .swggUiContainer button {
     padding: 0.5rem;
 }
@@ -112,6 +109,9 @@
 }
 .swggUiContainer .fontLineThrough {
     text-decoration: line-through;
+}
+.swggUiContainer .fontWeightBold {
+    font-weight: bold;
 }
 .swggUiContainer input {
     height: 1.5rem;
@@ -269,7 +269,7 @@
     color: #370;
     text-decoration: underline;
 }
-.swggUiContainer > .info > .bold {
+.swggUiContainer > .info > .fontWeightBold {
     font-size: x-large;
 }
 .swggUiContainer > .info > ul {
@@ -320,7 +320,7 @@
     padding: 4px;
     height: 1.5rem;
     text-align: center;
-    width: 4rem;
+    width: 4.5rem;
 }
 .swggUiContainer .operation > .header > .td3 {
     color: #777;
@@ -356,8 +356,6 @@
     font-size: large;
 }
 .swggUiContainer .resource > .header > .td2,
-.swggUiContainer .resource > .header > .td3,
-.swggUiContainer .resource > .header > .td4,
 .swggUiContainer .resource > .header > .td3 {
     border-right: 1px solid #777;
     padding-right: 1rem;

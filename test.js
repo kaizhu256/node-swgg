@@ -45,6 +45,11 @@
             break;
         // re-init local from example.js
         case 'node':
+            /* istanbul ignore next */
+            if (module.isRollup) {
+                local = module;
+                break;
+            }
             local = require('utility2').local;
             local._script = local.fs.readFileSync(__dirname + '/README.md', 'utf8')
                 // support syntax-highlighting
@@ -71,6 +76,24 @@
             local = local.utility2.requireFromScript(__dirname + '/example.js', local._script);
             break;
         }
+        // init templates
+/* jslint-ignore-begin */
+local.utility2.assetsDict['/assets.app.begin.js'] = '\
+/*\n\
+app.js\n\
+\n\
+this standalone script will run a virtual swagger-ui server with persistent storage\n\
+in the browser, that your webapp can use (in-place of a real backend)\n\
+\n\
+instruction\n\
+    1. save this script as app.js\n\
+    2. run the shell command:\n\
+        $ PORT=8081 node app.js\n\
+    3. open a browser to http://localhost:8081\n\
+    4. interact with the swagger-ui crud-api\n\
+*/\n\
+';
+/* jslint-ignore-end */
     }());
 
 
@@ -890,6 +913,22 @@
             onNext();
         };
 
+        local.testCase_idIntTimeCreate_default = function (options, onError) {
+        /*
+         * this function will test idIntTimeCreate's default handling-behavior
+         */
+            options = {};
+            // init data1
+            options.data1 = local.swgg.idIntTimeCreate();
+            for (options.ii = 0; options.ii < 100; options.ii += 1) {
+                options.data2 = local.swgg.idIntTimeCreate();
+                // validate data2 > data1
+                local.utility2.assert(options.data2 > options.data1, options);
+                options.data1 = options.data2;
+            }
+            onError();
+        };
+
         local.testCase_nedbReset_default = function (options, onError) {
         /*
          * this function will test nedbReset's default handling-behavior
@@ -1567,24 +1606,17 @@
          * this function will test the uiScrollTo's default handling-behavior
          */
             options = [
-                [location, {
-                    hash: ''
-                }]
+                '',
+                '#!/swgg_id_pet',
+                '#!/swgg_id_pet/undefined',
+                '#!/swgg_id_pet/undefined/undefined',
+                '#!/swgg_id_pet/swgg_datatable',
+                '#!/swgg_id_pet/swgg_id_addPet'
             ];
-            local.utility2.testMock(options, function (onError) {
-                [
-                    '',
-                    '#!/swgg_id_pet',
-                    '#!/swgg_id_pet/undefined',
-                    '#!/swgg_id_pet/undefined/undefined',
-                    '#!/swgg_id_pet/swgg_datatable',
-                    '#!/swgg_id_pet/swgg_id_addPet'
-                ].forEach(function (hash) {
-                    location.hash = hash;
-                    local.swgg.uiScrollTo();
-                });
-                onError();
-            }, onError);
+            options.forEach(function (element) {
+                local.swgg.uiScrollTo(element);
+            });
+            onError();
         };
         break;
 
@@ -1592,19 +1624,20 @@
 
     // run node js-env code - function
     case 'node':
-        local.testCase_build_assets = function (options, onError) {
+        local.testCase_build_app = function (options, onError) {
         /*
-         * this function will test build's asset handling-behavior
+         * this function will test build's app handling-behavior
          */
             var onParallel;
             onParallel = local.utility2.onParallel(onError);
             onParallel.counter += 1;
+            options = {};
             options = [{
-                file: '/index.html',
-                url: '/'
-            }, {
                 file: '/api/v0/swagger.json',
                 url: '/api/v0/swagger.json'
+            }, {
+                file: '/assets.app.js',
+                url: '/assets.app.js'
             }, {
                 file: '/assets.example.js',
                 url: '/assets.example.js'
@@ -1633,17 +1666,17 @@
                 file: '/assets.utility2.rollup.js',
                 url: '/assets.utility2.rollup.js'
             }, {
-                file: '/jsonp.swgg.stateInit.js',
-                url: '/jsonp.swgg.stateInit.js?callback=window.swgg.stateInit'
+                file: '/index.html',
+                url: '/index.html'
             }, {
-                file: '/swagger-ui.html',
-                url: '/swagger-ui.html'
+                file: '/jsonp.swgg.stateGet',
+                url: '/jsonp.swgg.stateGet?callback=window.swgg.stateInit'
             }];
             options.forEach(function (options) {
                 onParallel.counter += 1;
                 local.utility2.ajax(options, function (error, xhr) {
-                    // validate no error occurred
                     onParallel.counter += 1;
+                    // validate no error occurred
                     onParallel(error);
                     local.utility2.fsWriteFileWithMkdirp(
                         local.utility2.envDict.npm_config_dir_build + '/app' + options.file,
@@ -1655,9 +1688,73 @@
             onParallel();
         };
 
-        local.testCase_testPage_default = function (options, onError) {
+        local.testCase_build_doc = function (options, onError) {
         /*
-         * this function will test the test-page's default handling-behavior
+         * this function will test build's doc handling-behavior
+         */
+            var modeNext, onNext;
+            modeNext = 0;
+            onNext = function (error) {
+                local.utility2.tryCatchOnError(function () {
+                    // validate no error occurred
+                    local.utility2.assert(!error, error);
+                    modeNext += 1;
+                    switch (modeNext) {
+                    case 1:
+                        options = {};
+                        options.example = [
+                            'README.md',
+                            'test.js',
+                            'index.js',
+                            'lib.swagger-ui.js'
+                        ].map(function (file) {
+                            return '\n\n\n\n\n\n\n\n' +
+                                local.fs.readFileSync(file, 'utf8') +
+                                '\n\n\n\n\n\n\n\n';
+                        }).join('');
+                        options.moduleDict = {
+                            'swagger-lite': {
+                                aliasList: ['swgg'],
+                                exports: local.swgg
+                            },
+                            'swagger-lite.Nedb': {
+                                aliasList: ['swgg'],
+                                exports: local.swgg.Nedb
+                            },
+                            'swagger-lite.Nedb.prototype': {
+                                aliasList: ['collection'],
+                                exports: local.swgg.Nedb.prototype
+                            },
+                            'swagger-lite.Nedb.storage': {
+                                aliasList: ['storage'],
+                                exports: local.swgg.Nedb.storage
+                            }
+                        };
+                        // create doc.api.html
+                        local.utility2.fsWriteFileWithMkdirp(
+                            local.utility2.envDict.npm_config_dir_build + '/doc.api.html',
+                            local.utility2.docApiCreate(options),
+                            onNext
+                        );
+                        break;
+                    case 2:
+                        local.utility2.browserTest({
+                            modeBrowserTest: 'screenCapture',
+                            url: 'file://' + local.utility2.envDict.npm_config_dir_build +
+                                '/doc.api.html'
+                        }, onNext);
+                        break;
+                    default:
+                        onError(error);
+                    }
+                }, onError);
+            };
+            onNext();
+        };
+
+        local.testCase_webpage_default = function (options, onError) {
+        /*
+         * this function will test the webpage's default handling-behavior
          */
             options = {
                 modeCoverageMerge: true,
@@ -1749,7 +1846,7 @@
                         propString: { type: 'string' },
                         propString2: {
                             maxLength: 50,
-                            minLength: 20,
+                            minLength: 25,
                             pattern: '^\\w*$',
                             type: 'string'
                         },
@@ -2132,22 +2229,52 @@
 
     // run node js-env code - post-init
     case 'node':
+        // init repl debugger
+        local.utility2.replStart();
         // init assets
-        local.utility2.assetsDict['/'] = local.utility2.templateRender(
-            local.utility2.templateIndexHtml,
-            {
-                envDict: local.utility2.envDict,
-                // add extra scripts
-                scriptExtra: '<script src="assets.example.js"></script>' +
-                    '<script src="assets.test.js"></script>'
-            }
-        );
+        local.utility2.assetsDict['/'] = local.utility2.assetsDict['/index.html'] =
+            local.utility2.templateRender(
+                local.utility2.templateIndexHtml,
+                {
+                    envDict: local.utility2.envDict,
+                    isRollup: local.isRollup || local.utility2.envDict.npm_config_production
+                }
+            );
+        /* istanbul ignore next */
+        if (module.isRollup) {
+            local.utility2.assetsDict['/assets.app.js'] =
+                local.fs.readFileSync(__filename, 'utf8');
+            break;
+        }
         local.utility2.assetsDict['/assets.test.js'] =
             local.utility2.istanbulInstrumentInPackage(
                 local.fs.readFileSync(__filename, 'utf8'),
                 local.swgg.__dirname + '/test.js',
                 'swagger-lite'
             );
+        local.utility2.assetsDict['/assets.app.js'] = [
+            '/assets.app.begin.js',
+            '/assets.swgg.rollup.js',
+            'local.swgg.stateInit',
+            '/assets.example.js',
+            '/assets.test.js'
+        ].map(function (key) {
+            switch (key) {
+            case '/assets.app.begin.js':
+                return local.utility2.assetsDict[key];
+            case 'local.swgg.stateInit':
+                return '// ' + key + '\n' +
+                    local.utility2.assetsDict['/assets.utility2.rollup.content.js']
+                    .replace(
+                        '/* utility2.rollup.js content */',
+                        key + '(' + JSON.stringify(
+                            local.swgg.middlewareJsonpStateGet({ stateGet: true })
+                        ) + ');'
+                    );
+            default:
+                return '// ' + key + '\n' + local.utility2.assetsDict[key];
+            }
+        }).join('\n\n\n\n');
         // run validation test
         local.utility2.tryCatchOnError(function () {
             local.testCase_validateByParamDefList_default(null, local.utility2.onErrorDefault);
@@ -2175,8 +2302,6 @@
                 }
             });
         });
-        // init repl debugger
-        local.utility2.replStart();
         break;
     }
 }());

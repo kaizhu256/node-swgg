@@ -14,10 +14,31 @@
 
 
 
-    // run browser js-env code - pre-init
+    // run shared js-env code - pre-init
     (function () {
         // init local
-        local = window.swgg.local;
+        local = {};
+        // init modeJs
+        local.modeJs = (function () {
+            try {
+                return typeof navigator.userAgent === 'string' &&
+                    typeof document.querySelector('body') === 'object' &&
+                    typeof XMLHttpRequest.prototype.open === 'function' &&
+                    'browser';
+            } catch (errorCaughtBrowser) {
+                return module.exports &&
+                    typeof process.versions.node === 'string' &&
+                    typeof require('http').createServer === 'function' &&
+                    'node';
+            }
+        }());
+        /* istanbul ignore next */
+        // init local
+        local = local.modeJs === 'browser'
+            ? window.swgg.local
+            : module.isRollup
+            ? module
+            : require('./index.js').local;
 /* jslint-ignore-begin */
 local.swgg.templateUiDatatable = '\
 <div class="pagination tr">\n\
@@ -81,7 +102,7 @@ local.swgg.templateUiMain = '\
 </form>\n\
 <div class="info reset">\n\
     {{#if info}}\n\
-    <div class="bold">{{info.title htmlSafe}}</div>\n\
+    <div class="fontWeightBold">{{info.title htmlSafe}}</div>\n\
     {{#if info.description}}\n\
     <div>{{info.description htmlSafe}}</div>\n\
     {{/if info.description}}\n\
@@ -125,7 +146,7 @@ local.swgg.templateUiOperation = '\
     data-_key-operation-id="{{_keyOperationId}}"\n\
     id="{{id}}"\n\
 >\n\
-    <div class="cursorPointer eventDelegateClick onEventOperationDisplayToggle header tr">\n\
+    <div class="cursorPointer eventDelegateClick onEventOperationDisplayShow header tr">\n\
         <span class="td1">{{_method}}</span>\n\
         <span class="flex1 td2 {{#if deprecated}}fontLineThrough{{/if deprecated}}">{{_path}}</span>\n\
         <span class="flex1 td3">{{operationId}}</span>\n\
@@ -173,7 +194,7 @@ local.swgg.templateUiOperation = '\
 
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/param.handlebars
 local.swgg.templateUiParam = '\
-<span class="td1 {{#if required}}bold{{/if required}}">\n\
+<span class="td1 {{#if required}}fontWeightBold{{/if required}}">\n\
     {{name}}<br>\n\
     <span class="color777">{{description}}</span>\n\
 </span>\n\
@@ -207,12 +228,11 @@ local.swgg.templateUiResource = '\
     class="borderBottomBold resource eventDelegateClick"\n\
     data-name="{{name}}"\n\
     id="{{id}}">\n\
-    <div class="bold header tr">\n\
+    <div class="fontWeightBold header tr">\n\
         <a class="color777 flex1 onEventResourceDisplayAction td1" href="#">{{name}} : {{description htmlSafe}}</a>\n\
-        <a class="color777 onEventResourceDisplayAction td2" href="#">Show / Hide</a>\n\
-        <a class="color777 onEventResourceDisplayAction td3" href="#">List Operations</a>\n\
-        <a class="color777 onEventResourceDisplayAction td4" href="#">Expand Operations</a>\n\
-        <a class="color777 onEventDatatableReload td5" data-resource-name="{{name}}" href="#">Datatable</a>\n\
+        <a class="color777 onEventResourceDisplayAction td2" href="#">Show</a>\n\
+        <a class="color777 onEventResourceDisplayAction td3" href="#">Expand / Collapse Operations</a>\n\
+        <a class="color777 onEventDatatableReload td4" data-resource-name="{{name}}" href="#">Datatable</a>\n\
     </div>\n\
     <div class="operationList" style="display: none;"></div>\n\
 </div>\n\
@@ -240,11 +260,12 @@ local.swgg.templateUiResponseAjax = '\
 ';
 /* jslint-ignore-end */
     }());
+    switch (local.modeJs) {
 
 
 
-    // run browser js-env code - function
-    (function () {
+    // run browser js-env code - post-init
+    case 'browser':
         local.swgg.uiAnimateFadeIn = function (element) {
         /*
          * this function will fadeIn the element
@@ -735,7 +756,7 @@ local.swgg.templateUiResponseAjax = '\
             onNext();
         };
 
-        local.swgg.uiEventListenerDict['.onEventOperationDisplayToggle'] = function (event) {
+        local.swgg.uiEventListenerDict['.onEventOperationDisplayShow'] = function (event) {
         /*
          * this function will toggle the display of the operation
          */
@@ -743,19 +764,64 @@ local.swgg.templateUiResponseAjax = '\
             location.hash = '!/' + event.target.closest('.resource').id + '/' +
                 event.target.closest('.operation').id;
             tmp = event.target.closest('.operation').querySelector('.operation > .content');
+            tmp.closest('.resource').classList.remove('expanded');
             // show the operation, but hide all other operations
-            if (tmp.style.display === 'none') {
-                local.swgg.uiAnimateSlideAccordian(
-                    tmp,
-                    local.utility2.domQuerySelectorAll(
-                        tmp.closest('.operationList'),
-                        '.operation > .content'
-                    )
-                );
-            // hide the operation
-            } else {
-                local.swgg.uiAnimateSlideUp(tmp);
-            }
+            local.swgg.uiAnimateSlideAccordian(
+                tmp,
+                local.utility2.domQuerySelectorAll(
+                    tmp.closest('.operationList'),
+                    '.operation > .content'
+                )
+            );
+        };
+
+        local.swgg.uiEventListenerDict['.onEventResourceDisplayAction'] = function (event) {
+        /*
+         * this function will toggle the display of the resource
+         */
+            location.hash = '!/' + event.currentTarget.id;
+            event.target.className.split(' ').some(function (className) {
+                switch (className) {
+                // show the resource, but hide all other resources
+                case 'td1':
+                case 'td2':
+                case 'td3':
+                    local.swgg.uiAnimateSlideAccordian(
+                        event.currentTarget.querySelector('.operationList'),
+                        local.utility2.domQuerySelectorAll(
+                            document,
+                            '.swggUiContainer .operationList'
+                        )
+                    );
+                    break;
+                }
+                switch (className) {
+                case 'td1':
+                case 'td2':
+                    return true;
+                case 'td3':
+                    // collapse all operations in the resource
+                    if (event.currentTarget.classList.contains('expanded')) {
+                        event.currentTarget.classList.remove('expanded');
+                        local.utility2.domQuerySelectorAll(
+                            event.currentTarget,
+                            '.operation > .content'
+                        ).forEach(function (element) {
+                            local.swgg.uiAnimateSlideUp(element);
+                        });
+                    // expand all operations in the resource
+                    } else {
+                        event.currentTarget.classList.add('expanded');
+                        local.utility2.domQuerySelectorAll(
+                            event.currentTarget,
+                            '.operation > .content'
+                        ).forEach(function (element) {
+                            local.swgg.uiAnimateSlideDown(element);
+                        });
+                    }
+                    return true;
+                }
+            });
         };
 
         local.swgg.uiEventListenerDict['.onEventUiReload'] = function () {
@@ -783,65 +849,6 @@ local.swgg.templateUiResponseAjax = '\
                 local.swgg.apiDict = local.swgg.swaggerJson = null;
                 local.swgg.apiDictUpdate(JSON.parse(xhr.responseText));
                 local.swgg.uiRender();
-            });
-        };
-
-        local.swgg.uiEventListenerDict['.onEventResourceDisplayAction'] = function (event) {
-        /*
-         * this function will toggle the display of the resource
-         */
-            var tmp;
-            location.hash = '!/' + event.target.closest('.resource').id;
-            tmp = event.currentTarget.querySelector('.operationList');
-            event.target.className.split(' ').some(function (className) {
-                switch (className) {
-                // hide the resource
-                case 'td1':
-                case 'td2':
-                    if (tmp.style.display !== 'none') {
-                        local.swgg.uiAnimateSlideUp(tmp);
-                        return true;
-                    }
-                    break;
-                }
-                switch (className) {
-                // show the resource, but hide all other resources
-                case 'td1':
-                case 'td2':
-                case 'td3':
-                case 'td4':
-                    local.swgg.uiAnimateSlideAccordian(
-                        tmp,
-                        local.utility2.domQuerySelectorAll(
-                            document,
-                            '.swggUiContainer .operationList'
-                        )
-                    );
-                    break;
-                }
-                switch (className) {
-                case 'td1':
-                case 'td2':
-                    return true;
-                // collapse all operations in the resource
-                case 'td3':
-                    local.utility2.domQuerySelectorAll(
-                        tmp,
-                        '.operation > .content'
-                    ).forEach(function (element) {
-                        local.swgg.uiAnimateSlideUp(element);
-                    });
-                    return true;
-                // expand all operations in the resource
-                case 'td4':
-                    local.utility2.domQuerySelectorAll(
-                        tmp,
-                        '.operation > .content'
-                    ).forEach(function (element) {
-                        local.swgg.uiAnimateSlideDown(element);
-                    });
-                    return true;
-                }
             });
         };
 
@@ -1090,49 +1097,41 @@ local.swgg.templateUiResponseAjax = '\
             // init event-handling
             local.swgg.uiEventInit(document);
             // scrollTo location.hash
-            local.swgg.uiScrollTo();
+            local.swgg.uiScrollTo(location.hash);
         };
 
-        local.swgg.uiScrollTo = function () {
+        local.swgg.uiScrollTo = function (locationHash) {
         /*
-         * this function will scrollTo location.hash
+         * this function will scrollTo locationHash
          */
-            var scrollTo;
-            // init scrollTo
-            scrollTo = document.body;
-            // restore state from hash
-            local.utility2.tryCatchOnError(function () {
-                location.hash.split('/').slice(1).forEach(function (element, ii, list) {
-                    switch (ii) {
-                    case 0:
-                        // list operations for the resource and scroll to it
-                        element = document.querySelector('.swggUiContainer #' + element +
-                            ' .operationList');
-                        local.swgg.uiAnimateSlideDown(element);
-                        // scrollTo resource
-                        scrollTo = element.closest('.resource');
-                        break;
-                    case 1:
-                        // render datatable
-                        if (element === 'swgg_datatable') {
-                            local.utility2.onReadyAfter(function () {
-                                local.swgg.uiElementClick({ target: document.querySelector(
-                                    '.swggUiContainer #' + list[0] + ' .onEventDatatableReload'
-                                ) });
-                            });
-                            return;
-                        }
-                        // expand operation and scroll to it
-                        element = document.querySelector('.swggUiContainer #' + element +
-                            ' .content');
-                        local.swgg.uiAnimateSlideDown(element);
-                        // scrollTo operation
-                        scrollTo = element.closest('.operation');
-                        break;
-                    }
+            var operation, resource;
+            // init resource
+            resource = locationHash.split('/')[1];
+            // list operations
+            resource = document.querySelector('.swggUiContainer #' + resource) ||
+                document.querySelector('.swggUiContainer .resource');
+            local.swgg.uiAnimateSlideDown(resource.querySelector('.operationList'));
+            // init operation
+            operation = locationHash.split('/')[2];
+            // render datatable
+            if (operation === 'swgg_datatable') {
+                local.utility2.onReadyAfter(function () {
+                    local.swgg.uiElementClick({
+                        target: resource.querySelector('.onEventDatatableReload')
+                    });
                 });
-            }, local.utility2.onErrorDefault);
-            local.swgg.uiAnimateScrollTo(scrollTo);
+                return;
+            }
+            operation = resource.querySelector('#' + operation);
+            // expand operation and scroll to it
+            if (operation) {
+                local.swgg.uiAnimateSlideDown(operation.querySelector('.content'));
+                // scroll to operation
+                local.swgg.uiAnimateScrollTo(operation);
+            } else {
+                // scroll to resource
+                local.swgg.uiAnimateScrollTo(resource);
+            }
         };
 
         local.swgg.uiValueDecode = function (input, options) {
@@ -1195,5 +1194,6 @@ local.swgg.templateUiResponseAjax = '\
             options.valueEncoded = bb;
             return options;
         };
-    }());
+        break;
+    }
 }());
