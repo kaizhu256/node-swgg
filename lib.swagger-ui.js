@@ -98,7 +98,12 @@ local.swgg.templateUiMain = '\
 <div class="eventDelegateClick popup" style="display: none;"></div>\n\
 <form class="eventDelegateSubmit header onEventUiReload tr">\n\
     <a class="td1" href="http://swagger.io" target="_blank">swagger</a>\n\
-    <input class="flex1 td2" placeholder="http://petstore.swagger.io/v2/swagger.json" type="text" value="{{url}}"/>\n\
+    <input\n\
+        class="flex1 td2"\n\
+        placeholder="http://petstore.swagger.io/v2/swagger.json"\n\
+        type="text"\n\
+        value="{{url}}"\n\
+    >\n\
 </form>\n\
 <div class="info reset">\n\
     {{#if info}}\n\

@@ -34,10 +34,6 @@
                     'node';
             }
         }());
-        // init global
-        local.global = local.modeJs === 'browser'
-            ? window
-            : global;
         switch (local.modeJs) {
         // re-init local from window.local
         case 'browser':
@@ -50,30 +46,10 @@
                 local = module;
                 break;
             }
-            local = require('utility2').local;
-            local._script = local.fs.readFileSync(__dirname + '/README.md', 'utf8')
-                // support syntax-highlighting
-                .replace((/[\S\s]+?\n.*?example.js\s*?```\w*?\n/), function (match0) {
-                    // preserve lineno
-                    return match0.replace((/.+/g), '');
-                })
-                .replace((/\n```[\S\s]+/), '')
-                // alias require('$npm_package_name') to require('index.js');
-                .replace(
-                    "require('" + process.env.npm_package_name + "')",
-                    "require('./index.js')"
-                );
-            // jslint example.js
-            local.utility2.jslintAndPrint(local._script, __dirname + '/example.js');
-            // cover example.js
-            local._script = local.utility2.istanbulInstrumentInPackage(
-                local._script,
-                __dirname + '/example.js',
-                'swagger-lite'
-            );
-            local.global.assetsExampleJs = local._script;
-            // require example.js
-            local = local.utility2.requireFromScript(__dirname + '/example.js', local._script);
+            local = require('utility2').requireExampleJsFromReadme({
+                __dirname: __dirname
+            }).exports;
+            local.swgg = require('./index.js');
             break;
         }
         // init templates
@@ -90,7 +66,7 @@ instruction\n\
     2. run the shell command:\n\
         $ PORT=8081 node app.js\n\
     3. open a browser to http://localhost:8081\n\
-    4. interact with the swagger-ui crud-api\n\
+    4. interact with the swagger-ui server\n\
 */\n\
 ';
 /* jslint-ignore-end */
@@ -1639,6 +1615,9 @@ instruction\n\
                 file: '/assets.app.js',
                 url: '/assets.app.js'
             }, {
+                file: '/assets.app.min.js',
+                url: '/assets.app.min.js'
+            }, {
                 file: '/assets.example.js',
                 url: '/assets.example.js'
             }, {
@@ -1647,9 +1626,6 @@ instruction\n\
             }, {
                 file: '/assets.swgg.js',
                 url: '/assets.swgg.js'
-            }, {
-                file: '/assets.swgg.lib.nedb.js',
-                url: '/assets.swgg.lib.nedb.js'
             }, {
                 file: '/assets.swgg.lib.swagger-ui.js',
                 url: '/assets.swgg.lib.swagger-ui.js'
@@ -1702,34 +1678,39 @@ instruction\n\
                     switch (modeNext) {
                     case 1:
                         options = {};
-                        options.example = [
-                            'README.md',
-                            'test.js',
-                            'index.js',
-                            'lib.swagger-ui.js'
-                        ].map(function (file) {
-                            return '\n\n\n\n\n\n\n\n' +
-                                local.fs.readFileSync(file, 'utf8') +
-                                '\n\n\n\n\n\n\n\n';
-                        }).join('');
                         options.moduleDict = {
-                            'swagger-lite': {
-                                aliasList: ['swgg'],
+                            'swgg': {
+                                exampleList: [],
                                 exports: local.swgg
                             },
-                            'swagger-lite.Nedb': {
-                                aliasList: ['swgg'],
+                            'swgg.Nedb': {
+                                exampleList: [],
                                 exports: local.swgg.Nedb
                             },
-                            'swagger-lite.Nedb.prototype': {
-                                aliasList: ['collection'],
+                            'swgg.Nedb.prototype': {
+                                exampleList: [],
                                 exports: local.swgg.Nedb.prototype
                             },
-                            'swagger-lite.Nedb.storage': {
-                                aliasList: ['storage'],
+                            'swgg.Nedb.storage': {
+                                exampleList: [],
                                 exports: local.swgg.Nedb.storage
                             }
                         };
+                        Object.keys(options.moduleDict).forEach(function (key) {
+                            options.moduleDict[key].example =
+                                options.moduleDict[key].exampleList
+                                .concat([
+                                    'README.md',
+                                    'test.js',
+                                    'index.js',
+                                    'lib.swagger-ui.js'
+                                ])
+                                .map(function (file) {
+                                    return '\n\n\n\n\n\n\n\n' +
+                                        local.fs.readFileSync(file, 'utf8') +
+                                        '\n\n\n\n\n\n\n\n';
+                                }).join('');
+                        });
                         // create doc.api.html
                         local.utility2.fsWriteFileWithMkdirp(
                             local.utility2.envDict.npm_config_dir_build + '/doc.api.html',
@@ -2222,6 +2203,13 @@ instruction\n\
             // test error handling-behavior
             error: local.utility2.errorDefault
         }], local.utility2.nop);
+        // init serverLocal
+        local.utility2.serverLocalUrlTest = function (url) {
+            url = local.utility2.urlParse(url).pathname;
+            return local.modeJs === 'browser' &&
+                url.indexOf('/api/v0/swagger.json') < 0 &&
+                (/\/api\/v0\/|\/test\./).test(url);
+        };
     }());
     switch (local.modeJs) {
 
@@ -2233,16 +2221,14 @@ instruction\n\
         local.utility2.replStart();
         // init assets
         local.utility2.assetsDict['/'] = local.utility2.assetsDict['/index.html'] =
-            local.utility2.templateRender(
-                local.utility2.templateIndexHtml,
-                {
-                    envDict: local.utility2.envDict,
-                    isRollup: local.isRollup || local.utility2.envDict.npm_config_production
-                }
-            );
+            local.utility2.templateRender(local.utility2.templateIndexHtml, {
+                envDict: local.utility2.envDict,
+                isRollup: module.isRollup || local.utility2.envDict.NODE_ENV === 'production'
+            });
         /* istanbul ignore next */
         if (module.isRollup) {
             local.utility2.assetsDict['/assets.app.js'] =
+                local.utility2.assetsDict['/assets.app.min.js'] =
                 local.fs.readFileSync(__filename, 'utf8');
             break;
         }
@@ -2275,6 +2261,8 @@ instruction\n\
                 return '// ' + key + '\n' + local.utility2.assetsDict[key];
             }
         }).join('\n\n\n\n');
+        local.utility2.assetsDict['/assets.app.min.js'] =
+            local.utility2.uglifyIfProduction(local.utility2.assetsDict['/assets.app.js']);
         // run validation test
         local.utility2.tryCatchOnError(function () {
             local.testCase_validateByParamDefList_default(null, local.utility2.onErrorDefault);

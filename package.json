@@ -3,11 +3,9 @@
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "nedb-lite": "2016.5.1",
-        "utility2": "2016.5.3"
+        "utility2": "2016.5.4"
     },
     "description": "this package will run a virtual swagger-ui server with persistent storage in the browser, that your webapp can use (in-place of a real backend)",
-
     "devDependencies": {
         "electron-lite": "kaizhu256/node-electron-lite#alpha"
     },
@@ -32,22 +30,25 @@
         "url": "https://github.com/kaizhu256/node-swagger-lite.git"
     },
     "scripts": {
-        "build-app": "npm test --mode-test-case=testCase_build_app",
+        "build-app": "npm test --mode-test-case=testCase_build_app && utility2-jslint tmp/build/app/assets.app.js",
+
         "build-ci": "utility2 shRun shReadmeBuild",
         "build-doc": "npm test --mode-test-case=testCase_build_doc",
-        "example.js": ". node_modules/.bin/utility2 && shInit && shReadmeExportScripts && cp $(shFileTrimLeft tmp/README.package.json) package.json && shRunScreenCapture shReadmeTestJs example.js",
-
+        "example.js": ". node_modules/.bin/utility2 && shInit && shReadmeExportScripts && shRunScreenCapture shReadmeTestJs example.js",
 
 
         "start": "export PORT=${PORT:-8080} && export npm_config_mode_auto_restart=1 && utility2 shRun shIstanbulCover node test.js",
 
 
-        "test": ". node_modules/.bin/utility2 && shInit && shReadmeExportScripts && cp $(shFileTrimLeft tmp/README.package.json) package.json && export PORT=$(utility2 shServerPortRandom) && utility2 test node test.js",
+        "start-heroku": "export npm_config_mode_backend=1 && npm start ",
 
+
+
+        "test": ". node_modules/.bin/utility2 && shInit && shReadmeExportScripts && export PORT=$(utility2 shServerPortRandom) && utility2 test node test.js",
 
 
 
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.5.2"
+    "version": "2016.5.3"
 }

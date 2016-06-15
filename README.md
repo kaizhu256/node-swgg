@@ -2,7 +2,11 @@ swagger-lite
 ============
 this package will run a virtual swagger-ui server with persistent storage in the browser, that your webapp can use (in-place of a real backend)
 
-[![NPM](https://img.shields.io/npm/v/swagger-lite.svg?style=flat-square)](https://www.npmjs.com/package/swagger-lite) [![NPM](https://img.shields.io/npm/dm/swagger-lite.svg?style=flat-square)](https://www.npmjs.com/package/swagger-lite) [![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swagger-lite.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
+[![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swagger-lite.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
+
+[![NPM](https://nodei.co/npm/swagger-lite.png?downloads=true)](https://www.npmjs.com/package/swagger-lite)
+
+[![package-listing](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.gitLsTree.svg)](https://github.com/kaizhu256/node-swagger-lite)
 
 
 
@@ -20,10 +24,13 @@ this package will run a virtual swagger-ui server with persistent storage in the
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 16c2e225
-- npm publish 2016.5.2
-- add standalone-app download-link in test-page
-- ui - add button to reset nedb database
+#### change since a70466bf
+- npm publish 2016.5.3
+- deploy standalone app to heroku test-server
+- remove nedb-lite dependency
+- add minified asset assets.app.min.js
+- add 'run internal test' button in webpage
+- add env var npm_config_mode_backend to disable utility2.serverLocalUrlTest
 - none
 
 #### this package requires
@@ -53,7 +60,8 @@ this package will run a virtual swagger-ui server with persistent storage in the
 
 | git-branch : | [master](https://github.com/kaizhu256/node-swagger-lite/tree/master) | [beta](https://github.com/kaizhu256/node-swagger-lite/tree/beta) | [alpha](https://github.com/kaizhu256/node-swagger-lite/tree/alpha)|
 |--:|:--|:--|:--|
-| test-server : | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/app/index.html)|
+| test-server 1 : | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/app/index.html)|
+| test-server 2 : | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-master.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-beta.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-alpha.herokuapp.com)|
 | test-report : | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.html)|
 | coverage : | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.html/index.html)|
 | build-artifacts : | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..master..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..beta..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..alpha..travis-ci.org)|
@@ -77,7 +85,7 @@ this package will run a virtual swagger-ui server with persistent storage in the
 ![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.testExampleJs.browser..png)
 
 #### to run this example, follow the instruction in the script below
-- example.js
+- [example.js](https://kaizhu256.github.io/node-utility2/build/example.js)
 ```javascript
 /*
 example.js
@@ -89,7 +97,7 @@ instruction
     2. run the shell command:
         $ npm install swagger-lite && export PORT=8081 && node example.js
     3. open a browser to http://localhost:8081
-    4. interact with the swagger-ui crud-api
+    4. interact with the swagger-ui server
 */
 
 /*jslint
@@ -220,17 +228,39 @@ instruction
         ]);
         // init error-middleware
         local.middlewareError = local.swgg.middlewareError;
-        // init serverLocal
-        local.utility2.serverLocalUrlTest = function (url) {
-            url = local.utility2.urlParse(url).pathname;
-            return local.modeJs === 'browser' &&
-                url.indexOf('/api/v0/swagger.json') < 0 &&
-                (/\/api\/v0\/|\/test\./).test(url);
-        };
         // run server-test
         local.utility2.testRunServer(local);
     }());
     switch (local.modeJs) {
+
+
+
+    // run browser js-env code - post-init
+    case 'browser':
+        /* istanbul ignore next */
+        local.testRun = function (event) {
+            if (local.utility2.modeTest) {
+                return;
+            }
+            switch (event && event.currentTarget.id) {
+            case 'testRunButton1':
+                local.modeTest = true;
+                local.utility2.testRun(local);
+                break;
+            case 'swggButtonNedbReset1':
+                window.swgg.nedbReset(function () {
+                    location.reload();
+                });
+                break;
+            }
+        };
+        // init event-handling
+        document.querySelector('#swggButtonNedbReset1')
+            .addEventListener('click', local.testRun);
+        document.querySelector('#testRunButton1').addEventListener('click', local.testRun);
+        // init ui
+        local.swgg.uiEventListenerDict['.onEventUiReload']();
+        break;
 
 
 
@@ -239,9 +269,10 @@ instruction
         // export local
         module.exports = local;
         // init assets
-        /* istanbul ignore next */
-        local.utility2.assetsDict['/assets.example.js'] = local.global.assetsExampleJs ||
-            local.fs.readFileSync(__filename, 'utf8');
+        local.utility2.tryCatchOnError(function () {
+            local.utility2.assetsDict['/assets.example.js'] =
+                local.fs.readFileSync(__filename, 'utf8');
+        }, local.utility2.nop);
         /* jslint-ignore-begin */
         // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/dist/index.html
         local.utility2.templateIndexHtml = '\
@@ -255,12 +286,19 @@ instruction
 <link href="assets.swgg.css" rel="stylesheet">\n\
 <link href="assets.utility2.css" rel="stylesheet">\n\
 <style>\n\
+/*csslint\n\
+    box-sizing: false,\n\
+    universal-selector: false\n\
+*/\n\
 * {\n\
     box-sizing: border-box;\n\
 }\n\
 body {\n\
     background-color: #fff;\n\
     font-family: Helvetica Neue,Helvetica,Arial,sans-serif;\n\
+}\n\
+body > button {\n\
+    width: 10rem;\n\
 }\n\
 body > * {\n\
     margin-bottom: 1rem;\n\
@@ -279,45 +317,49 @@ body > * {\n\
             {{#if envDict.npm_package_homepage}}\n\
             href="{{envDict.npm_package_homepage}}"\n\
             {{/if envDict.npm_package_homepage}}\n\
-        >\n\
-            {{envDict.npm_package_name}} @ {{envDict.npm_package_version}}\n\
-        </a>\n\
+            target="_blank"\n\
+        >{{envDict.npm_package_name}} @ {{envDict.npm_package_version}}</a>\n\
+        {{#if envDict.NODE_ENV}}\n\
+        (NODE_ENV={{envDict.NODE_ENV}})\n\
+        {{/if envDict.NODE_ENV}}\n\
     </h1>\n\
     <h3>{{envDict.npm_package_description}}</h3>\n\
-    <h4><a href="assets.app.js">download standalone app</a></h4>\n\
+    <h4><a download href="assets.app.js">download standalone app</a></h4>\n\
+    <button id="testRunButton1">run internal test</button><br>\n\
+    <button id="swggButtonNedbReset1">reset nedb database</button><br>\n\
     <div class="testReportDiv" style="display: none;"></div>\n\
 \n\
-    <button id="swggButtonNedbReset">reset nedb database</button>\n\
     <div class="swggUiContainer">\n\
     <form class="header tr">\n\
         <a class="td1" href="http://swagger.io" target="_blank">swagger</a>\n\
-        <input class="flex1 td2" placeholder="http://petstore.swagger.io/v2/swagger.json" type="text" value="api/v0/swagger.json"/>\n\
+        <input\n\
+            class="flex1 td2"\n\
+            placeholder="http://petstore.swagger.io/v2/swagger.json"\n\
+            type="text"\n\
+            value="api/v0/swagger.json"\n\
+        >\n\
     </form>\n\
     <div class="reset"></div>\n\
     </div>\n\
-{{#if isRollup}}\n\
-<script src="assets.app.js"></script>\n\
-{{#unless isRollup}}\n\
-<script src="assets.utility2.rollup.js"></script>\n\
-<script src="assets.swgg.lib.nedb.js"></script>\n\
-<script src="assets.swgg.js"></script>\n\
-<script src="assets.swgg.lib.swagger-ui.js"></script>\n\
-<script src="jsonp.swgg.stateGet?callback=window.swgg.stateInit"></script>\n\
-<script>window.utility2.onReadyBefore.counter += 1;</script>\n\
-<script src="assets.example.js"></script>\n\
-<script src="assets.test.js"></script>\n\
-<script>window.utility2.onReadyBefore();</script>\n\
-{{/if isRollup}}\n\
+    {{#if isRollup}}\n\
+    <script src="assets.app.min.js"></script>\n\
+    <script src="jsonp.swgg.stateGet?callback=window.swgg.stateInit"></script>\n\
+    {{#unless isRollup}}\n\
+    <script src="assets.utility2.rollup.js"></script>\n\
+    <script src="assets.swgg.js"></script>\n\
+    <script src="assets.swgg.lib.swagger-ui.js"></script>\n\
+    <script src="jsonp.swgg.stateGet?callback=window.swgg.stateInit"></script>\n\
 <script>\n\
-(function () {\n\
-local.swgg.uiEventListenerDict[".onEventUiReload"]();\n\
-document.querySelector("#swggButtonNedbReset").addEventListener("click", function () {\n\
-    window.swgg.nedbReset(function () {\n\
-        location.reload();\n\
-    });\n\
-});\n\
-}());\n\
+/*jslint browser: true*/\n\
+window.utility2.onReadyBefore.counter += 1;\n\
 </script>\n\
+    <script src="assets.example.js"></script>\n\
+    <script src="assets.test.js"></script>\n\
+<script>\n\
+/*jslint browser: true*/\n\
+window.utility2.onReadyBefore();\n\
+</script>\n\
+    {{/if isRollup}}\n\
 </body>\n\
 </html>\n\
 ';
@@ -707,13 +749,7 @@ document.querySelector("#swggButtonNedbReset").addEventListener("click", functio
 
 
 # npm-dependencies
-- [nedb-lite](https://www.npmjs.com/package/nedb-lite)
 - [utility2](https://www.npmjs.com/package/utility2)
-
-
-
-# package-listing
-[![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.gitLsTree.svg)](https://github.com/kaizhu256/node-swagger-lite)
 
 
 
@@ -724,11 +760,9 @@ document.querySelector("#swggButtonNedbReset").addEventListener("click", functio
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "nedb-lite": "2016.5.1",
-        "utility2": "2016.5.3"
+        "utility2": "2016.5.4"
     },
-    "description": "this package will run a virtual swagger-ui server with persistent storage \
-in the browser, that your webapp can use (in-place of a real backend)",
+    "description": "{{packageJson.description}}",
     "devDependencies": {
         "electron-lite": "kaizhu256/node-electron-lite#alpha"
     },
@@ -753,24 +787,27 @@ in the browser, that your webapp can use (in-place of a real backend)",
         "url": "https://github.com/kaizhu256/node-swagger-lite.git"
     },
     "scripts": {
-        "build-app": "npm test --mode-test-case=testCase_build_app",
+        "build-app": "npm test --mode-test-case=testCase_build_app && \
+utility2-jslint tmp/build/app/assets.app.js",
         "build-ci": "utility2 shRun shReadmeBuild",
         "build-doc": "npm test --mode-test-case=testCase_build_doc",
         "example.js": "\
 . node_modules/.bin/utility2 && shInit && shReadmeExportScripts && \
-cp $(shFileTrimLeft tmp/README.package.json) package.json && \
 shRunScreenCapture shReadmeTestJs example.js",
         "start": "export PORT=${PORT:-8080} && \
 export npm_config_mode_auto_restart=1 && \
 utility2 shRun shIstanbulCover node test.js",
+        "start-heroku": "\
+export npm_config_mode_backend=1 && \
+npm start \
+",
         "test": "\
 . node_modules/.bin/utility2 && shInit && shReadmeExportScripts && \
-cp $(shFileTrimLeft tmp/README.package.json) package.json && \
 export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.5.2"
+    "version": "2016.5.3"
 }
 ```
 
@@ -793,23 +830,38 @@ shBuildCiTestPre() {(set -e
     # test example js script
     (export MODE_BUILD=testExampleJs &&
         export npm_config_timeout_exit=10000 &&
-        npm run example.js)
+        npm run example.js) || return $?
 )}
 
 shBuildCiTestPost() {(set -e
 # this function will run the post-test build
-    # if running legacy-node, then exit
-    [ "$(node --version)" \< "v5.0" ] && exit || true
-    TEST_URL="https://$(printf "$GITHUB_REPO" | \
-        sed 's/\//.github.io\//')/build..$CI_BRANCH..travis-ci.org/app/index.html"
+    # if running legacy-node, then return
+    [ "$(node --version)" \< "v5.0" ] && return || true
+    export NODE_ENV=production
     # deploy app to gh-pages
-    (export MODE_BUILD=githubTest &&
-        shGithubDeploy)
+    export TEST_URL="https://$(printf "$GITHUB_REPO" | \
+        sed 's/\//.github.io\//')/build..$CI_BRANCH..travis-ci.org/app/index.html"
+    (export MODE_BUILD=githubDeploy &&
+        shGithubDeploy) || return $?
     # test deployed app to gh-pages
     (export MODE_BUILD=githubTest &&
         export modeBrowserTest=test &&
         export url="$TEST_URL?modeTest=consoleLogResult&timeExit={{timeExit}}" &&
-        shBrowserTest)
+        shBrowserTest) || return $?
+    # deploy app to heroku
+    export HEROKU_REPO="hrku01-$npm_package_name-$CI_BRANCH"
+    export TEST_URL="https://$HEROKU_REPO.herokuapp.com"
+    shGitRepoBranchUpdateLocal() {(set -e
+    # this function will local-update git-repo-branch
+        cp "$npm_config_dir_build/app/assets.app.js" .
+    )}
+    (export MODE_BUILD=herokuDeploy &&
+        shHerokuDeploy) || return $?
+    # test deployed app to heroku
+    (export MODE_BUILD=herokuTest &&
+        export modeBrowserTest=test &&
+        export url="$TEST_URL?modeTest=consoleLogResult&timeExit={{timeExit}}" &&
+        shBrowserTest) || return $?
 )}
 
 shBuild() {(set -e

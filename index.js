@@ -28,7 +28,7 @@
         local.utility2 = local.modeJs === 'browser'
             ? local.global.utility2
             : require('utility2');
-        // init lib swagger-lite
+        // init lib swgg
         local.swgg = local.utility2.local.swgg = {
             collectionDict: {},
             idDomElementDict: {},
@@ -38,9 +38,7 @@
             uiEventListenerDict: {}
         };
         // init lib nedb
-        local.swgg.Nedb = local.modeJs === 'browser'
-            ? local.global.Nedb
-            : require('nedb-lite');
+        local.swgg.Nedb = local.utility2.Nedb;
         // init templateApiDict
         local.swgg.templateApiDict.crudCountManyByQuery = {
             _method: 'get',
@@ -597,8 +595,8 @@
                 }
             },
             info: {
-                description: 'demo of swagger-lite crud-api',
-                title: 'swagger-lite api',
+                description: 'demo of swagger-ui server',
+                title: 'swgg api',
                 version: '0'
             },
             paths: {},
@@ -1670,6 +1668,11 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 }
             }
             if (isRequest) {
+                [
+                    'npm_config_mode_backend'
+                ].forEach(function (key) {
+                    state.utility2.envDict[key] = local.utility2.envDict[key];
+                });
                 response.end(request.urlParsed.query.callback + '(' + JSON.stringify(state) +
                     ');');
                 return;
@@ -2644,14 +2647,12 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         if (module.isRollup) {
             break;
         }
-        require('./lib.swagger-ui.js');
         // init assets
         [
             'index.css',
             'index.js',
             // https://json-schema.org/draft-04/schema
             'lib.json-schema.schema.json',
-            'lib.nedb.js',
             // https://petstore.swagger.io/v2/swagger.json
             'lib.swagger.petstore.json',
             'lib.swagger-ui.js',
@@ -2678,10 +2679,6 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 local.utility2.assetsDict['/assets.swgg.' + key] =
                     local.fs.readFileSync(__dirname + '/' + key, 'utf8');
                 break;
-            case 'lib.nedb.js':
-                local.utility2.assetsDict['/assets.swgg.' + key] =
-                    local.fs.readFileSync(local.swgg.Nedb.__dirname + '/nedb-lite.js', 'utf8');
-                break;
             case 'lib.swagger-ui.js':
                 local.utility2.assetsDict['/assets.swgg.' + key] =
                     local.utility2.istanbulInstrumentInPackage(
@@ -2696,7 +2693,6 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         local.utility2.assetsDict['/assets.swgg.rollup.js'] = [
             '/assets.utility2.rollup.js',
             '/assets.swgg.css',
-            '/assets.swgg.lib.nedb.js',
             '/assets.swgg.js',
             '/assets.swgg.lib.swagger-ui.js',
             'local.swgg.stateInit'
@@ -2723,6 +2719,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     );
             }
         }).join('\n\n\n\n');
+        require('./lib.swagger-ui.js');
         break;
     }
 
