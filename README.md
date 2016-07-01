@@ -24,13 +24,9 @@ this package will run a virtual swagger-ui server with persistent storage in the
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since a70466bf
-- npm publish 2016.5.3
-- deploy standalone app to heroku test-server
-- remove nedb-lite dependency
-- add minified asset assets.app.min.js
-- add 'run internal test' button in webpage
-- add env var npm_config_mode_backend to disable utility2.serverLocalUrlTest
+#### change since ddb48891
+- npm publish 2016.5.4
+- fix internal tests for heroku backend
 - none
 
 #### this package requires
@@ -100,6 +96,7 @@ instruction
     4. interact with the swagger-ui server
 */
 
+/* istanbul instrument in package swagger-lite */
 /*jslint
     bitwise: true,
     browser: true,
@@ -281,7 +278,7 @@ instruction
 <head>\n\
 <meta charset="UTF-8">\n\
 <title>\n\
-{{envDict.npm_package_name}} @ {{envDict.npm_package_version}}\n\
+{{envDict.npm_package_name}} v{{envDict.npm_package_version}}\n\
 </title>\n\
 <link href="assets.swgg.css" rel="stylesheet">\n\
 <link href="assets.utility2.css" rel="stylesheet">\n\
@@ -318,7 +315,7 @@ body > * {\n\
             href="{{envDict.npm_package_homepage}}"\n\
             {{/if envDict.npm_package_homepage}}\n\
             target="_blank"\n\
-        >{{envDict.npm_package_name}} @ {{envDict.npm_package_version}}</a>\n\
+        >{{envDict.npm_package_name}} v{{envDict.npm_package_version}}</a>\n\
         {{#if envDict.NODE_ENV}}\n\
         (NODE_ENV={{envDict.NODE_ENV}})\n\
         {{/if envDict.NODE_ENV}}\n\
@@ -748,11 +745,6 @@ window.utility2.onReadyBefore();\n\
 
 
 
-# npm-dependencies
-- [utility2](https://www.npmjs.com/package/utility2)
-
-
-
 # package.json
 ```json
 {
@@ -760,7 +752,7 @@ window.utility2.onReadyBefore();\n\
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "utility2": "2016.5.4"
+        "utility2": "2016.5.5"
     },
     "description": "{{packageJson.description}}",
     "devDependencies": {
@@ -791,10 +783,9 @@ window.utility2.onReadyBefore();\n\
 utility2-jslint tmp/build/app/assets.app.js",
         "build-ci": "utility2 shRun shReadmeBuild",
         "build-doc": "npm test --mode-test-case=testCase_build_doc",
-        "example.js": "\
-. node_modules/.bin/utility2 && shInit && shReadmeExportScripts && \
-shRunScreenCapture shReadmeTestJs example.js",
-        "start": "export PORT=${PORT:-8080} && \
+        "example.js": "utility2 shRunScreenCapture shReadmeTestJs example.js",
+        "start": "\
+export PORT=${PORT:-8080} && \
 export npm_config_mode_auto_restart=1 && \
 utility2 shRun shIstanbulCover node test.js",
         "start-heroku": "\
@@ -802,12 +793,11 @@ export npm_config_mode_backend=1 && \
 npm start \
 ",
         "test": "\
-. node_modules/.bin/utility2 && shInit && shReadmeExportScripts && \
 export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.5.3"
+    "version": "2016.5.4"
 }
 ```
 
@@ -869,7 +859,7 @@ shBuild() {(set -e
     # init env
     . node_modules/.bin/utility2 && shInit
     # cleanup github-gh-pages dir
-    export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
+    # export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
     # init github-gh-pages commit-limit
     export COMMIT_LIMIT=16
     # if branch is alpha, beta, or master, then run default build

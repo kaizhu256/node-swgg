@@ -1,3 +1,4 @@
+/* istanbul instrument in package swagger-lite */
 /*jslint
     bitwise: true,
     browser: true,
@@ -47,7 +48,9 @@
                 break;
             }
             local = require('utility2').requireExampleJsFromReadme({
-                __dirname: __dirname
+                __dirname: __dirname,
+                moduleExports: require('./index.js'),
+                moduleName: 'swagger-lite'
             }).exports;
             local.swgg = require('./index.js');
             break;
@@ -418,15 +421,31 @@ instruction\n\
                         options = local.crudOptionsSetDefault(options, {
                             keyValue: '00_test_crudDeleteManyByQuery'
                         });
+                        // ajax - crudCreateOrReplaceOneByKeyUnique
+                        options.crudCreateOrReplaceOneByKeyUnique._ajax({
+                            paramDict: { body: {
+                                id: '00_test_crudDeleteManyByQuery',
+                                propRequired: true
+                            } }
+                        }, onNext);
+                        break;
+                    case 2:
                         // ajax - crudDeleteManyByQuery
                         options.crudDeleteManyByQuery._ajax({
                             paramDict: { _queryWhere: JSON.stringify(options.queryByKeyUnique) }
                         }, onNext);
                         break;
-                    case 2:
+                    case 3:
+                        // ajax - crudGetOneByKeyUnique
+                        options.crudGetOneByKeyUnique._ajax({
+                            paramDict: options.queryByKeyUnique
+                        }, onNext);
+                        break;
+                    case 4:
                         // validate data was removed
                         local.utility2.assertJsonEqual(data.responseJson.data.length, 1);
-                        local.utility2.assertJsonEqual(data.responseJson.data[0], 1);
+                        local.utility2.assert(data.responseJson.data[0] ===
+                            null, data.responseJson);
                         onNext();
                         break;
                     default:
@@ -453,18 +472,31 @@ instruction\n\
                         options = local.crudOptionsSetDefault(options, {
                             keyValue: '00_test_crudDeleteOneByKeyUnique'
                         });
+                        if (options.keyValue === '00_test_crudDeleteOneByKeyUnique') {
+                            // ajax - crudCreateOrReplaceOneByKeyUnique
+                            options.crudCreateOrReplaceOneByKeyUnique._ajax({
+                                paramDict: { body: {
+                                    id: '00_test_crudDeleteOneByKeyUnique',
+                                    propRequired: true
+                                } }
+                            }, onNext);
+                        } else {
+                            onNext();
+                        }
+                        break;
+                    case 2:
                         // ajax - crudDeleteOneByKeyUnique
                         options.crudDeleteOneByKeyUnique._ajax({
                             paramDict: options.queryByKeyUnique
                         }, onNext);
                         break;
-                    case 2:
+                    case 3:
                         // ajax - crudGetOneByKeyUnique
                         options.crudGetOneByKeyUnique._ajax({
                             paramDict: options.queryByKeyUnique
                         }, onNext);
                         break;
-                    case 3:
+                    case 4:
                         // validate data was removed
                         local.utility2.assertJsonEqual(data.responseJson.data.length, 1);
                         local.utility2.assert(data.responseJson.data[0] ===
@@ -711,9 +743,22 @@ instruction\n\
                         });
                         // test crudGetOneByKeyUnique's default handling-behavior
                         options.dataValidate = options.dataValidateUpdate1;
-                        local.testCase_crudGetOneByKeyUnique_default(options, onNext);
+                        if (options.data.id === '00_test_crudUpdateOneByKeyUnique') {
+                            // ajax - crudCreateOrReplaceOneByKeyUnique
+                            options.crudCreateOrReplaceOneByKeyUnique._ajax({
+                                paramDict: { body: {
+                                    id: '00_test_crudUpdateOneByKeyUnique',
+                                    propRequired: true
+                                } }
+                            }, onNext);
+                        } else {
+                            onNext();
+                        }
                         break;
                     case 2:
+                        local.testCase_crudGetOneByKeyUnique_default(options, onNext);
+                        break;
+                    case 3:
                         options.createdAt = data.responseJson.data[0].createdAt;
                         options.updatedAt = data.responseJson.data[0].updatedAt;
                         // init paramDict
@@ -729,7 +774,7 @@ instruction\n\
                             paramDict: paramDict
                         }, onNext);
                         break;
-                    case 3:
+                    case 4:
                         // validate time createdAt
                         local.utility2.assert(data.responseJson.data[0].createdAt ===
                             options.createdAt, data.responseJson);
@@ -2130,12 +2175,6 @@ instruction\n\
                     id: '00_test_crudCountManyByQuery',
                     propRequired: true
                 }, {
-                    id: '00_test_crudDeleteOneByKeyUnique',
-                    propRequired: true
-                }, {
-                    id: '00_test_crudDeleteManyByQuery',
-                    propRequired: true
-                }, {
                     id: '00_test_crudExistsOneByKeyUnique',
                     propRequired: true
                 }, {
@@ -2146,9 +2185,6 @@ instruction\n\
                     propRequired: true
                 }, {
                     id: '00_test_crudGetOneByQuery',
-                    propRequired: true
-                }, {
-                    id: '00_test_crudUpdateOneByKeyUnique',
                     propRequired: true
                 }],
                 // init 100 extra random objects

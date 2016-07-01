@@ -1,3 +1,4 @@
+/* istanbul instrument in package swagger-lite */
 /*jslint
     bitwise: true,
     browser: true,
