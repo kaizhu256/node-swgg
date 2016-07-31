@@ -3,7 +3,7 @@
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "utility2": "2016.5.5"
+        "utility2": "2016.7.2"
     },
     "description": "this package will run a virtual swagger-ui server with persistent storage in the browser, that your webapp can use (in-place of a real backend)",
     "devDependencies": {
@@ -48,5 +48,5 @@
 
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.5.4"
+    "version": "2016.7.1"
 }

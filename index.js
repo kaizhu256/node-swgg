@@ -1213,13 +1213,13 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             local.utility2.tryCatchOnError(function () {
                 // decode jwt-payload in bearer-token
                 user.jwtDecoded = local.utility2.jwtHs256Decode(
-                    user.jwtEncoded,
-                    local.utility2.envDict.JWT_SECRET || ''
+                    local.utility2.envDict.JWT_SECRET || '',
+                    user.jwtEncoded
                 );
                 // decrypt jwt-payload's encrypted-sub-payload
-                user.jwtDecrypted = JSON.parse(local.utility2.cryptojsCipherAes256Decrypt(
-                    user.jwtDecoded.encrypted,
-                    local.utility2.envDict.JWT_SECRET || ''
+                user.jwtDecrypted = JSON.parse(local.utility2.sjclCipherAes128Decrypt(
+                    local.utility2.envDict.JWT_SECRET || '',
+                    user.jwtDecoded.encrypted
                 ));
                 // validate expiration date
                 local.utility2.assert(Date.now() * 0.001 <= user.jwtDecrypted.exp);
@@ -1241,13 +1241,13 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     jti: local.utility2.uuidTimeCreate()
                 }
             }, 2);
-            user.jwtDecoded.encrypted = local.utility2.cryptojsCipherAes256Encrypt(
-                JSON.stringify(user.jwtDecrypted),
-                local.utility2.envDict.JWT_SECRET || ''
+            user.jwtDecoded.encrypted = local.utility2.sjclCipherAes128Encrypt(
+                local.utility2.envDict.JWT_SECRET || '',
+                JSON.stringify(user.jwtDecrypted)
             );
             user.jwtEncoded = local.utility2.jwtHs256Encode(
-                user.jwtDecoded,
-                local.utility2.envDict.JWT_SECRET || ''
+                local.utility2.envDict.JWT_SECRET || '',
+                user.jwtDecoded
             );
         };
 
@@ -1376,8 +1376,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 }
                 break;
             default:
-                request.swgg.bodyParsed =
-                    local.utility2.bufferToString(request.bodyRaw || '');
+                request.swgg.bodyParsed = local.utility2.bufferToString(request.bodyRaw || '');
                 // try to JSON.parse the string
                 local.utility2.tryCatchOnError(function () {
                     request.swgg.bodyParsed = JSON.parse(request.swgg.bodyParsed);
@@ -1775,7 +1774,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     switch (crud.operationId.split('.')[0]) {
                     case 'userLoginByPassword':
                         user.data = data;
-                        if (!local.utility2.bcryptPasswordValidate(
+                        if (!local.utility2.sjclHashScryptValidate(
                                 user.password,
                                 user.data && user.data.password
                             )) {
@@ -2670,8 +2669,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     local.utility2.istanbulInstrumentInPackage(
                         local.fs.readFileSync(__dirname + '/' + key, 'utf8')
                             .replace((/^#!/), '//'),
-                        __dirname + '/' + key,
-                        'swagger-lite'
+                        __dirname + '/' + key
                     );
                 break;
             case 'lib.json-schema.schema.json':
@@ -2685,8 +2683,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     local.utility2.istanbulInstrumentInPackage(
                         local.fs.readFileSync(__dirname + '/' + key, 'utf8')
                             .replace((/^#!/), '//'),
-                        __dirname + '/' + key,
-                        'swagger-lite'
+                        __dirname + '/' + key
                     );
                 break;
             }

@@ -24,9 +24,9 @@ this package will run a virtual swagger-ui server with persistent storage in the
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since ddb48891
-- npm publish 2016.5.4
-- fix internal tests for heroku backend
+#### change since 53f70bd7
+- npm publish 2016.7.1
+- replace lib bcrypt and lib cryptojs with lib sjcl
 - none
 
 #### this package requires
@@ -81,7 +81,7 @@ this package will run a virtual swagger-ui server with persistent storage in the
 ![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.testExampleJs.browser..png)
 
 #### to run this example, follow the instruction in the script below
-- [example.js](https://kaizhu256.github.io/node-utility2/build/example.js)
+- [example.js](https://kaizhu256.github.io/node-swagger-lite/build/example.js)
 ```javascript
 /*
 example.js
@@ -89,7 +89,7 @@ example.js
 this node script will run a standalone swagger-ui server backed by nedb
 
 instruction
-    1. save this js script as example.js
+    1. save this script as example.js
     2. run the shell command:
         $ npm install swagger-lite && export PORT=8081 && node example.js
     3. open a browser to http://localhost:8081
@@ -225,7 +225,7 @@ instruction
         ]);
         // init error-middleware
         local.middlewareError = local.swgg.middlewareError;
-        // run server-test
+        // run test-server
         local.utility2.testRunServer(local);
     }());
     switch (local.modeJs) {
@@ -252,9 +252,12 @@ instruction
             }
         };
         // init event-handling
-        document.querySelector('#swggButtonNedbReset1')
-            .addEventListener('click', local.testRun);
-        document.querySelector('#testRunButton1').addEventListener('click', local.testRun);
+        [
+            '#swggButtonNedbReset1',
+            '#testRunButton1'
+        ].forEach(function (element) {
+            document.querySelector(element).addEventListener('click', local.testRun);
+        });
         // init ui
         local.swgg.uiEventListenerDict['.onEventUiReload']();
         break;
@@ -272,7 +275,7 @@ instruction
         }, local.utility2.nop);
         /* jslint-ignore-begin */
         // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/dist/index.html
-        local.utility2.templateIndexHtml = '\
+        local.templateIndexHtml = '\
 <!doctype html>\n\
 <html lang="en">\n\
 <head>\n\
@@ -299,9 +302,6 @@ body > button {\n\
 }\n\
 body > * {\n\
     margin-bottom: 1rem;\n\
-}\n\
-.testReportDiv {\n\
-    display: none;\n\
 }\n\
 </style>\n\
 </head>\n\
@@ -362,7 +362,7 @@ window.utility2.onReadyBefore();\n\
 ';
         /* jslint-ignore-end */
         local.utility2.assetsDict['/'] = local.utility2.templateRender(
-            local.utility2.templateIndexHtml,
+            local.templateIndexHtml,
             { envDict: local.utility2.envDict }
         );
         break;
@@ -681,7 +681,7 @@ window.utility2.onReadyBefore();\n\
                     firstName: 'admin',
                     id: 0,
                     lastName: '',
-                    password: local.utility2.bcryptHashCreate('secret', 1),
+                    password: local.utility2.sjclHashScryptCreate('secret'),
                     phone: '1234-5678',
                     username: 'admin'
                 }, {
@@ -689,7 +689,7 @@ window.utility2.onReadyBefore();\n\
                     firstName: 'jane',
                     id: 1,
                     lastName: 'doe',
-                    password: local.utility2.bcryptHashCreate('secret', 1),
+                    password: local.utility2.sjclHashScryptCreate('secret'),
                     phone: '1234-5678',
                     username: 'jane.doe'
                 }, {
@@ -697,7 +697,7 @@ window.utility2.onReadyBefore();\n\
                     firstName: 'john',
                     id: 2,
                     lastName: 'doe',
-                    password: local.utility2.bcryptHashCreate('secret', 1),
+                    password: local.utility2.sjclHashScryptCreate('secret'),
                     phone: '1234-5678',
                     username: 'john.doe'
                 }],
@@ -711,7 +711,7 @@ window.utility2.onReadyBefore();\n\
                         id: options.ii + 100,
                         lastName: local.utility2.listGetElementRandom(['doe', 'smith']) +
                             '-' + (options.ii + 100),
-                        password: local.utility2.bcryptHashCreate('secret', 1),
+                        password: local.utility2.sjclHashScryptCreate('secret'),
                         tags: [
                             { name: local.utility2.listGetElementRandom(['female', 'male']) },
                             { name: Math.random().toString(36).slice(2) }
@@ -737,7 +737,7 @@ window.utility2.onReadyBefore();\n\
 }());
 ```
 
-#### output from electron-lite
+#### output from electron
 ![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.testExampleJs.browser..png)
 
 #### output from shell
@@ -752,7 +752,7 @@ window.utility2.onReadyBefore();\n\
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "utility2": "2016.5.5"
+        "utility2": "2016.7.2"
     },
     "description": "{{packageJson.description}}",
     "devDependencies": {
@@ -797,7 +797,7 @@ export PORT=$(utility2 shServerPortRandom) && \
 utility2 test node test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.5.4"
+    "version": "2016.7.1"
 }
 ```
 
@@ -819,7 +819,8 @@ shBuildCiTestPre() {(set -e
 # this function will run the pre-test build
     # test example js script
     (export MODE_BUILD=testExampleJs &&
-        export npm_config_timeout_exit=10000 &&
+        export PORT=8081 &&
+        export npm_config_timeout_exit=15000 &&
         npm run example.js) || return $?
 )}
 
@@ -859,7 +860,7 @@ shBuild() {(set -e
     # init env
     . node_modules/.bin/utility2 && shInit
     # cleanup github-gh-pages dir
-    # export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
+    export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
     # init github-gh-pages commit-limit
     export COMMIT_LIMIT=16
     # if branch is alpha, beta, or master, then run default build

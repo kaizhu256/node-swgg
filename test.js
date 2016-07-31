@@ -61,8 +61,7 @@ local.utility2.assetsDict['/assets.app.begin.js'] = '\
 /*\n\
 app.js\n\
 \n\
-this standalone script will run a virtual swagger-ui server with persistent storage\n\
-in the browser, that your webapp can use (in-place of a real backend)\n\
+{{packageJson.description}}\n\
 \n\
 instruction\n\
     1. save this script as app.js\n\
@@ -2255,12 +2254,6 @@ instruction\n\
     case 'node':
         // init repl debugger
         local.utility2.replStart();
-        // init assets
-        local.utility2.assetsDict['/'] = local.utility2.assetsDict['/index.html'] =
-            local.utility2.templateRender(local.utility2.templateIndexHtml, {
-                envDict: local.utility2.envDict,
-                isRollup: module.isRollup || local.utility2.envDict.NODE_ENV === 'production'
-            });
         /* istanbul ignore next */
         if (module.isRollup) {
             local.utility2.assetsDict['/assets.app.js'] =
@@ -2268,12 +2261,6 @@ instruction\n\
                 local.fs.readFileSync(__filename, 'utf8');
             break;
         }
-        local.utility2.assetsDict['/assets.test.js'] =
-            local.utility2.istanbulInstrumentInPackage(
-                local.fs.readFileSync(__filename, 'utf8'),
-                local.swgg.__dirname + '/test.js',
-                'swagger-lite'
-            );
         local.utility2.assetsDict['/assets.app.js'] = [
             '/assets.app.begin.js',
             '/assets.swgg.rollup.js',
