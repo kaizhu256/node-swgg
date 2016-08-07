@@ -3,7 +3,7 @@
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "utility2": "2016.7.2"
+        "utility2": "2016.7.4"
     },
     "description": "this package will run a virtual swagger-ui server with persistent storage in the browser, that your webapp can use (in-place of a real backend)",
     "devDependencies": {
@@ -35,18 +35,28 @@
         "build-ci": "utility2 shRun shReadmeBuild",
         "build-doc": "npm test --mode-test-case=testCase_build_doc",
         "example.js": "utility2 shRunScreenCapture shReadmeTestJs example.js",
-        "start": "export PORT=${PORT:-8080} && export npm_config_mode_auto_restart=1 && utility2 shRun shIstanbulCover node test.js",
+        "start": "export PORT=${PORT:-8080} && export npm_config_mode_auto_restart=1 && utility2 shRun shIstanbulCover test.js",
 
 
 
-        "start-heroku": "export npm_config_mode_backend=1 && npm start ",
+        "start-example": "utility2 shRun && cp tmp/README.example.js example.js && export PORT=8081 && node example.js ",
 
 
 
-        "test": "export PORT=$(utility2 shServerPortRandom) && utility2 test node test.js",
+
+
+        "start-heroku": "export npm_config_mode_backend=1 && node assets.app.js ",
+
+
+
+        "start-standalone": "npm run build-app && node tmp/build/app/assets.app.js ",
+
+
+
+        "test": "export PORT=$(utility2 shServerPortRandom) && utility2 test test.js",
 
 
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.7.1"
+    "version": "2016.7.2"
 }

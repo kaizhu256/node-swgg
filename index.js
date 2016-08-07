@@ -1633,46 +1633,33 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             local.swgg.serverRespondJsonapi(request, response, error);
         };
 
-        local.swgg.middlewareJsonpStateGet = function (request, response, nextMiddleware) {
+        local.swgg.middlewareJsonpStateInit = function (request, response, nextMiddleware) {
         /*
          * this function will run the middleware that will
          * serve the browser-state wrapped in the given request.jsonp-callback
          */
-            var isRequest, state;
-            isRequest = request.urlParsed &&
-                request.urlParsed.pathname === '/jsonp.swgg.stateGet';
-            state = { utility2: { assetsDict: {}, envDict: {} } };
-            if (request.configGet || isRequest) {
-                [
-                    '/assets.swgg.lib.json-schema.schema.json',
-                    '/assets.swgg.lib.swagger.petstore.json',
-                    '/assets.swgg.lib.swagger.schema.json'
-                ].forEach(function (key) {
-                    state.utility2.assetsDict[key] = local.utility2.assetsDict[key];
-                });
-                if (request.configGet) {
+            var state;
+            if (request.configInit || request.stateInit || (request.urlParsed &&
+                    request.urlParsed.pathname === '/jsonp.swgg.stateInit')) {
+                state = { utility2: { assetsDict: {
+                    '/assets.swgg.lib.json-schema.schema.json':
+                        local.utility2.assetsDict['/assets.swgg.lib.json-schema.schema.json'],
+                    '/assets.swgg.lib.swagger.petstore.json':
+                        local.utility2.assetsDict['/assets.swgg.lib.swagger.petstore.json'],
+                    '/assets.swgg.lib.swagger.schema.json':
+                        local.utility2.assetsDict['/assets.swgg.lib.swagger.schema.json']
+                } } };
+                if (request.configInit) {
                     return state;
                 }
-            }
-            if (request.stateGet || isRequest) {
-                [
-                    'npm_package_description',
-                    'npm_package_homepage',
-                    'npm_package_name',
-                    'npm_package_version'
-                ].forEach(function (key) {
-                    state.utility2.envDict[key] = local.utility2.envDict[key];
-                });
-                if (request.stateGet) {
+                local.utility2.objectSetDefault(
+                    state,
+                    local.utility2.middlewareJsonpStateInit({ stateInit: true }),
+                    3
+                );
+                if (request.stateInit) {
                     return state;
                 }
-            }
-            if (isRequest) {
-                [
-                    'npm_config_mode_backend'
-                ].forEach(function (key) {
-                    state.utility2.envDict[key] = local.utility2.envDict[key];
-                });
                 response.end(request.urlParsed.query.callback + '(' + JSON.stringify(state) +
                     ');');
                 return;
@@ -2704,7 +2691,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     .replace(
                         '/* utility2.rollup.js content */',
                         key + '(' + JSON.stringify(
-                            local.swgg.middlewareJsonpStateGet({ configGet: true })
+                            local.swgg.middlewareJsonpStateInit({ configInit: true })
                         ) + ');'
                     );
             default:

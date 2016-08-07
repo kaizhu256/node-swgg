@@ -42,36 +42,15 @@
             break;
         // re-init local from example.js
         case 'node':
-            /* istanbul ignore next */
-            if (module.isRollup) {
-                local = module;
-                break;
-            }
-            local = require('utility2').requireExampleJsFromReadme({
+            local = (module.utility2 || require('utility2')).requireExampleJsFromReadme({
                 __dirname: __dirname,
-                moduleExports: require('./index.js'),
+                module: module,
+                moduleExports: __dirname + '/index.js',
                 moduleName: 'swagger-lite'
-            }).exports;
-            local.swgg = require('./index.js');
+            });
+            local.swgg = local['swagger-lite'];
             break;
         }
-        // init templates
-/* jslint-ignore-begin */
-local.utility2.assetsDict['/assets.app.begin.js'] = '\
-/*\n\
-app.js\n\
-\n\
-{{packageJson.description}}\n\
-\n\
-instruction\n\
-    1. save this script as app.js\n\
-    2. run the shell command:\n\
-        $ PORT=8081 node app.js\n\
-    3. open a browser to http://localhost:8081\n\
-    4. interact with the swagger-ui server\n\
-*/\n\
-';
-/* jslint-ignore-end */
     }());
 
 
@@ -1689,8 +1668,8 @@ instruction\n\
                 file: '/index.html',
                 url: '/index.html'
             }, {
-                file: '/jsonp.swgg.stateGet',
-                url: '/jsonp.swgg.stateGet?callback=window.swgg.stateInit'
+                file: '/jsonp.swgg.stateInit',
+                url: '/jsonp.swgg.stateInit?callback=window.swgg.stateInit'
             }];
             options.forEach(function (options) {
                 onParallel.counter += 1;
@@ -2254,30 +2233,42 @@ instruction\n\
     case 'node':
         // init repl debugger
         local.utility2.replStart();
+        // init assets
         /* istanbul ignore next */
         if (module.isRollup) {
-            local.utility2.assetsDict['/assets.app.js'] =
-                local.utility2.assetsDict['/assets.app.min.js'] =
-                local.fs.readFileSync(__filename, 'utf8');
             break;
         }
         local.utility2.assetsDict['/assets.app.js'] = [
-            '/assets.app.begin.js',
+            'header',
             '/assets.swgg.rollup.js',
             'local.swgg.stateInit',
             '/assets.example.js',
             '/assets.test.js'
         ].map(function (key) {
             switch (key) {
-            case '/assets.app.begin.js':
-                return local.utility2.assetsDict[key];
+/* jslint-ignore-begin */
+case 'header':
+return '\
+/*\n\
+app.js\n\
+\n' + local.utility2.envDict.npm_package_description + '\n\
+\n\
+instruction\n\
+    1. save this script as app.js\n\
+    2. run the shell command:\n\
+        $ PORT=8081 node app.js\n\
+    3. open a browser to http://localhost:8081\n\
+    4. interact with the swagger-ui server\n\
+*/\n\
+';
+/* jslint-ignore-end */
             case 'local.swgg.stateInit':
                 return '// ' + key + '\n' +
                     local.utility2.assetsDict['/assets.utility2.rollup.content.js']
                     .replace(
                         '/* utility2.rollup.js content */',
                         key + '(' + JSON.stringify(
-                            local.swgg.middlewareJsonpStateGet({ stateGet: true })
+                            local.swgg.middlewareJsonpStateInit({ stateInit: true })
                         ) + ');'
                     );
             default:
@@ -2294,25 +2285,6 @@ instruction\n\
             local.testCase_validateBySchema_error(null, local.utility2.onErrorDefault);
             local.testCase_validateBySwagger_default(null, local.utility2.onErrorDefault);
         }, local.utility2.onErrorDefault);
-        // debug dir
-        [
-            local.utility2.__dirname,
-            local.swgg.Nedb.__dirname,
-            __dirname
-        ].forEach(function (dir) {
-            local.fs.readdirSync(dir).forEach(function (file) {
-                file = dir + '/' + file;
-                local.utility2.onFileModifiedRestart(file);
-                switch (local.path.extname(file)) {
-                case '.css':
-                case '.js':
-                case '.json':
-                    // jslint file
-                    local.utility2.jslintAndPrint(local.fs.readFileSync(file, 'utf8'), file);
-                    break;
-                }
-            });
-        });
         break;
     }
 }());

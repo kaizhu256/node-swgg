@@ -24,9 +24,10 @@ this package will run a virtual swagger-ui server with persistent storage in the
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 53f70bd7
-- npm publish 2016.7.1
-- replace lib bcrypt and lib cryptojs with lib sjcl
+#### change since b5df4fce
+- npm publish 2016.7.2
+- deploy standalone-app to heroku
+- rename local.utility2.middlewareJsonpStateGet to local.utility2.middlewareJsonpStateInit
 - none
 
 #### this package requires
@@ -95,7 +96,6 @@ instruction
     3. open a browser to http://localhost:8081
     4. interact with the swagger-ui server
 */
-
 /* istanbul instrument in package swagger-lite */
 /*jslint
     bitwise: true,
@@ -107,7 +107,6 @@ instruction
     regexp: true,
     stupid: true
 */
-
 (function () {
     'use strict';
     var local;
@@ -133,7 +132,7 @@ instruction
             }
         }());
         /* istanbul ignore next */
-        // init local
+        // re-init local
         local = local.modeJs === 'browser'
             ? window.swgg.local
             : module.isRollup
@@ -215,7 +214,7 @@ instruction
             local.swgg.middlewareRouter,
             local.swgg.middlewareUserLogin,
             local.middlewareInitCustom,
-            local.swgg.middlewareJsonpStateGet,
+            local.swgg.middlewareJsonpStateInit,
             local.utility2.middlewareBodyRead,
             local.swgg.middlewareBodyParse,
             local.swgg.middlewareValidate,
@@ -340,22 +339,15 @@ body > * {\n\
     </div>\n\
     {{#if isRollup}}\n\
     <script src="assets.app.min.js"></script>\n\
-    <script src="jsonp.swgg.stateGet?callback=window.swgg.stateInit"></script>\n\
     {{#unless isRollup}}\n\
     <script src="assets.utility2.rollup.js"></script>\n\
     <script src="assets.swgg.js"></script>\n\
     <script src="assets.swgg.lib.swagger-ui.js"></script>\n\
-    <script src="jsonp.swgg.stateGet?callback=window.swgg.stateInit"></script>\n\
-<script>\n\
-/*jslint browser: true*/\n\
-window.utility2.onReadyBefore.counter += 1;\n\
-</script>\n\
+    <script src="jsonp.swgg.stateInit?callback=window.swgg.stateInit"></script>\n\
+    <script >window.utility2.onReadyBefore.counter += 1;</script>\n\
     <script src="assets.example.js"></script>\n\
     <script src="assets.test.js"></script>\n\
-<script>\n\
-/*jslint browser: true*/\n\
-window.utility2.onReadyBefore();\n\
-</script>\n\
+    <script >window.utility2.onReadyBefore();</script>\n\
     {{/if isRollup}}\n\
 </body>\n\
 </html>\n\
@@ -752,7 +744,7 @@ window.utility2.onReadyBefore();\n\
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "utility2": "2016.7.2"
+        "utility2": "2016.7.4"
     },
     "description": "{{packageJson.description}}",
     "devDependencies": {
@@ -787,17 +779,27 @@ utility2-jslint tmp/build/app/assets.app.js",
         "start": "\
 export PORT=${PORT:-8080} && \
 export npm_config_mode_auto_restart=1 && \
-utility2 shRun shIstanbulCover node test.js",
+utility2 shRun shIstanbulCover test.js",
+        "start-example": "\
+utility2 shRun && \
+cp tmp/README.example.js example.js && \
+export PORT=8081 && \
+node example.js \
+",
         "start-heroku": "\
 export npm_config_mode_backend=1 && \
-npm start \
+node assets.app.js \
+",
+        "start-standalone": "\
+npm run build-app && \
+node tmp/build/app/assets.app.js \
 ",
         "test": "\
 export PORT=$(utility2 shServerPortRandom) && \
-utility2 test node test.js",
+utility2 test test.js",
         "test-published": "utility2 shRun shNpmTestPublished"
     },
-    "version": "2016.7.1"
+    "version": "2016.7.2"
 }
 ```
 

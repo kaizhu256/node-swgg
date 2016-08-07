@@ -34,7 +34,7 @@
             }
         }());
         /* istanbul ignore next */
-        // init local
+        // re-init local
         local = local.modeJs === 'browser'
             ? window.swgg.local
             : module.isRollup
