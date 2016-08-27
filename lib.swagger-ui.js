@@ -71,7 +71,7 @@ local.swgg.templateUiDatatable = '\
         </tr>\n\
     </thead>\n\
     <tbody>\n\
-        {{#each rowList}}\n\
+        {{#each dbRowList}}\n\
         <tr data-id="{{id}}" data-keyUnique="{{keyUnique}}">\n\
             <td class="cursorPointer eventDelegateClick onEventDatatableTrSelect">\n\
                 <span class="tr">\n\
@@ -83,7 +83,7 @@ local.swgg.templateUiDatatable = '\
             <td class="cursorPointer">{{valueEncoded htmlSafe}}</td>\n\
             {{/each colList}}\n\
         </tr>\n\
-        {{/each rowList}}\n\
+        {{/each dbRowList}}\n\
     <tfoot>\n\
     </tfoot>\n\
 </table>\n\
@@ -404,21 +404,21 @@ local.swgg.templateUiResponseAjax = '\
                     local.swgg.uiParamRender(propDef);
                     return propDef;
                 });
-            options.rowList = options.responseJson.data.map(function (collectDoc, ii) {
-                collectDoc = { paramDict: collectDoc };
-                collectDoc.colList = options.propDefList.map(function (propDef) {
+            options.dbRowList = options.responseJson.data.map(function (dbRow, ii) {
+                dbRow = { paramDict: dbRow };
+                dbRow.colList = options.propDefList.map(function (propDef) {
                     propDef = local.utility2.jsonCopy(propDef);
                     propDef.dataset = {};
-                    propDef.valueDecoded = collectDoc.paramDict[propDef.name];
+                    propDef.valueDecoded = dbRow.paramDict[propDef.name];
                     // init valueEncoded
                     local.swgg.uiValueEncode(propDef, propDef);
                     return propDef;
                 });
-                collectDoc.id = collectDoc.paramDict[options.keyUnique];
-                collectDoc.ii = options.iiPadding = options.querySkip + ii + 1;
-                return collectDoc;
+                dbRow.id = dbRow.paramDict[options.keyUnique];
+                dbRow.ii = options.iiPadding = options.querySkip + ii + 1;
+                return dbRow;
             });
-            options.iiPadding = 0.3 * options.iiPadding.toString().length;
+            options.iiPadding = 0.3 * String(options.iiPadding || '').length;
             // init pagination
             options.pageCurrent = Math.floor(
                 options.querySkip / options.queryLimit
@@ -957,7 +957,7 @@ local.swgg.templateUiResponseAjax = '\
             paramDef.valueDecoded = paramDef.default;
             if (paramDef.valueDecoded === undefined && paramDef.in === 'body') {
                 if (paramDef.schema2) {
-                    paramDef.valueDecoded = local.swgg.collectDocRandomCreate({
+                    paramDef.valueDecoded = local.swgg.dbRowRandomCreate({
                         override: function () {
                             var override = {};
                             // preserve default value

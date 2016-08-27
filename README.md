@@ -10,13 +10,20 @@ this package will run a virtual swagger-ui server with persistent storage in the
 
 
 
+# live demo
+- [https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html)
+
+[![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.githubDeploy.browser._2Fnode-swagger-lite_2Fbuild..alpha..travis-ci.org_2Fapp_2Findex.html.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html)
+
+
+
 # documentation
 #### todo
+- allow secure remote db export / import / reset to backend
 - add middlewareAcl
 - datatable - add sort-by-field
 - add notification system
 - add post-crud-middleware for pet photoUrl
-- rename collectDoc to something better
 - change api crudCreateOrReplaceMany to crudCreateOrReplaceManyByKeyUnique
 - add api userPasswordChange
 - add message-param to assertions in swgg.validateByPropDef
@@ -24,10 +31,11 @@ this package will run a virtual swagger-ui server with persistent storage in the
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since b5df4fce
-- npm publish 2016.7.2
-- deploy standalone-app to heroku
-- rename local.utility2.middlewareJsonpStateGet to local.utility2.middlewareJsonpStateInit
+#### change since 5ee55bba
+- npm publish 2016.8.1
+- allow file export / import of nedb-database
+- migrate nedb-api from swagger-lite to utility2
+- rename collectDoc to dbRow and collection to dbTable
 - none
 
 #### this package requires
@@ -45,20 +53,13 @@ this package will run a virtual swagger-ui server with persistent storage in the
 
 
 
-# live test-server
-- [https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html)
-
-[![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.githubDeploy.browser._2Fnode-swagger-lite_2Fbuild..alpha..travis-ci.org_2Fapp_2Findex.html.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html)
-
-
-
 # build-status [![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swagger-lite.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
 [![build commit status](https://kaizhu256.github.io/node-swagger-lite/build/build.badge.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
 
 | git-branch : | [master](https://github.com/kaizhu256/node-swagger-lite/tree/master) | [beta](https://github.com/kaizhu256/node-swagger-lite/tree/beta) | [alpha](https://github.com/kaizhu256/node-swagger-lite/tree/alpha)|
 |--:|:--|:--|:--|
-| test-server 1 : | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/app/index.html)|
-| test-server 2 : | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-master.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-beta.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-alpha.herokuapp.com)|
+| test-server-1 : | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/app/index.html)|
+| test-server-2 : | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-master.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-beta.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-alpha.herokuapp.com)|
 | test-report : | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.html)|
 | coverage : | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.html/index.html)|
 | build-artifacts : | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..master..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..beta..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..alpha..travis-ci.org)|
@@ -87,7 +88,7 @@ this package will run a virtual swagger-ui server with persistent storage in the
 /*
 example.js
 
-this node script will run a standalone swagger-ui server backed by nedb
+this script will run a standalone swagger-ui server backed by nedb
 
 instruction
     1. save this script as example.js
@@ -159,7 +160,7 @@ instruction
                         onNext(local.utility2.errorDefault);
                         return;
                     case 'getInventory':
-                        crud.collection.find({}, { status: 1 }, onNext);
+                        crud.dbTable.find({}, { status: 1 }, onNext);
                         break;
                     default:
                         modeNext = Infinity;
@@ -235,27 +236,47 @@ instruction
     case 'browser':
         /* istanbul ignore next */
         local.testRun = function (event) {
-            if (local.utility2.modeTest) {
-                return;
-            }
+            var reader, tmp;
             switch (event && event.currentTarget.id) {
+            case 'nedbExportButton1':
+                tmp = window.URL.createObjectURL(new window.Blob([local.utility2.dbExport()]));
+                document.querySelector('#nedbExportA1').href = tmp;
+                document.querySelector('#nedbExportA1').click();
+                setTimeout(function () {
+                    window.URL.revokeObjectURL(tmp);
+                }, 30000);
+                break;
+            case 'nedbImportButton1':
+                document.querySelector('#nedbImportInput1').click();
+                break;
+            case 'nedbImportInput1':
+                local.utility2.ajaxProgressShow();
+                reader = new window.FileReader();
+                tmp = document.querySelector('#nedbImportInput1').files[0];
+                if (!tmp) {
+                    return;
+                }
+                reader.addEventListener('load', function () {
+                    local.utility2.dbImport(reader.result, local.utility2.ajaxProgressUpdate);
+                });
+                reader.readAsText(tmp);
+                break;
+            case 'nedbResetButton1':
+                local.utility2.dbReset();
+                break;
             case 'testRunButton1':
                 local.modeTest = true;
                 local.utility2.testRun(local);
                 break;
-            case 'swggButtonNedbReset1':
-                window.swgg.nedbReset(function () {
-                    location.reload();
-                });
-                break;
             }
         };
         // init event-handling
-        [
-            '#swggButtonNedbReset1',
-            '#testRunButton1'
-        ].forEach(function (element) {
-            document.querySelector(element).addEventListener('click', local.testRun);
+        ['change', 'click'].forEach(function (event) {
+            Array.prototype.slice.call(
+                document.querySelectorAll('.on' + event)
+            ).forEach(function (element) {
+                element.addEventListener(event, local.testRun);
+            });
         });
         // init ui
         local.swgg.uiEventListenerDict['.onEventUiReload']();
@@ -296,11 +317,18 @@ body {\n\
     background-color: #fff;\n\
     font-family: Helvetica Neue,Helvetica,Arial,sans-serif;\n\
 }\n\
-body > button {\n\
-    width: 10rem;\n\
-}\n\
 body > * {\n\
     margin-bottom: 1rem;\n\
+}\n\
+body > button {\n\
+    width: 15rem;\n\
+}\n\
+.zeroPixel {\n\
+    border: 0;\n\
+    height: 0;\n\
+    margin: 0;\n\
+    padding: 0;\n\
+    width: 0;\n\
 }\n\
 </style>\n\
 </head>\n\
@@ -321,9 +349,13 @@ body > * {\n\
     </h1>\n\
     <h3>{{envDict.npm_package_description}}</h3>\n\
     <h4><a download href="assets.app.js">download standalone app</a></h4>\n\
-    <button id="testRunButton1">run internal test</button><br>\n\
-    <button id="swggButtonNedbReset1">reset nedb database</button><br>\n\
+    <button class="onclick" id="testRunButton1">run internal test</button><br>\n\
     <div class="testReportDiv" style="display: none;"></div>\n\
+    <button class="onclick" id="nedbResetButton1">reset nedb-database</button><br>\n\
+    <button class="onclick" id="nedbExportButton1">save nedb-database to file</button><br>\n\
+    <a download="nedb.persistence.json" href="" id="nedbExportA1"></a>\n\
+    <button class="onclick" id="nedbImportButton1">load nedb-database from file</button><br>\n\
+    <input class="onchange zeroPixel" type="file" id="nedbImportInput1">\n\
 \n\
     <div class="swggUiContainer">\n\
     <form class="header tr">\n\
@@ -344,10 +376,10 @@ body > * {\n\
     <script src="assets.swgg.js"></script>\n\
     <script src="assets.swgg.lib.swagger-ui.js"></script>\n\
     <script src="jsonp.swgg.stateInit?callback=window.swgg.stateInit"></script>\n\
-    <script >window.utility2.onReadyBefore.counter += 1;</script>\n\
+    <script>window.utility2.onResetBefore.counter += 1;</script>\n\
     <script src="assets.example.js"></script>\n\
     <script src="assets.test.js"></script>\n\
-    <script >window.utility2.onReadyBefore();</script>\n\
+    <script>window.utility2.onResetBefore();</script>\n\
     {{/if isRollup}}\n\
 </body>\n\
 </html>\n\
@@ -576,25 +608,19 @@ body > * {\n\
                 }
             }
         });
-        // init collectionList-fixtures
-        local.utility2.onReadyBefore.counter += 1;
-        local.swgg.collectionListInit([{
-            collectDocList: [{
+        // upsert fixtures
+        local.utility2.dbSeedList = [{
+            dbRowList: [{
                 id: '00_test_swaggerUiLogoSmall',
                 fileBlob: local.swgg.templateSwaggerUiLogoSmallBase64,
                 fileContentType: 'image/png',
                 fileDescription: 'swagger-ui logo',
                 fileFilename: 'swaggerUiLogoSmall.png'
             }],
-            drop: true,
-            ensureIndexList: [{
-                fieldName: 'id',
-                unique: true
-            }],
             name: 'File'
         }, {
-            collectDocList: local.swgg.collectDocListRandomCreate({
-                collectDocList: [{
+            dbRowList: local.swgg.dbRowListRandomCreate({
+                dbRowList: [{
                     id: 0,
                     name: 'birdie',
                     photoUrls: [],
@@ -629,15 +655,10 @@ body > * {\n\
                 },
                 properties: local.swgg.swaggerJson.definitions.Pet.properties
             }),
-            drop: true,
-            ensureIndexList: [{
-                fieldName: 'id',
-                unique: true
-            }],
             name: 'Pet'
         }, {
-            collectDocList: local.swgg.collectDocListRandomCreate({
-                collectDocList: [{
+            dbRowList: local.swgg.dbRowListRandomCreate({
+                dbRowList: [{
                     id: 0,
                     petId: 0,
                     status: 'available'
@@ -660,15 +681,10 @@ body > * {\n\
                 },
                 properties: local.swgg.swaggerJson.definitions.Order.properties
             }),
-            drop: true,
-            ensureIndexList: [{
-                fieldName: 'id',
-                unique: true
-            }],
             name: 'Order'
         }, {
-            collectDocList: local.swgg.collectDocListRandomCreate({
-                collectDocList: [{
+            dbRowList: local.swgg.dbRowListRandomCreate({
+                dbRowList: [{
                     email: 'admin@admin.com',
                     firstName: 'admin',
                     id: 0,
@@ -712,19 +728,20 @@ body > * {\n\
                 },
                 properties: local.swgg.swaggerJson.definitions.User.properties
             }),
-            drop: true,
             ensureIndexList: [{
                 fieldName: 'email',
-                unique: true
-            }, {
-                fieldName: 'id',
                 unique: true
             }, {
                 fieldName: 'username',
                 unique: true
             }],
             name: 'User'
-        }], local.utility2.onReadyBefore);
+        }];
+        local.utility2.onReadyBefore.counter += 1;
+        local.utility2.dbSeedListUpsert(
+            local.utility2.dbSeedList,
+            local.utility2.onReadyBefore
+        );
     }());
 }());
 ```
@@ -744,7 +761,7 @@ body > * {\n\
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "utility2": "2016.7.4"
+        "utility2": "2016.8.2"
     },
     "description": "{{packageJson.description}}",
     "devDependencies": {
@@ -771,35 +788,14 @@ body > * {\n\
         "url": "https://github.com/kaizhu256/node-swagger-lite.git"
     },
     "scripts": {
-        "build-app": "npm test --mode-test-case=testCase_build_app && \
-utility2-jslint tmp/build/app/assets.app.js",
         "build-ci": "utility2 shRun shReadmeBuild",
-        "build-doc": "npm test --mode-test-case=testCase_build_doc",
-        "example.js": "utility2 shRunScreenCapture shReadmeTestJs example.js",
         "start": "\
 export PORT=${PORT:-8080} && \
 export npm_config_mode_auto_restart=1 && \
 utility2 shRun shIstanbulCover test.js",
-        "start-example": "\
-utility2 shRun && \
-cp tmp/README.example.js example.js && \
-export PORT=8081 && \
-node example.js \
-",
-        "start-heroku": "\
-export npm_config_mode_backend=1 && \
-node assets.app.js \
-",
-        "start-standalone": "\
-npm run build-app && \
-node tmp/build/app/assets.app.js \
-",
-        "test": "\
-export PORT=$(utility2 shServerPortRandom) && \
-utility2 test test.js",
-        "test-published": "utility2 shRun shNpmTestPublished"
+        "test": "export PORT=$(utility2 shServerPortRandom) && utility2 test test.js"
     },
-    "version": "2016.7.2"
+    "version": "2016.8.1"
 }
 ```
 
@@ -819,11 +815,12 @@ utility2 test test.js",
 
 shBuildCiTestPre() {(set -e
 # this function will run the pre-test build
-    # test example js script
+    # test example.js
     (export MODE_BUILD=testExampleJs &&
-        export PORT=8081 &&
-        export npm_config_timeout_exit=15000 &&
-        npm run example.js) || return $?
+        shRunScreenCapture shReadmeTestJs example.js) || return $?
+    # test published-package
+    (export MODE_BUILD=npmTestPublished &&
+        shRunScreenCapture shNpmTestPublished) || return $?
 )}
 
 shBuildCiTestPost() {(set -e
@@ -839,7 +836,7 @@ shBuildCiTestPost() {(set -e
     # test deployed app to gh-pages
     (export MODE_BUILD=githubTest &&
         export modeBrowserTest=test &&
-        export url="$TEST_URL?modeTest=consoleLogResult&timeExit={{timeExit}}" &&
+        export url="$TEST_URL?modeTest=1&timeExit={{timeExit}}" &&
         shBrowserTest) || return $?
     # deploy app to heroku
     export HEROKU_REPO="hrku01-$npm_package_name-$CI_BRANCH"
@@ -847,13 +844,14 @@ shBuildCiTestPost() {(set -e
     shGitRepoBranchUpdateLocal() {(set -e
     # this function will local-update git-repo-branch
         cp "$npm_config_dir_build/app/assets.app.js" .
+        printf "web: npm_config_mode_backend=1 node assets.app.js" > Procfile
     )}
     (export MODE_BUILD=herokuDeploy &&
         shHerokuDeploy) || return $?
     # test deployed app to heroku
     (export MODE_BUILD=herokuTest &&
         export modeBrowserTest=test &&
-        export url="$TEST_URL?modeTest=consoleLogResult&timeExit={{timeExit}}" &&
+        export url="$TEST_URL?modeTest=1&timeExit={{timeExit}}" &&
         shBrowserTest) || return $?
 )}
 
@@ -862,7 +860,7 @@ shBuild() {(set -e
     # init env
     . node_modules/.bin/utility2 && shInit
     # cleanup github-gh-pages dir
-    export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
+    # export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
     # init github-gh-pages commit-limit
     export COMMIT_LIMIT=16
     # if branch is alpha, beta, or master, then run default build

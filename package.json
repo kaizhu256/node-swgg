@@ -3,7 +3,7 @@
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "utility2": "2016.7.4"
+        "utility2": "2016.8.2"
     },
     "description": "this package will run a virtual swagger-ui server with persistent storage in the browser, that your webapp can use (in-place of a real backend)",
     "devDependencies": {
@@ -30,33 +30,12 @@
         "url": "https://github.com/kaizhu256/node-swagger-lite.git"
     },
     "scripts": {
-        "build-app": "npm test --mode-test-case=testCase_build_app && utility2-jslint tmp/build/app/assets.app.js",
-
         "build-ci": "utility2 shRun shReadmeBuild",
-        "build-doc": "npm test --mode-test-case=testCase_build_doc",
-        "example.js": "utility2 shRunScreenCapture shReadmeTestJs example.js",
         "start": "export PORT=${PORT:-8080} && export npm_config_mode_auto_restart=1 && utility2 shRun shIstanbulCover test.js",
 
 
 
-        "start-example": "utility2 shRun && cp tmp/README.example.js example.js && export PORT=8081 && node example.js ",
-
-
-
-
-
-        "start-heroku": "export npm_config_mode_backend=1 && node assets.app.js ",
-
-
-
-        "start-standalone": "npm run build-app && node tmp/build/app/assets.app.js ",
-
-
-
-        "test": "export PORT=$(utility2 shServerPortRandom) && utility2 test test.js",
-
-
-        "test-published": "utility2 shRun shNpmTestPublished"
+        "test": "export PORT=$(utility2 shServerPortRandom) && utility2 test test.js"
     },
-    "version": "2016.7.2"
+    "version": "2016.8.1"
 }

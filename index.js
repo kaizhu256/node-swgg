@@ -31,15 +31,12 @@
             : require('utility2');
         // init lib swgg
         local.swgg = local.utility2.local.swgg = {
-            collectionDict: {},
             idDomElementDict: {},
             local: local,
             swaggerSchemaJson: {},
             templateApiDict: {},
             uiEventListenerDict: {}
         };
-        // init lib nedb
-        local.swgg.Nedb = local.utility2.Nedb;
         // init templateApiDict
         local.swgg.templateApiDict.crudCountManyByQuery = {
             _method: 'get',
@@ -923,30 +920,30 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             }, local.utility2.onErrorDefault);
         };
 
-        local.swgg.collectDocListRandomCreate = function (options) {
+        local.swgg.dbRowListRandomCreate = function (options) {
         /*
-         * this function will return a collectDocList of options.length random collectDoc's
+         * this function will return a dbRowList of options.length random dbRow's
          */
-            local.utility2.objectSetDefault(options, { collectDocList: [] });
+            local.utility2.objectSetDefault(options, { dbRowList: [] });
             for (options.ii = 0; options.ii < options.length; options.ii += 1) {
-                options.collectDocList.push(local.swgg.collectDocRandomCreate(options));
+                options.dbRowList.push(local.swgg.dbRowRandomCreate(options));
             }
-            return options.collectDocList;
+            return options.dbRowList;
         };
 
-        local.swgg.collectDocRandomCreate = function (options) {
+        local.swgg.dbRowRandomCreate = function (options) {
         /*
-         * this function will return a random collectDoc
+         * this function will return a random dbRow
          */
-            var collectDoc, ii, max, min, propDef, tmp;
-            collectDoc = {};
+            var dbRow, ii, max, min, propDef, tmp;
+            dbRow = {};
             Object.keys(options.properties).forEach(function (key) {
                 propDef = options.properties[key];
                 if (propDef.readOnly) {
                     return;
                 }
                 if (propDef.enum) {
-                    collectDoc[key] = local.utility2.listGetElementRandom(propDef.enum);
+                    dbRow[key] = local.utility2.listGetElementRandom(propDef.enum);
                     return;
                 }
                 // http://json-schema.org/latest/json-schema-validation.html#anchor13
@@ -1040,142 +1037,12 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         key: propDef.name,
                         schema: propDef
                     });
-                    collectDoc[key] = tmp;
+                    dbRow[key] = tmp;
                 }, local.utility2.nop);
             });
             return local.utility2.jsonCopy(
-                local.utility2.objectSetOverride(collectDoc, options.override(options))
+                local.utility2.objectSetOverride(dbRow, options.override(options))
             );
-        };
-
-        local.swgg.collectionCreate = function (schemaName) {
-        /*
-         * this function will return a persistent nedb-collection from schemaName
-         */
-            var dir;
-            dir = 'tmp/nedb.collection.' + local.utility2.envDict.NODE_ENV;
-            if (!local.swgg.collectionDict[schemaName]) {
-                // https://github.com/louischatriot/nedb/issues/134
-                // bug workaround - Error creating index when db does not exist #134
-                if (local.modeJs === 'node' && !local.swgg.modeNedbInitialized) {
-                    // try to init nedb dir
-                    local.utility2.tryCatchOnError(function () {
-                        local.fs.mkdirSync('tmp');
-                    }, local.utility2.nop);
-                    local.utility2.tryCatchOnError(function () {
-                        local.fs.mkdirSync(dir);
-                    }, local.utility2.nop);
-                }
-                local.swgg.modeNedbInitialized = true;
-                local.swgg.collectionDict[schemaName] = new local.swgg.Nedb({
-                    autoload: true,
-                    filename: dir + '/' + schemaName,
-                    timestampData: true
-                });
-            }
-            return local.swgg.collectionDict[schemaName];
-        };
-
-        local.swgg.collectionInit = function (options, onError) {
-        /*
-         * this function will init a persistent nedb-collection
-         */
-            var collection, modeNext, onNext, onParallel;
-            modeNext = 0;
-            onNext = function (error) {
-                modeNext = error
-                    ? Infinity
-                    : modeNext + 1;
-                switch (modeNext) {
-                case 1:
-                    onParallel = local.utility2.onParallel(onNext);
-                    onParallel.counter += 1;
-                    local.utility2.objectSetDefault(options, {
-                        collectDocList: [],
-                        ensureIndexList: [],
-                        removeIndexList: []
-                    });
-                    collection = local.swgg.collectionCreate(options.name);
-                    // drop collection
-                    if (options.drop) {
-                        onParallel.counter += 1;
-                        local.swgg.Nedb.storage.unlink(String(
-                            collection.filename
-                        ), function () {
-                            collection.loadDatabase(function () {
-                                onParallel.counter += 1;
-                                collection.remove({}, { multi: true }, onParallel);
-                                // drop indexes
-                                Object.keys(collection.indexes)
-                                    // coverage-hack - test removeIndex handling-behavior
-                                    .concat('undefined')
-                                    .forEach(function (key) {
-                                        if (key !== '_id') {
-                                            onParallel.counter += 1;
-                                            collection.removeIndex(key, onParallel);
-                                        }
-                                    });
-                                onParallel();
-                            });
-                        });
-                    }
-                    onParallel();
-                    break;
-                case 2:
-                    onParallel.counter += 1;
-                    // removeIndex
-                    options.removeIndexList.forEach(function (index) {
-                        onParallel.counter += 1;
-                        collection.removeIndex(index, onParallel);
-                    });
-                    onParallel();
-                    break;
-                case 3:
-                    onParallel.counter += 1;
-                    // ensureIndex
-                    options.ensureIndexList.forEach(function (index) {
-                        onParallel.counter += 1;
-                        collection.ensureIndex(index, onParallel);
-                    });
-                    onParallel();
-                    break;
-                case 4:
-                    onParallel.counter += 1;
-                    // upsert collectDoc
-                    options.collectDocList.forEach(function (collectDoc) {
-                        onParallel.counter += 1;
-                        collection.update({ id: collectDoc.id }, collectDoc, {
-                            upsert: true
-                        }, onParallel);
-                    });
-                    onParallel();
-                    break;
-                default:
-                    onError(error);
-                }
-            };
-            // coverage-hack - test error handling-behavior
-            onNext(options.error);
-        };
-
-        local.swgg.collectionListInit = function (optionsList, onError) {
-        /*
-         * this function will serially init a list of persistent nedb-collections
-         */
-            var modeNext, onNext;
-            modeNext = -1;
-            onNext = function (error) {
-                modeNext = error
-                    ? Infinity
-                    : modeNext + 1;
-                // recursively run each sub-middleware in middlewareList
-                if (modeNext < optionsList.length) {
-                    local.swgg.collectionInit(optionsList[modeNext], onNext);
-                    return;
-                }
-                onError(error);
-            };
-            onNext();
         };
 
         local.swgg.idDomElementCreate = function (seed) {
@@ -1415,12 +1282,12 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     user = request.swgg.user;
                     switch (crud.operationId.split('.')[0]) {
                     case 'crudCountManyByQuery':
-                        crud.collection.count(crud.queryWhere, onNext);
+                        crud.dbTable.count(crud.queryWhere, onNext);
                         break;
                     case 'crudCreateOrReplaceMany':
-                        crud.collection.remove({ id: {
-                            $in: crud.body.map(function (collectDoc) {
-                                return collectDoc.id;
+                        crud.dbTable.remove({ id: {
+                            $in: crud.body.map(function (dbRow) {
+                                return dbRow.id;
                             })
                         } }, { multi: true }, onNext);
                         break;
@@ -1430,17 +1297,17 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         delete crud.body.id;
                         delete crud.body[crud.keyUnique];
                         crud.body[crud.keyAlias] = crud.data[crud.keyUnique];
-                        // replace collectDoc
+                        // replace dbRow
                         if (crud.operationId.indexOf('Replace') >= 0) {
-                            crud.collection.update(
+                            crud.dbTable.update(
                                 crud.queryByKeyUnique,
                                 crud.body,
                                 { returnUpdatedDocs: true, upsert: true },
                                 onNext
                             );
-                        // update collectDoc
+                        // update dbRow
                         } else {
-                            crud.collection.update(
+                            crud.dbTable.update(
                                 crud.queryByKeyUnique,
                                 { $set: crud.body },
                                 { returnUpdatedDocs: true },
@@ -1449,10 +1316,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         }
                         break;
                     case 'crudDeleteManyByQuery':
-                        crud.collection.remove(crud.queryWhere, { multi: true }, onNext);
+                        crud.dbTable.remove(crud.queryWhere, { multi: true }, onNext);
                         break;
                     case 'crudDeleteOneByKeyUnique':
-                        crud.collection.remove(crud.queryByKeyUnique, onNext);
+                        crud.dbTable.remove(crud.queryByKeyUnique, onNext);
                         break;
                     // coverage-hack - test error handling-behavior
                     case 'crudErrorDelete':
@@ -1465,12 +1332,12 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         onNext(local.utility2.errorDefault);
                         break;
                     case 'crudExistsOneByKeyUnique':
-                        crud.collection.findOne(crud.queryByKeyUnique, { $: 1 }, onNext);
+                        crud.dbTable.findOne(crud.queryByKeyUnique, { $: 1 }, onNext);
                         break;
                     case 'crudGetManyByQuery':
                         onParallel = local.utility2.onParallel(onNext);
                         onParallel.counter += 1;
-                        crud.collection.find(crud.queryWhere, crud.queryFields)
+                        crud.dbTable.find(crud.queryWhere, crud.queryFields)
                             .sort(crud.querySort)
                             .skip(crud.querySkip)
                             .limit(crud.queryLimit)
@@ -1479,16 +1346,16 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                                 onParallel(error);
                             });
                         onParallel.counter += 1;
-                        crud.collection.count({}, function (error, data) {
+                        crud.dbTable.count({}, function (error, data) {
                             crud.paginationCountTotal = data;
                             onParallel(error);
                         });
                         break;
                     case 'crudGetOneByKeyUnique':
-                        crud.collection.findOne(crud.queryByKeyUnique, onNext);
+                        crud.dbTable.findOne(crud.queryByKeyUnique, onNext);
                         break;
                     case 'crudGetOneByQuery':
-                        crud.collection.findOne(crud.queryWhere, crud.queryFields, onNext);
+                        crud.dbTable.findOne(crud.queryWhere, crud.queryFields, onNext);
                         break;
                     case 'crudNullDelete':
                     case 'crudNullGet':
@@ -1500,11 +1367,15 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         onNext();
                         break;
                     case 'fileGetOneByKeyUnique':
-                        local.swgg.collectionFile = local.swgg.collectionCreate('File');
-                        local.swgg.collectionFile.findOne(crud.queryByKeyUnique, onNext);
+                        local.swgg.dbTableFile = local.utility2.dbTableCreate({
+                            name: 'File'
+                        });
+                        local.swgg.dbTableFile.findOne(crud.queryByKeyUnique, onNext);
                         break;
                     case 'fileUploadManyByForm':
-                        local.swgg.collectionFile = local.swgg.collectionCreate('File');
+                        local.swgg.dbTableFile = local.utility2.dbTableCreate({
+                            name: 'File'
+                        });
                         request.swgg.paramDict = {};
                         Object.keys(request.swgg.bodyMeta).forEach(function (key) {
                             if (typeof request.swgg.bodyMeta[key].filename !== 'string') {
@@ -1534,7 +1405,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                                 });
                                 return tmp;
                             });
-                        local.swgg.collectionFile.insert(crud.body, onNext);
+                        local.swgg.dbTableFile.insert(crud.body, onNext);
                         break;
                     case 'userLoginByPassword':
                     case 'userLogout':
@@ -1556,7 +1427,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 case 2:
                     switch (crud.operationId.split('.')[0]) {
                     case 'crudCreateOrReplaceMany':
-                        crud.collection.insert(crud.body, onNext);
+                        crud.dbTable.insert(crud.body, onNext);
                         break;
                     case 'crudCreateOrReplaceOneByKeyUnique':
                     case 'crudUpdateOneByKeyUnique':
@@ -1580,7 +1451,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         onNext(null, { jwtEncoded: user.jwtEncoded });
                         break;
                     case 'userLogout':
-                        crud.collection.update(
+                        crud.dbTable.update(
                             { username: user.username },
                             { $unset: { jwtEncoded: true } },
                             { returnUpdatedDocs: true },
@@ -1726,7 +1597,9 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     user = request.swgg.user = {};
                     user.jwtEncoded = request.headers.authorization &&
                         request.headers.authorization.replace('Bearer ', '');
-                    local.swgg.collectionUser = local.swgg.collectionCreate('User');
+                    local.swgg.dbTableUser = local.utility2.dbTableCreate({
+                        name: 'User'
+                    });
                     // decode and decrypt jwtEncoded
                     local.swgg.jwtEncodedDecodeAndDecrypt(user);
                     switch (crud.operationId.split('.')[0]) {
@@ -1738,7 +1611,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         user.password = request.urlParsed.query.password;
                         user.username = request.urlParsed.query.username;
                         if (user.password && user.username) {
-                            local.swgg.collectionUser.findOne({
+                            local.swgg.dbTableUser.findOne({
                                 username: user.username
                             }, onNext);
                             return;
@@ -1748,7 +1621,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         if (user.jwtDecrypted && user.jwtDecrypted.sub) {
                             // init username
                             user.username = user.jwtDecrypted.sub;
-                            local.swgg.collectionUser.findOne({
+                            local.swgg.dbTableUser.findOne({
                                 username: user.jwtDecrypted.sub
                             }, onNext);
                             return;
@@ -1778,8 +1651,8 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         local.swgg.jwtDecodedEncryptAndEncode(user);
                         // update jwtEncoded in client
                         local.swgg.jwtEncodedSetHeader(request, response);
-                        // update jwtEncoded in collection
-                        local.swgg.collectionUser.update({
+                        // update jwtEncoded in dbTableUser
+                        local.swgg.dbTableUser.update({
                             username: user.jwtDecrypted.sub
                         }, { $set: { jwtEncoded: user.jwtEncoded } }, onNext);
                         return;
@@ -1890,11 +1763,13 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 case 2:
                     // init crud
                     crud = request.swgg.crud;
-                    // init crud.collection
-                    crud.collection = request.swgg.pathObject &&
+                    // init crud.dbTable
+                    crud.dbTable = request.swgg.pathObject &&
                         request.swgg.pathObject._schemaName &&
-                        local.swgg.collectionCreate(request.swgg.pathObject._schemaName);
-                    if (!crud.collection) {
+                        local.utility2.dbTableCreate({
+                            name: request.swgg.pathObject._schemaName
+                        });
+                    if (!crud.dbTable) {
                         nextMiddleware();
                         return;
                     }
@@ -1978,25 +1853,6 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 }
             };
             onNext();
-        };
-
-        local.swgg.nedbReset = function (onError) {
-        /*
-         * this function will reset nedb's file-state and memory-state, but retain its indexes
-         */
-            var onParallel;
-            onParallel = local.utility2.onParallel(onError);
-            onParallel.counter += 1;
-            // reset nedb file-state
-            local.swgg.Nedb.fileReset(function () {
-                Object.keys(local.swgg.collectionDict).forEach(function (collection) {
-                    collection = local.swgg.collectionDict[collection];
-                    onParallel.counter += 1;
-                    // reset nedb memory-state
-                    collection.loadDatabase(onParallel);
-                });
-                onParallel();
-            });
         };
 
         local.swgg.normalizeParamDictSwagger = function (data, pathObject) {

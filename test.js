@@ -928,25 +928,6 @@
             onError();
         };
 
-        local.testCase_nedbReset_default = function (options, onError) {
-        /*
-         * this function will test nedbReset's default handling-behavior
-         */
-            options = [
-                [local.swgg, {
-                    collectionDict: { aa: { loadDatabase : function (onError) {
-                        onError();
-                    } } },
-                    Nedb: { fileReset: function (onError) {
-                        onError();
-                    } }
-                }]
-            ];
-            local.utility2.testMock(options, function (onError) {
-                local.swgg.nedbReset(onError);
-            }, onError);
-        };
-
         local.testCase_onErrorJsonapi_default = function (options, onError) {
         /*
          * this function will test onErrorJsonapi's default handling-behavior
@@ -1705,18 +1686,6 @@
                             'swgg': {
                                 exampleList: [],
                                 exports: local.swgg
-                            },
-                            'swgg.Nedb': {
-                                exampleList: [],
-                                exports: local.swgg.Nedb
-                            },
-                            'swgg.Nedb.prototype': {
-                                exampleList: [],
-                                exports: local.swgg.Nedb.prototype
-                            },
-                            'swgg.Nedb.storage': {
-                                exampleList: [],
-                                exports: local.swgg.Nedb.storage
                             }
                         };
                         Object.keys(options.moduleDict).forEach(function (key) {
@@ -1762,8 +1731,8 @@
          */
             options = {
                 modeCoverageMerge: true,
-                url: local.utility2.serverLocalHost +
-                    '/?modeTest=consoleLogResult#!/swgg_id_pet/swgg_id_addPet'
+                url: local.utility2.serverLocalHost + '/?modeTest=1' +
+                    '#!/swgg_id_pet/swgg_id_addPet'
             };
             local.utility2.browserTest(options, onError);
         };
@@ -2145,11 +2114,12 @@
                 local.utility2.middlewareFileServer(request, response, nextMiddleware);
             }
         });
-        // init collectionList-fixtures
-        local.utility2.onReadyBefore.counter += 1;
-        local.swgg.collectionListInit([{
-            collectDocList: local.swgg.collectDocListRandomCreate({
-                collectDocList: [{
+        // upsert fixtures
+        local.utility2.dbSeedList = local.utility2.dbSeedList.concat([{
+            dbRowList: local.swgg.dbRowListRandomCreate({
+                // init 100 extra random objects
+                length: 100,
+                dbRowList: [{
                     id: '00_test_crudCountManyByQuery',
                     propRequired: true
                 }, {
@@ -2165,29 +2135,21 @@
                     id: '00_test_crudGetOneByQuery',
                     propRequired: true
                 }],
-                // init 100 extra random objects
-                length: 100,
                 override: function (options) {
                     return {
-                        id: '00_test_collectDocListRandomCreate_' + (options.ii + 100)
+                        id: '00_test_dbRowListRandomCreate_' + (options.ii + 100)
                     };
                 },
                 properties: local.swgg.swaggerJson.definitions.TestCrud.properties
             }),
-            drop: true,
             ensureIndexList: [{
-                fieldName: 'id',
-                unique: true
-            }, {
                 fieldName: 'propStringUnique',
                 sparse: true,
                 unique: true
             }],
-            name: 'TestCrud',
-            // test removeIndexList handling-behavior
-            removeIndexList: ['undefined']
+            name: 'TestCrud'
         }, {
-            collectDocList: [{
+            dbRowList: [{
                 id: '00_test_fileGetOneByKeyUnique',
                 fileBlob: local.swgg.templateSwaggerUiLogoSmallBase64,
                 fileContentType: 'image/png',
@@ -2212,11 +2174,7 @@
                 fileFilename: '00_test_fileMediaVideoNull.mpg'
             }],
             name: 'File'
-        }], local.utility2.onReadyBefore);
-        local.swgg.collectionListInit([{
-            // test error handling-behavior
-            error: local.utility2.errorDefault
-        }], local.utility2.nop);
+        }]);
         // init serverLocal
         local.utility2.serverLocalUrlTest = function (url) {
             url = local.utility2.urlParse(url).pathname;
