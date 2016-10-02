@@ -31,11 +31,9 @@ this package will run a virtual swagger-ui server with persistent storage in the
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 5ee55bba
-- npm publish 2016.8.1
-- allow file export / import of nedb-database
-- migrate nedb-api from swagger-lite to utility2
-- rename collectDoc to dbRow and collection to dbTable
+#### change since 687f23ef
+- npm publish 2016.9.1
+- update utility2 dependency
 - none
 
 #### this package requires
@@ -300,6 +298,7 @@ instruction
 <html lang="en">\n\
 <head>\n\
 <meta charset="UTF-8">\n\
+<meta name="viewport" content="width=device-width, initial-scale=1">\n\
 <title>\n\
 {{envDict.npm_package_name}} v{{envDict.npm_package_version}}\n\
 </title>\n\
@@ -315,7 +314,7 @@ instruction
 }\n\
 body {\n\
     background-color: #fff;\n\
-    font-family: Helvetica Neue,Helvetica,Arial,sans-serif;\n\
+    font-family: Arial, Helvetica, sans-serif;\n\
 }\n\
 body > * {\n\
     margin-bottom: 1rem;\n\
@@ -608,7 +607,7 @@ body > button {\n\
                 }
             }
         });
-        // upsert fixtures
+        // init dbSeedList
         local.utility2.dbSeedList = [{
             dbRowList: [{
                 id: '00_test_swaggerUiLogoSmall',
@@ -761,7 +760,7 @@ body > button {\n\
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "utility2": "2016.8.2"
+        "utility2": "2016.9.1"
     },
     "description": "{{packageJson.description}}",
     "devDependencies": {
@@ -795,7 +794,7 @@ export npm_config_mode_auto_restart=1 && \
 utility2 shRun shIstanbulCover test.js",
         "test": "export PORT=$(utility2 shServerPortRandom) && utility2 test test.js"
     },
-    "version": "2016.8.1"
+    "version": "2016.9.1"
 }
 ```
 

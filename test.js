@@ -2114,7 +2114,7 @@
                 local.utility2.middlewareFileServer(request, response, nextMiddleware);
             }
         });
-        // upsert fixtures
+        // init dbSeedList
         local.utility2.dbSeedList = local.utility2.dbSeedList.concat([{
             dbRowList: local.swgg.dbRowListRandomCreate({
                 // init 100 extra random objects
