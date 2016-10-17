@@ -31,9 +31,10 @@ this package will run a virtual swagger-ui server with persistent storage in the
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 687f23ef
-- npm publish 2016.9.1
-- update utility2 dependency
+#### change since c6983e51
+- npm publish 2016.10.1
+- migrate db from nedb-lite to db-lite
+- streamline tests
 - none
 
 #### this package requires
@@ -86,7 +87,7 @@ this package will run a virtual swagger-ui server with persistent storage in the
 /*
 example.js
 
-this script will run a standalone swagger-ui server backed by nedb
+this script will run a standalone swagger-ui server backed by db-lite
 
 instruction
     1. save this script as example.js
@@ -143,26 +144,26 @@ instruction
         /*
          * this function will run the middleware that will run custom-crud-operations
          */
-            var crud, modeNext, onNext, result;
-            modeNext = 0;
-            onNext = function (error, data) {
-                modeNext = error
-                    ? Infinity
-                    : modeNext + 1;
-                switch (modeNext) {
+            var crud, options, result;
+            options = {};
+            local.utility2.onNext(options, function (error, data) {
+                switch (options.modeNext) {
                 case 1:
                     crud = request.swgg.crud;
                     switch (crud.operationId.split('.')[0]) {
                     // coverage-hack - test error handling-behavior
                     case 'crudErrorPre':
-                        onNext(local.utility2.errorDefault);
+                        options.onNext(local.utility2.errorDefault);
                         return;
                     case 'getInventory':
-                        crud.dbTable.find({}, { status: 1 }, onNext);
+                        crud.dbTable.crudFindMany({
+                            query: {},
+                            projection: { status: 1 }
+                        }, options.onNext);
                         break;
                     default:
-                        modeNext = Infinity;
-                        onNext();
+                        options.modeNext = Infinity;
+                        options.onNext();
                     }
                     break;
                 case 2:
@@ -173,7 +174,7 @@ instruction
                             result[element.status] = result[element.status] || 0;
                             result[element.status] += 1;
                         });
-                        onNext(null, result);
+                        options.onNext(null, result);
                         break;
                     }
                     break;
@@ -183,8 +184,9 @@ instruction
                 default:
                     nextMiddleware(error, data);
                 }
-            };
-            onNext();
+            });
+            options.modeNext = 0;
+            options.onNext();
         };
         local.middlewareInitCustom = function (request, response, nextMiddleware) {
         /*
@@ -236,35 +238,43 @@ instruction
         local.testRun = function (event) {
             var reader, tmp;
             switch (event && event.currentTarget.id) {
-            case 'nedbExportButton1':
-                tmp = window.URL.createObjectURL(new window.Blob([local.utility2.dbExport()]));
-                document.querySelector('#nedbExportA1').href = tmp;
-                document.querySelector('#nedbExportA1').click();
+            case 'dbExportButton1':
+                tmp = window.URL.createObjectURL(new window.Blob([local.db.dbExport()]));
+                document.querySelector('#dbExportA1').href = tmp;
+                document.querySelector('#dbExportA1').click();
                 setTimeout(function () {
                     window.URL.revokeObjectURL(tmp);
                 }, 30000);
                 break;
-            case 'nedbImportButton1':
-                document.querySelector('#nedbImportInput1').click();
+            case 'dbImportButton1':
+                document.querySelector('#dbImportInput1').click();
                 break;
-            case 'nedbImportInput1':
+            case 'dbImportInput1':
                 local.utility2.ajaxProgressShow();
                 reader = new window.FileReader();
-                tmp = document.querySelector('#nedbImportInput1').files[0];
+                tmp = document.querySelector('#dbImportInput1').files[0];
                 if (!tmp) {
                     return;
                 }
                 reader.addEventListener('load', function () {
-                    local.utility2.dbImport(reader.result, local.utility2.ajaxProgressUpdate);
+                    local.db.dbImport(reader.result);
+                    local.utility2.ajaxProgressUpdate();
                 });
                 reader.readAsText(tmp);
                 break;
-            case 'nedbResetButton1':
+            case 'dbResetButton1':
                 local.utility2.dbReset();
                 break;
             case 'testRunButton1':
-                local.modeTest = true;
-                local.utility2.testRun(local);
+                if (document.querySelector('.testReportDiv').style.display === 'none') {
+                    document.querySelector('.testReportDiv').style.display = 'block';
+                    document.querySelector('#testRunButton1').innerText = 'hide internal test';
+                    local.modeTest = true;
+                    local.utility2.testRun(local);
+                } else {
+                    document.querySelector('.testReportDiv').style.display = 'none';
+                    document.querySelector('#testRunButton1').innerText = 'run internal test';
+                }
                 break;
             }
         };
@@ -278,6 +288,10 @@ instruction
         });
         // init ui
         local.swgg.uiEventListenerDict['.onEventUiReload']();
+        // run tests
+        [local.utility2.modeTest].filter(local.utility2.echo).forEach(function () {
+            document.querySelector('#testRunButton1').innerText = 'hide internal test';
+        });
         break;
 
 
@@ -342,19 +356,16 @@ body > button {\n\
             {{/if envDict.npm_package_homepage}}\n\
             target="_blank"\n\
         >{{envDict.npm_package_name}} v{{envDict.npm_package_version}}</a>\n\
-        {{#if envDict.NODE_ENV}}\n\
-        (NODE_ENV={{envDict.NODE_ENV}})\n\
-        {{/if envDict.NODE_ENV}}\n\
     </h1>\n\
     <h3>{{envDict.npm_package_description}}</h3>\n\
     <h4><a download href="assets.app.js">download standalone app</a></h4>\n\
     <button class="onclick" id="testRunButton1">run internal test</button><br>\n\
     <div class="testReportDiv" style="display: none;"></div>\n\
-    <button class="onclick" id="nedbResetButton1">reset nedb-database</button><br>\n\
-    <button class="onclick" id="nedbExportButton1">save nedb-database to file</button><br>\n\
-    <a download="nedb.persistence.json" href="" id="nedbExportA1"></a>\n\
-    <button class="onclick" id="nedbImportButton1">load nedb-database from file</button><br>\n\
-    <input class="onchange zeroPixel" type="file" id="nedbImportInput1">\n\
+    <button class="onclick" id="dbResetButton1">reset db-database</button><br>\n\
+    <button class="onclick" id="dbExportButton1">save db-database to file</button><br>\n\
+    <a download="db.persistence.json" href="" id="dbExportA1"></a>\n\
+    <button class="onclick" id="dbImportButton1">load db-database from file</button><br>\n\
+    <input class="onchange zeroPixel" type="file" id="dbImportInput1">\n\
 \n\
     <div class="swggUiContainer">\n\
     <form class="header tr">\n\
@@ -443,10 +454,10 @@ body > button {\n\
                 'file crudCreateOrReplaceOneByKeyUnique.id.id': {
                     _schemaName: 'File'
                 },
-                'file crudDeleteOneByKeyUnique.id.id': {
+                'file crudGetManyByQuery': {
                     _schemaName: 'File'
                 },
-                'file crudGetManyByQuery': {
+                'file crudRemoveOneByKeyUnique.id.id': {
                     _schemaName: 'File'
                 },
                 'file crudUpdateOneByKeyUnique.id.id': {
@@ -466,7 +477,7 @@ body > button {\n\
                     _schemaName: 'Pet'
                 },
                 'pet deletePet': {
-                    _operationId: 'crudDeleteOneByKeyUnique.petId.id',
+                    _operationId: 'crudRemoveOneByKeyUnique.petId.id',
                     _schemaName: 'Pet'
                 },
                 'pet findPetsByStatus': {
@@ -502,7 +513,7 @@ body > button {\n\
                     _schemaName: 'Order'
                 },
                 'store deleteOrder': {
-                    _operationId: 'crudDeleteOneByKeyUnique.orderId.id',
+                    _operationId: 'crudRemoveOneByKeyUnique.orderId.id',
                     _schemaName: 'Order'
                 },
                 'store getInventory': {
@@ -534,7 +545,7 @@ body > button {\n\
                 'user crudCreateOrReplaceOneByKeyUnique.username.username': {
                     _schemaName: 'User'
                 },
-                'user crudDeleteOneByKeyUnique.username.username': {
+                'user crudRemoveOneByKeyUnique.username.username': {
                     _schemaName: 'User'
                 },
                 'user crudGetManyByQuery': {
@@ -544,7 +555,7 @@ body > button {\n\
                     _schemaName: 'User'
                 },
                 'user deleteUser': {
-                    _operationId: 'crudDeleteOneByKeyUnique.username.username',
+                    _operationId: 'crudRemoveOneByKeyUnique.username.username',
                     _schemaName: 'User'
                 },
                 'user getUserByName': {
@@ -574,8 +585,8 @@ body > button {\n\
                 file: {
                     crudCreateOrReplaceOneByKeyUnique:
                         'file crudCreateOrReplaceOneByKeyUnique.id.id',
-                    crudDeleteOneByKeyUnique:
-                        'file crudDeleteOneByKeyUnique.id.id',
+                    crudRemoveOneByKeyUnique:
+                        'file crudRemoveOneByKeyUnique.id.id',
                     crudGetManyByQuery: 'file crudGetManyByQuery',
                     keyUnique: 'id',
                     queryLimit: 20,
@@ -583,7 +594,7 @@ body > button {\n\
                 },
                 pet: {
                     crudCreateOrReplaceOneByKeyUnique: 'pet addPet',
-                    crudDeleteOneByKeyUnique: 'pet deletePet',
+                    crudRemoveOneByKeyUnique: 'pet deletePet',
                     crudGetManyByQuery: 'pet crudGetManyByQuery',
                     keyUnique: 'id',
                     queryLimit: 20,
@@ -591,7 +602,7 @@ body > button {\n\
                 },
                 store: {
                     crudCreateOrReplaceOneByKeyUnique: 'store placeOrder',
-                    crudDeleteOneByKeyUnique: 'store deleteOrder',
+                    crudRemoveOneByKeyUnique: 'store deleteOrder',
                     crudGetManyByQuery: 'store crudGetManyByQuery',
                     keyUnique: 'id',
                     queryLimit: 20,
@@ -599,7 +610,7 @@ body > button {\n\
                 },
                 user: {
                     crudCreateOrReplaceOneByKeyUnique: 'user createUser',
-                    crudDeleteOneByKeyUnique: 'user deleteUser',
+                    crudRemoveOneByKeyUnique: 'user deleteUser',
                     crudGetManyByQuery: 'user crudGetManyByQuery',
                     keyUnique: 'username',
                     queryLimit: 20,
@@ -609,6 +620,10 @@ body > button {\n\
         });
         // init dbSeedList
         local.utility2.dbSeedList = [{
+            dbIndexCreateList: [{
+                fieldName: 'id',
+                unique: true
+            }],
             dbRowList: [{
                 id: '00_test_swaggerUiLogoSmall',
                 fileBlob: local.swgg.templateSwaggerUiLogoSmallBase64,
@@ -618,6 +633,11 @@ body > button {\n\
             }],
             name: 'File'
         }, {
+            dbIndexCreateList: [{
+                fieldName: 'id',
+                integer: true,
+                unique: true
+            }],
             dbRowList: local.swgg.dbRowListRandomCreate({
                 dbRowList: [{
                     id: 0,
@@ -656,6 +676,11 @@ body > button {\n\
             }),
             name: 'Pet'
         }, {
+            dbIndexCreateList: [{
+                fieldName: 'id',
+                integer: true,
+                unique: true
+            }],
             dbRowList: local.swgg.dbRowListRandomCreate({
                 dbRowList: [{
                     id: 0,
@@ -682,6 +707,17 @@ body > button {\n\
             }),
             name: 'Order'
         }, {
+            dbIndexCreateList: [{
+                fieldName: 'email',
+                unique: true
+            }, {
+                fieldName: 'id',
+                integer: true,
+                unique: true
+            }, {
+                fieldName: 'username',
+                unique: true
+            }],
             dbRowList: local.swgg.dbRowListRandomCreate({
                 dbRowList: [{
                     email: 'admin@admin.com',
@@ -727,13 +763,6 @@ body > button {\n\
                 },
                 properties: local.swgg.swaggerJson.definitions.User.properties
             }),
-            ensureIndexList: [{
-                fieldName: 'email',
-                unique: true
-            }, {
-                fieldName: 'username',
-                unique: true
-            }],
             name: 'User'
         }];
         local.utility2.onReadyBefore.counter += 1;
@@ -760,7 +789,7 @@ body > button {\n\
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "utility2": "2016.9.1"
+        "utility2": "2016.10.1"
     },
     "description": "{{packageJson.description}}",
     "devDependencies": {
@@ -794,7 +823,7 @@ export npm_config_mode_auto_restart=1 && \
 utility2 shRun shIstanbulCover test.js",
         "test": "export PORT=$(utility2 shServerPortRandom) && utility2 test test.js"
     },
-    "version": "2016.9.1"
+    "version": "2016.10.1"
 }
 ```
 

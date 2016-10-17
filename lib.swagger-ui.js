@@ -58,7 +58,7 @@ local.swgg.templateUiDatatable = '\
     <thead>\n\
         <tr>\n\
             <th style="padding-left: {{iiPadding}}rem; padding-right: {{iiPadding}}rem;">\n\
-                <button class="onEventDatatableSelectedDelete">delete</button>\n\
+                <button class="onEventDatatableSelectedRemove">remove</button>\n\
             </th>\n\
             {{#each propDefList}}\n\
             <th class="cursorPointer">\n\
@@ -551,7 +551,7 @@ local.swgg.templateUiResponseAjax = '\
             });
         };
 
-        local.swgg.uiEventListenerDict['.onEventDatatableSelectedDelete'] = function () {
+        local.swgg.uiEventListenerDict['.onEventDatatableSelectedRemove'] = function () {
             var onParallel;
             onParallel = local.utility2.onParallel(
                 local.swgg.uiEventListenerDict['.onEventDatatableReload']
@@ -562,9 +562,9 @@ local.swgg.templateUiResponseAjax = '\
                 '.swggUiContainer .datatable tr.selected'
             ).forEach(function (element) {
                 onParallel.counter += 1;
-                // delete data
+                // remove data
                 local.swgg.apiDict[
-                    local.swgg.uiState.datatable.crudDeleteOneByKeyUnique
+                    local.swgg.uiState.datatable.crudRemoveOneByKeyUnique
                 ]._ajax(local.utility2.objectLiteralize({
                     paramDict: { '$[]': [
                         local.swgg.uiState.datatable.keyUnique,
@@ -606,14 +606,11 @@ local.swgg.templateUiResponseAjax = '\
         /*
          * this function will return submit the operation to the backend
          */
-            var modeNext, onNext, options, tmp;
-            modeNext = 0;
-            onNext = function (error, data) {
-                modeNext += 1;
-                switch (modeNext) {
+            var options, tmp;
+            options = {};
+            local.utility2.onNext(options, function (error, data) {
+                switch (options.modeNext) {
                 case 1:
-                    // init options
-                    options = {};
                     options.api = local.swgg.apiDict[
                         event.currentTarget.dataset._keyOperationId
                     ];
@@ -674,10 +671,10 @@ local.swgg.templateUiResponseAjax = '\
                         }, function (error) {
                             options.errorValidate = error;
                             options.errorValidate.options = { key: paramDef.name };
-                            onNext(error);
+                            options.onNext(error);
                         });
                     });
-                    options.api._ajax(options, onNext);
+                    options.api._ajax(options, options.onNext);
                     break;
                 default:
                     // remove previous error
@@ -758,8 +755,9 @@ local.swgg.templateUiResponseAjax = '\
                         local.utility2.templateRender(local.swgg.templateUiResponseAjax, data);
                     break;
                 }
-            };
-            onNext();
+            });
+            options.modeNext = 0;
+            options.onNext();
         };
 
         local.swgg.uiEventListenerDict['.onEventOperationDisplayShow'] = function (event) {
