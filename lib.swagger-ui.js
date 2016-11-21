@@ -72,7 +72,7 @@ local.swgg.templateUiDatatable = '\
     </thead>\n\
     <tbody>\n\
         {{#each dbRowList}}\n\
-        <tr data-id="{{id}}" data-keyUnique="{{keyUnique}}">\n\
+        <tr data-id="{{id}}" data-idField="{{idField}}">\n\
             <td class="cursorPointer eventDelegateClick onEventDatatableTrSelect">\n\
                 <span class="tr">\n\
                     <input type="checkbox">\n\
@@ -97,7 +97,7 @@ local.swgg.templateUiMain = '\
     <form class="datatable eventDelegateClick flex1"></form>\n\
 </div>\n\
 <div class="eventDelegateClick popup" style="display: none;"></div>\n\
-<form class="eventDelegateSubmit header onEventUiReload tr">\n\
+<form2 class="eventDelegateSubmit header onEventUiReload tr">\n\
     <a class="td1" href="http://swagger.io" target="_blank">swagger</a>\n\
     <input\n\
         class="flex1 td2"\n\
@@ -105,7 +105,7 @@ local.swgg.templateUiMain = '\
         type="text"\n\
         value="{{url}}"\n\
     >\n\
-</form>\n\
+</form2>\n\
 <div class="info reset">\n\
     {{#if info}}\n\
     <div class="fontWeightBold">{{info.title htmlSafe}}</div>\n\
@@ -389,9 +389,9 @@ local.swgg.templateUiResponseAjax = '\
             options.schema = local.swgg.schemaNormalizeAndCopy(options.schema);
             options.propDefList = Object.keys(options.schema.properties)
                 .sort(function (aa, bb) {
-                    return aa === options.keyUnique
+                    return aa === options.idField
                         ? -1
-                        : bb === options.keyUnique
+                        : bb === options.idField
                         ? 1
                         : aa < bb
                         ? -1
@@ -414,7 +414,7 @@ local.swgg.templateUiResponseAjax = '\
                     local.swgg.uiValueEncode(propDef, propDef);
                     return propDef;
                 });
-                dbRow.id = dbRow.paramDict[options.keyUnique];
+                dbRow.id = dbRow.paramDict[options.idField];
                 dbRow.ii = options.iiPadding = options.querySkip + ii + 1;
                 return dbRow;
             });
@@ -531,9 +531,12 @@ local.swgg.templateUiResponseAjax = '\
                 options.querySort = local.swgg.uiState.datatable.querySort;
                 options.queryWhere = local.swgg.uiState.datatable.queryWhere;
             }
-            local.utility2.objectSetDefault(options, local.utility2.jsonCopy(local.swgg.uiState[
-                'x-swgg-datatableDict'
-            ][options.name]));
+            local.utility2.objectSetDefault(
+                options,
+                local.utility2.jsonCopy(
+                    local.swgg.uiState['x-swgg-datatableDict'][options.name]
+                )
+            );
             options.querySkip = options.pageNumber * options.queryLimit || 0;
             options.paramDict = {
                 _queryLimit: options.queryLimit,
@@ -564,10 +567,10 @@ local.swgg.templateUiResponseAjax = '\
                 onParallel.counter += 1;
                 // remove data
                 local.swgg.apiDict[
-                    local.swgg.uiState.datatable.crudRemoveOneByKeyUnique
+                    local.swgg.uiState.datatable.crudRemoveOneById
                 ]._ajax(local.utility2.objectLiteralize({
                     paramDict: { '$[]': [
-                        local.swgg.uiState.datatable.keyUnique,
+                        local.swgg.uiState.datatable.idField,
                         element.dataset.id
                     ] }
                 }), onParallel);
@@ -632,7 +635,7 @@ local.swgg.templateUiResponseAjax = '\
                                     }).valueDecoded;
                                 break;
                             case 'SELECT':
-                                tmp = Array.prototype.slice.call(tmp.options)
+                                tmp = Array.from(tmp.options)
                                     .filter(function (element) {
                                         return element.selected;
                                     })

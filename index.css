@@ -186,48 +186,48 @@
 
 /* datatable color */
 .swggUiContainer .datatable tbody > tr > td {
-    background-color: #efe;
+    background: #efe;
 }
 .swggUiContainer .datatable tbody > tr > td:nth-child(odd) {
-    background-color: #dfd;
+    background: #dfd;
 }
 .swggUiContainer .datatable tbody > tr:nth-child(odd) > td {
-    background-color: #cfc;
+    background: #cfc;
 }
 .swggUiContainer .datatable tbody > tr:nth-child(odd) > td:nth-child(odd) {
-    background-color: #bfb;
+    background: #bfb;
 }
 .swggUiContainer .datatable tbody > tr:hover > td {
-    background-color: #afa;
+    background: #afa;
 }
 .swggUiContainer .datatable tbody > tr:hover > td:nth-child(odd) {
-    background-color: #9f9;
+    background: #9f9;
 }
 .swggUiContainer .datatable tbody > tr > td:hover,
 .swggUiContainer .datatable tbody > tr > td:hover:nth-child(odd),
 .swggUiContainer .datatable tbody > tr:nth-child(odd) > td:hover,
 .swggUiContainer .datatable tbody > tr:nth-child(odd) > td:hover:nth-child(odd),
 .swggUiContainer .datatable th:hover {
-    background-color: #7f7;
+    background: #7f7;
 }
 .swggUiContainer .datatable tbody > tr.selected > td {
-    background-color: #fee;
+    background: #fee;
 }
 .swggUiContainer .datatable tbody > tr.selected > td:nth-child(odd) {
-    background-color: #fdd;
+    background: #fdd;
 }
 .swggUiContainer .datatable tbody > tr.selected:nth-child(odd) > td {
-    background-color: #fcc;
+    background: #fcc;
 }
 .swggUiContainer .datatable tbody > tr.selected:nth-child(odd) > td:nth-child(odd) {
-    background-color: #fbb;
+    background: #fbb;
 }
 
 
 
 /* section */
 .swggUiContainer .datatable {
-    background-color: white;
+    background: white;
     margin: 2rem;
     overflow: auto;
     padding: 1rem;
@@ -249,7 +249,7 @@
     padding-right: 2rem;
 }
 .swggUiContainer > .header {
-    background-color: #8c0;
+    background: #8c0;
     padding: 0.5rem;
 }
 .swggUiContainer > .header > .td1 {
@@ -276,8 +276,8 @@
     margin-left: 2rem;
 }
 .swggUiContainer > .modal {
-    background-color: black;
-    background-color: rgba(0,0,0,0.5);
+    background: black;
+    background: rgba(0,0,0,0.5);
     display: flex;
     height: 100%;
     left: 0;
@@ -289,7 +289,7 @@
     z-index: 1;
 }
 .swggUiContainer .operation {
-    background-color: #dfd;
+    background: #dfd;
 }
 .swggUiContainer .operation > .content {
     padding: 1rem;
@@ -299,13 +299,13 @@
 }
 .swggUiContainer .operation > .content pre {
     border: 1px solid #bbb;
-    background-color: #ffd;
+    background: #ffd;
 }
 .swggUiContainer .operation > .content .tr {
     margin-left: 0.5rem;
 }
 .swggUiContainer .operation > .header:hover {
-    background-color: #bfb;
+    background: #bfb;
 }
 .swggUiContainer .operation > .header > span {
     padding: 2px 0 2px 0;
@@ -314,7 +314,7 @@
     margin-left: 0;
 }
 .swggUiContainer .operation > .header > .td1 {
-    background-color: #777;
+    background: #777;
     color: white;
     font-size: smaller;
     padding: 4px;
@@ -365,20 +365,20 @@
 
 /* method */
 .swggUiContainer .operation.DELETE > .header > .td1 {
-    background-color: #b00;
+    background: #b00;
 }
 .swggUiContainer .operation.GET > .header > .td1 {
-    background-color: #093;
+    background: #093;
 }
 .swggUiContainer .operation.HEAD > .header > .td1 {
-    background-color: #f30;
+    background: #f30;
 }
 .swggUiContainer .operation.PATCH > .header > .td1 {
-    background-color: #b0b;
+    background: #b0b;
 }
 .swggUiContainer .operation.POST > .header > .td1 {
-    background-color: #07b;
+    background: #07b;
 }
 .swggUiContainer .operation.PUT > .header > .td1 {
-    background-color: #70b;
+    background: #70b;
 }

@@ -65,50 +65,6 @@
             }],
             summary: 'count many {{_schemaName}} objects by query'
         };
-        local.swgg.templateApiDict.crudCreateOrReplaceMany = {
-            _method: 'put',
-            _path: '/{{_tags0}}/crudCreateOrReplaceMany',
-            parameters: [{
-                description: '{{_schemaName}} object',
-                in: 'body',
-                name: 'body',
-                required: true,
-                schema: { items: { $ref: '#/definitions/{{_schemaName}}' }, type: 'array' }
-            }],
-            responses: {
-                200: {
-                    description:
-                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/BuiltinJsonapiResponse{{_schemaName}}' }
-                }
-            },
-            summary: 'create or replace many {{_schemaName}} objects'
-        };
-        local.swgg.templateApiDict.crudCreateOrReplaceOneByKeyUnique = {
-            _keyUnique: '{{_keyUnique}}',
-            _method: 'put',
-            _path: '/{{_tags0}}/crudCreateOrReplaceOneByKeyUnique.{{_keyUnique}}.{{_keyAlias}}',
-            parameters: [{
-                description: '{{_schemaName}} {{_keyUnique}}',
-                in: 'query',
-                name: '{{_keyUnique}}',
-                type: 'string'
-            }, {
-                description: '{{_schemaName}} object',
-                in: 'body',
-                name: 'body',
-                required: true,
-                schema: { $ref: '#/definitions/{{_schemaName}}' }
-            }],
-            responses: {
-                200: {
-                    description:
-                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
-                    schema: { $ref: '#/definitions/BuiltinJsonapiResponse{{_schemaName}}' }
-                }
-            },
-            summary: 'create or replace one {{_schemaName}} object by {{_keyUnique}}'
-        };
         local.swgg.templateApiDict.crudErrorDelete = {
             _method: 'delete',
             _path: '/{{_tags0}}/crudErrorDelete',
@@ -181,9 +137,9 @@
             },
             summary: 'return error response'
         };
-        local.swgg.templateApiDict.crudErrorPre = {
-            _method: 'get',
-            _path: '/{{_tags0}}/crudErrorPre',
+        local.swgg.templateApiDict.crudErrorPost = {
+            _method: 'post',
+            _path: '/{{_tags0}}/crudErrorPost',
             responses: {
                 500: {
                     description:
@@ -193,9 +149,9 @@
             },
             summary: 'return error response'
         };
-        local.swgg.templateApiDict.crudErrorPost = {
-            _method: 'post',
-            _path: '/{{_tags0}}/crudErrorPost',
+        local.swgg.templateApiDict.crudErrorPre = {
+            _method: 'get',
+            _path: '/{{_tags0}}/crudErrorPre',
             responses: {
                 500: {
                     description:
@@ -216,19 +172,6 @@
                 }
             },
             summary: 'return error response'
-        };
-        local.swgg.templateApiDict.crudExistsOneByKeyUnique = {
-            _keyUnique: '{{_keyUnique}}',
-            _method: 'get',
-            _path: '/{{_tags0}}/crudExistsOneByKeyUnique.{{_keyUnique}}.{{_keyAlias}}',
-            parameters: [{
-                description: '{{_schemaName}} {{_keyUnique}}',
-                in: 'query',
-                name: '{{_keyUnique}}',
-                required: true,
-                type: 'string'
-            }],
-            summary: 'check if one {{_schemaName}} object exists by {{_keyUnique}}'
         };
         local.swgg.templateApiDict.crudGetManyByQuery = {
             _method: 'get',
@@ -262,7 +205,7 @@
                 name: '_querySkip',
                 type: 'integer'
             }, {
-                default: '{"updatedAt":-1}',
+                default: '[{"fieldName":"_timeModified","isDescending":true}]',
                 description: 'cursor-sort param',
                 format: 'json',
                 in: 'query',
@@ -278,14 +221,14 @@
             },
             summary: 'get many {{_schemaName}} objects by query'
         };
-        local.swgg.templateApiDict.crudGetOneByKeyUnique = {
-            _keyUnique: '{{_keyUnique}}',
+        local.swgg.templateApiDict.crudGetOneById = {
+            _idField: '{{_idField}}',
             _method: 'get',
-            _path: '/{{_tags0}}/crudGetOneByKeyUnique.{{_keyUnique}}.{{_keyAlias}}',
+            _path: '/{{_tags0}}/crudGetOneById.{{_idField}}.{{_idAlias}}',
             parameters: [{
-                description: '{{_schemaName}} {{_keyUnique}}',
+                description: '{{_schemaName}} {{_idField}}',
                 in: 'query',
-                name: '{{_keyUnique}}',
+                name: '{{_idField}}',
                 required: true,
                 type: 'string'
             }],
@@ -296,7 +239,7 @@
                     schema: { $ref: '#/definitions/BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'get one {{_schemaName}} object by {{_keyUnique}}'
+            summary: 'get one {{_schemaName}} object by {{_idField}}'
         };
         local.swgg.templateApiDict.crudGetOneByQuery = {
             _method: 'get',
@@ -308,13 +251,6 @@
                 in: 'query',
                 name: '_queryWhere',
                 required: true,
-                type: 'string'
-            }, {
-                default: '{}',
-                description: 'projection fields param',
-                format: 'json',
-                in: 'query',
-                name: '_queryFields',
                 type: 'string'
             }],
             responses: {
@@ -431,27 +367,71 @@
             },
             summary: 'remove many {{_schemaName}} objects by query'
         };
-        local.swgg.templateApiDict.crudRemoveOneByKeyUnique = {
-            _keyUnique: '{{_keyUnique}}',
+        local.swgg.templateApiDict.crudRemoveOneById = {
+            _idField: '{{_idField}}',
             _method: 'delete',
-            _path: '/{{_tags0}}/crudRemoveOneByKeyUnique.{{_keyUnique}}.{{_keyAlias}}',
+            _path: '/{{_tags0}}/crudRemoveOneById.{{_idField}}.{{_idAlias}}',
             parameters: [{
-                description: '{{_schemaName}} {{_keyUnique}}',
+                description: '{{_schemaName}} {{_idField}}',
                 in: 'query',
-                name: '{{_keyUnique}}',
+                name: '{{_idField}}',
                 required: true,
                 type: 'string'
             }],
-            summary: 'remove one {{_schemaName}} object by {{_keyUnique}}'
+            summary: 'remove one {{_schemaName}} object by {{_idField}}'
         };
-        local.swgg.templateApiDict.crudUpdateOneByKeyUnique = {
-            _keyUnique: '{{_keyUnique}}',
-            _method: 'patch',
-            _path: '/{{_tags0}}/crudUpdateOneByKeyUnique.{{_keyUnique}}.{{_keyAlias}}',
+        local.swgg.templateApiDict.crudSetManyById = {
+            _method: 'put',
+            _path: '/{{_tags0}}/crudSetManyById',
             parameters: [{
-                description: '{{_schemaName}} {{_keyUnique}}',
+                description: '{{_schemaName}} object',
+                in: 'body',
+                name: 'body',
+                required: true,
+                schema: { items: { $ref: '#/definitions/{{_schemaName}}' }, type: 'array' }
+            }],
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/BuiltinJsonapiResponse{{_schemaName}}' }
+                }
+            },
+            summary: 'create or replace many {{_schemaName}} objects'
+        };
+        local.swgg.templateApiDict.crudSetOneById = {
+            _idField: '{{_idField}}',
+            _method: 'put',
+            _path: '/{{_tags0}}/crudSetOneById.{{_idField}}.{{_idAlias}}',
+            parameters: [{
+                description: '{{_schemaName}} {{_idField}}',
                 in: 'query',
-                name: '{{_keyUnique}}',
+                name: '{{_idField}}',
+                type: 'string'
+            }, {
+                description: '{{_schemaName}} object',
+                in: 'body',
+                name: 'body',
+                required: true,
+                schema: { $ref: '#/definitions/{{_schemaName}}' }
+            }],
+            responses: {
+                200: {
+                    description:
+                        '200 ok - http://jsonapi.org/format/#document-structure-top-level',
+                    schema: { $ref: '#/definitions/BuiltinJsonapiResponse{{_schemaName}}' }
+                }
+            },
+            summary: 'create or replace one {{_schemaName}} object by {{_idField}}'
+        };
+        local.swgg.templateApiDict.crudUpdateOneById = {
+            _idField: '{{_idField}}',
+            _method: 'patch',
+            _path: '/{{_tags0}}/crudUpdateOneById.{{_idField}}.{{_idAlias}}',
+            parameters: [{
+                description: '{{_schemaName}} {{_idField}}',
+                in: 'query',
+                name: '{{_idField}}',
                 type: 'string'
             }, {
                 description: '{{_schemaName}} object',
@@ -468,16 +448,16 @@
                     schema: { $ref: '#/definitions/BuiltinJsonapiResponse{{_schemaName}}' }
                 }
             },
-            summary: 'create or update one {{_schemaName}} object by {{_keyUnique}}'
+            summary: 'create or update one {{_schemaName}} object by {{_idField}}'
         };
-        local.swgg.templateApiDict.fileGetOneByKeyUnique = {
-            _keyUnique: '{{_keyUnique}}',
+        local.swgg.templateApiDict.fileGetOneById = {
+            _idField: '{{_idField}}',
             _method: 'get',
-            _path: '/{{_tags0}}/fileGetOneByKeyUnique.{{_keyUnique}}.{{_keyAlias}}',
+            _path: '/{{_tags0}}/fileGetOneById.{{_idField}}.{{_idAlias}}',
             parameters: [{
-                description: '{{_schemaName}} {{_keyUnique}}',
+                description: '{{_schemaName}} {{_idField}}',
                 in: 'query',
-                name: '{{_keyUnique}}',
+                name: '{{_idField}}',
                 required: true,
                 type: 'string'
             }],
@@ -489,7 +469,7 @@
                     schema: { type: 'file' }
                 }
             },
-            summary: 'get one {{_schemaName}} file by {{_keyUnique}}'
+            summary: 'get one {{_schemaName}} file by {{_idField}}'
         };
         local.swgg.templateApiDict.fileUploadManyByForm = {
             _fileUploadNumber: '{{_fileUploadNumber}}',
@@ -568,7 +548,8 @@
                 BuiltinFile: {
                     properties: {
                         _id: { readOnly: true, type: 'string' },
-                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
+                        _timeCreated: { format: 'date-time', readOnly: true, type: 'string' },
+                        _timeModified: { format: 'date-time', readOnly: true, type: 'string' },
                         fileBlob: { format: 'byte', type: 'string' },
                         fileContentType: { type: 'string' },
                         fileDescription: { type: 'string' },
@@ -576,18 +557,17 @@
                         fileInputName: { type: 'string' },
                         fileSize: { minimum: 0, type: 'integer' },
                         fileUrl: { type: 'string' },
-                        id: { type: 'string' },
-                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
+                        id: { type: 'string' }
                     }
                 },
                 BuiltinUser: {
                     properties: {
                         _id: { readOnly: true, type: 'string' },
-                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
+                        _timeCreated: { format: 'date-time', readOnly: true, type: 'string' },
+                        _timeModified: { format: 'date-time', readOnly: true, type: 'string' },
                         id: { type: 'string' },
                         jwtEncoded: { type: 'string' },
                         password: { format: 'password', type: 'string' },
-                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' },
                         username: { type: 'string' }
                     }
                 },
@@ -849,10 +829,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         self._fileUploadNumber = Number(match1);
                     }
                 );
-                // init _keyAlias and _keyUnique
-                tmp = local.swgg.keyUniqueInit({ operationId: self._operationId });
-                self._keyAlias = tmp.keyAlias;
-                self._keyUnique = tmp.keyUnique;
+                // init _idAlias and _idField
+                tmp = local.swgg.idFieldInit({ operationId: self._operationId });
+                self._idAlias = tmp.idAlias;
+                self._idField = tmp.idField;
                 // init _tags0
                 self._tags0 = key.split(' ')[0];
                 // init templateApiDict
@@ -861,8 +841,8 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         self,
                         JSON.parse(local.swgg.templateApiDict[self._operationId.split('.')[0]]
                             .replace((/\{\{_fileUploadNumber\}\}/g), self._fileUploadNumber)
-                            .replace((/\{\{_keyAlias\}\}/g), self._keyAlias)
-                            .replace((/\{\{_keyUnique\}\}/g), self._keyUnique)
+                            .replace((/\{\{_idAlias\}\}/g), self._idAlias)
+                            .replace((/\{\{_idField\}\}/g), self._idField)
                             .replace((/\{\{_schemaName\}\}/g), self._schemaName)
                             .replace((/\{\{_tags0\}\}/g), self._tags0)
                             .replace((/\{\{operationId\}\}/g), self._operationId))
@@ -886,14 +866,14 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 self._method = self._method.toUpperCase();
                 // init _keyPath
                 self._keyPath = self._method + ' ' + self._path.replace((/\{.*?\}/g), '');
-                // init _keyUnique.format and _keyUnique.type
+                // init _idField.format and _idField.type
                 if (self._schemaName) {
                     self.parameters.forEach(function (param) {
-                        if (param.name === self._keyUnique) {
+                        if (param.name === self._idField) {
                             param.format = options.definitions[self._schemaName]
-                                .properties[self._keyAlias].format;
+                                .properties[self._idAlias].format;
                             param.type = options.definitions[self._schemaName]
-                                .properties[self._keyAlias].type;
+                                .properties[self._idAlias].type;
                         }
                     });
                 }
@@ -1073,6 +1053,49 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             return id;
         };
 
+        local.swgg.idFieldInit = function (options) {
+        /*
+         * this function will init options.idAlias, options.idField, and options.queryById
+         */
+            var idAlias, idField;
+            // init idField
+            options.idAlias = options.operationId.split('.');
+            idField = options.idField = options.idAlias[1] || 'id';
+            // init idAlias
+            idAlias = options.idAlias = options.idAlias[2] || options.idField;
+            // invert queryById
+            if (options.modeQueryByIdInvert) {
+                idAlias = options.idField;
+                idField = options.idAlias;
+            }
+            // init queryById
+            options.idValue = (options.data && options.data[idAlias]) || options.idValue;
+            options.queryById = {};
+            options.queryById[idField] = options.idValue;
+            return options;
+        };
+
+        local.swgg.jwtDecodedEncryptAndEncode = function (user) {
+        /*
+         * this function will encrypt and encode user.jwtDecrypted and user.jwtDecoded
+         */
+            local.utility2.objectSetDefault(user, {
+                jwtDecoded: {},
+                jwtDecrypted: {
+                    exp: Math.floor(Date.now() / 1000) + 3600,
+                    jti: local.utility2.uuidTimeCreate()
+                }
+            }, 2);
+            user.jwtDecoded.encrypted = local.utility2.sjclCipherAes128Encrypt(
+                local.utility2.envDict.JWT_SECRET || '',
+                JSON.stringify(user.jwtDecrypted)
+            );
+            user.jwtEncoded = local.utility2.jwtHs256Encode(
+                local.utility2.envDict.JWT_SECRET || '',
+                user.jwtDecoded
+            );
+        };
+
         local.swgg.jwtEncodedDecodeAndDecrypt = function (user) {
         /*
          * this function will decode and decrypt user.jwtEncoded
@@ -1098,27 +1121,6 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             });
         };
 
-        local.swgg.jwtDecodedEncryptAndEncode = function (user) {
-        /*
-         * this function will encrypt and encode user.jwtDecrypted and user.jwtDecoded
-         */
-            local.utility2.objectSetDefault(user, {
-                jwtDecoded: {},
-                jwtDecrypted: {
-                    exp: Math.floor(Date.now() / 1000) + 3600,
-                    jti: local.utility2.uuidTimeCreate()
-                }
-            }, 2);
-            user.jwtDecoded.encrypted = local.utility2.sjclCipherAes128Encrypt(
-                local.utility2.envDict.JWT_SECRET || '',
-                JSON.stringify(user.jwtDecrypted)
-            );
-            user.jwtEncoded = local.utility2.jwtHs256Encode(
-                local.utility2.envDict.JWT_SECRET || '',
-                user.jwtDecoded
-            );
-        };
-
         local.swgg.jwtEncodedSetHeader = function (request, response) {
         /*
          * this function will set the jwtEncoded-cookie in the response
@@ -1127,29 +1129,6 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             local.utility2.serverRespondHeadSet(request, response, null, {
                 'swgg-jwt-encoded': request.swgg.user.jwtEncoded
             });
-        };
-
-        local.swgg.keyUniqueInit = function (options) {
-        /*
-         * this function will init options.keyAlias, options.keyUnique,
-         * and options.queryByKeyUnique
-         */
-            var keyAlias, keyUnique;
-            // init keyUnique
-            options.keyAlias = options.operationId.split('.');
-            keyUnique = options.keyUnique = options.keyAlias[1] || 'id';
-            // init keyAlias
-            keyAlias = options.keyAlias = options.keyAlias[2] || options.keyUnique;
-            // invert queryByKeyUnique
-            if (options.modeQueryByKeyUniqueInvert) {
-                keyAlias = options.keyUnique;
-                keyUnique = options.keyAlias;
-            }
-            // init queryByKeyUnique
-            options.keyValue = (options.data && options.data[keyAlias]) || options.keyValue;
-            options.queryByKeyUnique = {};
-            options.queryByKeyUnique[keyUnique] = options.keyValue;
-            return options;
         };
 
         local.swgg.middlewareBodyParse = function (request, response, nextMiddleware) {
@@ -1253,19 +1232,6 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             nextMiddleware();
         };
 
-        local.swgg.middlewareCrudEnd = function (request, response, nextMiddleware) {
-        /*
-         * this function will run the middleware that will end the builtin crud-operations
-         */
-            // jslint-hack
-            local.utility2.nop(response);
-            if (request.swgg.crud.endArgList) {
-                local.swgg.serverRespondJsonapi.apply(null, request.swgg.crud.endArgList);
-                return;
-            }
-            nextMiddleware();
-        };
-
         local.swgg.middlewareCrudBuiltin = function (request, response, nextMiddleware) {
         /*
          * this function will run the middleware that will
@@ -1280,40 +1246,24 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     user = request.swgg.user;
                     switch (crud.operationId.split('.')[0]) {
                     case 'crudCountManyByQuery':
-                        crud.dbTable.crudCountMany({ query: crud.queryWhere },  options.onNext);
+                        crud.dbTable.crudCountManyByQuery(crud.queryWhere, options.onNext);
                         break;
-                    case 'crudCreateOrReplaceMany':
-                        crud.dbTable.crudRemoveMany({
-                            query: { id: {
-                                $in: crud.body.map(function (dbRow) {
-                                    return dbRow.id;
-                                })
-                            } }
-                        }, options.onNext);
+                    case 'crudSetManyById':
+                        crud.dbTable.crudSetManyById(crud.body, options.onNext);
                         break;
-                    case 'crudCreateOrReplaceOneByKeyUnique':
-                    case 'crudUpdateOneByKeyUnique':
-                        // replace keyUnique with keyAlias in body
+                    case 'crudSetOneById':
+                        // replace idField with idAlias in body
                         delete crud.body.id;
-                        delete crud.body[crud.keyUnique];
-                        crud.body[crud.keyAlias] = crud.data[crud.keyUnique];
-                        // replace dbRow
-                        if (crud.operationId.indexOf('Replace') >= 0) {
-                            crud.dbTable.crudUpdate(
-                                crud.queryByKeyUnique,
-                                crud.body,
-                                { upsert: true },
-                                options.onNext
-                            );
-                        // update dbRow
-                        } else {
-                            crud.dbTable.crudUpdate(
-                                crud.queryByKeyUnique,
-                                { $set: crud.body },
-                                {},
-                                options.onNext
-                            );
-                        }
+                        delete crud.body[crud.idField];
+                        crud.body[crud.idAlias] = crud.data[crud.idField];
+                        crud.dbTable.crudSetOneById(crud.body, options.onNext);
+                        break;
+                    case 'crudUpdateOneById':
+                        // replace idField with idAlias in body
+                        delete crud.body.id;
+                        delete crud.body[crud.idField];
+                        crud.body[crud.idAlias] = crud.data[crud.idField];
+                        crud.dbTable.crudUpdateOneById(crud.body, options.onNext);
                         break;
                     // coverage-hack - test error handling-behavior
                     case 'crudErrorDelete':
@@ -1325,16 +1275,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     case 'crudErrorPut':
                         options.onNext(local.utility2.errorDefault);
                         break;
-                    case 'crudExistsOneByKeyUnique':
-                        crud.dbTable.crudFindOne({
-                            projection: { _id: 1 },
-                            query: crud.queryWhere
-                        },  options.onNext);
-                        break;
                     case 'crudGetManyByQuery':
                         onParallel = local.utility2.onParallel(options.onNext);
                         onParallel.counter += 1;
-                        crud.dbTable.crudFindMany({
+                        crud.dbTable.crudGetManyByQuery({
                             limit: crud.queryLimit,
                             projection: crud.queryFields,
                             query: crud.queryWhere,
@@ -1345,20 +1289,16 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                             onParallel(error);
                         });
                         onParallel.counter += 1;
-                        crud.dbTable.crudCountMany({
-                        }, function (error, data) {
+                        crud.dbTable.crudCountAll(function (error, data) {
                             crud.paginationCountTotal = data;
                             onParallel(error);
                         });
                         break;
-                    case 'crudGetOneByKeyUnique':
-                        crud.dbTable.crudFindOne({
-                            query: crud.queryByKeyUnique
-                        },  options.onNext);
+                    case 'crudGetOneById':
+                        crud.dbTable.crudGetOneById(crud.queryById, options.onNext);
                         break;
                     case 'crudGetOneByQuery':
-                        crud.dbTable.crudFindOne({
-                            projection: crud.queryFields,
+                        crud.dbTable.crudGetOneByQuery({
                             query: crud.queryWhere
                         },  options.onNext);
                         break;
@@ -1372,25 +1312,19 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         options.onNext();
                         break;
                     case 'crudRemoveManyByQuery':
-                        crud.dbTable.crudRemoveMany({
-                            query: crud.queryWhere
-                        }, options.onNext);
+                        crud.dbTable.crudRemoveManyByQuery(crud.queryWhere, options.onNext);
                         break;
-                    case 'crudRemoveOneByKeyUnique':
-                        crud.dbTable.crudRemoveOne({
-                            query: crud.queryByKeyUnique
-                        }, options.onNext);
+                    case 'crudRemoveOneById':
+                        crud.dbTable.crudRemoveOneById(crud.queryById, options.onNext);
                         break;
-                    case 'fileGetOneByKeyUnique':
-                        local.swgg.dbTableFile = local.db.dbTableCreate({
+                    case 'fileGetOneById':
+                        local.swgg.dbTableFile = local.db.dbTableCreateOne({
                             name: 'File'
                         });
-                        crud.dbTable.crudFindOne({
-                            query: crud.queryByKeyUnique
-                        },  options.onNext);
+                        crud.dbTable.crudGetOneById(crud.queryById, options.onNext);
                         break;
                     case 'fileUploadManyByForm':
-                        local.swgg.dbTableFile = local.db.dbTableCreate({
+                        local.swgg.dbTableFile = local.db.dbTableCreateOne({
                             name: 'File'
                         });
                         request.swgg.paramDict = {};
@@ -1417,11 +1351,11 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                                     fileSize: request.swgg.bodyParsed[key].length,
                                     fileUrl: local.swgg.swaggerJson.basePath + '/' +
                                         request.swgg.pathObject._tags0 +
-                                        '/fileGetOneByKeyUnique/' + tmp.id
+                                        '/fileGetOneById/' + tmp.id
                                 });
                                 return tmp;
                             });
-                        local.swgg.dbTableFile.crudInsertMany(crud.body, options.onNext);
+                        local.swgg.dbTableFile.crudSetManyById(crud.body, options.onNext);
                         break;
                     case 'userLoginByPassword':
                     case 'userLogout':
@@ -1442,15 +1376,9 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     break;
                 case 2:
                     switch (crud.operationId.split('.')[0]) {
-                    case 'crudCreateOrReplaceMany':
-                        crud.dbTable.crudInsertMany(crud.body, options.onNext);
-                        break;
-                    case 'crudCreateOrReplaceOneByKeyUnique':
-                    case 'crudUpdateOneByKeyUnique':
-                        options.onNext(null, meta, data);
-                        break;
-                    case 'crudExistsOneByKeyUnique':
-                        options.onNext(null, !!data);
+                    case 'crudSetOneById':
+                    case 'crudUpdateOneById':
+                        options.onNext(null, data);
                         break;
                     case 'crudGetManyByQuery':
                         options.onNext(null, crud.queryData, {
@@ -1467,12 +1395,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         options.onNext(null, { jwtEncoded: user.jwtEncoded });
                         break;
                     case 'userLogout':
-                        crud.dbTable.crudUpdate(
-                            { username: user.username },
-                            { $unset: { jwtEncoded: true } },
-                            { returnUpdatedDocs: true },
-                            options.onNext
-                        );
+                        crud.dbTable.crudUpdateOneById({
+                            username: user.username,
+                            jwtEncoded: null
+                        }, options.onNext);
                         break;
                     default:
                         options.onNext(null, data, meta);
@@ -1480,7 +1406,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     break;
                 case 3:
                     switch (crud.operationId.split('.')[0]) {
-                    case 'fileGetOneByKeyUnique':
+                    case 'fileGetOneById':
                         if (!data) {
                             local.utility2.serverRespondDefault(request, response, 404);
                             return;
@@ -1507,6 +1433,19 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             });
             options.modeNext = 0;
             options.onNext();
+        };
+
+        local.swgg.middlewareCrudEnd = function (request, response, nextMiddleware) {
+        /*
+         * this function will run the middleware that will end the builtin crud-operations
+         */
+            // jslint-hack
+            local.utility2.nop(response);
+            if (request.swgg.crud.endArgList) {
+                local.swgg.serverRespondJsonapi.apply(null, request.swgg.crud.endArgList);
+                return;
+            }
+            nextMiddleware();
         };
 
         local.swgg.middlewareError = function (error, request, response) {
@@ -1611,7 +1550,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     user = request.swgg.user = {};
                     user.jwtEncoded = request.headers.authorization &&
                         request.headers.authorization.replace('Bearer ', '');
-                    local.swgg.dbTableUser = local.db.dbTableCreate({
+                    local.swgg.dbTableUser = local.db.dbTableCreateOne({
                         name: 'User'
                     });
                     // decode and decrypt jwtEncoded
@@ -1625,8 +1564,8 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         user.password = request.urlParsed.query.password;
                         user.username = request.urlParsed.query.username;
                         if (user.password && user.username) {
-                            local.swgg.dbTableUser.crudFindOne({
-                                query: { username: user.username }
+                            local.swgg.dbTableUser.crudGetOneById({
+                                username: user.username
                             },  options.onNext);
                             return;
                         }
@@ -1635,8 +1574,8 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         if (user.jwtDecrypted && user.jwtDecrypted.sub) {
                             // init username
                             user.username = user.jwtDecrypted.sub;
-                            local.swgg.dbTableUser.crudFindOne({
-                                query: { username: user.jwtDecrypted.sub }
+                            local.swgg.dbTableUser.crudGetOneById({
+                                username: user.jwtDecrypted.sub
                             },  options.onNext);
                             return;
                         }
@@ -1666,9 +1605,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         // update jwtEncoded in client
                         local.swgg.jwtEncodedSetHeader(request, response);
                         // update jwtEncoded in dbTableUser
-                        local.swgg.dbTableUser.crudUpdate({
+                        local.swgg.dbTableUser.crudUpdateOneById({
+                            jwtEncoded: user.jwtEncoded,
                             username: user.jwtDecrypted.sub
-                        }, { $set: { jwtEncoded: user.jwtEncoded } }, {}, options.onNext);
+                        }, options.onNext);
                         return;
                     default:
                         user.data = data || {};
@@ -1781,7 +1721,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     // init crud.dbTable
                     crud.dbTable = request.swgg.pathObject &&
                         request.swgg.pathObject._schemaName &&
-                        local.db.dbTableCreate({
+                        local.db.dbTableCreateOne({
                             name: request.swgg.pathObject._schemaName
                         });
                     if (!crud.dbTable) {
@@ -1814,7 +1754,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         value: 0
                     }, {
                         key: 'querySort',
-                        value: { updatedAt: -1 }
+                        value: [{ fieldName: '_timeModified', isDescending: true }]
                     }, {
                         key: 'queryWhere',
                         value: {}
@@ -1826,22 +1766,22 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                             )
                         ) || element.value;
                     });
-                    // pre-init crud.keyUnique
-                    crud.modeQueryByKeyUniqueInvert = true;
-                    local.swgg.keyUniqueInit(crud);
+                    // pre-init crud.idField
+                    crud.modeQueryByIdInvert = true;
+                    local.swgg.idFieldInit(crud);
                     // init crud.data.id
                     switch (crud.operationId.split('.')[0]) {
-                    case 'crudCreateOrReplaceOneByKeyUnique':
-                    case 'crudUpdateOneByKeyUnique':
-                        if (!local.utility2.isNullOrUndefined(crud.data[crud.keyUnique])) {
+                    case 'crudSetOneById':
+                    case 'crudUpdateOneById':
+                        if (!local.utility2.isNullOrUndefined(crud.data[crud.idField])) {
                             break;
                         }
-                        crud.data[crud.keyUnique] = (crud.body && crud.body[crud.keyAlias]);
+                        crud.data[crud.idField] = (crud.body && crud.body[crud.idAlias]);
                         break;
                     }
-                    // post-init crud.keyUnique
-                    crud.modeQueryByKeyUniqueInvert = true;
-                    local.swgg.keyUniqueInit(crud);
+                    // post-init crud.idField
+                    crud.modeQueryByIdInvert = true;
+                    local.swgg.idFieldInit(crud);
                     nextMiddleware();
                     break;
                 default:
@@ -1923,10 +1863,6 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         return;
                     }
                     data.meta = local.utility2.jsonCopy(meta || {});
-                    // normalize meta-object
-                    if (typeof data.meta !== 'object') {
-                        data.meta = { metaData: meta };
-                    }
                     data.meta.isJsonapiResponse = true;
                     if (ii === 0) {
                         data.meta.errorsLength = (data.errors && data.errors.length) | 0;

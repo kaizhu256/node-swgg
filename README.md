@@ -10,6 +10,12 @@ this package will run a virtual swagger-ui server with persistent storage in the
 
 
 
+# cdn download
+- [http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swagger-lite.js](http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swagger-lite.js)
+- [http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swagger-lite.min.js](http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swagger-lite.min.js)
+
+
+
 # live demo
 - [https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html)
 
@@ -18,23 +24,30 @@ this package will run a virtual swagger-ui server with persistent storage in the
 
 
 # documentation
+#### api-doc
+- [https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/doc.api.html](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/doc.api.html)
+
+[![api-doc](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/screen-capture.docApiCreate.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swagger-lite_2Ftmp_2Fbuild_2Fdoc.api.html.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/doc.api.html)
+
 #### todo
+- rename field _timeModified -> _timeUpdated
 - allow secure remote db export / import / reset to backend
 - add middlewareAcl
 - datatable - add sort-by-field
 - add notification system
 - add post-crud-middleware for pet photoUrl
-- change api crudCreateOrReplaceMany to crudCreateOrReplaceManyByKeyUnique
 - add api userPasswordChange
 - add message-param to assertions in swgg.validateByPropDef
 - add logging feature
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since c6983e51
-- npm publish 2016.10.1
-- migrate db from nedb-lite to db-lite
-- streamline tests
+#### change since 382dd07d
+- npm publish 2016.10.2
+- temporary fix for chrome render bug - https://bugs.chromium.org/p/chromium/issues/detail?id=660671
+- rename api-suffix *KeyUnique -> *Id
+- rename field createdAt -> _timeCreated
+- rename field updatedAt -> _timeModified
 - none
 
 #### this package requires
@@ -44,11 +57,6 @@ this package will run a virtual swagger-ui server with persistent storage in the
 #### differences from swagger-spec @ https://github.com/OAI/OpenAPI-Specification/blob/394ffd3ff3e2fe0029a821170937a8154b04e0ba/versions/2.0.md
 - content-type "application/xml" is not currently supported
 - array-parameters are serialized using JSON.stringify, and the "collectionFormat" field is ignored
-
-#### api-doc
-- [https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html](https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html)
-
-[![api-doc](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.docApiCreate.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swagger-lite_2Ftmp_2Fbuild_2Fdoc.api.html.png)](https://kaizhu256.github.io/node-swagger-lite/build/doc.api.html)
 
 
 
@@ -140,6 +148,10 @@ instruction
             : require('swagger-lite').local;
         // export local
         local.global.local = local;
+        // load db
+        local.db.dbLoad(function () {
+            console.log('db loaded from ' + local.storageDir);
+        });
         local.middlewareCrudCustom = function (request, response, nextMiddleware) {
         /*
          * this function will run the middleware that will run custom-crud-operations
@@ -156,9 +168,9 @@ instruction
                         options.onNext(local.utility2.errorDefault);
                         return;
                     case 'getInventory':
-                        crud.dbTable.crudFindMany({
+                        crud.dbTable.crudGetManyByQuery({
                             query: {},
-                            projection: { status: 1 }
+                            projection: ['status']
                         }, options.onNext);
                         break;
                     default:
@@ -263,16 +275,18 @@ instruction
                 reader.readAsText(tmp);
                 break;
             case 'dbResetButton1':
-                local.utility2.dbReset();
+                local.dbReset();
                 break;
             case 'testRunButton1':
-                if (document.querySelector('.testReportDiv').style.display === 'none') {
-                    document.querySelector('.testReportDiv').style.display = 'block';
+                // show tests
+                if (document.querySelector('#testReportDiv1').style.display === 'none') {
+                    document.querySelector('#testReportDiv1').style.display = 'block';
                     document.querySelector('#testRunButton1').innerText = 'hide internal test';
                     local.modeTest = true;
                     local.utility2.testRun(local);
+                // hide tests
                 } else {
-                    document.querySelector('.testReportDiv').style.display = 'none';
+                    document.querySelector('#testReportDiv1').style.display = 'none';
                     document.querySelector('#testRunButton1').innerText = 'run internal test';
                 }
                 break;
@@ -280,9 +294,7 @@ instruction
         };
         // init event-handling
         ['change', 'click'].forEach(function (event) {
-            Array.prototype.slice.call(
-                document.querySelectorAll('.on' + event)
-            ).forEach(function (element) {
+            Array.from(document.querySelectorAll('.on' + event)).forEach(function (element) {
                 element.addEventListener(event, local.testRun);
             });
         });
@@ -317,18 +329,19 @@ instruction
 {{envDict.npm_package_name}} v{{envDict.npm_package_version}}\n\
 </title>\n\
 <link href="assets.swgg.css" rel="stylesheet">\n\
-<link href="assets.utility2.css" rel="stylesheet">\n\
 <style>\n\
 /*csslint\n\
     box-sizing: false,\n\
+    ids: false,\n\
     universal-selector: false\n\
 */\n\
 * {\n\
     box-sizing: border-box;\n\
 }\n\
 body {\n\
-    background-color: #fff;\n\
+    background: #fff;\n\
     font-family: Arial, Helvetica, sans-serif;\n\
+    margin: 1rem;\n\
 }\n\
 body > * {\n\
     margin-bottom: 1rem;\n\
@@ -346,21 +359,27 @@ body > button {\n\
 </style>\n\
 </head>\n\
 <body>\n\
-    <div class="ajaxProgressDiv" style="display: block;">\n\
-        <div class="ajaxProgressBarDiv ajaxProgressBarDivLoading">loading</div>\n\
-    </div>\n\
     <h1>\n\
+<!-- utility2-comment\n\
+        <div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 0.5s, width 1.5s; width: 25%;"></div>\n\
         <a\n\
             {{#if envDict.npm_package_homepage}}\n\
             href="{{envDict.npm_package_homepage}}"\n\
             {{/if envDict.npm_package_homepage}}\n\
             target="_blank"\n\
-        >{{envDict.npm_package_name}} v{{envDict.npm_package_version}}</a>\n\
+        >\n\
+utility2-comment -->\n\
+            {{envDict.npm_package_name}} v{{envDict.npm_package_version}}\n\
+<!-- utility2-comment\n\
+        </a>\n\
+utility2-comment -->\n\
     </h1>\n\
     <h3>{{envDict.npm_package_description}}</h3>\n\
+<!-- utility2-comment\n\
     <h4><a download href="assets.app.js">download standalone app</a></h4>\n\
     <button class="onclick" id="testRunButton1">run internal test</button><br>\n\
-    <div class="testReportDiv" style="display: none;"></div>\n\
+utility2-comment -->\n\
+    <div id="testReportDiv1" style="display: none;"></div>\n\
     <button class="onclick" id="dbResetButton1">reset db-database</button><br>\n\
     <button class="onclick" id="dbExportButton1">save db-database to file</button><br>\n\
     <a download="db.persistence.json" href="" id="dbExportA1"></a>\n\
@@ -422,27 +441,27 @@ body > button {\n\
                 Pet: {
                     properties: {
                         _id: { readOnly: true, type: 'string' },
-                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
-                        id: { default: 1, minimum: 1 },
-                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
+                        _timeCreated: { format: 'date-time', readOnly: true, type: 'string' },
+                        _timeModified: { format: 'date-time', readOnly: true, type: 'string' },
+                        id: { default: 1, minimum: 1 }
                     }
                 },
                 Order: {
                     properties: {
                         _id: { readOnly: true, type: 'string' },
-                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
-                        id: { default: 1, minimum: 1 },
-                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
+                        _timeCreated: { format: 'date-time', readOnly: true, type: 'string' },
+                        _timeModified: { format: 'date-time', readOnly: true, type: 'string' },
+                        id: { default: 1, minimum: 1 }
                     }
                 },
                 User: {
                     allOf: [{ $ref: '#/definitions/BuiltinUser' }],
                     properties: {
                         _id: { readOnly: true, type: 'string' },
-                        createdAt: { format: 'date-time', readOnly: true, type: 'string' },
+                        _timeCreated: { format: 'date-time', readOnly: true, type: 'string' },
+                        _timeModified: { format: 'date-time', readOnly: true, type: 'string' },
                         email: { default: 'a@a.com', format: 'email' },
-                        id: { default: 1, minimum: 1 },
-                        updatedAt: { format: 'date-time', readOnly: true, type: 'string' }
+                        id: { default: 1, minimum: 1 }
                     }
                 }
             },
@@ -451,33 +470,33 @@ body > button {\n\
                 'file crudCountManyByQuery': {
                     _schemaName: 'File'
                 },
-                'file crudCreateOrReplaceOneByKeyUnique.id.id': {
+                'file crudSetOneById.id.id': {
                     _schemaName: 'File'
                 },
                 'file crudGetManyByQuery': {
                     _schemaName: 'File'
                 },
-                'file crudRemoveOneByKeyUnique.id.id': {
+                'file crudRemoveOneById.id.id': {
                     _schemaName: 'File'
                 },
-                'file crudUpdateOneByKeyUnique.id.id': {
+                'file crudUpdateOneById.id.id': {
                     _schemaName: 'File'
                 },
-                'file fileGetOneByKeyUnique.id.id': {
+                'file fileGetOneById.id.id': {
                     _schemaName: 'File'
                 },
                 'file fileUploadManyByForm.1': {
                     _schemaName: 'File'
                 },
                 'pet addPet': {
-                    _operationId: 'crudCreateOrReplaceOneByKeyUnique.petId.id',
+                    _operationId: 'crudSetOneById.petId.id',
                     _schemaName: 'Pet'
                 },
                 'pet crudGetManyByQuery': {
                     _schemaName: 'Pet'
                 },
                 'pet deletePet': {
-                    _operationId: 'crudRemoveOneByKeyUnique.petId.id',
+                    _operationId: 'crudRemoveOneById.petId.id',
                     _schemaName: 'Pet'
                 },
                 'pet findPetsByStatus': {
@@ -491,15 +510,15 @@ body > button {\n\
                     _schemaName: 'Pet'
                 },
                 'pet getPetById': {
-                    _operationId: 'crudGetOneByKeyUnique.petId.id',
+                    _operationId: 'crudGetOneById.petId.id',
                     _schemaName: 'Pet'
                 },
                 'pet updatePet': {
-                    _operationId: 'crudUpdateOneByKeyUnique.petId.id',
+                    _operationId: 'crudUpdateOneById.petId.id',
                     _schemaName: 'Pet'
                 },
                 'pet updatePetWithForm': {
-                    _operationId: 'crudUpdateOneByKeyUnique.petId.id',
+                    _operationId: 'crudUpdateOneById.petId.id',
                     _schemaName: 'Pet'
                 },
                 'pet uploadFile': {
@@ -509,57 +528,57 @@ body > button {\n\
                 'store crudGetManyByQuery': {
                     _schemaName: 'Order'
                 },
-                'store crudUpdateOneByKeyUnique.id.id': {
+                'store crudUpdateOneById.id.id': {
                     _schemaName: 'Order'
                 },
                 'store deleteOrder': {
-                    _operationId: 'crudRemoveOneByKeyUnique.orderId.id',
+                    _operationId: 'crudRemoveOneById.orderId.id',
                     _schemaName: 'Order'
                 },
                 'store getInventory': {
                     _schemaName: 'Order'
                 },
                 'store getOrderById': {
-                    _operationId: 'crudGetOneByKeyUnique.orderId.id',
+                    _operationId: 'crudGetOneById.orderId.id',
                     _schemaName: 'Order'
                 },
                 'store placeOrder': {
-                    _operationId: 'crudCreateOrReplaceOneByKeyUnique.orderId.id',
+                    _operationId: 'crudSetOneById.orderId.id',
                     _schemaName: 'Order'
                 },
                 'user createUser': {
-                    _operationId: 'crudCreateOrReplaceOneByKeyUnique.username.username',
+                    _operationId: 'crudSetOneById.username.username',
                     _schemaName: 'User'
                 },
                 'user createUsersWithArrayInput': {
-                    _operationId: 'crudCreateOrReplaceMany',
+                    _operationId: 'crudSetManyById',
                     _schemaName: 'User'
                 },
                 'user createUsersWithListInput': {
-                    _operationId: 'crudCreateOrReplaceMany',
+                    _operationId: 'crudSetManyById',
                     _schemaName: 'User'
                 },
                 'user crudCountManyByQuery': {
                     _schemaName: 'User'
                 },
-                'user crudCreateOrReplaceOneByKeyUnique.username.username': {
+                'user crudSetOneById.username.username': {
                     _schemaName: 'User'
                 },
-                'user crudRemoveOneByKeyUnique.username.username': {
+                'user crudRemoveOneById.username.username': {
                     _schemaName: 'User'
                 },
                 'user crudGetManyByQuery': {
                     _schemaName: 'User'
                 },
-                'user crudUpdateOneByKeyUnique.username.username': {
+                'user crudUpdateOneById.username.username': {
                     _schemaName: 'User'
                 },
                 'user deleteUser': {
-                    _operationId: 'crudRemoveOneByKeyUnique.username.username',
+                    _operationId: 'crudRemoveOneById.username.username',
                     _schemaName: 'User'
                 },
                 'user getUserByName': {
-                    _operationId: 'crudGetOneByKeyUnique.username.username',
+                    _operationId: 'crudGetOneById.username.username',
                     _schemaName: 'User'
                 },
                 'user loginUser': {
@@ -571,7 +590,7 @@ body > button {\n\
                     _schemaName: 'User'
                 },
                 'user updateUser': {
-                    _operationId: 'crudUpdateOneByKeyUnique.username.username',
+                    _operationId: 'crudUpdateOneById.username.username',
                     _schemaName: 'User'
                 },
                 'user userLoginByPassword': {
@@ -583,61 +602,55 @@ body > button {\n\
             },
             'x-swgg-datatableDict': {
                 file: {
-                    crudCreateOrReplaceOneByKeyUnique:
-                        'file crudCreateOrReplaceOneByKeyUnique.id.id',
-                    crudRemoveOneByKeyUnique:
-                        'file crudRemoveOneByKeyUnique.id.id',
+                    crudSetOneById:
+                        'file crudSetOneById.id.id',
+                    crudRemoveOneById:
+                        'file crudRemoveOneById.id.id',
                     crudGetManyByQuery: 'file crudGetManyByQuery',
-                    keyUnique: 'id',
+                    idField: 'id',
                     queryLimit: 20,
                     schema: { $ref: '#/definitions/File' }
                 },
                 pet: {
-                    crudCreateOrReplaceOneByKeyUnique: 'pet addPet',
-                    crudRemoveOneByKeyUnique: 'pet deletePet',
+                    crudSetOneById: 'pet addPet',
+                    crudRemoveOneById: 'pet deletePet',
                     crudGetManyByQuery: 'pet crudGetManyByQuery',
-                    keyUnique: 'id',
+                    idField: 'id',
                     queryLimit: 20,
                     schema: { $ref: '#/definitions/Pet' }
                 },
                 store: {
-                    crudCreateOrReplaceOneByKeyUnique: 'store placeOrder',
-                    crudRemoveOneByKeyUnique: 'store deleteOrder',
+                    crudSetOneById: 'store placeOrder',
+                    crudRemoveOneById: 'store deleteOrder',
                     crudGetManyByQuery: 'store crudGetManyByQuery',
-                    keyUnique: 'id',
+                    idField: 'id',
                     queryLimit: 20,
                     schema: { $ref: '#/definitions/Order' }
                 },
                 user: {
-                    crudCreateOrReplaceOneByKeyUnique: 'user createUser',
-                    crudRemoveOneByKeyUnique: 'user deleteUser',
+                    crudSetOneById: 'user createUser',
+                    crudRemoveOneById: 'user deleteUser',
                     crudGetManyByQuery: 'user crudGetManyByQuery',
-                    keyUnique: 'username',
+                    idField: 'username',
                     queryLimit: 20,
                     schema: { $ref: '#/definitions/User' }
                 }
             }
         });
-        // init dbSeedList
-        local.utility2.dbSeedList = [{
-            dbIndexCreateList: [{
-                fieldName: 'id',
-                unique: true
-            }],
+        // init db
+        local.dbSeedList = [{
             dbRowList: [{
-                id: '00_test_swaggerUiLogoSmall',
+                id: 'testCase_swaggerUiLogoSmall',
                 fileBlob: local.swgg.templateSwaggerUiLogoSmallBase64,
                 fileContentType: 'image/png',
                 fileDescription: 'swagger-ui logo',
                 fileFilename: 'swaggerUiLogoSmall.png'
             }],
+            idIndexCreateList: [{
+                name: 'id'
+            }],
             name: 'File'
         }, {
-            dbIndexCreateList: [{
-                fieldName: 'id',
-                integer: true,
-                unique: true
-            }],
             dbRowList: local.swgg.dbRowListRandomCreate({
                 dbRowList: [{
                     id: 0,
@@ -674,13 +687,12 @@ body > button {\n\
                 },
                 properties: local.swgg.swaggerJson.definitions.Pet.properties
             }),
+            idIndexCreateList: [{
+                isInteger: true,
+                name: 'id'
+            }],
             name: 'Pet'
         }, {
-            dbIndexCreateList: [{
-                fieldName: 'id',
-                integer: true,
-                unique: true
-            }],
             dbRowList: local.swgg.dbRowListRandomCreate({
                 dbRowList: [{
                     id: 0,
@@ -705,19 +717,12 @@ body > button {\n\
                 },
                 properties: local.swgg.swaggerJson.definitions.Order.properties
             }),
+            idIndexCreateList: [{
+                isInteger: true,
+                name: 'id'
+            }],
             name: 'Order'
         }, {
-            dbIndexCreateList: [{
-                fieldName: 'email',
-                unique: true
-            }, {
-                fieldName: 'id',
-                integer: true,
-                unique: true
-            }, {
-                fieldName: 'username',
-                unique: true
-            }],
             dbRowList: local.swgg.dbRowListRandomCreate({
                 dbRowList: [{
                     email: 'admin@admin.com',
@@ -763,13 +768,28 @@ body > button {\n\
                 },
                 properties: local.swgg.swaggerJson.definitions.User.properties
             }),
+            idIndexCreateList: [{
+                name: 'email'
+            }, {
+                name: 'id',
+                isInteger: true
+            }, {
+                name: 'username'
+            }],
             name: 'User'
         }];
-        local.utility2.onReadyBefore.counter += 1;
-        local.utility2.dbSeedListUpsert(
-            local.utility2.dbSeedList,
-            local.utility2.onReadyBefore
-        );
+        local.dbReset = function () {
+            local.utility2.onResetBefore.counter += 1;
+            local.db.dbReset(local.utility2.onResetBefore);
+            local.utility2.onResetAfter(function () {
+                console.log('db seeding ...');
+                local.utility2.onReadyBefore.counter += 1;
+                local.db.dbTableCreateMany(local.dbSeedList, local.utility2.onReadyBefore);
+                local.utility2.onReadyBefore.counter += 1;
+                local.db.dbTableCreateMany(local.dbSeedTestList, local.utility2.onReadyBefore);
+            });
+        };
+        local.utility2.testRunBefore = local.dbReset;
     }());
 }());
 ```
@@ -789,7 +809,7 @@ body > button {\n\
     "author": "kai zhu <kaizhu256@gmail.com>",
     "bin": { "swagger-lite": "index.js" },
     "dependencies": {
-        "utility2": "2016.10.1"
+        "utility2": "2016.10.4"
     },
     "description": "{{packageJson.description}}",
     "devDependencies": {
@@ -823,7 +843,7 @@ export npm_config_mode_auto_restart=1 && \
 utility2 shRun shIstanbulCover test.js",
         "test": "export PORT=$(utility2 shServerPortRandom) && utility2 test test.js"
     },
-    "version": "2016.10.1"
+    "version": "2016.10.2"
 }
 ```
 
