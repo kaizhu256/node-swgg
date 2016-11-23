@@ -1,6 +1,6 @@
 swagger-lite
 ============
-this package will run a virtual swagger-ui server with persistent storage in the browser, that your webapp can use (in-place of a real backend)
+this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend)
 
 [![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swagger-lite.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
 
@@ -11,8 +11,8 @@ this package will run a virtual swagger-ui server with persistent storage in the
 
 
 # cdn download
-- [http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swagger-lite.js](http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swagger-lite.js)
-- [http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swagger-lite.min.js](http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swagger-lite.min.js)
+- [http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swgg.rollup.js](http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swgg.rollup.js)
+- [http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swgg.rollup.min.js](http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swgg.rollup.min.js)
 
 
 
@@ -30,7 +30,8 @@ this package will run a virtual swagger-ui server with persistent storage in the
 [![api-doc](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/screen-capture.docApiCreate.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swagger-lite_2Ftmp_2Fbuild_2Fdoc.api.html.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/doc.api.html)
 
 #### todo
-- rename field _timeModified -> _timeUpdated
+- rename package from swagger-lite -> swgg
+- revert temporary fix for chrome render bug
 - allow secure remote db export / import / reset to backend
 - add middlewareAcl
 - datatable - add sort-by-field
@@ -42,12 +43,12 @@ this package will run a virtual swagger-ui server with persistent storage in the
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 382dd07d
-- npm publish 2016.10.2
-- temporary fix for chrome render bug - https://bugs.chromium.org/p/chromium/issues/detail?id=660671
-- rename api-suffix *KeyUnique -> *Id
-- rename field createdAt -> _timeCreated
-- rename field updatedAt -> _timeModified
+#### change since e0c4ffc6
+- npm publish 2016.11.1
+- make this package dependency-less
+- rename files index.* -> lib.swgg.*
+- rename field _timeModified -> _timeUpdated
+- fix cdn-links
 - none
 
 #### this package requires
@@ -139,13 +140,14 @@ instruction
                     'node';
             }
         }());
-        /* istanbul ignore next */
-        // re-init local
-        local = local.modeJs === 'browser'
-            ? window.swgg.local
-            : module.isRollup
-            ? module
-            : require('swagger-lite').local;
+        // init global
+        local.global = local.modeJs === 'browser'
+            ? window
+            : global;
+        // init utility2_rollup
+        local = local.global.utility2_rollup || (local.modeJs === 'browser'
+            ? window.swgg
+            : require('swagger-lite'));
         // export local
         local.global.local = local;
         // load db
@@ -227,6 +229,7 @@ instruction
             local.swgg.middlewareRouter,
             local.swgg.middlewareUserLogin,
             local.middlewareInitCustom,
+            local.utility2.middlewareJsonpStateInitDefault,
             local.swgg.middlewareJsonpStateInit,
             local.utility2.middlewareBodyRead,
             local.swgg.middlewareBodyParse,
@@ -283,7 +286,7 @@ instruction
                     document.querySelector('#testReportDiv1').style.display = 'block';
                     document.querySelector('#testRunButton1').innerText = 'hide internal test';
                     local.modeTest = true;
-                    local.utility2.testRun(local);
+                    local.utility2.testRunDefault(local);
                 // hide tests
                 } else {
                     document.querySelector('#testReportDiv1').style.display = 'none';
@@ -314,8 +317,10 @@ instruction
         module.exports = local;
         // init assets
         local.utility2.tryCatchOnError(function () {
-            local.utility2.assetsDict['/assets.example.js'] =
-                local.fs.readFileSync(__filename, 'utf8');
+            local.utility2.assetsWrite(
+                '/assets.example.js',
+                local.fs.readFileSync(__filename, 'utf8')
+            );
         }, local.utility2.nop);
         /* jslint-ignore-begin */
         // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/dist/index.html
@@ -325,9 +330,7 @@ instruction
 <head>\n\
 <meta charset="UTF-8">\n\
 <meta name="viewport" content="width=device-width, initial-scale=1">\n\
-<title>\n\
-{{envDict.npm_package_name}} v{{envDict.npm_package_version}}\n\
-</title>\n\
+<title>{{env.npm_package_name}} v{{env.npm_package_version}}</title>\n\
 <link href="assets.swgg.css" rel="stylesheet">\n\
 <style>\n\
 /*csslint\n\
@@ -363,18 +366,18 @@ body > button {\n\
 <!-- utility2-comment\n\
         <div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 0.5s, width 1.5s; width: 25%;"></div>\n\
         <a\n\
-            {{#if envDict.npm_package_homepage}}\n\
-            href="{{envDict.npm_package_homepage}}"\n\
-            {{/if envDict.npm_package_homepage}}\n\
+            {{#if env.npm_package_homepage}}\n\
+            href="{{env.npm_package_homepage}}"\n\
+            {{/if env.npm_package_homepage}}\n\
             target="_blank"\n\
         >\n\
 utility2-comment -->\n\
-            {{envDict.npm_package_name}} v{{envDict.npm_package_version}}\n\
+            {{env.npm_package_name}} v{{env.npm_package_version}}\n\
 <!-- utility2-comment\n\
         </a>\n\
 utility2-comment -->\n\
     </h1>\n\
-    <h3>{{envDict.npm_package_description}}</h3>\n\
+    <h3>{{env.npm_package_description}}</h3>\n\
 <!-- utility2-comment\n\
     <h4><a download href="assets.app.js">download standalone app</a></h4>\n\
     <button class="onclick" id="testRunButton1">run internal test</button><br>\n\
@@ -414,10 +417,8 @@ utility2-comment -->\n\
 </html>\n\
 ';
         /* jslint-ignore-end */
-        local.utility2.assetsDict['/'] = local.utility2.templateRender(
-            local.templateIndexHtml,
-            { envDict: local.utility2.envDict }
-        );
+        local.utility2.assetsDict['/'] =
+            local.utility2.templateRender(local.templateIndexHtml, { env: local.utility2.env });
         break;
     }
 
@@ -442,7 +443,7 @@ utility2-comment -->\n\
                     properties: {
                         _id: { readOnly: true, type: 'string' },
                         _timeCreated: { format: 'date-time', readOnly: true, type: 'string' },
-                        _timeModified: { format: 'date-time', readOnly: true, type: 'string' },
+                        _timeUpdated: { format: 'date-time', readOnly: true, type: 'string' },
                         id: { default: 1, minimum: 1 }
                     }
                 },
@@ -450,7 +451,7 @@ utility2-comment -->\n\
                     properties: {
                         _id: { readOnly: true, type: 'string' },
                         _timeCreated: { format: 'date-time', readOnly: true, type: 'string' },
-                        _timeModified: { format: 'date-time', readOnly: true, type: 'string' },
+                        _timeUpdated: { format: 'date-time', readOnly: true, type: 'string' },
                         id: { default: 1, minimum: 1 }
                     }
                 },
@@ -459,7 +460,7 @@ utility2-comment -->\n\
                     properties: {
                         _id: { readOnly: true, type: 'string' },
                         _timeCreated: { format: 'date-time', readOnly: true, type: 'string' },
-                        _timeModified: { format: 'date-time', readOnly: true, type: 'string' },
+                        _timeUpdated: { format: 'date-time', readOnly: true, type: 'string' },
                         email: { default: 'a@a.com', format: 'email' },
                         id: { default: 1, minimum: 1 }
                     }
@@ -780,7 +781,7 @@ utility2-comment -->\n\
         }];
         local.dbReset = function () {
             local.utility2.onResetBefore.counter += 1;
-            local.db.dbReset(local.utility2.onResetBefore);
+            local.db.dbDrop(local.utility2.onResetBefore);
             local.utility2.onResetAfter(function () {
                 console.log('db seeding ...');
                 local.utility2.onReadyBefore.counter += 1;
@@ -807,10 +808,6 @@ utility2-comment -->\n\
 {
     "package.json": true,
     "author": "kai zhu <kaizhu256@gmail.com>",
-    "bin": { "swagger-lite": "index.js" },
-    "dependencies": {
-        "utility2": "2016.10.4"
-    },
     "description": "{{packageJson.description}}",
     "devDependencies": {
         "electron-lite": "kaizhu256/node-electron-lite#alpha"
@@ -829,6 +826,7 @@ utility2-comment -->\n\
         "web"
     ],
     "license": "MIT",
+    "main": "lib.swgg",
     "name": "swagger-lite",
     "os": ["darwin", "linux"],
     "repository": {
@@ -836,14 +834,14 @@ utility2-comment -->\n\
         "url": "https://github.com/kaizhu256/node-swagger-lite.git"
     },
     "scripts": {
-        "build-ci": "utility2 shRun shReadmeBuild",
+        "build-ci": "./lib.utility2.sh shRun shReadmeBuild",
         "start": "\
 export PORT=${PORT:-8080} && \
 export npm_config_mode_auto_restart=1 && \
-utility2 shRun shIstanbulCover test.js",
-        "test": "export PORT=$(utility2 shServerPortRandom) && utility2 test test.js"
+./lib.utility2.sh shRun shIstanbulCover test.js",
+        "test": "export PORT=$(./lib.utility2.sh shServerPortRandom) && ./lib.utility2.sh test test.js"
     },
-    "version": "2016.10.2"
+    "version": "2016.11.1"
 }
 ```
 
@@ -874,7 +872,7 @@ shBuildCiTestPre() {(set -e
 shBuildCiTestPost() {(set -e
 # this function will run the post-test build
     # if running legacy-node, then return
-    [ "$(node --version)" \< "v5.0" ] && return || true
+    [ "$(node --version)" \< "v7.0" ] && return || true
     export NODE_ENV=production
     # deploy app to gh-pages
     export TEST_URL="https://$(printf "$GITHUB_REPO" | \
@@ -906,7 +904,7 @@ shBuildCiTestPost() {(set -e
 shBuild() {(set -e
 # this function will run the main build
     # init env
-    . node_modules/.bin/utility2 && shInit
+    . ./lib.utility2.sh && shInit
     # cleanup github-gh-pages dir
     # export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
     # init github-gh-pages commit-limit

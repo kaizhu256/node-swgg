@@ -37,20 +37,19 @@
         local.global = local.modeJs === 'browser'
             ? window
             : global;
+        // init utility2_rollup
+        local = local.global.utility2_rollup || local;
+        // init lib
+        local.local = local.swgg = local;
         // init lib utility2
-        local.utility2 = local.modeJs === 'browser'
+        local.utility2 = local.global.utility2_rollup || (local.modeJs === 'browser'
             ? local.global.utility2
-            : module.utility2 || require('utility2');
-        // init lib db
+            : require('./lib.utility2.js'));
         local.db = local.utility2.db;
-        // init lib swgg
-        local.swgg = local.utility2.local.swgg = {
-            idDomElementDict: {},
-            local: local,
-            swaggerSchemaJson: {},
-            templateApiDict: {},
-            uiEventListenerDict: {}
-        };
+        local.idDomElementDict = {};
+        local.swaggerSchemaJson = {};
+        local.templateApiDict = {};
+        local.uiEventListenerDict = {};
         // init templateApiDict
         local.swgg.templateApiDict.crudCountManyByQuery = {
             _method: 'get',
@@ -205,7 +204,7 @@
                 name: '_querySkip',
                 type: 'integer'
             }, {
-                default: '[{"fieldName":"_timeModified","isDescending":true}]',
+                default: '[{"fieldName":"_timeUpdated","isDescending":true}]',
                 description: 'cursor-sort param',
                 format: 'json',
                 in: 'query',
@@ -549,7 +548,7 @@
                     properties: {
                         _id: { readOnly: true, type: 'string' },
                         _timeCreated: { format: 'date-time', readOnly: true, type: 'string' },
-                        _timeModified: { format: 'date-time', readOnly: true, type: 'string' },
+                        _timeUpdated: { format: 'date-time', readOnly: true, type: 'string' },
                         fileBlob: { format: 'byte', type: 'string' },
                         fileContentType: { type: 'string' },
                         fileDescription: { type: 'string' },
@@ -564,7 +563,7 @@
                     properties: {
                         _id: { readOnly: true, type: 'string' },
                         _timeCreated: { format: 'date-time', readOnly: true, type: 'string' },
-                        _timeModified: { format: 'date-time', readOnly: true, type: 'string' },
+                        _timeUpdated: { format: 'date-time', readOnly: true, type: 'string' },
                         id: { type: 'string' },
                         jwtEncoded: { type: 'string' },
                         password: { format: 'password', type: 'string' },
@@ -1087,11 +1086,11 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 }
             }, 2);
             user.jwtDecoded.encrypted = local.utility2.sjclCipherAes128Encrypt(
-                local.utility2.envDict.JWT_SECRET || '',
+                local.utility2.env.JWT_SECRET || '',
                 JSON.stringify(user.jwtDecrypted)
             );
             user.jwtEncoded = local.utility2.jwtHs256Encode(
-                local.utility2.envDict.JWT_SECRET || '',
+                local.utility2.env.JWT_SECRET || '',
                 user.jwtDecoded
             );
         };
@@ -1104,12 +1103,12 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             local.utility2.tryCatchOnError(function () {
                 // decode jwt-payload in bearer-token
                 user.jwtDecoded = local.utility2.jwtHs256Decode(
-                    local.utility2.envDict.JWT_SECRET || '',
+                    local.utility2.env.JWT_SECRET || '',
                     user.jwtEncoded
                 );
                 // decrypt jwt-payload's encrypted-sub-payload
                 user.jwtDecrypted = JSON.parse(local.utility2.sjclCipherAes128Decrypt(
-                    local.utility2.envDict.JWT_SECRET || '',
+                    local.utility2.env.JWT_SECRET || '',
                     user.jwtDecoded.encrypted
                 ));
                 // validate expiration date
@@ -1481,7 +1480,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 }
                 local.utility2.objectSetDefault(
                     state,
-                    local.utility2.middlewareJsonpStateInit({ stateInit: true }),
+                    local.utility2.middlewareJsonpStateInitDefault({ stateInit: true }),
                     3
                 );
                 if (request.stateInit) {
@@ -1754,7 +1753,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         value: 0
                     }, {
                         key: 'querySort',
-                        value: [{ fieldName: '_timeModified', isDescending: true }]
+                        value: [{ fieldName: '_timeUpdated', isDescending: true }]
                     }, {
                         key: 'queryWhere',
                         value: {}
@@ -2419,33 +2418,35 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         local.path = require('path');
         local.url = require('url');
         /* istanbul ignore next */
-        if (module.isRollup) {
+        if (local.global.utility2_rollup) {
             break;
         }
         // init assets
         [
-            'index.css',
-            'index.js',
             // https://json-schema.org/draft-04/schema
             'lib.json-schema.schema.json',
             // https://petstore.swagger.io/v2/swagger.json
             'lib.swagger.petstore.json',
             'lib.swagger-ui.js',
             // https://swagger.io/v2/schema.json
-            'lib.swagger.schema.json'
+            'lib.swagger.schema.json',
+            'lib.swgg.css',
+            'lib.swgg.js'
         ].forEach(function (key) {
             switch (key) {
-            case 'index.css':
+            case 'lib.swgg.css':
                 local.utility2.assetsDict['/assets.swgg.css'] =
-                    local.fs.readFileSync(__dirname + '/' + key, 'utf8');
+                    local.utility2.tryCatchReadFile(__dirname + '/' + key, 'utf8');
                 break;
-            case 'index.js':
-                local.utility2.assetsDict['/assets.swgg.js'] =
+            case 'lib.swgg.js':
+                local.utility2.assetsWrite(
+                    '/assets.swgg.js',
                     local.utility2.istanbulInstrumentInPackage(
-                        local.fs.readFileSync(__dirname + '/' + key, 'utf8')
+                        local.utility2.tryCatchReadFile(__dirname + '/' + key, 'utf8')
                             .replace((/^#!/), '//'),
                         __dirname + '/' + key
-                    );
+                    )
+                );
                 break;
             case 'lib.json-schema.schema.json':
             case 'lib.swagger.petstore.json':
@@ -2463,12 +2464,14 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 break;
             }
         });
-        local.utility2.assetsDict['/assets.swgg.rollup.js'] = [
+        local.utility2.assetsWrite('/assets.swgg.rollup.js', [
             '/assets.utility2.rollup.js',
+            '/assets.utility2.rollup.begin.js',
             '/assets.swgg.css',
             '/assets.swgg.js',
             '/assets.swgg.lib.swagger-ui.js',
-            'local.swgg.stateInit'
+            'local.swgg.stateInit',
+            '/assets.utility2.rollup.end.js'
         ].map(function (key) {
             switch (local.path.extname(key)) {
             case '.js':
@@ -2491,7 +2494,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                             JSON.stringify(local.utility2.assetsDict[key])
                     );
             }
-        }).join('\n\n\n\n');
+        }).join('\n\n\n\n'));
         require('./lib.swagger-ui.js');
         break;
     }

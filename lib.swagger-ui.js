@@ -33,13 +33,14 @@
                     'node';
             }
         }());
-        /* istanbul ignore next */
-        // re-init local
-        local = local.modeJs === 'browser'
-            ? window.swgg.local
-            : module.isRollup
-            ? module
-            : require('./index.js').local;
+        // init global
+        local.global = local.modeJs === 'browser'
+            ? window
+            : global;
+        // init utility2_rollup
+        local = local.global.utility2_rollup || (local.modeJs === 'browser'
+            ? window.swgg
+            : require('./lib.swgg.js'));
 /* jslint-ignore-begin */
 local.swgg.templateUiDatatable = '\
 <div class="pagination tr">\n\

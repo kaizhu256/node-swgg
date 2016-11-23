@@ -11,14 +11,14 @@
 */
 (function () {
     'use strict';
-    var local;
+    var assert, assertJsonEqual, local;
 
 
 
     // run shared js-env code - pre-init
     (function () {
         // init Error.stackTraceLimit
-        Error.stackTraceLimit = 16;
+        Error.stackTraceLimit = 20;
         // init local
         local = {};
         // init modeJs
@@ -35,18 +35,20 @@
                     'node';
             }
         }());
+        // init global
+        local.global = local.modeJs === 'browser'
+            ? window
+            : global;
         switch (local.modeJs) {
         // re-init local from window.local
         case 'browser':
-            local = window.local;
+            local = local.global.utility2_rollup || local.global.local;
             break;
         // re-init local from example.js
         case 'node':
-            local = (module.utility2 || require('utility2')).requireExampleJsFromReadme({
-                __dirname: __dirname,
-                module: module
-            });
-            local.swgg = local[local.utility2.envDict.npm_package_name];
+            local = (local.global.utility2_rollup || require('./lib.utility2.js'))
+                .requireExampleJsFromReadme();
+            local.swgg = local[local.utility2.env.npm_package_name];
             break;
         }
     }());
@@ -55,6 +57,10 @@
 
     // run shared js-env code - function
     (function () {
+        assert = local.utility2.assert;
+
+        assertJsonEqual = local.utility2.assertJsonEqual;
+
         local.crudOptionsSetDefault = function (options, defaults) {
         /*
          * this function will set default-values for options
@@ -107,7 +113,6 @@
             return local.utility2.objectSetDefault({}, options);
         };
 
-        // init tests
         local.testCase_ajax_error = function (options, onError) {
         /*
          * this function will test ajax's error handling-behavior
@@ -137,13 +142,13 @@
                 onParallel.counter += 1;
                 local.utility2.ajax(options, function (error, xhr) {
                     // validate error occurred
-                    local.utility2.assert(error, error);
+                    assert(error, error);
                     // validate statusCode
-                    local.utility2.assertJsonEqual(error.statusCode, options.statusCode);
+                    assertJsonEqual(error.statusCode, options.statusCode);
                     // validate error is in jsonapi-format
                     if (options.url !== '/api/v0/x-test/undefined.map') {
                         error = JSON.parse(xhr.responseText);
-                        local.utility2.assert(error.errors[0], error);
+                        assert(error.errors[0], error);
                     }
                     onParallel();
                 });
@@ -168,8 +173,8 @@
                     break;
                 case 2:
                     // validate data
-                    local.utility2.assertJsonEqual(data.responseJson.data.length, 1);
-                    local.utility2.assert(data.responseJson.data[0] === 1, data.responseJson);
+                    assertJsonEqual(data.responseJson.data.length, 1);
+                    assert(data.responseJson.data[0] === 1, data.responseJson);
                     options.onNext();
                     break;
                 default:
@@ -278,9 +283,9 @@
                 options = {};
                 local.swgg.apiDict[key]._ajax(options, function (error, data) {
                     // validate error occurred
-                    local.utility2.assert(error, error);
+                    assert(error, error);
                     // validate statusCode
-                    local.utility2.assertJsonEqual(data.statusCode, 500);
+                    assertJsonEqual(data.statusCode, 500);
                     onParallel();
                 });
             });
@@ -304,8 +309,8 @@
                     break;
                 case 2:
                     // validate data
-                    local.utility2.assertJsonEqual(data.responseJson.data.length, 1);
-                    local.utility2.assert(
+                    assertJsonEqual(data.responseJson.data.length, 1);
+                    assert(
                         data.responseJson.data[0][options.idAlias] === options.idValue,
                         data.responseJson
                     );
@@ -337,14 +342,14 @@
                     break;
                 case 2:
                     // validate data
-                    local.utility2.assertJsonEqual(data.responseJson.data.length, 1);
-                    local.utility2.assert(
+                    assertJsonEqual(data.responseJson.data.length, 1);
+                    assert(
                         data.responseJson.data[0][options.idAlias] === options.idValue,
                         data.responseJson
                     );
                     // validate dataValidate
                     Object.keys(options.dataValidate).forEach(function (key) {
-                        local.utility2.assert(
+                        assert(
                             data.responseJson.data[0][key] === options.dataValidate[key],
                             [key, data.responseJson.data[0][key], options.dataValidate[key]]
                         );
@@ -378,8 +383,8 @@
                     break;
                 case 2:
                     // validate data
-                    local.utility2.assertJsonEqual(data.responseJson.data.length, 1);
-                    local.utility2.assert(
+                    assertJsonEqual(data.responseJson.data.length, 1);
+                    assert(
                         data.responseJson.data[0][options.idAlias] === options.idValue,
                         data.responseJson
                     );
@@ -448,11 +453,8 @@
                     break;
                 case 4:
                     // validate data was removed
-                    local.utility2.assertJsonEqual(data.responseJson.data.length, 1);
-                    local.utility2.assert(
-                        data.responseJson.data[0] === null,
-                        data.responseJson
-                    );
+                    assertJsonEqual(data.responseJson.data.length, 1);
+                    assert(data.responseJson.data[0] === null, data.responseJson);
                     options.onNext();
                     break;
                 default:
@@ -499,11 +501,8 @@
                     break;
                 case 4:
                     // validate data was removed
-                    local.utility2.assertJsonEqual(data.responseJson.data.length, 1);
-                    local.utility2.assert(
-                        data.responseJson.data[0] === null,
-                        data.responseJson
-                    );
+                    assertJsonEqual(data.responseJson.data.length, 1);
+                    assert(data.responseJson.data[0] === null, data.responseJson);
                     options.onNext();
                     break;
                 default:
@@ -565,7 +564,7 @@
                 data: {
                     // test dataReadonlyRemove handling-behavior
                     _timeCreated: '1970-01-01T00:00:00.000Z',
-                    _timeModified: '1970-01-01T00:00:00.000Z',
+                    _timeUpdated: '1970-01-01T00:00:00.000Z',
                     id: 'testCase_crudSetOneById_default'
                 },
                 dataValidateReplace: { propRequired: true }
@@ -588,15 +587,23 @@
                     // init id
                     options.data.id = data.responseJson.data[0].id;
                     // validate time _timeCreated
-                    local.utility2.assert(data.responseJson.data[0]._timeCreated >
-                        '1970-01-01T00:00:00.000Z', data.responseJson);
-                    local.utility2.assert(data.responseJson.data[0]._timeCreated <
-                        new Date().toISOString(), data.responseJson);
-                    // validate time _timeModified
-                    local.utility2.assert(data.responseJson.data[0]._timeModified >
-                        '1970-01-01T00:00:00.000Z', data.responseJson);
-                    local.utility2.assert(data.responseJson.data[0]._timeModified <
-                        new Date().toISOString(), data.responseJson);
+                    assert(
+                        data.responseJson.data[0]._timeCreated > '1970-01-01T00:00:00.000Z',
+                        data.responseJson
+                    );
+                    assert(
+                        data.responseJson.data[0]._timeCreated < new Date().toISOString(),
+                        data.responseJson
+                    );
+                    // validate time _timeUpdated
+                    assert(
+                        data.responseJson.data[0]._timeUpdated > '1970-01-01T00:00:00.000Z',
+                        data.responseJson
+                    );
+                    assert(
+                        data.responseJson.data[0]._timeUpdated < new Date().toISOString(),
+                        data.responseJson
+                    );
                     // test crudGetOneById's default handling-behavior
                     options.dataValidate = options.dataValidateReplace;
                     local.testCase_crudGetOneById_default(options, options.onNext);
@@ -641,7 +648,7 @@
                     break;
                 case 3:
                     options._timeCreated = data.responseJson.data[0]._timeCreated;
-                    options._timeModified = data.responseJson.data[0]._timeModified;
+                    options._timeUpdated = data.responseJson.data[0]._timeUpdated;
                     // init paramDict
                     paramDict = local.utility2.jsonCopy(options.queryById);
                     paramDict.body = local.utility2.objectSetOverride(
@@ -657,21 +664,21 @@
                     break;
                 case 4:
                     // validate time _timeCreated
-                    local.utility2.assert(
+                    assert(
                         data.responseJson.data[0]._timeCreated === options._timeCreated,
                         data.responseJson
                     );
-                    local.utility2.assert(
+                    assert(
                         data.responseJson.data[0]._timeCreated < new Date().toISOString(),
                         data.responseJson
                     );
-                    // validate time _timeModified
-                    local.utility2.assert(
-                        data.responseJson.data[0]._timeModified > options._timeModified,
+                    // validate time _timeUpdated
+                    assert(
+                        data.responseJson.data[0]._timeUpdated > options._timeUpdated,
                         data.responseJson
                     );
-                    local.utility2.assert(
-                        data.responseJson.data[0]._timeModified < new Date().toISOString(),
+                    assert(
+                        data.responseJson.data[0]._timeUpdated < new Date().toISOString(),
                         data.responseJson
                     );
                     // test crudGetOneById's default handling-behavior
@@ -709,13 +716,13 @@
                     break;
                 case 2:
                     // validate no error occurred
-                    local.utility2.assert(!error, error);
+                    assert(!error, error);
                     // validate Content-Type
                     options.data = data.getResponseHeader('content-type');
-                    local.utility2.assertJsonEqual(options.data, 'image/png');
+                    assertJsonEqual(options.data, 'image/png');
                     // validate response
                     options.data = local.utility2.bufferToString(data.response, 'base64');
-                    local.utility2.assert(
+                    assert(
                         options.data === local.swgg.templateSwaggerUiLogoSmallBase64,
                         options.data
                     );
@@ -726,9 +733,9 @@
                     break;
                 case 3:
                     // validate error occurred
-                    local.utility2.assert(error, error);
+                    assert(error, error);
                     // validate statusCode
-                    local.utility2.assertJsonEqual(data.statusCode, 404);
+                    assertJsonEqual(data.statusCode, 404);
                     onNext();
                     break;
                 default:
@@ -762,11 +769,8 @@
                     break;
                 case 2:
                     // validate data
-                    local.utility2.assertJsonEqual(data.responseJson.data.length, 2);
-                    local.utility2.assertJsonEqual(
-                        data.responseJson.data[0].fileDescription,
-                        'hello'
-                    );
+                    assertJsonEqual(data.responseJson.data.length, 2);
+                    assertJsonEqual(data.responseJson.data[0].fileDescription, 'hello');
                     local.crudOptionsSetDefault(options, {
                         idValue: data.responseJson.data[0].id
                     });
@@ -801,7 +805,7 @@
                     break;
                 case 2:
                     // validate data
-                    local.utility2.assertJsonEqual(data.responseJson.data.length, 0);
+                    assertJsonEqual(data.responseJson.data.length, 0);
                     options.onNext();
                     break;
                 default:
@@ -830,12 +834,9 @@
                     paramDict: { data: JSON.stringify(options) }
                 }, function (error, data) {
                     // validate no error occurred
-                    local.utility2.assert(!error, error);
+                    assert(!error, error);
                     // validate data
-                    local.utility2.assertJsonEqual(
-                        data.responseJson.data[0],
-                        'hello'
-                    );
+                    assertJsonEqual(data.responseJson.data[0], 'hello');
                     onParallel();
                 });
             });
@@ -853,24 +854,18 @@
             onParallel.counter += 1;
             local.swgg.apiDict['x-test onErrorJsonapi']._ajax(options, function (error, data) {
                 // validate no error occurred
-                local.utility2.assert(!error, error);
+                assert(!error, error);
                 // validate data
-                local.utility2.assertJsonEqual(
-                    data.responseJson.data[0],
-                    undefined
-                );
+                assertJsonEqual(data.responseJson.data[0], undefined);
                 onParallel();
             });
             options = { paramDict: { error: '[]' } };
             onParallel.counter += 1;
             local.swgg.apiDict['x-test onErrorJsonapi']._ajax(options, function (error, data) {
                 // validate error occurred
-                local.utility2.assert(error, error);
+                assert(error, error);
                 // validate error
-                local.utility2.assert(
-                    data.responseJson.errors[0].message === 'null',
-                    error
-                );
+                assert(data.responseJson.errors[0].message === 'null', error);
                 onParallel();
             });
             onParallel();
@@ -899,12 +894,9 @@
                     'x-test onErrorJsonapi'
                 ]._ajax(options, function (error, data) {
                     // validate error occurred
-                    local.utility2.assert(error, error);
+                    assert(error, error);
                     // validate error
-                    local.utility2.assert(
-                        data.responseJson.errors[0].message === 'hello',
-                        error
-                    );
+                    assert(data.responseJson.errors[0].message === 'hello', error);
                     onParallel();
                 });
             });
@@ -923,8 +915,8 @@
                     break;
                 case 2:
                     // validate data
-                    local.utility2.assertJsonEqual(data.responseJson.data.length, 1);
-                    local.utility2.assert(data.responseJson.data[0]);
+                    assertJsonEqual(data.responseJson.data.length, 1);
+                    assert(data.responseJson.data[0]);
                     options.onNext();
                     break;
                 default:
@@ -953,62 +945,50 @@
                     break;
                 case 2:
                     // validate error occurred
-                    local.utility2.assert(error, error);
+                    assert(error, error);
                     // test userLoginByPassword's 401 handling-behavior
                     options = { password: 'undefined', username: 'undefined' };
                     local.swgg.userLoginByPassword(options, onNext);
                     break;
                 case 3:
                     // validate error occurred
-                    local.utility2.assert(error, error);
+                    assert(error, error);
                     // validate statusCode
-                    local.utility2.assertJsonEqual(data.statusCode, 401);
+                    assertJsonEqual(data.statusCode, 401);
                     // validate userJwtEncoded does not exist
-                    local.utility2.assert(
-                        !local.swgg.userJwtEncoded,
-                        local.swgg.userJwtEncoded
-                    );
+                    assert(!local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
                     // test userLogout's 401 handling-behavior
                     options = {};
                     local.swgg.userLogout(options, onNext);
                     break;
                 case 4:
                     // validate error occurred
-                    local.utility2.assert(error, error);
+                    assert(error, error);
                     // validate statusCode
-                    local.utility2.assertJsonEqual(data.statusCode, 401);
+                    assertJsonEqual(data.statusCode, 401);
                     // validate userJwtEncoded does not exist
-                    local.utility2.assert(
-                        !local.swgg.userJwtEncoded,
-                        local.swgg.userJwtEncoded
-                    );
+                    assert(!local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
                     // test userLoginByPassword's 200 handling-behavior
                     options = { password: 'secret', username: 'admin' };
                     local.swgg.userLoginByPassword(options, onNext);
                     break;
                 case 5:
                     // validate no error occurred
-                    local.utility2.assert(!error, error);
+                    assert(!error, error);
                     // validate statusCode
-                    local.utility2.assertJsonEqual(data.statusCode, 200);
+                    assertJsonEqual(data.statusCode, 200);
                     // validate userJwtEncoded exists
-                    local.utility2.assert(
-                        local.swgg.userJwtEncoded,
-                        local.swgg.userJwtEncoded
-                    );
+                    assert(local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
                     // test persistent-session handling-behavior
                     local.swgg.apiDict['x-test crudNullGet']._ajax({}, onNext);
                     break;
                 case 6:
                     // validate no error occurred
-                    local.utility2.assert(!error, error);
+                    assert(!error, error);
                     // validate statusCode
-                    local.utility2.assertJsonEqual(data.statusCode, 200);
+                    assertJsonEqual(data.statusCode, 200);
                     // validate userJwtEncoded exists
-                    local.utility2.assert(
-                        local.swgg.userJwtEncoded,
-                        local.swgg.userJwtEncoded
-                    );
+                    assert(local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
                     // test userLogout's 200 handling-behavior
                     // test jwtEncoded's update handling-behavior
                     options = { jwtDecrypted: { sub: 'admin' } };
@@ -1017,23 +997,20 @@
                     break;
                 case 7:
                     // validate no error occurred
-                    local.utility2.assert(!error, error);
+                    assert(!error, error);
                     // validate statusCode
-                    local.utility2.assertJsonEqual(data.statusCode, 200);
+                    assertJsonEqual(data.statusCode, 200);
                     // validate userJwtEncoded exists
-                    local.utility2.assert(
-                        local.swgg.userJwtEncoded,
-                        local.swgg.userJwtEncoded
-                    );
+                    assert(local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
                     // test userLogout's 401 handling-behavior
                     options = {};
                     local.swgg.userLogout(options, onNext);
                     break;
                 case 8:
                     // validate error occurred
-                    local.utility2.assert(error, error);
+                    assert(error, error);
                     // validate statusCode
-                    local.utility2.assertJsonEqual(data.statusCode, 401);
+                    assertJsonEqual(data.statusCode, 401);
                     // test userLoginByPassword's 400 handling-behavior
                     local.utility2.ajax({
                         url: '/api/v0/user/userLoginByPassword?password=1'
@@ -1041,9 +1018,9 @@
                     break;
                 case 9:
                     // validate error occurred
-                    local.utility2.assert(error, error);
+                    assert(error, error);
                     // validate statusCode
-                    local.utility2.assertJsonEqual(data.statusCode, 400);
+                    assertJsonEqual(data.statusCode, 400);
                     // test userLogout's invalid-username handling-behavior
                     options = { jwtDecrypted: { sub: 'undefined' } };
                     local.swgg.jwtDecodedEncryptAndEncode(options);
@@ -1051,9 +1028,9 @@
                     break;
                 case 10:
                     // validate error occurred
-                    local.utility2.assert(error, error);
+                    assert(error, error);
                     // validate statusCode
-                    local.utility2.assertJsonEqual(data.statusCode, 401);
+                    assertJsonEqual(data.statusCode, 401);
                     onError(null, data);
                     break;
                 }
@@ -1098,9 +1075,9 @@
             onParallel.counter += 1;
             local.swgg.apiDict['x-test paramDefault']._ajax(options, function (error, data) {
                 // validate no error occurred
-                local.utility2.assert(!error, error);
+                assert(!error, error);
                 // validate object
-                local.utility2.assertJsonEqual(data.responseJson.data[0], {
+                assertJsonEqual(data.responseJson.data[0], {
                     paramArray: ['aa', 'bb'],
                     paramBody: { aa: { bb: 'hello body' } },
                     paramBoolean: true,
@@ -1124,9 +1101,9 @@
             onParallel.counter += 1;
             local.swgg.apiDict['x-test paramBodyArray']._ajax(options, function (error, data) {
                 // validate no error occurred
-                local.utility2.assert(!error, error);
+                assert(!error, error);
                 // validate object
-                local.utility2.assertJsonEqual(data.responseJson.data[0], {
+                assertJsonEqual(data.responseJson.data[0], {
                     paramBodyArray: [{ aa: { bb: 'hello body' } }, null]
                 });
                 onParallel();
@@ -1157,7 +1134,7 @@
                 onParallel.counter += 1;
                 local.swgg.apiDict['x-test paramDefault']._ajax(element, function (error) {
                     // validate error occurred
-                    local.utility2.assert(error, element);
+                    assert(error, element);
                     onParallel();
                 });
             });
@@ -1176,9 +1153,9 @@
             };
             local.swgg.apiDict['x-test paramFormData']._ajax(options, function (error, data) {
                 // validate no error occurred
-                local.utility2.assert(!error, error);
+                assert(!error, error);
                 // validate object
-                local.utility2.assertJsonEqual(data.responseJson.data[0], {
+                assertJsonEqual(data.responseJson.data[0], {
                     paramFormData1: 'hello formData1',
                     paramFormData2: 'hello formData2'
                 });
@@ -1298,7 +1275,7 @@
                     local.swgg.validateBySchema(element);
                 }, local.utility2.nop);
                 // validate error occurred
-                local.utility2.assert(local.utility2._debugTryCatchErrorCaught, element.data);
+                assert(local.utility2._debugTryCatchErrorCaught, element.data);
             });
             onError();
         };
@@ -1314,7 +1291,7 @@
                     local.swgg.validateBySwagger(element);
                 }, local.utility2.nop);
                 // validate error occurred
-                local.utility2.assert(local.utility2._debugTryCatchErrorCaught, element);
+                assert(local.utility2._debugTryCatchErrorCaught, element);
             });
             options.templateData = JSON.stringify({
                 definitions: {
@@ -1382,7 +1359,7 @@
                     ), 10);
                 }, local.utility2.nop);
                 // validate error occurred
-                local.utility2.assert(local.utility2._debugTryCatchErrorCaught, element);
+                assert(local.utility2._debugTryCatchErrorCaught, element);
             });
             onError();
         };
@@ -1495,19 +1472,12 @@
         /*
          * this function will test build's app handling-behavior
          */
-            var onParallel;
-            onParallel = local.utility2.onParallel(onError);
-            onParallel.counter += 1;
-            options = {};
             options = [{
                 file: '/api/v0/swagger.json',
                 url: '/api/v0/swagger.json'
             }, {
                 file: '/assets.app.js',
                 url: '/assets.app.js'
-            }, {
-                file: '/assets.app.min.js',
-                url: '/assets.app.min.js'
             }, {
                 file: '/assets.example.js',
                 url: '/assets.example.js'
@@ -1521,50 +1491,16 @@
                 file: '/assets.swgg.lib.swagger-ui.js',
                 url: '/assets.swgg.lib.swagger-ui.js'
             }, {
+                file: '/assets.swgg.rollup.js',
+                url: '/assets.swgg.rollup.js'
+            }, {
                 file: '/assets.swgg.swagger-ui.logo_small.png',
                 url: '/assets.swgg.swagger-ui.logo_small.png'
-            }, {
-                file: '/assets.test.js',
-                url: '/assets.test.js'
-            }, {
-                file: '/assets.utility2.rollup.js',
-                url: '/assets.utility2.rollup.js'
-            }, {
-                file: '/index.html',
-                url: '/index.html'
             }, {
                 file: '/jsonp.swgg.stateInit',
                 url: '/jsonp.swgg.stateInit?callback=window.swgg.stateInit'
             }];
-            options.forEach(function (options) {
-                onParallel.counter += 1;
-                local.utility2.ajax(options, function (error, xhr) {
-                    onParallel.counter += 1;
-                    // validate no error occurred
-                    onParallel(error);
-                    switch (local.path.extname(options.file)) {
-                    case '.css':
-                    case '.js':
-                    case '.json':
-                        local.utility2.jslintAndPrintConditional(
-                            xhr.responseText,
-                            options.file
-                        );
-                        // validate no error occurred
-                        local.utility2.assert(
-                            !local.utility2.jslint.errorText,
-                            local.utility2.jslint.errorText
-                        );
-                        break;
-                    }
-                    local.utility2.fsWriteFileWithMkdirp(
-                        local.utility2.envDict.npm_config_dir_build + '/app' + options.file,
-                        (options.transform || local.utility2.echo)(xhr.response),
-                        onParallel
-                    );
-                });
-            });
-            onParallel();
+            local.utility2.buildApp(options, onError);
         };
 
         local.testCase_build_doc = function (options, onError) {
@@ -1576,7 +1512,7 @@
                 switch (options.modeNext) {
                 case 1:
                     options.moduleDict = {
-                        'swgg': {
+                        'swagger-lite': {
                             exampleList: [],
                             exports: local.swgg
                         }
@@ -1587,8 +1523,8 @@
                             .concat([
                                 'README.md',
                                 'test.js',
-                                'index.js',
-                                'lib.swagger-ui.js'
+                                'lib.swagger-ui.js',
+                                local.utility2.env.npm_package_main + '.js'
                             ])
                             .map(function (file) {
                                 return '\n\n\n\n\n\n\n\n' +
@@ -1598,7 +1534,7 @@
                     });
                     // create doc.api.html
                     local.utility2.fsWriteFileWithMkdirp(
-                        local.utility2.envDict.npm_config_dir_build + '/doc.api.html',
+                        local.utility2.env.npm_config_dir_build + '/doc.api.html',
                         local.utility2.docApiCreate(options),
                         options.onNext
                     );
@@ -1606,7 +1542,7 @@
                 case 2:
                     local.utility2.browserTest({
                         modeBrowserTest: 'screenCapture',
-                        url: 'file://' + local.utility2.envDict.npm_config_dir_build +
+                        url: 'file://' + local.utility2.env.npm_config_dir_build +
                             '/doc.api.html'
                     }, options.onNext);
                     break;
@@ -1651,7 +1587,7 @@
                     properties: {
                         _id: { readOnly: true, type: 'string' },
                         _timeCreated: { format: 'date-time', readOnly: true, type: 'string' },
-                        _timeModified: { format: 'date-time', readOnly: true, type: 'string' },
+                        _timeUpdated: { format: 'date-time', readOnly: true, type: 'string' },
                         id: { type: 'string' },
                         propArray: { items: {}, type: 'array' },
                         propArray2: {
@@ -2079,34 +2015,33 @@
 
     // run node js-env code - post-init
     case 'node':
-        // init repl debugger
-        local.utility2.replStart();
-        // init assets
         /* istanbul ignore next */
-        if (module.isRollup) {
+        if (local.global.utility2_rollup) {
             break;
         }
-        local.utility2.assetsDict['/assets.app.js'] = [
+        // init assets
+        local.utility2.assetsWrite('/assets.app.js', [
             'header',
             '/assets.swgg.rollup.js',
+            '/assets.utility2.rollup.begin.js',
             'local.swgg.stateInit',
             '/assets.example.js',
-            '/assets.test.js'
+            '/assets.test.js',
+            '/assets.utility2.rollup.end.js'
         ].map(function (key) {
             switch (key) {
 /* jslint-ignore-begin */
 case 'header':
 return '\
 /*\n\
-app.js\n\
-\n' + local.utility2.envDict.npm_package_description + '\n\
+assets.app.js\n\
+\n' + local.utility2.env.npm_package_description + '\n\
 \n\
 instruction\n\
-    1. save this script as app.js\n\
+    1. save this script as assets.app.js\n\
     2. run the shell command:\n\
-        $ PORT=8081 node app.js\n\
-    3. open a browser to http://localhost:8081\n\
-    4. interact with the swagger-ui server\n\
+        $ PORT=8081 node assets.app.js\n\
+    3. run the browser-demo on http://localhost:8081\n\
 */\n\
 ';
 /* jslint-ignore-end */
@@ -2122,9 +2057,7 @@ instruction\n\
             default:
                 return '// ' + key + '\n' + local.utility2.assetsDict[key];
             }
-        }).join('\n\n\n\n');
-        local.utility2.assetsDict['/assets.app.min.js'] =
-            local.utility2.uglifyIfProduction(local.utility2.assetsDict['/assets.app.js']);
+        }).join('\n\n\n\n'));
         // run validation test
         local.testCase_validateByParamDefList_default(null, local.utility2.onErrorDefault);
         local.testCase_validateByParamDefList_error(null, local.utility2.onErrorDefault);
