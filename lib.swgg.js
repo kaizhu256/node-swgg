@@ -45,7 +45,7 @@
         local.utility2 = local.global.utility2_rollup || (local.modeJs === 'browser'
             ? local.global.utility2
             : require('./lib.utility2.js'));
-        local.db = local.utility2.db;
+        local.utility2.objectSetDefault(local, local.utility2);
         local.idDomElementDict = {};
         local.swaggerSchemaJson = {};
         local.templateApiDict = {};
@@ -614,15 +614,11 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
 ';
 /* jslint-ignore-end */
         // init assets
-        local.utility2.assetsDict['/assets.swgg.lib.json-schema.schema.json'] = '{}';
-        local.utility2.assetsDict['/assets.swgg.lib.swagger.schema.json'] = '{}';
-        local.utility2.assetsDict['/assets.swgg.swagger-ui.logo_small.png'] =
-            local.utility2.assetsDict['/favicon.ico'] =
-            local.utility2.bufferToNodeBuffer(
-                local.utility2.bufferCreate(
-                    local.swgg.templateSwaggerUiLogoSmallBase64,
-                    'base64'
-                )
+        local.assetsDict['/assets.swgg.lib.json-schema.schema.json'] = '{}';
+        local.assetsDict['/assets.swgg.lib.swagger.schema.json'] = '{}';
+        local.assetsDict['/assets.swgg.swagger-ui.logo_small.png'] =
+            local.assetsDict['/favicon.ico'] = local.bufferToNodeBuffer(
+                local.bufferCreate(local.swgg.templateSwaggerUiLogoSmallBase64, 'base64')
             );
     }());
 
@@ -636,17 +632,13 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
          */
             var isMultipartFormData, tmp;
             isMultipartFormData = (self.consumes && self.consumes[0]) === 'multipart/form-data';
-            local.utility2.objectSetDefault(options, {
-                data: '',
-                paramDict: {},
-                url: ''
-            });
+            local.objectSetDefault(options, { data: '', paramDict: {}, url: '' });
             // try to validate paramDict
-            local.utility2.tryCatchOnError(function () {
+            local.tryCatchOnError(function () {
                 local.swgg.validateByParamDefList({
                     // normalize paramDict
                     data: local.swgg.normalizeParamDictSwagger(
-                        local.utility2.jsonCopy(options.paramDict),
+                        local.jsonCopy(options.paramDict),
                         self
                     ),
                     dataReadonlyRemove: options.paramDict,
@@ -661,9 +653,9 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 return;
             }
             // init options-defaults
-            local.utility2.objectSetDefault(options, {
+            local.objectSetDefault(options, {
                 inForm: isMultipartFormData
-                    ? new local.utility2.FormData()
+                    ? new local.FormData()
                     : '',
                 inHeader: {},
                 inPath: self._path,
@@ -681,7 +673,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 if (tmp === undefined) {
                     return;
                 }
-                if (!(paramDef.type === 'string' || tmp instanceof local.utility2.Blob)) {
+                if (!(paramDef.type === 'string' || tmp instanceof local.Blob)) {
                     tmp = JSON.stringify(tmp);
                 }
                 switch (paramDef.in) {
@@ -714,7 +706,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 ? options.inForm
                 : options.inForm.slice(1));
             // init headers
-            local.utility2.objectSetOverride(options.headers, options.inHeader);
+            local.objectSetOverride(options.headers, options.inHeader);
             // init headers - Content-Type
             if (options.inForm) {
                 options.headers['Content-Type'] = isMultipartFormData
@@ -735,11 +727,11 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 options.headers['content-type'] = 'application/json; charset=UTF-8';
             }
             // send ajax-request
-            return local.utility2.ajax(options, function (error, xhr) {
+            return local.ajax(options, function (error, xhr) {
                 // try to init responseJson
-                local.utility2.tryCatchOnError(function () {
+                local.tryCatchOnError(function () {
                     xhr.responseJson = JSON.parse(xhr.responseText);
-                }, local.utility2.nop);
+                }, local.nop);
                 // init userJwtEncoded
                 tmp = xhr.getResponseHeader('swgg-jwt-encoded');
                 if (tmp) {
@@ -764,7 +756,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             tmp = {};
             [local.swgg.swaggerJson.tags, options.tags || []].forEach(function (tagList) {
                 tagList.forEach(function (tag) {
-                    local.utility2.objectSetOverride(tmp, local.utility2.objectLiteralize({
+                    local.objectSetOverride(tmp, local.objectLiteralize({
                         '$[]': [tag.name, tag]
                     }));
                 }, 2);
@@ -773,7 +765,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 return tmp[key];
             });
             // merge options into swaggerJson
-            options = local.utility2.objectSetOverride(local.swgg.swaggerJson, options, 10);
+            options = local.objectSetOverride(local.swgg.swaggerJson, options, 10);
             // restore tags
             local.swgg.swaggerJson.tags = tmp;
             Object.keys(options.definitions).forEach(function (schemaName) {
@@ -789,9 +781,9 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     self = options.paths[path][method];
                     self._method = method;
                     self._path = path;
-                    local.utility2.objectSetOverride(
+                    local.objectSetOverride(
                         local.swgg.apiDict,
-                        local.utility2.objectLiteralize({
+                        local.objectLiteralize({
                             '$[]': [self.tags[0] + ' ' + self.operationId, self]
                         }),
                         2
@@ -801,12 +793,12 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             // init apiDict from x-swgg-apiDict
             Object.keys(options['x-swgg-apiDict'] || {}).forEach(function (key) {
                 // init self
-                local.utility2.objectSetOverride(
+                local.objectSetOverride(
                     local.swgg.apiDict,
-                    local.utility2.objectLiteralize({
-                        '$[]': [key, local.utility2.jsonCopy(options['x-swgg-apiDict'][key])]
+                    local.objectLiteralize({
+                        '$[]': [key, local.jsonCopy(options['x-swgg-apiDict'][key])]
                     }),
-                    10
+                    Infinity
                 );
             });
             // init apiDict
@@ -824,7 +816,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     (/^fileUploadManyByForm\.(\d+)/),
                     function (match0, match1) {
                         // jslint-hack - nop
-                        local.utility2.nop(match0);
+                        local.nop(match0);
                         self._fileUploadNumber = Number(match1);
                     }
                 );
@@ -836,7 +828,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 self._tags0 = key.split(' ')[0];
                 // init templateApiDict
                 if (local.swgg.templateApiDict[self._operationId.split('.')[0]]) {
-                    local.utility2.objectSetDefault(
+                    local.objectSetDefault(
                         self,
                         JSON.parse(local.swgg.templateApiDict[self._operationId.split('.')[0]]
                             .replace((/\{\{_fileUploadNumber\}\}/g), self._fileUploadNumber)
@@ -848,7 +840,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     );
                 }
                 // init default
-                local.utility2.objectSetDefault(self, {
+                local.objectSetDefault(self, {
                     _keyOperationId: key,
                     operationId: self._operationId,
                     parameters: [],
@@ -880,44 +872,45 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 // add extra file-upload forms
                 case 'fileUploadManyByForm':
                     for (tmp = 1; tmp <= self._fileUploadNumber; tmp += 1) {
-                        self.parameters[tmp] =
-                            local.utility2.jsonCopy(self.parameters[1]);
+                        self.parameters[tmp] = local.jsonCopy(self.parameters[1]);
                         self.parameters[tmp].name = 'file' + tmp;
                     }
                     break;
                 }
                 // update apiDict
                 self = local.swgg.apiDict[key] = local.swgg.apiDict[self._keyPath] =
-                    local.utility2.jsonCopy(self);
+                    local.jsonCopy(self);
                 // init _ajax
                 self._ajax = function (options, onError) {
                     return local.swgg.apiAjax(self, options, onError);
                 };
                 // remove underscored keys from self
-                tmp = local.utility2.jsonCopy(self);
+                tmp = local.jsonCopy(self);
                 Object.keys(tmp).forEach(function (key) {
                     if (key[0] === '_') {
                         delete tmp[key];
                     }
                 });
                 // update paths
-                local.utility2.objectSetOverride(options, local.utility2.objectLiteralize({
+                local.objectSetOverride(options, local.objectLiteralize({
                     paths: { '$[]': [self._path, { '$[]': [self._method.toLowerCase(), tmp] }] }
                 }), 3);
             });
             // normalize swaggerJson
-            local.swgg.swaggerJson = JSON.parse(local.utility2.jsonStringifyOrdered(options));
+            local.swgg.swaggerJson = JSON.parse(local.jsonStringifyOrdered(options));
+            // update $npm_config_swagger_basePath
+            local.env.npm_config_swagger_basePath = local.swgg.swaggerJson.basePath;
             // try to validate swaggerJson
-            local.utility2.tryCatchOnError(function () {
+            local.tryCatchOnError(function () {
                 local.swgg.validateBySwagger(local.swgg.swaggerJson);
-            }, local.utility2.onErrorDefault);
+            }, local.onErrorDefault);
         };
 
         local.swgg.dbRowListRandomCreate = function (options) {
         /*
          * this function will return a dbRowList of options.length random dbRow's
          */
-            local.utility2.objectSetDefault(options, { dbRowList: [] });
+            local.objectSetDefault(options, { dbRowList: [] });
             for (options.ii = 0; options.ii < options.length; options.ii += 1) {
                 options.dbRowList.push(local.swgg.dbRowRandomCreate(options));
             }
@@ -936,7 +929,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     return;
                 }
                 if (propDef.enum) {
-                    dbRow[key] = local.utility2.listGetElementRandom(propDef.enum);
+                    dbRow[key] = local.listGetElementRandom(propDef.enum);
                     return;
                 }
                 // http://json-schema.org/latest/json-schema-validation.html#anchor13
@@ -957,7 +950,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     }
                     break;
                 case 'boolean':
-                    tmp = local.utility2.listGetElementRandom([false, true]);
+                    tmp = local.listGetElementRandom([false, true]);
                     break;
                 case 'integer':
                     if (propDef.exclusiveMaximum) {
@@ -994,7 +987,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         Math.random().toString(36).slice(2, 10);
                     switch (propDef.format) {
                     case 'byte':
-                        tmp = local.utility2.stringToBase64(tmp);
+                        tmp = local.stringToBase64(tmp);
                         break;
                     case 'date':
                     case 'date-time':
@@ -1024,18 +1017,16 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     }
                 }
                 // try to validate data
-                local.utility2.tryCatchOnError(function () {
+                local.tryCatchOnError(function () {
                     local.swgg.validateByPropDef({
                         data: tmp,
                         key: propDef.name,
                         schema: propDef
                     });
                     dbRow[key] = tmp;
-                }, local.utility2.nop);
+                }, local.nop);
             });
-            return local.utility2.jsonCopy(
-                local.utility2.objectSetOverride(dbRow, options.override(options))
-            );
+            return local.jsonCopy(local.objectSetOverride(dbRow, options.override(options)));
         };
 
         local.swgg.idDomElementCreate = function (seed) {
@@ -1078,21 +1069,18 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         /*
          * this function will encrypt and encode user.jwtDecrypted and user.jwtDecoded
          */
-            local.utility2.objectSetDefault(user, {
+            local.objectSetDefault(user, {
                 jwtDecoded: {},
                 jwtDecrypted: {
                     exp: Math.floor(Date.now() / 1000) + 3600,
-                    jti: local.utility2.uuidTimeCreate()
+                    jti: local.uuidTimeCreate()
                 }
             }, 2);
-            user.jwtDecoded.encrypted = local.utility2.sjclCipherAes128Encrypt(
-                local.utility2.env.JWT_SECRET || '',
+            user.jwtDecoded.encrypted = local.sjclCipherAes128Encrypt(
+                local.env.JWT_SECRET || '',
                 JSON.stringify(user.jwtDecrypted)
             );
-            user.jwtEncoded = local.utility2.jwtHs256Encode(
-                local.utility2.env.JWT_SECRET || '',
-                user.jwtDecoded
-            );
+            user.jwtEncoded = local.jwtHs256Encode(local.env.JWT_SECRET || '', user.jwtDecoded);
         };
 
         local.swgg.jwtEncodedDecodeAndDecrypt = function (user) {
@@ -1100,19 +1088,19 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
          * this function will decode and decrypt user.jwtEncoded
          */
             // try to decode and decrypt jwtEncoded
-            local.utility2.tryCatchOnError(function () {
+            local.tryCatchOnError(function () {
                 // decode jwt-payload in bearer-token
-                user.jwtDecoded = local.utility2.jwtHs256Decode(
-                    local.utility2.env.JWT_SECRET || '',
+                user.jwtDecoded = local.jwtHs256Decode(
+                    local.env.JWT_SECRET || '',
                     user.jwtEncoded
                 );
                 // decrypt jwt-payload's encrypted-sub-payload
-                user.jwtDecrypted = JSON.parse(local.utility2.sjclCipherAes128Decrypt(
-                    local.utility2.env.JWT_SECRET || '',
+                user.jwtDecrypted = JSON.parse(local.sjclCipherAes128Decrypt(
+                    local.env.JWT_SECRET || '',
                     user.jwtDecoded.encrypted
                 ));
                 // validate expiration date
-                local.utility2.assert(Date.now() * 0.001 <= user.jwtDecrypted.exp);
+                local.assert(Date.now() * 0.001 <= user.jwtDecrypted.exp);
             }, function () {
                 // if error occurred, then undo decoding and decryption
                 user.jwtDecoded = user.jwtDecrypted =
@@ -1125,7 +1113,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
          * this function will set the jwtEncoded-cookie in the response
          * from request.swgg.user.jwtEncoded
          */
-            local.utility2.serverRespondHeadSet(request, response, null, {
+            local.serverRespondHeadSet(request, response, null, {
                 'swgg-jwt-encoded': request.swgg.user.jwtEncoded
             });
         };
@@ -1136,9 +1124,9 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
          */
             var ii, jj, options;
             // jslint-hack
-            local.utility2.nop(response);
+            local.nop(response);
             // if request is already parsed, then goto nextMiddleware
-            if (!local.utility2.isNullOrUndefined(request.swgg.bodyParsed)) {
+            if (!local.isNullOrUndefined(request.swgg.bodyParsed)) {
                 nextMiddleware();
                 return;
             }
@@ -1146,9 +1134,9 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             // parse application/x-www-form-urlencoded, e.g.
             // aa=hello%20world&bb=bye%20world
             case 'application/x-www-form-urlencoded':
-                request.swgg.bodyParsed = local.utility2.bufferToString(request.bodyRaw);
+                request.swgg.bodyParsed = local.bufferToString(request.bodyRaw);
                 request.swgg.bodyParsed =
-                    local.utility2.urlParse('?' + request.swgg.bodyParsed, true).query;
+                    local.urlParse('?' + request.swgg.bodyParsed, true).query;
                 break;
             /*
              * https://tools.ietf.org/html/rfc7578
@@ -1174,20 +1162,20 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 request.swgg.bodyParsed = {};
                 request.swgg.bodyMeta = {};
                 options = {};
-                options.crlf = local.utility2.bufferCreate([0x0d, 0x0a]);
+                options.crlf = local.bufferCreate([0x0d, 0x0a]);
                 // init boundary
                 ii = 0;
-                jj = local.utility2.bufferIndexOfSubBuffer(request.bodyRaw, options.crlf, ii);
+                jj = local.bufferIndexOfSubBuffer(request.bodyRaw, options.crlf, ii);
                 if (jj <= 0) {
                     break;
                 }
-                options.boundary = local.utility2.bufferConcat([
+                options.boundary = local.bufferConcat([
                     options.crlf,
                     request.bodyRaw.slice(ii, jj)
                 ]);
                 ii = jj + 2;
                 while (true) {
-                    jj = local.utility2.bufferIndexOfSubBuffer(
+                    jj = local.bufferIndexOfSubBuffer(
                         request.bodyRaw,
                         options.boundary,
                         ii
@@ -1195,7 +1183,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     if (jj < 0) {
                         break;
                     }
-                    options.header = local.utility2.bufferToString(
+                    options.header = local.bufferToString(
                         request.bodyRaw.slice(ii, ii + 1024)
                     ).split('\r\n').slice(0, 2).join('\r\n');
                     options.contentType = (/^content-type:(.*)/im).exec(options.header);
@@ -1206,7 +1194,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     options.name = (/^content-disposition:.*?\bname="([^"]+)/im)
                         .exec(options.header);
                     options.name = options.name && options.name[1];
-                    ii = local.utility2.bufferIndexOfSubBuffer(
+                    ii = local.bufferIndexOfSubBuffer(
                         request.bodyRaw,
                         [0x0d, 0x0a, 0x0d, 0x0a],
                         ii + 2
@@ -1222,11 +1210,11 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 }
                 break;
             default:
-                request.swgg.bodyParsed = local.utility2.bufferToString(request.bodyRaw || '');
+                request.swgg.bodyParsed = local.bufferToString(request.bodyRaw || '');
                 // try to JSON.parse the string
-                local.utility2.tryCatchOnError(function () {
+                local.tryCatchOnError(function () {
                     request.swgg.bodyParsed = JSON.parse(request.swgg.bodyParsed);
-                }, local.utility2.nop);
+                }, local.nop);
             }
             nextMiddleware();
         };
@@ -1238,7 +1226,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
          */
             var crud, onParallel, options, tmp, user;
             options = {};
-            local.utility2.onNext(options, function (error, data, meta) {
+            local.onNext(options, function (error, data, meta) {
                 switch (options.modeNext) {
                 case 1:
                     crud = request.swgg.crud;
@@ -1272,10 +1260,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     case 'crudErrorPatch':
                     case 'crudErrorPost':
                     case 'crudErrorPut':
-                        options.onNext(local.utility2.errorDefault);
+                        options.onNext(local.errorDefault);
                         break;
                     case 'crudGetManyByQuery':
-                        onParallel = local.utility2.onParallel(options.onNext);
+                        onParallel = local.onParallel(options.onNext);
                         onParallel.counter += 1;
                         crud.dbTable.crudGetManyByQuery({
                             limit: crud.queryLimit,
@@ -1330,7 +1318,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         Object.keys(request.swgg.bodyMeta).forEach(function (key) {
                             if (typeof request.swgg.bodyMeta[key].filename !== 'string') {
                                 request.swgg.paramDict[key] =
-                                    local.utility2.bufferToString(request.swgg.bodyParsed[key]);
+                                    local.bufferToString(request.swgg.bodyParsed[key]);
                             }
                         });
                         crud.body = Object.keys(request.swgg.bodyMeta)
@@ -1338,9 +1326,9 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                                 return typeof request.swgg.bodyMeta[key].filename === 'string';
                             })
                             .map(function (key) {
-                                tmp = local.utility2.jsonCopy(request.swgg.paramDict);
-                                local.utility2.objectSetOverride(tmp, {
-                                    fileBlob: local.utility2.bufferToString(
+                                tmp = local.jsonCopy(request.swgg.paramDict);
+                                local.objectSetOverride(tmp, {
+                                    fileBlob: local.bufferToString(
                                         request.swgg.bodyParsed[key],
                                         'base64'
                                     ),
@@ -1360,7 +1348,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     case 'userLogout':
                         // respond with 401 Unauthorized
                         if (!user.isAuthenticated) {
-                            local.utility2.serverRespondHeadSet(request, response, 401, {});
+                            local.serverRespondHeadSet(request, response, 401, {});
                             request.swgg.crud.endArgList = [request, response];
                             options.modeNext = Infinity;
                             options.onNext();
@@ -1407,13 +1395,13 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     switch (crud.operationId.split('.')[0]) {
                     case 'fileGetOneById':
                         if (!data) {
-                            local.utility2.serverRespondDefault(request, response, 404);
+                            local.serverRespondDefault(request, response, 404);
                             return;
                         }
-                        local.utility2.serverRespondHeadSet(request, response, null, {
+                        local.serverRespondHeadSet(request, response, null, {
                             'Content-Type': data.fileContentType
                         });
-                        response.end(local.utility2.bufferCreate(data.fileBlob, 'base64'));
+                        response.end(local.bufferCreate(data.fileBlob, 'base64'));
                         break;
                     case 'userLogout':
                         options.onNext();
@@ -1439,7 +1427,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
          * this function will run the middleware that will end the builtin crud-operations
          */
             // jslint-hack
-            local.utility2.nop(response);
+            local.nop(response);
             if (request.swgg.crud.endArgList) {
                 local.swgg.serverRespondJsonapi.apply(null, request.swgg.crud.endArgList);
                 return;
@@ -1459,40 +1447,6 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             local.swgg.serverRespondJsonapi(request, response, error);
         };
 
-        local.swgg.middlewareJsonpStateInit = function (request, response, nextMiddleware) {
-        /*
-         * this function will run the middleware that will
-         * serve the browser-state wrapped in the given request.jsonp-callback
-         */
-            var state;
-            if (request.configInit || request.stateInit || (request.urlParsed &&
-                    request.urlParsed.pathname === '/jsonp.swgg.stateInit')) {
-                state = { utility2: { assetsDict: {
-                    '/assets.swgg.lib.json-schema.schema.json':
-                        local.utility2.assetsDict['/assets.swgg.lib.json-schema.schema.json'],
-                    '/assets.swgg.lib.swagger.petstore.json':
-                        local.utility2.assetsDict['/assets.swgg.lib.swagger.petstore.json'],
-                    '/assets.swgg.lib.swagger.schema.json':
-                        local.utility2.assetsDict['/assets.swgg.lib.swagger.schema.json']
-                } } };
-                if (request.configInit) {
-                    return state;
-                }
-                local.utility2.objectSetDefault(
-                    state,
-                    local.utility2.middlewareJsonpStateInitDefault({ stateInit: true }),
-                    3
-                );
-                if (request.stateInit) {
-                    return state;
-                }
-                response.end(request.urlParsed.query.callback + '(' + JSON.stringify(state) +
-                    ');');
-                return;
-            }
-            nextMiddleware();
-        };
-
         local.swgg.middlewareRouter = function (request, response, nextMiddleware) {
         /*
          * this function will run the middleware that will
@@ -1500,11 +1454,13 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
          */
             var tmp;
             // jslint-hack
-            local.utility2.nop(response);
+            local.nop(response);
             // init swgg object
-            local.utility2.objectSetDefault(request, {
-                swgg: { crud: { operationId: '' }, user: {} }
-            }, 2);
+            local.objectSetDefault(
+                request,
+                { swgg: { crud: { operationId: '' }, user: {} } },
+                2
+            );
             // if request.url is not prefixed with swaggerJson.basePath,
             // then default to nextMiddleware
             if (request.urlParsed.pathname.indexOf(local.swgg.swaggerJson.basePath) !== 0) {
@@ -1523,7 +1479,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         .replace((/\/[^\/]+\/([^\/]*?)$/), '//$1')];
                 // if pathObject exists, then break
                 if (request.swgg.pathObject) {
-                    request.swgg.pathObject = local.utility2.jsonCopy(request.swgg.pathObject);
+                    request.swgg.pathObject = local.jsonCopy(request.swgg.pathObject);
                     request.swgg.pathname = request.swgg.pathObject._keyPath;
                     // init crud.operationId
                     request.swgg.crud.operationId = request.swgg.pathObject._operationId;
@@ -1542,7 +1498,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
          */
             var crud, options, user;
             options = {};
-            local.utility2.onNext(options, function (error, data) {
+            local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     crud = request.swgg.crud;
@@ -1557,7 +1513,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     switch (crud.operationId.split('.')[0]) {
                     // coverage-hack - test error handling-behavior
                     case 'crudErrorLogin':
-                        options.onNext(local.utility2.errorDefault);
+                        options.onNext(local.errorDefault);
                         return;
                     case 'userLoginByPassword':
                         user.password = request.urlParsed.query.password;
@@ -1586,7 +1542,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     switch (crud.operationId.split('.')[0]) {
                     case 'userLoginByPassword':
                         user.data = data;
-                        if (!local.utility2.sjclHashScryptValidate(
+                        if (!local.sjclHashScryptValidate(
                                 user.password,
                                 user.data && user.data.password
                             )) {
@@ -1694,11 +1650,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                             break;
                         }
                         // init default param
-                        if (local.utility2.isNullOrUndefined(
-                                request.swgg.paramDict[paramDef.name]
-                            ) && paramDef.default !== undefined) {
+                        if (local.isNullOrUndefined(request.swgg.paramDict[paramDef.name]) &&
+                                paramDef.default !== undefined) {
                             request.swgg.paramDict[paramDef.name] =
-                                local.utility2.jsonCopy(paramDef.default);
+                                local.jsonCopy(paramDef.default);
                         }
                     });
                     // normalize paramDict
@@ -1729,10 +1684,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     }
                     // init crud.body
                     if (!request.swgg.isMultipartFormData) {
-                        crud.body = local.utility2.jsonCopy(request.swgg.bodyParsed);
+                        crud.body = local.jsonCopy(request.swgg.bodyParsed);
                     }
                     // init crud.data
-                    crud.data = local.utility2.jsonCopy(request.swgg.paramDict);
+                    crud.data = local.jsonCopy(request.swgg.paramDict);
                     request.swgg.pathObject.parameters.forEach(function (param) {
                         // JSON.parse json-string
                         if (param.format === 'json' &&
@@ -1759,7 +1714,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         value: {}
                     }].forEach(function (element) {
                         crud[element.key] = crud.data['_' + element.key] || JSON.parse(
-                            local.utility2.templateRender(
+                            local.templateRender(
                                 request.swgg.pathObject['_' + element.key] || 'null',
                                 request.swgg.paramDict
                             )
@@ -1772,7 +1727,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     switch (crud.operationId.split('.')[0]) {
                     case 'crudSetOneById':
                     case 'crudUpdateOneById':
-                        if (!local.utility2.isNullOrUndefined(crud.data[crud.idField])) {
+                        if (!local.isNullOrUndefined(crud.data[crud.idField])) {
                             break;
                         }
                         crud.data[crud.idField] = (crud.body && crud.body[crud.idAlias]);
@@ -1798,16 +1753,16 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             pathObject.parameters.forEach(function (paramDef) {
                 tmp = data[paramDef.name];
                 // init default value
-                if (local.utility2.isNullOrUndefined(tmp) && paramDef.default !== undefined) {
-                    tmp = local.utility2.jsonCopy(paramDef.default);
+                if (local.isNullOrUndefined(tmp) && paramDef.default !== undefined) {
+                    tmp = local.jsonCopy(paramDef.default);
                 }
                 // JSON.parse paramDict
                 if (!(paramDef.type === 'file' || paramDef.type === 'string') &&
                         (typeof tmp === 'string' || tmp instanceof local.global.Uint8Array)) {
                     // try to JSON.parse the string
-                    local.utility2.tryCatchOnError(function () {
-                        tmp = JSON.parse(local.utility2.bufferToString(tmp));
-                    }, local.utility2.nop);
+                    local.tryCatchOnError(function () {
+                        tmp = JSON.parse(local.bufferToString(tmp));
+                    }, local.nop);
                 }
                 data[paramDef.name] = tmp;
             });
@@ -1844,13 +1799,13 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                                 element = { message: String(element) };
                             }
                             // normalize error-object to plain json-object
-                            error = local.utility2.jsonCopy(element);
+                            error = local.jsonCopy(element);
                             error.message = element.message;
                             error.stack = element.stack;
                             error.statusCode = Number(error.statusCode) || 500;
                             return error;
                         });
-                        error = local.utility2.jsonCopy(data[0]);
+                        error = local.jsonCopy(data[0]);
                         error.errors = data;
                         return error;
                     }
@@ -1861,7 +1816,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     if (!data) {
                         return;
                     }
-                    data.meta = local.utility2.jsonCopy(meta || {});
+                    data.meta = local.jsonCopy(meta || {});
                     data.meta.isJsonapiResponse = true;
                     if (ii === 0) {
                         data.meta.errorsLength = (data.errors && data.errors.length) | 0;
@@ -1887,39 +1842,35 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     local.swgg.swaggerJson,
                     local.swgg.swaggerSchemaJson
                 ].some(function (options) {
-                    local.utility2.tryCatchOnError(function () {
+                    local.tryCatchOnError(function () {
                         schema.$ref.replace(
                             (/#\/(.*?)\/(.*?)$/),
                             function (match0, match1, match2) {
                                 // jslint-hack - nop
-                                local.utility2.nop(match0);
+                                local.nop(match0);
                                 tmp = options[match1][match2];
                             }
                         );
-                    }, local.utility2.nop);
+                    }, local.nop);
                     return tmp;
                 });
                 // validate schema
-                local.utility2.assert(tmp, schema.$ref);
+                local.assert(tmp, schema.$ref);
                 // recurse
                 tmp = local.swgg.schemaNormalizeAndCopy(tmp);
                 schema = tmp;
             }
             // inherit allOf
             if (schema.allOf) {
-                tmp = local.utility2.jsonCopy(schema);
+                tmp = local.jsonCopy(schema);
                 delete tmp.allOf;
                 schema.allOf.reverse().forEach(function (element) {
-                    local.utility2.objectSetDefault(
-                        tmp,
-                        // recurse
-                        local.swgg.schemaNormalizeAndCopy(element),
-                        2
-                    );
+                    // recurse
+                    local.objectSetDefault(tmp, local.swgg.schemaNormalizeAndCopy(element), 2);
                 });
                 schema = tmp;
             }
-            return local.utility2.jsonCopy(schema);
+            return local.jsonCopy(schema);
         };
 
         local.swgg.serverRespondJsonapi = function (request, response, error, data, meta) {
@@ -1929,18 +1880,15 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
          * this function will respond in jsonapi format
          */
             local.swgg.onErrorJsonapi(function (error, data) {
-                local.utility2.serverRespondHeadSet(
-                    request,
-                    response,
-                    error && error.statusCode,
-                    { 'Content-Type': 'application/json; charset=UTF-8' }
-                );
+                local.serverRespondHeadSet(request, response, error && error.statusCode, {
+                    'Content-Type': 'application/json; charset=UTF-8'
+                });
                 if (error) {
                     // debug statusCode / method / url
-                    local.utility2.errorMessagePrepend(error, response.statusCode + ' ' +
+                    local.errorMessagePrepend(error, response.statusCode + ' ' +
                         request.method + ' ' + request.url + '\n');
                     // print error.stack to stderr
-                    local.utility2.onErrorDefault(error);
+                    local.onErrorDefault(error);
                 }
                 data = error || data;
                 data.meta.statusCode = response.statusCode =
@@ -1949,32 +1897,13 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             })(error, data, meta);
         };
 
-        local.swgg.stateInit = function (options) {
-        /*
-         * this function will init the state-options
-         */
-            local.utility2.objectSetOverride(local, options, 10);
-            // init swaggerSchemaJson
-            local.swgg.swaggerSchemaJson = local.utility2.objectSetOverride(
-                JSON.parse(
-                    local.utility2.assetsDict['/assets.swgg.lib.json-schema.schema.json']
-                ),
-                JSON.parse(
-                    local.utility2.assetsDict['/assets.swgg.lib.swagger.schema.json']
-                ),
-                2
-            );
-            // init api
-            local.swgg.apiDictUpdate(local.swgg.swaggerJson);
-        };
-
         local.swgg.urlBaseGet = function () {
         /*
          * this function will return the base swagger url
          */
             return (local.swgg.swaggerJson.schemes ||
-                local.utility2.urlParse('').protocol.slice(0, -1)) + '://' +
-                (local.swgg.swaggerJson.host || local.utility2.urlParse('').host) +
+                local.urlParse('').protocol.slice(0, -1)) + '://' +
+                (local.swgg.swaggerJson.host || local.urlParse('').host) +
                 local.swgg.swaggerJson.basePath;
         };
 
@@ -2000,10 +1929,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
          * this function will validate options.data against options.paramDefList
          */
             var data, key;
-            local.utility2.tryCatchOnError(function () {
+            local.tryCatchOnError(function () {
                 data = options.data;
                 // validate data
-                local.utility2.assert(data && typeof data === 'object', data);
+                local.assert(data && typeof data === 'object', data);
                 (options.paramDefList || []).forEach(function (paramDef) {
                     key = paramDef.name;
                     // recurse - validateByPropDef
@@ -2019,8 +1948,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 });
             }, function (error) {
                 error.statusCode = error.statusCode || 400;
-                local.utility2.errorMessagePrepend(error, options.key + '.' + key +
-                    ' -> ');
+                local.errorMessagePrepend(error, options.key + '.' + key + ' -> ');
                 throw error;
             });
         };
@@ -2030,12 +1958,12 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
          * this function will validate options.data against options.schema
          */
             var data, prefix, propDef, tmp;
-            local.utility2.tryCatchOnError(function () {
+            local.tryCatchOnError(function () {
                 data = options.data;
                 prefix = 'property ' + options.key;
                 propDef = options.schema;
                 // validate undefined data
-                if (local.utility2.isNullOrUndefined(data)) {
+                if (local.isNullOrUndefined(data)) {
                     if (options.required && !options['x-swgg-notRequired']) {
                         tmp = new Error(prefix + ' cannot be null or undefined');
                         tmp.options = options;
@@ -2060,7 +1988,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 // handle anyOf
                 if (propDef.anyOf) {
                     tmp = propDef.anyOf.some(function (element) {
-                        local.utility2.tryCatchOnError(function () {
+                        local.tryCatchOnError(function () {
                             // recurse - validateBySchema
                             local.swgg.validateBySchema({
                                 circularList: options.circularList,
@@ -2069,10 +1997,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                                 schema: local.swgg.schemaNormalizeAndCopy(element),
                                 'x-swgg-notRequired': options['x-swgg-notRequired']
                             });
-                        }, local.utility2.nop);
+                        }, local.nop);
                         return !local.utility2._debugTryCatchErrorCaught;
                     });
-                    local.utility2.assert(tmp, local.utility2._debugTryCatchErrorCaught);
+                    local.assert(tmp, local.utility2._debugTryCatchErrorCaught);
                     return;
                 }
                 // normalize propDef
@@ -2093,13 +2021,13 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 // 5.1.  Validation keywords for numeric instances (number and integer)
                 if (typeof data === 'number') {
                     if (typeof propDef.multipleOf === 'number') {
-                        local.utility2.assert(
+                        local.assert(
                             data % propDef.multipleOf === 0,
                             prefix + ' must be a multiple of ' + propDef.multipleOf
                         );
                     }
                     if (typeof propDef.maximum === 'number') {
-                        local.utility2.assert(
+                        local.assert(
                             propDef.exclusiveMaximum
                                 ? data < propDef.maximum
                                 : data <= propDef.maximum,
@@ -2109,7 +2037,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         );
                     }
                     if (typeof propDef.minimum === 'number') {
-                        local.utility2.assert(
+                        local.assert(
                             propDef.exclusiveMinimum
                                 ? data > propDef.minimum
                                 : data >= propDef.minimum,
@@ -2122,19 +2050,19 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 // 5.2.  Validation keywords for strings
                 } else if (typeof data === 'string') {
                     if (propDef.maxLength) {
-                        local.utility2.assert(
+                        local.assert(
                             data.length <= propDef.maxLength,
                             prefix + ' must have <= ' + propDef.maxLength + ' characters'
                         );
                     }
                     if (propDef.minLength) {
-                        local.utility2.assert(
+                        local.assert(
                             data.length >= propDef.minLength,
                             prefix + ' must have >= ' + propDef.minLength + ' characters'
                         );
                     }
                     if (propDef.pattern) {
-                        local.utility2.assert(
+                        local.assert(
                             new RegExp(propDef.pattern).test(data),
                             prefix + ' must match regex pattern /' + propDef.pattern + '/'
                         );
@@ -2143,13 +2071,13 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 // 5.3.  Validation keywords for arrays
                 } else if (Array.isArray(data)) {
                     if (propDef.maxItems) {
-                        local.utility2.assert(
+                        local.assert(
                             data.length <= propDef.maxItems,
                             prefix + ' must have <= ' + propDef.maxItems + ' items'
                         );
                     }
                     if (propDef.minItems) {
-                        local.utility2.assert(
+                        local.assert(
                             data.length >= propDef.minItems,
                             prefix + ' must have >= ' + propDef.minItems + ' items'
                         );
@@ -2158,7 +2086,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                         tmp = {};
                         data.forEach(function (element) {
                             element = JSON.stringify(element);
-                            local.utility2.assert(
+                            local.assert(
                                 !tmp[element],
                                 prefix + ' must have only unique items'
                             );
@@ -2169,13 +2097,13 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 // 5.4.  Validation keywords for objects
                 } else if (typeof data === 'object') {
                     if (propDef.maxProperties) {
-                        local.utility2.assert(
+                        local.assert(
                             Object.keys(data).length <= propDef.maxProperties,
                             prefix + ' must have <= ' + propDef.maxProperties + ' items'
                         );
                     }
                     if (propDef.minProperties) {
-                        local.utility2.assert(
+                        local.assert(
                             Object.keys(data).length >= propDef.minProperties,
                             prefix + ' must have >= ' + propDef.minProperties + ' items'
                         );
@@ -2187,7 +2115,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     (Array.isArray(data)
                         ? data
                         : [data]).forEach(function (element) {
-                        local.utility2.assert(
+                        local.assert(
                             propDef.enum.indexOf(element) >= 0,
                             prefix + ' must only have items in the list ' +
                                 JSON.stringify(propDef.enum)
@@ -2199,7 +2127,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 // validate schema.type
                 switch (propDef.type) {
                 case 'array':
-                    local.utility2.assert(Array.isArray(data) && propDef.items);
+                    local.assert(Array.isArray(data) && propDef.items);
                     data.forEach(function (element, ii) {
                         // recurse - validateByPropDef
                         local.swgg.validateByPropDef({
@@ -2213,12 +2141,13 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     });
                     break;
                 case 'boolean':
-                    local.utility2.assert(typeof data === 'boolean');
+                    local.assert(typeof data === 'boolean');
                     break;
                 case 'file':
                     break;
                 case 'integer':
-                    local.utility2.assert(typeof data === 'number' && isFinite(data) &&
+                    local.assert(typeof data === 'number' &&
+                        isFinite(data) &&
                         Math.floor(data) === data);
                     switch (propDef.format) {
                     case 'int32':
@@ -2227,7 +2156,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     }
                     break;
                 case 'number':
-                    local.utility2.assert(typeof data === 'number' && isFinite(data));
+                    local.assert(typeof data === 'number' && isFinite(data));
                     switch (propDef.format) {
                     case 'double':
                     case 'float':
@@ -2235,23 +2164,22 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     }
                     break;
                 case 'object':
-                    local.utility2.assert(typeof data === 'object');
+                    local.assert(typeof data === 'object');
                     break;
                 case 'string':
-                    local.utility2.assert(typeof data === 'string' ||
-                        propDef.format === 'binary');
+                    local.assert(typeof data === 'string' || propDef.format === 'binary');
                     switch (propDef.format) {
                     // https://github.com/swagger-api/swagger-spec/issues/50
                     // Clarify 'byte' format #50
                     case 'byte':
-                        local.utility2.assert(!(/[^\n\r\+\/0-9\=A-Za-z]/).test(data));
+                        local.assert(!(/[^\n\r\+\/0-9\=A-Za-z]/).test(data));
                         break;
                     case 'date':
                     case 'date-time':
-                        local.utility2.assert(isFinite(new Date(data).getTime()));
+                        local.assert(isFinite(new Date(data).getTime()));
                         break;
                     case 'email':
-                        local.utility2.assert(local.utility2.regexpEmailValidate.test(data));
+                        local.assert(local.regexpEmailValidate.test(data));
                         break;
                     case 'json':
                         JSON.parse(data);
@@ -2259,7 +2187,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     }
                     break;
                 default:
-                    local.utility2.assert(
+                    local.assert(
                         propDef.type === undefined,
                         prefix + ' has invalid type ' + propDef.type
                     );
@@ -2281,19 +2209,19 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             var data, key, prefix, propDefDict, schema, tmp, validateByPropDef;
             // recurse - validateByPropDef
             local.swgg.validateByPropDef(options);
-            local.utility2.tryCatchOnError(function () {
+            local.tryCatchOnError(function () {
                 data = options.data;
                 prefix = 'schema ' + options.key;
                 schema = options.schema;
                 // validate schema
-                local.utility2.assert(
+                local.assert(
                     schema && typeof schema === 'object',
                     prefix + ' must be an object (not ' + typeof schema + ')'
                 );
                 // init propDefDict
                 propDefDict = schema.properties || {};
                 // validate data
-                local.utility2.assert(
+                local.assert(
                     (data && typeof data === 'object') || !Object.keys(propDefDict).length,
                     'data for ' + prefix + ' must be an object (not ' + typeof data + ')'
                 );
@@ -2338,7 +2266,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     // https://tools.ietf.org/html/draft-fge-json-schema-validation-00
                     // #section-5.4.4
                     // validate additionalProperties
-                    local.utility2.assert(
+                    local.assert(
                         schema.additionalProperties !== false,
                         prefix + ' must not have additionalProperties - ' + key
                     );
@@ -2347,7 +2275,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     }
                 });
             }, function (error) {
-                local.utility2.errorMessagePrepend(error, options.key + '.' + key + ' -> ');
+                local.errorMessagePrepend(error, options.key + '.' + key + ' -> ');
                 throw error;
             });
         };
@@ -2395,6 +2323,63 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 });
             });
         };
+
+        local.utility2._middlewareJsonpStateInit = function (
+            request,
+            response,
+            nextMiddleware
+        ) {
+        /*
+         * this function will run the middleware that will
+         * serve the browser-state wrapped in the given jsonp-callback
+         */
+            var state;
+            if (request._configInit || request._stateInit || (request.urlParsed &&
+                    request.urlParsed.pathname === '/jsonp.utility2._stateInit')) {
+                state = { utility2: { assetsDict: {
+                    '/assets.swgg.lib.json-schema.schema.json':
+                        local.assetsDict['/assets.swgg.lib.json-schema.schema.json'],
+                    '/assets.swgg.lib.swagger.petstore.json':
+                        local.assetsDict['/assets.swgg.lib.swagger.petstore.json'],
+                    '/assets.swgg.lib.swagger.schema.json':
+                        local.assetsDict['/assets.swgg.lib.swagger.schema.json']
+                } } };
+                if (request._configInit) {
+                    return state;
+                }
+                local.objectSetDefault(state, { utility2: { env: {
+                    NODE_ENV: local.env.NODE_ENV,
+                    npm_config_mode_backend: local.env.npm_config_mode_backend,
+                    npm_package_description: local.env.npm_package_description,
+                    npm_package_homepage: local.env.npm_package_homepage,
+                    npm_package_name: local.env.npm_package_name,
+                    npm_package_nameAlias: local.env.npm_package_nameAlias,
+                    npm_package_version: local.env.npm_package_version
+                } } }, 3);
+                if (request._stateInit) {
+                    return state;
+                }
+                response.end(request.urlParsed.query.callback + '(' + JSON.stringify(state) +
+                    ');');
+                return;
+            }
+            nextMiddleware();
+        };
+
+        local.utility2._stateInit = function (options) {
+        /*
+         * this function will init the state-options
+         */
+            local.objectSetOverride(local, options, 10);
+            // init swaggerSchemaJson
+            local.swgg.swaggerSchemaJson = local.objectSetOverride(
+                JSON.parse(local.assetsDict['/assets.swgg.lib.json-schema.schema.json']),
+                JSON.parse(local.assetsDict['/assets.swgg.lib.swagger.schema.json']),
+                2
+            );
+            // init api
+            local.swgg.apiDictUpdate(local.swgg.swaggerJson);
+        };
     }());
     switch (local.modeJs) {
 
@@ -2435,15 +2420,14 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         ].forEach(function (key) {
             switch (key) {
             case 'lib.swgg.css':
-                local.utility2.assetsDict['/assets.swgg.css'] =
-                    local.utility2.tryCatchReadFile(__dirname + '/' + key, 'utf8');
+                local.assetsDict['/assets.swgg.css'] =
+                    local.tryCatchReadFile(__dirname + '/' + key, 'utf8');
                 break;
             case 'lib.swgg.js':
-                local.utility2.assetsWrite(
+                local.assetsWrite(
                     '/assets.swgg.js',
-                    local.utility2.istanbulInstrumentInPackage(
-                        local.utility2.tryCatchReadFile(__dirname + '/' + key, 'utf8')
-                            .replace((/^#!/), '//'),
+                    local.istanbulInstrumentInPackage(
+                        local.tryCatchReadFile(__dirname + '/' + key, 'utf8'),
                         __dirname + '/' + key
                     )
                 );
@@ -2451,47 +2435,48 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
             case 'lib.json-schema.schema.json':
             case 'lib.swagger.petstore.json':
             case 'lib.swagger.schema.json':
-                local.utility2.assetsDict['/assets.swgg.' + key] =
+                local.assetsDict['/assets.swgg.' + key] =
                     local.fs.readFileSync(__dirname + '/' + key, 'utf8');
                 break;
             case 'lib.swagger-ui.js':
-                local.utility2.assetsDict['/assets.swgg.' + key] =
-                    local.utility2.istanbulInstrumentInPackage(
-                        local.fs.readFileSync(__dirname + '/' + key, 'utf8')
-                            .replace((/^#!/), '//'),
+                local.assetsWrite(
+                    '/assets.swgg.' + key,
+                    local.istanbulInstrumentInPackage(
+                        local.fs.readFileSync(__dirname + '/' + key, 'utf8'),
                         __dirname + '/' + key
-                    );
+                    )
+                );
                 break;
             }
         });
-        local.utility2.assetsWrite('/assets.swgg.rollup.js', [
+        local.assetsWrite('/assets.swgg.rollup.js', [
             '/assets.utility2.rollup.js',
             '/assets.utility2.rollup.begin.js',
             '/assets.swgg.css',
             '/assets.swgg.js',
             '/assets.swgg.lib.swagger-ui.js',
-            'local.swgg.stateInit',
+            'local._stateInit',
             '/assets.utility2.rollup.end.js'
         ].map(function (key) {
             switch (local.path.extname(key)) {
             case '.js':
-                return '// ' + key + '\n' + local.utility2.assetsDict[key];
-            case '.stateInit':
+                return '// ' + key + '\n' + local.assetsDict[key];
+            case '._stateInit':
                 return '// ' + key + '\n' +
-                    local.utility2.assetsDict['/assets.utility2.rollup.content.js']
+                    local.assetsDict['/assets.utility2.rollup.content.js']
                     .replace(
                         '/* utility2.rollup.js content */',
                         key + '(' + JSON.stringify(
-                            local.swgg.middlewareJsonpStateInit({ configInit: true })
+                            local.utility2._middlewareJsonpStateInit({ _configInit: true })
                         ) + ');'
                     );
             default:
                 return '// ' + key + '\n' +
-                    local.utility2.assetsDict['/assets.utility2.rollup.content.js']
+                    local.assetsDict['/assets.utility2.rollup.content.js']
                     .replace(
                         '/* utility2.rollup.js content */',
-                        'local.utility2.assetsDict[' + JSON.stringify(key) + '] = ' +
-                            JSON.stringify(local.utility2.assetsDict[key])
+                        'local.assetsDict[' + JSON.stringify(key) + '] = ' +
+                            JSON.stringify(local.assetsDict[key])
                     );
             }
         }).join('\n\n\n\n'));
@@ -2504,6 +2489,6 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
     // run shared js-env code - post-init
     (function () {
         // init state
-        local.swgg.stateInit({});
+        local.utility2._stateInit({});
     }());
 }());

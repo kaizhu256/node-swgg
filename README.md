@@ -43,12 +43,11 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since e0c4ffc6
-- npm publish 2016.11.1
-- make this package dependency-less
-- rename files index.* -> lib.swgg.*
-- rename field _timeModified -> _timeUpdated
-- fix cdn-links
+#### change since ba59afdc
+- npm publish 2016.11.2
+- merge swgg.middlewareJsonpStateInit into utility2._middlewareJsonpStateInit
+- db - fix persistence-cancel handling-behavior
+- utility2 - add env npm_package_nameAlias
 - none
 
 #### this package requires
@@ -101,9 +100,10 @@ this script will run a standalone swagger-ui server backed by db-lite
 instruction
     1. save this script as example.js
     2. run the shell command:
-        $ npm install swagger-lite && export PORT=8081 && node example.js
-    3. open a browser to http://localhost:8081
-    4. interact with the swagger-ui server
+        $ npm install swagger-lite && \
+            export PORT=8081 && \
+            node example.js
+    3. play with the browser-demo on http://localhost:8081
 */
 /* istanbul instrument in package swagger-lite */
 /*jslint
@@ -160,14 +160,14 @@ instruction
          */
             var crud, options, result;
             options = {};
-            local.utility2.onNext(options, function (error, data) {
+            local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     crud = request.swgg.crud;
                     switch (crud.operationId.split('.')[0]) {
                     // coverage-hack - test error handling-behavior
                     case 'crudErrorPre':
-                        options.onNext(local.utility2.errorDefault);
+                        options.onNext(local.errorDefault);
                         return;
                     case 'getInventory':
                         crud.dbTable.crudGetManyByQuery({
@@ -217,21 +217,20 @@ instruction
             response.setHeader('Content-Type', 'application/json; charset=UTF-8');
             // ignore .map files
             if (request.urlParsed.pathname.slice(-4) === '.map') {
-                local.utility2.serverRespondDefault(request, response, 404);
+                local.serverRespondDefault(request, response, 404);
                 return;
             }
             nextMiddleware();
         };
         // init middleware
-        local.middleware = local.utility2.middlewareGroupCreate([
-            local.utility2.middlewareInit,
-            local.utility2.middlewareAssetsCached,
+        local.middleware = local.middlewareGroupCreate([
+            local.middlewareInit,
+            local.middlewareAssetsCached,
             local.swgg.middlewareRouter,
             local.swgg.middlewareUserLogin,
             local.middlewareInitCustom,
-            local.utility2.middlewareJsonpStateInitDefault,
-            local.swgg.middlewareJsonpStateInit,
-            local.utility2.middlewareBodyRead,
+            local.utility2._middlewareJsonpStateInit,
+            local.middlewareBodyRead,
             local.swgg.middlewareBodyParse,
             local.swgg.middlewareValidate,
             local.middlewareCrudCustom,
@@ -241,7 +240,7 @@ instruction
         // init error-middleware
         local.middlewareError = local.swgg.middlewareError;
         // run test-server
-        local.utility2.testRunServer(local);
+        local.testRunServer(local);
     }());
     switch (local.modeJs) {
 
@@ -265,7 +264,7 @@ instruction
                 document.querySelector('#dbImportInput1').click();
                 break;
             case 'dbImportInput1':
-                local.utility2.ajaxProgressShow();
+                local.ajaxProgressShow();
                 reader = new window.FileReader();
                 tmp = document.querySelector('#dbImportInput1').files[0];
                 if (!tmp) {
@@ -273,7 +272,7 @@ instruction
                 }
                 reader.addEventListener('load', function () {
                     local.db.dbImport(reader.result);
-                    local.utility2.ajaxProgressUpdate();
+                    local.ajaxProgressUpdate();
                 });
                 reader.readAsText(tmp);
                 break;
@@ -286,7 +285,7 @@ instruction
                     document.querySelector('#testReportDiv1').style.display = 'block';
                     document.querySelector('#testRunButton1').innerText = 'hide internal test';
                     local.modeTest = true;
-                    local.utility2.testRunDefault(local);
+                    local.testRunDefault(local);
                 // hide tests
                 } else {
                     document.querySelector('#testReportDiv1').style.display = 'none';
@@ -304,7 +303,7 @@ instruction
         // init ui
         local.swgg.uiEventListenerDict['.onEventUiReload']();
         // run tests
-        [local.utility2.modeTest].filter(local.utility2.echo).forEach(function () {
+        local.runIfTrue(local.modeTest, function () {
             document.querySelector('#testRunButton1').innerText = 'hide internal test';
         });
         break;
@@ -316,12 +315,12 @@ instruction
         // export local
         module.exports = local;
         // init assets
-        local.utility2.tryCatchOnError(function () {
-            local.utility2.assetsWrite(
+        local.tryCatchOnError(function () {
+            local.assetsWrite(
                 '/assets.example.js',
                 local.fs.readFileSync(__filename, 'utf8')
             );
-        }, local.utility2.nop);
+        }, local.nop);
         /* jslint-ignore-begin */
         // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/dist/index.html
         local.templateIndexHtml = '\
@@ -362,9 +361,11 @@ body > button {\n\
 </style>\n\
 </head>\n\
 <body>\n\
+<!-- utility2-comment\n\
+    <div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 0.5s, width 1.5s; width: 25%;"></div>\n\
+utility2-comment -->\n\
     <h1>\n\
 <!-- utility2-comment\n\
-        <div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 0.5s, width 1.5s; width: 25%;"></div>\n\
         <a\n\
             {{#if env.npm_package_homepage}}\n\
             href="{{env.npm_package_homepage}}"\n\
@@ -383,10 +384,10 @@ utility2-comment -->\n\
     <button class="onclick" id="testRunButton1">run internal test</button><br>\n\
 utility2-comment -->\n\
     <div id="testReportDiv1" style="display: none;"></div>\n\
-    <button class="onclick" id="dbResetButton1">reset db-database</button><br>\n\
-    <button class="onclick" id="dbExportButton1">save db-database to file</button><br>\n\
+    <button class="onclick" id="dbResetButton1">reset database</button><br>\n\
+    <button class="onclick" id="dbExportButton1">export database -&gt; file</button><br>\n\
     <a download="db.persistence.json" href="" id="dbExportA1"></a>\n\
-    <button class="onclick" id="dbImportButton1">load db-database from file</button><br>\n\
+    <button class="onclick" id="dbImportButton1">import database &lt;- file</button><br>\n\
     <input class="onchange zeroPixel" type="file" id="dbImportInput1">\n\
 \n\
     <div class="swggUiContainer">\n\
@@ -396,7 +397,7 @@ utility2-comment -->\n\
             class="flex1 td2"\n\
             placeholder="http://petstore.swagger.io/v2/swagger.json"\n\
             type="text"\n\
-            value="api/v0/swagger.json"\n\
+            value="{{env.npm_config_swagger_basePath}}/swagger.json"\n\
         >\n\
     </form>\n\
     <div class="reset"></div>\n\
@@ -407,7 +408,7 @@ utility2-comment -->\n\
     <script src="assets.utility2.rollup.js"></script>\n\
     <script src="assets.swgg.js"></script>\n\
     <script src="assets.swgg.lib.swagger-ui.js"></script>\n\
-    <script src="jsonp.swgg.stateInit?callback=window.swgg.stateInit"></script>\n\
+    <script src="jsonp.utility2._stateInit?callback=window.utility2._stateInit"></script>\n\
     <script>window.utility2.onResetBefore.counter += 1;</script>\n\
     <script src="assets.example.js"></script>\n\
     <script src="assets.test.js"></script>\n\
@@ -417,8 +418,8 @@ utility2-comment -->\n\
 </html>\n\
 ';
         /* jslint-ignore-end */
-        local.utility2.assetsDict['/'] =
-            local.utility2.templateRender(local.templateIndexHtml, { env: local.utility2.env });
+        local.assetsDict['/'] =
+            local.templateRender(local.templateIndexHtml, { env: local.env });
         break;
     }
 
@@ -428,7 +429,7 @@ utility2-comment -->\n\
     (function () {
         // init petstore-api - frontend
         local.tmp =
-            JSON.parse(local.utility2.assetsDict['/assets.swgg.lib.swagger.petstore.json']);
+            JSON.parse(local.assetsDict['/assets.swgg.lib.swagger.petstore.json']);
         delete local.tmp.basePath;
         delete local.tmp.host;
         delete local.tmp.schemes;
@@ -677,11 +678,11 @@ utility2-comment -->\n\
                 override: function (options) {
                     return {
                         id: options.ii + 100,
-                        name: local.utility2.listGetElementRandom(
+                        name: local.listGetElementRandom(
                             ['birdie', 'doggie', 'fishie']
                         ) + '-' + (options.ii + 100),
                         tags: [
-                            { name: local.utility2.listGetElementRandom(['female', 'male']) },
+                            { name: local.listGetElementRandom(['female', 'male']) },
                             { name: Math.random().toString(36).slice(2) }
                         ]
                     };
@@ -730,7 +731,7 @@ utility2-comment -->\n\
                     firstName: 'admin',
                     id: 0,
                     lastName: '',
-                    password: local.utility2.sjclHashScryptCreate('secret'),
+                    password: local.sjclHashScryptCreate('secret'),
                     phone: '1234-5678',
                     username: 'admin'
                 }, {
@@ -738,7 +739,7 @@ utility2-comment -->\n\
                     firstName: 'jane',
                     id: 1,
                     lastName: 'doe',
-                    password: local.utility2.sjclHashScryptCreate('secret'),
+                    password: local.sjclHashScryptCreate('secret'),
                     phone: '1234-5678',
                     username: 'jane.doe'
                 }, {
@@ -746,7 +747,7 @@ utility2-comment -->\n\
                     firstName: 'john',
                     id: 2,
                     lastName: 'doe',
-                    password: local.utility2.sjclHashScryptCreate('secret'),
+                    password: local.sjclHashScryptCreate('secret'),
                     phone: '1234-5678',
                     username: 'john.doe'
                 }],
@@ -754,15 +755,15 @@ utility2-comment -->\n\
                 length: 100,
                 override: function (options) {
                     return {
-                        firstName: local.utility2.listGetElementRandom(
+                        firstName: local.listGetElementRandom(
                             ['alice', 'bob', 'jane', 'john']
                         ) + '-' + (options.ii + 100),
                         id: options.ii + 100,
-                        lastName: local.utility2.listGetElementRandom(['doe', 'smith']) +
+                        lastName: local.listGetElementRandom(['doe', 'smith']) +
                             '-' + (options.ii + 100),
-                        password: local.utility2.sjclHashScryptCreate('secret'),
+                        password: local.sjclHashScryptCreate('secret'),
                         tags: [
-                            { name: local.utility2.listGetElementRandom(['female', 'male']) },
+                            { name: local.listGetElementRandom(['female', 'male']) },
                             { name: Math.random().toString(36).slice(2) }
                         ]
                     };
@@ -779,18 +780,17 @@ utility2-comment -->\n\
             }],
             name: 'User'
         }];
-        local.dbReset = function () {
-            local.utility2.onResetBefore.counter += 1;
-            local.db.dbDrop(local.utility2.onResetBefore);
-            local.utility2.onResetAfter(function () {
+        local.dbReset = local.utility2._testRunBefore = function () {
+            local.onResetBefore.counter += 1;
+            local.db.dbDrop(local.onResetBefore);
+            local.onResetAfter(function () {
                 console.log('db seeding ...');
-                local.utility2.onReadyBefore.counter += 1;
-                local.db.dbTableCreateMany(local.dbSeedList, local.utility2.onReadyBefore);
-                local.utility2.onReadyBefore.counter += 1;
-                local.db.dbTableCreateMany(local.dbSeedTestList, local.utility2.onReadyBefore);
+                local.onReadyBefore.counter += 1;
+                local.db.dbTableCreateMany(local.dbSeedList, local.onReadyBefore);
+                local.onReadyBefore.counter += 1;
+                local.db.dbTableCreateMany(local.dbSeedTestList, local.onReadyBefore);
             });
         };
-        local.utility2.testRunBefore = local.dbReset;
     }());
 }());
 ```
@@ -828,6 +828,7 @@ utility2-comment -->\n\
     "license": "MIT",
     "main": "lib.swgg",
     "name": "swagger-lite",
+    "nameAlias": "swgg",
     "os": ["darwin", "linux"],
     "repository": {
         "type": "git",
@@ -841,7 +842,7 @@ export npm_config_mode_auto_restart=1 && \
 ./lib.utility2.sh shRun shIstanbulCover test.js",
         "test": "export PORT=$(./lib.utility2.sh shServerPortRandom) && ./lib.utility2.sh test test.js"
     },
-    "version": "2016.11.1"
+    "version": "2016.11.2"
 }
 ```
 

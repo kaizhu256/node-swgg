@@ -11,7 +11,7 @@
 */
 (function () {
     'use strict';
-    var assert, assertJsonEqual, local;
+    var local;
 
 
 
@@ -43,12 +43,12 @@
         // re-init local from window.local
         case 'browser':
             local = local.global.utility2_rollup || local.global.local;
+            local.global.utility2.objectSetDefault(local, local.global.utility2);
             break;
         // re-init local from example.js
         case 'node':
             local = (local.global.utility2_rollup || require('./lib.utility2.js'))
                 .requireExampleJsFromReadme();
-            local.swgg = local[local.utility2.env.npm_package_name];
             break;
         }
     }());
@@ -57,18 +57,14 @@
 
     // run shared js-env code - function
     (function () {
-        assert = local.utility2.assert;
-
-        assertJsonEqual = local.utility2.assertJsonEqual;
-
         local.crudOptionsSetDefault = function (options, defaults) {
         /*
          * this function will set default-values for options
          */
-            options = local.utility2.objectSetDefault(options, defaults);
+            options = local.objectSetDefault(options, defaults);
             switch (options._tags0) {
             case 'pet':
-                local.utility2.objectSetDefault(options, {
+                local.objectSetDefault(options, {
                     crudGetOneById: local.swgg.apiDict['pet getPetById'],
                     crudRemoveOneById: local.swgg.apiDict['pet deletePet'],
                     crudSetOneById: local.swgg.apiDict['pet addPet'],
@@ -77,7 +73,7 @@
                 });
                 break;
             case 'store':
-                local.utility2.objectSetDefault(options, {
+                local.objectSetDefault(options, {
                     crudGetOneById: local.swgg.apiDict['store getOrderById'],
                     crudRemoveOneById: local.swgg.apiDict['store deleteOrder'],
                     crudSetOneById: local.swgg.apiDict['store placeOrder'],
@@ -88,7 +84,7 @@
                 });
                 break;
             case 'user':
-                local.utility2.objectSetDefault(options, {
+                local.objectSetDefault(options, {
                     crudGetOneById: local.swgg.apiDict['user getUserByName'],
                     crudRemoveOneById: local.swgg.apiDict['user deleteUser'],
                     crudSetOneById: local.swgg.apiDict['user createUser'],
@@ -100,17 +96,15 @@
                 Object.keys(local.swgg.apiDict).forEach(function (key) {
                     key.replace((/^x-test (\w+)/), function (match0, match1) {
                         // jslint-hack - nop
-                        local.utility2.nop(match0);
+                        local.nop(match0);
                         options[match1] = options[match1] || local.swgg.apiDict[key];
                     });
                 });
-                local.utility2.objectSetDefault(options, {
-                    operationId: 'undefined.id.id'
-                });
+                local.objectSetDefault(options, { operationId: 'undefined.id.id' });
             }
             local.swgg.idFieldInit(options);
             // shallow-copy options
-            return local.utility2.objectSetDefault({}, options);
+            return local.objectSetDefault({}, options);
         };
 
         local.testCase_ajax_error = function (options, onError) {
@@ -118,7 +112,7 @@
          * this function will test ajax's error handling-behavior
          */
             var onParallel;
-            onParallel = local.utility2.onParallel(onError);
+            onParallel = local.onParallel(onError);
             onParallel.counter += 1;
             options = [{
                 method: 'POST',
@@ -140,15 +134,15 @@
             }];
             options.forEach(function (options) {
                 onParallel.counter += 1;
-                local.utility2.ajax(options, function (error, xhr) {
+                local.ajax(options, function (error, xhr) {
                     // validate error occurred
-                    assert(error, error);
+                    local.assert(error, error);
                     // validate statusCode
-                    assertJsonEqual(error.statusCode, options.statusCode);
+                    local.assertJsonEqual(error.statusCode, options.statusCode);
                     // validate error is in jsonapi-format
                     if (options.url !== '/api/v0/x-test/undefined.map') {
                         error = JSON.parse(xhr.responseText);
-                        assert(error.errors[0], error);
+                        local.assert(error.errors[0], error);
                     }
                     onParallel();
                 });
@@ -163,7 +157,7 @@
             options = local.crudOptionsSetDefault(options, {
                 idValue: 'testCase_crudCountManyByQuery_default'
             });
-            local.utility2.onNext(options, function (error, data) {
+            local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     // ajax - crudCountManyByQuery
@@ -173,8 +167,8 @@
                     break;
                 case 2:
                     // validate data
-                    assertJsonEqual(data.responseJson.data.length, 1);
-                    assert(data.responseJson.data[0] === 1, data.responseJson);
+                    local.assertJsonEqual(data.responseJson.data.length, 1);
+                    local.assert(data.responseJson.data[0] === 1, data.responseJson);
                     options.onNext();
                     break;
                 default:
@@ -190,7 +184,7 @@
          * this function will test crudCreateReplaceUpdateRemoveMany's default handling-behavior
          */
             var onParallel;
-            onParallel = local.utility2.onParallel(onError);
+            onParallel = local.onParallel(onError);
             onParallel.counter += 1;
             [{
                 _tags0: 'x-test',
@@ -229,7 +223,7 @@
             options = local.crudOptionsSetDefault(options, {
                 data: {}
             });
-            local.utility2.onNext(options, function (error, data) {
+            local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     // test crudSetOneById's create handling-behavior
@@ -266,7 +260,7 @@
          * this function will test crudErrorXxx's default handling-behavior
          */
             var onParallel;
-            onParallel = local.utility2.onParallel(onError);
+            onParallel = local.onParallel(onError);
             onParallel.counter += 1;
             [
                 'x-test crudErrorDelete',
@@ -283,9 +277,9 @@
                 options = {};
                 local.swgg.apiDict[key]._ajax(options, function (error, data) {
                     // validate error occurred
-                    assert(error, error);
+                    local.assert(error, error);
                     // validate statusCode
-                    assertJsonEqual(data.statusCode, 500);
+                    local.assertJsonEqual(data.statusCode, 500);
                     onParallel();
                 });
             });
@@ -299,7 +293,7 @@
             options = local.crudOptionsSetDefault(options, {
                 idValue: 'testCase_crudGetManyByQuery_default'
             });
-            local.utility2.onNext(options, function (error, data) {
+            local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     // ajax - crudGetManyByQuery
@@ -309,8 +303,8 @@
                     break;
                 case 2:
                     // validate data
-                    assertJsonEqual(data.responseJson.data.length, 1);
-                    assert(
+                    local.assertJsonEqual(data.responseJson.data.length, 1);
+                    local.assert(
                         data.responseJson.data[0][options.idAlias] === options.idValue,
                         data.responseJson
                     );
@@ -332,7 +326,7 @@
                 dataValidate: {},
                 idValue: 'testCase_crudGetOneById_default'
             });
-            local.utility2.onNext(options, function (error, data) {
+            local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     // ajax - crudGetOneById
@@ -342,14 +336,14 @@
                     break;
                 case 2:
                     // validate data
-                    assertJsonEqual(data.responseJson.data.length, 1);
-                    assert(
+                    local.assertJsonEqual(data.responseJson.data.length, 1);
+                    local.assert(
                         data.responseJson.data[0][options.idAlias] === options.idValue,
                         data.responseJson
                     );
                     // validate dataValidate
                     Object.keys(options.dataValidate).forEach(function (key) {
-                        assert(
+                        local.assert(
                             data.responseJson.data[0][key] === options.dataValidate[key],
                             [key, data.responseJson.data[0][key], options.dataValidate[key]]
                         );
@@ -373,7 +367,7 @@
             options = local.crudOptionsSetDefault(options, {
                 idValue: 'testCase_crudGetOneByQuery_default'
             });
-            local.utility2.onNext(options, function (error, data) {
+            local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     // ajax - crudGetOneByQuery
@@ -383,8 +377,8 @@
                     break;
                 case 2:
                     // validate data
-                    assertJsonEqual(data.responseJson.data.length, 1);
-                    assert(
+                    local.assertJsonEqual(data.responseJson.data.length, 1);
+                    local.assert(
                         data.responseJson.data[0][options.idAlias] === options.idValue,
                         data.responseJson
                     );
@@ -403,7 +397,7 @@
          * this function will test crudNullXxx's default handling-behavior
          */
             var onParallel;
-            onParallel = local.utility2.onParallel(onError);
+            onParallel = local.onParallel(onError);
             onParallel.counter += 1;
             options = {};
             [
@@ -428,7 +422,7 @@
             options = local.crudOptionsSetDefault(options, {
                 idValue: 'testCase_crudRemoveManyByQuery_default'
             });
-            local.utility2.onNext(options, function (error, data) {
+            local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     // ajax - crudSetOneById
@@ -453,8 +447,8 @@
                     break;
                 case 4:
                     // validate data was removed
-                    assertJsonEqual(data.responseJson.data.length, 1);
-                    assert(data.responseJson.data[0] === null, data.responseJson);
+                    local.assertJsonEqual(data.responseJson.data.length, 1);
+                    local.assert(data.responseJson.data[0] === null, data.responseJson);
                     options.onNext();
                     break;
                 default:
@@ -472,7 +466,7 @@
             options = local.crudOptionsSetDefault(options, {
                 idValue: 'testCase_crudRemoveOneById_default'
             });
-            local.utility2.onNext(options, function (error, data) {
+            local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     if (options.idValue === 'testCase_crudRemoveOneById_default') {
@@ -501,8 +495,8 @@
                     break;
                 case 4:
                     // validate data was removed
-                    assertJsonEqual(data.responseJson.data.length, 1);
-                    assert(data.responseJson.data[0] === null, data.responseJson);
+                    local.assertJsonEqual(data.responseJson.data.length, 1);
+                    local.assert(data.responseJson.data[0] === null, data.responseJson);
                     options.onNext();
                     break;
                 default:
@@ -527,7 +521,7 @@
                     propRequired: true
                 }]
             });
-            local.utility2.onNext(options, function (error, data) {
+            local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     // ajax - crudSetManyById
@@ -536,7 +530,7 @@
                     }, options.onNext);
                     break;
                 case 2:
-                    onParallel = local.utility2.onParallel(options.onNext);
+                    onParallel = local.onParallel(options.onNext);
                     onParallel.counter += 1;
                     options.data.forEach(function (element) {
                         onParallel.counter += 1;
@@ -569,38 +563,36 @@
                 },
                 dataValidateReplace: { propRequired: true }
             });
-            local.utility2.onNext(options, function (error, data) {
+            local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     // init paramDict
                     paramDict = {};
-                    paramDict.body = local.utility2.objectSetOverride(
-                        local.utility2.jsonCopy(options.data),
+                    paramDict.body = local.objectSetOverride(
+                        local.jsonCopy(options.data),
                         options.dataValidateReplace
                     );
                     // ajax - crudSetOneById
-                    options.crudSetOneById._ajax({
-                        paramDict: paramDict
-                    }, options.onNext);
+                    options.crudSetOneById._ajax({ paramDict: paramDict }, options.onNext);
                     break;
                 case 2:
                     // init id
                     options.data.id = data.responseJson.data[0].id;
                     // validate time _timeCreated
-                    assert(
+                    local.assert(
                         data.responseJson.data[0]._timeCreated > '1970-01-01T00:00:00.000Z',
                         data.responseJson
                     );
-                    assert(
+                    local.assert(
                         data.responseJson.data[0]._timeCreated < new Date().toISOString(),
                         data.responseJson
                     );
                     // validate time _timeUpdated
-                    assert(
+                    local.assert(
                         data.responseJson.data[0]._timeUpdated > '1970-01-01T00:00:00.000Z',
                         data.responseJson
                     );
-                    assert(
+                    local.assert(
                         data.responseJson.data[0]._timeUpdated < new Date().toISOString(),
                         data.responseJson
                     );
@@ -626,7 +618,7 @@
                 dataValidateUpdate1: { propRequired: true },
                 dataValidateUpdate2: { propRequired: false }
             });
-            local.utility2.onNext(options, function (error, data) {
+            local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     // test crudGetOneById's default handling-behavior
@@ -650,13 +642,13 @@
                     options._timeCreated = data.responseJson.data[0]._timeCreated;
                     options._timeUpdated = data.responseJson.data[0]._timeUpdated;
                     // init paramDict
-                    paramDict = local.utility2.jsonCopy(options.queryById);
-                    paramDict.body = local.utility2.objectSetOverride(
-                        local.utility2.jsonCopy(options.data),
+                    paramDict = local.jsonCopy(options.queryById);
+                    paramDict.body = local.objectSetOverride(
+                        local.jsonCopy(options.data),
                         options.dataValidateUpdate2
                     );
                     // test application/x-www-form-urlencoded's handling-behavior
-                    local.utility2.objectSetOverride(paramDict, paramDict.body);
+                    local.objectSetOverride(paramDict, paramDict.body);
                     // ajax - crudUpdateOneById
                     options.crudUpdateOneById._ajax({
                         paramDict: paramDict
@@ -664,26 +656,26 @@
                     break;
                 case 4:
                     // validate time _timeCreated
-                    assert(
+                    local.assert(
                         data.responseJson.data[0]._timeCreated === options._timeCreated,
                         data.responseJson
                     );
-                    assert(
+                    local.assert(
                         data.responseJson.data[0]._timeCreated < new Date().toISOString(),
                         data.responseJson
                     );
                     // validate time _timeUpdated
-                    assert(
+                    local.assert(
                         data.responseJson.data[0]._timeUpdated > options._timeUpdated,
                         data.responseJson
                     );
-                    assert(
+                    local.assert(
                         data.responseJson.data[0]._timeUpdated < new Date().toISOString(),
                         data.responseJson
                     );
                     // test crudGetOneById's default handling-behavior
-                    options.dataValidate = local.utility2.objectSetOverride(
-                        local.utility2.jsonCopy(options.dataValidateUpdate1),
+                    options.dataValidate = local.objectSetOverride(
+                        local.jsonCopy(options.dataValidateUpdate1),
                         options.dataValidateUpdate2
                     );
                     local.testCase_crudGetOneById_default(options, options.onNext);
@@ -716,13 +708,13 @@
                     break;
                 case 2:
                     // validate no error occurred
-                    assert(!error, error);
+                    local.assert(!error, error);
                     // validate Content-Type
                     options.data = data.getResponseHeader('content-type');
-                    assertJsonEqual(options.data, 'image/png');
+                    local.assertJsonEqual(options.data, 'image/png');
                     // validate response
-                    options.data = local.utility2.bufferToString(data.response, 'base64');
-                    assert(
+                    options.data = local.bufferToString(data.response, 'base64');
+                    local.assert(
                         options.data === local.swgg.templateSwaggerUiLogoSmallBase64,
                         options.data
                     );
@@ -733,9 +725,9 @@
                     break;
                 case 3:
                     // validate error occurred
-                    assert(error, error);
+                    local.assert(error, error);
                     // validate statusCode
-                    assertJsonEqual(data.statusCode, 404);
+                    local.assertJsonEqual(data.statusCode, 404);
                     onNext();
                     break;
                 default:
@@ -750,12 +742,13 @@
          * this function will test fileUploadManyByForm's default handling-behavior
          */
             options = {};
-            local.utility2.onNext(options, function (error, data) {
+            local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
-                    options.blob = new local.utility2.Blob([
-                        local.utility2.assetsDict['/assets.swgg.swagger-ui.logo_small.png']
-                    ], { type: 'image/png' });
+                    options.blob = new local.Blob(
+                        [local.assetsDict['/assets.swgg.swagger-ui.logo_small.png']],
+                        { type: 'image/png' }
+                    );
                     options.blob.name = 'a00.png';
                     // ajax - fileUploadManyByForm
                     local.swgg.apiDict['file fileUploadManyByForm.2']._ajax({
@@ -769,8 +762,8 @@
                     break;
                 case 2:
                     // validate data
-                    assertJsonEqual(data.responseJson.data.length, 2);
-                    assertJsonEqual(data.responseJson.data[0].fileDescription, 'hello');
+                    local.assertJsonEqual(data.responseJson.data.length, 2);
+                    local.assertJsonEqual(data.responseJson.data[0].fileDescription, 'hello');
                     local.crudOptionsSetDefault(options, {
                         idValue: data.responseJson.data[0].id
                     });
@@ -794,7 +787,7 @@
          * this function will test fileUploadManyByForm's null-case handling-behavior
          */
             options = {};
-            local.utility2.onNext(options, function (error, data) {
+            local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     // ajax - fileUploadManyByForm
@@ -805,7 +798,7 @@
                     break;
                 case 2:
                     // validate data
-                    assertJsonEqual(data.responseJson.data.length, 0);
+                    local.assertJsonEqual(data.responseJson.data.length, 0);
                     options.onNext();
                     break;
                 default:
@@ -821,7 +814,7 @@
          * this function will test onErrorJsonapi's default handling-behavior
          */
             var onParallel;
-            onParallel = local.utility2.onParallel(onError);
+            onParallel = local.onParallel(onError);
             onParallel.counter += 1;
             [
                 'hello',
@@ -834,9 +827,9 @@
                     paramDict: { data: JSON.stringify(options) }
                 }, function (error, data) {
                     // validate no error occurred
-                    assert(!error, error);
+                    local.assert(!error, error);
                     // validate data
-                    assertJsonEqual(data.responseJson.data[0], 'hello');
+                    local.assertJsonEqual(data.responseJson.data[0], 'hello');
                     onParallel();
                 });
             });
@@ -848,24 +841,24 @@
          * this function will test onErrorJsonapi's empty-array handling-behavior
          */
             var onParallel;
-            onParallel = local.utility2.onParallel(onError);
+            onParallel = local.onParallel(onError);
             onParallel.counter += 1;
             options = { paramDict: { data: '[]' } };
             onParallel.counter += 1;
             local.swgg.apiDict['x-test onErrorJsonapi']._ajax(options, function (error, data) {
                 // validate no error occurred
-                assert(!error, error);
+                local.assert(!error, error);
                 // validate data
-                assertJsonEqual(data.responseJson.data[0], undefined);
+                local.assertJsonEqual(data.responseJson.data[0], undefined);
                 onParallel();
             });
             options = { paramDict: { error: '[]' } };
             onParallel.counter += 1;
             local.swgg.apiDict['x-test onErrorJsonapi']._ajax(options, function (error, data) {
                 // validate error occurred
-                assert(error, error);
+                local.assert(error, error);
                 // validate error
-                assert(data.responseJson.errors[0].message === 'null', error);
+                local.assert(data.responseJson.errors[0].message === 'null', error);
                 onParallel();
             });
             onParallel();
@@ -876,7 +869,7 @@
          * this function will test onErrorJsonapi's error handling-behavior
          */
             var onParallel;
-            onParallel = local.utility2.onParallel(onError);
+            onParallel = local.onParallel(onError);
             onParallel.counter += 1;
             [
                 'hello',
@@ -894,9 +887,9 @@
                     'x-test onErrorJsonapi'
                 ]._ajax(options, function (error, data) {
                     // validate error occurred
-                    assert(error, error);
+                    local.assert(error, error);
                     // validate error
-                    assert(data.responseJson.errors[0].message === 'hello', error);
+                    local.assert(data.responseJson.errors[0].message === 'hello', error);
                     onParallel();
                 });
             });
@@ -908,15 +901,15 @@
          * this function will test petstoreStoreGetInventory's default handling-behavior
          */
             options = {};
-            local.utility2.onNext(options, function (error, data) {
+            local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     local.swgg.apiDict['store getInventory']._ajax(options, options.onNext);
                     break;
                 case 2:
                     // validate data
-                    assertJsonEqual(data.responseJson.data.length, 1);
-                    assert(data.responseJson.data[0]);
+                    local.assertJsonEqual(data.responseJson.data.length, 1);
+                    local.assert(data.responseJson.data[0]);
                     options.onNext();
                     break;
                 default:
@@ -945,50 +938,50 @@
                     break;
                 case 2:
                     // validate error occurred
-                    assert(error, error);
+                    local.assert(error, error);
                     // test userLoginByPassword's 401 handling-behavior
                     options = { password: 'undefined', username: 'undefined' };
                     local.swgg.userLoginByPassword(options, onNext);
                     break;
                 case 3:
                     // validate error occurred
-                    assert(error, error);
+                    local.assert(error, error);
                     // validate statusCode
-                    assertJsonEqual(data.statusCode, 401);
+                    local.assertJsonEqual(data.statusCode, 401);
                     // validate userJwtEncoded does not exist
-                    assert(!local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
+                    local.assert(!local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
                     // test userLogout's 401 handling-behavior
                     options = {};
                     local.swgg.userLogout(options, onNext);
                     break;
                 case 4:
                     // validate error occurred
-                    assert(error, error);
+                    local.assert(error, error);
                     // validate statusCode
-                    assertJsonEqual(data.statusCode, 401);
+                    local.assertJsonEqual(data.statusCode, 401);
                     // validate userJwtEncoded does not exist
-                    assert(!local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
+                    local.assert(!local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
                     // test userLoginByPassword's 200 handling-behavior
                     options = { password: 'secret', username: 'admin' };
                     local.swgg.userLoginByPassword(options, onNext);
                     break;
                 case 5:
                     // validate no error occurred
-                    assert(!error, error);
+                    local.assert(!error, error);
                     // validate statusCode
-                    assertJsonEqual(data.statusCode, 200);
+                    local.assertJsonEqual(data.statusCode, 200);
                     // validate userJwtEncoded exists
-                    assert(local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
+                    local.assert(local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
                     // test persistent-session handling-behavior
                     local.swgg.apiDict['x-test crudNullGet']._ajax({}, onNext);
                     break;
                 case 6:
                     // validate no error occurred
-                    assert(!error, error);
+                    local.assert(!error, error);
                     // validate statusCode
-                    assertJsonEqual(data.statusCode, 200);
+                    local.assertJsonEqual(data.statusCode, 200);
                     // validate userJwtEncoded exists
-                    assert(local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
+                    local.assert(local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
                     // test userLogout's 200 handling-behavior
                     // test jwtEncoded's update handling-behavior
                     options = { jwtDecrypted: { sub: 'admin' } };
@@ -997,30 +990,28 @@
                     break;
                 case 7:
                     // validate no error occurred
-                    assert(!error, error);
+                    local.assert(!error, error);
                     // validate statusCode
-                    assertJsonEqual(data.statusCode, 200);
+                    local.assertJsonEqual(data.statusCode, 200);
                     // validate userJwtEncoded exists
-                    assert(local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
+                    local.assert(local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
                     // test userLogout's 401 handling-behavior
                     options = {};
                     local.swgg.userLogout(options, onNext);
                     break;
                 case 8:
                     // validate error occurred
-                    assert(error, error);
+                    local.assert(error, error);
                     // validate statusCode
-                    assertJsonEqual(data.statusCode, 401);
+                    local.assertJsonEqual(data.statusCode, 401);
                     // test userLoginByPassword's 400 handling-behavior
-                    local.utility2.ajax({
-                        url: '/api/v0/user/userLoginByPassword?password=1'
-                    }, onNext);
+                    local.ajax({ url: '/api/v0/user/userLoginByPassword?password=1' }, onNext);
                     break;
                 case 9:
                     // validate error occurred
-                    assert(error, error);
+                    local.assert(error, error);
                     // validate statusCode
-                    assertJsonEqual(data.statusCode, 400);
+                    local.assertJsonEqual(data.statusCode, 400);
                     // test userLogout's invalid-username handling-behavior
                     options = { jwtDecrypted: { sub: 'undefined' } };
                     local.swgg.jwtDecodedEncryptAndEncode(options);
@@ -1028,9 +1019,9 @@
                     break;
                 case 10:
                     // validate error occurred
-                    assert(error, error);
+                    local.assert(error, error);
                     // validate statusCode
-                    assertJsonEqual(data.statusCode, 401);
+                    local.assertJsonEqual(data.statusCode, 401);
                     onError(null, data);
                     break;
                 }
@@ -1043,7 +1034,7 @@
          * this function will test validateByParamDefList's default handling-behavior
          */
             var onParallel;
-            onParallel = local.utility2.onParallel(onError);
+            onParallel = local.onParallel(onError);
             onParallel.counter += 1;
             // test nop handling-behavior
             local.swgg.validateByParamDefList({ data: {} });
@@ -1075,9 +1066,9 @@
             onParallel.counter += 1;
             local.swgg.apiDict['x-test paramDefault']._ajax(options, function (error, data) {
                 // validate no error occurred
-                assert(!error, error);
+                local.assert(!error, error);
                 // validate object
-                assertJsonEqual(data.responseJson.data[0], {
+                local.assertJsonEqual(data.responseJson.data[0], {
                     paramArray: ['aa', 'bb'],
                     paramBody: { aa: { bb: 'hello body' } },
                     paramBoolean: true,
@@ -1101,9 +1092,9 @@
             onParallel.counter += 1;
             local.swgg.apiDict['x-test paramBodyArray']._ajax(options, function (error, data) {
                 // validate no error occurred
-                assert(!error, error);
+                local.assert(!error, error);
                 // validate object
-                assertJsonEqual(data.responseJson.data[0], {
+                local.assertJsonEqual(data.responseJson.data[0], {
                     paramBodyArray: [{ aa: { bb: 'hello body' } }, null]
                 });
                 onParallel();
@@ -1116,7 +1107,7 @@
          * this function will test validateByParamDefList's error handling-behavior
          */
             var onParallel;
-            onParallel = local.utility2.onParallel(onError);
+            onParallel = local.onParallel(onError);
             onParallel.counter += 1;
             options = { paramPath: 'hello path', paramRequired: 'hello required' };
             [
@@ -1129,12 +1120,12 @@
                 { key: 'paramPath', value: true },
                 { key: 'paramRequired', value: true }
             ].forEach(function (element) {
-                element.paramDict = local.utility2.jsonCopy(options);
+                element.paramDict = local.jsonCopy(options);
                 element.paramDict[element.key] = element.value;
                 onParallel.counter += 1;
                 local.swgg.apiDict['x-test paramDefault']._ajax(element, function (error) {
                     // validate error occurred
-                    assert(error, element);
+                    local.assert(error, element);
                     onParallel();
                 });
             });
@@ -1153,9 +1144,9 @@
             };
             local.swgg.apiDict['x-test paramFormData']._ajax(options, function (error, data) {
                 // validate no error occurred
-                assert(!error, error);
+                local.assert(!error, error);
                 // validate object
-                assertJsonEqual(data.responseJson.data[0], {
+                local.assertJsonEqual(data.responseJson.data[0], {
                     paramFormData1: 'hello formData1',
                     paramFormData2: 'hello formData2'
                 });
@@ -1193,14 +1184,16 @@
                 { key: 'propString', value: 'hello' },
                 { key: 'propString2', value: 'hello_0123456789_0123456789' },
                 { key: 'propStringBinary', value: '\u1234' },
-                { key: 'propStringByte', value:
-                    local.utility2.stringToBase64(local.utility2.stringAsciiCharset) },
+                {
+                    key: 'propStringByte',
+                    value: local.stringToBase64(local.stringAsciiCharset)
+                },
                 { key: 'propStringDate', value: '1971-01-01' },
                 { key: 'propStringDatetime', value: '1971-01-01T00:00:00Z' },
                 { key: 'propStringEmail', value: 'a@a.com' },
                 { key: 'propStringJson', value: 'true' }
             ].forEach(function (element) {
-                element.data = local.utility2.jsonCopy(options.data);
+                element.data = local.jsonCopy(options.data);
                 element.data[element.key] = element.value;
                 element.schema = options.schema;
                 // test circular-reference handling-behavior
@@ -1259,23 +1252,23 @@
                 { key: 'propString', value: true },
                 { key: 'propString2', value: '' },
                 { key: 'propString2', value: '!' },
-                { key: 'propString2', value: local.utility2.stringAsciiCharset },
-                { key: 'propStringByte', value: local.utility2.stringAsciiCharset },
+                { key: 'propString2', value: local.stringAsciiCharset },
+                { key: 'propStringByte', value: local.stringAsciiCharset },
                 { key: 'propStringDate', value: 'null' },
                 { key: 'propStringDatetime', value: 'null' },
                 { key: 'propStringEmail', value: 'null' },
                 { key: 'propStringJson', value: 'syntax error' }
             ].forEach(function (element) {
-                local.utility2.tryCatchOnError(function () {
+                local.tryCatchOnError(function () {
                     if (element.data === undefined) {
-                        element.data = local.utility2.jsonCopy(options.data);
+                        element.data = local.jsonCopy(options.data);
                         element.data[element.key] = element.value;
                     }
                     element.schema = options.schema;
                     local.swgg.validateBySchema(element);
-                }, local.utility2.nop);
+                }, local.nop);
                 // validate error occurred
-                assert(local.utility2._debugTryCatchErrorCaught, element.data);
+                local.assert(local.utility2._debugTryCatchErrorCaught, element.data);
             });
             onError();
         };
@@ -1287,11 +1280,11 @@
             options = {};
             // test null-case handling-behavior
             [null, undefined, {}].forEach(function (element) {
-                local.utility2.tryCatchOnError(function () {
+                local.tryCatchOnError(function () {
                     local.swgg.validateBySwagger(element);
-                }, local.utility2.nop);
+                }, local.nop);
                 // validate error occurred
-                assert(local.utility2._debugTryCatchErrorCaught, element);
+                local.assert(local.utility2._debugTryCatchErrorCaught, element);
             });
             options.templateData = JSON.stringify({
                 definitions: {
@@ -1352,14 +1345,14 @@
                 { definitions: { Test: { type: true } } },
                 { definitions: { Test: { uniqueItems: 'undefined' } } }
             ].forEach(function (element) {
-                local.utility2.tryCatchOnError(function () {
-                    local.swgg.validateBySwagger(local.utility2.objectSetOverride(
+                local.tryCatchOnError(function () {
+                    local.swgg.validateBySwagger(local.objectSetOverride(
                         JSON.parse(options.templateData),
                         element
-                    ), 10);
-                }, local.utility2.nop);
+                    ), Infinity);
+                }, local.nop);
                 // validate error occurred
-                assert(local.utility2._debugTryCatchErrorCaught, element);
+                local.assert(local.utility2._debugTryCatchErrorCaught, element);
             });
             onError();
         };
@@ -1404,7 +1397,7 @@
          */
             var onParallel;
             options = {};
-            onParallel = local.utility2.onParallel(function (error) {
+            onParallel = local.onParallel(function (error) {
                 setTimeout(function () {
                     // hide onEventModalHide's default handling-behavior
                     local.swgg.uiElementClick({
@@ -1415,7 +1408,7 @@
             });
             onParallel.counter += 1;
             Object.keys(local.swgg.uiEventListenerDict).sort().forEach(function (selector) {
-                local.utility2.domQuerySelectorAll(
+                local.domQuerySelectorAll(
                     document,
                     selector
                 ).forEach(function (element, ii, list) {
@@ -1476,18 +1469,6 @@
                 file: '/api/v0/swagger.json',
                 url: '/api/v0/swagger.json'
             }, {
-                file: '/assets.app.js',
-                url: '/assets.app.js'
-            }, {
-                file: '/assets.example.js',
-                url: '/assets.example.js'
-            }, {
-                file: '/assets.swgg.css',
-                url: '/assets.swgg.css'
-            }, {
-                file: '/assets.swgg.js',
-                url: '/assets.swgg.js'
-            }, {
                 file: '/assets.swgg.lib.swagger-ui.js',
                 url: '/assets.swgg.lib.swagger-ui.js'
             }, {
@@ -1496,11 +1477,8 @@
             }, {
                 file: '/assets.swgg.swagger-ui.logo_small.png',
                 url: '/assets.swgg.swagger-ui.logo_small.png'
-            }, {
-                file: '/jsonp.swgg.stateInit',
-                url: '/jsonp.swgg.stateInit?callback=window.swgg.stateInit'
             }];
-            local.utility2.buildApp(options, onError);
+            local.buildApp(options, onError);
         };
 
         local.testCase_build_doc = function (options, onError) {
@@ -1508,50 +1486,7 @@
          * this function will test build's doc handling-behavior
          */
             options = {};
-            local.utility2.onNext(options, function (error) {
-                switch (options.modeNext) {
-                case 1:
-                    options.moduleDict = {
-                        'swagger-lite': {
-                            exampleList: [],
-                            exports: local.swgg
-                        }
-                    };
-                    Object.keys(options.moduleDict).forEach(function (key) {
-                        options.moduleDict[key].example =
-                            options.moduleDict[key].exampleList
-                            .concat([
-                                'README.md',
-                                'test.js',
-                                'lib.swagger-ui.js',
-                                local.utility2.env.npm_package_main + '.js'
-                            ])
-                            .map(function (file) {
-                                return '\n\n\n\n\n\n\n\n' +
-                                    local.fs.readFileSync(file, 'utf8') +
-                                    '\n\n\n\n\n\n\n\n';
-                            }).join('');
-                    });
-                    // create doc.api.html
-                    local.utility2.fsWriteFileWithMkdirp(
-                        local.utility2.env.npm_config_dir_build + '/doc.api.html',
-                        local.utility2.docApiCreate(options),
-                        options.onNext
-                    );
-                    break;
-                case 2:
-                    local.utility2.browserTest({
-                        modeBrowserTest: 'screenCapture',
-                        url: 'file://' + local.utility2.env.npm_config_dir_build +
-                            '/doc.api.html'
-                    }, options.onNext);
-                    break;
-                default:
-                    onError(error);
-                }
-            });
-            options.modeNext = 0;
-            options.onNext();
+            local.buildDoc(options, onError);
         };
 
         local.testCase_webpage_default = function (options, onError) {
@@ -1560,10 +1495,9 @@
          */
             options = {
                 modeCoverageMerge: true,
-                url: local.utility2.serverLocalHost + '/?modeTest=1' +
-                    '#!/swgg_id_pet/swgg_id_addPet'
+                url: local.serverLocalHost + '/?modeTest=1' + '#!/swgg_id_pet/swgg_id_addPet'
             };
-            local.utility2.browserTest(options, onError);
+            local.browserTest(options, onError);
         };
         break;
     }
@@ -1937,7 +1871,7 @@
                 break;
             default:
                 // serve file
-                local.utility2.middlewareFileServer(request, response, nextMiddleware);
+                local.middlewareFileServer(request, response, nextMiddleware);
             }
         });
         // init db
@@ -2002,8 +1936,8 @@
             name: 'File'
         }];
         // init serverLocal
-        local.utility2.serverLocalUrlTest = function (url) {
-            url = local.utility2.urlParse(url).pathname;
+        local.utility2._serverLocalUrlTest = function (url) {
+            url = local.urlParse(url).pathname;
             return local.modeJs === 'browser' &&
                 url.indexOf('/api/v0/swagger.json') < 0 &&
                 (/\/api\/v0\/|\/test\./).test(url);
@@ -2019,51 +1953,12 @@
         if (local.global.utility2_rollup) {
             break;
         }
-        // init assets
-        local.utility2.assetsWrite('/assets.app.js', [
-            'header',
-            '/assets.swgg.rollup.js',
-            '/assets.utility2.rollup.begin.js',
-            'local.swgg.stateInit',
-            '/assets.example.js',
-            '/assets.test.js',
-            '/assets.utility2.rollup.end.js'
-        ].map(function (key) {
-            switch (key) {
-/* jslint-ignore-begin */
-case 'header':
-return '\
-/*\n\
-assets.app.js\n\
-\n' + local.utility2.env.npm_package_description + '\n\
-\n\
-instruction\n\
-    1. save this script as assets.app.js\n\
-    2. run the shell command:\n\
-        $ PORT=8081 node assets.app.js\n\
-    3. run the browser-demo on http://localhost:8081\n\
-*/\n\
-';
-/* jslint-ignore-end */
-            case 'local.swgg.stateInit':
-                return '// ' + key + '\n' +
-                    local.utility2.assetsDict['/assets.utility2.rollup.content.js']
-                    .replace(
-                        '/* utility2.rollup.js content */',
-                        key + '(' + JSON.stringify(
-                            local.swgg.middlewareJsonpStateInit({ stateInit: true })
-                        ) + ');'
-                    );
-            default:
-                return '// ' + key + '\n' + local.utility2.assetsDict[key];
-            }
-        }).join('\n\n\n\n'));
         // run validation test
-        local.testCase_validateByParamDefList_default(null, local.utility2.onErrorDefault);
-        local.testCase_validateByParamDefList_error(null, local.utility2.onErrorDefault);
-        local.testCase_validateBySchema_default(null, local.utility2.onErrorDefault);
-        local.testCase_validateBySchema_error(null, local.utility2.onErrorDefault);
-        local.testCase_validateBySwagger_default(null, local.utility2.onErrorDefault);
+        local.testCase_validateByParamDefList_default(null, local.onErrorDefault);
+        local.testCase_validateByParamDefList_error(null, local.onErrorDefault);
+        local.testCase_validateBySchema_default(null, local.onErrorDefault);
+        local.testCase_validateBySchema_error(null, local.onErrorDefault);
+        local.testCase_validateBySwagger_default(null, local.onErrorDefault);
         break;
     }
 }());

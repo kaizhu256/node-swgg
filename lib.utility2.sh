@@ -132,11 +132,6 @@ shBuildApp() {(set -e
     npm test --mode-test-case=testCase_build_app
 )}
 
-shBuildDoc() {(set -e
-# this function will build the doc
-    npm test --mode-test-case=testCase_build_doc
-)}
-
 shBuildCiDefault() {(set -e
 # this function will run the default build-ci
     # run pre-test build
@@ -173,6 +168,11 @@ shBuildCiDefault() {(set -e
         shBuildGithubUpload) || return $?
 )}
 
+shBuildDoc() {(set -e
+# this function will build the doc
+    npm test --mode-test-case=testCase_build_doc
+)}
+
 shBuildGithubUpload() {(set -e
 # this function will upload build-artifacts to github
     if [ ! "$GIT_SSH" ]
@@ -205,7 +205,7 @@ shBuildInsideDocker() {(set -e
     # start xvfb
     shXvfbStart
     # https://github.com/npm/npm/issues/10686
-    # bug workaround - Cannot read property 'target' of null #10686
+    # bug-workaround - Cannot read property 'target' of null #10686
     sed -in -e 's/  "_requiredBy":/  "_requiredBy_":/' package.json
     rm -f package.jsonn
     # npm install
@@ -409,15 +409,15 @@ shDockerRm() {(set -e
     docker rm -fv "$@" || true
 )}
 
+shDockerRmAll() {(set -e
+# this function will stop and rm all docker-containers
+    shDockerRm $(docker ps -aq)
+)}
+
 shDockerRmSince() {(set -e
 # this function will stop and rm all docker-containers since $NAME
     NAME="$1"
     shDockerRm $(docker ps -aq --since="$NAME")
-)}
-
-shDockerRmAll() {(set -e
-# this function will stop and rm all docker-containers
-    shDockerRm $(docker ps -aq)
 )}
 
 shDockerRmiUntagged() {(set -e
@@ -493,7 +493,8 @@ shFileKeySort() {(set -e
 console.log('var aa = [' + require('fs').readFileSync('$FILE', 'utf8')
 /* jslint-ignore-begin */
     .replace((/\\n{2,}/gm), '\\n')
-    .replace((/^ {8}(\\w[^ \']*?) = .*?$/gm), '\`\'\$1\',')
+    .replace((/^( {8}\\w[^ ]*? = .*?)$/gm), '\`\"\$1\",')
+    .replace((/^(\\w+?\\(\\) \\{.*?)$/gm), '\`\"\$1\",')
     .replace((/\\n[^\`].*?$/gm), '')
     .replace((/^\W.*/), '')
     .replace((/\`/g), '') + '];\n\
@@ -507,14 +508,6 @@ JSON.stringify(aa) === JSON.stringify(bb)\n\
     );
 // </script>
     "
-)}
-
-shFileTrimTrailingWhitespace() {(set -e
-# this function will trim trailing whitespaces from the file
-    # find . -type file -print0 | xargs -0 sed -i -e 's/[ ]\{1,\}$//'
-    # find . -type file -print0 | xargs -0 sed -i '' -e 's/[ ]\{1,\}$//'
-    sed -in -e 's/[ ]\{1,\}$//' "$1"
-    rm -f "$1n"
 )}
 
 shFileTrimLeft() {(set -e
@@ -537,6 +530,14 @@ require('fs').writeFileSync('$FILE', require('fs').readFileSync('$FILE', 'utf8')
 process.stdout.write('$FILE');
 // </script>
     "
+)}
+
+shFileTrimTrailingWhitespace() {(set -e
+# this function will trim trailing whitespaces from the file
+    # find . -type file -print0 | xargs -0 sed -i -e 's/[ ]\{1,\}$//'
+    # find . -type file -print0 | xargs -0 sed -i '' -e 's/[ ]\{1,\}$//'
+    sed -in -e 's/[ ]\{1,\}$//' "$1"
+    rm -f "$1n"
 )}
 
 shGitDiffNameStatus() {(set -e
@@ -1315,7 +1316,7 @@ shNpmTestPublished() {(set -e
     npm install "$npm_package_name"
     cd "node_modules/$npm_package_name"
     # https://github.com/npm/npm/issues/10686
-    # bug workaround - Cannot read property 'target' of null #10686
+    # bug-workaround - Cannot read property 'target' of null #10686
     sed -in -e 's/  "_requiredBy":/  "_requiredBy_":/' package.json
     rm -f package.jsonn
     # npm install
@@ -1804,7 +1805,7 @@ shMain() {
         ;;
     start)
         (shInit && export npm_config_mode_auto_restart=1 && export npm_config_mode_start=1 &&
-            shRun node "$npm_config_dir_utility2/test.js" "$@") || return $?
+            shRun shIstanbulCover "$npm_config_dir_utility2/test.js" "$@") || return $?
         ;;
     test)
         (shInit && shNpmTest "$@") || return $?
