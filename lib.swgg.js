@@ -1,4 +1,4 @@
-/* istanbul instrument in package swagger-lite */
+/* istanbul instrument in package swgg */
 /*jslint
     bitwise: true,
     browser: true,
@@ -2395,13 +2395,13 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
 
     // run node js-env code - post-init
     case 'node':
-        // init exports
-        module.exports = module['swagger-lite'] = local.swgg;
-        module.exports.__dirname = __dirname;
         // require modules
         local.fs = require('fs');
         local.path = require('path');
         local.url = require('url');
+        // init exports
+        module.exports = local;
+        module.exports.__dirname = __dirname;
         /* istanbul ignore next */
         if (local.global.utility2_rollup) {
             break;
@@ -2420,8 +2420,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         ].forEach(function (key) {
             switch (key) {
             case 'lib.swgg.css':
-                local.assetsDict['/assets.swgg.css'] =
-                    local.tryCatchReadFile(__dirname + '/' + key, 'utf8');
+                local.assetsWrite(
+                    '/assets.swgg.css',
+                    local.tryCatchReadFile(__dirname + '/' + key, 'utf8')
+                );
                 break;
             case 'lib.swgg.js':
                 local.assetsWrite(

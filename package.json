@@ -6,7 +6,7 @@
         "electron-lite": "kaizhu256/node-electron-lite#alpha"
     },
     "engines": { "node": ">=4.0" },
-    "homepage": "https://github.com/kaizhu256/node-swagger-lite",
+    "homepage": "https://github.com/kaizhu256/node-swgg",
     "keywords": [
         "api", "admin", "admin-ui",
         "browser",
@@ -20,12 +20,11 @@
     ],
     "license": "MIT",
     "main": "lib.swgg",
-    "name": "swagger-lite",
-    "nameAlias": "swgg",
+    "name": "swgg",
     "os": ["darwin", "linux"],
     "repository": {
         "type": "git",
-        "url": "https://github.com/kaizhu256/node-swagger-lite.git"
+        "url": "https://github.com/kaizhu256/node-swgg.git"
     },
     "scripts": {
         "build-ci": "./lib.utility2.sh shRun shReadmeBuild",
@@ -35,5 +34,5 @@
 
         "test": "export PORT=$(./lib.utility2.sh shServerPortRandom) && ./lib.utility2.sh test test.js"
     },
-    "version": "2016.11.2"
+    "version": "2016.11.1"
 }

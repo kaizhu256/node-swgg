@@ -1,36 +1,36 @@
-swagger-lite
-============
+swgg
+====
 this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend)
 
-[![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swagger-lite.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
+[![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swgg.svg)](https://travis-ci.org/kaizhu256/node-swgg)
 
-[![NPM](https://nodei.co/npm/swagger-lite.png?downloads=true)](https://www.npmjs.com/package/swagger-lite)
+[![NPM](https://nodei.co/npm/swgg.png?downloads=true)](https://www.npmjs.com/package/swgg)
 
-[![package-listing](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.gitLsTree.svg)](https://github.com/kaizhu256/node-swagger-lite)
+[![package-listing](https://kaizhu256.github.io/node-swgg/build/screen-capture.gitLsTree.svg)](https://github.com/kaizhu256/node-swgg)
 
 
 
 # cdn download
-- [http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swgg.rollup.js](http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swgg.rollup.js)
-- [http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swgg.rollup.min.js](http://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/assets.swgg.rollup.min.js)
+- [http://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.swgg.rollup.js](http://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.swgg.rollup.js)
+- [http://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.swgg.rollup.min.js](http://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.swgg.rollup.min.js)
 
 
 
 # live demo
-- [https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html)
+- [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html)
 
-[![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.githubDeploy.browser._2Fnode-swagger-lite_2Fbuild..alpha..travis-ci.org_2Fapp_2Findex.html.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html)
+[![github.com test-server](https://kaizhu256.github.io/node-swgg/build/screen-capture.githubDeploy.browser._2Fnode-swgg_2Fbuild..alpha..travis-ci.org_2Fapp_2Findex.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html)
 
 
 
 # documentation
 #### api-doc
-- [https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/doc.api.html](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/doc.api.html)
+- [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/doc.api.html](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/doc.api.html)
 
-[![api-doc](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/screen-capture.docApiCreate.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swagger-lite_2Ftmp_2Fbuild_2Fdoc.api.html.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/doc.api.html)
+[![api-doc](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/screen-capture.docApiCreate.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swgg_2Ftmp_2Fbuild_2Fdoc.api.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/doc.api.html)
 
 #### todo
-- rename package from swagger-lite -> swgg
+- npm publish 2016.11.1
 - revert temporary fix for chrome render bug
 - allow secure remote db export / import / reset to backend
 - add middlewareAcl
@@ -43,11 +43,8 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since ba59afdc
-- npm publish 2016.11.2
-- merge swgg.middlewareJsonpStateInit into utility2._middlewareJsonpStateInit
-- db - fix persistence-cancel handling-behavior
-- utility2 - add env npm_package_nameAlias
+#### change since 94298d65
+- rename package from swagger-lite -> swgg
 - none
 
 #### this package requires
@@ -60,16 +57,16 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 
 
-# build-status [![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swagger-lite.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
-[![build commit status](https://kaizhu256.github.io/node-swagger-lite/build/build.badge.svg)](https://travis-ci.org/kaizhu256/node-swagger-lite)
+# build-status [![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swgg.svg)](https://travis-ci.org/kaizhu256/node-swgg)
+[![build commit status](https://kaizhu256.github.io/node-swgg/build/build.badge.svg)](https://travis-ci.org/kaizhu256/node-swgg)
 
-| git-branch : | [master](https://github.com/kaizhu256/node-swagger-lite/tree/master) | [beta](https://github.com/kaizhu256/node-swagger-lite/tree/beta) | [alpha](https://github.com/kaizhu256/node-swagger-lite/tree/alpha)|
+| git-branch : | [master](https://github.com/kaizhu256/node-swgg/tree/master) | [beta](https://github.com/kaizhu256/node-swgg/tree/beta) | [alpha](https://github.com/kaizhu256/node-swgg/tree/alpha)|
 |--:|:--|:--|:--|
-| test-server-1 : | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swagger-lite/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/app/index.html)|
-| test-server-2 : | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-master.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-beta.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swagger-lite/heroku-logo.75x25.png)](https://hrku01-swagger-lite-alpha.herokuapp.com)|
-| test-report : | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/test-report.html)|
-| coverage : | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..master..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..beta..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swagger-lite/build..alpha..travis-ci.org/coverage.html/index.html)|
-| build-artifacts : | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..master..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..beta..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swagger-lite/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swagger-lite/tree/gh-pages/build..alpha..travis-ci.org)|
+| test-server-1 : | [![github.com test-server](https://kaizhu256.github.io/node-swgg/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swgg/build..master..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swgg/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swgg/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swgg/build..alpha..travis-ci.org/app/index.html)|
+| test-server-2 : | [![heroku.com test-server](https://kaizhu256.github.io/node-swgg/heroku-logo.75x25.png)](https://hrku01-swgg-master.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swgg/heroku-logo.75x25.png)](https://hrku01-swgg-beta.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swgg/heroku-logo.75x25.png)](https://hrku01-swgg-alpha.herokuapp.com)|
+| test-report : | [![test-report](https://kaizhu256.github.io/node-swgg/build..master..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swgg/build..master..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swgg/build..alpha..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swgg/build..alpha..travis-ci.org/test-report.html)|
+| coverage : | [![istanbul coverage](https://kaizhu256.github.io/node-swgg/build..master..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build..master..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/coverage.html/index.html) | [![istanbul coverage](https://kaizhu256.github.io/node-swgg/build..alpha..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build..alpha..travis-ci.org/coverage.html/index.html)|
+| build-artifacts : | [![build-artifacts](https://kaizhu256.github.io/node-swgg/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swgg/tree/gh-pages/build..master..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swgg/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swgg/tree/gh-pages/build..beta..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swgg/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swgg/tree/gh-pages/build..alpha..travis-ci.org)|
 
 #### master branch
 - stable branch
@@ -87,10 +84,10 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 
 # quickstart web example
-![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.testExampleJs.browser..png)
+![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleJs.browser..png)
 
 #### to run this example, follow the instruction in the script below
-- [example.js](https://kaizhu256.github.io/node-swagger-lite/build/example.js)
+- [example.js](https://kaizhu256.github.io/node-swgg/build/example.js)
 ```javascript
 /*
 example.js
@@ -100,12 +97,12 @@ this script will run a standalone swagger-ui server backed by db-lite
 instruction
     1. save this script as example.js
     2. run the shell command:
-        $ npm install swagger-lite && \
+        $ npm install swgg && \
             export PORT=8081 && \
             node example.js
     3. play with the browser-demo on http://localhost:8081
 */
-/* istanbul instrument in package swagger-lite */
+/* istanbul instrument in package swgg */
 /*jslint
     bitwise: true,
     browser: true,
@@ -147,7 +144,7 @@ instruction
         // init utility2_rollup
         local = local.global.utility2_rollup || (local.modeJs === 'browser'
             ? window.swgg
-            : require('swagger-lite'));
+            : require('swgg'));
         // export local
         local.global.local = local;
         // load db
@@ -796,10 +793,10 @@ utility2-comment -->\n\
 ```
 
 #### output from electron
-![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.testExampleJs.browser..png)
+![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleJs.browser..png)
 
 #### output from shell
-![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.testExampleJs.svg)
+![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleJs.svg)
 
 
 
@@ -813,7 +810,7 @@ utility2-comment -->\n\
         "electron-lite": "kaizhu256/node-electron-lite#alpha"
     },
     "engines": { "node": ">=4.0" },
-    "homepage": "https://github.com/kaizhu256/node-swagger-lite",
+    "homepage": "https://github.com/kaizhu256/node-swgg",
     "keywords": [
         "api", "admin", "admin-ui",
         "browser",
@@ -827,12 +824,11 @@ utility2-comment -->\n\
     ],
     "license": "MIT",
     "main": "lib.swgg",
-    "name": "swagger-lite",
-    "nameAlias": "swgg",
+    "name": "swgg",
     "os": ["darwin", "linux"],
     "repository": {
         "type": "git",
-        "url": "https://github.com/kaizhu256/node-swagger-lite.git"
+        "url": "https://github.com/kaizhu256/node-swgg.git"
     },
     "scripts": {
         "build-ci": "./lib.utility2.sh shRun shReadmeBuild",
@@ -842,14 +838,14 @@ export npm_config_mode_auto_restart=1 && \
 ./lib.utility2.sh shRun shIstanbulCover test.js",
         "test": "export PORT=$(./lib.utility2.sh shServerPortRandom) && ./lib.utility2.sh test test.js"
     },
-    "version": "2016.11.2"
+    "version": "2016.11.1"
 }
 ```
 
 
 
 # changelog of last 50 commits
-[![screen-capture](https://kaizhu256.github.io/node-swagger-lite/build/screen-capture.gitLog.svg)](https://github.com/kaizhu256/node-swagger-lite/commits)
+[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.gitLog.svg)](https://github.com/kaizhu256/node-swgg/commits)
 
 
 
