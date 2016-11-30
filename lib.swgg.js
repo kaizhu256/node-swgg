@@ -2420,8 +2420,10 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
         ].forEach(function (key) {
             switch (key) {
             case 'lib.swgg.css':
-                local.assetsDict['/assets.swgg.css'] =
-                    local.tryCatchReadFile(__dirname + '/' + key, 'utf8');
+                local.assetsWrite(
+                    '/assets.swgg.css',
+                    local.tryCatchReadFile(__dirname + '/' + key, 'utf8')
+                );
                 break;
             case 'lib.swgg.js':
                 local.assetsWrite(
