@@ -65,44 +65,42 @@
             switch (options._tags0) {
             case 'pet':
                 local.objectSetDefault(options, {
-                    crudGetOneById: local.swgg.apiDict['pet getPetById'],
-                    crudRemoveOneById: local.swgg.apiDict['pet deletePet'],
-                    crudSetOneById: local.swgg.apiDict['pet addPet'],
-                    crudUpdateOneById: local.swgg.apiDict['pet updatePetWithForm'],
+                    crudGetOneById: local.apiDict['pet getPetById'],
+                    crudRemoveOneById: local.apiDict['pet deletePet'],
+                    crudSetOneById: local.apiDict['pet addPet'],
+                    crudUpdateOneById: local.apiDict['pet updatePetWithForm'],
                     operationId: 'undefined.petId.id'
                 });
                 break;
             case 'store':
                 local.objectSetDefault(options, {
-                    crudGetOneById: local.swgg.apiDict['store getOrderById'],
-                    crudRemoveOneById: local.swgg.apiDict['store deleteOrder'],
-                    crudSetOneById: local.swgg.apiDict['store placeOrder'],
-                    crudUpdateOneById: local.swgg.apiDict[
-                        'store crudUpdateOneById.id.id'
-                    ],
+                    crudGetOneById: local.apiDict['store getOrderById'],
+                    crudRemoveOneById: local.apiDict['store deleteOrder'],
+                    crudSetOneById: local.apiDict['store placeOrder'],
+                    crudUpdateOneById: local.apiDict['store crudUpdateOneById.id.id'],
                     operationId: 'undefined.orderId.id'
                 });
                 break;
             case 'user':
                 local.objectSetDefault(options, {
-                    crudGetOneById: local.swgg.apiDict['user getUserByName'],
-                    crudRemoveOneById: local.swgg.apiDict['user deleteUser'],
-                    crudSetOneById: local.swgg.apiDict['user createUser'],
-                    crudUpdateOneById: local.swgg.apiDict['user updateUser'],
+                    crudGetOneById: local.apiDict['user getUserByName'],
+                    crudRemoveOneById: local.apiDict['user deleteUser'],
+                    crudSetOneById: local.apiDict['user createUser'],
+                    crudUpdateOneById: local.apiDict['user updateUser'],
                     operationId: 'undefined.username.username'
                 });
                 break;
             default:
-                Object.keys(local.swgg.apiDict).forEach(function (key) {
+                Object.keys(local.apiDict).forEach(function (key) {
                     key.replace((/^x-test (\w+)/), function (match0, match1) {
                         // jslint-hack - nop
                         local.nop(match0);
-                        options[match1] = options[match1] || local.swgg.apiDict[key];
+                        options[match1] = options[match1] || local.apiDict[key];
                     });
                 });
                 local.objectSetDefault(options, { operationId: 'undefined.id.id' });
             }
-            local.swgg.idFieldInit(options);
+            local.idFieldInit(options);
             // shallow-copy options
             return local.objectSetDefault({}, options);
         };
@@ -275,7 +273,7 @@
             ].forEach(function (key) {
                 onParallel.counter += 1;
                 options = {};
-                local.swgg.apiDict[key]._ajax(options, function (error, data) {
+                local.apiDict[key]._ajax(options, function (error, data) {
                     // validate error occurred
                     local.assert(error, error);
                     // validate statusCode
@@ -410,7 +408,7 @@
                 'x-test crudNullPut'
             ].forEach(function (key) {
                 onParallel.counter += 1;
-                local.swgg.apiDict[key]._ajax(options, onParallel);
+                local.apiDict[key]._ajax(options, onParallel);
             });
             onParallel();
         };
@@ -702,7 +700,7 @@
                         idValue: 'testCase_fileGetOneById_default'
                     });
                     // ajax - fileGetOneById
-                    local.swgg.apiDict['file fileGetOneById.id.id']._ajax({
+                    local.apiDict['file fileGetOneById.id.id']._ajax({
                         paramDict: options.queryById
                     }, onNext);
                     break;
@@ -713,13 +711,10 @@
                     options.data = data.getResponseHeader('content-type');
                     local.assertJsonEqual(options.data, 'image/png');
                     // validate response
-                    options.data = local.bufferToString(data.response, 'base64');
-                    local.assert(
-                        options.data === local.swgg.templateSwaggerUiLogoSmallBase64,
-                        options.data
-                    );
+                    options.data = local.bufferToBase64(data.response);
+                    local.assertJsonEqual(options.data, local.templateSwaggerUiLogoSmallBase64);
                     // test fileGetOneById's 404 handling-behavior
-                    local.swgg.apiDict['file fileGetOneById.id.id']._ajax({
+                    local.apiDict['file fileGetOneById.id.id']._ajax({
                         paramDict: { id: 'testCase_fileGetOneById_default_undefined' }
                     }, onNext);
                     break;
@@ -751,7 +746,7 @@
                     );
                     options.blob.name = 'a00.png';
                     // ajax - fileUploadManyByForm
-                    local.swgg.apiDict['file fileUploadManyByForm.2']._ajax({
+                    local.apiDict['file fileUploadManyByForm.2']._ajax({
                         paramDict: {
                             fileDescription: 'hello',
                             file1: options.blob,
@@ -791,10 +786,7 @@
                 switch (options.modeNext) {
                 case 1:
                     // ajax - fileUploadManyByForm
-                    local.swgg.apiDict['file fileUploadManyByForm.2']._ajax(
-                        options,
-                        options.onNext
-                    );
+                    local.apiDict['file fileUploadManyByForm.2']._ajax(options, options.onNext);
                     break;
                 case 2:
                     // validate data
@@ -823,7 +815,7 @@
             ].forEach(function (_) {
                 options = _;
                 onParallel.counter += 1;
-                local.swgg.apiDict['x-test onErrorJsonapi']._ajax({
+                local.apiDict['x-test onErrorJsonapi']._ajax({
                     paramDict: { data: JSON.stringify(options) }
                 }, function (error, data) {
                     // validate no error occurred
@@ -845,7 +837,7 @@
             onParallel.counter += 1;
             options = { paramDict: { data: '[]' } };
             onParallel.counter += 1;
-            local.swgg.apiDict['x-test onErrorJsonapi']._ajax(options, function (error, data) {
+            local.apiDict['x-test onErrorJsonapi']._ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate data
@@ -854,7 +846,7 @@
             });
             options = { paramDict: { error: '[]' } };
             onParallel.counter += 1;
-            local.swgg.apiDict['x-test onErrorJsonapi']._ajax(options, function (error, data) {
+            local.apiDict['x-test onErrorJsonapi']._ajax(options, function (error, data) {
                 // validate error occurred
                 local.assert(error, error);
                 // validate error
@@ -883,9 +875,7 @@
             ].forEach(function (data) {
                 options = { paramDict: { error: JSON.stringify(data) } };
                 onParallel.counter += 1;
-                local.swgg.apiDict[
-                    'x-test onErrorJsonapi'
-                ]._ajax(options, function (error, data) {
+                local.apiDict['x-test onErrorJsonapi']._ajax(options, function (error, data) {
                     // validate error occurred
                     local.assert(error, error);
                     // validate error
@@ -904,7 +894,7 @@
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
-                    local.swgg.apiDict['store getInventory']._ajax(options, options.onNext);
+                    local.apiDict['store getInventory']._ajax(options, options.onNext);
                     break;
                 case 2:
                     // validate data
@@ -930,74 +920,73 @@
                 modeNext += 1;
                 switch (modeNext) {
                 case 1:
-                    // cleanup userJwtEncoded
-                    delete local.swgg.userJwtEncoded;
+                    // cleanup userJwtEncrypted
+                    delete local.userJwtEncrypted;
                     // test userLogout's default handling-behavior
                     options = {};
-                    local.swgg.userLogout(options, onNext);
+                    local.userLogout(options, onNext);
                     break;
                 case 2:
                     // validate error occurred
                     local.assert(error, error);
                     // test userLoginByPassword's 401 handling-behavior
                     options = { password: 'undefined', username: 'undefined' };
-                    local.swgg.userLoginByPassword(options, onNext);
+                    local.userLoginByPassword(options, onNext);
                     break;
                 case 3:
                     // validate error occurred
                     local.assert(error, error);
                     // validate statusCode
                     local.assertJsonEqual(data.statusCode, 401);
-                    // validate userJwtEncoded does not exist
-                    local.assert(!local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
+                    // validate userJwtEncrypted does not exist
+                    local.assert(!local.userJwtEncrypted, local.userJwtEncrypted);
                     // test userLogout's 401 handling-behavior
                     options = {};
-                    local.swgg.userLogout(options, onNext);
+                    local.userLogout(options, onNext);
                     break;
                 case 4:
                     // validate error occurred
                     local.assert(error, error);
                     // validate statusCode
                     local.assertJsonEqual(data.statusCode, 401);
-                    // validate userJwtEncoded does not exist
-                    local.assert(!local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
+                    // validate userJwtEncrypted does not exist
+                    local.assert(!local.userJwtEncrypted, local.userJwtEncrypted);
                     // test userLoginByPassword's 200 handling-behavior
                     options = { password: 'secret', username: 'admin' };
-                    local.swgg.userLoginByPassword(options, onNext);
+                    local.userLoginByPassword(options, onNext);
                     break;
                 case 5:
                     // validate no error occurred
                     local.assert(!error, error);
                     // validate statusCode
                     local.assertJsonEqual(data.statusCode, 200);
-                    // validate userJwtEncoded exists
-                    local.assert(local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
+                    // validate userJwtEncrypted exists
+                    local.assert(local.userJwtEncrypted, local.userJwtEncrypted);
                     // test persistent-session handling-behavior
-                    local.swgg.apiDict['x-test crudNullGet']._ajax({}, onNext);
+                    local.apiDict['x-test crudNullGet']._ajax({}, onNext);
                     break;
                 case 6:
                     // validate no error occurred
                     local.assert(!error, error);
                     // validate statusCode
                     local.assertJsonEqual(data.statusCode, 200);
-                    // validate userJwtEncoded exists
-                    local.assert(local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
+                    // validate userJwtEncrypted exists
+                    local.assert(local.userJwtEncrypted, local.userJwtEncrypted);
                     // test userLogout's 200 handling-behavior
                     // test jwtEncoded's update handling-behavior
-                    options = { jwtDecrypted: { sub: 'admin' } };
-                    local.swgg.jwtDecodedEncryptAndEncode(options);
-                    local.swgg.userLogout(options, onNext);
+                    options = { jwtEncrypted: local.jwtA256GcmEncrypt({ sub: 'admin' }) };
+                    local.userLogout(options, onNext);
                     break;
                 case 7:
                     // validate no error occurred
                     local.assert(!error, error);
                     // validate statusCode
                     local.assertJsonEqual(data.statusCode, 200);
-                    // validate userJwtEncoded exists
-                    local.assert(local.swgg.userJwtEncoded, local.swgg.userJwtEncoded);
+                    // validate userJwtEncrypted exists
+                    local.assert(local.userJwtEncrypted, local.userJwtEncrypted);
                     // test userLogout's 401 handling-behavior
                     options = {};
-                    local.swgg.userLogout(options, onNext);
+                    local.userLogout(options, onNext);
                     break;
                 case 8:
                     // validate error occurred
@@ -1013,9 +1002,8 @@
                     // validate statusCode
                     local.assertJsonEqual(data.statusCode, 400);
                     // test userLogout's invalid-username handling-behavior
-                    options = { jwtDecrypted: { sub: 'undefined' } };
-                    local.swgg.jwtDecodedEncryptAndEncode(options);
-                    local.swgg.userLogout(options, onNext);
+                    options = { jwtEncrypted: local.jwtA256GcmEncrypt({ sub: 'undefined' }) };
+                    local.userLogout(options, onNext);
                     break;
                 case 10:
                     // validate error occurred
@@ -1037,7 +1025,7 @@
             onParallel = local.onParallel(onError);
             onParallel.counter += 1;
             // test nop handling-behavior
-            local.swgg.validateByParamDefList({ data: {} });
+            local.validateByParamDefList({ data: {} });
             options = {
                 paramDict: {
                     id: 'testCase_validateByParamDefList_default',
@@ -1064,7 +1052,7 @@
                 }
             };
             onParallel.counter += 1;
-            local.swgg.apiDict['x-test paramDefault']._ajax(options, function (error, data) {
+            local.apiDict['x-test paramDefault']._ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate object
@@ -1090,7 +1078,7 @@
                 }
             };
             onParallel.counter += 1;
-            local.swgg.apiDict['x-test paramBodyArray']._ajax(options, function (error, data) {
+            local.apiDict['x-test paramBodyArray']._ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate object
@@ -1123,7 +1111,7 @@
                 element.paramDict = local.jsonCopy(options);
                 element.paramDict[element.key] = element.value;
                 onParallel.counter += 1;
-                local.swgg.apiDict['x-test paramDefault']._ajax(element, function (error) {
+                local.apiDict['x-test paramDefault']._ajax(element, function (error) {
                     // validate error occurred
                     local.assert(error, element);
                     onParallel();
@@ -1142,7 +1130,7 @@
                     paramFormData2: 'hello formData2'
                 }
             };
-            local.swgg.apiDict['x-test paramFormData']._ajax(options, function (error, data) {
+            local.apiDict['x-test paramFormData']._ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate object
@@ -1160,7 +1148,7 @@
          */
             options = {
                 data: { propRequired: true },
-                schema: local.swgg.swaggerJson.definitions.TestCrud
+                schema: local.swaggerJson.definitions.TestCrud
             };
             [
                 { key: 'propArray', value: [null] },
@@ -1200,7 +1188,7 @@
                 element.data.propArraySubdoc = element.data.propArraySubdoc || [element.data];
                 element.data.propObject = element.data.propObject || element.data;
                 element.data.propObjectSubdoc = element.data.propObjectSubdoc || element.data;
-                local.swgg.validateBySchema(element);
+                local.validateBySchema(element);
             });
             onError();
         };
@@ -1211,7 +1199,7 @@
          */
             options = {
                 data: { propRequired: true },
-                schema: local.swgg.swaggerJson.definitions.TestCrud
+                schema: local.swaggerJson.definitions.TestCrud
             };
             [
                 { data: null },
@@ -1265,7 +1253,7 @@
                         element.data[element.key] = element.value;
                     }
                     element.schema = options.schema;
-                    local.swgg.validateBySchema(element);
+                    local.validateBySchema(element);
                 }, local.nop);
                 // validate error occurred
                 local.assert(local.utility2._debugTryCatchErrorCaught, element.data);
@@ -1281,7 +1269,7 @@
             // test null-case handling-behavior
             [null, undefined, {}].forEach(function (element) {
                 local.tryCatchOnError(function () {
-                    local.swgg.validateBySwagger(element);
+                    local.validateBySwagger(element);
                 }, local.nop);
                 // validate error occurred
                 local.assert(local.utility2._debugTryCatchErrorCaught, element);
@@ -1321,7 +1309,7 @@
             });
             // validate templateData
             // test error handling-behavior
-            local.swgg.validateBySwagger(JSON.parse(options.templateData));
+            local.validateBySwagger(JSON.parse(options.templateData));
             [
                 { propUndefined: {} },
                 { definitions: { Test: { $ref: true } } },
@@ -1346,7 +1334,7 @@
                 { definitions: { Test: { uniqueItems: 'undefined' } } }
             ].forEach(function (element) {
                 local.tryCatchOnError(function () {
-                    local.swgg.validateBySwagger(local.objectSetOverride(
+                    local.validateBySwagger(local.objectSetOverride(
                         JSON.parse(options.templateData),
                         element
                     ), Infinity);
@@ -1369,7 +1357,7 @@
          */
             options = {};
             options.element = document.querySelector('div');
-            local.swgg.uiAnimateShake(options.element);
+            local.uiAnimateShake(options.element);
             setTimeout(onError, 1500);
         };
 
@@ -1386,7 +1374,7 @@
                 '#!/swgg_id_pet/swgg_id_addPet'
             ];
             options.forEach(function (element) {
-                local.swgg.uiScrollTo(element);
+                local.uiScrollTo(element);
             });
             onError();
         };
@@ -1400,14 +1388,14 @@
             onParallel = local.onParallel(function (error) {
                 setTimeout(function () {
                     // hide onEventModalHide's default handling-behavior
-                    local.swgg.uiElementClick({
+                    local.uiElementClick({
                         target: document.querySelector('.onEventModalHide')
                     });
                 }, 500);
                 onError(error);
             });
             onParallel.counter += 1;
-            Object.keys(local.swgg.uiEventListenerDict).sort().forEach(function (selector) {
+            Object.keys(local.uiEventListenerDict).sort().forEach(function (selector) {
                 local.domQuerySelectorAll(
                     document,
                     selector
@@ -1415,7 +1403,7 @@
                     [null, null].forEach(function () {
                         onParallel.counter += 1;
                         setTimeout(function () {
-                            local.swgg.uiElementClick({ target: element });
+                            local.uiElementClick({ target: element });
                             onParallel();
                         }, ii * 1000 / list.length);
                     });
@@ -1425,13 +1413,13 @@
             options = {
                 target: document.querySelector('.onEventModalHide').children[0]
             };
-            local.swgg.uiElementClick(options);
+            local.uiElementClick(options);
             // test onEventOperationAjax's error handling-behavior
             document.querySelector('#swgg_id_paramInteger .input').value = 'syntax error';
             options = {
                 target: document.querySelector('#swgg_id_paramDefault .onEventOperationAjax')
             };
-            local.swgg.uiElementClick(options);
+            local.uiElementClick(options);
             onParallel();
         };
 
@@ -1445,13 +1433,10 @@
                 'testCase_ui_fileMedia_videoNull'
             ];
             options.forEach(function (id) {
-                document.querySelector('#swgg_id_fileGetOneById_id_id .input').value =
-                    id;
-                local.swgg.uiElementClick({
-                    target: document.querySelector(
-                        '#swgg_id_fileGetOneById_id_id .onEventOperationAjax'
-                    )
-                });
+                document.querySelector('#swgg_id_fileGetOneById_id_id .input').value = id;
+                local.uiElementClick({ target: document.querySelector(
+                    '#swgg_id_fileGetOneById_id_id .onEventOperationAjax'
+                ) });
             });
             onError();
         };
@@ -1507,7 +1492,7 @@
     // run shared js-env code - post-init
     (function () {
         // init test api
-        local.swgg.apiDictUpdate({
+        local.apiDictUpdate({
             definitions: {
                 // init onErrorJsonapi schema
                 onErrorJsonapi: {
@@ -1845,14 +1830,18 @@
             }
         });
         // test redundant http-body-parse-middleware handling-behavior
-        local.middleware.middlewareList.push(local.swgg.middlewareBodyParse);
+        local.utility2._middleware.middlewareList.push(local.middlewareBodyParse);
         // init test-middleware
-        local.middleware.middlewareList.push(function (request, response, nextMiddleware) {
+        local.utility2._middleware.middlewareList.push(function (
+            request,
+            response,
+            nextMiddleware
+        ) {
             switch (request.swgg.pathObject && request.swgg.pathObject.operationId) {
             case 'onErrorJsonapi':
                 // test redundant onErrorJsonapi handling-behavior
-                local.swgg.onErrorJsonapi(function (error, data) {
-                    local.swgg.serverRespondJsonapi(request, response, error, data);
+                local.onErrorJsonapi(function (error, data) {
+                    local.serverRespondJsonapi(request, response, error, data);
                 })(
                     JSON.parse(request.swgg.paramDict.error || 'null'),
                     JSON.parse(request.swgg.paramDict.data || 'null')
@@ -1862,12 +1851,7 @@
             case 'paramDefault':
             case 'paramFormData':
                 // test redundant onErrorJsonapi handling-behavior
-                local.swgg.serverRespondJsonapi(
-                    request,
-                    response,
-                    null,
-                    request.swgg.paramDict
-                );
+                local.serverRespondJsonapi(request, response, null, request.swgg.paramDict);
                 break;
             default:
                 // serve file
@@ -1876,7 +1860,7 @@
         });
         // init db
         local.dbSeedTestList = [{
-            dbRowList: local.swgg.dbRowListRandomCreate({
+            dbRowList: local.dbRowListRandomCreate({
                 // init 100 extra random objects
                 length: 100,
                 dbRowList: [{
@@ -1897,7 +1881,7 @@
                         id: 'testCase_dbRowListRandomCreate_' + (options.ii + 100)
                     };
                 },
-                properties: local.swgg.swaggerJson.definitions.TestCrud.properties
+                properties: local.swaggerJson.definitions.TestCrud.properties
             }),
             idIndexCreateList: [{
                 name: 'id'
@@ -1908,7 +1892,7 @@
         }, {
             dbRowList: [{
                 id: 'testCase_fileGetOneById_default',
-                fileBlob: local.swgg.templateSwaggerUiLogoSmallBase64,
+                fileBlob: local.templateSwaggerUiLogoSmallBase64,
                 fileContentType: 'image/png',
                 propRequired: true
             }, {

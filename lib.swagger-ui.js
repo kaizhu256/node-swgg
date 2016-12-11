@@ -42,7 +42,7 @@
             ? window.swgg
             : require('./lib.swgg.js'));
 /* jslint-ignore-begin */
-local.swgg.templateUiDatatable = '\
+local.templateUiDatatable = '\
 <div class="pagination tr">\n\
     {{#each pageList}}\n\
     <button\n\
@@ -93,7 +93,7 @@ local.swgg.templateUiDatatable = '\
 
 
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/main.handlebars
-local.swgg.templateUiMain = '\
+local.templateUiMain = '\
 <div class="eventDelegateClick modal onEventModalHide" style="display: none; opacity: 0;">\n\
     <form class="datatable eventDelegateClick flex1"></form>\n\
 </div>\n\
@@ -147,7 +147,7 @@ local.swgg.templateUiMain = '\
 
 
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/operation.handlebars
-local.swgg.templateUiOperation = '\
+local.templateUiOperation = '\
 <div\n\
     class="eventDelegateClick eventDelegateSubmit marginTop05 operation {{_method}}"\n\
     data-_key-operation-id="{{_keyOperationId}}"\n\
@@ -200,7 +200,7 @@ local.swgg.templateUiOperation = '\
 
 
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/param.handlebars
-local.swgg.templateUiParam = '\
+local.templateUiParam = '\
 <span class="td1 {{#if required}}fontWeightBold{{/if required}}">\n\
     {{name}}<br>\n\
     <span class="color777">{{description}}</span>\n\
@@ -230,7 +230,7 @@ local.swgg.templateUiParam = '\
 
 
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/resource.handlebars
-local.swgg.templateUiResource = '\
+local.templateUiResource = '\
 <div\n\
     class="borderBottomBold resource eventDelegateClick"\n\
     data-name="{{name}}"\n\
@@ -247,7 +247,7 @@ local.swgg.templateUiResource = '\
 
 
 
-local.swgg.templateUiResponseAjax = '\
+local.templateUiResponseAjax = '\
 <h4 class="label marginTop10">Curl Request</h4>\n\
 {{#if errorValidate}}\n\
 <pre>n/a</pre>\n\
@@ -273,7 +273,7 @@ local.swgg.templateUiResponseAjax = '\
 
     // run browser js-env code - post-init
     case 'browser':
-        local.swgg.uiAnimateFadeIn = function (element) {
+        local.uiAnimateFadeIn = function (element) {
         /*
          * this function will fadeIn the element
          */
@@ -287,7 +287,7 @@ local.swgg.templateUiResponseAjax = '\
             }, 500);
         };
 
-        local.swgg.uiAnimateFadeOut = function (element) {
+        local.uiAnimateFadeOut = function (element) {
         /*
          * this function will fadeOut the element
          */
@@ -299,7 +299,7 @@ local.swgg.templateUiResponseAjax = '\
             }, 500);
         };
 
-        local.swgg.uiAnimateScrollTo = function (element) {
+        local.uiAnimateScrollTo = function (element) {
         /*
          * this function will scrollTo the element
          */
@@ -316,7 +316,7 @@ local.swgg.templateUiResponseAjax = '\
             }, 1000);
         };
 
-        local.swgg.uiAnimateShake = function (element) {
+        local.uiAnimateShake = function (element) {
         /*
          * this function will shake the dom-element
          */
@@ -326,7 +326,7 @@ local.swgg.templateUiResponseAjax = '\
             }, 500);
         };
 
-        local.swgg.uiAnimateSlideAccordian = function (element, elementList) {
+        local.uiAnimateSlideAccordian = function (element, elementList) {
         /*
          * this function will slideDown the element,
          * but slideUp all other elements in elementList
@@ -334,14 +334,14 @@ local.swgg.templateUiResponseAjax = '\
             // hide elements in elementList
             elementList.forEach(function (element2) {
                 if (element2 !== element) {
-                    local.swgg.uiAnimateSlideUp(element2);
+                    local.uiAnimateSlideUp(element2);
                 }
             });
             // show element
-            local.swgg.uiAnimateSlideDown(element);
+            local.uiAnimateSlideDown(element);
         };
 
-        local.swgg.uiAnimateSlideDown = function (element) {
+        local.uiAnimateSlideDown = function (element) {
         /*
          * this function will slideDown the dom-element
          */
@@ -360,7 +360,7 @@ local.swgg.templateUiResponseAjax = '\
             }, 500);
         };
 
-        local.swgg.uiAnimateSlideUp = function (element) {
+        local.uiAnimateSlideUp = function (element) {
         /*
          * this function will slideUp the dom-element
          */
@@ -381,13 +381,13 @@ local.swgg.templateUiResponseAjax = '\
             }, 500);
         };
 
-        local.swgg.uiDatatableRender = function (options) {
+        local.uiDatatableRender = function (options) {
         /*
          * this function will render the datatable
          */
             var tmp;
-            local.swgg.uiState.datatable = options;
-            options.schema = local.swgg.schemaNormalizeAndCopy(options.schema);
+            local.uiState.datatable = options;
+            options.schema = local.schemaNormalizeAndCopy(options.schema);
             options.propDefList = Object.keys(options.schema.properties)
                 .sort(function (aa, bb) {
                     return aa === options.idField
@@ -402,7 +402,7 @@ local.swgg.templateUiResponseAjax = '\
                     tmp = propDef;
                     propDef = options.schema.properties[tmp];
                     propDef.name = tmp;
-                    local.swgg.uiParamRender(propDef);
+                    local.uiParamRender(propDef);
                     return propDef;
                 });
             options.dbRowList = options.responseJson.data.map(function (dbRow, ii) {
@@ -412,7 +412,7 @@ local.swgg.templateUiResponseAjax = '\
                     propDef.dataset = {};
                     propDef.valueDecoded = dbRow.paramDict[propDef.name];
                     // init valueEncoded
-                    local.swgg.uiValueEncode(propDef, propDef);
+                    local.uiValueEncode(propDef, propDef);
                     return propDef;
                 });
                 dbRow.id = dbRow.paramDict[options.idField];
@@ -456,18 +456,18 @@ local.swgg.templateUiResponseAjax = '\
             options.pageCurrentIsLast = options.pageCurrent + 1 === options.pageTotal;
             // templateRender datatable
             document.querySelector('.swggUiContainer .datatable').innerHTML =
-                local.templateRender(local.swgg.templateUiDatatable, options);
+                local.templateRender(local.templateUiDatatable, options);
             // init event-handling
-            local.swgg.uiEventInit(document.querySelector('.swggUiContainer .datatable'));
+            local.uiEventInit(document.querySelector('.swggUiContainer .datatable'));
             // show modal
             if (document.querySelector('.swggUiContainer > .modal').style.display !== 'none') {
                 return;
             }
             document.body.style.overflow = 'hidden';
-            local.swgg.uiAnimateFadeIn(document.querySelector('.swggUiContainer > .modal'));
+            local.uiAnimateFadeIn(document.querySelector('.swggUiContainer > .modal'));
         };
 
-        local.swgg.uiElementClick = function (options) {
+        local.uiElementClick = function (options) {
         /*
          * this function will simulate a click-event on options.target
          */
@@ -478,8 +478,8 @@ local.swgg.templateUiResponseAjax = '\
             options.target.dispatchEvent(options.event);
         };
 
-        local.swgg.uiEventDelegate = function (event) {
-            Object.keys(local.swgg.uiEventListenerDict).sort().some(function (key) {
+        local.uiEventDelegate = function (event) {
+            Object.keys(local.uiEventListenerDict).sort().some(function (key) {
                 if (!(event.currentTarget.matches(key) || event.target.matches(key))) {
                     return;
                 }
@@ -491,12 +491,12 @@ local.swgg.templateUiResponseAjax = '\
                     break;
                 }
                 event.stopPropagation();
-                local.swgg.uiEventListenerDict[key](event);
+                local.uiEventListenerDict[key](event);
                 return true;
             });
         };
 
-        local.swgg.uiEventInit = function (element) {
+        local.uiEventInit = function (element) {
         /*
          * this function will init event-handling for the dom-element
          */
@@ -505,15 +505,12 @@ local.swgg.templateUiResponseAjax = '\
                     element,
                     '.eventDelegate' + eventType
                 ).forEach(function (element) {
-                    element.addEventListener(
-                        eventType.toLowerCase(),
-                        local.swgg.uiEventDelegate
-                    );
+                    element.addEventListener(eventType.toLowerCase(), local.uiEventDelegate);
                 });
             });
         };
 
-        local.swgg.uiEventListenerDict['.onEventDatatableReload'] = function (event) {
+        local.uiEventListenerDict['.onEventDatatableReload'] = function (event) {
         /*
          * this function will show the modal
          */
@@ -526,15 +523,15 @@ local.swgg.templateUiResponseAjax = '\
                 options.name = event.target.dataset.resourceName;
                 options.pageNumber = event.target.dataset.pageNumber;
             } else {
-                options.name = local.swgg.uiState.datatable.name;
-                options.pageNumber = local.swgg.uiState.datatable.pageNumber;
-                options.queryLimit = local.swgg.uiState.datatable.queryLimit;
-                options.querySort = local.swgg.uiState.datatable.querySort;
-                options.queryWhere = local.swgg.uiState.datatable.queryWhere;
+                options.name = local.uiState.datatable.name;
+                options.pageNumber = local.uiState.datatable.pageNumber;
+                options.queryLimit = local.uiState.datatable.queryLimit;
+                options.querySort = local.uiState.datatable.querySort;
+                options.queryWhere = local.uiState.datatable.queryWhere;
             }
             local.objectSetDefault(
                 options,
-                local.jsonCopy(local.swgg.uiState['x-swgg-datatableDict'][options.name])
+                local.jsonCopy(local.uiState['x-swgg-datatableDict'][options.name])
             );
             options.querySkip = options.pageNumber * options.queryLimit || 0;
             options.paramDict = {
@@ -544,20 +541,16 @@ local.swgg.templateUiResponseAjax = '\
                 _queryWhere: options.queryWhere
             };
             // request data
-            local.swgg.apiDict[
-                options.crudGetManyByQuery
-            ]._ajax(options, function (error, options) {
+            local.apiDict[options.crudGetManyByQuery]._ajax(options, function (error, options) {
                 // validate no error occurred
                 local.assert(!error, error);
-                local.swgg.uiDatatableRender(options);
+                local.uiDatatableRender(options);
             });
         };
 
-        local.swgg.uiEventListenerDict['.onEventDatatableSelectedRemove'] = function () {
+        local.uiEventListenerDict['.onEventDatatableSelectedRemove'] = function () {
             var onParallel;
-            onParallel = local.onParallel(
-                local.swgg.uiEventListenerDict['.onEventDatatableReload']
-            );
+            onParallel = local.onParallel(local.uiEventListenerDict['.onEventDatatableReload']);
             onParallel.counter += 1;
             local.domQuerySelectorAll(
                 document,
@@ -565,19 +558,16 @@ local.swgg.templateUiResponseAjax = '\
             ).forEach(function (element) {
                 onParallel.counter += 1;
                 // remove data
-                local.swgg.apiDict[
-                    local.swgg.uiState.datatable.crudRemoveOneById
+                local.apiDict[
+                    local.uiState.datatable.crudRemoveOneById
                 ]._ajax(local.objectLiteralize({
-                    paramDict: { '$[]': [
-                        local.swgg.uiState.datatable.idField,
-                        element.dataset.id
-                    ] }
+                    paramDict: { '$[]': [local.uiState.datatable.idField, element.dataset.id] }
                 }), onParallel);
             });
             onParallel();
         };
 
-        local.swgg.uiEventListenerDict['.onEventDatatableTrSelect'] = function (event) {
+        local.uiEventListenerDict['.onEventDatatableTrSelect'] = function (event) {
             if (event.target.tagName !== 'INPUT') {
                 event.currentTarget.querySelector('input').checked =
                     !event.currentTarget.querySelector('input').checked;
@@ -589,7 +579,7 @@ local.swgg.templateUiResponseAjax = '\
             }
         };
 
-        local.swgg.uiEventListenerDict['.onEventModalHide'] = function (event) {
+        local.uiEventListenerDict['.onEventModalHide'] = function (event) {
         /*
          * this function will hide the modal
          */
@@ -601,10 +591,10 @@ local.swgg.templateUiResponseAjax = '\
             }
             document.body.style.overflow = '';
             // hide modeal
-            local.swgg.uiAnimateFadeOut(document.querySelector('.swggUiContainer > .modal'));
+            local.uiAnimateFadeOut(document.querySelector('.swggUiContainer > .modal'));
         };
 
-        local.swgg.uiEventListenerDict['.onEventOperationAjax'] = function (event) {
+        local.uiEventListenerDict['.onEventOperationAjax'] = function (event) {
         /*
          * this function will return submit the operation to the backend
          */
@@ -613,9 +603,7 @@ local.swgg.templateUiResponseAjax = '\
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
-                    options.api = local.swgg.apiDict[
-                        event.currentTarget.dataset._keyOperationId
-                    ];
+                    options.api = local.apiDict[event.currentTarget.dataset._keyOperationId];
                     options.domOperationContent = event.target.closest('.operation > .content');
                     options.headers = {};
                     options.paramDict = {};
@@ -628,7 +616,7 @@ local.swgg.templateUiResponseAjax = '\
                             case 'INPUT':
                                 tmp = tmp.type === 'file'
                                     ? tmp.files && tmp.files[0]
-                                    : local.swgg.uiValueDecode(tmp, {
+                                    : local.uiValueDecode(tmp, {
                                         type: paramDef.type,
                                         valueEncoded: tmp.value
                                     }).valueDecoded;
@@ -639,7 +627,7 @@ local.swgg.templateUiResponseAjax = '\
                                         return element.selected;
                                     })
                                     .map(function (element) {
-                                        return local.swgg.uiValueDecode(element, {
+                                        return local.uiValueDecode(element, {
                                             type: paramDef.items
                                                 ? paramDef.items.type
                                                 : paramDef.type,
@@ -655,14 +643,14 @@ local.swgg.templateUiResponseAjax = '\
                                 break;
                             case 'TEXTAREA':
                                 tmp = paramDef.in === 'body'
-                                    ? local.swgg.uiValueDecode(tmp, {
+                                    ? local.uiValueDecode(tmp, {
                                         type: paramDef.type,
                                         valueEncoded: tmp.value
                                     }).valueDecoded
                                     : !tmp.value
                                     ? undefined
                                     : tmp.value.split('\n').map(function (element) {
-                                        return local.swgg.uiValueDecode(null, {
+                                        return local.uiValueDecode(null, {
                                             type: paramDef.items.type,
                                             valueEncoded: element
                                         }).valueDecoded;
@@ -693,7 +681,7 @@ local.swgg.templateUiResponseAjax = '\
                             '.paramDef[name=' + options.errorValidate.options.key + '] .input'
                         ).forEach(function (element) {
                             element.classList.add('error');
-                            local.swgg.uiAnimateShake(element.closest('span'));
+                            local.uiAnimateShake(element.closest('span'));
                         });
                         data = {
                             errorValidate: options.errorValidate,
@@ -722,13 +710,13 @@ local.swgg.templateUiResponseAjax = '\
                     case 'video':
                         data.responseBody = '<' + data.contentType.split('/')[0] +
                             ' controls><source src="data:' + data.contentType + ';base64,' +
-                            local.bufferToString(data.response, 'base64') +
+                            local.bufferToBase64(data.response) +
                             '" type="' + data.contentType + '"></' +
                             data.contentType.split('/')[0] + '>';
                         break;
                     case 'image':
                         data.responseBody = '<img src="data:' + data.contentType + ';base64,' +
-                            local.bufferToString(data.response, 'base64') + '">';
+                            local.bufferToBase64(data.response) + '">';
                         break;
                     default:
                         data.responseBody = '<pre>' + local.stringHtmlSafe(
@@ -753,8 +741,7 @@ local.swgg.templateUiResponseAjax = '\
                     // templateRender response
                     options.domOperationContent.querySelector(
                         '.responseAjax'
-                    ).innerHTML =
-                        local.templateRender(local.swgg.templateUiResponseAjax, data);
+                    ).innerHTML = local.templateRender(local.templateUiResponseAjax, data);
                     break;
                 }
             });
@@ -762,7 +749,7 @@ local.swgg.templateUiResponseAjax = '\
             options.onNext();
         };
 
-        local.swgg.uiEventListenerDict['.onEventOperationDisplayShow'] = function (event) {
+        local.uiEventListenerDict['.onEventOperationDisplayShow'] = function (event) {
         /*
          * this function will toggle the display of the operation
          */
@@ -772,7 +759,7 @@ local.swgg.templateUiResponseAjax = '\
             tmp = event.target.closest('.operation').querySelector('.operation > .content');
             tmp.closest('.resource').classList.remove('expanded');
             // show the operation, but hide all other operations
-            local.swgg.uiAnimateSlideAccordian(
+            local.uiAnimateSlideAccordian(
                 tmp,
                 local.domQuerySelectorAll(
                     tmp.closest('.operationList'),
@@ -781,7 +768,7 @@ local.swgg.templateUiResponseAjax = '\
             );
         };
 
-        local.swgg.uiEventListenerDict['.onEventResourceDisplayAction'] = function (event) {
+        local.uiEventListenerDict['.onEventResourceDisplayAction'] = function (event) {
         /*
          * this function will toggle the display of the resource
          */
@@ -792,7 +779,7 @@ local.swgg.templateUiResponseAjax = '\
                 case 'td1':
                 case 'td2':
                 case 'td3':
-                    local.swgg.uiAnimateSlideAccordian(
+                    local.uiAnimateSlideAccordian(
                         event.currentTarget.querySelector('.operationList'),
                         local.domQuerySelectorAll(document, '.swggUiContainer .operationList')
                     );
@@ -810,7 +797,7 @@ local.swgg.templateUiResponseAjax = '\
                             event.currentTarget,
                             '.operation > .content'
                         ).forEach(function (element) {
-                            local.swgg.uiAnimateSlideUp(element);
+                            local.uiAnimateSlideUp(element);
                         });
                     // expand all operations in the resource
                     } else {
@@ -819,7 +806,7 @@ local.swgg.templateUiResponseAjax = '\
                             event.currentTarget,
                             '.operation > .content'
                         ).forEach(function (element) {
-                            local.swgg.uiAnimateSlideDown(element);
+                            local.uiAnimateSlideDown(element);
                         });
                     }
                     return true;
@@ -827,7 +814,7 @@ local.swgg.templateUiResponseAjax = '\
             });
         };
 
-        local.swgg.uiEventListenerDict['.onEventUiReload'] = function () {
+        local.uiEventListenerDict['.onEventUiReload'] = function () {
         /*
          * this function will reload the ui
          */
@@ -850,13 +837,13 @@ local.swgg.templateUiResponseAjax = '\
                 // validate no error occurred
                 local.assert(!error, error);
                 // reset state
-                local.swgg.apiDict = local.swgg.swaggerJson = null;
-                local.swgg.apiDictUpdate(JSON.parse(xhr.responseText));
-                local.swgg.uiRender();
+                local.apiDict = local.swaggerJson = null;
+                local.apiDictUpdate(JSON.parse(xhr.responseText));
+                local.uiRender();
             });
         };
 
-        local.swgg.uiParamRender = function (paramDef) {
+        local.uiParamRender = function (paramDef) {
         /*
          * this function will render the param
          */
@@ -886,7 +873,7 @@ local.swgg.templateUiResponseAjax = '\
                     : paramDef.enum).map(function (element) {
                     paramDef.hasDefault |= paramDef.enumDefault.indexOf(element) >= 0;
                     return {
-                        id: local.swgg.idDomElementCreate('swgg_id_' + paramDef.name),
+                        id: local.idDomElementCreate('swgg_id_' + paramDef.name),
                         selected: paramDef.enumDefault.indexOf(element) >= 0
                             ? 'selected'
                             : '',
@@ -901,13 +888,13 @@ local.swgg.templateUiResponseAjax = '\
                         paramDef.isSelectMultiple ||
                         paramDef.required)) {
                     paramDef.selectOptionList.unshift({
-                        id: local.swgg.idDomElementCreate('swgg_id_' + paramDef.name),
+                        id: local.idDomElementCreate('swgg_id_' + paramDef.name),
                         selected: 'selected',
                         type: paramDef.type
                     });
                 }
                 paramDef.selectOptionList.forEach(function (element) {
-                    local.swgg.uiValueEncode({ dataset: {} }, element);
+                    local.uiValueEncode({ dataset: {} }, element);
                 });
             // init input - textarea
             } else if (paramDef.type === 'array') {
@@ -942,7 +929,7 @@ local.swgg.templateUiResponseAjax = '\
             ].some(function (element) {
                 local.tryCatchOnError(function () {
                     paramDef.schema2 = paramDef.schema2 ||
-                        local.swgg.schemaNormalizeAndCopy(element).properties;
+                        local.schemaNormalizeAndCopy(element).properties;
                 }, local.nop);
                 return paramDef.schema2;
             });
@@ -955,7 +942,7 @@ local.swgg.templateUiResponseAjax = '\
             paramDef.valueDecoded = paramDef.default;
             if (paramDef.valueDecoded === undefined && paramDef.in === 'body') {
                 if (paramDef.schema2) {
-                    paramDef.valueDecoded = local.swgg.dbRowRandomCreate({
+                    paramDef.valueDecoded = local.dbRowRandomCreate({
                         override: function () {
                             var override = {};
                             // preserve default value
@@ -980,25 +967,25 @@ local.swgg.templateUiResponseAjax = '\
             }
             // templateRender paramDef
             paramDef.uiFragment = local.domFragmentRender(
-                local.templateRender(local.swgg.templateUiParam, paramDef)
+                local.templateRender(local.templateUiParam, paramDef)
             );
             ['td1', 'td2', 'td3', 'td4'].forEach(function (element) {
                 paramDef[element] = paramDef.uiFragment.querySelector('.' + element);
             });
         };
 
-        local.swgg.uiRender = function () {
+        local.uiRender = function () {
         /*
          * this function will render swagger-ui
          */
             var resource, self;
             // reset state
-            local.swgg.idDomElementDict = {};
-            self = local.swgg.uiState = local.jsonCopy(local.swgg.swaggerJson);
+            local.idDomElementDict = {};
+            self = local.uiState = local.jsonCopy(local.swaggerJson);
             // init url
             self.url = document.querySelector('.swggUiContainer > .header > .td2').value;
             // templateRender main
-            self.uiFragment = local.domFragmentRender(local.swgg.templateUiMain, self);
+            self.uiFragment = local.domFragmentRender(local.templateUiMain, self);
             local.objectSetDefault(self, {
                 resourceDict: {},
                 operationDict: {},
@@ -1010,9 +997,9 @@ local.swgg.templateUiResponseAjax = '\
                 self.tagDict[tag.name] = tag;
             });
             // init operationDict
-            Object.keys(local.swgg.apiDict).sort().forEach(function (operation) {
+            Object.keys(local.apiDict).sort().forEach(function (operation) {
                 // init operation
-                operation = local.jsonCopy(local.swgg.apiDict[operation]);
+                operation = local.jsonCopy(local.apiDict[operation]);
                 if (!operation.tags[0] || self.operationDict[operation._keyOperationId]) {
                     return;
                 }
@@ -1024,7 +1011,7 @@ local.swgg.templateUiResponseAjax = '\
                         self.tagDict[operation.tags[0]];
                     local.objectSetDefault(resource, {
                         description: 'no description available',
-                        id: local.swgg.idDomElementCreate('swgg_id_' + operation.tags[0]),
+                        id: local.idDomElementCreate('swgg_id_' + operation.tags[0]),
                         name: operation.tags[0],
                         operationListInnerHtml: ''
                     });
@@ -1034,10 +1021,7 @@ local.swgg.templateUiResponseAjax = '\
             Object.keys(self.resourceDict).sort().forEach(function (key) {
                 // templateRender resource
                 self.uiFragment.querySelector('.resourceList').appendChild(
-                    local.domFragmentRender(
-                        local.swgg.templateUiResource,
-                        self.resourceDict[key]
-                    )
+                    local.domFragmentRender(local.templateUiResource, self.resourceDict[key])
                 );
             });
             Object.keys(self.operationDict).sort(function (aa, bb) {
@@ -1050,8 +1034,7 @@ local.swgg.templateUiResponseAjax = '\
                     : 1;
             }).forEach(function (operation) {
                 operation = self.operationDict[operation];
-                operation.id =
-                    local.swgg.idDomElementCreate('swgg_id_' + operation.operationId);
+                operation.id = local.idDomElementCreate('swgg_id_' + operation.operationId);
                 resource = self.resourceDict[operation.tags[0]];
                 local.objectSetDefault(operation, {
                     description: '',
@@ -1062,31 +1045,29 @@ local.swgg.templateUiResponseAjax = '\
                 });
                 operation.parameters.forEach(function (element) {
                     // init element.id
-                    element.id = local.swgg.idDomElementCreate('swgg_id_' + element.name);
+                    element.id = local.idDomElementCreate('swgg_id_' + element.name);
                     self.paramDefDict[element.id] = element;
                 });
                 // templateRender operation
                 self.uiFragment.querySelector(
                     '#' + resource.id + ' .operationList'
-                ).appendChild(
-                    local.domFragmentRender(local.swgg.templateUiOperation, operation)
-                );
+                ).appendChild(local.domFragmentRender(local.templateUiOperation, operation));
             });
             Object.keys(self.paramDefDict).forEach(function (paramDef) {
                 paramDef = self.paramDefDict[paramDef];
-                local.swgg.uiParamRender(paramDef);
+                local.uiParamRender(paramDef);
                 self.uiFragment.querySelector('#' + paramDef.id).innerHTML = '';
                 self.uiFragment.querySelector('#' + paramDef.id)
                     .appendChild(paramDef.uiFragment);
                 // init valueEncoded
                 paramDef.paramInput =
                     self.uiFragment.querySelector('#' + paramDef.id + ' > .td3').children[0];
-                local.swgg.uiValueEncode(paramDef.paramInput, paramDef);
+                local.uiValueEncode(paramDef.paramInput, paramDef);
                 // init input.value
                 if (paramDef.isSelect) {
                     paramDef.selectOptionList.forEach(function (element) {
                         element.paramInput = self.uiFragment.querySelector('#' + element.id);
-                        local.swgg.uiValueEncode(element.paramInput, element);
+                        local.uiValueEncode(element.paramInput, element);
                         element.paramInput.value = element.valueEncoded;
                     });
                 } else if (paramDef.isInputText) {
@@ -1099,12 +1080,12 @@ local.swgg.templateUiResponseAjax = '\
             document.querySelector('.swggUiContainer').innerHTML = '';
             document.querySelector('.swggUiContainer').appendChild(self.uiFragment);
             // init event-handling
-            local.swgg.uiEventInit(document);
+            local.uiEventInit(document);
             // scrollTo location.hash
-            local.swgg.uiScrollTo(location.hash);
+            local.uiScrollTo(location.hash);
         };
 
-        local.swgg.uiScrollTo = function (locationHash) {
+        local.uiScrollTo = function (locationHash) {
         /*
          * this function will scrollTo locationHash
          */
@@ -1114,13 +1095,13 @@ local.swgg.templateUiResponseAjax = '\
             // list operations
             resource = document.querySelector('.swggUiContainer #' + resource) ||
                 document.querySelector('.swggUiContainer .resource');
-            local.swgg.uiAnimateSlideDown(resource.querySelector('.operationList'));
+            local.uiAnimateSlideDown(resource.querySelector('.operationList'));
             // init operation
             operation = locationHash.split('/')[2];
             // render datatable
             if (operation === 'swgg_datatable') {
                 local.onReadyAfter(function () {
-                    local.swgg.uiElementClick({
+                    local.uiElementClick({
                         target: resource.querySelector('.onEventDatatableReload')
                     });
                 });
@@ -1129,16 +1110,16 @@ local.swgg.templateUiResponseAjax = '\
             operation = resource.querySelector('#' + operation);
             // expand operation and scroll to it
             if (operation) {
-                local.swgg.uiAnimateSlideDown(operation.querySelector('.content'));
+                local.uiAnimateSlideDown(operation.querySelector('.content'));
                 // scroll to operation
-                local.swgg.uiAnimateScrollTo(operation);
+                local.uiAnimateScrollTo(operation);
             } else {
                 // scroll to resource
-                local.swgg.uiAnimateScrollTo(resource);
+                local.uiAnimateScrollTo(resource);
             }
         };
 
-        local.swgg.uiValueDecode = function (input, options) {
+        local.uiValueDecode = function (input, options) {
         /*
          * this function will decode options.valueEncoded
          * according to input.dataset.swgg_param_value_options
@@ -1169,7 +1150,7 @@ local.swgg.templateUiResponseAjax = '\
             return options;
         };
 
-        local.swgg.uiValueEncode = function (input, options) {
+        local.uiValueEncode = function (input, options) {
         /*
          * this function will encode options.valueDecoded according to options.type
          */

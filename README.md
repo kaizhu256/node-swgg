@@ -30,7 +30,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![api-doc](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/screen-capture.docApiCreate.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swgg_2Ftmp_2Fbuild_2Fdoc.api.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/doc.api.html)
 
 #### todo
-- npm publish 2016.11.1
+- make collectionFormat spec-compliant
 - revert temporary fix for chrome render bug
 - allow secure remote db export / import / reset to backend
 - add middlewareAcl
@@ -43,8 +43,10 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 94298d65
-- rename package from swagger-lite -> swgg
+#### change since 648e97d8
+- npm publish 2016.12.1
+- merge utility2 and swgg namespace into local namespace
+- revamp user-login / user-logout to use standard json-web-encryption token
 - none
 
 #### this package requires
@@ -220,7 +222,7 @@ instruction
             nextMiddleware();
         };
         // init middleware
-        local.middleware = local.middlewareGroupCreate([
+        local.utility2._middleware = local.middlewareGroupCreate([
             local.middlewareInit,
             local.middlewareAssetsCached,
             local.swgg.middlewareRouter,
@@ -234,8 +236,6 @@ instruction
             local.swgg.middlewareCrudBuiltin,
             local.swgg.middlewareCrudEnd
         ]);
-        // init error-middleware
-        local.middlewareError = local.swgg.middlewareError;
         // run test-server
         local.testRunServer(local);
     }());
@@ -819,7 +819,7 @@ utility2-comment -->\n\
         "light", "lightweight", "lite",
         "mongo", "mongodb",
         "nedb",
-        "standalone", "swagger", "swagger-ui",
+        "standalone", "swagger", "swagger-ui", "swgg",
         "web"
     ],
     "license": "MIT",
@@ -838,7 +838,7 @@ export npm_config_mode_auto_restart=1 && \
 ./lib.utility2.sh shRun shIstanbulCover test.js",
         "test": "export PORT=$(./lib.utility2.sh shServerPortRandom) && ./lib.utility2.sh test test.js"
     },
-    "version": "2016.11.1"
+    "version": "2016.12.1"
 }
 ```
 
