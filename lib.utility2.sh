@@ -170,7 +170,7 @@ shBuildCiDefault() {(set -e
 
 shBuildDoc() {(set -e
 # this function will build the doc
-    npm test --mode-test-case=testCase_build_doc
+    npm test --mode-test-case=testCase_build_doc --mode-coverage=""
 )}
 
 shBuildGithubUpload() {(set -e
