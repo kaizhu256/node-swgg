@@ -254,7 +254,7 @@
 }
 .swggUiContainer > .header > .td1 {
     font-size: x-large;
-    background: transparent url(assets.swgg.swagger-ui.logo_small.png) no-repeat left center;
+    background: transparent url(assets.lib.swgg.ui_logo_small.png) no-repeat left center;
     padding-left: 40px;
     color: white;
 }

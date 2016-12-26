@@ -30,6 +30,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![api-doc](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/screen-capture.docApiCreate.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swgg_2Ftmp_2Fbuild_2Fdoc.api.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/doc.api.html)
 
 #### todo
+- npm publish 2016.12.26
 - revert temporary fix for chrome render bug
 - allow secure remote db export / import / reset to backend
 - add middlewareAcl
@@ -42,11 +43,11 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since c6e3186f
-- npm publish 2016.12.25
-- add spec-compliant collectionFormat parameter for arrays
-- merge github-crud into this package
-- add heroku-postbuild npm-script
+#### change since 178d7079
+- rename file lib.swgg.json-schema.json
+- rename file lib.swgg.petstore.json
+- rename file lib.swgg.schema.json
+- rename file lib.swgg.ui.js
 - none
 
 #### this package requires
@@ -401,7 +402,7 @@ utility2-comment -->\n\
     {{#unless isRollup}}\n\
     <script src="assets.utility2.rollup.js"></script>\n\
     <script src="assets.swgg.js"></script>\n\
-    <script src="assets.swgg.lib.swagger-ui.js"></script>\n\
+    <script src="assets.lib.swgg.ui.js"></script>\n\
     <script src="jsonp.utility2._stateInit?callback=window.utility2._stateInit"></script>\n\
     <script>window.utility2.onResetBefore.counter += 1;</script>\n\
     <script src="assets.example.js"></script>\n\
@@ -423,7 +424,7 @@ utility2-comment -->\n\
     (function () {
         // init petstore-api - frontend
         local.tmp =
-            JSON.parse(local.assetsDict['/assets.swgg.lib.swagger.petstore.json']);
+            JSON.parse(local.assetsDict['/assets.lib.swgg.petstore.json']);
         delete local.tmp.basePath;
         delete local.tmp.host;
         delete local.tmp.schemes;
@@ -835,7 +836,7 @@ export npm_config_mode_auto_restart=1 && \
 ./lib.utility2.sh shRun shIstanbulCover test.js",
         "test": "export PORT=$(./lib.utility2.sh shServerPortRandom) && ./lib.utility2.sh test test.js"
     },
-    "version": "2016.12.25"
+    "version": "2016.12.26"
 }
 ```
 

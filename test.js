@@ -741,7 +741,7 @@
                 switch (options.modeNext) {
                 case 1:
                     options.blob = new local.Blob(
-                        [local.assetsDict['/assets.swgg.swagger-ui.logo_small.png']],
+                        [local.assetsDict['/assets.lib.swgg.ui_logo_small.png']],
                         { type: 'image/png' }
                     );
                     options.blob.name = 'a00.png';
@@ -1480,14 +1480,14 @@
                 file: '/api/v0/swagger.json',
                 url: '/api/v0/swagger.json'
             }, {
-                file: '/assets.swgg.lib.swagger-ui.js',
-                url: '/assets.swgg.lib.swagger-ui.js'
+                file: '/assets.lib.swgg.ui.js',
+                url: '/assets.lib.swgg.ui.js'
+            }, {
+                file: '/assets.lib.swgg.ui_logo_small.png',
+                url: '/assets.lib.swgg.ui_logo_small.png'
             }, {
                 file: '/assets.swgg.rollup.js',
                 url: '/assets.swgg.rollup.js'
-            }, {
-                file: '/assets.swgg.swagger-ui.logo_small.png',
-                url: '/assets.swgg.swagger-ui.logo_small.png'
             }];
             local.buildApp(options, onError);
         };

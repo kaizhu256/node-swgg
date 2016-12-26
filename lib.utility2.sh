@@ -255,7 +255,7 @@ shDeployGithub() {(set -e
     shBuildPrint "waiting 15 seconds for $TEST_URL to finish deploying"
     sleep 15
     # verify deployed app's main-page returns status-code < 400
-    if [ $(curl --connect-timeout 30 -Ls -o /dev/null -w "%{http_code}" "$TEST_URL") -lt 400 ]
+    if [ $(curl --connect-timeout 60 -Ls -o /dev/null -w "%{http_code}" "$TEST_URL") -lt 400 ]
     then
         shBuildPrint "curl test passed for $TEST_URL"
     else
@@ -293,7 +293,7 @@ shDeployHeroku() {(set -e
     export MODE_BUILD=deployHeroku
     export TEST_URL="https://hrku01-$npm_package_name-$CI_BRANCH.herokuapp.com"
     # verify deployed app's main-page returns status-code < 400
-    if [ $(curl --connect-timeout 30 -Ls -o /dev/null -w "%{http_code}" "$TEST_URL") -lt 400 ]
+    if [ $(curl --connect-timeout 60 -Ls -o /dev/null -w "%{http_code}" "$TEST_URL") -lt 400 ]
     then
         shBuildPrint "curl test passed for $TEST_URL"
     else
