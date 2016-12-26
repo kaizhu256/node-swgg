@@ -1029,8 +1029,20 @@
             options = {
                 paramDict: {
                     id: 'testCase_validateByParamDefList_default',
-                    // test array-param handling-behavior
-                    paramArray: ['aa', 'bb'],
+                    // test array-csv-param handling-behavior
+                    paramArrayCsv: ['aa', 'bb'],
+                    // test array-default-param handling-behavior
+                    paramArrayDefault: 'aa,bb',
+                    // test array-json-param handling-behavior
+                    paramArrayJson: ['aa', 'bb'],
+                    // test array-multi-param handling-behavior
+                    paramArrayMulti: ['aa', 'bb'],
+                    // test array-pipes-param handling-behavior
+                    paramArrayPipes: ['aa', 'bb'],
+                    // test array-ssv-param handling-behavior
+                    paramArraySsv: ['aa', 'bb'],
+                    // test array-tsv-param handling-behavior
+                    paramArrayTsv: ['aa', 'bb'],
                     // test body-param handling-behavior
                     paramBody: { aa: { bb: 'hello body' } },
                     // test boolean-param handling-behavior
@@ -1057,7 +1069,13 @@
                 local.assert(!error, error);
                 // validate object
                 local.assertJsonEqual(data.responseJson.data[0], {
-                    paramArray: ['aa', 'bb'],
+                    paramArrayCsv: ['aa', 'bb'],
+                    paramArrayDefault: ['aa', 'bb'],
+                    paramArrayJson: ['aa', 'bb'],
+                    paramArrayMulti: ['aa', 'bb'],
+                    paramArrayPipes: ['aa', 'bb'],
+                    paramArraySsv: ['aa', 'bb'],
+                    paramArrayTsv: ['aa', 'bb'],
                     paramBody: { aa: { bb: 'hello body' } },
                     paramBoolean: true,
                     paramEnumMultiple: [0, 1],
@@ -1099,7 +1117,13 @@
             onParallel.counter += 1;
             options = { paramPath: 'hello path', paramRequired: 'hello required' };
             [
-                { key: 'paramArray', value: true },
+                { key: 'paramArrayCsv', value: true },
+                { key: 'paramArrayDefault', value: true },
+                { key: 'paramArrayJson', value: true },
+                { key: 'paramArrayMulti', value: true },
+                { key: 'paramArrayPipes', value: true },
+                { key: 'paramArraySsv', value: true },
+                { key: 'paramArrayTsv', value: true },
                 { key: 'paramEnumSingle', value: true },
                 { key: 'paramHeader', value: true },
                 { key: 'paramInteger', value: true },
@@ -1126,6 +1150,7 @@
          */
             options = {
                 paramDict: {
+                    paramArrayMulti: [0, 1],
                     paramFormData1: 'hello formData1',
                     paramFormData2: 'hello formData2'
                 }
@@ -1135,6 +1160,7 @@
                 local.assert(!error, error);
                 // validate object
                 local.assertJsonEqual(data.responseJson.data[0], {
+                    paramArrayMulti: [0, 1],
                     paramFormData1: 'hello formData1',
                     paramFormData2: 'hello formData2'
                 });
@@ -1616,12 +1642,61 @@
                 '/x-test/paramDefault/{paramPath}': { post: {
                     operationId: 'paramDefault',
                     parameters: [{
-                        // test array-param handling-behavior
-                        default: ['aa', 'bb'],
-                        description: 'array-param',
+                        // test array-csv-param handling-behavior
+                        collectionFormat: 'csv',
+                        description: 'csv-array param',
                         in: 'query',
                         items: { type: 'string' },
-                        name: 'paramArray',
+                        name: 'paramArrayCsv',
+                        type: 'array'
+                    }, {
+                        // test array-default-param handling-behavior
+                        collectionFormat: 'default',
+                        description: 'default-array param',
+                        in: 'query',
+                        items: { type: 'string' },
+                        name: 'paramArrayDefault',
+                        type: 'array'
+                    }, {
+                        // test array-json-param handling-behavior
+                        collectionFormat: 'json',
+                        default: ['aa', 'bb'],
+                        description: 'json-array param',
+                        in: 'query',
+                        items: { type: 'string' },
+                        name: 'paramArrayJson',
+                        type: 'array'
+                    }, {
+                        // test array-multi-param handling-behavior
+                        collectionFormat: 'multi',
+                        description: 'multi-array param',
+                        in: 'query',
+                        items: { type: 'string' },
+                        name: 'paramArrayMulti',
+                        type: 'array'
+                    }, {
+                        // test array-pipes-param handling-behavior
+                        collectionFormat: 'pipes',
+                        description: 'pipes-array param',
+                        in: 'query',
+                        items: { type: 'string' },
+                        name: 'paramArrayPipes',
+                        type: 'array'
+                    }, {
+                        // test array-ssv-param handling-behavior
+                        collectionFormat: 'ssv',
+                        description: 'ssv-array param',
+                        in: 'query',
+                        items: { type: 'string' },
+                        name: 'paramArraySsv',
+                        type: 'array'
+                    }, {
+                        // test array-tsv-param handling-behavior
+                        collectionFormat: 'tsv',
+                        description: 'tsv-array param',
+                        in: 'query',
+                        items: { type: 'string' },
+                        name: 'paramArrayTsv',
                         type: 'array'
                     }, {
                         // test body-param handling-behavior
@@ -1715,6 +1790,14 @@
                 '/x-test/paramFormData': { post: {
                     operationId: 'paramFormData',
                     parameters: [{
+                        // test array-multi-param handling-behavior
+                        collectionFormat: 'multi',
+                        description: 'multi-array param',
+                        in: 'formData',
+                        items: { type: 'integer' },
+                        name: 'paramArrayMulti',
+                        type: 'array'
+                    }, {
                         description: 'form-data-param 1',
                         in: 'formData',
                         name: 'paramFormData1',
@@ -1940,6 +2023,7 @@
         // run validation test
         local.testCase_validateByParamDefList_default(null, local.onErrorDefault);
         local.testCase_validateByParamDefList_error(null, local.onErrorDefault);
+        local.testCase_validateByParamDefList_formData(null, local.onErrorDefault);
         local.testCase_validateBySchema_default(null, local.onErrorDefault);
         local.testCase_validateBySchema_error(null, local.onErrorDefault);
         local.testCase_validateBySwagger_default(null, local.onErrorDefault);

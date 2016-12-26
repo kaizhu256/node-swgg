@@ -672,7 +672,39 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 if (tmp === undefined) {
                     return;
                 }
-                if (!(paramDef.type === 'string' || tmp instanceof local.Blob)) {
+                // serialize array
+                if (paramDef.type === 'array' && paramDef.in !== 'body') {
+                    if (typeof tmp !== 'string') {
+                        switch (paramDef.collectionFormat) {
+                        case 'json':
+                            tmp = JSON.stringify(tmp);
+                            break;
+                        case 'multi':
+                            tmp.forEach(function (value) {
+                                options[paramDef.in === 'formData'
+                                    ? 'inForm'
+                                    : 'inQuery'] += '&' +
+                                    encodeURIComponent(paramDef.name) + '=' +
+                                    encodeURIComponent(paramDef.items.type === 'string'
+                                        ? value
+                                        : JSON.stringify(value));
+                            });
+                            return;
+                        case 'pipes':
+                            tmp = tmp.join('|');
+                            break;
+                        case 'ssv':
+                            tmp = tmp.join(' ');
+                            break;
+                        case 'tsv':
+                            tmp = tmp.join('\t');
+                            break;
+                        // default to csv
+                        default:
+                            tmp = tmp.join(',');
+                        }
+                    }
+                } else if (!(paramDef.type === 'string' || tmp instanceof local.Blob)) {
                     tmp = JSON.stringify(tmp);
                 }
                 switch (paramDef.in) {
@@ -970,8 +1002,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     tmp = min + Math.random() * (max - min);
                     break;
                 case 'string':
-                    tmp = 'random_' + Date.now().toString(36) +
-                        Math.random().toString(36).slice(2, 10);
+                    tmp = ((1 + Math.random()) * 0x10000000000000).toString(36).slice(1);
                     switch (propDef.format) {
                     case 'byte':
                         tmp = local.stringToBase64(tmp);
@@ -990,7 +1021,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                     // http://json-schema.org/latest/json-schema-validation.html#anchor25
                     // 5.2.  Validation keywords for strings
                     while (tmp.length < (propDef.minLength || 0)) {
-                        tmp += Math.random().toString(36).slice(2, 6);
+                        tmp += ((1 + Math.random()) * 0x10000000000000).toString(36).slice(1);
                     }
                     tmp = tmp.slice(0, propDef.maxLength || Infinity);
                     break;
@@ -1559,6 +1590,17 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                                 request.urlParsed.query[paramDef.name];
                             break;
                         }
+                        // parse array-multi
+                        if (request.swgg.paramDict[paramDef.name] &&
+                                paramDef.type === 'array' &&
+                                paramDef.collectionFormat === 'multi') {
+                            tmp = '';
+                            request.swgg.paramDict[paramDef.name].forEach(function (value) {
+                                tmp += '&' + encodeURIComponent(paramDef.name) + '=' +
+                                    encodeURIComponent(value);
+                            });
+                            request.swgg.paramDict[paramDef.name] = tmp.slice(1);
+                        }
                         // init default param
                         if (local.isNullOrUndefined(request.swgg.paramDict[paramDef.name]) &&
                                 paramDef.default !== undefined) {
@@ -1666,8 +1708,44 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                 if (local.isNullOrUndefined(tmp) && paramDef.default !== undefined) {
                     tmp = local.jsonCopy(paramDef.default);
                 }
+                // parse array
+                if (paramDef.type === 'array' && paramDef.in !== 'body') {
+                    if (typeof tmp === 'string') {
+                        switch (paramDef.collectionFormat) {
+                        case 'json':
+                            local.tryCatchOnError(function () {
+                                tmp = JSON.parse(tmp);
+                            }, local.nop);
+                            data[paramDef.name] = tmp;
+                            return;
+                        case 'multi':
+                            tmp = local.urlParse('?' + tmp, true).query[paramDef.name];
+                            break;
+                        case 'pipes':
+                            tmp = tmp.split('|');
+                            break;
+                        case 'ssv':
+                            tmp = tmp.split(' ');
+                            break;
+                        case 'tsv':
+                            tmp = tmp.split('\t');
+                            break;
+                        // default to csv
+                        default:
+                            tmp = tmp.split(',');
+                        }
+                        if (paramDef.items && paramDef.items.type !== 'string') {
+                            // try to JSON.parse the string
+                            local.tryCatchOnError(function () {
+                                tmp = tmp.map(function (element) {
+                                    return JSON.parse(element);
+                                });
+                            }, local.nop);
+                        }
+                    }
                 // JSON.parse paramDict
-                if (!(paramDef.type === 'file' || paramDef.type === 'string') &&
+                } else if (paramDef.type !== 'file' &&
+                        paramDef.type !== 'string' &&
                         (typeof tmp === 'string' || tmp instanceof local.global.Uint8Array)) {
                     // try to JSON.parse the string
                     local.tryCatchOnError(function () {
@@ -2045,6 +2123,15 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
                             'x-swgg-notRequired': options['x-swgg-notRequired']
                         });
                     });
+                    switch (propDef.collectionFormat) {
+                    case 'multi':
+                        local.assert(
+                            propDef.in === 'formData' || propDef.in === 'query',
+                            prefix + ' with collectionFormat "multi" ' +
+                                'is valid only for parameters in "query" or "formData"'
+                        );
+                        break;
+                    }
                     break;
                 case 'boolean':
                     local.assert(typeof data === 'boolean');

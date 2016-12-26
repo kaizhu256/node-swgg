@@ -28,11 +28,12 @@
     },
     "scripts": {
         "build-ci": "./lib.utility2.sh shRun shReadmeBuild",
+        "heroku-postbuild": "./lib.utility2.sh shRun shDeployHeroku",
         "start": "export PORT=${PORT:-8080} && export npm_config_mode_auto_restart=1 && ./lib.utility2.sh shRun shIstanbulCover test.js",
 
 
 
         "test": "export PORT=$(./lib.utility2.sh shServerPortRandom) && ./lib.utility2.sh test test.js"
     },
-    "version": "2016.12.1"
+    "version": "2016.12.25"
 }

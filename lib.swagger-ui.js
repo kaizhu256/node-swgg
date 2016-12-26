@@ -116,7 +116,9 @@ local.templateUiMain = '\
     <ul>\n\
         {{#if externalDocs}}\n\
         <li class="marginTop05">\n\
+            {{#if externalDocs.description}}\n\
             <p>{{externalDocs.description htmlSafe}}</p>\n\
+            {{/if externalDocs.description}}\n\
             <a href="{{externalDocs.url}}" target="_blank">{{externalDocs.url}}</a>\n\
         </li>\n\
         {{/if externalDocs}}\n\
@@ -188,7 +190,9 @@ local.templateUiOperation = '\
         {{#each responseList}}\n\
         <div class="borderTop responseList tr">\n\
             <span class="td1">{{key}}</span>\n\
+            {{#if value.description}}\n\
             <span class="td2">{{value.description htmlSafe}}</span>\n\
+            {{/if value.description}}\n\
         </div>\n\
         {{/each responseList}}\n\
         <button class="marginTop10 onEventOperationAjax">Try it out!</button>\n\
@@ -203,7 +207,9 @@ local.templateUiOperation = '\
 local.templateUiParam = '\
 <span class="td1 {{#if required}}fontWeightBold{{/if required}}">\n\
     {{name}}<br>\n\
+    {{#if description}}\n\
     <span class="color777">{{description}}</span>\n\
+    {{/if description}}\n\
 </span>\n\
 <span class="td2">{{type2}}{{#if format2}} ({{format2}}){{/if format2}}</span>\n\
 <span class="td3">\n\
@@ -236,7 +242,11 @@ local.templateUiResource = '\
     data-name="{{name}}"\n\
     id="{{id}}">\n\
     <div class="fontWeightBold header tr">\n\
-        <a class="color777 flex1 onEventResourceDisplayAction td1" href="#">{{name}} : {{description htmlSafe}}</a>\n\
+        <a class="color777 flex1 onEventResourceDisplayAction td1" href="#">{{name}} :\n\
+        {{#if description}}\n\
+        {{description htmlSafe}}\n\
+        {{/if description}}\n\
+        </a>\n\
         <a class="color777 onEventResourceDisplayAction td2" href="#">Show</a>\n\
         <a class="color777 onEventResourceDisplayAction td3" href="#">Expand / Collapse Operations</a>\n\
         <a class="color777 onEventDatatableReload td4" data-resource-name="{{name}}" href="#">Datatable</a>\n\
@@ -869,7 +879,7 @@ local.templateUiResponseAjax = '\
                 paramDef.isSelect = true;
                 paramDef.isSelectMultiple = paramDef.type === 'array';
                 paramDef.selectOptionList = (paramDef.type === 'boolean'
-                    ? [true, false]
+                    ? [false, true]
                     : paramDef.enum).map(function (element) {
                     paramDef.hasDefault |= paramDef.enumDefault.indexOf(element) >= 0;
                     return {

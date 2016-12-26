@@ -129,7 +129,7 @@ require('$npm_config_dir_utility2/lib.utility2.js').browserTest({
 
 shBuildApp() {(set -e
 # this function will build the app
-    npm test --mode-test-case=testCase_build_app
+    npm test --mode-coverage="" --mode-test-case=testCase_build_app
 )}
 
 shBuildCiDefault() {(set -e
@@ -170,7 +170,7 @@ shBuildCiDefault() {(set -e
 
 shBuildDoc() {(set -e
 # this function will build the doc
-    npm test --mode-test-case=testCase_build_doc --mode-coverage=""
+    npm test --mode-coverage="" --mode-test-case=testCase_build_doc
 )}
 
 shBuildGithubUpload() {(set -e
@@ -234,6 +234,81 @@ shDebugArgv() {(set -e
     do
         printf "'$ARG'\n"
     done
+)}
+
+shDeployGithub() {(set -e
+# this function will deploy the app to $GITHUB_REPO
+# and run a simple curl check for $TEST_URL
+# and test $TEST_URL
+    if [ ! "$GIT_SSH" ]
+    then
+        return
+    fi
+    export MODE_BUILD=deployGithub
+    export TEST_URL="https://$(printf "$GITHUB_REPO" | \
+        sed 's/\//.github.io\//')/build..$CI_BRANCH..travis-ci.org/app/index.html"
+    shBuildPrint "deploying to $TEST_URL"
+    # build app
+    shBuildApp
+    # upload app
+    shBuildGithubUpload
+    shBuildPrint "waiting 15 seconds for $TEST_URL to finish deploying"
+    sleep 15
+    # verify deployed app's main-page returns status-code < 400
+    if [ $(curl --connect-timeout 30 -Ls -o /dev/null -w "%{http_code}" "$TEST_URL") -lt 400 ]
+    then
+        shBuildPrint "curl test passed for $TEST_URL"
+    else
+        shBuildPrint "curl test failed for $TEST_URL"
+        return 1
+    fi
+    # test deployed app
+    (export MODE_BUILD=${MODE_BUILD}Test &&
+        export modeBrowserTest=test &&
+        export url="$TEST_URL?modeTest=1&timeExit={{timeExit}}" &&
+        shBrowserTest) || return $?
+    # screen-capture deployed app
+    (export modeBrowserTest=screenCapture &&
+        export url="$TEST_URL" &&
+        shBrowserTest) || return $?
+)}
+
+shDeployHeroku() {(set -e
+# this function will deploy the app to heroku
+# and run a simple curl check for $TEST_URL
+# and test $TEST_URL
+    # build app inside heroku
+    if [ "$npm_lifecycle_event" = heroku-postbuild ]
+    then
+        shBuildApp
+        cp tmp/build/app/assets.app.js .
+        printf "web: npm_config_mode_backend=1 node assets.app.js" > Procfile
+        rm -fr tmp
+        return
+    fi
+    if [ ! "$GIT_SSH" ]
+    then
+        return
+    fi
+    export MODE_BUILD=deployHeroku
+    export TEST_URL="https://hrku01-$npm_package_name-$CI_BRANCH.herokuapp.com"
+    # verify deployed app's main-page returns status-code < 400
+    if [ $(curl --connect-timeout 30 -Ls -o /dev/null -w "%{http_code}" "$TEST_URL") -lt 400 ]
+    then
+        shBuildPrint "curl test passed for $TEST_URL"
+    else
+        shBuildPrint "curl test failed for $TEST_URL"
+        return 1
+    fi
+    # test deployed app
+    (export MODE_BUILD=${MODE_BUILD}Test &&
+        export modeBrowserTest=test &&
+        export url="$TEST_URL?modeTest=1&timeExit={{timeExit}}" &&
+        shBrowserTest) || return $?
+    # screen-capture deployed app
+    (export modeBrowserTest=screenCapture &&
+        export url="$TEST_URL" &&
+        shBrowserTest) || return $?
 )}
 
 shDockerBuildCleanup() {(set -e
@@ -334,11 +409,11 @@ server {
 server {
     listen 443;
     root /root/docker/usr.share.nginx.html;
-    ssl_certificate /root/docker/etc.nginx.ssl.pem;
-    ssl_certificate_key /root/docker/etc.nginx.ssl.key;
+    ssl_certificate /root/docker/etc.nginx.ssl.cert.pem;
+    ssl_certificate_key /root/docker/etc.nginx.ssl.key.pem;
     ssl on;
     ssl_prefer_server_ciphers on;
-    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_protocols TLSv1.2;
     location / {
         index index.html index.htm;
     }
@@ -493,7 +568,7 @@ shFileKeySort() {(set -e
 console.log('var aa = [' + require('fs').readFileSync('$FILE', 'utf8')
 /* jslint-ignore-begin */
     .replace((/\\n{2,}/gm), '\\n')
-    .replace((/^( {8}\\w[^ ]*? = .*?)$/gm), '\`\"\$1\",')
+    .replace((/^( {8}\\w[^ ]*? =(?:| .*?))$/gm), '\`\"\$1\",')
     .replace((/^(\\w+?\\(\\) \\{.*?)$/gm), '\`\"\$1\",')
     .replace((/\\n[^\`].*?$/gm), '')
     .replace((/^\W.*/), '')
@@ -706,36 +781,6 @@ shGitSquashShift() {(set -e
     git checkout "$BRANCH"
 )}
 
-shGithubDeploy() {(set -e
-# this function will deploy the app to $GITHUB_REPO
-# and run a simple curl check for the main-page
-    if [ ! "$GIT_SSH" ]
-    then
-        return
-    fi
-    export MODE_BUILD=githubDeploy
-    shBuildPrint "deploying to $TEST_URL"
-    # build app
-    shBuildApp
-    # upload app
-    shBuildGithubUpload
-    shBuildPrint "waiting 15 seconds for $TEST_URL to finish deploying"
-    sleep 15
-    # verify deployed app's main-page returns status-code < 400
-    # '
-    if [ $(curl --connect-timeout 30 -Ls -o /dev/null -w "%{http_code}" "$TEST_URL") -lt 400 ]
-    then
-        shBuildPrint "curl test passed for $TEST_URL"
-    else
-        shBuildPrint "curl test failed for $TEST_URL"
-        return 1
-    fi
-    # screen-capture deployed app
-    export modeBrowserTest=screenCapture
-    export url="$TEST_URL"
-    shBrowserTest
-)}
-
 shGrep() {(set -e
 # this function will recursively grep $DIR for the $REGEXP
     DIR="$1"
@@ -797,37 +842,6 @@ Object.keys(local.fileDict).forEach(function (key) {
 });
 // </script>
     "
-)}
-
-shHerokuDeploy() {(set -e
-# this function will deploy the app to $HEROKU_REPO,
-# and run a simple curl check for the main-page
-    if [ ! "$GIT_SSH" ]
-    then
-        return
-    fi
-    export MODE_BUILD=herokuDeploy
-    shBuildPrint "deploying to $TEST_URL"
-    # build app
-    shBuildApp
-    # upload app
-    (shGitRepoBranchCommand copyPwdLsTree local HEAD "git@heroku.com:$HEROKU_REPO.git" master) \
-        || return $?
-    shBuildPrint "waiting 30 seconds for $TEST_URL to finish deploying"
-    sleep 30
-    # verify deployed app's main-page returns status-code < 400
-    # '
-    if [ $(curl --connect-timeout 30 -Ls -o /dev/null -w "%{http_code}" "$TEST_URL") -lt 400 ]
-    then
-        shBuildPrint "curl test passed for $TEST_URL"
-    else
-        shBuildPrint "curl test failed for $TEST_URL"
-        return 1
-    fi
-    # screen-capture deployed app
-    export modeBrowserTest=screenCapture
-    export url="$TEST_URL"
-    shBrowserTest
 )}
 
 shHtpasswdCreate() {(set -e
@@ -1081,7 +1095,6 @@ shIptablesInit() {(set -e
 
     # https://wiki.debian.org/iptables
     # Allows all loopback (lo0) traffic and drop all traffic to 127/8 that doesn't use lo0
-    # '
     iptables -A INPUT -i lo -j ACCEPT
     iptables -A INPUT ! -i lo -d 127.0.0.0/8 -j REJECT
     # Accepts all established inbound connections
@@ -1330,6 +1343,11 @@ shNpmTestPublished() {(set -e
     return "$EXIT_CODE"
 )}
 
+shPasswordRandom() {(set -e
+# this function will create a random password
+    openssl rand -base64 32
+)}
+
 shReadmeBuild() {(set -e
 # this function will run the internal build-script embedded in README.md
     # run shell script from README.md
@@ -1568,7 +1586,26 @@ local.fs.writeFileSync('$npm_config_dir_build/$MODE_BUILD_SCREEN_CAPTURE', local
 shServerPortRandom() {(set -e
 # https://wiki.ubuntu.com/DashAsBinSh#A.24RANDOM
 # this function will print a random port in the inclusive range 0x8000 to 0xffff
-    if (busybox > /dev/null 2>&1)
+    if (node --version > /dev/null 2>&1)
+    then
+        node -e "
+// <script>
+/*jslint
+    bitwise: true,
+    browser: true,
+    maxerr: 8,
+    maxlen: 96,
+    node: true,
+    nomen: true,
+    regexp: true,
+    stupid: true
+*/
+'use strict';
+process.stdout.write(String(Math.random() * 0x10000 | 0x8000));
+// </script>
+        "
+        return
+    elif (busybox > /dev/null 2>&1)
     then
         HEXDUMP="busybox hexdump"
     else
