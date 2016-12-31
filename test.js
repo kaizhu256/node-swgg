@@ -1034,7 +1034,7 @@
                     // test array-default-param handling-behavior
                     paramArrayDefault: 'aa,bb',
                     // test array-json-param handling-behavior
-                    paramArrayJson: ['aa', 'bb'],
+                    paramArrayJson: [0, 1],
                     // test array-multi-param handling-behavior
                     paramArrayMulti: ['aa', 'bb'],
                     // test array-pipes-param handling-behavior
@@ -1046,9 +1046,9 @@
                     // test body-param handling-behavior
                     paramBody: { aa: { bb: 'hello body' } },
                     // test boolean-param handling-behavior
-                    paramBoolean: true,
+                    paramBoolean: false,
                     // test enum-multiple-param handling-behavior
-                    paramEnumMultiple: [0, 1],
+                    paramEnumMulti: [0, 1],
                     // test enum-single-param handling-behavior
                     paramEnumSingle: 0,
                     // test header-param handling-behavior
@@ -1071,14 +1071,14 @@
                 local.assertJsonEqual(data.responseJson.data[0], {
                     paramArrayCsv: ['aa', 'bb'],
                     paramArrayDefault: ['aa', 'bb'],
-                    paramArrayJson: ['aa', 'bb'],
+                    paramArrayJson: [0, 1],
                     paramArrayMulti: ['aa', 'bb'],
                     paramArrayPipes: ['aa', 'bb'],
                     paramArraySsv: ['aa', 'bb'],
                     paramArrayTsv: ['aa', 'bb'],
                     paramBody: { aa: { bb: 'hello body' } },
-                    paramBoolean: true,
-                    paramEnumMultiple: [0, 1],
+                    paramBoolean: false,
+                    paramEnumMulti: [0, 1],
                     paramEnumSingle: 0,
                     paramHeader: 'hello header',
                     paramInteger: 0,
@@ -1182,6 +1182,7 @@
                 { key: 'propArraySubdoc', value: [{ propRequired: true }] },
                 { key: 'propBoolean', value: true },
                 { key: 'propEnum', value: 0 },
+                { key: 'propEnumMulti', value: [0, 1] },
                 { key: 'propInteger', value: 0 },
                 { key: 'propInteger2', value: 0 },
                 { key: 'propIntegerInt32', value: 0 },
@@ -1237,6 +1238,7 @@
                 { key: 'propArraySubdoc', value: [{ propRequired: null }] },
                 { key: 'propBoolean', value: 0 },
                 { key: 'propEnum', value: -1 },
+                { key: 'propEnumMulti', value: 0 },
                 { key: 'propInteger', value: 0.5 },
                 { key: 'propInteger', value: Infinity },
                 { key: 'propInteger', value: NaN },
@@ -1396,7 +1398,6 @@
                 '#!/swgg_id_pet',
                 '#!/swgg_id_pet/undefined',
                 '#!/swgg_id_pet/undefined/undefined',
-                '#!/swgg_id_pet/swgg_datatable',
                 '#!/swgg_id_pet/swgg_id_addPet'
             ];
             options.forEach(function (element) {
@@ -1405,47 +1406,62 @@
             onError();
         };
 
+        local.testCase_ui_datable = function (options, onError) {
+        /*
+         * this function will test the ui's datatable handling-behavior
+         */
+            options = {};
+            options.onEvent = function () {
+                document.removeEventListener('uiDatatableRendered', options.onEvent);
+                // test onEventModalHide's null-case handling-behavior
+                document.querySelector('.onEventModalHide div').click();
+                // select dbRow
+                document.querySelector('.onEventDatatableTrSelect').click();
+                // un-select dbRow
+                document.querySelector('.onEventDatatableTrSelect input').click();
+                // re-select dbRow
+                document.querySelector('.onEventDatatableTrSelect').click();
+                document.querySelector('.onEventDatatableSelectedRemove').click();
+                // hide modal
+                document.querySelector('.onEventModalHide').click();
+                onError();
+            };
+            document.addEventListener('uiDatatableRendered', options.onEvent);
+            document.querySelector('[data-resource-name=pet]').click();
+        };
+
         local.testCase_ui_default = function (options, onError) {
         /*
          * this function will test the ui's default handling-behavior
          */
             var onParallel;
-            options = {};
             onParallel = local.onParallel(function (error) {
                 setTimeout(function () {
-                    // hide onEventModalHide's default handling-behavior
-                    local.uiElementClick({
-                        target: document.querySelector('.onEventModalHide')
-                    });
-                }, 500);
-                onError(error);
+                    // hide modal
+                    document.querySelector('.onEventModalHide').click();
+                    // reset location.hash
+                    document.querySelector('#swgg_id_pet .td1').click();
+                    onError(error);
+                }, 1000);
             });
             onParallel.counter += 1;
-            Object.keys(local.uiEventListenerDict).sort().forEach(function (selector) {
-                local.domQuerySelectorAll(
-                    document,
-                    selector
+            options = Object.keys(local.uiEventListenerDict).sort();
+            options.forEach(function (selector) {
+                Array.from(
+                    document.querySelectorAll(selector)
                 ).forEach(function (element, ii, list) {
                     [null, null].forEach(function () {
                         onParallel.counter += 1;
                         setTimeout(function () {
-                            local.uiElementClick({ target: element });
+                            element.click();
                             onParallel();
                         }, ii * 1000 / list.length);
                     });
                 });
             });
-            // test onEventModalHide's null-case handling-behavior
-            options = {
-                target: document.querySelector('.onEventModalHide').children[0]
-            };
-            local.uiElementClick(options);
             // test onEventOperationAjax's error handling-behavior
             document.querySelector('#swgg_id_paramInteger .input').value = 'syntax error';
-            options = {
-                target: document.querySelector('#swgg_id_paramDefault .onEventOperationAjax')
-            };
-            local.uiElementClick(options);
+            document.querySelector('#swgg_id_paramDefault .onEventOperationAjax').click();
             onParallel();
         };
 
@@ -1460,9 +1476,8 @@
             ];
             options.forEach(function (id) {
                 document.querySelector('#swgg_id_fileGetOneById_id_id .input').value = id;
-                local.uiElementClick({ target: document.querySelector(
-                    '#swgg_id_fileGetOneById_id_id .onEventOperationAjax'
-                ) });
+                document.querySelector('#swgg_id_fileGetOneById_id_id .onEventOperationAjax')
+                    .click();
             });
             onError();
         };
@@ -1496,7 +1511,9 @@
         /*
          * this function will test build's doc handling-behavior
          */
-            options = {};
+            options = {
+                exampleFileList: ['README.md', 'test.js', 'lib.swgg.js', 'lib.swgg.ui.js']
+            };
             local.buildDoc(options, onError);
         };
 
@@ -1549,6 +1566,11 @@
                         },
                         propBoolean: { type: 'boolean' },
                         propEnum: { enum: [0, 1], type: 'integer' },
+                        propEnumMulti: {
+                            enum: [0, 1],
+                            items: { type: 'integer' },
+                            type: 'array'
+                        },
                         propInteger: { type: 'integer' },
                         propInteger2: {
                             exclusiveMaximum: true,
@@ -1644,6 +1666,7 @@
                     parameters: [{
                         // test array-csv-param handling-behavior
                         collectionFormat: 'csv',
+                        default: ['aa', 'bb'],
                         description: 'csv-array param',
                         in: 'query',
                         items: { type: 'string' },
@@ -1652,6 +1675,7 @@
                     }, {
                         // test array-default-param handling-behavior
                         collectionFormat: 'default',
+                        default: ['aa', 'bb'],
                         description: 'default-array param',
                         in: 'query',
                         items: { type: 'string' },
@@ -1660,15 +1684,16 @@
                     }, {
                         // test array-json-param handling-behavior
                         collectionFormat: 'json',
-                        default: ['aa', 'bb'],
+                        default: [0, 1],
                         description: 'json-array param',
                         in: 'query',
-                        items: { type: 'string' },
+                        items: { type: 'integer' },
                         name: 'paramArrayJson',
                         type: 'array'
                     }, {
                         // test array-multi-param handling-behavior
                         collectionFormat: 'multi',
+                        default: ['aa', 'bb'],
                         description: 'multi-array param',
                         in: 'query',
                         items: { type: 'string' },
@@ -1677,6 +1702,7 @@
                     }, {
                         // test array-pipes-param handling-behavior
                         collectionFormat: 'pipes',
+                        default: ['aa', 'bb'],
                         description: 'pipes-array param',
                         in: 'query',
                         items: { type: 'string' },
@@ -1685,6 +1711,7 @@
                     }, {
                         // test array-ssv-param handling-behavior
                         collectionFormat: 'ssv',
+                        default: ['aa', 'bb'],
                         description: 'ssv-array param',
                         in: 'query',
                         items: { type: 'string' },
@@ -1693,6 +1720,7 @@
                     }, {
                         // test array-tsv-param handling-behavior
                         collectionFormat: 'tsv',
+                        default: ['aa', 'bb'],
                         description: 'tsv-array param',
                         in: 'query',
                         items: { type: 'string' },
@@ -1700,13 +1728,14 @@
                         type: 'array'
                     }, {
                         // test body-param handling-behavior
+                        default: {},
                         description: 'body-param',
                         in: 'body',
                         name: 'paramBody',
                         schema: { type: 'object' }
                     }, {
                         // test boolean-param handling-behavior
-                        default: true,
+                        default: false,
                         description: 'boolean-param',
                         in: 'query',
                         name: 'paramBoolean',
@@ -1714,15 +1743,16 @@
                     }, {
                         // test enum-multiple-param handling-behavior
                         // coverage-hack - test default multi-select handling-behavio
-                        default: [0],
+                        default: [0, 1],
                         description: 'enum-multiple-param',
                         enum: [null, 0, 1, 2, 3, 4],
                         in: 'query',
                         items: { type: 'integer' },
-                        name: 'paramEnumMultiple',
+                        name: 'paramEnumMulti',
                         type: 'array'
                     }, {
                         // test enum-single-param handling-behavior
+                        default: 0,
                         description: 'enum-single-param',
                         enum: [null, 0, 1, 2, 3, 4],
                         in: 'query',
@@ -1730,6 +1760,7 @@
                         type: 'integer'
                     }, {
                         // test header-param handling-behavior
+                        default: 'hello header',
                         description: 'header-param',
                         in: 'header',
                         name: 'paramHeader',
@@ -1742,6 +1773,7 @@
                         type: 'integer'
                     }, {
                         // test json-param handling-behavior
+                        default: '{}',
                         description: 'json-param',
                         format: 'json',
                         in: 'query',

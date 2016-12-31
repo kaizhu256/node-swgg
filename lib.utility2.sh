@@ -577,7 +577,7 @@ var bb = aa.slice().sort();\n\
 aa.forEach(function (aa, ii) {\n\
     console.log(ii, aa === bb[ii], aa, bb[ii]);\n\
 });\n\
-JSON.stringify(aa) === JSON.stringify(bb)\n\
+console.assert(JSON.stringify(aa) === JSON.stringify(bb))\n\
 '
 /* jslint-ignore-end */
     );
@@ -657,7 +657,7 @@ shGitLsTree() {(set -e
     git ls-tree --name-only -r HEAD | while read file
     do
         ii=$((ii+1))
-        printf "%-4s    %s    %8s bytes    %s\n" \
+        printf "%3s.  %s  %7s byte  %s\n" \
             "$ii" \
             "$(git log -1 --format="%ai" -- "$file")" \
             "$(ls -ln "$file" | awk "{print \$5}")" \
@@ -810,7 +810,7 @@ tmp\\)\\(\\b\\|[_s]\\)\
 
 shGrepFileReplace() {(set -e
 # this function will save the grep-and-replace lines in $FILE
-    FILE=$1
+    FILE="$1"
     node -e "
 // <script>
 /*jslint
@@ -1267,6 +1267,56 @@ shNpmPublish() {(set -e
     shInit
     shGitRepoBranchCommand copyPwdLsTree
     cd /tmp/git.repo.branch
+    npm publish
+)}
+
+shNpmPublishAlias() {(set -e
+# this function will run npm-publish $NAME to $ALIAS
+    NAME="$1"
+    ALIAS="$2"
+    VERSION="$3"
+    # init /tmp/app
+    rm -fr /tmp/app /tmp/node_modules && mkdir -p /tmp/app
+    # cd /tmp/app
+    cd /tmp/app
+    curl "https://registry.npmjs.org/$NAME" > package.json
+    node -e "
+// <script>
+/*jslint
+    bitwise: true,
+    browser: true,
+    maxerr: 8,
+    maxlen: 96,
+    node: true,
+    nomen: true,
+    regexp: true,
+    stupid: true
+*/
+'use strict';
+var local;
+local = {};
+local.fs = require('fs');
+local.packageJson = JSON.parse(local.fs.readFileSync('package.json'));
+local.version = '$VERSION';
+local.version = local.version || Object.keys(local.packageJson.versions).slice(-1)[0];
+local.fs.writeFileSync('README.md', local.packageJson.readme);
+local.fs.writeFileSync('index.js', 'module.exports = require(\'$NAME\')');
+local.fs.writeFileSync('package.json', JSON.stringify({
+    author: local.packageJson.author,
+    bugs: local.packageJson.bugs,
+    dependencies: { '$NAME': local.version },
+    description: local.packageJson.description,
+    homepage: local.packageJson.homepage,
+    keywords: local.packageJson.keywords,
+    license: local.packageJson.license,
+    maintainers: local.packageJson.maintainers,
+    name: '$ALIAS',
+    repository: local.packageJson.repository,
+    users: local.packageJson.users,
+    version: local.version
+}, null, 4));
+// </script>
+    "
     npm publish
 )}
 

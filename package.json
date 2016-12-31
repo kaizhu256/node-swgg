@@ -8,15 +8,12 @@
     "engines": { "node": ">=4.0" },
     "homepage": "https://github.com/kaizhu256/node-swgg",
     "keywords": [
-        "api", "admin", "admin-ui",
-        "browser",
+        "admin", "admin-ui", "api",
         "cms", "crud",
-        "db",
-        "light", "lightweight", "lite",
-        "mongo", "mongodb",
-        "nedb",
-        "standalone", "swagger", "swagger-ui", "swgg",
-        "web"
+        "dashboard",
+        "light", "lightweight", "lite", "login",
+        "oai", "oauth", "open-api", "open-id", "openapi", "openid",
+        "standalone", "swagger", "swagger-ui", "swgg"
     ],
     "license": "MIT",
     "main": "lib.swgg",
@@ -35,5 +32,5 @@
 
         "test": "export PORT=$(./lib.utility2.sh shServerPortRandom) && ./lib.utility2.sh test test.js"
     },
-    "version": "2016.12.26"
+    "version": "2016.12.30"
 }

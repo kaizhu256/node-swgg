@@ -30,7 +30,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![api-doc](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/screen-capture.docApiCreate.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swgg_2Ftmp_2Fbuild_2Fdoc.api.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/doc.api.html)
 
 #### todo
-- npm publish 2016.12.26
+- fix integer id delete bug
 - revert temporary fix for chrome render bug
 - allow secure remote db export / import / reset to backend
 - add middlewareAcl
@@ -43,11 +43,9 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 178d7079
-- rename file lib.swgg.json-schema.json
-- rename file lib.swgg.petstore.json
-- rename file lib.swgg.schema.json
-- rename file lib.swgg.ui.js
+#### change since 80d60044
+- npm publish 2016.12.30
+- revamp swgg.ui.js
 - none
 
 #### this package requires
@@ -357,7 +355,7 @@ body > button {\n\
 </head>\n\
 <body>\n\
 <!-- utility2-comment\n\
-    <div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 0.5s, width 1.5s; width: 25%;"></div>\n\
+    <div id="ajaxProgressDiv1" style="background: #d00; height: 4px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 0.5s, width 1.5s; width: 25%;"></div>\n\
 utility2-comment -->\n\
     <h1>\n\
 <!-- utility2-comment\n\
@@ -413,8 +411,13 @@ utility2-comment -->\n\
 </html>\n\
 ';
         /* jslint-ignore-end */
-        local.assetsDict['/'] =
-            local.templateRender(local.templateIndexHtml, { env: local.env });
+        local.assetsDict['/'] = local.templateRender(local.templateIndexHtml, {
+            env: local.objectSetDefault(local.env, {
+                npm_package_description: 'example module',
+                npm_package_name: 'example',
+                npm_package_version: '0.0.1'
+            })
+        });
         break;
     }
 
@@ -423,8 +426,7 @@ utility2-comment -->\n\
     // run shared js-env code - post-init
     (function () {
         // init petstore-api - frontend
-        local.tmp =
-            JSON.parse(local.assetsDict['/assets.lib.swgg.petstore.json']);
+        local.tmp = JSON.parse(local.assetsDict['/assets.lib.swgg.petstore.json']);
         delete local.tmp.basePath;
         delete local.tmp.host;
         delete local.tmp.schemes;
@@ -599,37 +601,27 @@ utility2-comment -->\n\
             },
             'x-swgg-datatableDict': {
                 file: {
-                    crudSetOneById:
-                        'file crudSetOneById.id.id',
-                    crudRemoveOneById:
-                        'file crudRemoveOneById.id.id',
+                    crudSetOneById: 'file crudSetOneById.id.id',
+                    crudRemoveOneById: 'file crudRemoveOneById.id.id',
                     crudGetManyByQuery: 'file crudGetManyByQuery',
-                    idField: 'id',
-                    queryLimit: 20,
                     schema: { $ref: '#/definitions/File' }
                 },
                 pet: {
                     crudSetOneById: 'pet addPet',
                     crudRemoveOneById: 'pet deletePet',
                     crudGetManyByQuery: 'pet crudGetManyByQuery',
-                    idField: 'id',
-                    queryLimit: 20,
                     schema: { $ref: '#/definitions/Pet' }
                 },
                 store: {
                     crudSetOneById: 'store placeOrder',
                     crudRemoveOneById: 'store deleteOrder',
                     crudGetManyByQuery: 'store crudGetManyByQuery',
-                    idField: 'id',
-                    queryLimit: 20,
                     schema: { $ref: '#/definitions/Order' }
                 },
                 user: {
                     crudSetOneById: 'user createUser',
                     crudRemoveOneById: 'user deleteUser',
                     crudGetManyByQuery: 'user crudGetManyByQuery',
-                    idField: 'username',
-                    queryLimit: 20,
                     schema: { $ref: '#/definitions/User' }
                 }
             }
@@ -809,15 +801,12 @@ utility2-comment -->\n\
     "engines": { "node": ">=4.0" },
     "homepage": "https://github.com/kaizhu256/node-swgg",
     "keywords": [
-        "api", "admin", "admin-ui",
-        "browser",
+        "admin", "admin-ui", "api",
         "cms", "crud",
-        "db",
-        "light", "lightweight", "lite",
-        "mongo", "mongodb",
-        "nedb",
-        "standalone", "swagger", "swagger-ui", "swgg",
-        "web"
+        "dashboard",
+        "light", "lightweight", "lite", "login",
+        "oai", "oauth", "open-api", "open-id", "openapi", "openid",
+        "standalone", "swagger", "swagger-ui", "swgg"
     ],
     "license": "MIT",
     "main": "lib.swgg",
@@ -836,7 +825,7 @@ export npm_config_mode_auto_restart=1 && \
 ./lib.utility2.sh shRun shIstanbulCover test.js",
         "test": "export PORT=$(./lib.utility2.sh shServerPortRandom) && ./lib.utility2.sh test test.js"
     },
-    "version": "2016.12.26"
+    "version": "2016.12.30"
 }
 ```
 

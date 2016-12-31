@@ -1437,7 +1437,7 @@ local.templateTestReportHtml = '\
                                 options.fileScreenCapture + '\n');
                             onParallel();
                         });
-                    }, Number(options.timeoutScreenCapture || 5000));
+                    }, Number(options.timeoutScreenCapture || 10000));
                     onParallel();
                     break;
                 // run electron-browser code
@@ -1803,10 +1803,16 @@ return Utf8ArrayToStr(bff);
             // init moduleDict.*.prototype
             options.moduleExports = options.moduleDict[local.env.npm_package_nameAlias].exports;
             Object.keys(options.moduleExports).forEach(function (key) {
-                if ((/[A-Z]/).test(key[0]) &&
-                        options.moduleExports[key] &&
+                if (options.moduleExports[key] &&
                         options.moduleExports[key].prototype &&
+                        (Object.keys(options.moduleExports[key]).length ||
+                            Object.keys(options.moduleExports[key].prototype).length) &&
                         options.moduleExports[key] !== local.global.utility2_apiDict[key]) {
+                    options.moduleDict[local.env.npm_package_nameAlias + '.' + key] =
+                        options.moduleDict[local.env.npm_package_nameAlias + '.' + key] || {
+                            exampleFileList: [],
+                            exports: options.moduleExports[key]
+                        };
                     options.moduleDict[
                         local.env.npm_package_nameAlias + '.' + key + '.prototype'
                     ] = options.moduleDict[
@@ -2019,17 +2025,6 @@ return Utf8ArrayToStr(bff);
             tmp = document.createElement('template');
             tmp.innerHTML = local.templateRender(template, dict);
             return tmp.content;
-        };
-
-        local.domQuerySelectorAll = function (element, selectors) {
-        /*
-         * this function will return the list of query-selected dom-elements,
-         * as a javascript-array
-         */
-            return Array.from((element.length === 1
-                // handle jQuery element
-                ? element[0]
-                : element).querySelectorAll(selectors));
         };
 
         local.echo = function (arg) {
