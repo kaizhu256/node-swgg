@@ -725,7 +725,7 @@ local.templateUiResponseAjax = '\
                                             element.dataset.valueDecoded
                                         ));
                                     });
-                                if (!tmp.length || tmp[0] === '$undefined') {
+                                if (!tmp.length || tmp[0] === '$swggUndefined') {
                                     return;
                                 }
                                 if (paramDef.type !== 'array') {
@@ -977,8 +977,8 @@ local.templateUiResponseAjax = '\
                         id: local.idDomElementCreate('swgg_id_' + paramDef.name),
                         selected: 'selected',
                         type: paramDef.type,
-                        valueDecoded: '$undefined',
-                        valueEncoded: ''
+                        valueDecoded: '$swggUndefined',
+                        valueEncoded: '<none>'
                     });
                 }
             // init input - textarea

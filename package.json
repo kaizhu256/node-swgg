@@ -1,24 +1,44 @@
 {
-    "package.json": true,
     "author": "kai zhu <kaizhu256@gmail.com>",
     "description": "this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend)",
     "devDependencies": {
-        "electron-lite": "kaizhu256/node-electron-lite#alpha"
+        "electron-lite": "kaizhu256/node-electron-lite#alpha",
+        "utility2": "kaizhu256/node-utility2#alpha"
     },
-    "engines": { "node": ">=4.0" },
+    "engines": {
+        "node": ">=4.0"
+    },
     "homepage": "https://github.com/kaizhu256/node-swgg",
     "keywords": [
-        "admin", "admin-ui", "api",
-        "cms", "crud",
+        "admin",
+        "admin-ui",
+        "api",
+        "cms",
+        "crud",
         "dashboard",
-        "light", "lightweight", "lite", "login",
-        "oai", "oauth", "open-api", "open-id", "openapi", "openid",
-        "standalone", "swagger", "swagger-ui", "swgg"
+        "light",
+        "lightweight",
+        "lite",
+        "login",
+        "oai",
+        "oauth",
+        "open-api",
+        "open-id",
+        "openapi",
+        "openid",
+        "standalone",
+        "swagger",
+        "swagger-ui",
+        "swgg"
     ],
     "license": "MIT",
     "main": "lib.swgg",
     "name": "swgg",
-    "os": ["darwin", "linux"],
+    "nameAlias": "swgg",
+    "os": [
+        "darwin",
+        "linux"
+    ],
     "repository": {
         "type": "git",
         "url": "https://github.com/kaizhu256/node-swgg.git"
@@ -26,11 +46,9 @@
     "scripts": {
         "build-ci": "./lib.utility2.sh shRun shReadmeBuild",
         "heroku-postbuild": "./lib.utility2.sh shRun shDeployHeroku",
+        "postinstall": "if [ -f lib.swgg.npm-scripts.sh ]; then ./lib.swgg.npm-scripts.sh postinstall; fi",
         "start": "export PORT=${PORT:-8080} && export npm_config_mode_auto_restart=1 && ./lib.utility2.sh shRun shIstanbulCover test.js",
-
-
-
         "test": "export PORT=$(./lib.utility2.sh shServerPortRandom) && ./lib.utility2.sh test test.js"
     },
-    "version": "2016.12.30"
+    "version": "2017.1.12"
 }

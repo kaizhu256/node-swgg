@@ -19,7 +19,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 # live demo
 - [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html)
 
-[![github.com test-server](https://kaizhu256.github.io/node-swgg/build/screen-capture.githubDeploy.browser._2Fnode-swgg_2Fbuild..alpha..travis-ci.org_2Fapp_2Findex.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html)
+[![github.com test-server](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithub.browser._2Fnode-swgg_2Fbuild..alpha..travis-ci.org_2Fapp_2Findex.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html)
 
 
 
@@ -30,7 +30,6 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![api-doc](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/screen-capture.docApiCreate.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swgg_2Ftmp_2Fbuild_2Fdoc.api.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/doc.api.html)
 
 #### todo
-- fix integer id delete bug
 - revert temporary fix for chrome render bug
 - allow secure remote db export / import / reset to backend
 - add middlewareAcl
@@ -43,9 +42,10 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 80d60044
-- npm publish 2016.12.30
-- revamp swgg.ui.js
+#### change since dd4dbc97
+- npm publish 2017.1.12
+- update files lib.utility2.*
+- update documentation
 - none
 
 #### this package requires
@@ -140,7 +140,7 @@ instruction
             : global;
         // init utility2_rollup
         local = local.global.utility2_rollup || (local.modeJs === 'browser'
-            ? window.swgg
+            ? local.global.swgg
             : require('swgg'));
         // export local
         local.global.local = local;
@@ -327,7 +327,6 @@ instruction
 <style>\n\
 /*csslint\n\
     box-sizing: false,\n\
-    ids: false,\n\
     universal-selector: false\n\
 */\n\
 * {\n\
@@ -336,11 +335,15 @@ instruction
 body {\n\
     background: #fff;\n\
     font-family: Arial, Helvetica, sans-serif;\n\
-    margin: 1rem;\n\
+    margin: 2rem;\n\
 }\n\
 body > * {\n\
     margin-bottom: 1rem;\n\
 }\n\
+</style>\n\
+<style>\n\
+/*csslint\n\
+*/\n\
 body > button {\n\
     width: 15rem;\n\
 }\n\
@@ -375,14 +378,14 @@ utility2-comment -->\n\
 <!-- utility2-comment\n\
     <h4><a download href="assets.app.js">download standalone app</a></h4>\n\
     <button class="onclick" id="testRunButton1">run internal test</button><br>\n\
-utility2-comment -->\n\
     <div id="testReportDiv1" style="display: none;"></div>\n\
+utility2-comment -->\n\
+\n\
     <button class="onclick" id="dbResetButton1">reset database</button><br>\n\
     <button class="onclick" id="dbExportButton1">export database -&gt; file</button><br>\n\
     <a download="db.persistence.json" href="" id="dbExportA1"></a>\n\
     <button class="onclick" id="dbImportButton1">import database &lt;- file</button><br>\n\
     <input class="onchange zeroPixel" type="file" id="dbImportInput1">\n\
-\n\
     <div class="swggUiContainer">\n\
     <form class="header tr">\n\
         <a class="td1" href="http://swagger.io" target="_blank">swagger</a>\n\
@@ -395,9 +398,11 @@ utility2-comment -->\n\
     </form>\n\
     <div class="reset"></div>\n\
     </div>\n\
+<!-- utility2-comment\n\
     {{#if isRollup}}\n\
     <script src="assets.app.min.js"></script>\n\
     {{#unless isRollup}}\n\
+utility2-comment -->\n\
     <script src="assets.utility2.rollup.js"></script>\n\
     <script src="assets.swgg.js"></script>\n\
     <script src="assets.lib.swgg.ui.js"></script>\n\
@@ -406,7 +411,9 @@ utility2-comment -->\n\
     <script src="assets.example.js"></script>\n\
     <script src="assets.test.js"></script>\n\
     <script>window.utility2.onResetBefore();</script>\n\
+<!-- utility2-comment\n\
     {{/if isRollup}}\n\
+utility2-comment -->\n\
 </body>\n\
 </html>\n\
 ';
@@ -792,26 +799,46 @@ utility2-comment -->\n\
 # package.json
 ```json
 {
-    "package.json": true,
     "author": "kai zhu <kaizhu256@gmail.com>",
-    "description": "{{packageJson.description}}",
+    "description": "this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend)",
     "devDependencies": {
-        "electron-lite": "kaizhu256/node-electron-lite#alpha"
+        "electron-lite": "kaizhu256/node-electron-lite#alpha",
+        "utility2": "kaizhu256/node-utility2#alpha"
     },
-    "engines": { "node": ">=4.0" },
+    "engines": {
+        "node": ">=4.0"
+    },
     "homepage": "https://github.com/kaizhu256/node-swgg",
     "keywords": [
-        "admin", "admin-ui", "api",
-        "cms", "crud",
+        "admin",
+        "admin-ui",
+        "api",
+        "cms",
+        "crud",
         "dashboard",
-        "light", "lightweight", "lite", "login",
-        "oai", "oauth", "open-api", "open-id", "openapi", "openid",
-        "standalone", "swagger", "swagger-ui", "swgg"
+        "light",
+        "lightweight",
+        "lite",
+        "login",
+        "oai",
+        "oauth",
+        "open-api",
+        "open-id",
+        "openapi",
+        "openid",
+        "standalone",
+        "swagger",
+        "swagger-ui",
+        "swgg"
     ],
     "license": "MIT",
     "main": "lib.swgg",
     "name": "swgg",
-    "os": ["darwin", "linux"],
+    "nameAlias": "swgg",
+    "os": [
+        "darwin",
+        "linux"
+    ],
     "repository": {
         "type": "git",
         "url": "https://github.com/kaizhu256/node-swgg.git"
@@ -819,13 +846,11 @@ utility2-comment -->\n\
     "scripts": {
         "build-ci": "./lib.utility2.sh shRun shReadmeBuild",
         "heroku-postbuild": "./lib.utility2.sh shRun shDeployHeroku",
-        "start": "\
-export PORT=${PORT:-8080} && \
-export npm_config_mode_auto_restart=1 && \
-./lib.utility2.sh shRun shIstanbulCover test.js",
+        "postinstall": "if [ -f lib.swgg.npm-scripts.sh ]; then ./lib.swgg.npm-scripts.sh postinstall; fi",
+        "start": "export PORT=${PORT:-8080} && export npm_config_mode_auto_restart=1 && ./lib.utility2.sh shRun shIstanbulCover test.js",
         "test": "export PORT=$(./lib.utility2.sh shServerPortRandom) && ./lib.utility2.sh test test.js"
     },
-    "version": "2016.12.30"
+    "version": "2017.1.12"
 }
 ```
 

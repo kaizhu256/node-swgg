@@ -223,6 +223,11 @@ shBuildPrint() {
     printf '%b' "\n\033[35m[MODE_BUILD=$MODE_BUILD]\033[0m - $(shDateIso) - $1\n\n" || return $?
 }
 
+shBuildReadme() {(set -e
+# this function will build the readme
+    npm test --mode-coverage="" --mode-test-case=testCase_build_readme
+)}
+
 shDateIso() {(set -e
 # this function will print the current date in ISO format
     date -u "+%Y-%m-%dT%H:%M:%SZ"
@@ -526,17 +531,9 @@ shDockerStart() {(set -e
     shDockerLogs $NAME
 )}
 
-shDsStoreRm() {(set -e
-# http://stackoverflow.com/questions/2016844/bash-recursively-remove-files
-# this function will recursively rm .DS_Store from the current dir
-    find . -name "._*" -print0 | xargs -0 rm || true
-    find . -name ".DS_Store" -print0 | xargs -0 rm || true
-    find . -name "npm-debug.log" -print0 | xargs -0 rm || true
-)}
-
 shDuList() {(set -e
 # this function will run du, and create a list of all child dir in $1 sorted by size
-    du -ms $1/* | sort -nr
+    du -md1 $1 | sort -nr
 )}
 
 shEmscriptenInit() {
@@ -567,17 +564,17 @@ shFileKeySort() {(set -e
 'use strict';
 console.log('var aa = [' + require('fs').readFileSync('$FILE', 'utf8')
 /* jslint-ignore-begin */
+    .replace((/[\"\\\\]/g), '#')
     .replace((/\\n{2,}/gm), '\\n')
-    .replace((/^( {8}\\w[^ ]*? =(?:| .*?))$/gm), '\`\"\$1\",')
-    .replace((/^(\\w+?\\(\\) \\{.*?)$/gm), '\`\"\$1\",')
-    .replace((/\\n[^\`].*?$/gm), '')
-    .replace((/^\W.*/), '')
-    .replace((/\`/g), '') + '];\n\
+    .replace((/^ {0,8}(\\w[^\\n ]*? =(?:| .*?))$/gm), '\"\$1\",')
+    .replace((/^(\\w+?\\(\\) \\{.*?)$/gm), '\"\$1\",')
+    .replace((/^(?:[^\\n\"]|\"\W|\"\").*/gm), '')
+    .replace((/\\n{2,}/gm), '\\n') + '];\n\
 var bb = aa.slice().sort();\n\
 aa.forEach(function (aa, ii) {\n\
     console.log(ii, aa === bb[ii], aa, bb[ii]);\n\
 });\n\
-console.assert(JSON.stringify(aa) === JSON.stringify(bb))\n\
+console.assert(JSON.stringify(aa) === JSON.stringify(bb));\n\
 '
 /* jslint-ignore-end */
     );
@@ -826,8 +823,8 @@ shGrepFileReplace() {(set -e
 'use strict';
 var local;
 local = {};
-local.fs = require('fs');
 local.fileDict = {};
+local.fs = require('fs');
 local.fs.readFileSync('$FILE', 'utf8').split('\n').forEach(function (element) {
     element = (/^(.+?):(\d+?):(.+?)$/).exec(element);
     if (!element) {
@@ -866,7 +863,7 @@ shHttpFileServer() {(set -e
 'use strict';
 require('http').createServer(function (request, response) {
     require('fs').readFile(
-        process.cwd() + require('url').parse(request.url).pathname,
+        require('url').parse(request.url).pathname.slice(1),
         function (error, data) {
             response.end(error
                 ? error.stack
@@ -903,68 +900,6 @@ shInit() {
         # init $CI_COMMIT_*
         export CI_COMMIT_MESSAGE="$(git log -1 --pretty=%s)" || return $?
         export CI_COMMIT_INFO="$CI_COMMIT_ID - $CI_COMMIT_MESSAGE" || return $?
-    fi
-    # extract and save the scripts embedded in README.md to tmp/
-    if [ -f README.md ]
-    then
-        mkdir -p tmp
-        node -e "
-// <script>
-/*jslint
-    bitwise: true,
-    browser: true,
-    maxerr: 8,
-    maxlen: 96,
-    node: true,
-    nomen: true,
-    regexp: true,
-    stupid: true
-*/
-'use strict';
-var local;
-local = {};
-local.fs = require('fs');
-local.nop = function () {
-    return;
-};
-local.readme = local.fs.readFileSync('README.md', 'utf8');
-local.packageJson = {};
-local.packageJson.description = local.readme.split('\n')[2];
-[
-    (/\`\`\`json(\n[\\W\\s]*?(package.json)[\n\"][\\S\\s]+?)\n\`\`\`/g),
-    (/\`\`\`\\w*?(\n[\\W\\s]*?(\w\S*?)[\n\"][\\S\\s]+?)\n\`\`\`/g)
-].forEach(function (rgx) {
-    local.readme.replace(rgx, function (match0, match1, match2, ii, text) {
-        // jslint-hack
-        local.nop(match0);
-        // preserve lineno
-        match1 = text.slice(0, ii).replace((/.+/g), '') + match1
-            // parse '\' line-continuation
-            .replace((/(?:.*\\\\\n)+.*/g), function (match0) {
-                return match0.replace((/\\\\\n/g), '') + match0.replace((/.+/g), '');
-            });
-        // trim json-file
-        if (match2.slice(-5) === '.json') {
-            match1 = match1.trim();
-        }
-        // handle package.json
-        if (match2 === 'package.json') {
-            match1 = match1
-                .replace((/\{\{packageJson\.description\}\}/g), local.packageJson.description);
-            local.packageJson = JSON.parse(match1);
-            local.readme = local.readme
-                .replace((/\{\{packageJson\.([^}]+?)\}\}/g), function (match0, match1) {
-                    // jslint-hack
-                    local.nop(match0);
-                    return local.packageJson[match1];
-                });
-            local.fs.writeFileSync('package.json', match1);
-        }
-        local.fs.writeFileSync('tmp/README.' + match2, match1);
-    });
-});
-// </script>
-"
     fi
     # init $npm_package_*
     if [ -f package.json ]
@@ -1015,6 +950,50 @@ if (process.env.GITHUB_REPO === undefined && value) {
     fi
     # init $PATH
     export PATH="$PWD/node_modules/.bin:$PATH" || return $?
+    # extract and save the scripts embedded in README.md to tmp/
+    if [ -f README.md ]
+    then
+        mkdir -p tmp
+        node -e "
+// <script>
+/*jslint
+    bitwise: true,
+    browser: true,
+    maxerr: 8,
+    maxlen: 96,
+    node: true,
+    nomen: true,
+    regexp: true,
+    stupid: true
+*/
+'use strict';
+var local;
+local = {};
+local.fs = require('fs');
+local.nop = function () {
+    return;
+};
+local.readme = local.fs.readFileSync('README.md', 'utf8');
+local.readme.replace((
+    /\`\`\`\\w*?(\n[\\W\\s]*?(\w\S*?)[\n\"][\\S\\s]+?)\n\`\`\`/g
+), function (match0, match1, match2, ii, text) {
+    // jslint-hack
+    local.nop(match0);
+    // preserve lineno
+    match1 = text.slice(0, ii).replace((/.+/g), '') + match1
+        // parse '\' line-continuation
+        .replace((/(?:.*\\\\\n)+.*/g), function (match0) {
+            return match0.replace((/\\\\\n/g), '') + match0.replace((/.+/g), '');
+        });
+    // trim json-file
+    if (match2.slice(-5) === '.json') {
+        match1 = match1.trim();
+    }
+    local.fs.writeFileSync('tmp/README.' + match2, match1);
+});
+// </script>
+"
+    fi
 }
 
 shInitNpmConfigDirUtility2() {
@@ -1025,7 +1004,7 @@ shInitNpmConfigDirUtility2() {
         return
     fi
     # init $npm_config_dir_utility2
-    if [ "$npm_package_name" = utility2 ]
+    if [ -f lib.utility2.js ]
     then
         export npm_config_dir_utility2="$PWD" || return $?
     else
@@ -1170,12 +1149,13 @@ shIptablesInit() {(set -e
 
 shIstanbulCover() {(set -e
 # this function will run the command $@ with istanbul coverage
+    export NODE_BINARY="${NODE_BINARY:-node}"
     if [ ! "$npm_config_mode_coverage" ]
     then
-        node "$@"
+        $NODE_BINARY "$@"
         return $?
     fi
-    node $npm_config_dir_utility2/lib.istanbul.js cover "$@"
+    $NODE_BINARY $npm_config_dir_utility2/lib.istanbul.js cover "$@"
 )}
 
 shJsonFileNormalize() {(set -e
@@ -1197,11 +1177,17 @@ shJsonFileNormalize() {(set -e
     stupid: true
 */
 'use strict';
-require('fs').writeFileSync(
+var local;
+local = {};
+local.fs = require('fs');
+try {
+    local.utility2 = require('utility2');
+} catch (errorCaught) {
+    local.utility2 = require('./lib.utility2.js');
+}
+local.fs.writeFileSync(
     '$FILE',
-    require('utility2').jsonStringifyOrdered(JSON.parse(
-        require('fs').readFileSync('$FILE')
-    ), null, 4)
+    local.utility2.jsonStringifyOrdered(JSON.parse(local.fs.readFileSync('$FILE')), null, 4)
 );
 // </script>
     "
@@ -1338,6 +1324,7 @@ shNpmTest() {(set -e
 # this function will run npm-test with coverage and create test-report
     EXIT_CODE=0
     export MODE_BUILD="${MODE_BUILD:-npmTest}"
+    export NODE_BINARY="${NODE_BINARY:-node}"
     shBuildPrint "npm-testing $PWD"
     # cleanup $npm_config_dir_tmp/*.json
     rm -f "$npm_config_dir_tmp/"*.json
@@ -1349,7 +1336,7 @@ shNpmTest() {(set -e
     # run npm-test without coverage
     if [ ! "$npm_config_mode_coverage" ]
     then
-        node "$@" || EXIT_CODE=$?
+        $NODE_BINARY "$@" || EXIT_CODE=$?
     # run npm-test with coverage
     else
         # cleanup old coverage
@@ -1359,7 +1346,7 @@ shNpmTest() {(set -e
         # if $EXIT_CODE != 0, then debug covered-test by re-running it uncovered
         if [ "$EXIT_CODE" != 0 ] && [ "$EXIT_CODE" != 130 ]
         then
-            npm_config_mode_coverage="" node "$@" || true
+            npm_config_mode_coverage="" $NODE_BINARY "$@" || true
         fi
     fi
     # create test-report artifacts
@@ -1530,6 +1517,14 @@ socket.on('end', process.exit);
 shReturn1() {(set -e
 # this function will return 1
     return 1
+)}
+
+shRmDsStore() {(set -e
+# http://stackoverflow.com/questions/2016844/bash-recursively-remove-files
+# this function will recursively rm .DS_Store from the current dir
+    find . -name "._*" -print0 | xargs -0 rm || true
+    find . -name ".DS_Store" -print0 | xargs -0 rm || true
+    find . -name "npm-debug.log" -print0 | xargs -0 rm || true
 )}
 
 shRun() {(set -e

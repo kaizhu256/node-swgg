@@ -291,10 +291,10 @@
 .swggUiContainer .operation > .header > .td1 {
     background: #777;
     color: white;
-    padding: 5px;
+    padding-top: 5px;
     height: 1.5rem;
     text-align: center;
-    width: 4.5rem;
+    width: 5rem;
 }
 .swggUiContainer .operation > .header > .td2 {
     flex: 3;

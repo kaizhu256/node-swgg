@@ -17,8 +17,6 @@
 
     // run shared js-env code - pre-init
     (function () {
-        // init Error.stackTraceLimit
-        Error.stackTraceLimit = 20;
         // init local
         local = {};
         // init modeJs
@@ -1459,6 +1457,8 @@
                     });
                 });
             });
+            // test empty-input handling-behavior
+            document.querySelector('#swgg_id_paramOptional .input').value = '';
             // test onEventOperationAjax's error handling-behavior
             document.querySelector('#swgg_id_paramInteger .input').value = 'syntax error';
             document.querySelector('#swgg_id_paramDefault .onEventOperationAjax').click();
@@ -1515,6 +1515,20 @@
                 exampleFileList: ['README.md', 'test.js', 'lib.swgg.js', 'lib.swgg.ui.js']
             };
             local.buildDoc(options, onError);
+        };
+
+        local.testCase_build_readme = function (options, onError) {
+        /*
+         * this function will test build's readme handling-behavior
+         */
+            options = {};
+            options.readmeFile = local.fs.readFileSync('README.md', 'utf8');
+            options.readmeTemplate = local.templateReadme;
+            options.readmeTemplate = options.readmeTemplate.replace(
+                (/(app\/assets\.jslint-lite)/g),
+                '$1.rollup'
+            );
+            local.buildReadmeJslintLite(options, onError);
         };
 
         local.testCase_webpage_default = function (options, onError) {
@@ -1666,7 +1680,6 @@
                     parameters: [{
                         // test array-csv-param handling-behavior
                         collectionFormat: 'csv',
-                        default: ['aa', 'bb'],
                         description: 'csv-array param',
                         in: 'query',
                         items: { type: 'string' },
@@ -1693,7 +1706,6 @@
                     }, {
                         // test array-multi-param handling-behavior
                         collectionFormat: 'multi',
-                        default: ['aa', 'bb'],
                         description: 'multi-array param',
                         in: 'query',
                         items: { type: 'string' },
@@ -1702,7 +1714,6 @@
                     }, {
                         // test array-pipes-param handling-behavior
                         collectionFormat: 'pipes',
-                        default: ['aa', 'bb'],
                         description: 'pipes-array param',
                         in: 'query',
                         items: { type: 'string' },
@@ -1711,7 +1722,6 @@
                     }, {
                         // test array-ssv-param handling-behavior
                         collectionFormat: 'ssv',
-                        default: ['aa', 'bb'],
                         description: 'ssv-array param',
                         in: 'query',
                         items: { type: 'string' },
@@ -1720,7 +1730,6 @@
                     }, {
                         // test array-tsv-param handling-behavior
                         collectionFormat: 'tsv',
-                        default: ['aa', 'bb'],
                         description: 'tsv-array param',
                         in: 'query',
                         items: { type: 'string' },
@@ -1728,7 +1737,6 @@
                         type: 'array'
                     }, {
                         // test body-param handling-behavior
-                        default: {},
                         description: 'body-param',
                         in: 'body',
                         name: 'paramBody',
@@ -1743,24 +1751,22 @@
                     }, {
                         // test enum-multiple-param handling-behavior
                         // coverage-hack - test default multi-select handling-behavio
-                        default: [0, 1],
+                        default: [1, 3],
                         description: 'enum-multiple-param',
-                        enum: [null, 0, 1, 2, 3, 4],
+                        enum: [0, 1, 2, 3],
                         in: 'query',
                         items: { type: 'integer' },
                         name: 'paramEnumMulti',
                         type: 'array'
                     }, {
                         // test enum-single-param handling-behavior
-                        default: 0,
                         description: 'enum-single-param',
-                        enum: [null, 0, 1, 2, 3, 4],
+                        enum: [0, 1, 2, 3],
                         in: 'query',
                         name: 'paramEnumSingle',
                         type: 'integer'
                     }, {
                         // test header-param handling-behavior
-                        default: 'hello header',
                         description: 'header-param',
                         in: 'header',
                         name: 'paramHeader',
@@ -1773,7 +1779,6 @@
                         type: 'integer'
                     }, {
                         // test json-param handling-behavior
-                        default: '{}',
                         description: 'json-param',
                         format: 'json',
                         in: 'query',
@@ -1787,7 +1792,6 @@
                         type: 'string'
                     }, {
                         // test path-param handling-behavior
-                        default: 'hello path',
                         description: 'path-param',
                         in: 'path',
                         name: 'paramPath',
@@ -1795,7 +1799,6 @@
                         type: 'string'
                     }, {
                         // test required-param handling-behavior
-                        default: 'hello required',
                         description: 'required-param',
                         in: 'query',
                         name: 'paramRequired',
