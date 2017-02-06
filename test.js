@@ -45,7 +45,7 @@
             break;
         // re-init local from example.js
         case 'node':
-            local = (local.global.utility2_rollup || require('./lib.utility2.js'))
+            local = (local.global.utility2_rollup || require('./assets.swgg.rollup.js'))
                 .requireExampleJsFromReadme();
             break;
         }
@@ -709,7 +709,7 @@
                     options.data = data.getResponseHeader('content-type');
                     local.assertJsonEqual(options.data, 'image/png');
                     // validate response
-                    options.data = local.bufferToBase64(data.response);
+                    options.data = local.base64FromBuffer(data.response);
                     local.assertJsonEqual(options.data, local.templateSwaggerUiLogoSmallBase64);
                     // test fileGetOneById's 404 handling-behavior
                     local.apiDict['file fileGetOneById.id.id']._ajax({
@@ -739,7 +739,9 @@
                 switch (options.modeNext) {
                 case 1:
                     options.blob = new local.Blob(
-                        [local.assetsDict['/assets.lib.swgg.ui_logo_small.png']],
+                        [local.bufferToNodeBuffer(
+                            local.base64ToBuffer(local.templateSwaggerUiLogoSmallBase64)
+                        )],
                         { type: 'image/png' }
                     );
                     options.blob.name = 'a00.png';
@@ -1199,7 +1201,7 @@
                 { key: 'propStringBinary', value: '\u1234' },
                 {
                     key: 'propStringByte',
-                    value: local.stringToBase64(local.stringAsciiCharset)
+                    value: local.base64FromString(local.stringAsciiCharset)
                 },
                 { key: 'propStringDate', value: '1971-01-01' },
                 { key: 'propStringDatetime', value: '1971-01-01T00:00:00Z' },
@@ -1495,16 +1497,14 @@
                 file: '/api/v0/swagger.json',
                 url: '/api/v0/swagger.json'
             }, {
-                file: '/assets.lib.swgg.ui.js',
-                url: '/assets.lib.swgg.ui.js'
-            }, {
-                file: '/assets.lib.swgg.ui_logo_small.png',
-                url: '/assets.lib.swgg.ui_logo_small.png'
-            }, {
                 file: '/assets.swgg.rollup.js',
                 url: '/assets.swgg.rollup.js'
             }];
             local.buildApp(options, onError);
+            local.fs.writeFileSync(
+                'assets.swgg.html',
+                local.assetsDict['/assets.swgg.html']
+            );
         };
 
         local.testCase_build_doc = function (options, onError) {
@@ -1512,7 +1512,7 @@
          * this function will test build's doc handling-behavior
          */
             options = {
-                exampleFileList: ['README.md', 'test.js', 'lib.swgg.js', 'lib.swgg.ui.js']
+                exampleFileList: ['README.md', 'test.js', 'lib.swgg.js']
             };
             local.buildDoc(options, onError);
         };
@@ -1522,12 +1522,17 @@
          * this function will test build's readme handling-behavior
          */
             options = {};
-            options.readmeFile = local.fs.readFileSync('README.md', 'utf8');
-            options.readmeTemplate = local.templateReadme;
-            options.readmeTemplate = options.readmeTemplate.replace(
-                (/(app\/assets\.jslint-lite)/g),
-                '$1.rollup'
-            );
+            options.html = local.assetsDict['/assets.swgg.html'].replace((/$/gm), '\\n\\');
+            options.readmeFrom = local.fs.readFileSync('README.md', 'utf8');
+            options.readmeTo = local.templateReadme;
+            // search-and-replace readmeFrom
+            [
+                (/<style>[\S\s]*<\/style>/)
+            ].forEach(function (rgx) {
+                options.html.replace(rgx, function (match0) {
+                    options.readmeFrom = options.readmeFrom.replace(rgx, match0);
+                });
+            });
             local.buildReadmeJslintLite(options, onError);
         };
 
@@ -1757,6 +1762,7 @@
                         in: 'query',
                         items: { type: 'integer' },
                         name: 'paramEnumMulti',
+                        required: true,
                         type: 'array'
                     }, {
                         // test enum-single-param handling-behavior

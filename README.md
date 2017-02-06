@@ -30,22 +30,26 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![api-doc](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/screen-capture.docApiCreate.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swgg_2Ftmp_2Fbuild_2Fdoc.api.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/doc.api.html)
 
 #### todo
+- allow offline-mode
+- add authorization-header hook
+- add phone format string
 - revert temporary fix for chrome render bug
 - allow secure remote db export / import / reset to backend
 - add middlewareAcl
 - datatable - add sort-by-field
 - add notification system
-- add post-crud-middleware for pet photoUrl
 - add api userPasswordChange
-- add message-param to assertions in swgg.validateByPropDef
 - add logging feature
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since dd4dbc97
-- npm publish 2017.1.12
-- update files lib.utility2.*
-- update documentation
+#### change since 2aea5844
+- npm publish 2017.2.6
+- allow swagger-json url to be changed
+- allow swagger-ui operation to appear in multiple tags
+- rename assets.lib.swgg.* to assets.swgg.*
+- merge files lib.* into standaalone file assets.swgg.rollup.js
+- merge files lib.swgg.* into lib.swgg.js
 - none
 
 #### this package requires
@@ -97,7 +101,7 @@ instruction
         $ npm install swgg && \
             export PORT=8081 && \
             node example.js
-    3. play with the browser-demo on http://localhost:8081
+    3. play with the browser-demo on http://127.0.0.1:8081
 */
 /* istanbul instrument in package swgg */
 /*jslint
@@ -323,7 +327,6 @@ instruction
 <meta charset="UTF-8">\n\
 <meta name="viewport" content="width=device-width, initial-scale=1">\n\
 <title>{{env.npm_package_name}} v{{env.npm_package_version}}</title>\n\
-<link href="assets.swgg.css" rel="stylesheet">\n\
 <style>\n\
 /*csslint\n\
     box-sizing: false,\n\
@@ -343,7 +346,12 @@ body > * {\n\
 </style>\n\
 <style>\n\
 /*csslint\n\
+    adjoining-classes: false,\n\
+    box-model: false,\n\
+    box-sizing: false,\n\
+    universal-selector: false\n\
 */\n\
+/* example.js */\n\
 body > button {\n\
     width: 15rem;\n\
 }\n\
@@ -354,6 +362,368 @@ body > button {\n\
     padding: 0;\n\
     width: 0;\n\
 }\n\
+\n\
+\n\
+\n\
+/* animate */\n\
+.swggAnimateFade {\n\
+    transition: opacity 250ms;\n\
+}\n\
+@keyframes swggAnimateShake {\n\
+    100% {\n\
+        transform: translateX(0);\n\
+    }\n\
+    0%, 20%, 60% {\n\
+        transform: translateX(1rem);\n\
+    }\n\
+    40%, 80% {\n\
+        transform: translateX(-1rem);\n\
+    }\n\
+}\n\
+.swggAnimateShake {\n\
+    animation-duration: 500ms;\n\
+    animation-name: swggAnimateShake;\n\
+}\n\
+.swggAnimateSlide {\n\
+    overflow-y: hidden;\n\
+    transition: max-height 500ms;\n\
+}\n\
+\n\
+\n\
+\n\
+/* general */\n\
+.swggUiContainer,\n\
+.swggUiContainer * {\n\
+    box-sizing: border-box;\n\
+    margin: 0;\n\
+    padding: 0;\n\
+}\n\
+.swggUiContainer {\n\
+    font-family: Arial, Helvetica, sans-serif;\n\
+    margin-left: auto;\n\
+    margin-right: auto;\n\
+    max-width: 1024px;\n\
+}\n\
+.swggUiContainer > * {\n\
+    margin-top: 1rem;\n\
+}\n\
+.swggUiContainer a {\n\
+    text-decoration: none;\n\
+}\n\
+.swggUiContainer a:hover {\n\
+    color: black;\n\
+}\n\
+.swggUiContainer a,\n\
+.swggUiContainer input,\n\
+.swggUiContainer span {\n\
+    min-height: 1.5rem;\n\
+}\n\
+.swggUiContainer button {\n\
+    padding: 0.5rem;\n\
+}\n\
+.swggUiContainer .color777 {\n\
+    color: #777;\n\
+}\n\
+.swggUiContainer button,\n\
+.swggUiContainer .cursorPointer,\n\
+.swggUiContainer .cursorPointer input {\n\
+    cursor: pointer;\n\
+}\n\
+.swggUiContainer .flex1 {\n\
+    flex: 1;\n\
+}\n\
+.swggUiContainer .fontLineThrough {\n\
+    text-decoration: line-through;\n\
+}\n\
+.swggUiContainer .fontWeightBold {\n\
+    font-weight: bold;\n\
+}\n\
+.swggUiContainer input {\n\
+    height: 1.5rem;\n\
+    padding-left: 0.25rem;\n\
+    padding-right: 0.25rem;\n\
+}\n\
+.swggUiContainer .marginTop05 {\n\
+    margin-top: 0.5rem;\n\
+}\n\
+.swggUiContainer .marginTop10 {\n\
+    margin-top: 1rem;\n\
+}\n\
+.swggUiContainer pre,\n\
+.swggUiContainer textarea {\n\
+    font-family: Menlo, Monaco, Consolas, Courier New, monospace;\n\
+    font-size: small;\n\
+    line-height: 1.25rem;\n\
+    max-height: 20rem;\n\
+    overflow: auto;\n\
+    padding: 0.25rem;\n\
+    white-space: pre;\n\
+}\n\
+.swggUiContainer .tr {\n\
+    display: flex;\n\
+}\n\
+.swggUiContainer .tr > * {\n\
+    margin-left: 1rem;\n\
+    overflow: auto;\n\
+    padding-top: 0.1rem;\n\
+    word-wrap: break-word;\n\
+}\n\
+.swggUiContainer .tr > *:first-child {\n\
+    margin-left: 0;\n\
+}\n\
+.swggUiContainer .tr > * > * {\n\
+    width: 100%;\n\
+}\n\
+\n\
+\n\
+\n\
+/* border */\n\
+/* border-bottom-bold */\n\
+.swggUiContainer .borderBottom {\n\
+    border-bottom: 1px solid #bbb;\n\
+    margin-bottom: 0.5rem;\n\
+    padding-bottom: 0.5rem;\n\
+}\n\
+.swggUiContainer .borderBottomBold {\n\
+    border-bottom: 1px solid #777;\n\
+    margin-bottom: 0.5rem;\n\
+    padding-bottom: 0.5rem;\n\
+}\n\
+/* border-top */\n\
+.swggUiContainer .borderTop {\n\
+    border-top: 1px solid #bbb;\n\
+    margin-top: 0.5rem;\n\
+    padding-top: 0.5rem;\n\
+}\n\
+/* border-top-bold */\n\
+.swggUiContainer .borderTopBold,\n\
+.swggUiContainer .resource:first-child {\n\
+    border-top: 1px solid #777;\n\
+    margin-top: 0.5rem;\n\
+    padding-top: 0.5rem;\n\
+}\n\
+/* border-error*/\n\
+.swggUiContainer .error {\n\
+    border: 5px solid #b00;\n\
+}\n\
+\n\
+\n\
+\n\
+/* datatable color */\n\
+.swggUiContainer .datatable tbody > tr > td {\n\
+    background: #efe;\n\
+}\n\
+.swggUiContainer .datatable tbody > tr > td:nth-child(odd) {\n\
+    background: #dfd;\n\
+}\n\
+.swggUiContainer .datatable tbody > tr:nth-child(odd) > td {\n\
+    background: #cfc;\n\
+}\n\
+.swggUiContainer .datatable tbody > tr:nth-child(odd) > td:nth-child(odd) {\n\
+    background: #beb;\n\
+}\n\
+.swggUiContainer .datatable tbody > tr:hover > td {\n\
+    background: #aea;\n\
+}\n\
+.swggUiContainer .datatable tbody > tr:hover > td:nth-child(odd) {\n\
+    background: #9e9;\n\
+}\n\
+.swggUiContainer .datatable tbody > tr > td:hover,\n\
+.swggUiContainer .datatable tbody > tr > td:hover:nth-child(odd),\n\
+.swggUiContainer .datatable tbody > tr:nth-child(odd) > td:hover,\n\
+.swggUiContainer .datatable tbody > tr:nth-child(odd) > td:hover:nth-child(odd),\n\
+.swggUiContainer .datatable th:hover {\n\
+    background: #7d7;\n\
+}\n\
+.swggUiContainer .datatable tbody > tr.selected > td {\n\
+    background: #fee;\n\
+}\n\
+.swggUiContainer .datatable tbody > tr.selected > td:nth-child(odd) {\n\
+    background: #fdd;\n\
+}\n\
+.swggUiContainer .datatable tbody > tr.selected:nth-child(odd) > td {\n\
+    background: #ecc;\n\
+}\n\
+.swggUiContainer .datatable tbody > tr.selected:nth-child(odd) > td:nth-child(odd) {\n\
+    background: #ebb;\n\
+}\n\
+.swggUiContainer .datatable th {\n\
+    background: #9e9;\n\
+}\n\
+\n\
+\n\
+\n\
+/* section */\n\
+.swggUiContainer .datatable {\n\
+    background: #fff;\n\
+    background: rgba(255,255,255,0.875);\n\
+    margin: 2rem;\n\
+    overflow: auto;\n\
+    padding: 1rem;\n\
+}\n\
+.swggUiContainer .datatable input[type=checkbox] {\n\
+    width: 1.5rem;\n\
+}\n\
+.swggUiContainer .datatable .sortAsc,\n\
+.swggUiContainer .datatable .sortDsc {\n\
+    display: none;\n\
+}\n\
+.swggUiContainer .datatable td,\n\
+.swggUiContainer .datatable th {\n\
+    max-width: 10rem;\n\
+    overflow: auto;\n\
+    padding: 0.5rem;\n\
+}\n\
+.swggUiContainer .datatable th:first-child {\n\
+    padding-right: 2rem;\n\
+}\n\
+.swggUiContainer > .header {\n\
+    background: #8c0;\n\
+    padding: 0.5rem;\n\
+}\n\
+.swggUiContainer > .header > .td1 {\n\
+    font-size: x-large;\n\
+    background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAqRJREFUeNrEVz1s00AUfnGXii5maMXoEUEHVwIpEkPNgkBdMnQoU5ytiKHJwpp2Q2JIO8DCUDOxIJFIVOoWZyJSh3pp1Q2PVVlcCVBH3ufeVZZ9Zye1Ay86nXV+ue/9fO/lheg/Se02X1rvksmbnTiKvuxQMBNgBnN4a/LCbmnUAP6JV58NCUsBC8CuAJxGPF47OgNqBaA93tolUhnx6jC4NxGwyOEwlccyAs+3kwdzKq0HDn2vEBTi8J2XpyMaywNDE157BhXUE3zJhlq8GKq+Zd2zaWHepPA8oN9XkfLmRdOiJV4XUUg/IyWncLjCYY/SHndV2u7zHr3bPKZtdxgboJOnthvrfGj/oMf3G0r7JVmNlLfKklmrt2MvvcNO7LFOhoFHfuAJI5o6ta10jpt5CQLgwXhXG2YIwvu+34qf78ybOjWTnWwkgR36d7JqJOrW0hHmNrKg9xhiS4+1jFmrxymh03B0w+6kURIAu3yHtOD5oaUNojMnGgbcctNvwdAnyxvxRR+/vaJnjzbpzcZX+nN1SdGv85i9eH8w3qPO+mdm/y4dnQ1iI8Fq6Nf4cxL6GWSjiFDSs0VRnxC5g0xSB2cgHpaseTxfqOv5uoHkNQ6Ha/N1Yz9mNMppEkEkYKj79q6uCq4bCHcSX3fJ0Vk/k9siASjCm1N6gZH6Ec9IXt2WkFES2K/ixoIyktJPAu/ptOA1SgO5zqtr6KASJPF0nMV8dgMsRhRPOcMwqQAOoi0VAIMLAEWJ6YYC1c8ibj1GP51RqwzYwZVMHQuvOzMCBUtb2tGHx5NAdLKqp5AX7Ng4d+Zi8AGDI9z1ijx9yaCH04y3GCP2S+QcvaGl+pcxyUBvinFlawoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=) no-repeat left center;\n\
+    padding-left: 2.5rem;\n\
+    color: white;\n\
+}\n\
+.swggUiContainer > .header > .td2 {\n\
+    font-size: medium;\n\
+    height: 2rem;\n\
+}\n\
+.swggUiContainer > .header > .td3 {\n\
+border: 0;\n\
+    color: #fff;\n\
+    padding: 6px 8px;\n\
+    background-color: #580;\n\
+}\n\
+.swggUiContainer > .info > * {\n\
+    margin-top: 1rem;\n\
+}\n\
+.swggUiContainer > .info a {\n\
+    color: #370;\n\
+    text-decoration: underline;\n\
+}\n\
+.swggUiContainer > .info > .fontWeightBold {\n\
+    font-size: x-large;\n\
+}\n\
+.swggUiContainer > .info > ul {\n\
+    margin-left: 2rem;\n\
+}\n\
+.swggUiContainer > .modal {\n\
+    background: black;\n\
+    background: rgba(0,0,0,0.5);\n\
+    display: flex;\n\
+    height: 100%;\n\
+    left: 0;\n\
+    margin: 0;\n\
+    margin-top: 4px;\n\
+    padding: 0;\n\
+    position: fixed;\n\
+    top: 0;\n\
+    width: 100%;\n\
+    z-index: 1;\n\
+}\n\
+.swggUiContainer .operation {\n\
+    background: #dfd;\n\
+    font-size: smaller;\n\
+}\n\
+.swggUiContainer .operation > .content {\n\
+    padding: 1rem;\n\
+}\n\
+.swggUiContainer .operation > .content .label {\n\
+    color: #0b0;\n\
+}\n\
+.swggUiContainer .operation > .content pre {\n\
+    border: 1px solid #bbb;\n\
+    background: #ffd;\n\
+}\n\
+.swggUiContainer .operation > .content .tr {\n\
+    margin-left: 0.5rem;\n\
+}\n\
+.swggUiContainer .operation > .header:hover {\n\
+    background: #bfb;\n\
+}\n\
+.swggUiContainer .operation > .header > span {\n\
+    padding: 2px 0 2px 0;\n\
+}\n\
+.swggUiContainer .operation > .header > span:first-child {\n\
+    margin-left: 0;\n\
+}\n\
+.swggUiContainer .operation > .header > .td1 {\n\
+    background: #777;\n\
+    color: white;\n\
+    padding-top: 5px;\n\
+    height: 1.5rem;\n\
+    text-align: center;\n\
+    width: 5rem;\n\
+}\n\
+.swggUiContainer .operation > .header > .td2 {\n\
+    flex: 3;\n\
+}\n\
+.swggUiContainer .operation > .header > .td3 {\n\
+    color: #777;\n\
+    flex: 2;\n\
+    text-decoration: none;\n\
+}\n\
+.swggUiContainer .operation > .header > .td4 {\n\
+    flex: 2;\n\
+    padding-right: 1rem;\n\
+}\n\
+.swggUiContainer .operation .paramDef pre,\n\
+.swggUiContainer .operation .paramDef textarea {\n\
+    height: 10rem;\n\
+}\n\
+.swggUiContainer .operation .paramDef > .td1 {\n\
+    flex: 2;\n\
+}\n\
+.swggUiContainer .operation .paramDef > .td2 {\n\
+    flex: 1;\n\
+}\n\
+.swggUiContainer .operation .paramDef > .td3 {\n\
+    flex: 4;\n\
+}\n\
+.swggUiContainer .operation .paramDef > .td4 {\n\
+    flex: 3;\n\
+}\n\
+.swggUiContainer .operation .responseList > .td1 {\n\
+    flex: 1;\n\
+}\n\
+.swggUiContainer .operation .responseList > .td2 {\n\
+    flex: 4;\n\
+}\n\
+.swggUiContainer .resource > .header > .td1 {\n\
+    font-size: large;\n\
+}\n\
+.swggUiContainer .resource > .header > .td2,\n\
+.swggUiContainer .resource > .header > .td3 {\n\
+    border-right: 1px solid #777;\n\
+    padding-right: 1rem;\n\
+}\n\
+\n\
+\n\
+\n\
+/* method */\n\
+.swggUiContainer .operation.DELETE > .header > .td1 {\n\
+    background: #b00;\n\
+}\n\
+.swggUiContainer .operation.GET > .header > .td1 {\n\
+    background: #093;\n\
+}\n\
+.swggUiContainer .operation.HEAD > .header > .td1 {\n\
+    background: #f30;\n\
+}\n\
+.swggUiContainer .operation.PATCH > .header > .td1 {\n\
+    background: #b0b;\n\
+}\n\
+.swggUiContainer .operation.POST > .header > .td1 {\n\
+    background: #07b;\n\
+}\n\
+.swggUiContainer .operation.PUT > .header > .td1 {\n\
+    background: #70b;\n\
+}\n\
+/*csslint\n\
+*/\n\
 </style>\n\
 </head>\n\
 <body>\n\
@@ -387,25 +757,23 @@ utility2-comment -->\n\
     <button class="onclick" id="dbImportButton1">import database &lt;- file</button><br>\n\
     <input class="onchange zeroPixel" type="file" id="dbImportInput1">\n\
     <div class="swggUiContainer">\n\
-    <form class="header tr">\n\
-        <a class="td1" href="http://swagger.io" target="_blank">swagger</a>\n\
-        <input\n\
-            class="flex1 td2"\n\
-            placeholder="http://petstore.swagger.io/v2/swagger.json"\n\
-            type="text"\n\
-            value="{{env.npm_config_swagger_basePath}}/swagger.json"\n\
-        >\n\
-    </form>\n\
-    <div class="reset"></div>\n\
+<form2 class="header tr">\n\
+    <a class="td1" href="http://swagger.io" target="_blank">swagger</a>\n\
+    <input\n\
+        class="flex1 td2"\n\
+        type="text"\n\
+        value="{{env.npm_config_swagger_basePath}}/swagger.json"\n\
+    >\n\
+    <button class="td3">Explore</button>\n\
+</form2>\n\
     </div>\n\
 <!-- utility2-comment\n\
     {{#if isRollup}}\n\
     <script src="assets.app.min.js"></script>\n\
     {{#unless isRollup}}\n\
 utility2-comment -->\n\
-    <script src="assets.utility2.rollup.js"></script>\n\
+    <script src="assets.swgg.rollup.js"></script>\n\
     <script src="assets.swgg.js"></script>\n\
-    <script src="assets.lib.swgg.ui.js"></script>\n\
     <script src="jsonp.utility2._stateInit?callback=window.utility2._stateInit"></script>\n\
     <script>window.utility2.onResetBefore.counter += 1;</script>\n\
     <script src="assets.example.js"></script>\n\
@@ -433,7 +801,7 @@ utility2-comment -->\n\
     // run shared js-env code - post-init
     (function () {
         // init petstore-api - frontend
-        local.tmp = JSON.parse(local.assetsDict['/assets.lib.swgg.petstore.json']);
+        local.tmp = JSON.parse(local.assetsDict['/assets.swgg.petstore.json']);
         delete local.tmp.basePath;
         delete local.tmp.host;
         delete local.tmp.schemes;
@@ -844,13 +1212,14 @@ utility2-comment -->\n\
         "url": "https://github.com/kaizhu256/node-swgg.git"
     },
     "scripts": {
-        "build-ci": "./lib.utility2.sh shRun shReadmeBuild",
-        "heroku-postbuild": "./lib.utility2.sh shRun shDeployHeroku",
+        "build-ci": "utility2 shRun shReadmeBuild",
+        "heroku-postbuild": "npm install 'kaizhu256/node-utility2#alpha' && utility2 shRun shDeployHeroku",
         "postinstall": "if [ -f lib.swgg.npm-scripts.sh ]; then ./lib.swgg.npm-scripts.sh postinstall; fi",
-        "start": "export PORT=${PORT:-8080} && export npm_config_mode_auto_restart=1 && ./lib.utility2.sh shRun shIstanbulCover test.js",
-        "test": "export PORT=$(./lib.utility2.sh shServerPortRandom) && ./lib.utility2.sh test test.js"
+        "publish-alias": "for ALIAS in swagger-lite; do shNpmPublish swgg $ALIAS; done",
+        "start": "export PORT=${PORT:-8080} && export npm_config_mode_auto_restart=1 && utility2 shRun shIstanbulCover test.js",
+        "test": "export PORT=$(utility2 shServerPortRandom) && utility2 test test.js"
     },
-    "version": "2017.1.12"
+    "version": "2017.2.6"
 }
 ```
 
@@ -894,7 +1263,7 @@ shBuildCiTestPost() {(set -e
 shBuild() {(set -e
 # this function will run the main build
     # init env
-    . ./lib.utility2.sh && shInit
+    . node_modules/.bin/utility2 && shInit
     # cleanup github-gh-pages dir
     # export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
     # init github-gh-pages commit-limit
