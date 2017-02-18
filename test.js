@@ -1489,13 +1489,30 @@
 
     // run node js-env code - function
     case 'node':
-        local.testCase_build_app = function (options, onError) {
+        local.testCase_buildApiDoc_default = function (options, onError) {
         /*
-         * this function will test build's app handling-behavior
+         * this function will test buildApiDoc's handling-behavior
          */
+            options = {
+                exampleFileList: ['README.md', 'test.js', 'lib.swgg.js']
+            };
+            local.buildApiDoc(options, onError);
+        };
+
+        local.testCase_buildApp_default = function (options, onError) {
+        /*
+         * this function will test buildApp's handling-behavior
+         */
+            local.testCase_buildReadme_default(options, local.onErrorDefault);
             options = [{
                 file: '/api/v0/swagger.json',
                 url: '/api/v0/swagger.json'
+            }, {
+                file: '/assets.swgg.html',
+                url: '/assets.swgg.html'
+            }, {
+                file: '/assets.swgg.petstore.json',
+                url: '/assets.swgg.petstore.json'
             }, {
                 file: '/assets.swgg.rollup.js',
                 url: '/assets.swgg.rollup.js'
@@ -1507,33 +1524,27 @@
             );
         };
 
-        local.testCase_build_doc = function (options, onError) {
+        local.testCase_buildReadme_default = function (options, onError) {
         /*
-         * this function will test build's doc handling-behavior
-         */
-            options = {
-                exampleFileList: ['README.md', 'test.js', 'lib.swgg.js']
-            };
-            local.buildDoc(options, onError);
-        };
-
-        local.testCase_build_readme = function (options, onError) {
-        /*
-         * this function will test build's readme handling-behavior
+         * this function will test buildReadme's handling-behavior
          */
             options = {};
-            options.html = local.assetsDict['/assets.swgg.html'].replace((/$/gm), '\\n\\');
-            options.readmeFrom = local.fs.readFileSync('README.md', 'utf8');
-            options.readmeTo = local.templateReadme;
-            // search-and-replace readmeFrom
-            [
-                (/<style>[\S\s]*<\/style>/)
-            ].forEach(function (rgx) {
-                options.html.replace(rgx, function (match0) {
-                    options.readmeFrom = options.readmeFrom.replace(rgx, match0);
+            options.customize = function () {
+                // search-and-replace - customize readmeTo
+                [
+                    // customize cdn-download
+                    (/cdn download[\S\s]*?\n\n\n\n/),
+                    // customize quickstart-html-style
+                    (/<style>[^`]*?<\/style>/),
+                    // customize quickstart-html-script
+                    (/<script [^`]*?<\/body>/)
+                ].forEach(function (rgx) {
+                    options.readmeFrom.replace(rgx, function (match0) {
+                        options.readmeTo = options.readmeTo.replace(rgx, match0);
+                    });
                 });
-            });
-            local.buildReadmeJslintLite(options, onError);
+            };
+            local.buildReadme(options, onError);
         };
 
         local.testCase_webpage_default = function (options, onError) {
