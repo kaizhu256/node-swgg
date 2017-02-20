@@ -45,11 +45,11 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 957e32c2
-- npm publish 2017.2.17
-- do not auto-uglify js-assets
-- revamp README.md
-- update lib.utility2
+#### change since 91dc0792
+- npm publish 2017.2.20
+- create published-alias oai-client oai-server swagger-client-lite swagger-lite swagger-server-lite
+- rename dom-element #outputTextareaStdout -> #outputTextareaStdout1
+- replace env var npm_package_name with npm_package_nameAlias in istanbul code-coverage
 - none
 
 #### this package requires
@@ -596,12 +596,13 @@ instruction
 
 
 
+    // post-init
+    /* istanbul ignore next */
     // run browser js-env code - post-init
     case 'browser':
-        /* istanbul ignore next */
-        local.testRun = function (event) {
+        local.testRunBrowser = function (event) {
             var reader, tmp;
-            switch (event && event.currentTarget.id) {
+            switch (event.currentTarget.id) {
             case 'dbExportButton1':
                 tmp = window.URL.createObjectURL(new window.Blob([local.db.dbExport()]));
                 document.querySelector('#dbExportA1').href = tmp;
@@ -629,6 +630,13 @@ instruction
             case 'dbResetButton1':
                 local.dbReset();
                 break;
+            case 'default':
+                // init ui
+                local.swgg.uiEventListenerDict['.onEventUiReload']();
+                local.runIfTrue(local.modeTest, function () {
+                    document.querySelector('#testRunButton1').innerText = 'hide internal test';
+                });
+                break;
             case 'testRunButton1':
                 // show tests
                 if (document.querySelector('#testReportDiv1').style.display === 'none') {
@@ -644,18 +652,27 @@ instruction
                 break;
             }
         };
+        // log stderr and stdout to #outputTextareaStdout1
+        ['error', 'log'].forEach(function (key) {
+            console['_' + key] = console[key];
+            console[key] = function () {
+                console['_' + key].apply(console, arguments);
+                (document.querySelector('#outputTextareaStdout1') || { value: '' }).value +=
+                    Array.from(arguments).map(function (arg) {
+                        return typeof arg === 'string'
+                            ? arg
+                            : JSON.stringify(arg, null, 4);
+                    }).join(' ') + '\n';
+            };
+        });
         // init event-handling
-        ['change', 'click'].forEach(function (event) {
+        ['change', 'click', 'keyup'].forEach(function (event) {
             Array.from(document.querySelectorAll('.on' + event)).forEach(function (element) {
-                element.addEventListener(event, local.testRun);
+                element.addEventListener(event, local.testRunBrowser);
             });
         });
-        // init ui
-        local.swgg.uiEventListenerDict['.onEventUiReload']();
         // run tests
-        local.runIfTrue(local.modeTest, function () {
-            document.querySelector('#testRunButton1').innerText = 'hide internal test';
-        });
+        local.testRunBrowser({ currentTarget: { id: 'default' } });
         break;
 
 
@@ -1248,6 +1265,7 @@ utility2-comment -->\n\
     "main": "lib.swgg.js",
     "name": "swgg",
     "nameAlias": "swgg",
+    "nameOriginal": "swgg",
     "os": [
         "darwin",
         "linux"
@@ -1258,13 +1276,14 @@ utility2-comment -->\n\
     },
     "scripts": {
         "build-ci": "utility2 shRun shReadmeBuild",
+        "env": "env",
         "heroku-postbuild": "npm install 'kaizhu256/node-utility2#alpha' && utility2 shRun shDeployHeroku",
         "postinstall": "if [ -f lib.swgg.npm-scripts.sh ]; then ./lib.swgg.npm-scripts.sh postinstall; fi",
-        "publish-alias": "for ALIAS in swagger-lite; do shNpmPublish swgg $ALIAS; done",
+        "publish-alias": "VERSION=$(npm info $npm_package_name version); for ALIAS in oai-client oai-server swagger-client-lite swagger-lite swagger-server-lite; do utility2 shRun shNpmPublish $ALIAS $VERSION; utility2 shRun shNpmTestPublished $ALIAS || exit $?; done",
         "start": "export PORT=${PORT:-8080} && export npm_config_mode_auto_restart=1 && utility2 shRun shIstanbulCover test.js",
         "test": "export PORT=$(utility2 shServerPortRandom) && utility2 test test.js"
     },
-    "version": "2017.2.17"
+    "version": "2017.2.20"
 }
 ```
 
@@ -1289,14 +1308,18 @@ shBuild() {(set -e
     # cleanup github-gh-pages dir
     # export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
     # init github-gh-pages commit-limit
-    export COMMIT_LIMIT=16
-    # if branch is alpha, beta, or master, then run default build
-    if [ "$CI_BRANCH" = alpha ] ||
-        [ "$CI_BRANCH" = beta ] ||
-        [ "$CI_BRANCH" = master ]
-    then
+    export COMMIT_LIMIT=20
+    case "$CI_BRANCH" in
+    alpha)
         shBuildCiDefault
-    fi
+        ;;
+    beta)
+        shBuildCiDefault
+        ;;
+    master)
+        shBuildCiDefault
+        ;;
+    esac
 )}
 
 shBuildCiTestPost() {(set -e

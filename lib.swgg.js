@@ -16,7 +16,7 @@
     if (typeof global === 'object' &&
             global.utility2_rollup &&
             global.process &&
-            global.process.env.npm_package_name === 'swgg') {
+            global.process.env.npm_package_nameAlias === 'swgg') {
         return;
     }
 
