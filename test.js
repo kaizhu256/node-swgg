@@ -1206,7 +1206,8 @@
                 { key: 'propStringDate', value: '1971-01-01' },
                 { key: 'propStringDatetime', value: '1971-01-01T00:00:00Z' },
                 { key: 'propStringEmail', value: 'a@a.com' },
-                { key: 'propStringJson', value: 'true' }
+                { key: 'propStringJson', value: 'true' },
+                { key: 'propStringPhone', value: '+123 (1234) 1234-1234' }
             ].forEach(function (element) {
                 element.data = local.jsonCopy(options.data);
                 element.data[element.key] = element.value;
@@ -1273,7 +1274,8 @@
                 { key: 'propStringDate', value: 'null' },
                 { key: 'propStringDatetime', value: 'null' },
                 { key: 'propStringEmail', value: 'null' },
-                { key: 'propStringJson', value: 'syntax error' }
+                { key: 'propStringJson', value: 'syntax error' },
+                { key: 'propStringPhone', value: 'null' }
             ].forEach(function (element) {
                 local.tryCatchOnError(function () {
                     if (element.data === undefined) {
@@ -1391,7 +1393,7 @@
 
         local.testCase_uiScrollTo = function (options, onError) {
         /*
-         * this function will test the uiScrollTo's default handling-behavior
+         * this function will test uiScrollTo's default handling-behavior
          */
             options = [
                 '',
@@ -1408,7 +1410,7 @@
 
         local.testCase_ui_datable = function (options, onError) {
         /*
-         * this function will test the ui's datatable handling-behavior
+         * this function will test ui's datatable handling-behavior
          */
             options = {};
             options.onEvent = function () {
@@ -1419,8 +1421,9 @@
                 document.querySelector('.onEventDatatableTrSelect').click();
                 // un-select dbRow
                 document.querySelector('.onEventDatatableTrSelect input').click();
-                // re-select dbRow
-                document.querySelector('.onEventDatatableTrSelect').click();
+                // bug-workaround - select last (hopefully not important) dbRow to remove
+                Array.from(document.querySelectorAll('.onEventDatatableTrSelect'))
+                    .slice(-1)[0].click();
                 document.querySelector('.onEventDatatableSelectedRemove').click();
                 // hide modal
                 document.querySelector('.onEventModalHide').click();
@@ -1432,7 +1435,7 @@
 
         local.testCase_ui_default = function (options, onError) {
         /*
-         * this function will test the ui's default handling-behavior
+         * this function will test ui's default handling-behavior
          */
             var onParallel;
             onParallel = local.onParallel(function (error) {
@@ -1469,7 +1472,7 @@
 
         local.testCase_ui_fileMedia = function (options, onError) {
         /*
-         * this function will test the ui's file-media handling-behavior
+         * this function will test ui's file-media handling-behavior
          */
             options = [
                 'testCase_ui_fileMedia_audioNull',
@@ -1489,21 +1492,20 @@
 
     // run node js-env code - function
     case 'node':
-        local.testCase_buildApiDoc_default = function (options, onError) {
+        local.testCase_buildApidoc_default = function (options, onError) {
         /*
-         * this function will test buildApiDoc's handling-behavior
+         * this function will test buildApidoc's default handling-behavior-behavior
          */
-            options = {
-                exampleFileList: ['README.md', 'test.js', 'lib.swgg.js']
-            };
-            local.buildApiDoc(options, onError);
+            options = {};
+            local.buildApidoc(options, onError);
         };
 
         local.testCase_buildApp_default = function (options, onError) {
         /*
-         * this function will test buildApp's handling-behavior
+         * this function will test buildApp's default handling-behavior-behavior
          */
             local.testCase_buildReadme_default(options, local.onErrorDefault);
+            local.testCase_buildTest_default(options, local.onErrorThrow);
             options = [{
                 file: '/api/v0/swagger.json',
                 url: '/api/v0/swagger.json'
@@ -1526,30 +1528,50 @@
 
         local.testCase_buildReadme_default = function (options, onError) {
         /*
-         * this function will test buildReadme's handling-behavior
+         * this function will test buildReadme's default handling-behavior-behavior
          */
             options = {};
             options.customize = function () {
-                // search-and-replace - customize readmeTo
+                // search-and-replace - customize dataTo
                 [
                     // customize cdn-download
                     (/cdn download[\S\s]*?\n\n\n\n/),
                     // customize quickstart-html-style
                     (/<style>[^`]*?<\/style>/),
                     // customize quickstart-html-script
-                    (/<script [^`]*?<\/body>/)
+                    (/<script [^`]*?utility2FooterDiv/)
                 ].forEach(function (rgx) {
-                    options.readmeFrom.replace(rgx, function (match0) {
-                        options.readmeTo = options.readmeTo.replace(rgx, match0);
+                    options.dataFrom.replace(rgx, function (match0) {
+                        options.dataTo = options.dataTo.replace(rgx, match0);
                     });
                 });
             };
             local.buildReadme(options, onError);
         };
 
+        local.testCase_buildTest_default = function (options, onError) {
+        /*
+         * this function will test buildTest's default handling-behavior
+         */
+            options = {};
+            options.customize = function () {
+                // search-and-replace - customize dataTo
+                [
+                    // customize js\-env code
+                    (/\n {4}\/\/ run shared js\-env code - pre-init\n[\S\s]*?\n {4}\}\(\)\);/),
+                    (/\n {4}\/\/ run node js\-env code - post-init\n[\S\s]*?\n {8}break;\n/)
+                ].forEach(function (rgx) {
+                    options.dataFrom.replace(rgx, function (match0) {
+                        options.dataTo = options.dataTo.replace(rgx, match0);
+                    });
+                });
+            };
+            local.buildTest(options, onError);
+        };
+
         local.testCase_webpage_default = function (options, onError) {
         /*
-         * this function will test the webpage's default handling-behavior
+         * this function will test webpage's default handling-behavior
          */
             options = {
                 modeCoverageMerge: true,
@@ -1657,6 +1679,11 @@
                         propStringEmail:
                             { default: 'a@a.com', format: 'email', type: 'string' },
                         propStringJson: { default: 'null', format: 'json', type: 'string' },
+                        propStringPhone: {
+                            default: '+123 (1234) 1234-1234',
+                            format: 'phone',
+                            type: 'string'
+                        },
                         propStringUnique: { type: 'string' }
                     },
                     required: ['propRequired']
@@ -2063,6 +2090,16 @@
         };
     }());
     switch (local.modeJs) {
+
+
+
+    // run browser js-env code - post-init
+    case 'browser':
+        // run tests
+        local.nop(local.modeTest &&
+            document.querySelector('#testRunButton1') &&
+            document.querySelector('#testRunButton1').click());
+        break;
 
 
 

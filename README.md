@@ -1,12 +1,11 @@
-swgg
-====
+# swgg
 this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend)
 
-[![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swgg.svg)](https://travis-ci.org/kaizhu256/node-swgg) [![istanbul-coverage](https://kaizhu256.github.io/node-swgg/build..alpha..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build..alpha..travis-ci.org/coverage.html/index.html)
+[![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swgg.svg)](https://travis-ci.org/kaizhu256/node-swgg) [![istanbul-coverage](https://kaizhu256.github.io/node-swgg/build/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build/coverage.html/index.html)
 
 [![NPM](https://nodei.co/npm/swgg.png?downloads=true)](https://www.npmjs.com/package/swgg)
 
-[![package-listing](https://kaizhu256.github.io/node-swgg/build/screen-capture.gitLsTree.svg)](https://github.com/kaizhu256/node-swgg)
+[![package-listing](https://kaizhu256.github.io/node-swgg/build/screen-capture.npmPackageListing.svg)](https://github.com/kaizhu256/node-swgg)
 
 
 
@@ -20,22 +19,20 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 # live demo
 - [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html)
 
-[![github.com test-server](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithub.browser._2Fnode-swgg_2Fbuild..alpha..travis-ci.org_2Fapp_2Findex.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html)
+[![github.com test-server](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithub.browser._2Fnode-swgg_2Fbuild_2Fapp_2Findex.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html)
 
 
 
 # documentation
-#### api-doc
-- [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/api-doc.html](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/api-doc.html)
+#### apidoc
+- [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
-[![api-doc](https://kaizhu256.github.io/node-swgg/build/screen-capture.apiDoc.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swgg_2Ftmp_2Fbuild_2Fapi-doc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/api-doc.html)
+[![apidoc](https://kaizhu256.github.io/node-swgg/build/screen-capture.buildApidoc.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swgg_2Ftmp_2Fbuild_2Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
-- add loading text
-- allow offline-mode
+- npm publish 2017.3.29
+- allow optional sub-level input for swagger-models
 - add authorization-header hook
-- add phone format string
-- revert temporary fix for chrome render bug
 - allow secure remote db export / import / reset to backend
 - add middlewareAcl
 - datatable - add sort-by-field
@@ -45,16 +42,14 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### change since 91dc0792
-- npm publish 2017.2.20
-- create published-alias oai-client oai-server swagger-client-lite swagger-lite swagger-server-lite
-- rename dom-element #outputTextareaStdout -> #outputTextareaStdout1
-- replace env var npm_package_name with npm_package_nameAlias in istanbul code-coverage
+#### changes for v2017.3.29
+- update utility2 static-dependency in assets.swgg.rollup.js
+- add loading-text when resource is loading
+- add validation for phone format-string
 - none
 
 #### this package requires
 - darwin or linux os
-- chromium-based browser or firefox browser
 
 
 
@@ -63,8 +58,8 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 | git-branch : | [master](https://github.com/kaizhu256/node-swgg/tree/master) | [beta](https://github.com/kaizhu256/node-swgg/tree/beta) | [alpha](https://github.com/kaizhu256/node-swgg/tree/alpha)|
 |--:|:--|:--|:--|
-| test-server-1 : | [![github.com test-server](https://kaizhu256.github.io/node-swgg/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swgg/build..master..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swgg/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swgg/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swgg/build..alpha..travis-ci.org/app/index.html)|
-| test-server-2 : | [![heroku.com test-server](https://kaizhu256.github.io/node-swgg/heroku-logo.75x25.png)](https://h1-swgg-master.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swgg/heroku-logo.75x25.png)](https://h1-swgg-beta.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swgg/heroku-logo.75x25.png)](https://h1-swgg-alpha.herokuapp.com)|
+| test-server-github : | [![github.com test-server](https://kaizhu256.github.io/node-swgg/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swgg/build..master..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swgg/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html) | [![github.com test-server](https://kaizhu256.github.io/node-swgg/GitHub-Mark-32px.png)](https://kaizhu256.github.io/node-swgg/build..alpha..travis-ci.org/app/index.html)|
+| test-server-heroku : | [![heroku.com test-server](https://kaizhu256.github.io/node-swgg/heroku-logo.75x25.png)](https://h1-swgg-master.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swgg/heroku-logo.75x25.png)](https://h1-swgg-beta.herokuapp.com) | [![heroku.com test-server](https://kaizhu256.github.io/node-swgg/heroku-logo.75x25.png)](https://h1-swgg-alpha.herokuapp.com)|
 | test-report : | [![test-report](https://kaizhu256.github.io/node-swgg/build..master..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swgg/build..master..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/test-report.html) | [![test-report](https://kaizhu256.github.io/node-swgg/build..alpha..travis-ci.org/test-report.badge.svg)](https://kaizhu256.github.io/node-swgg/build..alpha..travis-ci.org/test-report.html)|
 | coverage : | [![istanbul-coverage](https://kaizhu256.github.io/node-swgg/build..master..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build..master..travis-ci.org/coverage.html/index.html) | [![istanbul-coverage](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/coverage.html/index.html) | [![istanbul-coverage](https://kaizhu256.github.io/node-swgg/build..alpha..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build..alpha..travis-ci.org/coverage.html/index.html)|
 | build-artifacts : | [![build-artifacts](https://kaizhu256.github.io/node-swgg/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swgg/tree/gh-pages/build..master..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swgg/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swgg/tree/gh-pages/build..beta..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swgg/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swgg/tree/gh-pages/build..alpha..travis-ci.org)|
@@ -88,7 +83,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 ![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleJs.browser..png)
 
 #### to run this example, follow the instruction in the script below
-- [example.js](https://kaizhu256.github.io/node-swgg/build/example.js)
+- [example.js](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/example.js)
 ```javascript
 /*
 example.js
@@ -597,12 +592,46 @@ instruction
 
 
     // post-init
-    /* istanbul ignore next */
     // run browser js-env code - post-init
+    /* istanbul ignore next */
     case 'browser':
         local.testRunBrowser = function (event) {
             var reader, tmp;
-            switch (event.currentTarget.id) {
+            if (!event || (event &&
+                    event.currentTarget &&
+                    event.currentTarget.className &&
+                    event.currentTarget.className.includes &&
+                    event.currentTarget.className.includes('onreset'))) {
+                // reset output
+                Array.from(
+                    document.querySelectorAll('body > .resettable')
+                ).forEach(function (element) {
+                    switch (element.tagName) {
+                    case 'INPUT':
+                    case 'TEXTAREA':
+                        element.value = '';
+                        break;
+                    default:
+                        element.textContent = '';
+                    }
+                });
+            }
+            switch (event && event.currentTarget && event.currentTarget.id) {
+            case 'testRunButton1':
+                // show tests
+                if (document.querySelector('#testReportDiv1').style.display === 'none') {
+                    document.querySelector('#testReportDiv1').style.display = 'block';
+                    document.querySelector('#testRunButton1').textContent =
+                        'hide internal test';
+                    local.modeTest = true;
+                    local.testRunDefault(local);
+                // hide tests
+                } else {
+                    document.querySelector('#testReportDiv1').style.display = 'none';
+                    document.querySelector('#testRunButton1').textContent = 'run internal test';
+                }
+                break;
+            // custom-case
             case 'dbExportButton1':
                 tmp = window.URL.createObjectURL(new window.Blob([local.db.dbExport()]));
                 document.querySelector('#dbExportA1').href = tmp;
@@ -630,39 +659,48 @@ instruction
             case 'dbResetButton1':
                 local.dbReset();
                 break;
-            case 'default':
+            case undefined:
                 // init ui
                 local.swgg.uiEventListenerDict['.onEventUiReload']();
-                local.runIfTrue(local.modeTest, function () {
-                    document.querySelector('#testRunButton1').innerText = 'hide internal test';
-                });
+                // coverage-hack
+                local.nop(local.modeTest && (function () {
+                    document.querySelector('#testRunButton1').textContent =
+                        'hide internal test';
+                }()));
                 break;
-            case 'testRunButton1':
-                // show tests
-                if (document.querySelector('#testReportDiv1').style.display === 'none') {
-                    document.querySelector('#testReportDiv1').style.display = 'block';
-                    document.querySelector('#testRunButton1').innerText = 'hide internal test';
-                    local.modeTest = true;
-                    local.testRunDefault(local);
-                // hide tests
-                } else {
-                    document.querySelector('#testReportDiv1').style.display = 'none';
-                    document.querySelector('#testRunButton1').innerText = 'run internal test';
+            }
+            if (document.querySelector('#inputTextareaEval1') && (!event || (event &&
+                    event.currentTarget &&
+                    event.currentTarget.className &&
+                    event.currentTarget.className.includes &&
+                    event.currentTarget.className.includes('oneval')))) {
+                // try to eval input-code
+                try {
+                    /*jslint evil: true*/
+                    eval(document.querySelector('#inputTextareaEval1').value);
+                } catch (errorCaught) {
+                    console.error(errorCaught.stack);
                 }
-                break;
             }
         };
         // log stderr and stdout to #outputTextareaStdout1
         ['error', 'log'].forEach(function (key) {
-            console['_' + key] = console[key];
+            console[key + '_original'] = console[key];
             console[key] = function () {
-                console['_' + key].apply(console, arguments);
-                (document.querySelector('#outputTextareaStdout1') || { value: '' }).value +=
-                    Array.from(arguments).map(function (arg) {
-                        return typeof arg === 'string'
-                            ? arg
-                            : JSON.stringify(arg, null, 4);
-                    }).join(' ') + '\n';
+                var element;
+                console[key + '_original'].apply(console, arguments);
+                element = document.querySelector('#outputTextareaStdout1');
+                if (!element) {
+                    return;
+                }
+                // append text to #outputTextareaStdout1
+                element.value += Array.from(arguments).map(function (arg) {
+                    return typeof arg === 'string'
+                        ? arg
+                        : JSON.stringify(arg, null, 4);
+                }).join(' ') + '\n';
+                // scroll textarea to bottom
+                element.scrollTop = element.scrollHeight;
             };
         });
         // init event-handling
@@ -672,13 +710,13 @@ instruction
             });
         });
         // run tests
-        local.testRunBrowser({ currentTarget: { id: 'default' } });
+        local.testRunBrowser();
         break;
 
 
 
-    /* istanbul ignore next */
     // run node js-env code - post-init
+    /* istanbul ignore next */
     case 'node':
         // export local
         module.exports = local;
@@ -695,7 +733,7 @@ instruction
 <head>\n\
 <meta charset="UTF-8">\n\
 <meta name="viewport" content="width=device-width, initial-scale=1">\n\
-<title>{{env.npm_package_nameAlias}} v{{env.npm_package_version}}</title>\n\
+<title>{{env.npm_package_name}} (v{{env.npm_package_version}})</title>\n\
 <style>\n\
 /*csslint\n\
     box-sizing: false,\n\
@@ -993,6 +1031,9 @@ border: 0;\n\
     width: 100%;\n\
     z-index: 1;\n\
 }\n\
+.swggUiContainer .modal button {\n\
+    padding: 0.5rem;\n\
+}\n\
 .swggUiContainer .operation {\n\
     background: #dfd;\n\
     font-size: smaller;\n\
@@ -1091,43 +1132,43 @@ border: 0;\n\
 .swggUiContainer .operation.PUT > .header > .td1 {\n\
     background: #70b;\n\
 }\n\
-/*csslint\n\
-*/\n\
 </style>\n\
 </head>\n\
 <body>\n\
 <!-- utility2-comment\n\
-    <div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 0.5s, width 1.5s; width: 25%;"></div>\n\
+<div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 0.5s, width 1.5s; width: 25%;"></div>\n\
 utility2-comment -->\n\
-    <h1>\n\
+<h1>\n\
 <!-- utility2-comment\n\
-        <a\n\
-            {{#if env.npm_package_homepage}}\n\
-            href="{{env.npm_package_homepage}}"\n\
-            {{/if env.npm_package_homepage}}\n\
-            target="_blank"\n\
-        >\n\
+    <a\n\
+        {{#if env.npm_package_homepage}}\n\
+        href="{{env.npm_package_homepage}}"\n\
+        {{/if env.npm_package_homepage}}\n\
+        target="_blank"\n\
+    >\n\
 utility2-comment -->\n\
-            {{env.npm_package_nameAlias}} v{{env.npm_package_version}}\n\
+        {{env.npm_package_name}} (v{{env.npm_package_version}})\n\
 <!-- utility2-comment\n\
-        </a>\n\
+    </a>\n\
 utility2-comment -->\n\
-    </h1>\n\
-    <h3>{{env.npm_package_description}}</h3>\n\
+</h1>\n\
+<h3>{{env.npm_package_description}}</h3>\n\
 <!-- utility2-comment\n\
-    <h4><a download href="assets.app.js">download standalone app</a></h4>\n\
-    <button class="onclick" id="testRunButton1">run internal test</button><br>\n\
-    <div id="testReportDiv1" style="display: none;"></div>\n\
+<h4><a download href="assets.app.js">download standalone app</a></h4>\n\
+<button class="onclick onreset" id="testRunButton1">run internal test</button><br>\n\
+<div id="testReportDiv1" style="display: none;"></div>\n\
 utility2-comment -->\n\
 \n\
-    <button class="onclick" id="dbResetButton1">reset database</button><br>\n\
-    <button class="onclick" id="dbExportButton1">export database -&gt; file</button><br>\n\
-    <a download="db.persistence.json" href="" id="dbExportA1"></a>\n\
-    <button class="onclick" id="dbImportButton1">import database &lt;- file</button><br>\n\
-    <input class="onchange zeroPixel" type="file" id="dbImportInput1">\n\
-    <div class="swggUiContainer">\n\
+\n\
+\n\
+<button class="onclick" id="dbResetButton1">reset database</button><br>\n\
+<button class="onclick" id="dbExportButton1">export database -&gt; file</button><br>\n\
+<a download="db.persistence.json" href="" id="dbExportA1"></a>\n\
+<button class="onclick" id="dbImportButton1">import database &lt;- file</button><br>\n\
+<input class="onchange zeroPixel" type="file" id="dbImportInput1">\n\
+<div class="swggUiContainer">\n\
 <form2 class="header tr">\n\
-    <a class="td1" href="http://swagger.io" target="_blank">swagger</a>\n\
+    <a class="td1" href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
     <input\n\
         class="flex1 td2"\n\
         type="text"\n\
@@ -1135,22 +1176,28 @@ utility2-comment -->\n\
     >\n\
     <button class="td3">Explore</button>\n\
 </form2>\n\
-    </div>\n\
+</div>\n\
+<div class="swggAjaxProgressDiv" style="margin-top: 1rem; text-align: center;">fetching resource list; Please wait.</div>\n\
 <!-- utility2-comment\n\
-    {{#if isRollup}}\n\
-    <script src="assets.app.js"></script>\n\
-    {{#unless isRollup}}\n\
+{{#if isRollup}}\n\
+<script src="assets.app.js"></script>\n\
+{{#unless isRollup}}\n\
 utility2-comment -->\n\
-    <script src="assets.swgg.rollup.js"></script>\n\
-    <script src="assets.swgg.js"></script>\n\
-    <script src="jsonp.utility2._stateInit?callback=window.utility2._stateInit"></script>\n\
-    <script>window.utility2.onResetBefore.counter += 1;</script>\n\
-    <script src="assets.example.js"></script>\n\
-    <script src="assets.test.js"></script>\n\
-    <script>window.utility2.onResetBefore();</script>\n\
+<script src="assets.swgg.rollup.js"></script>\n\
+<script src="assets.swgg.js"></script>\n\
+<script src="jsonp.utility2._stateInit?callback=window.utility2._stateInit"></script>\n\
+<script>window.utility2.onResetBefore.counter += 1;</script>\n\
+<script src="assets.example.js"></script>\n\
+<script src="assets.test.js"></script>\n\
+<script>window.utility2.onResetBefore();</script>\n\
 <!-- utility2-comment\n\
-    {{/if isRollup}}\n\
+{{/if isRollup}}\n\
 utility2-comment -->\n\
+<div class="utility2FooterDiv">\n\
+    [ this app was created with\n\
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>\n\
+    ]\n\
+</div>\n\
 </body>\n\
 </html>\n\
 ';
@@ -1161,6 +1208,7 @@ utility2-comment -->\n\
                 {
                     env: local.objectSetDefault(local.env, {
                         npm_package_description: 'example module',
+                        npm_package_name: 'example',
                         npm_package_nameAlias: 'example',
                         npm_package_version: '0.0.1'
                     })
@@ -1174,6 +1222,8 @@ utility2-comment -->\n\
                     switch (match1) {
                     case 'npm_package_description':
                         return 'example module';
+                    case 'npm_package_name':
+                        return 'example';
                     case 'npm_package_nameAlias':
                         return 'example';
                     case 'npm_package_version':
@@ -1185,11 +1235,15 @@ utility2-comment -->\n\
         if (local.global.utility2_rollup || module !== require.main) {
             break;
         }
-        local.assetsDict['/assets.example.js'] = local.assetsDict['/assets.example.js'] ||
+        local.assetsDict['/assets.example.js'] =
+            local.assetsDict['/assets.example.js'] ||
             local.fs.readFileSync(__filename, 'utf8');
         local.assetsDict['/assets.swgg.rollup.js'] =
-            local.assetsDict['/assets.swgg.rollup.js'] || local.fs.readFileSync(
-                local.swgg.__dirname + '/lib.swgg.js',
+            local.assetsDict['/assets.swgg.rollup.js'] ||
+            local.fs.readFileSync(
+                // npmdoc-hack
+                local.swgg.__dirname +
+                    '/lib.swgg.js',
                 'utf8'
             ).replace((/^#!/), '//');
         local.assetsDict['/favicon.ico'] = local.assetsDict['/favicon.ico'] || '';
@@ -1203,7 +1257,7 @@ utility2-comment -->\n\
             break;
         }
         process.env.PORT = process.env.PORT || '8081';
-        console.log('server starting on port ' + process.env.PORT);
+        console.error('server starting on port ' + process.env.PORT);
         local.http.createServer(function (request, response) {
             request.urlParsed = local.url.parse(request.url);
             if (local.assetsDict[request.urlParsed.pathname] !== undefined) {
@@ -1218,7 +1272,7 @@ utility2-comment -->\n\
 }());
 ```
 
-#### output from electron
+#### output from browser
 ![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleJs.browser..png)
 
 #### output from shell
@@ -1246,9 +1300,6 @@ utility2-comment -->\n\
         "cms",
         "crud",
         "dashboard",
-        "light",
-        "lightweight",
-        "lite",
         "login",
         "oai",
         "oauth",
@@ -1256,7 +1307,6 @@ utility2-comment -->\n\
         "open-id",
         "openapi",
         "openid",
-        "standalone",
         "swagger",
         "swagger-ui",
         "swgg"
@@ -1265,25 +1315,27 @@ utility2-comment -->\n\
     "main": "lib.swgg.js",
     "name": "swgg",
     "nameAlias": "swgg",
+    "nameAliasDeprecate": "oai-client oai-server swagger-client-lite swagger-server-lite",
+    "nameAliasPublish": "swagger-lite",
     "nameOriginal": "swgg",
     "os": [
         "darwin",
         "linux"
     ],
+    "readmeParse": "1",
     "repository": {
         "type": "git",
         "url": "https://github.com/kaizhu256/node-swgg.git"
     },
     "scripts": {
-        "build-ci": "utility2 shRun shReadmeBuild",
+        "build-ci": "utility2 shReadmeTest build_ci.sh",
         "env": "env",
-        "heroku-postbuild": "npm install 'kaizhu256/node-utility2#alpha' && utility2 shRun shDeployHeroku",
-        "postinstall": "if [ -f lib.swgg.npm-scripts.sh ]; then ./lib.swgg.npm-scripts.sh postinstall; fi",
-        "publish-alias": "VERSION=$(npm info $npm_package_name version); for ALIAS in oai-client oai-server swagger-client-lite swagger-lite swagger-server-lite; do utility2 shRun shNpmPublish $ALIAS $VERSION; utility2 shRun shNpmTestPublished $ALIAS || exit $?; done",
-        "start": "export PORT=${PORT:-8080} && export npm_config_mode_auto_restart=1 && utility2 shRun shIstanbulCover test.js",
+        "heroku-postbuild": "npm install 'kaizhu256/node-utility2#alpha' && utility2 shDeployHeroku",
+        "postinstall": "if [ -f npm_scripts.sh ]; then ./npm_scripts.sh postinstall; fi",
+        "start": "export PORT=${PORT:-8080} && utility2 start test.js",
         "test": "export PORT=$(utility2 shServerPortRandom) && utility2 test test.js"
     },
-    "version": "2017.2.20"
+    "version": "2017.3.29"
 }
 ```
 
@@ -1295,51 +1347,30 @@ utility2-comment -->\n\
 
 
 # internal build-script
-- build.sh
+- build_ci.sh
 ```shell
-# build.sh
+# build_ci.sh
 
 # this shell script will run the build for this package
 
-shBuild() {(set -e
-# this function will run the main build
-    # init env
-    . node_modules/.bin/utility2 && shInit
-    # cleanup github-gh-pages dir
-    # export BUILD_GITHUB_UPLOAD_PRE_SH="rm -fr build"
-    # init github-gh-pages commit-limit
-    export COMMIT_LIMIT=20
-    case "$CI_BRANCH" in
-    alpha)
-        shBuildCiDefault
-        ;;
-    beta)
-        shBuildCiDefault
-        ;;
-    master)
-        shBuildCiDefault
-        ;;
-    esac
+shBuildCiPost() {(set -e
+    shDeployGithub
+    shDeployHeroku
+    shReadmeBuildLinkVerify
 )}
 
-shBuildCiTestPost() {(set -e
-# this function will run the post-test build
-    # if running legacy-node, then return
-    [ "$(node --version)" \< "v7.0" ] && return || true
-    export NODE_ENV=production
-    # deploy app to gh-pages
-    (export MODE_BUILD=deployGithub && shDeployGithub) || return $?
-    # deploy app to heroku
-    (export MODE_BUILD=deployHeroku && shDeployHeroku) || return $?
+shBuildCiPre() {(set -e
+    shReadmeTest example.js
+    shReadmeTest example.sh
+    shNpmTestPublished
 )}
 
-shBuildCiTestPre() {(set -e
-# this function will run the pre-test build
-    # test example.js
-    (export MODE_BUILD=testExampleJs && shRunScreenCapture shReadmeTestExampleJs) || return $?
-    # test published-package
-    (export MODE_BUILD=npmTestPublished && shRunScreenCapture shNpmTestPublished) || return $?
-)}
-
-shBuild
+# run shBuildCi
+eval $(utility2 source)
+shBuildCi
 ```
+
+
+
+# misc
+- this package was created with [utility2](https://github.com/kaizhu256/node-utility2)

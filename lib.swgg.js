@@ -48,6 +48,14 @@
         local = local.global.utility2_rollup || local;
         // init lib
         local.local = local.swgg = local;
+        // init exports
+        if (local.modeJs === 'browser') {
+            local.global.swgg = local;
+        } else {
+            module.exports = local;
+            module.exports.__dirname = __dirname;
+            module.exports.module = module;
+        }
         // init lib utility2
         local.utility2 = local.global.utility2_rollup || (local.modeJs === 'browser'
             ? local.global.utility2
@@ -366,6 +374,9 @@ border: 0;\n\
     width: 100%;\n\
     z-index: 1;\n\
 }\n\
+.swggUiContainer .modal button {\n\
+    padding: 0.5rem;\n\
+}\n\
 .swggUiContainer .operation {\n\
     background: #dfd;\n\
     font-size: smaller;\n\
@@ -479,6 +490,7 @@ border: 0;\n\
     <button class="td3">Explore</button>\n\
 </form2>\n\
     </div>\n\
+    <div class="swggAjaxProgressDiv" style="margin-top: 1rem; text-align: center;">fetching resource list; Please wait.</div>\n\
     <script src="assets.swgg.rollup.js"></script>\n\
     <script>window.swgg.uiEventListenerDict[".onEventUiReload"]();</script>\n\
 </body>\n\
@@ -1913,6 +1925,14 @@ local.templateUiResponseAjax = '\
                 case 'json':
                     tmp = JSON.stringify({ random: tmp });
                     break;
+                case 'phone':
+                    tmp = options.modeNotRandom
+                        ? '+123 (1234) 1234-1234'
+                        : '+' + Math.random().toString().slice(-3) +
+                            ' (' + Math.random().toString().slice(-4) + ') ' +
+                            Math.random().toString().slice(-4) + '-' +
+                            Math.random().toString().slice(-4);
+                    break;
                 }
                 // http://json-schema.org/latest/json-schema-validation.html#anchor25
                 // 5.2.  Validation keywords for strings
@@ -2151,8 +2171,8 @@ local.templateUiResponseAjax = '\
                         onParallel = local.onParallel(options.onNext);
                         onParallel.counter += 1;
                         crud.dbTable.crudGetManyByQuery({
+                            fieldList: crud.queryFields,
                             limit: crud.queryLimit,
-                            projection: crud.queryFields,
                             query: crud.queryWhere,
                             skip: crud.querySkip,
                             sort: crud.querySort
@@ -2767,8 +2787,7 @@ local.templateUiResponseAjax = '\
                 // validate schema
                 local.assert(tmp, schema.$ref);
                 // recurse
-                tmp = local.schemaNormalizeAndCopy(tmp);
-                schema = tmp;
+                schema = local.schemaNormalizeAndCopy(tmp);
             }
             // inherit allOf
             if (schema.allOf) {
@@ -2780,7 +2799,11 @@ local.templateUiResponseAjax = '\
                 });
                 schema = tmp;
             }
-            return local.jsonCopy(schema);
+            schema = local.jsonCopy(schema);
+            if (schema.type === 'object') {
+                schema.properties = local.normalizeDict(schema.properties);
+            }
+            return schema;
         };
 
         local.serverRespondJsonapi = function (request, response, error, data, meta) {
@@ -2982,7 +3005,7 @@ local.templateUiResponseAjax = '\
                 options.pageList.push({
                     disabled: tmp === options.pageCurrent,
                     pageNumber: tmp,
-                    valueEncoded: tmp + 1
+                    valueEncoded: JSON.stringify(tmp + 1)
                 });
             }
             // add last page
@@ -3372,9 +3395,17 @@ local.templateUiResponseAjax = '\
                     document.querySelector('.swggUiContainer > .header > .td2').value
                         .replace((/^\//), '')
                 ).href;
+            // display .swggAjaxProgressDiv
+            document.querySelector('.swggAjaxProgressDiv').textContent =
+                'fetching resource list: ' +
+                document.querySelector('.swggUiContainer > .header > .td2').value +
+                '; Please wait.';
+            document.querySelector('.swggAjaxProgressDiv').style.display = 'block';
             local.ajax({
                 url: document.querySelector('.swggUiContainer > .header > .td2').value
             }, function (error, xhr) {
+                // hide .swggAjaxProgressDiv
+                document.querySelector('.swggAjaxProgressDiv').style.display = 'none';
                 // validate no error occurred
                 local.assert(!error, error);
                 // reset state
@@ -3481,10 +3512,7 @@ local.templateUiResponseAjax = '\
                 paramDef.schema,
                 paramDef.schema && paramDef.schema.items
             ].some(function (element) {
-                local.tryCatchOnError(function () {
-                    paramDef.schema2 = paramDef.schema2 ||
-                        local.schemaNormalizeAndCopy(element).properties;
-                }, local.nop);
+                paramDef.schema2 = local.schemaNormalizeAndCopy(element || {}).properties;
                 return paramDef.schema2;
             });
             if (paramDef.schema2) {
@@ -3977,6 +4005,9 @@ local.templateUiResponseAjax = '\
                     case 'email':
                         local.assert(local.regexpEmailValidate.test(data));
                         break;
+                    case 'phone':
+                        local.assert(local.regexpPhoneValidate.test(data));
+                        break;
                     case 'json':
                         JSON.parse(data);
                         break;
@@ -4126,8 +4157,6 @@ local.templateUiResponseAjax = '\
 
     // run browser js-env code - post-init
     case 'browser':
-        // init exports
-        local.global.swgg = local;
         // init state
         local.utility2._stateInit({});
         break;
@@ -4136,9 +4165,6 @@ local.templateUiResponseAjax = '\
 
     // run node js-env code - post-init
     case 'node':
-        // init exports
-        module.exports = local;
-        module.exports.__dirname = __dirname;
         // init assets.lib.rollup.js
         local.assetsDict['/assets.swgg.rollup.js'] =
             local.assetsDict['/assets.utility2.rollup.js'];
