@@ -15,7 +15,7 @@
 
 
 
-    // run shared js-env code - pre-init
+    // run shared js-env code - init-before
     (function () {
         // init local
         local = {};
@@ -46,7 +46,7 @@
         // re-init local from example.js
         case 'node':
             local = (local.global.utility2_rollup || require('./assets.swgg.rollup.js'))
-                .requireExampleJsFromReadme();
+                .requireReadme();
             break;
         }
     }());
@@ -1526,6 +1526,25 @@
             );
         };
 
+        local.testCase_buildLib_default = function (options, onError) {
+        /*
+         * this function will test buildLib's default handling-behavior
+         */
+            options = {};
+            options.customize = function () {
+                // search-and-replace - customize dataTo
+                [
+                    // customize js\-env code
+                    (/[\S\s]*?run shared js\-env code - init-before/)
+                ].forEach(function (rgx) {
+                    options.dataFrom.replace(rgx, function (match0) {
+                        options.dataTo = options.dataTo.replace(rgx, match0);
+                    });
+                });
+            };
+            local.buildLib(options, onError);
+        };
+
         local.testCase_buildReadme_default = function (options, onError) {
         /*
          * this function will test buildReadme's default handling-behavior-behavior
@@ -1558,8 +1577,10 @@
                 // search-and-replace - customize dataTo
                 [
                     // customize js\-env code
-                    (/\n {4}\/\/ run shared js\-env code - pre-init\n[\S\s]*?\n {4}\}\(\)\);/),
-                    (/\n {4}\/\/ run node js\-env code - post-init\n[\S\s]*?\n {8}break;\n/)
+                    new RegExp('\\n {4}\\/\\/ run shared js\\-env code - init-before\\n' +
+                        '[\\S\\s]*?\\n {4}\\}\\(\\)\\);'),
+                    new RegExp('\\n {4}\\/\\/ run browser js\\-env code - init-after\\n' +
+                        '[\\S\\s]*?\\n {8}break;\\n')
                 ].forEach(function (rgx) {
                     options.dataFrom.replace(rgx, function (match0) {
                         options.dataTo = options.dataTo.replace(rgx, match0);
@@ -1584,7 +1605,7 @@
 
 
 
-    // run shared js-env code - post-init
+    // run shared js-env code - init-after
     (function () {
         // init test api
         local.apiDictUpdate({
@@ -2088,12 +2109,19 @@
                 url.indexOf('/api/v0/swagger.json') < 0 &&
                 (/\/api\/v0\/|\/test\./).test(url);
         };
+        // run validation test
+        local.testCase_validateByParamDefList_default(null, local.onErrorDefault);
+        local.testCase_validateByParamDefList_error(null, local.onErrorDefault);
+        local.testCase_validateByParamDefList_formData(null, local.onErrorDefault);
+        local.testCase_validateBySchema_default(null, local.onErrorDefault);
+        local.testCase_validateBySchema_error(null, local.onErrorDefault);
+        local.testCase_validateBySwagger_default(null, local.onErrorDefault);
     }());
     switch (local.modeJs) {
 
 
 
-    // run browser js-env code - post-init
+    // run browser js-env code - init-after
     case 'browser':
         // run tests
         local.nop(local.modeTest &&
@@ -2103,19 +2131,90 @@
 
 
 
-    // run node js-env code - post-init
+    // run node js-env code - init-after
+    /* istanbul ignore next */
     case 'node':
-        /* istanbul ignore next */
-        if (local.global.utility2_rollup) {
-            break;
-        }
-        // run validation test
-        local.testCase_validateByParamDefList_default(null, local.onErrorDefault);
-        local.testCase_validateByParamDefList_error(null, local.onErrorDefault);
-        local.testCase_validateByParamDefList_formData(null, local.onErrorDefault);
-        local.testCase_validateBySchema_default(null, local.onErrorDefault);
-        local.testCase_validateBySchema_error(null, local.onErrorDefault);
-        local.testCase_validateBySwagger_default(null, local.onErrorDefault);
+        local.testCase_buildApidoc_default = local.testCase_buildApidoc_default || function (
+            options,
+            onError
+        ) {
+        /*
+         * this function will test buildApidoc's default handling-behavior-behavior
+         */
+            options = { modulePathList: module.paths };
+            local.buildApidoc(options, onError);
+        };
+
+        local.testCase_buildApp_default = local.testCase_buildApp_default || function (
+            options,
+            onError
+        ) {
+        /*
+         * this function will test buildApp's default handling-behavior-behavior
+         */
+            local.testCase_buildReadme_default(options, local.onErrorThrow);
+            local.testCase_buildLib_default(options, local.onErrorThrow);
+            local.testCase_buildTest_default(options, local.onErrorThrow);
+            local.testCase_buildCustomOrg_default(options, local.onErrorThrow);
+            options = [];
+            local.buildApp(options, onError);
+        };
+
+        local.testCase_buildCustomOrg_default = local.testCase_buildCustomOrg_default ||
+            function (options, onError) {
+            /*
+             * this function will test buildCustomOrg's default handling-behavior
+             */
+                options = {};
+                local.buildCustomOrg(options, onError);
+            };
+
+        local.testCase_buildLib_default = local.testCase_buildLib_default || function (
+            options,
+            onError
+        ) {
+        /*
+         * this function will test buildLib's default handling-behavior
+         */
+            options = {};
+            local.buildLib(options, onError);
+        };
+
+        local.testCase_buildReadme_default = local.testCase_buildReadme_default || function (
+            options,
+            onError
+        ) {
+        /*
+         * this function will test buildReadme's default handling-behavior-behavior
+         */
+            options = {};
+            local.buildReadme(options, onError);
+        };
+
+        local.testCase_buildTest_default = local.testCase_buildTest_default || function (
+            options,
+            onError
+        ) {
+        /*
+         * this function will test buildTest's default handling-behavior
+         */
+            options = {};
+            local.buildTest(options, onError);
+        };
+
+        local.testCase_webpage_default = local.testCase_webpage_default || function (
+            options,
+            onError
+        ) {
+        /*
+         * this function will test webpage's default handling-behavior
+         */
+            options = { modeCoverageMerge: true, url: local.serverLocalHost + '?modeTest=1' };
+            local.browserTest(options, onError);
+        };
+
+        // run test-server
+        local.testRunServer(local);
         break;
     }
 }());

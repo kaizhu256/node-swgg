@@ -5,7 +5,9 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 [![NPM](https://nodei.co/npm/swgg.png?downloads=true)](https://www.npmjs.com/package/swgg)
 
-[![package-listing](https://kaizhu256.github.io/node-swgg/build/screen-capture.npmPackageListing.svg)](https://github.com/kaizhu256/node-swgg)
+[![npmPackageListing](https://kaizhu256.github.io/node-swgg/build/screenCapture.npmPackageListing.svg)](https://github.com/kaizhu256/node-swgg)
+
+![npmPackageDependencyTree](https://kaizhu256.github.io/node-swgg/build/screenCapture.npmPackageDependencyTree.svg)
 
 
 
@@ -19,7 +21,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 # live demo
 - [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html)
 
-[![github.com test-server](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithub.browser._2Fnode-swgg_2Fbuild_2Fapp_2Findex.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html)
+[![github.com test-server](https://kaizhu256.github.io/node-swgg/build/screenCapture.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp%252Findex.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/index.html)
 
 
 
@@ -27,10 +29,9 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 #### apidoc
 - [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
-[![apidoc](https://kaizhu256.github.io/node-swgg/build/screen-capture.buildApidoc.browser._2Fhome_2Ftravis_2Fbuild_2Fkaizhu256_2Fnode-swgg_2Ftmp_2Fbuild_2Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
+[![apidoc](https://kaizhu256.github.io/node-swgg/build/screenCapture.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
-- npm publish 2017.3.29
 - allow optional sub-level input for swagger-models
 - add authorization-header hook
 - allow secure remote db export / import / reset to backend
@@ -42,10 +43,9 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changes for v2017.3.29
+#### changelog for v2017.5.1
+- npm publish 2017.5.1
 - update utility2 static-dependency in assets.swgg.rollup.js
-- add loading-text when resource is loading
-- add validation for phone format-string
 - none
 
 #### this package requires
@@ -80,7 +80,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 
 # quickstart web example
-![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleJs.browser..png)
+![screenCapture](https://kaizhu256.github.io/node-swgg/build/screenCapture.testExampleJs.browser.%252F.png)
 
 #### to run this example, follow the instruction in the script below
 - [example.js](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/example.js)
@@ -116,7 +116,7 @@ instruction
 
 
 
-    // run shared js-env code - pre-init
+    // run shared js-env code - init-before
     (function () {
         // init local
         local = {};
@@ -591,8 +591,8 @@ instruction
 
 
 
-    // post-init
-    // run browser js-env code - post-init
+    // init-after
+    // run browser js-env code - init-after
     /* istanbul ignore next */
     case 'browser':
         local.testRunBrowser = function (event) {
@@ -679,7 +679,7 @@ instruction
                     /*jslint evil: true*/
                     eval(document.querySelector('#inputTextareaEval1').value);
                 } catch (errorCaught) {
-                    console.error(errorCaught.stack);
+                    console.error(errorCaught);
                 }
             }
         };
@@ -715,7 +715,7 @@ instruction
 
 
 
-    // run node js-env code - post-init
+    // run node js-env code - init-after
     /* istanbul ignore next */
     case 'node':
         // export local
@@ -1207,9 +1207,9 @@ utility2-comment -->\n\
                 local.assetsDict['/assets.index.template.html'],
                 {
                     env: local.objectSetDefault(local.env, {
-                        npm_package_description: 'example module',
-                        npm_package_name: 'example',
-                        npm_package_nameAlias: 'example',
+                        npm_package_description: 'the greatest app in the world!',
+                        npm_package_name: 'my-app',
+                        npm_package_nameAlias: 'my_app',
                         npm_package_version: '0.0.1'
                     })
                 }
@@ -1221,11 +1221,11 @@ utility2-comment -->\n\
                     String(match0);
                     switch (match1) {
                     case 'npm_package_description':
-                        return 'example module';
+                        return 'the greatest app in the world!';
                     case 'npm_package_name':
-                        return 'example';
+                        return 'my-app';
                     case 'npm_package_nameAlias':
-                        return 'example';
+                        return 'my_app';
                     case 'npm_package_version':
                         return '0.0.1';
                     }
@@ -1238,14 +1238,15 @@ utility2-comment -->\n\
         local.assetsDict['/assets.example.js'] =
             local.assetsDict['/assets.example.js'] ||
             local.fs.readFileSync(__filename, 'utf8');
+        // bug-workaround - long $npm_package_buildCustomOrg
+        /* jslint-ignore-begin */
         local.assetsDict['/assets.swgg.rollup.js'] =
             local.assetsDict['/assets.swgg.rollup.js'] ||
             local.fs.readFileSync(
-                // npmdoc-hack
-                local.swgg.__dirname +
-                    '/lib.swgg.js',
+                local.swgg.__dirname + '/lib.swgg.js',
                 'utf8'
             ).replace((/^#!/), '//');
+        /* jslint-ignore-end */
         local.assetsDict['/favicon.ico'] = local.assetsDict['/favicon.ico'] || '';
         // if $npm_config_timeout_exit exists,
         // then exit this process after $npm_config_timeout_exit ms
@@ -1273,10 +1274,10 @@ utility2-comment -->\n\
 ```
 
 #### output from browser
-![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleJs.browser..png)
+![screenCapture](https://kaizhu256.github.io/node-swgg/build/screenCapture.testExampleJs.browser.%252F.png)
 
 #### output from shell
-![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleJs.svg)
+![screenCapture](https://kaizhu256.github.io/node-swgg/build/screenCapture.testExampleJs.svg)
 
 
 
@@ -1322,7 +1323,6 @@ utility2-comment -->\n\
         "darwin",
         "linux"
     ],
-    "readmeParse": "1",
     "repository": {
         "type": "git",
         "url": "https://github.com/kaizhu256/node-swgg.git"
@@ -1330,19 +1330,19 @@ utility2-comment -->\n\
     "scripts": {
         "build-ci": "utility2 shReadmeTest build_ci.sh",
         "env": "env",
-        "heroku-postbuild": "npm install 'kaizhu256/node-utility2#alpha' && utility2 shDeployHeroku",
+        "heroku-postbuild": "(set -e; npm install \"kaizhu256/node-utility2#alpha\"; utility2 shDeployHeroku)",
         "postinstall": "if [ -f npm_scripts.sh ]; then ./npm_scripts.sh postinstall; fi",
-        "start": "export PORT=${PORT:-8080} && utility2 start test.js",
-        "test": "export PORT=$(utility2 shServerPortRandom) && utility2 test test.js"
+        "start": "(set -e; export PORT=${PORT:-8080}; utility2 start test.js)",
+        "test": "(set -e; export PORT=$(utility2 shServerPortRandom); utility2 test test.js)"
     },
-    "version": "2017.3.29"
+    "version": "2017.5.1"
 }
 ```
 
 
 
 # changelog of last 50 commits
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.gitLog.svg)](https://github.com/kaizhu256/node-swgg/commits)
+[![screenCapture](https://kaizhu256.github.io/node-swgg/build/screenCapture.gitLog.svg)](https://github.com/kaizhu256/node-swgg/commits)
 
 
 
@@ -1353,13 +1353,13 @@ utility2-comment -->\n\
 
 # this shell script will run the build for this package
 
-shBuildCiPost() {(set -e
+shBuildCiAfter() {(set -e
     shDeployGithub
     shDeployHeroku
     shReadmeBuildLinkVerify
 )}
 
-shBuildCiPre() {(set -e
+shBuildCiBefore() {(set -e
     shReadmeTest example.js
     shReadmeTest example.sh
     shNpmTestPublished
