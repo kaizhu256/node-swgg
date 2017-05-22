@@ -45,7 +45,7 @@
             break;
         // re-init local from example.js
         case 'node':
-            local = (local.global.utility2_rollup || require('./assets.swgg.rollup.js'))
+            local = (local.global.utility2_rollup || require('./assets.utility2.rollup.js'))
                 .requireReadme();
             break;
         }
@@ -136,7 +136,8 @@
                     // validate statusCode
                     local.assertJsonEqual(error.statusCode, options.statusCode);
                     // validate error is in jsonapi-format
-                    if (options.url !== '/api/v0/x-test/undefined.map') {
+                    if (options.url ===
+                            '/api/v0/x-test/paramDefault/aa?paramJson=syntax%20error') {
                         error = JSON.parse(xhr.responseText);
                         local.assert(error.errors[0], error);
                     }
@@ -1374,6 +1375,13 @@
             });
             onError();
         };
+
+        local.utility2.serverLocalUrlTest = function (url) {
+            url = local.urlParse(url).pathname;
+            return local.modeJs === 'browser' &&
+                !local.env.npm_config_mode_backend &&
+                (/^\/test\.|\/api\/v0\//).test(url);
+        };
     }());
     switch (local.modeJs) {
 
@@ -1500,51 +1508,6 @@
             local.buildApidoc(options, onError);
         };
 
-        local.testCase_buildApp_default = function (options, onError) {
-        /*
-         * this function will test buildApp's default handling-behavior-behavior
-         */
-            local.testCase_buildReadme_default(options, local.onErrorDefault);
-            local.testCase_buildTest_default(options, local.onErrorThrow);
-            options = [{
-                file: '/api/v0/swagger.json',
-                url: '/api/v0/swagger.json'
-            }, {
-                file: '/assets.swgg.html',
-                url: '/assets.swgg.html'
-            }, {
-                file: '/assets.swgg.petstore.json',
-                url: '/assets.swgg.petstore.json'
-            }, {
-                file: '/assets.swgg.rollup.js',
-                url: '/assets.swgg.rollup.js'
-            }];
-            local.buildApp(options, onError);
-            local.fs.writeFileSync(
-                'assets.swgg.html',
-                local.assetsDict['/assets.swgg.html']
-            );
-        };
-
-        local.testCase_buildLib_default = function (options, onError) {
-        /*
-         * this function will test buildLib's default handling-behavior
-         */
-            options = {};
-            options.customize = function () {
-                // search-and-replace - customize dataTo
-                [
-                    // customize js\-env code
-                    (/[\S\s]*?run shared js\-env code - init-before/)
-                ].forEach(function (rgx) {
-                    options.dataFrom.replace(rgx, function (match0) {
-                        options.dataTo = options.dataTo.replace(rgx, match0);
-                    });
-                });
-            };
-            local.buildLib(options, onError);
-        };
-
         local.testCase_buildReadme_default = function (options, onError) {
         /*
          * this function will test buildReadme's default handling-behavior-behavior
@@ -1554,11 +1517,9 @@
                 // search-and-replace - customize dataTo
                 [
                     // customize cdn-download
-                    (/cdn download[\S\s]*?\n\n\n\n/),
-                    // customize quickstart-html-style
-                    (/<style>[^`]*?<\/style>/),
-                    // customize quickstart-html-script
-                    (/<script [^`]*?utility2FooterDiv/)
+                    (/\n# cdn download\n[\S\s]*?\n\n\n\n/),
+                    // customize swaggerdoc
+                    (/\n#### apidoc\n[\S\s]*?\n#### todo\n/)
                 ].forEach(function (rgx) {
                     options.dataFrom.replace(rgx, function (match0) {
                         options.dataTo = options.dataTo.replace(rgx, match0);
@@ -1578,9 +1539,7 @@
                 [
                     // customize js\-env code
                     new RegExp('\\n {4}\\/\\/ run shared js\\-env code - init-before\\n' +
-                        '[\\S\\s]*?\\n {4}\\}\\(\\)\\);'),
-                    new RegExp('\\n {4}\\/\\/ run browser js\\-env code - init-after\\n' +
-                        '[\\S\\s]*?\\n {8}break;\\n')
+                        '[\\S\\s]*?\\n {4}\\}\\(\\)\\);')
                 ].forEach(function (rgx) {
                     options.dataFrom.replace(rgx, function (match0) {
                         options.dataTo = options.dataTo.replace(rgx, match0);
@@ -2013,9 +1972,9 @@
             }
         });
         // test redundant http-body-parse-middleware handling-behavior
-        local.utility2._middleware.middlewareList.push(local.middlewareBodyParse);
+        local.middlewareList.push(local.middlewareBodyParse);
         // init test-middleware
-        local.utility2._middleware.middlewareList.push(function (
+        local.middlewareList.push(function (
             request,
             response,
             nextMiddleware
@@ -2102,13 +2061,6 @@
             }],
             name: 'File'
         }];
-        // init serverLocal
-        local.utility2._serverLocalUrlTest = function (url) {
-            url = local.urlParse(url).pathname;
-            return local.modeJs === 'browser' &&
-                url.indexOf('/api/v0/swagger.json') < 0 &&
-                (/\/api\/v0\/|\/test\./).test(url);
-        };
         // run validation test
         local.testCase_validateByParamDefList_default(null, local.onErrorDefault);
         local.testCase_validateByParamDefList_error(null, local.onErrorDefault);
@@ -2123,6 +2075,16 @@
 
     // run browser js-env code - init-after
     case 'browser':
+        local.testCase_browser_nullCase = local.testCase_browser_nullCase || function (
+            options,
+            onError
+        ) {
+        /*
+         * this function will test browsers's null-case handling-behavior-behavior
+         */
+            onError(null, options);
+        };
+
         // run tests
         local.nop(local.modeTest &&
             document.querySelector('#testRunButton1') &&

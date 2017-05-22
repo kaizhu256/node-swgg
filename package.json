@@ -10,19 +10,10 @@
     },
     "homepage": "https://github.com/kaizhu256/node-swgg",
     "keywords": [
-        "admin",
-        "admin-ui",
         "api",
-        "cms",
-        "crud",
-        "dashboard",
-        "login",
         "oai",
-        "oauth",
         "open-api",
-        "open-id",
         "openapi",
-        "openid",
         "swagger",
         "swagger-ui",
         "swgg"
@@ -31,7 +22,6 @@
     "main": "lib.swgg.js",
     "name": "swgg",
     "nameAlias": "swgg",
-    "nameAliasDeprecate": "oai-client oai-server swagger-client-lite swagger-server-lite",
     "nameAliasPublish": "swagger-lite",
     "nameOriginal": "swgg",
     "os": [
@@ -50,5 +40,5 @@
         "start": "(set -e; export PORT=${PORT:-8080}; utility2 start test.js)",
         "test": "(set -e; export PORT=$(utility2 shServerPortRandom); utility2 test test.js)"
     },
-    "version": "2017.5.1"
+    "version": "2017.5.20"
 }
