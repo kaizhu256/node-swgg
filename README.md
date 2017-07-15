@@ -1,7 +1,7 @@
 # swgg
 this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend)
 
-[![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swgg.svg)](https://travis-ci.org/kaizhu256/node-swgg)
+[![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swgg.svg)](https://travis-ci.org/kaizhu256/node-swgg) [![coverage](https://kaizhu256.github.io/node-swgg/build/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build/coverage.html/index.html)
 
 [![NPM](https://nodei.co/npm/swgg.png?downloads=true)](https://www.npmjs.com/package/swgg)
 
@@ -15,59 +15,23 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 | coverage : | [![coverage](https://kaizhu256.github.io/node-swgg/build..master..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build..master..travis-ci.org/coverage.html/index.html) | [![coverage](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/coverage.html/index.html) | [![coverage](https://kaizhu256.github.io/node-swgg/build..alpha..travis-ci.org/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build..alpha..travis-ci.org/coverage.html/index.html)|
 | build-artifacts : | [![build-artifacts](https://kaizhu256.github.io/node-swgg/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swgg/tree/gh-pages/build..master..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swgg/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swgg/tree/gh-pages/build..beta..travis-ci.org) | [![build-artifacts](https://kaizhu256.github.io/node-swgg/glyphicons_144_folder_open.png)](https://github.com/kaizhu256/node-swgg/tree/gh-pages/build..alpha..travis-ci.org)|
 
-[![npmPackageListing](https://kaizhu256.github.io/node-swgg/build/screen-capture.npmPackageListing.svg)](https://github.com/kaizhu256/node-swgg)
+[![npmPackageListing](https://kaizhu256.github.io/node-swgg/build/screenshot.npmPackageListing.svg)](https://github.com/kaizhu256/node-swgg)
 
-![npmPackageDependencyTree](https://kaizhu256.github.io/node-swgg/build/screen-capture.npmPackageDependencyTree.svg)
+![npmPackageDependencyTree](https://kaizhu256.github.io/node-swgg/build/screenshot.npmPackageDependencyTree.svg)
 
 
 
-# package.json
-```json
-{
-    "author": "kai zhu <kaizhu256@gmail.com>",
-    "description": "this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend)",
-    "devDependencies": {
-        "electron-lite": "kaizhu256/node-electron-lite#alpha",
-        "utility2": "kaizhu256/node-utility2#alpha"
-    },
-    "engines": {
-        "node": ">=4.0"
-    },
-    "homepage": "https://github.com/kaizhu256/node-swgg",
-    "keywords": [
-        "api",
-        "oai",
-        "open-api",
-        "openapi",
-        "swagger",
-        "swagger-ui",
-        "swgg"
-    ],
-    "license": "MIT",
-    "main": "lib.swgg.js",
-    "name": "swgg",
-    "nameAlias": "swgg",
-    "nameAliasPublish": "swagger-lite",
-    "nameOriginal": "swgg",
-    "os": [
-        "darwin",
-        "linux"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/kaizhu256/node-swgg.git"
-    },
-    "scripts": {
-        "build-ci": "utility2 shReadmeTest build_ci.sh",
-        "env": "env",
-        "heroku-postbuild": "(set -e; npm install \"kaizhu256/node-utility2#alpha\"; utility2 shDeployHeroku)",
-        "postinstall": "if [ -f npm_scripts.sh ]; then ./npm_scripts.sh postinstall; fi",
-        "start": "(set -e; export PORT=${PORT:-8080}; utility2 start test.js)",
-        "test": "(set -e; export PORT=$(utility2 shServerPortRandom); utility2 test test.js)"
-    },
-    "version": "2017.5.20"
-}
-```
+# table of contents
+1. [cdn download](#cdn-download)
+1. [live demo](#live-demo)
+1. [documentation](#documentation)
+1. [quickstart standalone app](#quickstart-standalone-app)
+1. [quickstart example.js](#quickstart-examplejs)
+1. [extra screenshots](#extra-screenshots)
+1. [package.json](#packagejson)
+1. [changelog of last 50 commits](#changelog-of-last-50-commits)
+1. [internal build script](#internal-build-script)
+1. [misc](#misc)
 
 
 
@@ -81,7 +45,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 # live demo
 - [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app)
 
-[![github.com test-server](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app)
+[![github.com test-server](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app)
 
 
 
@@ -89,9 +53,16 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 #### apidoc
 - [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
-[![apidoc](https://kaizhu256.github.io/node-swgg/build/screen-capture.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
+[![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
+
+#### swaggerdoc
+- [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.swgg.html](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.swgg.html)
+
+[![swaggerdoc](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp%252Fassets.swgg.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.swgg.html)
 
 #### todo
+- revamp datatable with card-expansion ui
+- add forward-proxy ui-checkbox
 - allow optional sub-level input for swagger-models
 - add authorization-header hook
 - allow secure remote db export / import / reset to backend
@@ -103,17 +74,11 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2017.5.20
-- npm publish 2017.5.20
-- add url-search param modeSwaggerJsonUrl to override assets.swgg.swagger.json
-- deduplicate files assets.swgg.html and assets.swgg.rollup.js
-- hardcode server-based swagger.json as assets.swgg.swagger.server.json
-- merge assets.swgg.rollup.js into assets.utility2.rollup.js
-- rename api/v0/swagger.json -> assets.swgg.swagger.server.json
-- rename assets.swgg.petstore.json -> assets.swgg.swagger.petstore.json
-- add README section 'internal screen-capture'
-- add README section 'quickstart standalone app'
-- rename README section 'quickstart web example' -> 'quickstart example.js'
+#### changelog for v2017.7.1
+- npm publish 2017.7.1
+- auto-build README section 'table of contents'
+- enhance github-cors with function githubCorsUrlOverride
+- move functions uiAnimateSlideXxx from file lib.swgg.js to file assets.utility2.rollup.js
 - none
 
 #### this package requires
@@ -123,29 +88,30 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 # quickstart standalone app
 #### to run this example, follow the instruction in the script below
-- [example.sh](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/example.sh)
 - [assets.app.js](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js)
 ```shell
 # example.sh
+
+# this shell script will download and run a web demo of swgg as a standalone app
 
 # 1. download standalone app
 curl -O https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js
 # 2. run standalone app
 node ./assets.app.js
 # 3. open a browser to http://127.0.0.1:8081 and play with the web demo
-# 4. edit standalone app to suit your needs
+# 4. edit file assets.app.js to suit your needs
 ```
 
 #### output from browser
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleSh.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/app/assets.example.html)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleSh.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/app/assets.example.html)
 
 #### output from shell
-![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleSh.svg)
+![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleSh.svg)
 
 
 
 # quickstart example.js
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleJs.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/app/assets.example.html)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleJs.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/app/assets.example.html)
 
 #### to run this example, follow the instruction in the script below
 - [example.js](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/example.js)
@@ -153,13 +119,14 @@ node ./assets.app.js
 /*
 example.js
 
-this script will create a web demo of swgg
+this script will run a web demo of swgg
 
 instruction
     1. save this script as example.js
     2. run the shell command:
         $ npm install swgg && PORT=8081 node example.js
     3. open a browser to http://127.0.0.1:8081 and play with the web demo
+    4. edit this script to suit your needs
 */
 
 
@@ -294,7 +261,9 @@ instruction
 
         local.utility2.testRunBefore = function () {
             local.onResetBefore.counter += 1;
+            // reset db
             local.db.dbDrop(local.onResetBefore);
+            // seed db
             local.onResetAfter(function () {
                 console.log('db seeding ...');
                 local.onReadyBefore.counter += 1;
@@ -701,15 +670,15 @@ instruction
             switch (event && event.currentTarget && event.currentTarget.id) {
             case 'testRunButton1':
                 // show tests
-                if (document.querySelector('#testReportDiv1').style.display === 'none') {
-                    document.querySelector('#testReportDiv1').style.display = 'block';
+                if (document.querySelector('#testReportDiv1').style.maxHeight === '0px') {
+                    local.uiAnimateSlideDown(document.querySelector('#testReportDiv1'));
                     document.querySelector('#testRunButton1').textContent =
                         'hide internal test';
                     local.modeTest = true;
                     local.testRunDefault(local);
                 // hide tests
                 } else {
-                    document.querySelector('#testReportDiv1').style.display = 'none';
+                    local.uiAnimateSlideUp(document.querySelector('#testReportDiv1'));
                     document.querySelector('#testRunButton1').textContent = 'run internal test';
                 }
                 break;
@@ -744,7 +713,7 @@ instruction
             case undefined:
                 // init ui
                 local.swgg.uiEventListenerDict['.onEventUiReload']();
-                // coverage-hack
+                // coverage-hack - ignore else-statement
                 local.nop(local.modeTest && (function () {
                     document.querySelector('#testRunButton1').textContent =
                         'hide internal test';
@@ -832,21 +801,19 @@ body {\n\
 body > * {\n\
     margin-bottom: 1rem;\n\
 }\n\
+body > button {\n\
+    width: 20rem;\n\
+}\n\
+button {\n\
+    cursor: pointer;\n\
+}\n\
+.uiAnimateSlide {\n\
+    overflow-y: hidden;\n\
+    transition: border-bottom 250ms, border-top 250ms, margin-bottom 250ms, margin-top 250ms, max-height 250ms, min-height 250ms, padding-bottom 250ms, padding-top 250ms;\n\
+}\n\
 .utility2FooterDiv {\n\
     margin-top: 20px;\n\
     text-align: center;\n\
-}\n\
-</style>\n\
-<style>\n\
-/*csslint\n\
-    adjoining-classes: false,\n\
-    box-model: false,\n\
-    box-sizing: false,\n\
-    universal-selector: false\n\
-*/\n\
-/* example.js */\n\
-body > button {\n\
-    width: 15rem;\n\
 }\n\
 .zeroPixel {\n\
     border: 0;\n\
@@ -855,9 +822,15 @@ body > button {\n\
     padding: 0;\n\
     width: 0;\n\
 }\n\
-\n\
-\n\
-\n\
+</style>\n\
+<style>\n\
+/*csslint\n\
+    adjoining-classes: false,\n\
+    box-model: false,\n\
+    box-sizing: false,\n\
+    outline-none: false,\n\
+    universal-selector: false\n\
+*/\n\
 /* animate */\n\
 .uiAnimateFade {\n\
     transition: opacity 250ms;\n\
@@ -876,10 +849,6 @@ body > button {\n\
 .uiAnimateShake {\n\
     animation-duration: 500ms;\n\
     animation-name: uiAnimateShake;\n\
-}\n\
-.uiAnimateSlide {\n\
-    overflow-y: hidden;\n\
-    transition: max-height 500ms;\n\
 }\n\
 \n\
 \n\
@@ -1088,7 +1057,7 @@ body > button {\n\
 border: 0;\n\
     color: #fff;\n\
     padding: 6px 8px;\n\
-    background-color: #580;\n\
+    background: #580;\n\
 }\n\
 .swggUiContainer > .info > * {\n\
     margin-top: 1rem;\n\
@@ -1123,6 +1092,7 @@ border: 0;\n\
 .swggUiContainer .operation {\n\
     background: #dfd;\n\
     font-size: smaller;\n\
+    outline: none;\n\
 }\n\
 .swggUiContainer .operation > .content {\n\
     padding: 1rem;\n\
@@ -1188,6 +1158,9 @@ border: 0;\n\
 .swggUiContainer .operation .responseList > .td2 {\n\
     flex: 4;\n\
 }\n\
+.swggUiContainer .resource {\n\
+    outline: none;\n\
+}\n\
 .swggUiContainer .resource > .header > .td1 {\n\
     font-size: large;\n\
 }\n\
@@ -1222,7 +1195,7 @@ border: 0;\n\
 </head>\n\
 <body>\n\
 <!-- utility2-comment\n\
-<div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; width: 25%;"></div>\n\
+<div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 25%;"></div>\n\
 utility2-comment -->\n\
 <h1>\n\
 <!-- utility2-comment\n\
@@ -1242,7 +1215,7 @@ utility2-comment -->\n\
 <!-- utility2-comment\n\
 <h4><a download href="assets.app.js">download standalone app</a></h4>\n\
 <button class="onclick onreset" id="testRunButton1">run internal test</button><br>\n\
-<div id="testReportDiv1" style="display: none;"></div>\n\
+<div class="uiAnimateSlide" id="testReportDiv1" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>\n\
 utility2-comment -->\n\
 \n\
 \n\
@@ -1307,10 +1280,11 @@ utility2-comment -->\n\
             'assets.swgg.swagger.json',
             'assets.swgg.swagger.server.json'
         ].forEach(function (file) {
-            local.assetsDict['/' + file] = local.assetsDict['/' + file] || '';
-            if (local.fs.existsSync(local.__dirname + '/' + file)) {
-                local.assetsDict['/' + file] = local.fs.readFileSync(
-                    local.__dirname + '/' + file,
+            file = '/' + file;
+            local.assetsDict[file] = local.assetsDict[file] || '';
+            if (local.fs.existsSync(local.__dirname + file)) {
+                local.assetsDict[file] = local.fs.readFileSync(
+                    local.__dirname + file,
                     'utf8'
                 );
             }
@@ -1377,19 +1351,111 @@ utility2-comment -->\n\
 ```
 
 #### output from browser
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleJs.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/app/assets.example.html)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleJs.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/app/assets.example.html)
 
 #### output from shell
-![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleJs.svg)
+![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleJs.svg)
+
+
+
+# extra screenshots
+1. [https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)
+
+1. [https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fcoverage.lib.html.png](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fcoverage.lib.html.png)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fcoverage.lib.html.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fcoverage.lib.html.png)
+
+1. [https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Ftest-report.html.png](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Ftest-report.html.png)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Ftest-report.html.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Ftest-report.html.png)
+
+1. [https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp%252Fassets.swgg.html.png](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp%252Fassets.swgg.html.png)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp%252Fassets.swgg.html.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp%252Fassets.swgg.html.png)
+
+1. [https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)
+
+1. [https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithubTest.browser.%252Fnode-swgg%252Fbuild%252Fapp.png](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithubTest.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithubTest.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithubTest.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)
+
+1. [https://kaizhu256.github.io/node-swgg/build/screenshot.deployHeroku.browser.%252Fassets.swgg.html.png](https://kaizhu256.github.io/node-swgg/build/screenshot.deployHeroku.browser.%252Fassets.swgg.html.png)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.deployHeroku.browser.%252Fassets.swgg.html.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.deployHeroku.browser.%252Fassets.swgg.html.png)
+
+1. [https://kaizhu256.github.io/node-swgg/build/screenshot.deployHeroku.browser.%252F.png](https://kaizhu256.github.io/node-swgg/build/screenshot.deployHeroku.browser.%252F.png)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.deployHeroku.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.deployHeroku.browser.%252F.png)
+
+1. [https://kaizhu256.github.io/node-swgg/build/screenshot.deployHerokuTest.browser.%252F.png](https://kaizhu256.github.io/node-swgg/build/screenshot.deployHerokuTest.browser.%252F.png)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.deployHerokuTest.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.deployHerokuTest.browser.%252F.png)
+
+1. [https://kaizhu256.github.io/node-swgg/build/screenshot.npmTest.browser.%252F.png](https://kaizhu256.github.io/node-swgg/build/screenshot.npmTest.browser.%252F.png)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.npmTest.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.npmTest.browser.%252F.png)
+
+1. [https://kaizhu256.github.io/node-swgg/build/screenshot.npmTestPublished.browser.%252F.png](https://kaizhu256.github.io/node-swgg/build/screenshot.npmTestPublished.browser.%252F.png)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.npmTestPublished.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.npmTestPublished.browser.%252F.png)
+
+1. [https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleJs.browser.%252F.png](https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleJs.browser.%252F.png)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleJs.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleJs.browser.%252F.png)
+
+1. [https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleSh.browser.%252F.png](https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleSh.browser.%252F.png)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleSh.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleSh.browser.%252F.png)
+
+
+
+# package.json
+```json
+{
+    "author": "kai zhu <kaizhu256@gmail.com>",
+    "description": "this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend)",
+    "devDependencies": {
+        "electron-lite": "kaizhu256/node-electron-lite#alpha",
+        "utility2": "kaizhu256/node-utility2#alpha"
+    },
+    "engines": {
+        "node": ">=4.0"
+    },
+    "homepage": "https://github.com/kaizhu256/node-swgg",
+    "keywords": [
+        "api",
+        "oai",
+        "open-api",
+        "openapi",
+        "swagger",
+        "swagger-ui",
+        "swgg"
+    ],
+    "license": "MIT",
+    "main": "lib.swgg.js",
+    "name": "swgg",
+    "nameAlias": "swgg",
+    "nameAliasPublish": "swagger-lite",
+    "nameOriginal": "swgg",
+    "os": [
+        "darwin",
+        "linux"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/kaizhu256/node-swgg.git"
+    },
+    "scripts": {
+        "build-ci": "utility2 shReadmeTest build_ci.sh",
+        "env": "env",
+        "heroku-postbuild": "(set -e; npm install \"kaizhu256/node-utility2#alpha\"; utility2 shDeployHeroku)",
+        "postinstall": "if [ -f npm_scripts.sh ]; then ./npm_scripts.sh postinstall; fi",
+        "start": "(set -e; export PORT=${PORT:-8080}; utility2 start test.js)",
+        "test": "(set -e; export PORT=$(utility2 shServerPortRandom); utility2 test test.js)"
+    },
+    "version": "2017.7.1"
+}
+```
 
 
 
 # changelog of last 50 commits
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.gitLog.svg)](https://github.com/kaizhu256/node-swgg/commits)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.gitLog.svg)](https://github.com/kaizhu256/node-swgg/commits)
 
 
 
-# internal build-script
+# internal build script
 - build_ci.sh
 ```shell
 # build_ci.sh
@@ -1397,56 +1463,20 @@ utility2-comment -->\n\
 # this shell script will run the build for this package
 
 shBuildCiAfter() {(set -e
-    shNpmTestPublished
-    shReadmeTest example.js
     shDeployGithub
     shDeployHeroku
     shReadmeTest example.sh
+)}
+
+shBuildCiBefore() {(set -e
+    shNpmTestPublished
+    shReadmeTest example.js
 )}
 
 # run shBuildCi
 eval $(utility2 source)
 shBuildCi
 ```
-
-
-
-# internal screen-capture
-- [https://kaizhu256.github.io/node-swgg/build/screen-capture.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png](https://kaizhu256.github.io/node-swgg/build/screen-capture.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build/screen-capture.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)
-
-- [https://kaizhu256.github.io/node-swgg/build/screen-capture.buildCi.browser.%252Ftmp%252Fbuild%252Fcoverage.lib.html.png](https://kaizhu256.github.io/node-swgg/build/screen-capture.buildCi.browser.%252Ftmp%252Fbuild%252Fcoverage.lib.html.png)
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.buildCi.browser.%252Ftmp%252Fbuild%252Fcoverage.lib.html.png)](https://kaizhu256.github.io/node-swgg/build/screen-capture.buildCi.browser.%252Ftmp%252Fbuild%252Fcoverage.lib.html.png)
-
-- [https://kaizhu256.github.io/node-swgg/build/screen-capture.buildCi.browser.%252Ftmp%252Fbuild%252Ftest-report.html.png](https://kaizhu256.github.io/node-swgg/build/screen-capture.buildCi.browser.%252Ftmp%252Fbuild%252Ftest-report.html.png)
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.buildCi.browser.%252Ftmp%252Fbuild%252Ftest-report.html.png)](https://kaizhu256.github.io/node-swgg/build/screen-capture.buildCi.browser.%252Ftmp%252Fbuild%252Ftest-report.html.png)
-
-- [https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)
-
-- [https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp%252Fassets.swgg.html.png](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp%252Fassets.swgg.html.png)
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp%252Fassets.swgg.html.png)](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp%252Fassets.swgg.html.png)
-
-- [https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithubTest.browser.%252Fnode-swgg%252Fbuild%252Fapp.png](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithubTest.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithubTest.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployGithubTest.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)
-
-- [https://kaizhu256.github.io/node-swgg/build/screen-capture.deployHeroku.browser.%252F.png](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployHeroku.browser.%252F.png)
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployHeroku.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployHeroku.browser.%252F.png)
-
-- [https://kaizhu256.github.io/node-swgg/build/screen-capture.deployHeroku.browser.%252Fassets.swgg.html.png](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployHeroku.browser.%252Fassets.swgg.html.png)
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployHeroku.browser.%252Fassets.swgg.html.png)](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployHeroku.browser.%252Fassets.swgg.html.png)
-
-- [https://kaizhu256.github.io/node-swgg/build/screen-capture.deployHerokuTest.browser.%252F.png](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployHerokuTest.browser.%252F.png)
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployHerokuTest.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/screen-capture.deployHerokuTest.browser.%252F.png)
-
-- [https://kaizhu256.github.io/node-swgg/build/screen-capture.npmTest.browser.%252F.png](https://kaizhu256.github.io/node-swgg/build/screen-capture.npmTest.browser.%252F.png)
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.npmTest.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/screen-capture.npmTest.browser.%252F.png)
-
-- [https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleJs.browser.%252F.png](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleJs.browser.%252F.png)
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleJs.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleJs.browser.%252F.png)
-
-- [https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleSh.browser.%252F.png](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleSh.browser.%252F.png)
-[![screen-capture](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleSh.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/screen-capture.testExampleSh.browser.%252F.png)
 
 
 

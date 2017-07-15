@@ -57,7 +57,7 @@
             module.exports.__dirname = __dirname;
             module.exports.module = module;
         }
-        // init swgg
+        // init lib swgg
         local.global.swgg = local.global.utility2_swgg = local.swgg = local;
         // init lib utility2
         local.utility2 = local.global.utility2_rollup || (local.modeJs === 'browser'
@@ -73,55 +73,17 @@
         local.utility2.swgg = local;
         // init assets and templates
 /* jslint-ignore-begin */
-local.assetsDict['/assets.swgg.html'] = '\
-<!doctype html>\n\
-<html lang="en">\n\
-<head>\n\
-<meta charset="UTF-8">\n\
-<meta name="viewport" content="width=device-width, initial-scale=1">\n\
-<title>swgg</title>\n\
-<style>\n\
-/*csslint\n\
-    box-sizing: false,\n\
-    universal-selector: false\n\
-*/\n\
-* {\n\
-    box-sizing: border-box;\n\
-}\n\
-body {\n\
-    background: #dde;\n\
-    font-family: Arial, Helvetica, sans-serif;\n\
-    margin: 2rem;\n\
-}\n\
-body > * {\n\
-    margin-bottom: 1rem;\n\
-}\n\
-.utility2FooterDiv {\n\
-    margin-top: 20px;\n\
-    text-align: center;\n\
-}\n\
-</style>\n\
+local.assetsDict['/assets.swgg.html'] = (/[\S\s]+?<\/style>\n/)
+    .exec(local.assetsDict['/assets.example.template.html'])[0]
+    .replace((/<title>.*?<\/title>/), '<title>swgg</title>') + '\
 <style>\n\
 /*csslint\n\
     adjoining-classes: false,\n\
     box-model: false,\n\
     box-sizing: false,\n\
+    outline-none: false,\n\
     universal-selector: false\n\
 */\n\
-/* example.js */\n\
-body > button {\n\
-    width: 15rem;\n\
-}\n\
-.zeroPixel {\n\
-    border: 0;\n\
-    height: 0;\n\
-    margin: 0;\n\
-    padding: 0;\n\
-    width: 0;\n\
-}\n\
-\n\
-\n\
-\n\
 /* animate */\n\
 .uiAnimateFade {\n\
     transition: opacity 250ms;\n\
@@ -140,10 +102,6 @@ body > button {\n\
 .uiAnimateShake {\n\
     animation-duration: 500ms;\n\
     animation-name: uiAnimateShake;\n\
-}\n\
-.uiAnimateSlide {\n\
-    overflow-y: hidden;\n\
-    transition: max-height 500ms;\n\
 }\n\
 \n\
 \n\
@@ -352,7 +310,7 @@ body > button {\n\
 border: 0;\n\
     color: #fff;\n\
     padding: 6px 8px;\n\
-    background-color: #580;\n\
+    background: #580;\n\
 }\n\
 .swggUiContainer > .info > * {\n\
     margin-top: 1rem;\n\
@@ -387,6 +345,7 @@ border: 0;\n\
 .swggUiContainer .operation {\n\
     background: #dfd;\n\
     font-size: smaller;\n\
+    outline: none;\n\
 }\n\
 .swggUiContainer .operation > .content {\n\
     padding: 1rem;\n\
@@ -452,6 +411,9 @@ border: 0;\n\
 .swggUiContainer .operation .responseList > .td2 {\n\
     flex: 4;\n\
 }\n\
+.swggUiContainer .resource {\n\
+    outline: none;\n\
+}\n\
 .swggUiContainer .resource > .header > .td1 {\n\
     font-size: large;\n\
 }\n\
@@ -509,9 +471,10 @@ border: 0;\n\
 document.querySelector(".swggUiContainer > .header > .td2").value =\n\
     ((/\\bmodeSwaggerJsonUrl=([^&]+)/g).exec(location.search) &&\n\
         (/\\bmodeSwaggerJsonUrl=([^&]+)/g).exec(location.search)[1]) ||\n\
-        "assets.swgg.swagger.server.json";\n\
+        "assets.swgg.swagger.json";\n\
 </script>\n\
 <script src="assets.utility2.rollup.js"></script>\n\
+<script>window.swgg.uiEventListenerDict[".onEventUiReload"]();</script>\n\
 </body>\n\
 </html>\n\
 ';
@@ -531,6 +494,11 @@ local.assetsDict['/assets.swgg.json-schema.json'] = JSON.stringify(
 local.assetsDict['/assets.swgg.schema.json'] = JSON.stringify(
 {"title":"A JSON Schema for Swagger 2.0 API.","id":"http://swagger.io/v2/schema.json#","$schema":"http://json-schema.org/draft-04/schema#","type":"object","required":["swagger","info","paths"],"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"swagger":{"type":"string","enum":["2.0"],"description":"The Swagger version of this document."},"info":{"$ref":"#/definitions/info"},"host":{"type":"string","pattern":"^[^{}/ :\\\\]+(?::\\d+)?$","description":"The host (name or ip) of the API. Example: 'swagger.io'"},"basePath":{"type":"string","pattern":"^/","description":"The base path to the API. Example: '/api'."},"schemes":{"$ref":"#/definitions/schemesList"},"consumes":{"description":"A list of MIME types accepted by the API.","allOf":[{"$ref":"#/definitions/mediaTypeList"}]},"produces":{"description":"A list of MIME types the API can produce.","allOf":[{"$ref":"#/definitions/mediaTypeList"}]},"paths":{"$ref":"#/definitions/paths"},"definitions":{"$ref":"#/definitions/definitions"},"parameters":{"$ref":"#/definitions/parameterDefinitions"},"responses":{"$ref":"#/definitions/responseDefinitions"},"security":{"$ref":"#/definitions/security"},"securityDefinitions":{"$ref":"#/definitions/securityDefinitions"},"tags":{"type":"array","items":{"$ref":"#/definitions/tag"},"uniqueItems":true},"externalDocs":{"$ref":"#/definitions/externalDocs"}},"definitions":{"info":{"type":"object","description":"General information about the API.","required":["version","title"],"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"title":{"type":"string","description":"A unique and precise title of the API."},"version":{"type":"string","description":"A semantic version number of the API."},"description":{"type":"string","description":"A longer description of the API. Should be different from the title.  GitHub Flavored Markdown is allowed."},"termsOfService":{"type":"string","description":"The terms of service for the API."},"contact":{"$ref":"#/definitions/contact"},"license":{"$ref":"#/definitions/license"}}},"contact":{"type":"object","description":"Contact information for the owners of the API.","additionalProperties":false,"properties":{"name":{"type":"string","description":"The identifying name of the contact person/organization."},"url":{"type":"string","description":"The URL pointing to the contact information.","format":"uri"},"email":{"type":"string","description":"The email address of the contact person/organization.","format":"email"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"license":{"type":"object","required":["name"],"additionalProperties":false,"properties":{"name":{"type":"string","description":"The name of the license type. It's encouraged to use an OSI compatible license."},"url":{"type":"string","description":"The URL pointing to the license.","format":"uri"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"paths":{"type":"object","description":"Relative paths to the individual endpoints. They must be relative to the 'basePath'.","patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"},"^/":{"$ref":"#/definitions/pathItem"}},"additionalProperties":false},"definitions":{"type":"object","additionalProperties":{"$ref":"#/definitions/schema"},"description":"One or more JSON objects describing the schemas being consumed and produced by the API."},"parameterDefinitions":{"type":"object","additionalProperties":{"$ref":"#/definitions/parameter"},"description":"One or more JSON representations for parameters"},"responseDefinitions":{"type":"object","additionalProperties":{"$ref":"#/definitions/response"},"description":"One or more JSON representations for parameters"},"externalDocs":{"type":"object","additionalProperties":false,"description":"information about external documentation","required":["url"],"properties":{"description":{"type":"string"},"url":{"type":"string","format":"uri"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"examples":{"type":"object","additionalProperties":true},"mimeType":{"type":"string","description":"The MIME type of the HTTP message."},"operation":{"type":"object","required":["responses"],"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"tags":{"type":"array","items":{"type":"string"},"uniqueItems":true},"summary":{"type":"string","description":"A brief summary of the operation."},"description":{"type":"string","description":"A longer description of the operation, GitHub Flavored Markdown is allowed."},"externalDocs":{"$ref":"#/definitions/externalDocs"},"operationId":{"type":"string","description":"A unique identifier of the operation."},"produces":{"description":"A list of MIME types the API can produce.","allOf":[{"$ref":"#/definitions/mediaTypeList"}]},"consumes":{"description":"A list of MIME types the API can consume.","allOf":[{"$ref":"#/definitions/mediaTypeList"}]},"parameters":{"$ref":"#/definitions/parametersList"},"responses":{"$ref":"#/definitions/responses"},"schemes":{"$ref":"#/definitions/schemesList"},"deprecated":{"type":"boolean","default":false},"security":{"$ref":"#/definitions/security"}}},"pathItem":{"type":"object","additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"$ref":{"type":"string"},"get":{"$ref":"#/definitions/operation"},"put":{"$ref":"#/definitions/operation"},"post":{"$ref":"#/definitions/operation"},"delete":{"$ref":"#/definitions/operation"},"options":{"$ref":"#/definitions/operation"},"head":{"$ref":"#/definitions/operation"},"patch":{"$ref":"#/definitions/operation"},"parameters":{"$ref":"#/definitions/parametersList"}}},"responses":{"type":"object","description":"Response objects names can either be any valid HTTP status code or 'default'.","minProperties":1,"additionalProperties":false,"patternProperties":{"^([0-9]{3})$|^(default)$":{"$ref":"#/definitions/responseValue"},"^x-":{"$ref":"#/definitions/vendorExtension"}},"not":{"type":"object","additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}}},"responseValue":{"oneOf":[{"$ref":"#/definitions/response"},{"$ref":"#/definitions/jsonReference"}]},"response":{"type":"object","required":["description"],"properties":{"description":{"type":"string"},"schema":{"oneOf":[{"$ref":"#/definitions/schema"},{"$ref":"#/definitions/fileSchema"}]},"headers":{"$ref":"#/definitions/headers"},"examples":{"$ref":"#/definitions/examples"}},"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"headers":{"type":"object","additionalProperties":{"$ref":"#/definitions/header"}},"header":{"type":"object","additionalProperties":false,"required":["type"],"properties":{"type":{"type":"string","enum":["string","number","integer","boolean","array"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormat"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"vendorExtension":{"description":"Any property starting with x- is valid.","additionalProperties":true,"additionalItems":true},"bodyParameter":{"type":"object","required":["name","in","schema"],"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"description":{"type":"string","description":"A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed."},"name":{"type":"string","description":"The name of the parameter."},"in":{"type":"string","description":"Determines the location of the parameter.","enum":["body"]},"required":{"type":"boolean","description":"Determines whether or not this parameter is required or optional.","default":false},"schema":{"$ref":"#/definitions/schema"}},"additionalProperties":false},"headerParameterSubSchema":{"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"required":{"type":"boolean","description":"Determines whether or not this parameter is required or optional.","default":false},"in":{"type":"string","description":"Determines the location of the parameter.","enum":["header"]},"description":{"type":"string","description":"A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed."},"name":{"type":"string","description":"The name of the parameter."},"type":{"type":"string","enum":["string","number","boolean","integer","array"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormat"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"}}},"queryParameterSubSchema":{"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"required":{"type":"boolean","description":"Determines whether or not this parameter is required or optional.","default":false},"in":{"type":"string","description":"Determines the location of the parameter.","enum":["query"]},"description":{"type":"string","description":"A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed."},"name":{"type":"string","description":"The name of the parameter."},"allowEmptyValue":{"type":"boolean","default":false,"description":"allows sending a parameter by name only or with an empty value."},"type":{"type":"string","enum":["string","number","boolean","integer","array"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormatWithMulti"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"}}},"formDataParameterSubSchema":{"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"required":{"type":"boolean","description":"Determines whether or not this parameter is required or optional.","default":false},"in":{"type":"string","description":"Determines the location of the parameter.","enum":["formData"]},"description":{"type":"string","description":"A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed."},"name":{"type":"string","description":"The name of the parameter."},"allowEmptyValue":{"type":"boolean","default":false,"description":"allows sending a parameter by name only or with an empty value."},"type":{"type":"string","enum":["string","number","boolean","integer","array","file"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormatWithMulti"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"}}},"pathParameterSubSchema":{"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"required":["required"],"properties":{"required":{"type":"boolean","enum":[true],"description":"Determines whether or not this parameter is required or optional."},"in":{"type":"string","description":"Determines the location of the parameter.","enum":["path"]},"description":{"type":"string","description":"A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed."},"name":{"type":"string","description":"The name of the parameter."},"type":{"type":"string","enum":["string","number","boolean","integer","array"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormat"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"}}},"nonBodyParameter":{"type":"object","required":["name","in","type"],"oneOf":[{"$ref":"#/definitions/headerParameterSubSchema"},{"$ref":"#/definitions/formDataParameterSubSchema"},{"$ref":"#/definitions/queryParameterSubSchema"},{"$ref":"#/definitions/pathParameterSubSchema"}]},"parameter":{"oneOf":[{"$ref":"#/definitions/bodyParameter"},{"$ref":"#/definitions/nonBodyParameter"}]},"schema":{"type":"object","description":"A deterministic version of a JSON Schema object.","patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"$ref":{"type":"string"},"format":{"type":"string"},"title":{"$ref":"http://json-schema.org/draft-04/schema#/properties/title"},"description":{"$ref":"http://json-schema.org/draft-04/schema#/properties/description"},"default":{"$ref":"http://json-schema.org/draft-04/schema#/properties/default"},"multipleOf":{"$ref":"http://json-schema.org/draft-04/schema#/properties/multipleOf"},"maximum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/maximum"},"exclusiveMaximum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum"},"minimum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/minimum"},"exclusiveMinimum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum"},"maxLength":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveInteger"},"minLength":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"},"pattern":{"$ref":"http://json-schema.org/draft-04/schema#/properties/pattern"},"maxItems":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveInteger"},"minItems":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"},"uniqueItems":{"$ref":"http://json-schema.org/draft-04/schema#/properties/uniqueItems"},"maxProperties":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveInteger"},"minProperties":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"},"required":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/stringArray"},"enum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/enum"},"additionalProperties":{"anyOf":[{"$ref":"#/definitions/schema"},{"type":"boolean"}],"default":{}},"type":{"$ref":"http://json-schema.org/draft-04/schema#/properties/type"},"items":{"anyOf":[{"$ref":"#/definitions/schema"},{"type":"array","minItems":1,"items":{"$ref":"#/definitions/schema"}}],"default":{}},"allOf":{"type":"array","minItems":1,"items":{"$ref":"#/definitions/schema"}},"properties":{"type":"object","additionalProperties":{"$ref":"#/definitions/schema"},"default":{}},"discriminator":{"type":"string"},"readOnly":{"type":"boolean","default":false},"xml":{"$ref":"#/definitions/xml"},"externalDocs":{"$ref":"#/definitions/externalDocs"},"example":{}},"additionalProperties":false},"fileSchema":{"type":"object","description":"A deterministic version of a JSON Schema object.","patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"required":["type"],"properties":{"format":{"type":"string"},"title":{"$ref":"http://json-schema.org/draft-04/schema#/properties/title"},"description":{"$ref":"http://json-schema.org/draft-04/schema#/properties/description"},"default":{"$ref":"http://json-schema.org/draft-04/schema#/properties/default"},"required":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/stringArray"},"type":{"type":"string","enum":["file"]},"readOnly":{"type":"boolean","default":false},"externalDocs":{"$ref":"#/definitions/externalDocs"},"example":{}},"additionalProperties":false},"primitivesItems":{"type":"object","additionalProperties":false,"properties":{"type":{"type":"string","enum":["string","number","integer","boolean","array"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormat"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"security":{"type":"array","items":{"$ref":"#/definitions/securityRequirement"},"uniqueItems":true},"securityRequirement":{"type":"object","additionalProperties":{"type":"array","items":{"type":"string"},"uniqueItems":true}},"xml":{"type":"object","additionalProperties":false,"properties":{"name":{"type":"string"},"namespace":{"type":"string"},"prefix":{"type":"string"},"attribute":{"type":"boolean","default":false},"wrapped":{"type":"boolean","default":false}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"tag":{"type":"object","additionalProperties":false,"required":["name"],"properties":{"name":{"type":"string"},"description":{"type":"string"},"externalDocs":{"$ref":"#/definitions/externalDocs"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"securityDefinitions":{"type":"object","additionalProperties":{"oneOf":[{"$ref":"#/definitions/basicAuthenticationSecurity"},{"$ref":"#/definitions/apiKeySecurity"},{"$ref":"#/definitions/oauth2ImplicitSecurity"},{"$ref":"#/definitions/oauth2PasswordSecurity"},{"$ref":"#/definitions/oauth2ApplicationSecurity"},{"$ref":"#/definitions/oauth2AccessCodeSecurity"}]}},"basicAuthenticationSecurity":{"type":"object","additionalProperties":false,"required":["type"],"properties":{"type":{"type":"string","enum":["basic"]},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"apiKeySecurity":{"type":"object","additionalProperties":false,"required":["type","name","in"],"properties":{"type":{"type":"string","enum":["apiKey"]},"name":{"type":"string"},"in":{"type":"string","enum":["header","query"]},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"oauth2ImplicitSecurity":{"type":"object","additionalProperties":false,"required":["type","flow","authorizationUrl"],"properties":{"type":{"type":"string","enum":["oauth2"]},"flow":{"type":"string","enum":["implicit"]},"scopes":{"$ref":"#/definitions/oauth2Scopes"},"authorizationUrl":{"type":"string","format":"uri"},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"oauth2PasswordSecurity":{"type":"object","additionalProperties":false,"required":["type","flow","tokenUrl"],"properties":{"type":{"type":"string","enum":["oauth2"]},"flow":{"type":"string","enum":["password"]},"scopes":{"$ref":"#/definitions/oauth2Scopes"},"tokenUrl":{"type":"string","format":"uri"},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"oauth2ApplicationSecurity":{"type":"object","additionalProperties":false,"required":["type","flow","tokenUrl"],"properties":{"type":{"type":"string","enum":["oauth2"]},"flow":{"type":"string","enum":["application"]},"scopes":{"$ref":"#/definitions/oauth2Scopes"},"tokenUrl":{"type":"string","format":"uri"},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"oauth2AccessCodeSecurity":{"type":"object","additionalProperties":false,"required":["type","flow","authorizationUrl","tokenUrl"],"properties":{"type":{"type":"string","enum":["oauth2"]},"flow":{"type":"string","enum":["accessCode"]},"scopes":{"$ref":"#/definitions/oauth2Scopes"},"authorizationUrl":{"type":"string","format":"uri"},"tokenUrl":{"type":"string","format":"uri"},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"oauth2Scopes":{"type":"object","additionalProperties":{"type":"string"}},"mediaTypeList":{"type":"array","items":{"$ref":"#/definitions/mimeType"},"uniqueItems":true},"parametersList":{"type":"array","description":"The parameters needed to send a valid API call.","additionalItems":false,"items":{"oneOf":[{"$ref":"#/definitions/parameter"},{"$ref":"#/definitions/jsonReference"}]},"uniqueItems":true},"schemesList":{"type":"array","description":"The transfer protocol of the API.","items":{"type":"string","enum":["http","https","ws","wss"]},"uniqueItems":true},"collectionFormat":{"type":"string","enum":["csv","ssv","tsv","pipes"],"default":"csv"},"collectionFormatWithMulti":{"type":"string","enum":["csv","ssv","tsv","pipes","multi"],"default":"csv"},"title":{"$ref":"http://json-schema.org/draft-04/schema#/properties/title"},"description":{"$ref":"http://json-schema.org/draft-04/schema#/properties/description"},"default":{"$ref":"http://json-schema.org/draft-04/schema#/properties/default"},"multipleOf":{"$ref":"http://json-schema.org/draft-04/schema#/properties/multipleOf"},"maximum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/maximum"},"exclusiveMaximum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum"},"minimum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/minimum"},"exclusiveMinimum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum"},"maxLength":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveInteger"},"minLength":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"},"pattern":{"$ref":"http://json-schema.org/draft-04/schema#/properties/pattern"},"maxItems":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveInteger"},"minItems":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"},"uniqueItems":{"$ref":"http://json-schema.org/draft-04/schema#/properties/uniqueItems"},"enum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/enum"},"jsonReference":{"type":"object","required":["$ref"],"additionalProperties":false,"properties":{"$ref":{"type":"string"}}}}}
 );
+
+
+
+local.assetsDict['/assets.swgg.swagger.json'] = local.assetsDict['/assets.swgg.swagger.json'] ||
+    '';
 
 
 
@@ -1288,6 +1256,7 @@ local.templateUiOperation = '\
     class="eventDelegateClick eventDelegateSubmit marginTop05 operation {{_method}}"\n\
     data-_key-operation-id="{{_keyOperationId}}"\n\
     id="{{id}}"\n\
+    tabindex="-1"\n\
 >\n\
     <div class="cursorPointer eventDelegateClick onEventOperationDisplayShow header tr">\n\
         <span class="td1">{{_method}}</span>\n\
@@ -1297,7 +1266,7 @@ local.templateUiOperation = '\
         <span class="td3">{{operationId}}</span>\n\
         <span class="td4">{{summary htmlSafe}}</span>\n\
     </div>\n\
-    <form accept-charset="UTF-8" class="content" style="display: none;">\n\
+    <form accept-charset="UTF-8" class="content uiAnimateSlide" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;">\n\
         {{#if deprecated}}\n\
         <h4 class="label marginTop10">Warning: Deprecated</h4>\n\
         {{/if deprecated}}\n\
@@ -1362,7 +1331,7 @@ local.templateUiParam = '\
         {{#each selectOptionList}}\n\
         <option\n\
             data-value-decoded="{{valueDecoded jsonStringify encodeURIComponent}}"\n\
-            id={{id}}\n\
+            id="{{id}}"\n\
             {{selected}}\n\
         >{{valueEncoded htmlSafe}}</option>\n\
         {{/each selectOptionList}}\n\
@@ -1387,7 +1356,9 @@ local.templateUiResource = '\
 <div\n\
     class="borderBottomBold resource eventDelegateClick"\n\
     data-name="{{name}}"\n\
-    id="{{id}}">\n\
+    id="{{id}}"\n\
+    tabindex="-1"\n\
+>\n\
     <div class="fontWeightBold header tr">\n\
         <a class="color777 flex1 onEventResourceDisplayAction td1" href="#">{{name}} :\n\
         {{#if description}}\n\
@@ -1405,7 +1376,7 @@ local.templateUiResource = '\
             href="#"\n\
         >Datatable</a>\n\
     </div>\n\
-    <div class="operationList" style="display: none;"></div>\n\
+    <div class="operationList uiAnimateSlide" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>\n\
 </div>\n\
 ';
 
@@ -1591,7 +1562,8 @@ local.templateUiResponseAjax = '\
          * this function will update the swagger-api dict of api-calls
          */
             var tmp;
-            options = options || {};
+            // init options
+            options = local.normalizeValue('dict', options);
             // init apiDict
             local.apiDict = local.apiDict || {};
             // init swaggerJson
@@ -1705,8 +1677,8 @@ local.templateUiResponseAjax = '\
             };
             // save tags
             tmp = {};
-            [local.swaggerJson.tags, options.tags || []].forEach(function (tagList) {
-                tagList.forEach(function (tag) {
+            [local.swaggerJson.tags, options.tags].forEach(function (tagList) {
+                local.normalizeValue('list', tagList).forEach(function (tag) {
                     local.objectSetOverride(tmp, local.objectLiteralize({
                         '$[]': [tag.name, tag]
                     }));
@@ -2820,7 +2792,7 @@ local.templateUiResponseAjax = '\
             }
             schema = local.jsonCopy(schema);
             if (schema.type === 'object') {
-                schema.properties = local.normalizeDict(schema.properties);
+                schema.properties = local.normalizeValue('dict', schema.properties);
             }
             return schema;
         };
@@ -2875,23 +2847,6 @@ local.templateUiResponseAjax = '\
             }, 500);
         };
 
-        local.uiAnimateScrollTo = function (element) {
-        /*
-         * this function will scrollTo the element
-         */
-            var ii, timerInterval;
-            ii = 0;
-            timerInterval = setInterval(function () {
-                ii += 0.025;
-                local.global.scrollTo(0, document.body.scrollTop +
-                    Math.min(ii, 1) * (element.offsetTop - document.body.scrollTop) +
-                    -5);
-            }, 25);
-            setTimeout(function () {
-                clearInterval(timerInterval);
-            }, 1000);
-        };
-
         local.uiAnimateShake = function (element) {
         /*
          * this function will shake the dom-element
@@ -2899,61 +2854,6 @@ local.templateUiResponseAjax = '\
             element.classList.add('uiAnimateShake');
             setTimeout(function () {
                 element.classList.remove('uiAnimateShake');
-            }, 500);
-        };
-
-        local.uiAnimateSlideAccordian = function (element, elementList) {
-        /*
-         * this function will slideDown the element,
-         * but slideUp all other elements in elementList
-         */
-            // hide elements in elementList
-            elementList.forEach(function (element2) {
-                if (element2 !== element) {
-                    local.uiAnimateSlideUp(element2);
-                }
-            });
-            // show element
-            local.uiAnimateSlideDown(element);
-        };
-
-        local.uiAnimateSlideDown = function (element) {
-        /*
-         * this function will slideDown the dom-element
-         */
-            if (element.style.display !== 'none') {
-                return;
-            }
-            element.style.maxHeight = 0;
-            element.classList.add('uiAnimateSlide');
-            element.style.display = '';
-            setTimeout(function () {
-                element.style.maxHeight = 1.5 * local.global.innerHeight + 'px';
-            }, 20);
-            setTimeout(function () {
-                element.style.maxHeight = '';
-                element.classList.remove('uiAnimateSlide');
-            }, 500);
-        };
-
-        local.uiAnimateSlideUp = function (element) {
-        /*
-         * this function will slideUp the dom-element
-         */
-            if (element.style.display === 'none') {
-                return;
-            }
-            element.style.maxHeight = 2 * local.global.innerHeight + 'px';
-            element.classList.add('uiAnimateSlide');
-            setTimeout(function () {
-                element.style.maxHeight = '0px';
-            }, 20);
-            setTimeout(function () {
-                element.style.display = 'none';
-            }, 500);
-            setTimeout(function () {
-                element.style.maxHeight = '';
-                element.classList.remove('uiAnimateSlide');
             }, 500);
         };
 
@@ -3233,6 +3133,9 @@ local.templateUiResponseAjax = '\
                                 if (!tmp) {
                                     return;
                                 }
+                                if (paramDef.type === 'string' && typeof tmp === 'string') {
+                                    break;
+                                }
                                 // parse schema
                                 if (paramDef.in === 'body') {
                                     tmp = JSON.parse(tmp);
@@ -3341,8 +3244,7 @@ local.templateUiResponseAjax = '\
          * this function will toggle the display of the operation
          */
             var tmp;
-            location.hash = '!/' + event.target.closest('.resource').id + '/' +
-                event.target.closest('.operation').id;
+            location.hash = '!' + event.target.closest('.operation').id;
             tmp = event.target.closest('.operation').querySelector('.operation > .content');
             tmp.closest('.resource').classList.remove('expanded');
             // show the operation, but hide all other operations
@@ -3358,7 +3260,7 @@ local.templateUiResponseAjax = '\
         /*
          * this function will toggle the display of the resource
          */
-            location.hash = '!/' + event.currentTarget.id;
+            location.hash = '!' + event.currentTarget.id;
             event.target.className.split(' ').some(function (className) {
                 switch (className) {
                 // show the resource, but hide all other resources
@@ -3402,7 +3304,7 @@ local.templateUiResponseAjax = '\
         /*
          * this function will reload the ui
          */
-            var notify;
+            var notify, tmp;
             notify = function (message) {
             /*
              * this function will notify with the given message
@@ -3437,11 +3339,21 @@ local.templateUiResponseAjax = '\
                     document.querySelector('.swggAjaxProgressDiv').style.display = 'none';
                     // reset state
                     local.apiDict = local.swaggerJson = null;
-                    local.apiDictUpdate(local.objectSetDefault(JSON.parse(xhr.responseText), {
-                        host: local.urlParse(
-                            document.querySelector('.swggUiContainer > .header > .td2').value
-                        ).host
-                    }));
+                    tmp = '{}';
+                    // coverage-hack - ignore else-statement
+                    local.nop(xhr.responseText && (function () {
+                        tmp = xhr.responseText;
+                    }()));
+                    tmp = JSON.parse(tmp);
+                    local.objectSetDefault(tmp, {
+                        host: local.githubCorsUrlOverride(
+                            local.urlParse(document.querySelector(
+                                '.swggUiContainer > .header > .td2'
+                            ).value).host,
+                            tmp['x-github-cors-host']
+                        )
+                    });
+                    local.apiDictUpdate(tmp);
                     local.uiRender();
                 }, notify);
             });
@@ -3692,39 +3604,28 @@ local.templateUiResponseAjax = '\
             // init event-handling
             local.uiEventInit(document);
             // scrollTo location.hash
-            local.uiScrollTo(location.hash);
-        };
-
-        local.uiScrollTo = function (locationHash) {
-        /*
-         * this function will scrollTo locationHash
-         */
-            var operation, resource;
-            // init resource
-            resource = locationHash.split('/')[1];
-            // list operations
-            resource = document.querySelector('.swggUiContainer #' + resource) ||
-                document.querySelector('.swggUiContainer .resource');
-            local.uiAnimateSlideDown(resource.querySelector('.operationList'));
-            // init operation
-            operation = locationHash.split('/')[2];
-            operation = resource.querySelector('#' + operation);
-            // expand operation and scroll to it
-            if (operation) {
-                local.uiAnimateSlideDown(operation.querySelector('.content'));
-                // scroll to operation
-                local.uiAnimateScrollTo(operation);
-            } else {
-                // scroll to resource
-                local.uiAnimateScrollTo(resource);
-            }
+            local.tryCatchOnError(function () {
+                var element, parent;
+                element = document.querySelector(
+                    '.swggUiContainer .operation, .swggUiContainer .operation'
+                );
+                local.tryCatchOnError(function () {
+                    element = document.querySelector('#' + location.hash.slice(2));
+                }, local.nop);
+                parent = element.querySelector('.uiAnimateSlide');
+                while (parent) {
+                    local.uiAnimateSlideDown(parent);
+                    parent = parent.parentElement;
+                }
+                element.focus();
+            }, local.nop);
         };
 
         local.urlBaseGet = function () {
         /*
          * this function will return the base swagger url
          */
-            return (local.swaggerJson.schemes ||
+            return (local.normalizeValue('list', local.swaggerJson.schemes)[0] ||
                 local.urlParse('').protocol.slice(0, -1)) + '://' +
                 (local.swaggerJson.host || local.urlParse('').host) +
                 local.swaggerJson.basePath;

@@ -40,15 +40,19 @@
         switch (local.modeJs) {
         // re-init local from window.local
         case 'browser':
-            local = local.global.utility2_rollup || local.global.local;
-            local.global.utility2.objectSetDefault(local, local.global.utility2);
+            local = local.global.utility2.objectSetDefault(
+                local.global.utility2_rollup || local.global.local,
+                local.global.utility2
+            );
             break;
         // re-init local from example.js
         case 'node':
-            local = (local.global.utility2_rollup || require('./assets.utility2.rollup.js'))
-                .requireReadme();
+            local = (local.global.utility2_rollup ||
+                require('./assets.utility2.rollup.js')).requireReadme();
             break;
         }
+        // init exports
+        local.global.local = local;
     }());
 
 
@@ -1089,10 +1093,10 @@
                 });
                 onParallel();
             });
+            // test body-array-param handling-behavior
             options = {
                 paramDict: {
                     id: 'testCase_validateByParamDefList_default',
-                    // test body-array-param handling-behavior
                     paramBodyArray: [{ aa: { bb: 'hello body' } }, null]
                 }
             };
@@ -1103,6 +1107,23 @@
                 // validate object
                 local.assertJsonEqual(data.responseJson.data[0], {
                     paramBodyArray: [{ aa: { bb: 'hello body' } }, null]
+                });
+                onParallel();
+            });
+            // test body-string-param handling-behavior
+            options = {
+                paramDict: {
+                    id: 'testCase_validateByParamDefList_default',
+                    paramBodyString: 'hello body'
+                }
+            };
+            onParallel.counter += 1;
+            local.apiDict['x-test paramBodyString']._ajax(options, function (error, data) {
+                // validate no error occurred
+                local.assert(!error, error);
+                // validate object
+                local.assertJsonEqual(data.responseJson.data[0], {
+                    paramBodyString: 'hello body'
                 });
                 onParallel();
             });
@@ -1399,23 +1420,6 @@
             setTimeout(onError, 1500);
         };
 
-        local.testCase_uiScrollTo = function (options, onError) {
-        /*
-         * this function will test uiScrollTo's default handling-behavior
-         */
-            options = [
-                '',
-                '#!/swgg_id_pet',
-                '#!/swgg_id_pet/undefined',
-                '#!/swgg_id_pet/undefined/undefined',
-                '#!/swgg_id_pet/swgg_id_addPet'
-            ];
-            options.forEach(function (element) {
-                local.uiScrollTo(element);
-            });
-            onError();
-        };
-
         local.testCase_ui_datable = function (options, onError) {
         /*
          * this function will test ui's datatable handling-behavior
@@ -1506,47 +1510,6 @@
          */
             options = {};
             local.buildApidoc(options, onError);
-        };
-
-        local.testCase_buildReadme_default = function (options, onError) {
-        /*
-         * this function will test buildReadme's default handling-behavior-behavior
-         */
-            options = {};
-            options.customize = function () {
-                // search-and-replace - customize dataTo
-                [
-                    // customize cdn-download
-                    (/\n# cdn download\n[\S\s]*?\n\n\n\n/),
-                    // customize swaggerdoc
-                    (/\n#### apidoc\n[\S\s]*?\n#### todo\n/)
-                ].forEach(function (rgx) {
-                    options.dataFrom.replace(rgx, function (match0) {
-                        options.dataTo = options.dataTo.replace(rgx, match0);
-                    });
-                });
-            };
-            local.buildReadme(options, onError);
-        };
-
-        local.testCase_buildTest_default = function (options, onError) {
-        /*
-         * this function will test buildTest's default handling-behavior
-         */
-            options = {};
-            options.customize = function () {
-                // search-and-replace - customize dataTo
-                [
-                    // customize js\-env code
-                    new RegExp('\\n {4}\\/\\/ run shared js\\-env code - init-before\\n' +
-                        '[\\S\\s]*?\\n {4}\\}\\(\\)\\);')
-                ].forEach(function (rgx) {
-                    options.dataFrom.replace(rgx, function (match0) {
-                        options.dataTo = options.dataTo.replace(rgx, match0);
-                    });
-                });
-            };
-            local.buildTest(options, onError);
         };
 
         local.testCase_webpage_default = function (options, onError) {
@@ -1845,6 +1808,19 @@
                     summary: 'test body-array-param handling-behavior',
                     tags: ['x-test']
                 } },
+                // test body-string-param handling-behavior
+                '/x-test/paramBodyString': { post: {
+                    operationId: 'paramBodyString',
+                    parameters: [{
+                        // test body-string-param handling-behavior
+                        description: 'body-string-param',
+                        in: 'body',
+                        name: 'paramBodyString',
+                        type: 'string'
+                    }],
+                    summary: 'test body-string-param handling-behavior',
+                    tags: ['x-test']
+                } },
                 // test form-data-param handling-behavior
                 '/x-test/paramFormData': { post: {
                     operationId: 'paramFormData',
@@ -1974,11 +1950,7 @@
         // test redundant http-body-parse-middleware handling-behavior
         local.middlewareList.push(local.middlewareBodyParse);
         // init test-middleware
-        local.middlewareList.push(function (
-            request,
-            response,
-            nextMiddleware
-        ) {
+        local.middlewareList.push(function (request, response, nextMiddleware) {
             switch (request.swgg.pathObject && request.swgg.pathObject.operationId) {
             case 'onErrorJsonapi':
                 // test redundant onErrorJsonapi handling-behavior
@@ -1990,6 +1962,7 @@
                 );
                 break;
             case 'paramBodyArray':
+            case 'paramBodyString':
             case 'paramDefault':
             case 'paramFormData':
                 // test redundant onErrorJsonapi handling-behavior
@@ -2074,21 +2047,34 @@
 
 
     // run browser js-env code - init-after
+    /* istanbul ignore next */
     case 'browser':
         local.testCase_browser_nullCase = local.testCase_browser_nullCase || function (
             options,
             onError
         ) {
         /*
-         * this function will test browsers's null-case handling-behavior-behavior
+         * this function will test browser's null-case handling-behavior
          */
             onError(null, options);
         };
 
+        local.utility2.ajaxForwardProxyUrlTest = local.utility2.ajaxForwardProxyUrlTest ||
+            function (url, location) {
+            /*
+             * this function will test if the url requires forward-proxy
+             */
+                // jslint-hack
+                local.nop(url);
+                return local.env.npm_package_nameAlias && (/\bgithub.io$/).test(location.host)
+                    ? 'https://h1-' + local.env.npm_package_nameAlias + '-alpha.herokuapp.com'
+                    : location.protocol + '//' + location.host;
+            };
+
         // run tests
-        local.nop(local.modeTest &&
-            document.querySelector('#testRunButton1') &&
-            document.querySelector('#testRunButton1').click());
+        if (local.modeTest && document.querySelector('#testRunButton1')) {
+            document.querySelector('#testRunButton1').click();
+        }
         break;
 
 
@@ -2101,7 +2087,7 @@
             onError
         ) {
         /*
-         * this function will test buildApidoc's default handling-behavior-behavior
+         * this function will test buildApidoc's default handling-behavior
          */
             options = { modulePathList: module.paths };
             local.buildApidoc(options, onError);
@@ -2112,7 +2098,7 @@
             onError
         ) {
         /*
-         * this function will test buildApp's default handling-behavior-behavior
+         * this function will test buildApp's default handling-behavior
          */
             local.testCase_buildReadme_default(options, local.onErrorThrow);
             local.testCase_buildLib_default(options, local.onErrorThrow);
@@ -2147,7 +2133,7 @@
             onError
         ) {
         /*
-         * this function will test buildReadme's default handling-behavior-behavior
+         * this function will test buildReadme's default handling-behavior
          */
             options = {};
             local.buildReadme(options, onError);
