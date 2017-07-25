@@ -1,6 +1,8 @@
 # swgg
 this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend)
 
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app)
+
 [![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swgg.svg)](https://travis-ci.org/kaizhu256/node-swgg) [![coverage](https://kaizhu256.github.io/node-swgg/build/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build/coverage.html/index.html)
 
 [![NPM](https://nodei.co/npm/swgg.png?downloads=true)](https://www.npmjs.com/package/swgg)
@@ -45,7 +47,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 # live demo
 - [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app)
 
-[![github.com test-server](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app)
+[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app)
 
 
 
@@ -55,12 +57,9 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
-#### swaggerdoc
-- [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.swgg.html](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.swgg.html)
-
-[![swaggerdoc](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp%252Fassets.swgg.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.swgg.html)
-
 #### todo
+- npm publish 2017.7.24
+- lazily render operations upon expansion
 - revamp datatable with card-expansion ui
 - add forward-proxy ui-checkbox
 - allow optional sub-level input for swagger-models
@@ -74,11 +73,11 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2017.7.1
-- npm publish 2017.7.1
-- auto-build README section 'table of contents'
-- enhance github-cors with function githubCorsUrlOverride
-- move functions uiAnimateSlideXxx from file lib.swgg.js to file assets.utility2.rollup.js
+#### changelog for v2017.7.24
+- add url property x-homepage in swagger.json to url-link info.title
+- auto-scroll to hashtag of expanded element
+- chrome bug-workaround and w3 validation - replace <form2> tag with <div class="form">
+- streamline server logs
 - none
 
 #### this package requires
@@ -278,6 +277,56 @@ instruction
 
     // run shared js-env code - init-after
     (function () {
+        // init assets
+        /* jslint-ignore-begin */
+        local.assetsDict['/assets.index.template.html'] = local.assetsDict['/assets.swgg.html']
+            .replace((/\n<\/script>\n/), '\
+\n\
+</script>\n\
+<h1>\n\
+    <a href="{{env.npm_package_homepage}}" target="_blank">\n\
+        {{env.npm_package_name}} (v{{env.npm_package_version}})\n\
+    </a>\n\
+</h1>\n\
+<h3>{{env.npm_package_description}}</h3>\n\
+<h4><a download href="assets.app.js">download standalone app</a></h4>\n\
+<button class="onclick onreset" id="testRunButton1">run internal test</button><br>\n\
+<div class="uiAnimateSlide" id="testReportDiv1" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>\n\
+\n\
+\n\
+\n\
+<button class="onclick" id="dbResetButton1">reset database</button><br>\n\
+<button class="onclick" id="dbExportButton1">export database -&gt; file</button><br>\n\
+<a download="db.persistence.json" href="" id="dbExportA1"></a>\n\
+<button class="onclick" id="dbImportButton1">import database &lt;- file</button><br>\n\
+<input class="onchange zeroPixel" type="file" id="dbImportInput1">\n\
+')
+            .replace('assets.swgg.swagger.json', 'assets.swgg.swagger.server.json')
+            .replace((/\n<script src=[\S\s]*\n<\/html>\n/), '\
+\n\
+{{#if isRollup}}\n\
+<script src="assets.app.js"></script>\n\
+{{#unless isRollup}}\n\
+<script src="assets.utility2.rollup.js"></script>\n\
+<script>window.utility2.onResetBefore.counter += 1;</script>\n\
+<script src="jsonp.utility2.stateInit?callback=window.utility2.stateInit"></script>\n\
+<script src="assets.swgg.js"></script>\n\
+<script src="assets.example.js"></script>\n\
+<script src="assets.test.js"></script>\n\
+<script>window.utility2.onResetBefore();</script>\n\
+{{/if isRollup}}\n\
+<div class="utility2FooterDiv">\n\
+    [ this app was created with\n\
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>\n\
+    ]\n\
+</div>\n\
+</body>\n\
+</html>\n\
+');
+        /* jslint-ignore-end */
+
+
+
         // init middleware
         local.middlewareList = local.utility2.middlewareList = [
             local.middlewareInit,
@@ -777,503 +826,6 @@ instruction
         local.url = require('url');
         // init assets
         local.assetsDict = local.assetsDict || {};
-        /* jslint-ignore-begin */
-        local.assetsDict['/assets.index.template.html'] = '\
-<!doctype html>\n\
-<html lang="en">\n\
-<head>\n\
-<meta charset="UTF-8">\n\
-<meta name="viewport" content="width=device-width, initial-scale=1">\n\
-<title>{{env.npm_package_name}} (v{{env.npm_package_version}})</title>\n\
-<style>\n\
-/*csslint\n\
-    box-sizing: false,\n\
-    universal-selector: false\n\
-*/\n\
-* {\n\
-    box-sizing: border-box;\n\
-}\n\
-body {\n\
-    background: #dde;\n\
-    font-family: Arial, Helvetica, sans-serif;\n\
-    margin: 2rem;\n\
-}\n\
-body > * {\n\
-    margin-bottom: 1rem;\n\
-}\n\
-body > button {\n\
-    width: 20rem;\n\
-}\n\
-button {\n\
-    cursor: pointer;\n\
-}\n\
-.uiAnimateSlide {\n\
-    overflow-y: hidden;\n\
-    transition: border-bottom 250ms, border-top 250ms, margin-bottom 250ms, margin-top 250ms, max-height 250ms, min-height 250ms, padding-bottom 250ms, padding-top 250ms;\n\
-}\n\
-.utility2FooterDiv {\n\
-    margin-top: 20px;\n\
-    text-align: center;\n\
-}\n\
-.zeroPixel {\n\
-    border: 0;\n\
-    height: 0;\n\
-    margin: 0;\n\
-    padding: 0;\n\
-    width: 0;\n\
-}\n\
-</style>\n\
-<style>\n\
-/*csslint\n\
-    adjoining-classes: false,\n\
-    box-model: false,\n\
-    box-sizing: false,\n\
-    outline-none: false,\n\
-    universal-selector: false\n\
-*/\n\
-/* animate */\n\
-.uiAnimateFade {\n\
-    transition: opacity 250ms;\n\
-}\n\
-@keyframes uiAnimateShake {\n\
-    100% {\n\
-        transform: translateX(0);\n\
-    }\n\
-    0%, 20%, 60% {\n\
-        transform: translateX(1rem);\n\
-    }\n\
-    40%, 80% {\n\
-        transform: translateX(-1rem);\n\
-    }\n\
-}\n\
-.uiAnimateShake {\n\
-    animation-duration: 500ms;\n\
-    animation-name: uiAnimateShake;\n\
-}\n\
-\n\
-\n\
-\n\
-/* general */\n\
-.swggUiContainer,\n\
-.swggUiContainer * {\n\
-    box-sizing: border-box;\n\
-    margin: 0;\n\
-    padding: 0;\n\
-}\n\
-.swggUiContainer {\n\
-    font-family: Arial, Helvetica, sans-serif;\n\
-    margin-left: auto;\n\
-    margin-right: auto;\n\
-    max-width: 1024px;\n\
-}\n\
-.swggUiContainer > * {\n\
-    margin-top: 1rem;\n\
-}\n\
-.swggUiContainer a {\n\
-    text-decoration: none;\n\
-}\n\
-.swggUiContainer a:hover {\n\
-    color: black;\n\
-}\n\
-.swggUiContainer a,\n\
-.swggUiContainer input,\n\
-.swggUiContainer span {\n\
-    min-height: 1.5rem;\n\
-}\n\
-.swggUiContainer button {\n\
-    padding: 0.5rem;\n\
-}\n\
-.swggUiContainer .color777 {\n\
-    color: #777;\n\
-}\n\
-.swggUiContainer button,\n\
-.swggUiContainer .cursorPointer,\n\
-.swggUiContainer .cursorPointer input {\n\
-    cursor: pointer;\n\
-}\n\
-.swggUiContainer .flex1 {\n\
-    flex: 1;\n\
-}\n\
-.swggUiContainer .fontLineThrough {\n\
-    text-decoration: line-through;\n\
-}\n\
-.swggUiContainer .fontWeightBold {\n\
-    font-weight: bold;\n\
-}\n\
-.swggUiContainer input {\n\
-    height: 1.5rem;\n\
-    padding-left: 0.25rem;\n\
-    padding-right: 0.25rem;\n\
-}\n\
-.swggUiContainer .marginTop05 {\n\
-    margin-top: 0.5rem;\n\
-}\n\
-.swggUiContainer .marginTop10 {\n\
-    margin-top: 1rem;\n\
-}\n\
-.swggUiContainer pre,\n\
-.swggUiContainer textarea {\n\
-    font-family: Menlo, Monaco, Consolas, Courier New, monospace;\n\
-    font-size: small;\n\
-    line-height: 1.25rem;\n\
-    max-height: 20rem;\n\
-    overflow: auto;\n\
-    padding: 0.25rem;\n\
-    white-space: pre;\n\
-}\n\
-.swggUiContainer .tr {\n\
-    display: flex;\n\
-}\n\
-.swggUiContainer .tr > * {\n\
-    margin-left: 1rem;\n\
-    overflow: auto;\n\
-    padding-top: 0.1rem;\n\
-    word-wrap: break-word;\n\
-}\n\
-.swggUiContainer .tr > *:first-child {\n\
-    margin-left: 0;\n\
-}\n\
-.swggUiContainer .tr > * > * {\n\
-    width: 100%;\n\
-}\n\
-\n\
-\n\
-\n\
-/* border */\n\
-/* border-bottom-bold */\n\
-.swggUiContainer .borderBottom {\n\
-    border-bottom: 1px solid #bbb;\n\
-    margin-bottom: 0.5rem;\n\
-    padding-bottom: 0.5rem;\n\
-}\n\
-.swggUiContainer .borderBottomBold {\n\
-    border-bottom: 1px solid #777;\n\
-    margin-bottom: 0.5rem;\n\
-    padding-bottom: 0.5rem;\n\
-}\n\
-/* border-top */\n\
-.swggUiContainer .borderTop {\n\
-    border-top: 1px solid #bbb;\n\
-    margin-top: 0.5rem;\n\
-    padding-top: 0.5rem;\n\
-}\n\
-/* border-top-bold */\n\
-.swggUiContainer .borderTopBold,\n\
-.swggUiContainer .resource:first-child {\n\
-    border-top: 1px solid #777;\n\
-    margin-top: 0.5rem;\n\
-    padding-top: 0.5rem;\n\
-}\n\
-/* border-error*/\n\
-.swggUiContainer .error {\n\
-    border: 5px solid #b00;\n\
-}\n\
-\n\
-\n\
-\n\
-/* datatable color */\n\
-.swggUiContainer .datatable tbody > tr > td {\n\
-    background: #efe;\n\
-}\n\
-.swggUiContainer .datatable tbody > tr > td:nth-child(odd) {\n\
-    background: #dfd;\n\
-}\n\
-.swggUiContainer .datatable tbody > tr:nth-child(odd) > td {\n\
-    background: #cfc;\n\
-}\n\
-.swggUiContainer .datatable tbody > tr:nth-child(odd) > td:nth-child(odd) {\n\
-    background: #beb;\n\
-}\n\
-.swggUiContainer .datatable tbody > tr:hover > td {\n\
-    background: #aea;\n\
-}\n\
-.swggUiContainer .datatable tbody > tr:hover > td:nth-child(odd) {\n\
-    background: #9e9;\n\
-}\n\
-.swggUiContainer .datatable tbody > tr > td:hover,\n\
-.swggUiContainer .datatable tbody > tr > td:hover:nth-child(odd),\n\
-.swggUiContainer .datatable tbody > tr:nth-child(odd) > td:hover,\n\
-.swggUiContainer .datatable tbody > tr:nth-child(odd) > td:hover:nth-child(odd),\n\
-.swggUiContainer .datatable th:hover {\n\
-    background: #7d7;\n\
-}\n\
-.swggUiContainer .datatable tbody > tr.selected > td {\n\
-    background: #fee;\n\
-}\n\
-.swggUiContainer .datatable tbody > tr.selected > td:nth-child(odd) {\n\
-    background: #fdd;\n\
-}\n\
-.swggUiContainer .datatable tbody > tr.selected:nth-child(odd) > td {\n\
-    background: #ecc;\n\
-}\n\
-.swggUiContainer .datatable tbody > tr.selected:nth-child(odd) > td:nth-child(odd) {\n\
-    background: #ebb;\n\
-}\n\
-.swggUiContainer .datatable th {\n\
-    background: #9e9;\n\
-}\n\
-\n\
-\n\
-\n\
-/* section */\n\
-.swggUiContainer .datatable {\n\
-    background: #fff;\n\
-    background: rgba(255,255,255,0.875);\n\
-    margin: 2rem;\n\
-    overflow: auto;\n\
-    padding: 1rem;\n\
-}\n\
-.swggUiContainer .datatable input[type=checkbox] {\n\
-    width: 1.5rem;\n\
-}\n\
-.swggUiContainer .datatable .sortAsc,\n\
-.swggUiContainer .datatable .sortDsc {\n\
-    display: none;\n\
-}\n\
-.swggUiContainer .datatable td,\n\
-.swggUiContainer .datatable th {\n\
-    max-width: 10rem;\n\
-    overflow: auto;\n\
-    padding: 0.5rem;\n\
-}\n\
-.swggUiContainer .datatable th:first-child {\n\
-    padding-right: 2rem;\n\
-}\n\
-.swggUiContainer > .header {\n\
-    background: #8c0;\n\
-    padding: 0.5rem;\n\
-}\n\
-.swggUiContainer > .header > .td1 {\n\
-    font-size: x-large;\n\
-    background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAqRJREFUeNrEVz1s00AUfnGXii5maMXoEUEHVwIpEkPNgkBdMnQoU5ytiKHJwpp2Q2JIO8DCUDOxIJFIVOoWZyJSh3pp1Q2PVVlcCVBH3ufeVZZ9Zye1Ay86nXV+ue/9fO/lheg/Se02X1rvksmbnTiKvuxQMBNgBnN4a/LCbmnUAP6JV58NCUsBC8CuAJxGPF47OgNqBaA93tolUhnx6jC4NxGwyOEwlccyAs+3kwdzKq0HDn2vEBTi8J2XpyMaywNDE157BhXUE3zJhlq8GKq+Zd2zaWHepPA8oN9XkfLmRdOiJV4XUUg/IyWncLjCYY/SHndV2u7zHr3bPKZtdxgboJOnthvrfGj/oMf3G0r7JVmNlLfKklmrt2MvvcNO7LFOhoFHfuAJI5o6ta10jpt5CQLgwXhXG2YIwvu+34qf78ybOjWTnWwkgR36d7JqJOrW0hHmNrKg9xhiS4+1jFmrxymh03B0w+6kURIAu3yHtOD5oaUNojMnGgbcctNvwdAnyxvxRR+/vaJnjzbpzcZX+nN1SdGv85i9eH8w3qPO+mdm/y4dnQ1iI8Fq6Nf4cxL6GWSjiFDSs0VRnxC5g0xSB2cgHpaseTxfqOv5uoHkNQ6Ha/N1Yz9mNMppEkEkYKj79q6uCq4bCHcSX3fJ0Vk/k9siASjCm1N6gZH6Ec9IXt2WkFES2K/ixoIyktJPAu/ptOA1SgO5zqtr6KASJPF0nMV8dgMsRhRPOcMwqQAOoi0VAIMLAEWJ6YYC1c8ibj1GP51RqwzYwZVMHQuvOzMCBUtb2tGHx5NAdLKqp5AX7Ng4d+Zi8AGDI9z1ijx9yaCH04y3GCP2S+QcvaGl+pcxyUBvinFlawoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=) no-repeat left center;\n\
-    padding-left: 2.5rem;\n\
-    color: white;\n\
-}\n\
-.swggUiContainer > .header > .td2 {\n\
-    font-size: medium;\n\
-    height: 2rem;\n\
-}\n\
-.swggUiContainer > .header > .td3 {\n\
-border: 0;\n\
-    color: #fff;\n\
-    padding: 6px 8px;\n\
-    background: #580;\n\
-}\n\
-.swggUiContainer > .info > * {\n\
-    margin-top: 1rem;\n\
-}\n\
-.swggUiContainer > .info a {\n\
-    color: #370;\n\
-    text-decoration: underline;\n\
-}\n\
-.swggUiContainer > .info > .fontWeightBold {\n\
-    font-size: x-large;\n\
-}\n\
-.swggUiContainer > .info > ul {\n\
-    margin-left: 2rem;\n\
-}\n\
-.swggUiContainer > .modal {\n\
-    background: black;\n\
-    background: rgba(0,0,0,0.5);\n\
-    display: flex;\n\
-    height: 100%;\n\
-    left: 0;\n\
-    margin: 0;\n\
-    margin-top: 4px;\n\
-    padding: 0;\n\
-    position: fixed;\n\
-    top: 0;\n\
-    width: 100%;\n\
-    z-index: 1;\n\
-}\n\
-.swggUiContainer .modal button {\n\
-    padding: 0.5rem;\n\
-}\n\
-.swggUiContainer .operation {\n\
-    background: #dfd;\n\
-    font-size: smaller;\n\
-    outline: none;\n\
-}\n\
-.swggUiContainer .operation > .content {\n\
-    padding: 1rem;\n\
-}\n\
-.swggUiContainer .operation > .content .label {\n\
-    color: #0b0;\n\
-}\n\
-.swggUiContainer .operation > .content pre {\n\
-    border: 1px solid #bbb;\n\
-    background: #ffd;\n\
-}\n\
-.swggUiContainer .operation > .content .tr {\n\
-    margin-left: 0.5rem;\n\
-}\n\
-.swggUiContainer .operation > .header:hover {\n\
-    background: #bfb;\n\
-}\n\
-.swggUiContainer .operation > .header > span {\n\
-    padding: 2px 0 2px 0;\n\
-}\n\
-.swggUiContainer .operation > .header > span:first-child {\n\
-    margin-left: 0;\n\
-}\n\
-.swggUiContainer .operation > .header > .td1 {\n\
-    background: #777;\n\
-    color: white;\n\
-    padding-top: 5px;\n\
-    height: 1.5rem;\n\
-    text-align: center;\n\
-    width: 5rem;\n\
-}\n\
-.swggUiContainer .operation > .header > .td2 {\n\
-    flex: 3;\n\
-}\n\
-.swggUiContainer .operation > .header > .td3 {\n\
-    color: #777;\n\
-    flex: 2;\n\
-    text-decoration: none;\n\
-}\n\
-.swggUiContainer .operation > .header > .td4 {\n\
-    flex: 2;\n\
-    padding-right: 1rem;\n\
-}\n\
-.swggUiContainer .operation .paramDef pre,\n\
-.swggUiContainer .operation .paramDef textarea {\n\
-    height: 10rem;\n\
-}\n\
-.swggUiContainer .operation .paramDef > .td1 {\n\
-    flex: 2;\n\
-}\n\
-.swggUiContainer .operation .paramDef > .td2 {\n\
-    flex: 1;\n\
-}\n\
-.swggUiContainer .operation .paramDef > .td3 {\n\
-    flex: 4;\n\
-}\n\
-.swggUiContainer .operation .paramDef > .td4 {\n\
-    flex: 3;\n\
-}\n\
-.swggUiContainer .operation .responseList > .td1 {\n\
-    flex: 1;\n\
-}\n\
-.swggUiContainer .operation .responseList > .td2 {\n\
-    flex: 4;\n\
-}\n\
-.swggUiContainer .resource {\n\
-    outline: none;\n\
-}\n\
-.swggUiContainer .resource > .header > .td1 {\n\
-    font-size: large;\n\
-}\n\
-.swggUiContainer .resource > .header > .td2,\n\
-.swggUiContainer .resource > .header > .td3 {\n\
-    border-right: 1px solid #777;\n\
-    padding-right: 1rem;\n\
-}\n\
-\n\
-\n\
-\n\
-/* method */\n\
-.swggUiContainer .operation.DELETE > .header > .td1 {\n\
-    background: #b00;\n\
-}\n\
-.swggUiContainer .operation.GET > .header > .td1 {\n\
-    background: #093;\n\
-}\n\
-.swggUiContainer .operation.HEAD > .header > .td1 {\n\
-    background: #f30;\n\
-}\n\
-.swggUiContainer .operation.PATCH > .header > .td1 {\n\
-    background: #b0b;\n\
-}\n\
-.swggUiContainer .operation.POST > .header > .td1 {\n\
-    background: #07b;\n\
-}\n\
-.swggUiContainer .operation.PUT > .header > .td1 {\n\
-    background: #70b;\n\
-}\n\
-</style>\n\
-</head>\n\
-<body>\n\
-<!-- utility2-comment\n\
-<div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 25%;"></div>\n\
-utility2-comment -->\n\
-<h1>\n\
-<!-- utility2-comment\n\
-    <a\n\
-        {{#if env.npm_package_homepage}}\n\
-        href="{{env.npm_package_homepage}}"\n\
-        {{/if env.npm_package_homepage}}\n\
-        target="_blank"\n\
-    >\n\
-utility2-comment -->\n\
-        {{env.npm_package_name}} (v{{env.npm_package_version}})\n\
-<!-- utility2-comment\n\
-    </a>\n\
-utility2-comment -->\n\
-</h1>\n\
-<h3>{{env.npm_package_description}}</h3>\n\
-<!-- utility2-comment\n\
-<h4><a download href="assets.app.js">download standalone app</a></h4>\n\
-<button class="onclick onreset" id="testRunButton1">run internal test</button><br>\n\
-<div class="uiAnimateSlide" id="testReportDiv1" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>\n\
-utility2-comment -->\n\
-\n\
-\n\
-\n\
-<button class="onclick" id="dbResetButton1">reset database</button><br>\n\
-<button class="onclick" id="dbExportButton1">export database -&gt; file</button><br>\n\
-<a download="db.persistence.json" href="" id="dbExportA1"></a>\n\
-<button class="onclick" id="dbImportButton1">import database &lt;- file</button><br>\n\
-<input class="onchange zeroPixel" type="file" id="dbImportInput1">\n\
-<div class="swggUiContainer">\n\
-<form2 class="header tr">\n\
-    <a class="td1" href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
-    <input class="flex1 td2" type="text">\n\
-    <button class="td3">Explore</button>\n\
-</form2>\n\
-</div>\n\
-<div class="swggAjaxProgressDiv" style="margin-top: 1rem; text-align: center;">fetching resource list; Please wait.</div>\n\
-<script>\n\
-/*jslint\n\
-    bitwise: true,\n\
-    browser: true,\n\
-    maxerr: 8,\n\
-    maxlen: 96,\n\
-    node: true,\n\
-    nomen: true,\n\
-    regexp: true,\n\
-    stupid: true\n\
-*/\n\
-"use strict";\n\
-document.querySelector(".swggUiContainer > .header > .td2").value =\n\
-    ((/\\bmodeSwaggerJsonUrl=([^&]+)/g).exec(location.search) &&\n\
-        (/\\bmodeSwaggerJsonUrl=([^&]+)/g).exec(location.search)[1]) ||\n\
-        "assets.swgg.swagger.server.json";\n\
-</script>\n\
-<!-- utility2-comment\n\
-{{#if isRollup}}\n\
-<script src="assets.app.js"></script>\n\
-{{#unless isRollup}}\n\
-utility2-comment -->\n\
-<script src="assets.utility2.rollup.js"></script>\n\
-<script>window.utility2.onResetBefore.counter += 1;</script>\n\
-<script src="jsonp.utility2.stateInit?callback=window.utility2.stateInit"></script>\n\
-<script src="assets.swgg.js"></script>\n\
-<script src="assets.example.js"></script>\n\
-<script src="assets.test.js"></script>\n\
-<script>window.utility2.onResetBefore();</script>\n\
-<!-- utility2-comment\n\
-{{/if isRollup}}\n\
-utility2-comment -->\n\
-<div class="utility2FooterDiv">\n\
-    [ this app was created with\n\
-    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>\n\
-    ]\n\
-</div>\n\
-</body>\n\
-</html>\n\
-';
-        /* jslint-ignore-end */
         [
             'assets.index.css',
             'assets.index.template.html',
@@ -1419,8 +971,7 @@ utility2-comment -->\n\
         "open-api",
         "openapi",
         "swagger",
-        "swagger-ui",
-        "swgg"
+        "swagger-ui"
     ],
     "license": "MIT",
     "main": "lib.swgg.js",
@@ -1439,12 +990,12 @@ utility2-comment -->\n\
     "scripts": {
         "build-ci": "utility2 shReadmeTest build_ci.sh",
         "env": "env",
-        "heroku-postbuild": "(set -e; npm install \"kaizhu256/node-utility2#alpha\"; utility2 shDeployHeroku)",
+        "heroku-postbuild": "npm uninstall utility2 2>/dev/null; npm install kaizhu256/node-utility2#alpha && utility2 shDeployHeroku",
         "postinstall": "if [ -f npm_scripts.sh ]; then ./npm_scripts.sh postinstall; fi",
         "start": "(set -e; export PORT=${PORT:-8080}; utility2 start test.js)",
         "test": "(set -e; export PORT=$(utility2 shServerPortRandom); utility2 test test.js)"
     },
-    "version": "2017.7.1"
+    "version": "2017.7.24"
 }
 ```
 

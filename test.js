@@ -1529,6 +1529,9 @@
 
     // run shared js-env code - init-after
     (function () {
+        // coverage-hack - root basePath
+        local.apiDictUpdate({ basePath: '/' });
+        local.apiDictUpdate({ basePath: '/api/v0' });
         // init test api
         local.apiDictUpdate({
             definitions: {
@@ -1816,7 +1819,7 @@
                         description: 'body-string-param',
                         in: 'body',
                         name: 'paramBodyString',
-                        type: 'string'
+                        schema: { type: 'string' }
                     }],
                     summary: 'test body-string-param handling-behavior',
                     tags: ['x-test']
@@ -2066,7 +2069,7 @@
              */
                 // jslint-hack
                 local.nop(url);
-                return local.env.npm_package_nameAlias && (/\bgithub.io$/).test(location.host)
+                return local.env.npm_package_nameAlias && location.host.match(/\bgithub.io$/)
                     ? 'https://h1-' + local.env.npm_package_nameAlias + '-alpha.herokuapp.com'
                     : location.protocol + '//' + location.host;
             };

@@ -657,7 +657,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 local.objectSetDefault(tmp, moduleMain);
             // init circularList - builtin
             Object.keys(process.binding('natives')).forEach(function (key) {
-                if (!(/\/|_linklist|sys/).test(key)) {
+                if (!key.match(/\/|_linklist|sys/)) {
                     options.blacklistDict[key] = options.blacklistDict[key] || require(key);
                 }
             });
@@ -774,7 +774,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                             .filter(function (key) {
                                 return local.tryCatchOnError(function () {
                                     return key &&
-                                        (/^\w[\w\-.]*?$/).test(key) &&
+                                        key.match(/^\w[\w\-.]*?$/) &&
                                         key.indexOf('testCase_') !== 0 &&
                                         module[key] !== options.blacklistDict[key];
                                 }, console.error);
@@ -805,13 +805,13 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             var isModule, tmp;
             ['child', 'prototype', 'grandchild', 'prototype'].forEach(function (element) {
                 Object.keys(moduleDict).sort().forEach(function (prefix) {
-                    if (!(/^\w[\w\-.]*?$/).test(prefix)) {
+                    if (!prefix.match(/^\w[\w\-.]*?$/)) {
                         return;
                     }
                     Object.keys(moduleDict[prefix]).forEach(function (key) {
                         // bug-workaround - buggy electron getter / setter
                         local.tryCatchOnError(function () {
-                            if (!(/^\w[\w\-.]*?$/).test(key) || !moduleDict[prefix][key]) {
+                            if (!key.match(/^\w[\w\-.]*?$/) || !moduleDict[prefix][key]) {
                                 return;
                             }
                             tmp = element === 'prototype'
@@ -2904,7 +2904,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 switch (options.modeNext) {
                 case 1:
                     // get file from url
-                    if ((/^(?:http|https):\/\//).test(options.file)) {
+                    if (options.file.match(/^(?:http|https):\/\//)) {
                         local.httpRequest({
                             method: 'GET',
                             url: options.file
@@ -2924,7 +2924,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                         content: data,
                         message: options.message,
                         // resolve file in url
-                        url: (/\/$/).test(options.url)
+                        url: options.url.match(/\/$/)
                             ? options.url + local.path.basename(options.file)
                             : options.url
                     }, options.onNext);
@@ -11946,8 +11946,8 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
                             ', col ' + error.col + '\u001b[39m\n';
                     });
             // jslint es6-script
-            } else if ((/^\/\*jslint\b[\s\w,:]*?\bes6: true\b/m)
-                    .test(scriptParsed.slice(0, 0x1000))) {
+            } else if (scriptParsed.slice(0, 0x1000)
+                    .match(/^\/\*jslint\b[\s\w,:]*?\bes6: true\b/m)) {
                 // comment shebang
                 scriptParsed = scriptParsed.replace((/^#!/), '//');
                 local.jslintEs6.errors = local.jslintEs6(scriptParsed).warnings;
@@ -13105,7 +13105,7 @@ split_lines=split_lines,exports.MAP=MAP,exports.ast_squeeze_more=require("./sque
         if (module !== require.main || local.global.utility2_rollup) {
             break;
         }
-        if ((/^(?:http|https):\/\//).test(process.argv[2])) {
+        if (process.argv[2].match(/^(?:http|https):\/\//)) {
             // uglify url
             (process.argv[2].indexOf('https') === 0
                 ? local.https
@@ -13194,7 +13194,6 @@ split_lines=split_lines,exports.MAP=MAP,exports.ast_squeeze_more=require("./sque
         }
         // init lib utility2
         local.global.utility2 = local.global.utility2_utility2 = local.utility2 = local;
-        local.timeStart = local.timeStart || Date.now();
     }());
 
 
@@ -13242,13 +13241,18 @@ split_lines=split_lines,exports.MAP=MAP,exports.ast_squeeze_more=require("./sque
         });
         // init assets and templates
         local.assetsDict = {};
+
+
+
 /* jslint-ignore-begin */
+local.assetsDict['/assets.index.default.template.html'] =
 local.assetsDict['/assets.index.template.html'] = '\
 <!doctype html>\n\
 <html lang="en">\n\
 <head>\n\
 <meta charset="UTF-8">\n\
 <meta name="viewport" content="width=device-width, initial-scale=1">\n\
+<!-- "assets.index.default.template.html" -->\n\
 <title>{{env.npm_package_name}} (v{{env.npm_package_version}})</title>\n\
 <style>\n\
 /*csslint\n\
@@ -13303,7 +13307,32 @@ textarea[readonly] {\n\
 </head>\n\
 <body>\n\
 <!-- utility2-comment\n\
-<div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 25%;"></div>\n\
+<div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%;"></div>\n\
+<script>\n\
+/*jslint\n\
+    bitwise: true,\n\
+    browser: true,\n\
+    maxerr: 8,\n\
+    maxlen: 96,\n\
+    node: true,\n\
+    nomen: true,\n\
+    regexp: true,\n\
+    stupid: true\n\
+*/\n\
+(function () {\n\
+    "use strict";\n\
+    var ajaxProgressDiv1, ajaxProgressState;\n\
+    ajaxProgressDiv1 = document.querySelector("#ajaxProgressDiv1");\n\
+    ajaxProgressState = 0;\n\
+    window.timerIntervalAjaxProgressUpdate = setInterval(function () {\n\
+        ajaxProgressState += 1;\n\
+        ajaxProgressDiv1.style.width = Math.max(\n\
+            100 - 100 * Math.exp(-0.0625 * ajaxProgressState),\n\
+            Number(ajaxProgressDiv1.style.width.slice(0, -1)) || 0\n\
+        ) + "%";\n\
+    }, 1000);\n\
+}());\n\
+</script>\n\
 utility2-comment -->\n\
 <h1>\n\
 <!-- utility2-comment\n\
@@ -13363,11 +13392,6 @@ local.assetsDict['/assets.buildBadge.template.svg'] =
 
 
 local.assetsDict['/assets.example.html'] = '';
-
-
-
-local.assetsDict['/assets.example.template.html'] =
-    local.assetsDict['/assets.index.template.html'];
 
 
 
@@ -13681,6 +13705,8 @@ local.assetsDict['/assets.readme.template.md'] = '\
 # jslint-lite\n\
 the greatest app in the world!\n\
 \n\
+![screenshot]()\n\
+\n\
 [![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-jslint-lite.svg)](https://travis-ci.org/kaizhu256/node-jslint-lite) [![coverage](https://kaizhu256.github.io/node-jslint-lite/build/coverage.badge.svg)](https://kaizhu256.github.io/node-jslint-lite/build/coverage.html/index.html)\n\
 \n\
 [![NPM](https://nodei.co/npm/jslint-lite.png?downloads=true)](https://www.npmjs.com/package/jslint-lite)\n\
@@ -13713,7 +13739,7 @@ the greatest app in the world!\n\
 # live demo\n\
 - [https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app](https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app)\n\
 \n\
-[![github.com test-server](https://kaizhu256.github.io/node-jslint-lite/build/screenshot.deployGithub.browser.%252Fnode-jslint-lite%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app)\n\
+[![screenshot](https://kaizhu256.github.io/node-jslint-lite/build/screenshot.deployGithub.browser.%252Fnode-jslint-lite%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app)\n\
 \n\
 \n\
 \n\
@@ -13848,7 +13874,7 @@ node ./assets.app.js\n\
     "scripts": {\n\
         "build-ci": "utility2 shReadmeTest build_ci.sh",\n\
         "env": "env",\n\
-        "heroku-postbuild": "npm install \\\"kaizhu256/node-utility2#alpha\\\" && utility2 shDeployHeroku",\n\
+        "heroku-postbuild": "npm uninstall utility2 2>/dev/null; npm install kaizhu256/node-utility2#alpha && utility2 shDeployHeroku",\n\
         "postinstall": "[ ! -f npm_scripts.sh ] || ./npm_scripts.sh postinstall",\n\
         "start": "PORT=${PORT:-8080} utility2 start test.js",\n\
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"\n\
@@ -14100,7 +14126,7 @@ local.assetsDict['/assets.test.template.js'] = '\
              */\n\
                 // jslint-hack\n\
                 local.nop(url);\n\
-                return local.env.npm_package_nameAlias && (/\\bgithub.io$/).test(location.host)\n\
+                return local.env.npm_package_nameAlias && location.host.match(/\\bgithub.io$/)\n\
                     ? \'https://h1-\' + local.env.npm_package_nameAlias + \'-alpha.herokuapp.com\'\n\
                     : location.protocol + \'//\' + location.host;\n\
             };\n\
@@ -14977,6 +15003,7 @@ local.assetsDict['/favicon.ico'] = '';
                 return;
             };
             local.ajaxForwardProxyUrlTest = local.ajaxForwardProxyUrlTest || local.nop;
+            local.ajaxProgressCounter = local.ajaxProgressCounter || 0;
             local.ajaxProgressUpdate = local.ajaxProgressUpdate || local.nop;
             local.bufferToNodeBuffer = local.bufferToNodeBuffer || local.nop;
             local.bufferToString = local.bufferToString || local.nop;
@@ -15009,6 +15036,8 @@ local.assetsDict['/favicon.ico'] = '';
             });
             // init method
             xhr.method = xhr.method || 'GET';
+            // init timeStart
+            xhr.timeStart = Date.now();
             // init timeout
             xhr.timeout = xhr.timeout || local.timeoutDefault;
             // init timerTimeout
@@ -15032,6 +15061,24 @@ local.assetsDict['/favicon.ico'] = '';
                         return;
                     }
                     xhr.isDone = true;
+                    // debug ajaxResponse
+                    if (xhr.modeDebug) {
+                        console.error({
+                            type: 'ajaxResponse',
+                            time: new Date(xhr.timeStart).toISOString(),
+                            method: xhr.method,
+                            url: xhr.url,
+                            statusCode: xhr.statusCode,
+                            duration: Date.now() - xhr.timeStart,
+                            // extra
+                            headers: xhr.headers,
+                            data: xhr.data && xhr.data.slice &&
+                                local.bufferToString(xhr.data.slice(0, 256)),
+                            responseText: local.tryCatchOnError(function () {
+                                return xhr.responseText.slice(0, 256);
+                            }, local.nop)
+                        });
+                    }
                     // cleanup timerTimeout
                     clearTimeout(xhr.timerTimeout);
                     // cleanup requestStream and responseStream
@@ -15049,18 +15096,6 @@ local.assetsDict['/favicon.ico'] = '';
                     }
                     // handle completed xhr request
                     if (xhr.readyState === 4) {
-                        // debug xhr
-                        if (xhr.modeDebug) {
-                            console.error(new Date().toISOString(
-                            ) + ' ajax-response ' + JSON.stringify({
-                                statusCode: xhr.statusCode,
-                                method: xhr.method,
-                                url: xhr.url,
-                                responseText: local.tryCatchOnError(function () {
-                                    return xhr.responseText.slice(0, 256);
-                                }, local.nop)
-                            }));
-                        }
                         // handle string data
                         if (xhr.error) {
                             // debug statusCode
@@ -15091,7 +15126,7 @@ local.assetsDict['/favicon.ico'] = '';
             xhr.upload.addEventListener('progress', local.ajaxProgressUpdate);
             // open url
             xhr.forwardProxyUrl = local.modeJs === 'browser' &&
-                (/^https{0,1}:/).test(xhr.url) &&
+                xhr.url.match(/^https{0,1}:/) &&
                 xhr.url.indexOf(location.protocol + '//' + location.host) !== 0 &&
                 local.ajaxForwardProxyUrlTest(xhr.url, location);
             if (xhr.forwardProxyUrl) {
@@ -15104,16 +15139,6 @@ local.assetsDict['/favicon.ico'] = '';
             Object.keys(xhr.headers).forEach(function (key) {
                 xhr.setRequestHeader(key, xhr.headers[key]);
             });
-            // debug xhr
-            if (xhr.modeDebug) {
-                console.error(new Date().toISOString() + ' ajax-request ' + JSON.stringify({
-                    method: xhr.method,
-                    url: xhr.url,
-                    headers: xhr.headers,
-                    data: xhr.data && xhr.data.slice &&
-                        local.bufferToString(xhr.data.slice(0, 256))
-                }));
-            }
             if (local.FormData && xhr.data instanceof local.FormData) {
                 // handle formData
                 xhr.data.read(function (error, data) {
@@ -15137,6 +15162,8 @@ local.assetsDict['/favicon.ico'] = '';
          * this function will update ajaxProgress
          */
             var ajaxProgressDiv1;
+            // cleanup timerInterval
+            clearInterval(local.global.timerIntervalAjaxProgressUpdate);
             ajaxProgressDiv1 = local.modeJs === 'browser' &&
                 document.querySelector('#ajaxProgressDiv1');
             if (!ajaxProgressDiv1) {
@@ -15424,7 +15451,7 @@ local.assetsDict['/favicon.ico'] = '';
                     }
                     options.timeoutDefault = options.timeoutDefault || local.timeoutDefault;
                     // init url
-                    if (!(/^\w+:\/\//).test(options.url)) {
+                    if (!options.url.match(/^\w+:\/\//)) {
                         options.url = local.path.resolve(process.cwd(), options.url);
                         if (options.modeBrowserTest2 === 'translateAfterScrape' &&
                                 !options.modeBrowserTestTranslating) {
@@ -15919,7 +15946,10 @@ function TranslateElementInit() {\n\
                         ).forEach(function (element) {
                             ['href', 'src'].forEach(function (key) {
                                 tmp = element[key];
-                                if ((/^http:|^https:/).test(tmp)) {
+                                if (!tmp) {
+                                    return;
+                                }
+                                if (tmp.match(/^http:|^https:/)) {
                                     element[key] = tmp;
                                     if (key === 'href') {
                                         tmp = tmp.split(/[?#]/)[0];
@@ -15931,7 +15961,7 @@ function TranslateElementInit() {\n\
                                     }
                                     return;
                                 }
-                                if ((/^javascript/).test(tmp)) {
+                                if (tmp.match(/^javascript/)) {
                                     element[key] = '#';
                                 }
                             });
@@ -15939,7 +15969,7 @@ function TranslateElementInit() {\n\
                         // deduplicate '/'
                         Object.keys(data.hrefDict).forEach(function (key) {
                             if (data.hrefDict.hasOwnProperty(key + '/') ||
-                                    (/\.(?:css|js)$/).test(key)) {
+                                    key.match(/\.(?:css|js)$/)) {
                                 data.hrefDict[key] = undefined;
                             }
                         });
@@ -16402,7 +16432,7 @@ return Utf8ArrayToStr(bff);
                 local.objectSetDefault(
                     options.packageJson,
                     JSON.parse(local.templateRenderJslintLite(
-                        options.rgx.exec(local.assetsDict['/assets.readme.template.md'])[1],
+                        local.assetsDict['/assets.readme.template.md'].match(options.rgx)[1],
                         options
                     )),
                     2
@@ -16427,6 +16457,21 @@ return Utf8ArrayToStr(bff);
                     )
                 );
             });
+            // init assets.swgg.swagger.json
+            if (local.fs.existsSync('assets.swgg.swagger.json')) {
+                local.fs.writeFileSync(
+                    'assets.swgg.swagger.json',
+                    local.fs.readFileSync('assets.swgg.swagger.json', 'utf8')
+                        .replace((/(\n {8}"description": ").*?(".*\n)/), '$1' +
+                            options.packageJson.description + '$2')
+                        .replace((/(\n {8}"title": ").*?(".*\n)/), '$1' +
+                            options.packageJson.name + '$2')
+                        .replace((/(\n {8}"version": ").*?(".*\n)/), '$1' +
+                            options.packageJson.version + '$2')
+                        .replace((/(\n {8}"x-homepage": ").*?(".*\n)/), '$1' +
+                            options.packageJson.homepage + '$2')
+                );
+            }
             // search-and-replace - customize dataTo
             [
                 // customize name and description
@@ -16463,7 +16508,7 @@ return Utf8ArrayToStr(bff);
             });
             // customize swaggerdoc
             if (!local.assetsDict['/assets.swgg.swagger.json'] ||
-                    local.assetsDict['/index.html'] === local.assetsDict['/assets.swgg.html']) {
+                    local.assetsDict['/index.html'].match(/\bswggUiContainer\b/)) {
                 options.dataTo = options.dataTo.replace(
                     (/\n#### swaggerdoc\n[\S\s]*?\n#### /),
                     '\n#### '
@@ -16477,33 +16522,28 @@ return Utf8ArrayToStr(bff);
                 }
             );
             options.customize();
-            // customize no shDeployGithub
+            // customize shDeployCustom
             if (options.dataFrom.indexOf('shDeployCustom') >= 0) {
                 [
                     // customize test-server
                     (/\n\| git-branch : \|[\S\s]*?\n\| test-report : \|/),
-                    // customize swaggerdoc
-                    (/\n#### swaggerdoc\n[\S\s]*?\n#### /),
                     // customize quickstart
-                    (/\n# quickstart [\S\s]*?\n# extra screenshots\n/)
+                    (/\n#### changelog [\S\s]*\n# quickstart example.js\n/),
+                    options.dataFrom.indexOf('"assets.index.default.template.html"') < 0 &&
+                        (/\n# quickstart [\S\s]*?\n# extra screenshots\n/)
                 ].forEach(function (rgx) {
                     options.dataFrom.replace(rgx, function (match0) {
                         options.dataTo = options.dataTo.replace(rgx, match0);
                     });
                 });
-                [
-                    // customize screenshot
-                    new RegExp('^1\\. .*?screenshot\\.' +
-                        '(?:deployGithub|deployHeroku|npmTest|testExampleJs|testExampleSh)' +
-                        '.*?\\.png[\\S\\s]*?\\n\\n', 'gm')
-                ].forEach(function (rgx) {
-                    options.dataTo = options.dataTo.replace(rgx, '');
-                });
+                // customize screenshot
+                options.dataTo = options.dataTo.replace(new RegExp('^1\\. .*?screenshot\\.' +
+                    '(?:deployGithub|deployHeroku|npmTest|testExampleJs|testExampleSh)' +
+                    '.*?\\.png[\\S\\s]*?\\n\\n', 'gm'), '');
             }
-            // customize assets.index.template.html with file-override
-            if (local.assetsDict['/index.html'] ===
-                    local.assetsDict['/assets.swgg.html'] ||
-                    local.fs.existsSync('./assets.index.template.html')) {
+            // customize assets.index.template.html
+            if (local.assetsDict['/assets.index.template.html']
+                    .indexOf('"assets.index.default.template.html"') < 0) {
                 options.dataTo = options.dataTo.replace(
                     new RegExp('\\n {8}\\/\\* jslint-ignore-begin \\*\\/\\n' +
                         ' {8}local.assetsDict\\[\'\\/assets.index.template.html\'\\]' +
@@ -16527,6 +16567,19 @@ return Utf8ArrayToStr(bff);
                     .replace(/[^ \-0-9A-Z_a-z]/g, '').replace(/ /g, '-') + ')\n';
             });
             options.dataTo = options.dataTo.replace('\n# table of contents\n', options.toc);
+            // customize screenshot
+            options.dataTo = options.dataTo.replace(
+                (/\n.*?!\[screenshot\].*?\n([\S\s]+?(\n.*?!\[screenshot\].*?\n))/),
+                function (match0, match1, match2) {
+                    // jslint-hack
+                    local.nop(match0);
+                    return match2 + match1;
+                }
+            );
+            // normalize whitespace
+            options.dataTo = options.dataTo
+                .replace((/\n{5,}/g), '\n\n\n\n')
+                .replace((/(\S)\n{3}(\S)/g), '$1\n\n$2');
             // save README.md
             local.fs.writeFileSync('README.md', options.dataTo);
             onError();
@@ -16851,9 +16904,9 @@ return Utf8ArrayToStr(bff);
         /*
          * this function will try to determine if the env-key is sensitive
          */
-            return (/(?:\b|_)(?:crypt|decrypt|key|pass|private|secret|token)/)
-                .test(key.toLowerCase()) ||
-                (/Crypt|Decrypt|Key|Pass|Private|Secret|Token/).test(key);
+            return key.toLowerCase()
+                .match(/(?:\b|_)(?:crypt|decrypt|key|pass|private|secret|token)/) ||
+                key.match(/Crypt|Decrypt|Key|Pass|Private|Secret|Token/);
         };
 
         local.envSanitize = function (env) {
@@ -16940,7 +16993,7 @@ return Utf8ArrayToStr(bff);
          */
             location = location || (typeof window === 'object' && window && window.location);
             if (!(hostOverride && location && (local.githubCorsHostTest ||
-                    (/\bgithub.com$|\bgithub.io$/)).test(location.host))) {
+                    location.host.match(/\bgithub.com$|\bgithub.io$/)))) {
                 return url;
             }
             // init github-branch
@@ -16959,13 +17012,29 @@ return Utf8ArrayToStr(bff);
         /*
          * this function will request the data from options.url
          */
-            var chunkList, isDone, onError2, timerTimeout, request, response, urlParsed;
+            var chunkList,
+                isDone,
+                onError2,
+                timerTimeout,
+                request,
+                response,
+                timeStart,
+                urlParsed;
             // init onError2
             onError2 = function (error) {
                 if (isDone) {
                     return;
                 }
                 isDone = true;
+                // debug httpResponse
+                local.serverLog({
+                    type: 'httpResponse',
+                    time: new Date(timeStart).toISOString(),
+                    method: options.method,
+                    url: options.url,
+                    statusCode: local.normalizeValue('number', response && response.statusCode),
+                    duration: Date.now() - timeStart
+                });
                 // cleanup timerTimeout
                 clearTimeout(timerTimeout);
                 // cleanup request and response
@@ -16981,12 +17050,6 @@ return Utf8ArrayToStr(bff);
                         }
                     }
                 });
-                // debug response
-                console.error(new Date().toISOString() + ' http-response ' + JSON.stringify({
-                    method: options.method,
-                    url: options.url,
-                    statusCode: Number(response && response.statusCode) || 0
-                }));
                 onError(error, response);
             };
             // init timerTimeout
@@ -16997,11 +17060,7 @@ return Utf8ArrayToStr(bff);
             urlParsed.headers = options.headers;
             urlParsed.method = options.method;
             // debug request
-            console.error();
-            console.error(new Date().toISOString() + ' http-request ' + JSON.stringify({
-                method: options.method,
-                url: options.url
-            }));
+            timeStart = Date.now();
             request = require(
                 urlParsed.protocol.slice(0, -1)
             ).request(urlParsed, function (_response) {
@@ -17044,8 +17103,7 @@ return Utf8ArrayToStr(bff);
             if (!script || script.length >= 0x100000) {
                 return script;
             }
-            extname = (/\.\w+$/).exec(file);
-            extname = extname && extname[0];
+            extname = file.match(/\.\w+$/) && file.match(/\.\w+$/)[0];
             switch (extname) {
             case '.css':
                 if (script.indexOf('/*csslint') >= 0 || mode === 'force') {
@@ -17319,7 +17377,7 @@ return Utf8ArrayToStr(bff);
                 case 1:
                     // skip gzip
                     if (response.headersSent ||
-                            !(/\bgzip\b/).test(request.headers['accept-encoding'])) {
+                            !String(request.headers['accept-encoding']).match(/\bgzip\b/)) {
                         options.modeNext += 1;
                         options.onNext();
                         return;
@@ -17444,9 +17502,9 @@ return Utf8ArrayToStr(bff);
                     return;
                 }
                 // init response-header content-type
-                request.urlParsed.contentType = (/\.[^\.]*$/).exec(request.urlParsed.pathname);
                 request.urlParsed.contentType = local.contentTypeDict[
-                    request.urlParsed.contentType && request.urlParsed.contentType[0]
+                    request.urlParsed.pathname.match(/\.[^\.]*$/) &&
+                        request.urlParsed.pathname.match(/\.[^\.]*$/)
                 ];
                 local.serverRespondHeadSet(request, response, null, {
                     'Content-Type': request.urlParsed.contentType
@@ -17463,9 +17521,10 @@ return Utf8ArrayToStr(bff);
          */
             var onError, options, timerTimeout;
             // handle preflight-cors
-            if (request.method === 'OPTIONS' && (/forward-proxy-url/).test(
+            if (request.method === 'OPTIONS' &&
+                    request.headers['access-control-request-headers'] &&
                     request.headers['access-control-request-headers']
-                )) {
+                    .match(/forward-proxy-url/)) {
                 local.serverRespondCors(request, response);
                 response.end();
                 return;
@@ -17478,10 +17537,24 @@ return Utf8ArrayToStr(bff);
             // init onError
             onError = function (error) {
                 clearTimeout(timerTimeout);
-                if (!error || options.isDone) {
+                if (options.isDone) {
                     return;
                 }
                 options.isDone = true;
+                // debug middlewareForwardProxy
+                local.serverLog({
+                    type: 'middlewareForwardProxy',
+                    time: new Date(options.timeStart).toISOString(),
+                    method: options.method,
+                    url: options.url,
+                    statusCode: local.normalizeValue('number', response.statusCode),
+                    duration: Date.now() - options.timeStart,
+                    // extra
+                    headers: options.headers
+                });
+                if (!error) {
+                    return;
+                }
                 // cleanup client
                 local.streamListCleanup([options.clientRequest, options.clientResponse]);
                 nextMiddleware(error);
@@ -17503,12 +17576,6 @@ return Utf8ArrayToStr(bff);
             }, local.nop);
             // debug options
             local._debugForwardProxy = options;
-            console.error(new Date().toISOString() + ' middlewareForwardProxy ' +
-                JSON.stringify({
-                    method: options.method,
-                    url: options.url,
-                    headers: options.headers
-                }));
             options.clientRequest = (options.protocol === 'https:'
                 ? local.https
                 : local.http).request(options, function (clientResponse) {
@@ -17517,6 +17584,7 @@ return Utf8ArrayToStr(bff);
                 // pipe clientResponse to serverResponse
                 options.clientResponse.pipe(response);
             }).on('error', onError);
+            options.timeStart = Date.now();
             // init event-handling
             request.on('error', onError);
             response.on('finish', onError).on('error', onError);
@@ -17537,9 +17605,9 @@ return Utf8ArrayToStr(bff);
             // init request.urlParsed
             request.urlParsed = local.urlParse(request.url);
             // init response-header content-type
-            request.urlParsed.contentType = (/\.[^\.]*$/).exec(request.urlParsed.pathname);
             request.urlParsed.contentType = local.contentTypeDict[
-                request.urlParsed.contentType && request.urlParsed.contentType[0]
+                request.urlParsed.pathname.match(/\.[^\.]*$/) &&
+                    request.urlParsed.pathname.match(/\.[^\.]*$/)
             ];
             local.serverRespondHeadSet(request, response, null, {
                 'Content-Type': request.urlParsed.contentType
@@ -18064,7 +18132,7 @@ return Utf8ArrayToStr(bff);
             // hook custom repl eval function
             self.eval = function (script, context, file, onError) {
                 var match, onError2;
-                match = (/^(\S+)(.*?)\n/).exec(script);
+                match = script.match(/^(\S+)(.*?)\n/);
                 onError2 = function (error, data) {
                     // debug error
                     global.utility2_debugReplError = error || global.utility2_debugReplError;
@@ -18206,9 +18274,8 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 tmp = element[0][element[1]];
                 mockDict = {};
                 Object.keys(tmp).forEach(function (key) {
-                    if (typeof tmp[key] === 'function' && !(
-                            /^(?:fs\.Read|fs\.read|process\.binding|process\.dlopen)/
-                        ).test(element[1] + '.' + key)) {
+                    if (typeof tmp[key] === 'function' && !(element[1] + '.' + key)
+                            .match(/^(?:fs\.Read|fs\.read|process\.binding|process\.dlopen)/)) {
                         mockDict[key] = function () {
                             return;
                         };
@@ -18245,7 +18312,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                     case '.html':
                     case '.js':
                     case '.json':
-                        if ((/\brollup\b/).test(file)) {
+                        if (file.match(/\brollup\b/)) {
                             return;
                         }
                         // jslint file
@@ -18337,21 +18404,24 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 local.assetsDict['/assets.index.template.html'] =
                     local.fs.readFileSync('assets.index.template.html', 'utf8');
             }, local.nop);
-            local.assetsDict['/'] = local.assetsDict['/index.html'] =
-                local.assetsDict['/index.html'] ||
-                local.jslintAndPrintConditional(local.templateRender(
-                    // uncomment utility2-comment
-                    local.assetsDict['/assets.index.template.html'].replace(
-                        (/<!-- utility2-comment\b([\S\s]+?)\butility2-comment -->/g),
-                        '$1'
-                    ),
-                    {
-                        env: local.env,
-                        isRollup: local.global.utility2_rollup ||
-                            local.env.NODE_ENV === 'rollup' ||
-                            local.env.NODE_ENV === 'production'
-                    }
-                ), '/index.html');
+            ['index', 'index.default'].forEach(function (element) {
+                local.assetsDict['/' + element + '.html'] =
+                    local.assetsDict['/' + element + '.html'] ||
+                    local.jslintAndPrintConditional(local.templateRender(
+                        // uncomment utility2-comment
+                        local.assetsDict['/assets.' + element + '.template.html'].replace(
+                            (/<!-- utility2-comment\b([\S\s]+?)\butility2-comment -->/g),
+                            '$1'
+                        ),
+                        {
+                            env: local.env,
+                            isRollup: local.global.utility2_rollup ||
+                                local.env.NODE_ENV === 'rollup' ||
+                                local.env.NODE_ENV === 'production'
+                        }
+                    ), '/' + element + '.html');
+            });
+            local.assetsDict['/'] = local.assetsDict['/index.html'];
             // init assets.app.js
             local.assetsDict['/assets.app.js'] = [
                 'header',
@@ -18431,6 +18501,10 @@ instruction\n\
             return module.exports;
         };
 
+        local.serverLog = function (options) {
+            console.error('serverLog - ' + JSON.stringify(options));
+        };
+
         local.serverRespondCors = function (request, response) {
         /*
          * this function will enable cors for the request
@@ -18440,7 +18514,7 @@ instruction\n\
                 'access-control-allow-headers':
                     request.headers['access-control-request-headers'],
                 'access-control-allow-methods':
-                    request.headers['access-control-request-methods'],
+                    request.headers['access-control-request-method'],
                 'access-control-allow-origin': '*'
             }));
         };
@@ -18512,6 +18586,32 @@ instruction\n\
         /*
          * this function will create a timeout-error-handler for the server-request
          */
+            var onError;
+            onError = function () {
+                if (response.isDone) {
+                    return;
+                }
+                response.isDone = true;
+                // debug serverResponse
+                local.serverLog({
+                    type: 'serverResponse',
+                    time: new Date(request.timeStart).toISOString(),
+                    method: request.method,
+                    url: request.url,
+                    statusCode: local.normalizeValue('number', response.statusCode),
+                    duration: Date.now() - request.timeStart,
+                    // extra
+                    requestContentLength: request.dataLength || 0,
+                    responseContentLength: response.contentLength,
+                    requestHeaderXForwardedFor: request.headers['x-forwarded-for'] || '',
+                    requestHeaderOrigin: request.headers.origin || '',
+                    requestHeaderReferer: request.headers.referer || '',
+                    requestHeaderUserAgent: request.headers['user-agent']
+                });
+                // cleanup timerTimeout
+                clearTimeout(request.timerTimeout);
+            };
+            request.timeStart = Date.now();
             request.onTimeout = request.onTimeout || function (error) {
                 local.serverRespondDefault(request, response, 500, error);
                 setTimeout(function () {
@@ -18524,10 +18624,14 @@ instruction\n\
                 timeout || local.timeoutDefault,
                 'server ' + request.method + ' ' + request.url
             );
-            response.on('finish', function () {
-                // cleanup timerTimeout
-                clearTimeout(request.timerTimeout);
-            });
+            response.contentLength = 0;
+            response.writeContentLength = response.writeContentLength || response.write;
+            response.write = function (chunk, encoding, callback) {
+                response.contentLength += chunk.length;
+                response.writeContentLength(chunk, encoding, callback);
+            };
+            response.on('error', onError);
+            response.on('finish', onError);
         };
 
         local.setTimeoutOnError = function (onError, error, data) {
@@ -18632,11 +18736,13 @@ instruction\n\
          */
             var chunkList;
             chunkList = [];
+            stream.dataLength = 0;
             // read data from the stream
             stream
                 // on data event, push the buffer chunk to chunkList
                 .on('data', function (chunk) {
                     chunkList.push(chunk);
+                    stream.dataLength += chunk.length;
                 })
                 // on end event, pass concatenated read buffer to onError
                 .on('end', function () {
@@ -19245,6 +19351,9 @@ instruction\n\
             options.testRunBeforeDone = options.testRunBeforeTimer = null;
             // visual notification - testRun
             local.ajaxProgressUpdate();
+            // mock serverLog
+            local._serverLog = local._serverLog || local.serverLog;
+            local.serverLog = local.nop;
             switch (local.modeJs) {
             case 'node':
                 // mock proces.exit
@@ -19379,6 +19488,8 @@ instruction\n\
                     break;
                 }
                 setTimeout(function () {
+                    // restore serverLog
+                    local.serverLog = local._serverLog;
                     switch (local.modeJs) {
                     case 'browser':
                         // update coverageReport
@@ -19584,7 +19695,7 @@ instruction\n\
                     if (url[0] === '/') {
                         url = local.serverLocalHost + url;
                     // resolve relative path
-                    } else if (!(/^\w+?:\/\//).test(url)) {
+                    } else if (!url.match(/^\w+?:\/\//)) {
                         url = local.serverLocalHost +
                             location.pathname.replace((/\/[^\/]*?$/), '') + '/' + url;
                     }
@@ -19603,7 +19714,7 @@ instruction\n\
                     if (url[0] === '/') {
                         url = local.serverLocalHost + url;
                     // resolve relative path
-                    } else if (!(/^\w+?:\/\//).test(url)) {
+                    } else if (!url.match(/^\w+?:\/\//)) {
                         url = local.serverLocalHost + '/' + url;
                     }
                     urlParsed = local.url.parse(url);
@@ -19965,10 +20076,11 @@ instruction\n\
             'assets.swgg.swagger.server.json'
         ].forEach(function (file) {
             local.assetsDict['/' + file] = local.assetsDict['/' + file] || '';
-            if (local.fs.existsSync(file)) {
-                console.error('override assets ' + file);
-                local.assetsDict['/' + file] = local.fs.readFileSync(file, 'utf8');
+            if (!local.fs.existsSync(file)) {
+                return;
             }
+            console.error('override assets ' + file);
+            local.assetsDict['/' + file] = local.fs.readFileSync(file, 'utf8');
         });
         if (local.global.utility2_rollup) {
             local.assetsDict['/assets.utility2.rollup.js'] =
@@ -20154,9 +20266,13 @@ instruction\n\
         local.utility2.swgg = local;
         // init assets and templates
 /* jslint-ignore-begin */
-local.assetsDict['/assets.swgg.html'] = (/[\S\s]+?<\/style>\n/)
-    .exec(local.assetsDict['/assets.example.template.html'])[0]
-    .replace((/<title>.*?<\/title>/), '<title>swgg</title>') + '\
+local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.template.html']
+    .replace('assets.index.default.template.html', '')
+    .replace((/<title>.*?<\/title>/), '<title>swgg</title>')
+    .replace('\n<!-- utility2-comment\n', '\n')
+    .replace((/\n<\/style>\n<style>\n[\S\s]*\n<\/style>\n/), '\
+\n\
+</style>\n\
 <style>\n\
 /*csslint\n\
     adjoining-classes: false,\n\
@@ -20293,7 +20409,7 @@ local.assetsDict['/assets.swgg.html'] = (/[\S\s]+?<\/style>\n/)
 }\n\
 /* border-top-bold */\n\
 .swggUiContainer .borderTopBold,\n\
-.swggUiContainer .resource:first-child {\n\
+.swggUiContainer .resourceList {\n\
     border-top: 1px solid #777;\n\
     margin-top: 0.5rem;\n\
     padding-top: 0.5rem;\n\
@@ -20526,17 +20642,18 @@ border: 0;\n\
     background: #70b;\n\
 }\n\
 </style>\n\
-</head>\n\
-<body>\n\
-<div id="ajaxProgressDiv1" style="background: #d00; height: 4px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 0.5s, width 1.5s; width: 25%;"></div>\n\
+')
+    .replace((/\n<\/script>\n[\S\s]*\n<\/html>\n/), '\
+\n\
+</script>\n\
 <div class="swggUiContainer">\n\
-<form2 class="header tr">\n\
+<div class="form header tr">\n\
     <a class="td1" href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
     <input class="flex1 td2" type="text">\n\
     <button class="td3">Explore</button>\n\
-</form2>\n\
 </div>\n\
-<div class="swggAjaxProgressDiv" style="margin-top: 1rem; text-align: center;">fetching resource list; Please wait.</div>\n\
+</div>\n\
+<div class="swggAjaxProgressDiv" style="margin-top: 1rem; text-align: center;">fetching resource-list ...</div>\n\
 <script>\n\
 /*jslint\n\
     bitwise: true,\n\
@@ -20550,15 +20667,16 @@ border: 0;\n\
 */\n\
 "use strict";\n\
 document.querySelector(".swggUiContainer > .header > .td2").value =\n\
-    ((/\\bmodeSwaggerJsonUrl=([^&]+)/g).exec(location.search) &&\n\
-        (/\\bmodeSwaggerJsonUrl=([^&]+)/g).exec(location.search)[1]) ||\n\
+    (location.search.match(/\\bmodeSwaggerJsonUrl=([^&]+)/g) &&\n\
+        location.search.match(/\\bmodeSwaggerJsonUrl=([^&]+)/g)[1]) ||\n\
         "assets.swgg.swagger.json";\n\
 </script>\n\
 <script src="assets.utility2.rollup.js"></script>\n\
 <script>window.swgg.uiEventListenerDict[".onEventUiReload"]();</script>\n\
 </body>\n\
 </html>\n\
-';
+');
+
 
 
 
@@ -21268,7 +21386,7 @@ local.templateUiMain = '\
     <form class="datatable eventDelegateClick"></form>\n\
 </div>\n\
 <div class="eventDelegateClick popup" style="display: none;"></div>\n\
-<form2 class="eventDelegateSubmit header onEventUiReload tr">\n\
+<div class="eventDelegateSubmit form header onEventUiReload tr">\n\
     <a class="td1" href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
     <input\n\
         class="flex1 td2"\n\
@@ -21276,10 +21394,19 @@ local.templateUiMain = '\
         value="{{url}}"\n\
     >\n\
     <button class="eventDelegateClick onEventUiReload td3">Explore</button>\n\
-</form2>\n\
+</div>\n\
 <div class="info reset">\n\
     {{#if info}}\n\
-    <div class="fontWeightBold">{{info.title htmlSafe}}</div>\n\
+    {{#if info.x-homepage}}\n\
+    <a class="fontWeightBold"\n\
+        href="{{info.x-homepage}}"\n\
+        target="_blank"\n\
+    >\n\
+        {{info.title htmlSafe}} ({{info.version htmlSafe}})\n\
+    </a>\n\
+    {{#unless info.x-homepage}}\n\
+    <div class="fontWeightBold">{{info.title htmlSafe}} ({{info.version htmlSafe}})</div>\n\
+    {{/if info.x-homepage}}\n\
     {{#if info.description}}\n\
     <div>{{info.description htmlSafe}}</div>\n\
     {{/if info.description}}\n\
@@ -21321,12 +21448,10 @@ local.templateUiMain = '\
     </ul>\n\
     {{/if info}}\n\
 </div>\n\
-<div class="reset resourceList"></div>\n\
-<div class="color777 footer reset">\n\
-    <div>\n\
-        [ <span>base url</span>: {{basePath}}, <span>api version</span>: {{info.version}} ]\n\
-    </div>\n\
+<div class="color777 reset">\n\
+    [ <span>base url</span>: {{basePath}} ]\n\
 </div>\n\
+<div class="swggAjaxProgressDiv reset resourceList" style="margin-top: 1rem; text-align: center;">rendering resource-list ...</div>\n\
 ';
 
 
@@ -21337,7 +21462,7 @@ local.templateUiOperation = '\
     class="eventDelegateClick eventDelegateSubmit marginTop05 operation {{_method}}"\n\
     data-_key-operation-id="{{_keyOperationId}}"\n\
     id="{{id}}"\n\
-    tabindex="-1"\n\
+    tabindex="0"\n\
 >\n\
     <div class="cursorPointer eventDelegateClick onEventOperationDisplayShow header tr">\n\
         <span class="td1">{{_method}}</span>\n\
@@ -21438,7 +21563,7 @@ local.templateUiResource = '\
     class="borderBottomBold resource eventDelegateClick"\n\
     data-name="{{name}}"\n\
     id="{{id}}"\n\
-    tabindex="-1"\n\
+    tabindex="0"\n\
 >\n\
     <div class="fontWeightBold header tr">\n\
         <a class="color777 flex1 onEventResourceDisplayAction td1" href="#">{{name}} :\n\
@@ -21480,6 +21605,20 @@ local.templateUiResponseAjax = '\
 {{/if errorValidate}}\n\
 <h4 class="label marginTop10">Response Body</h4>\n\
 {{responseBody}}\n\
+';
+
+
+
+local.templateUiTitle = '\
+{{#if info.title}}\n\
+{{#if info.version}}\n\
+{{info.title}} ({{info.version}})\n\
+{{#unless info.version}}\n\
+{{info.title}}\n\
+{{/if info.version}}\n\
+{{#unless info.title}}\n\
+swgg\n\
+{{/if info.title}}\n\
 ';
 /* jslint-ignore-end */
         local.swaggerSchemaJson = local.jsonCopy(local.objectSetOverride(
@@ -21572,7 +21711,9 @@ local.templateUiResponseAjax = '\
                             tmp = tmp.join(',');
                         }
                     }
-                } else if (!(paramDef.type === 'string' || tmp instanceof local.Blob)) {
+                } else if (!(paramDef.type === 'string' ||
+                        (paramDef.schema && paramDef.schema.type === 'string') ||
+                        tmp instanceof local.Blob)) {
                     tmp = JSON.stringify(tmp);
                 }
                 switch (paramDef.in) {
@@ -21619,7 +21760,10 @@ local.templateUiResponseAjax = '\
                     'Bearer ' + options.jwtEncrypted;
             }
             // init url
-            options.url = (local.urlBaseGet() + options.inPath + '?' + options.inQuery.slice(1))
+            options.url = (((local.normalizeValue('list', local.swaggerJson.schemes)[0] ||
+                local.urlParse('').protocol.slice(0, -1)) + '://' +
+                (local.swaggerJson.host || local.urlParse('').host) +
+                local.swaggerJsonBasePath) + options.inPath + '?' + options.inQuery.slice(1))
                 .replace((/\?$/), '');
             if (!(options.headers['Content-Type'] || options.headers['content-type'])) {
                 options.headers['content-type'] = 'application/json; charset=UTF-8';
@@ -21772,8 +21916,12 @@ local.templateUiResponseAjax = '\
             options = local.objectSetOverride(local.swaggerJson, options, 10);
             // restore tags
             local.swaggerJson.tags = tmp;
+            // init swaggerJsonBasePath
+            local.swaggerJsonBasePath = local.swaggerJson.basePath === '/'
+                ? ''
+                : local.swaggerJson.basePath;
+            // normalize definition
             Object.keys(options.definitions).forEach(function (schemaName) {
-                // normalize definition
                 options.definitions[schemaName] =
                     local.schemaNormalizeAndCopy(options.definitions[schemaName]);
             });
@@ -21929,7 +22077,7 @@ local.templateUiResponseAjax = '\
             min = isFinite(propDef.maximum)
                 ? propDef.minimum
                 : 0;
-            switch (propDef.type) {
+            switch (propDef.type || (propDef.schema && propDef.schema.type)) {
             case 'array':
                 tmp = [];
                 // http://json-schema.org/latest/json-schema-validation.html#anchor36
@@ -22167,13 +22315,13 @@ local.templateUiResponseAjax = '\
                     }
                     options.header = local.bufferToString(request.bodyRaw.slice(ii, ii + 1024))
                         .split('\r\n').slice(0, 2).join('\r\n');
-                    options.contentType = (/^content-type:(.*)/im).exec(options.header);
+                    options.contentType = options.header.match(/^content-type:(.*)/im);
                     options.contentType = options.contentType && options.contentType[1].trim();
-                    options.filename = (/^content-disposition:.*?\bfilename="([^"]+)/im)
-                        .exec(options.header);
+                    options.filename = options.header
+                        .match(/^content-disposition:.*?\bfilename="([^"]+)/im);
                     options.filename = options.filename && options.filename[1];
-                    options.name = (/^content-disposition:.*?\bname="([^"]+)/im)
-                        .exec(options.header);
+                    options.name = options.header
+                        .match(/^content-disposition:.*?\bname="([^"]+)/im);
                     options.name = options.name && options.name[1];
                     ii = local.bufferIndexOfSubBuffer(
                         request.bodyRaw,
@@ -22311,7 +22459,7 @@ local.templateUiResponseAjax = '\
                                     fileFilename: request.swgg.bodyMeta[key].filename,
                                     fileInputName: request.swgg.bodyMeta[key].name,
                                     fileSize: request.swgg.bodyParsed[key].length,
-                                    fileUrl: local.swaggerJson.basePath +
+                                    fileUrl: local.swaggerJsonBasePath +
                                         '/' + request.swgg.pathObject._tags0 +
                                         '/fileGetOneById/' + tmp.id
                                 });
@@ -22424,15 +22572,15 @@ local.templateUiResponseAjax = '\
                 { swgg: { crud: { operationId: '' }, user: {} } },
                 2
             );
-            // if request.url is not prefixed with swaggerJson.basePath,
+            // if request.url is not prefixed with swaggerJsonBasePath,
             // then default to nextMiddleware
-            if (request.urlParsed.pathname.indexOf(local.swaggerJson.basePath) !== 0) {
+            if (request.urlParsed.pathname.indexOf(local.swaggerJsonBasePath) !== 0) {
                 nextMiddleware();
                 return;
             }
             // init pathname
             request.swgg.pathname = request.method + ' ' + request.urlParsed.pathname
-                .replace(local.swaggerJson.basePath, '');
+                .replace(local.swaggerJsonBasePath, '');
             // init pathObject
             while (request.swgg.pathname !== tmp) {
                 request.swgg.pathObject =
@@ -22573,9 +22721,9 @@ local.templateUiResponseAjax = '\
                     request.swgg.paramDict = {};
                     // parse path param
                     tmp = request.urlParsed.pathname
-                        .replace(local.swaggerJson.basePath, '').split('/');
+                        .replace(local.swaggerJsonBasePath, '').split('/');
                     request.swgg.pathObject._path.split('/').forEach(function (key, ii) {
-                        if ((/^\{\S*?\}$/).test(key)) {
+                        if (key.match(/^\{\S*?\}$/)) {
                             request.swgg.paramDict[key.slice(1, -1)] =
                                 decodeURIComponent(tmp[ii]);
                         }
@@ -23160,7 +23308,7 @@ local.templateUiResponseAjax = '\
 
         local.uiEventListenerDict['.onEventOperationAjax'] = function (event) {
         /*
-         * this function will return submit the operation to the backend
+         * this function will submit the operation to the backend
          */
             var options, tmp;
             options = {};
@@ -23214,7 +23362,8 @@ local.templateUiResponseAjax = '\
                                 if (!tmp) {
                                     return;
                                 }
-                                if (paramDef.type === 'string' && typeof tmp === 'string') {
+                                if (paramDef.schema && paramDef.schema.type === 'string' &&
+                                        typeof tmp === 'string') {
                                     break;
                                 }
                                 // parse schema
@@ -23406,9 +23555,8 @@ local.templateUiResponseAjax = '\
                         .replace((/^\//), '')
                 ).href;
             // display .swggAjaxProgressDiv
-            notify('fetching resource list: ' +
-                document.querySelector('.swggUiContainer > .header > .td2').value +
-                '; Please wait.');
+            notify('fetching resource-list ' +
+                document.querySelector('.swggUiContainer > .header > .td2').value + ' ...');
             document.querySelector('.swggAjaxProgressDiv').style.display = 'block';
             local.ajax({
                 url: document.querySelector('.swggUiContainer > .header > .td2').value
@@ -23589,127 +23737,135 @@ local.templateUiResponseAjax = '\
         /*
          * this function will render swagger-ui
          */
-            var resource, self;
-            // reset state
-            local.idDomElementDict = {};
-            self = local.uiState = local.jsonCopy(local.swaggerJson);
+            var resource, options;
+            options = local.uiState = local.jsonCopy(local.swaggerJson);
+            // init title
+            document.querySelector('head > title').textContent =
+                local.templateRender(local.templateUiTitle, options).trim();
             // init url
-            self.url = document.querySelector('.swggUiContainer > .header > .td2').value;
+            options.url = document.querySelector('.swggUiContainer > .header > .td2').value;
             // templateRender main
-            self.uiFragment = local.domFragmentRender(local.templateUiMain, self);
-            local.objectSetDefault(self, {
-                resourceDict: {},
-                operationDict: {},
-                tagDict: {}
-            });
-            // init tagDict
-            self.tags.forEach(function (tag) {
-                self.tagDict[tag.name] = tag;
-            });
-            // init operationDict
-            Object.keys(local.apiDict).sort().forEach(function (operation) {
-                // init operation
-                operation = local.jsonCopy(local.apiDict[operation]);
-                operation.tags.forEach(function (tag) {
-                    self.operationDict[operation._keyOperationId] = operation;
-                    // init resource
-                    resource = self.resourceDict[tag];
-                    if (!resource && self.tagDict[tag]) {
-                        resource = self.resourceDict[tag] = self.tagDict[tag];
-                        local.objectSetDefault(resource, {
-                            description: 'no description available',
-                            id: local.idDomElementCreate('swgg_id_' + tag),
-                            name: tag,
-                            operationListInnerHtml: ''
+            document.querySelector('.swggUiContainer').innerHTML =
+                local.templateRender(local.templateUiMain, options);
+            // optimization - render .swggUiContainer and .resourceList in 2 separate processes
+            setTimeout(function () {
+                // reset state
+                local.idDomElementDict = {};
+                local.objectSetDefault(options, {
+                    resourceDict: {},
+                    operationDict: {},
+                    tagDict: {}
+                });
+                // init tagDict
+                options.tags.forEach(function (tag) {
+                    options.tagDict[tag.name] = tag;
+                });
+                // init operationDict
+                Object.keys(local.apiDict).sort().forEach(function (operation) {
+                    // init operation
+                    operation = local.jsonCopy(local.apiDict[operation]);
+                    operation.tags.forEach(function (tag) {
+                        options.operationDict[operation._keyOperationId] = operation;
+                        // init resource
+                        resource = options.resourceDict[tag];
+                        if (!resource && options.tagDict[tag]) {
+                            resource = options.resourceDict[tag] = options.tagDict[tag];
+                            local.objectSetDefault(resource, {
+                                description: 'no description available',
+                                id: local.idDomElementCreate('swgg_id_' + tag),
+                                name: tag,
+                                operationListInnerHtml: ''
+                            });
+                        }
+                    });
+                });
+                // init uiFragment
+                options.uiFragment =
+                    local.domFragmentRender('<div class="reset resourceList"></div>');
+                // init resourceDict
+                Object.keys(options.resourceDict).sort().forEach(function (key) {
+                    // templateRender resource
+                    options.uiFragment.querySelector('.resourceList')
+                        .appendChild(local.domFragmentRender(
+                            local.templateUiResource,
+                            options.resourceDict[key]
+                        ));
+                });
+                Object.keys(options.operationDict).sort(function (aa, bb) {
+                    aa = options.operationDict[aa];
+                    aa = aa._path + ' ' + aa._method;
+                    bb = options.operationDict[bb];
+                    bb = bb._path + ' ' + bb._method;
+                    return aa < bb
+                        ? -1
+                        : 1;
+                }).forEach(function (operation) {
+                    operation = options.operationDict[operation];
+                    operation.id = local.idDomElementCreate('swgg_id_' + operation.operationId);
+                    operation.tags.forEach(function (tag) {
+                        operation = local.jsonCopy(operation);
+                        resource = options.resourceDict[tag];
+                        local.objectSetDefault(operation, {
+                            description: '',
+                            responseList: Object.keys(operation.responses).sort()
+                                .map(function (key) {
+                                    return { key: key, value: operation.responses[key] };
+                                }),
+                            summary: 'no summary available'
                         });
+                        operation.parameters.forEach(function (element) {
+                            // init element.id
+                            element.id = local.idDomElementCreate('swgg_id_' + element.name);
+                            local.uiParamRender(element);
+                        });
+                        // templateRender operation
+                        options.uiFragment.querySelector('#' + resource.id + ' .operationList')
+                            .appendChild(
+                                local.domFragmentRender(local.templateUiOperation, operation)
+                            );
+                    });
+                });
+                // append uiFragment to swggUiContainer
+                document.querySelector('.swggUiContainer')
+                    .removeChild(document.querySelector('.resourceList'));
+                document.querySelector('.swggUiContainer').appendChild(options.uiFragment);
+                /* istanbul ignore next */
+                // bug-workaround - add keypress listener for <form>
+                document.querySelector(
+                    '.swggUiContainer .form'
+                ).addEventListener('keypress', function (event) {
+                    if (event.keyCode === 13) {
+                        local.uiEventListenerDict['.onEventUiReload']();
                     }
                 });
-            });
-            // init resourceDict
-            Object.keys(self.resourceDict).sort().forEach(function (key) {
-                // templateRender resource
-                self.uiFragment.querySelector('.resourceList').appendChild(
-                    local.domFragmentRender(local.templateUiResource, self.resourceDict[key])
-                );
-            });
-            Object.keys(self.operationDict).sort(function (aa, bb) {
-                aa = self.operationDict[aa];
-                aa = aa._path + ' ' + aa._method;
-                bb = self.operationDict[bb];
-                bb = bb._path + ' ' + bb._method;
-                return aa < bb
-                    ? -1
-                    : 1;
-            }).forEach(function (operation) {
-                operation = self.operationDict[operation];
-                operation.id = local.idDomElementCreate('swgg_id_' + operation.operationId);
-                operation.tags.forEach(function (tag) {
-                    operation = local.jsonCopy(operation);
-                    resource = self.resourceDict[tag];
-                    local.objectSetDefault(operation, {
-                        description: '',
-                        responseList: Object.keys(operation.responses).sort()
-                            .map(function (key) {
-                                return { key: key, value: operation.responses[key] };
-                            }),
-                        summary: 'no summary available'
-                    });
-                    operation.parameters.forEach(function (element) {
-                        // init element.id
-                        element.id = local.idDomElementCreate('swgg_id_' + element.name);
-                        local.uiParamRender(element);
-                    });
-                    // templateRender operation
-                    self.uiFragment.querySelector('#' + resource.id + ' .operationList')
-                        .appendChild(
-                            local.domFragmentRender(local.templateUiOperation, operation)
-                        );
+                // render valueEncoded
+                Array.from(
+                    document.querySelectorAll('.swggUiContainer [data-value-encoded]')
+                ).forEach(function (element) {
+                    element.value = decodeURIComponent(element.dataset.valueEncoded);
                 });
-            });
-            // overwrite swggUiContainer with uiFragment
-            document.querySelector('.swggUiContainer').innerHTML = '';
-            document.querySelector('.swggUiContainer').appendChild(self.uiFragment);
-            /* istanbul ignore next */
-            // bug-workaround - add keypress listener for <form2>
-            document.querySelector('form2').addEventListener('keypress', function (event) {
-                if (event.keyCode === 13) {
-                    local.uiEventListenerDict['.onEventUiReload']();
-                }
-            });
-            // render valueEncoded
-            Array.from(
-                document.querySelectorAll('.swggUiContainer [data-value-encoded]')
-            ).forEach(function (element) {
-                element.value = decodeURIComponent(element.dataset.valueEncoded);
-            });
-            // init event-handling
-            local.uiEventInit(document);
-            // scrollTo location.hash
-            local.tryCatchOnError(function () {
-                var element, parent;
-                element = document.querySelector(
-                    '.swggUiContainer .operation, .swggUiContainer .operation'
-                );
+                // init event-handling
+                local.uiEventInit(document);
+                // scrollTo location.hash
                 local.tryCatchOnError(function () {
-                    element = document.querySelector('#' + location.hash.slice(2));
+                    var element, parent;
+                    element = document.querySelector(
+                        '.swggUiContainer .operation, .swggUiContainer .operation'
+                    );
+                    local.tryCatchOnError(function () {
+                        element = document.querySelector('#' + location.hash.slice(2));
+                    }, local.nop);
+                    parent = element.querySelector('.uiAnimateSlide');
+                    while (parent) {
+                        local.uiAnimateSlideDown(parent);
+                        parent = parent.parentElement;
+                    }
+                    document.querySelector('button').focus();
+                    setTimeout(function () {
+                        element.focus();
+                    }, 1000);
                 }, local.nop);
-                parent = element.querySelector('.uiAnimateSlide');
-                while (parent) {
-                    local.uiAnimateSlideDown(parent);
-                    parent = parent.parentElement;
-                }
-                element.focus();
-            }, local.nop);
-        };
-
-        local.urlBaseGet = function () {
-        /*
-         * this function will return the base swagger url
-         */
-            return (local.normalizeValue('list', local.swaggerJson.schemes)[0] ||
-                local.urlParse('').protocol.slice(0, -1)) + '://' +
-                (local.swaggerJson.host || local.urlParse('').host) +
-                local.swaggerJson.basePath;
+            });
         };
 
         local.userLoginByPassword = function (options, onError) {
@@ -23787,16 +23943,32 @@ local.templateUiResponseAjax = '\
                     }
                     return;
                 }
+                // handle schema
+                if (propDef.schema) {
+                    local.assert(!propDef.$ref, prefix + ' cannot have both schema and $ref');
+                    local.assert(!propDef.type, prefix + ' cannot have both schema and type');
+                    // recurse - validateByPropDef
+                    local.validateByPropDef({
+                        circularList: options.circularList,
+                        data: data,
+                        dataReadonlyRemove: options.dataReadonlyRemove,
+                        key: options.key,
+                        schema: propDef.schema,
+                        'x-swgg-notRequired': options['x-swgg-notRequired']
+                    });
+                    return;
+                }
                 // handle $ref
-                tmp = propDef.$ref || (propDef.schema && propDef.schema.$ref);
-                if (tmp) {
+                if (propDef.$ref) {
+                    local.assert(!propDef.schema, prefix + ' cannot have both $ref and schema');
+                    local.assert(!propDef.type, prefix + ' cannot have both $ref and type');
                     // recurse - validateBySchema
                     local.validateBySchema({
                         circularList: options.circularList,
                         data: data,
                         dataReadonlyRemove: options.dataReadonlyRemove,
-                        key: tmp,
-                        schema: local.schemaNormalizeAndCopy({ $ref: tmp }),
+                        key: propDef.$ref,
+                        schema: local.schemaNormalizeAndCopy({ $ref: propDef.$ref }),
                         'x-swgg-notRequired': options['x-swgg-notRequired']
                     });
                     return;
@@ -23828,10 +24000,6 @@ local.templateUiResponseAjax = '\
                         return;
                     }
                     options.circularList.push(data);
-                }
-                // validate propDef embedded in propDef.schema.type
-                if (!propDef.type && propDef.schema && propDef.schema.type) {
-                    propDef = propDef.schema;
                 }
                 // http://json-schema.org/latest/json-schema-validation.html#anchor13
                 // 5.1.  Validation keywords for numeric instances (number and integer)
@@ -23879,7 +24047,7 @@ local.templateUiResponseAjax = '\
                     }
                     if (propDef.pattern) {
                         local.assert(
-                            new RegExp(propDef.pattern).test(data),
+                            data.match(new RegExp(propDef.pattern)),
                             prefix + ' must match regex pattern /' + propDef.pattern + '/'
                         );
                     }
@@ -23997,17 +24165,17 @@ local.templateUiResponseAjax = '\
                     // https://github.com/swagger-api/swagger-spec/issues/50
                     // Clarify 'byte' format #50
                     case 'byte':
-                        local.assert(!(/[^\n\r\+\/0-9\=A-Za-z]/).test(data));
+                        local.assert(!data.match(/[^\n\r\+\/0-9\=A-Za-z]/));
                         break;
                     case 'date':
                     case 'date-time':
                         local.assert(JSON.stringify(new Date(data)) !== 'null');
                         break;
                     case 'email':
-                        local.assert(local.regexpEmailValidate.test(data));
+                        local.assert(data.match(local.regexpEmailValidate));
                         break;
                     case 'phone':
-                        local.assert(local.regexpPhoneValidate.test(data));
+                        local.assert(data.match(local.regexpPhoneValidate));
                         break;
                     case 'json':
                         JSON.parse(data);
@@ -24083,7 +24251,7 @@ local.templateUiResponseAjax = '\
                         return;
                     }
                     tmp = Object.keys(schema.patternProperties || {}).some(function (_) {
-                        if (new RegExp(_).test(key)) {
+                        if (key.match(new RegExp(_))) {
                             validateByPropDef(schema.patternProperties[_]);
                             return true;
                         }
