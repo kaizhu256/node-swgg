@@ -1,9 +1,14 @@
 # swgg
 this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend)
 
+# live demo
+- [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app)
+
 [![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app)
 
-[![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swgg.svg)](https://travis-ci.org/kaizhu256/node-swgg) [![coverage](https://kaizhu256.github.io/node-swgg/build/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build/coverage.html/index.html)
+
+
+[![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swgg.svg)](https://travis-ci.org/kaizhu256/node-swgg) [![coverage](https://kaizhu256.github.io/node-swgg/build/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build/coverage.html/index.html) [![snyk.io vulnerabilities](https://snyk.io/test/github/kaizhu256/node-swgg/badge.svg)](https://snyk.io/test/github/kaizhu256/node-swgg)
 
 [![NPM](https://nodei.co/npm/swgg.png?downloads=true)](https://www.npmjs.com/package/swgg)
 
@@ -25,7 +30,6 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 # table of contents
 1. [cdn download](#cdn-download)
-1. [live demo](#live-demo)
 1. [documentation](#documentation)
 1. [quickstart standalone app](#quickstart-standalone-app)
 1. [quickstart example.js](#quickstart-examplejs)
@@ -44,40 +48,35 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 
 
-# live demo
-- [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app)
-
-[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app)
-
-
-
 # documentation
-#### apidoc
+#### cli help
+![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.npmPackageCliHelp.svg)
+
+#### api doc
 - [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
-- npm publish 2017.7.24
-- lazily render operations upon expansion
+- improve notification of unreachable network
 - revamp datatable with card-expansion ui
 - add forward-proxy ui-checkbox
-- allow optional sub-level input for swagger-models
+- datatable - allow optional sub-level input for swagger-models
 - add authorization-header hook
-- allow secure remote db export / import / reset to backend
 - add middlewareAcl
 - datatable - add sort-by-field
-- add notification system
 - add api userPasswordChange
-- add logging feature
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2017.7.24
-- add url property x-homepage in swagger.json to url-link info.title
-- auto-scroll to hashtag of expanded element
-- chrome bug-workaround and w3 validation - replace <form2> tag with <div class="form">
-- streamline server logs
+#### changelog for v2017.10.5
+- npm publish 2017.10.5
+- add api-key form-input, and persist in localStorage
+- add param-property 'x-apiKey'
+- add param-property 'x-example' (similar to 'default' param-property, except used in input-placeholder)
+- allow degenerate method-path's by appending # comment
+- fix double '//' bug when basePath is '/'
+- rename ajaxForwardProxyUrlTest to githubForwardProxyUrlTest
 - none
 
 #### this package requires
@@ -304,9 +303,11 @@ instruction
             .replace('assets.swgg.swagger.json', 'assets.swgg.swagger.server.json')
             .replace((/\n<script src=[\S\s]*\n<\/html>\n/), '\
 \n\
+<!-- utility2-comment\n\
 {{#if isRollup}}\n\
 <script src="assets.app.js"></script>\n\
 {{#unless isRollup}}\n\
+utility2-comment -->\n\
 <script src="assets.utility2.rollup.js"></script>\n\
 <script>window.utility2.onResetBefore.counter += 1;</script>\n\
 <script src="jsonp.utility2.stateInit?callback=window.utility2.stateInit"></script>\n\
@@ -314,7 +315,9 @@ instruction
 <script src="assets.example.js"></script>\n\
 <script src="assets.test.js"></script>\n\
 <script>window.utility2.onResetBefore();</script>\n\
+<!-- utility2-comment\n\
 {{/if isRollup}}\n\
+utility2-comment -->\n\
 <div class="utility2FooterDiv">\n\
     [ this app was created with\n\
     <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>\n\
@@ -691,8 +694,7 @@ instruction
 
 
 
-    // init-after
-    // run browser js-env code - init-after
+    // run browser js-env code - init-test
     /* istanbul ignore next */
     case 'browser':
         local.testRunBrowser = function (event) {
@@ -815,15 +817,17 @@ instruction
 
 
 
-    // run node js-env code - init-after
+    // run node js-env code - init-test
     /* istanbul ignore next */
     case 'node':
         // init exports
         module.exports = local;
-        // require modules
-        local.fs = require('fs');
-        local.http = require('http');
-        local.url = require('url');
+        // require builtins
+        Object.keys(process.binding('natives')).forEach(function (key) {
+            if (!local[key] && !(/\/|^_|^sys$/).test(key)) {
+                local[key] = require(key);
+            }
+        });
         // init assets
         local.assetsDict = local.assetsDict || {};
         [
@@ -852,7 +856,7 @@ instruction
                     return 'the greatest app in the world!';
                 case 'npm_package_name':
                     return 'swgg';
-                case 'npm_package_nameAlias':
+                case 'npm_package_nameLib':
                     return 'swgg';
                 case 'npm_package_version':
                     return '0.0.1';
@@ -860,8 +864,8 @@ instruction
                     return match0;
                 }
             });
-        // run the cli
-        if (local.global.utility2_rollup || module !== require.main) {
+        // init cli
+        if (module !== require.main || local.global.utility2_rollup) {
             break;
         }
         local.assetsDict['/assets.example.js'] =
@@ -872,7 +876,7 @@ instruction
         local.assetsDict['/assets.swgg.js'] =
             local.assetsDict['/assets.swgg.js'] ||
             local.fs.readFileSync(
-                local.swgg.__dirname + '/lib.swgg.js',
+                local.__dirname + '/lib.swgg.js',
                 'utf8'
             ).replace((/^#!/), '//');
         /* jslint-ignore-end */
@@ -941,9 +945,6 @@ instruction
 1. [https://kaizhu256.github.io/node-swgg/build/screenshot.npmTest.browser.%252F.png](https://kaizhu256.github.io/node-swgg/build/screenshot.npmTest.browser.%252F.png)
 [![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.npmTest.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.npmTest.browser.%252F.png)
 
-1. [https://kaizhu256.github.io/node-swgg/build/screenshot.npmTestPublished.browser.%252F.png](https://kaizhu256.github.io/node-swgg/build/screenshot.npmTestPublished.browser.%252F.png)
-[![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.npmTestPublished.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.npmTestPublished.browser.%252F.png)
-
 1. [https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleJs.browser.%252F.png](https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleJs.browser.%252F.png)
 [![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleJs.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleJs.browser.%252F.png)
 
@@ -966,18 +967,15 @@ instruction
     },
     "homepage": "https://github.com/kaizhu256/node-swgg",
     "keywords": [
-        "api",
         "oai",
         "open-api",
-        "openapi",
-        "swagger",
         "swagger-ui"
     ],
     "license": "MIT",
     "main": "lib.swgg.js",
     "name": "swgg",
-    "nameAlias": "swgg",
     "nameAliasPublish": "swagger-lite",
+    "nameLib": "swgg",
     "nameOriginal": "swgg",
     "os": [
         "darwin",
@@ -991,11 +989,11 @@ instruction
         "build-ci": "utility2 shReadmeTest build_ci.sh",
         "env": "env",
         "heroku-postbuild": "npm uninstall utility2 2>/dev/null; npm install kaizhu256/node-utility2#alpha && utility2 shDeployHeroku",
-        "postinstall": "if [ -f npm_scripts.sh ]; then ./npm_scripts.sh postinstall; fi",
-        "start": "(set -e; export PORT=${PORT:-8080}; utility2 start test.js)",
-        "test": "(set -e; export PORT=$(utility2 shServerPortRandom); utility2 test test.js)"
+        "postinstall": "[ ! -f npm_scripts.sh ] || ./npm_scripts.sh postinstall",
+        "start": "PORT=${PORT:-8080} utility2 start test.js",
+        "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2017.7.24"
+    "version": "2017.10.5"
 }
 ```
 

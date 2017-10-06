@@ -37,22 +37,11 @@
         local.global = local.modeJs === 'browser'
             ? window
             : global;
-        switch (local.modeJs) {
-        // re-init local from window.local
-        case 'browser':
-            local = local.global.utility2.objectSetDefault(
-                local.global.utility2_rollup || local.global.local,
-                local.global.utility2
-            );
-            break;
-        // re-init local from example.js
-        case 'node':
-            local = (local.global.utility2_rollup ||
-                require('./assets.utility2.rollup.js')).requireReadme();
-            break;
-        }
-        // init exports
-        local.global.local = local;
+        // re-init local
+        local = local.global.local = (local.global.utility2 ||
+            require('./assets.utility2.rollup.js')).requireReadme();
+        // init test
+        local.testRunInit(local);
     }());
 
 
@@ -1420,7 +1409,7 @@
             setTimeout(onError, 1500);
         };
 
-        local.testCase_ui_datable = function (options, onError) {
+        local.testCase_ui_datatable = function (options, onError) {
         /*
          * this function will test ui's datatable handling-behavior
          */
@@ -1460,6 +1449,10 @@
                 }, 1000);
             });
             onParallel.counter += 1;
+            // init localStorage
+            localStorage.setItem('testCase_ui_default', '');
+            localStorage.setItem('utility2_swgg_apiKeyKey_', '');
+            // test click handling-behavior
             options = Object.keys(local.uiEventListenerDict).sort();
             options.forEach(function (selector) {
                 Array.from(
@@ -1479,6 +1472,13 @@
             // test onEventOperationAjax's error handling-behavior
             document.querySelector('#swgg_id_paramInteger .input').value = 'syntax error';
             document.querySelector('#swgg_id_paramDefault .onEventOperationAjax').click();
+            // test onEventUiReload's key handling-behavior
+            onParallel.counter += 1;
+            local.uiEventListenerDict['.onEventUiReload']({
+                target: { id: 'swggApiKeyInput1' },
+                type: 'keyup'
+            });
+            onParallel();
             onParallel();
         };
 
@@ -1504,14 +1504,6 @@
 
     // run node js-env code - function
     case 'node':
-        local.testCase_buildApidoc_default = function (options, onError) {
-        /*
-         * this function will test buildApidoc's default handling-behavior-behavior
-         */
-            options = {};
-            local.buildApidoc(options, onError);
-        };
-
         local.testCase_webpage_default = function (options, onError) {
         /*
          * this function will test webpage's default handling-behavior
@@ -1691,7 +1683,8 @@
                         in: 'query',
                         items: { type: 'integer' },
                         name: 'paramArrayJson',
-                        type: 'array'
+                        type: 'array',
+                        'x-example': [0, 1]
                     }, {
                         // test array-multi-param handling-behavior
                         collectionFormat: 'multi',
@@ -1766,7 +1759,8 @@
                         description: 'integer-param',
                         in: 'query',
                         name: 'paramInteger',
-                        type: 'integer'
+                        type: 'integer',
+                        'x-example': 0
                     }, {
                         // test json-param handling-behavior
                         description: 'json-param',
@@ -1779,7 +1773,8 @@
                         description: 'optional-param',
                         in: 'query',
                         name: 'paramOptional',
-                        type: 'string'
+                        type: 'string',
+                        'x-apiKey': true
                     }, {
                         // test path-param handling-behavior
                         description: 'path-param',
@@ -1826,6 +1821,7 @@
                 } },
                 // test form-data-param handling-behavior
                 '/x-test/paramFormData': { post: {
+                    consumes: ['application/x-www-form-urlencoded'],
                     operationId: 'paramFormData',
                     parameters: [{
                         // test array-multi-param handling-behavior
@@ -2045,127 +2041,4 @@
         local.testCase_validateBySchema_error(null, local.onErrorDefault);
         local.testCase_validateBySwagger_default(null, local.onErrorDefault);
     }());
-    switch (local.modeJs) {
-
-
-
-    // run browser js-env code - init-after
-    /* istanbul ignore next */
-    case 'browser':
-        local.testCase_browser_nullCase = local.testCase_browser_nullCase || function (
-            options,
-            onError
-        ) {
-        /*
-         * this function will test browser's null-case handling-behavior
-         */
-            onError(null, options);
-        };
-
-        local.utility2.ajaxForwardProxyUrlTest = local.utility2.ajaxForwardProxyUrlTest ||
-            function (url, location) {
-            /*
-             * this function will test if the url requires forward-proxy
-             */
-                // jslint-hack
-                local.nop(url);
-                return local.env.npm_package_nameAlias && location.host.match(/\bgithub.io$/)
-                    ? 'https://h1-' + local.env.npm_package_nameAlias + '-alpha.herokuapp.com'
-                    : location.protocol + '//' + location.host;
-            };
-
-        // run tests
-        if (local.modeTest && document.querySelector('#testRunButton1')) {
-            document.querySelector('#testRunButton1').click();
-        }
-        break;
-
-
-
-    // run node js-env code - init-after
-    /* istanbul ignore next */
-    case 'node':
-        local.testCase_buildApidoc_default = local.testCase_buildApidoc_default || function (
-            options,
-            onError
-        ) {
-        /*
-         * this function will test buildApidoc's default handling-behavior
-         */
-            options = { modulePathList: module.paths };
-            local.buildApidoc(options, onError);
-        };
-
-        local.testCase_buildApp_default = local.testCase_buildApp_default || function (
-            options,
-            onError
-        ) {
-        /*
-         * this function will test buildApp's default handling-behavior
-         */
-            local.testCase_buildReadme_default(options, local.onErrorThrow);
-            local.testCase_buildLib_default(options, local.onErrorThrow);
-            local.testCase_buildTest_default(options, local.onErrorThrow);
-            local.testCase_buildCustomOrg_default(options, local.onErrorThrow);
-            options = [];
-            local.buildApp(options, onError);
-        };
-
-        local.testCase_buildCustomOrg_default = local.testCase_buildCustomOrg_default ||
-            function (options, onError) {
-            /*
-             * this function will test buildCustomOrg's default handling-behavior
-             */
-                options = {};
-                local.buildCustomOrg(options, onError);
-            };
-
-        local.testCase_buildLib_default = local.testCase_buildLib_default || function (
-            options,
-            onError
-        ) {
-        /*
-         * this function will test buildLib's default handling-behavior
-         */
-            options = {};
-            local.buildLib(options, onError);
-        };
-
-        local.testCase_buildReadme_default = local.testCase_buildReadme_default || function (
-            options,
-            onError
-        ) {
-        /*
-         * this function will test buildReadme's default handling-behavior
-         */
-            options = {};
-            local.buildReadme(options, onError);
-        };
-
-        local.testCase_buildTest_default = local.testCase_buildTest_default || function (
-            options,
-            onError
-        ) {
-        /*
-         * this function will test buildTest's default handling-behavior
-         */
-            options = {};
-            local.buildTest(options, onError);
-        };
-
-        local.testCase_webpage_default = local.testCase_webpage_default || function (
-            options,
-            onError
-        ) {
-        /*
-         * this function will test webpage's default handling-behavior
-         */
-            options = { modeCoverageMerge: true, url: local.serverLocalHost + '?modeTest=1' };
-            local.browserTest(options, onError);
-        };
-
-        // run test-server
-        local.testRunServer(local);
-        break;
-    }
 }());

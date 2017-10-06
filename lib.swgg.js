@@ -17,7 +17,7 @@
             !global.utility2_app &&
             global.utility2_rollup &&
             global.process &&
-            global.process.env.npm_package_nameAlias === 'swgg') {
+            global.process.env.npm_package_nameLib === 'swgg') {
         return;
     }
 
@@ -53,6 +53,12 @@
         if (local.modeJs === 'browser') {
             local.global.utility2_swgg = local;
         } else {
+            // require builtins
+            Object.keys(process.binding('natives')).forEach(function (key) {
+                if (!local[key] && !(/\/|^_|^sys$/).test(key)) {
+                    local[key] = require(key);
+                }
+            });
             module.exports = local;
             module.exports.__dirname = __dirname;
             module.exports.module = module;
@@ -167,6 +173,9 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer .marginTop10 {\n\
     margin-top: 1rem;\n\
+}\n\
+.swggUiContainer select[multiple] {\n\
+    height: 10rem;\n\
 }\n\
 .swggUiContainer pre,\n\
 .swggUiContainer textarea {\n\
@@ -454,11 +463,27 @@ border: 0;\n\
 \n\
 </script>\n\
 <div class="swggUiContainer">\n\
-<div class="form header tr">\n\
+<div class="eventDelegateKeyup eventDelegateSubmit form header onEventUiReload tr">\n\
     <a class="td1" href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
-    <input class="flex1 td2" type="text">\n\
-    <button class="td3">Explore</button>\n\
+    <input\n\
+        class="flex1 td2"\n\
+        placeholder="http://petstore.swagger.io/v2/swagger.json"\n\
+        type="text"\n\
+    >\n\
+    <input\n\
+        class="td2"\n\
+        id="swggApiKeyInput1"\n\
+        placeholder="api-key"\n\
+        style="width: 8rem;"\n\
+        type="text"\n\
+    >\n\
+    <button\n\
+        class="eventDelegateClick onEventUiReload td3"\n\
+        id="swggApiKeyClearButton1"\n\
+    >Clear api-keys</button>\n\
+    <button class="eventDelegateClick onEventUiReload td3">Explore</button>\n\
 </div>\n\
+<div class="coverageHack reset"></div>\n\
 </div>\n\
 <div class="swggAjaxProgressDiv" style="margin-top: 1rem; text-align: center;">fetching resource-list ...</div>\n\
 <script>\n\
@@ -474,8 +499,7 @@ border: 0;\n\
 */\n\
 "use strict";\n\
 document.querySelector(".swggUiContainer > .header > .td2").value =\n\
-    (location.search.match(/\\bmodeSwaggerJsonUrl=([^&]+)/g) &&\n\
-        location.search.match(/\\bmodeSwaggerJsonUrl=([^&]+)/g)[1]) ||\n\
+    ((/\\bmodeSwaggerJsonUrl=([^&]+)/g).exec(location.search) || {})[1] ||\n\
         "assets.swgg.swagger.json";\n\
 </script>\n\
 <script src="assets.utility2.rollup.js"></script>\n\
@@ -698,7 +722,7 @@ local.templateApiDict = {
             "200": {
                 "description": "200 ok - http://jsonapi.org/format/#document-structure-top-level",
                 "schema": {
-                    "$ref": "#/definitions/BuiltinJsonapiResponse{{_schemaName}}"
+                    "$ref": "#/definitions/BuiltinJsonapiResponse"
                 }
             }
         },
@@ -721,7 +745,7 @@ local.templateApiDict = {
             "200": {
                 "description": "200 ok - http://jsonapi.org/format/#document-structure-top-level",
                 "schema": {
-                    "$ref": "#/definitions/BuiltinJsonapiResponse{{_schemaName}}"
+                    "$ref": "#/definitions/BuiltinJsonapiResponse"
                 }
             }
         },
@@ -745,7 +769,7 @@ local.templateApiDict = {
             "200": {
                 "description": "200 ok - http://jsonapi.org/format/#document-structure-top-level",
                 "schema": {
-                    "$ref": "#/definitions/BuiltinJsonapiResponse{{_schemaName}}"
+                    "$ref": "#/definitions/BuiltinJsonapiResponse"
                 }
             }
         },
@@ -902,7 +926,7 @@ local.templateApiDict = {
             "200": {
                 "description": "200 ok - http://jsonapi.org/format/#document-structure-top-level",
                 "schema": {
-                    "$ref": "#/definitions/BuiltinJsonapiResponse{{_schemaName}}"
+                    "$ref": "#/definitions/BuiltinJsonapiResponse"
                 }
             }
         },
@@ -933,7 +957,7 @@ local.templateApiDict = {
             "200": {
                 "description": "200 ok - http://jsonapi.org/format/#document-structure-top-level",
                 "schema": {
-                    "$ref": "#/definitions/BuiltinJsonapiResponse{{_schemaName}}"
+                    "$ref": "#/definitions/BuiltinJsonapiResponse"
                 }
             }
         },
@@ -965,7 +989,7 @@ local.templateApiDict = {
             "200": {
                 "description": "200 ok - http://jsonapi.org/format/#document-structure-top-level",
                 "schema": {
-                    "$ref": "#/definitions/BuiltinJsonapiResponse{{_schemaName}}"
+                    "$ref": "#/definitions/BuiltinJsonapiResponse"
                 }
             }
         },
@@ -1022,7 +1046,7 @@ local.templateApiDict = {
             "200": {
                 "description": "200 ok - http://jsonapi.org/format/#document-structure-top-level",
                 "schema": {
-                    "$ref": "#/definitions/BuiltinJsonapiResponse{{_schemaName}}"
+                    "$ref": "#/definitions/BuiltinJsonapiResponse"
                 }
             }
         },
@@ -1192,14 +1216,26 @@ local.templateUiMain = '\
 <div class="eventDelegateClick modal onEventModalHide" style="display: none; opacity: 0;">\n\
     <form class="datatable eventDelegateClick"></form>\n\
 </div>\n\
-<div class="eventDelegateClick popup" style="display: none;"></div>\n\
-<div class="eventDelegateSubmit form header onEventUiReload tr">\n\
+<div class="eventDelegateKeyup eventDelegateSubmit form header onEventUiReload tr">\n\
     <a class="td1" href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
     <input\n\
         class="flex1 td2"\n\
+        placeholder="http://petstore.swagger.io/v2/swagger.json"\n\
         type="text"\n\
         value="{{url}}"\n\
     >\n\
+    <input\n\
+        class="td2"\n\
+        id="swggApiKeyInput1"\n\
+        placeholder="api-key"\n\
+        style="width: 8rem;"\n\
+        type="text"\n\
+        value="{{apiKeyValue}}"\n\
+    >\n\
+    <button\n\
+        class="eventDelegateClick onEventUiReload td3"\n\
+        id="swggApiKeyClearButton1"\n\
+    >Clear api-keys</button>\n\
     <button class="eventDelegateClick onEventUiReload td3">Explore</button>\n\
 </div>\n\
 <div class="info reset">\n\
@@ -1279,7 +1315,10 @@ local.templateUiOperation = '\
         <span class="td3">{{operationId}}</span>\n\
         <span class="td4">{{summary htmlSafe}}</span>\n\
     </div>\n\
-    <form accept-charset="UTF-8" class="content uiAnimateSlide" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;">\n\
+    <form accept-charset="UTF-8"\n\
+        class="content uiAnimateSlide"\n\
+        style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
+    >\n\
         {{#if deprecated}}\n\
         <h4 class="label marginTop10">Warning: Deprecated</h4>\n\
         {{/if deprecated}}\n\
@@ -1389,7 +1428,9 @@ local.templateUiResource = '\
             href="#"\n\
         >Datatable</a>\n\
     </div>\n\
-    <div class="operationList uiAnimateSlide" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>\n\
+    <div class="operationList uiAnimateSlide"\n\
+        style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
+    ></div>\n\
 </div>\n\
 ';
 
@@ -1471,7 +1512,7 @@ swgg\n\
                     ? new local.FormData()
                     : '',
                 inHeader: {},
-                inPath: self._path,
+                inPath: self._path.replace((/#.*?$/), ''),
                 inQuery: '',
                 headers: {},
                 method: self._method,
@@ -1851,9 +1892,9 @@ swgg\n\
             local.tryCatchOnError(function () {
                 local.validateBySwagger(local.swaggerJson);
             }, local.onErrorDefault);
-            // init modeForwardProxyUrl
-            local.modeForwardProxyUrl = local.modeForwardProxyUrl ||
-                local.swaggerJson['x-modeForwardProxyUrl'];
+            // init githubForwardProxyUrl
+            local.githubForwardProxyUrl = local.githubForwardProxyUrl ||
+                local.swaggerJson['x-githubForwardProxyUrl'];
             // init assets.swgg.swagger.server.json
             local.assetsDict['/assets.swgg.swagger.server.json'] =
                 JSON.stringify(local.swaggerJson);
@@ -2059,7 +2100,7 @@ swgg\n\
         /*
          * this function will run the middleware that will parse request.bodyRaw
          */
-            var ii, jj, options;
+            var boundary, crlf, data, header, ii, jj, name;
             // jslint-hack
             local.nop(response);
             // if request is already parsed, then goto nextMiddleware
@@ -2098,51 +2139,43 @@ swgg\n\
                 request.swgg.isMultipartFormData = true;
                 request.swgg.bodyParsed = {};
                 request.swgg.bodyMeta = {};
-                options = {};
-                options.crlf = local.bufferCreate([0x0d, 0x0a]);
+                crlf = local.bufferCreate([0x0d, 0x0a]);
                 // init boundary
                 ii = 0;
-                jj = local.bufferIndexOfSubBuffer(request.bodyRaw, options.crlf, ii);
+                jj = local.bufferIndexOfSubBuffer(request.bodyRaw, crlf, ii);
                 if (jj <= 0) {
                     break;
                 }
-                options.boundary = local.bufferConcat([
-                    options.crlf,
-                    request.bodyRaw.slice(ii, jj)
-                ]);
+                boundary = local.bufferConcat([crlf, request.bodyRaw.slice(ii, jj)]);
                 ii = jj + 2;
                 while (true) {
                     jj = local.bufferIndexOfSubBuffer(
                         request.bodyRaw,
-                        options.boundary,
+                        boundary,
                         ii
                     );
                     if (jj < 0) {
                         break;
                     }
-                    options.header = local.bufferToString(request.bodyRaw.slice(ii, ii + 1024))
+                    header = local.bufferToString(request.bodyRaw.slice(ii, ii + 1024))
                         .split('\r\n').slice(0, 2).join('\r\n');
-                    options.contentType = options.header.match(/^content-type:(.*)/im);
-                    options.contentType = options.contentType && options.contentType[1].trim();
-                    options.filename = options.header
-                        .match(/^content-disposition:.*?\bfilename="([^"]+)/im);
-                    options.filename = options.filename && options.filename[1];
-                    options.name = options.header
-                        .match(/^content-disposition:.*?\bname="([^"]+)/im);
-                    options.name = options.name && options.name[1];
+                    name = (/^content-disposition:.*?\bname="([^"]+)/im).exec(header);
+                    name = name && name[1];
+                    request.swgg.bodyMeta[name] = {
+                        contentType: ((/^content-type:(.*)/im)
+                        .exec(header) || {1: ''})[1].trim() || null,
+                        filename: ((/^content-disposition:.*?\bfilename="([^"]+)/im)
+                        .exec(header) || {1: ''})[1].trim() || null,
+                        name: name
+                    };
                     ii = local.bufferIndexOfSubBuffer(
                         request.bodyRaw,
                         [0x0d, 0x0a, 0x0d, 0x0a],
                         ii + 2
                     ) + 4;
-                    options.data = request.bodyRaw.slice(ii, jj);
-                    request.swgg.bodyParsed[options.name] = options.data;
-                    request.swgg.bodyMeta[options.name] = {
-                        contentType: options.contentType,
-                        filename: options.filename,
-                        name: options.name
-                    };
-                    ii = jj + options.boundary.length + 2;
+                    data = request.bodyRaw.slice(ii, jj);
+                    request.swgg.bodyParsed[name] = data;
+                    ii = jj + boundary.length + 2;
                 }
                 break;
             default:
@@ -2530,7 +2563,7 @@ swgg\n\
                     tmp = request.urlParsed.pathname
                         .replace(local.swaggerJsonBasePath, '').split('/');
                     request.swgg.pathObject._path.split('/').forEach(function (key, ii) {
-                        if (key.match(/^\{\S*?\}$/)) {
+                        if ((/^\{\S*?\}$/).test(key)) {
                             request.swgg.paramDict[key.slice(1, -1)] =
                                 decodeURIComponent(tmp[ii]);
                         }
@@ -3006,7 +3039,7 @@ swgg\n\
         /*
          * this function will init event-handling for the dom-element
          */
-            ['Click', 'Submit'].forEach(function (eventType) {
+            ['Click', 'Keyup', 'Submit'].forEach(function (eventType) {
                 Array.from(
                     element.querySelectorAll('.eventDelegate' + eventType)
                 ).forEach(function (element) {
@@ -3337,11 +3370,35 @@ swgg\n\
             });
         };
 
-        local.uiEventListenerDict['.onEventUiReload'] = function () {
+        local.uiEventListenerDict['.onEventUiReload'] = function (event) {
         /*
          * this function will reload the ui
          */
             var notify, tmp;
+            switch (event && event.target && event.target.id) {
+            // clear all apiKeyValue's from localStorage
+            case 'swggApiKeyClearButton1':
+                local.apiKeyValue = '';
+                Object.keys(localStorage).forEach(function (key) {
+                    if (key.indexOf('utility2_swgg_apiKeyKey_') === 0) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                break;
+            // persist apiKeyValue to localStorage
+            case 'swggApiKeyInput1':
+                local.apiKeyValue = event.target.value;
+                local.localStorageSetItemOrClear(local.apiKeyKey, event.target.value);
+                break;
+            }
+            // if keyup-event is not return-key, then return
+            if (event && event.type === 'keyup' && event.code !== 'Enter') {
+                return;
+            }
+            // do not reload ui during test
+            if (local.global.utility2_modeTestRun >= 2) {
+                return;
+            }
             notify = function (message) {
             /*
              * this function will notify with the given message
@@ -3399,7 +3456,9 @@ swgg\n\
         /*
          * this function will render the param
          */
-            paramDef.placeholder = paramDef.required
+            paramDef.placeholder = !local.isNullOrUndefined(paramDef['x-example'])
+                ? String(paramDef['x-example'])
+                : paramDef.required
                 ? '(required)'
                 : '';
             // init input - file
@@ -3436,7 +3495,6 @@ swgg\n\
                 });
                 // init 'undefined' value
                 if (!(paramDef.hasDefault ||
-                        paramDef.isSelectMultiple ||
                         paramDef.required)) {
                     paramDef.selectOptionList.unshift({
                         id: local.idDomElementCreate('swgg_id_' + paramDef.name),
@@ -3460,8 +3518,9 @@ swgg\n\
             // init input - textarea
             } else if (paramDef.type === 'array') {
                 paramDef.isTextarea = true;
-                paramDef.placeholder = 'provide multiple values in new lines' +
-                    (paramDef.required
+                paramDef.placeholder = Array.isArray(paramDef['x-example'])
+                    ? paramDef['x-example'].join('\n')
+                    : 'provide multiple values in new lines' + (paramDef.required
                         ? ' (at least one required)'
                         : '');
             // init input - text
@@ -3497,8 +3556,11 @@ swgg\n\
                     : paramDef.schema2, null, 4);
             }
             // init valueEncoded
-            paramDef.valueEncoded = paramDef.default;
-            if (paramDef.valueEncoded === undefined) {
+            paramDef.valueEncoded = paramDef['x-apiKey']
+                ? local.apiKeyValue
+                : paramDef.default;
+            if (paramDef.valueEncoded === undefined &&
+                    local.isNullOrUndefined(paramDef['x-example'])) {
                 paramDef.valueEncoded = local.dbFieldRandomCreate({
                     modeNotRandom: true,
                     propDef: paramDef
@@ -3551,6 +3613,9 @@ swgg\n\
                 local.templateRender(local.templateUiTitle, options).trim();
             // init url
             options.url = document.querySelector('.swggUiContainer > .header > .td2').value;
+            // init apiKeyValue
+            local.apiKeyKey = 'utility2_swgg_apiKeyKey_' + encodeURIComponent(options.url);
+            local.apiKeyValue = options.apiKeyValue = localStorage[local.apiKeyKey] || '';
             // templateRender main
             document.querySelector('.swggUiContainer').innerHTML =
                 local.templateRender(local.templateUiMain, options);
@@ -3636,15 +3701,6 @@ swgg\n\
                 document.querySelector('.swggUiContainer')
                     .removeChild(document.querySelector('.resourceList'));
                 document.querySelector('.swggUiContainer').appendChild(options.uiFragment);
-                /* istanbul ignore next */
-                // bug-workaround - add keypress listener for <form>
-                document.querySelector(
-                    '.swggUiContainer .form'
-                ).addEventListener('keypress', function (event) {
-                    if (event.keyCode === 13) {
-                        local.uiEventListenerDict['.onEventUiReload']();
-                    }
-                });
                 // render valueEncoded
                 Array.from(
                     document.querySelectorAll('.swggUiContainer [data-value-encoded]')
@@ -3854,7 +3910,7 @@ swgg\n\
                     }
                     if (propDef.pattern) {
                         local.assert(
-                            data.match(new RegExp(propDef.pattern)),
+                            new RegExp(propDef.pattern).test(data),
                             prefix + ' must match regex pattern /' + propDef.pattern + '/'
                         );
                     }
@@ -3972,17 +4028,17 @@ swgg\n\
                     // https://github.com/swagger-api/swagger-spec/issues/50
                     // Clarify 'byte' format #50
                     case 'byte':
-                        local.assert(!data.match(/[^\n\r\+\/0-9\=A-Za-z]/));
+                        local.assert(!(/[^\n\r\+\/0-9\=A-Za-z]/).test(data));
                         break;
                     case 'date':
                     case 'date-time':
                         local.assert(JSON.stringify(new Date(data)) !== 'null');
                         break;
                     case 'email':
-                        local.assert(data.match(local.regexpEmailValidate));
+                        local.assert((local.regexpEmailValidate).test(data));
                         break;
                     case 'phone':
-                        local.assert(data.match(local.regexpPhoneValidate));
+                        local.assert((local.regexpPhoneValidate).test(data));
                         break;
                     case 'json':
                         JSON.parse(data);
@@ -4058,7 +4114,7 @@ swgg\n\
                         return;
                     }
                     tmp = Object.keys(schema.patternProperties || {}).some(function (_) {
-                        if (key.match(new RegExp(_))) {
+                        if (new RegExp(_).test(key)) {
                             validateByPropDef(schema.patternProperties[_]);
                             return true;
                         }
@@ -4134,7 +4190,7 @@ swgg\n\
     // run node js-env code - init-after
     /* istanbul ignore next */
     case 'node':
-        // run the cli
+        // init cli
         switch (process.argv[2]) {
         case 'swagger-ui':
             local.replStart();
