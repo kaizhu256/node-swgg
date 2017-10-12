@@ -151,7 +151,7 @@
                 switch (options.modeNext) {
                 case 1:
                     // ajax - crudCountManyByQuery
-                    options.crudCountManyByQuery._ajax({
+                    options.crudCountManyByQuery.ajax({
                         paramDict: { _queryWhere: JSON.stringify(options.queryById) }
                     }, options.onNext);
                     break;
@@ -265,7 +265,7 @@
             ].forEach(function (key) {
                 onParallel.counter += 1;
                 options = {};
-                local.apiDict[key]._ajax(options, function (error, data) {
+                local.apiDict[key].ajax(options, function (error, data) {
                     // validate error occurred
                     local.assert(error, error);
                     // validate statusCode
@@ -287,7 +287,7 @@
                 switch (options.modeNext) {
                 case 1:
                     // ajax - crudGetManyByQuery
-                    options.crudGetManyByQuery._ajax({
+                    options.crudGetManyByQuery.ajax({
                         paramDict: { _queryWhere: JSON.stringify(options.queryById) }
                     }, options.onNext);
                     break;
@@ -320,7 +320,7 @@
                 switch (options.modeNext) {
                 case 1:
                     // ajax - crudGetOneById
-                    options.crudGetOneById._ajax({
+                    options.crudGetOneById.ajax({
                         paramDict: options.queryById
                     }, options.onNext);
                     break;
@@ -361,7 +361,7 @@
                 switch (options.modeNext) {
                 case 1:
                     // ajax - crudGetOneByQuery
-                    options.crudGetOneByQuery._ajax({
+                    options.crudGetOneByQuery.ajax({
                         paramDict: { _queryWhere: JSON.stringify(options.queryById) }
                     }, options.onNext);
                     break;
@@ -400,7 +400,7 @@
                 'x-test crudNullPut'
             ].forEach(function (key) {
                 onParallel.counter += 1;
-                local.apiDict[key]._ajax(options, onParallel);
+                local.apiDict[key].ajax(options, onParallel);
             });
             onParallel();
         };
@@ -416,7 +416,7 @@
                 switch (options.modeNext) {
                 case 1:
                     // ajax - crudSetOneById
-                    options.crudSetOneById._ajax({
+                    options.crudSetOneById.ajax({
                         paramDict: { body: {
                             id: 'testCase_crudRemoveManyByQuery_default',
                             propRequired: true
@@ -425,13 +425,13 @@
                     break;
                 case 2:
                     // ajax - crudRemoveManyByQuery
-                    options.crudRemoveManyByQuery._ajax({
+                    options.crudRemoveManyByQuery.ajax({
                         paramDict: { _queryWhere: JSON.stringify(options.queryById) }
                     }, options.onNext);
                     break;
                 case 3:
                     // ajax - crudGetOneById
-                    options.crudGetOneById._ajax({
+                    options.crudGetOneById.ajax({
                         paramDict: options.queryById
                     }, options.onNext);
                     break;
@@ -461,7 +461,7 @@
                 case 1:
                     if (options.idValue === 'testCase_crudRemoveOneById_default') {
                         // ajax - crudSetOneById
-                        options.crudSetOneById._ajax({
+                        options.crudSetOneById.ajax({
                             paramDict: { body: {
                                 id: 'testCase_crudRemoveOneById_default',
                                 propRequired: true
@@ -473,13 +473,13 @@
                     break;
                 case 2:
                     // ajax - crudRemoveOneById
-                    options.crudRemoveOneById._ajax({
+                    options.crudRemoveOneById.ajax({
                         paramDict: options.queryById
                     }, options.onNext);
                     break;
                 case 3:
                     // ajax - crudGetOneById
-                    options.crudGetOneById._ajax({
+                    options.crudGetOneById.ajax({
                         paramDict: options.queryById
                     }, options.onNext);
                     break;
@@ -515,7 +515,7 @@
                 switch (options.modeNext) {
                 case 1:
                     // ajax - crudSetManyById
-                    options.crudSetManyById._ajax({
+                    options.crudSetManyById.ajax({
                         paramDict: { body: options.data }
                     }, options.onNext);
                     break;
@@ -563,7 +563,7 @@
                         options.dataValidateReplace
                     );
                     // ajax - crudSetOneById
-                    options.crudSetOneById._ajax({ paramDict: paramDict }, options.onNext);
+                    options.crudSetOneById.ajax({ paramDict: paramDict }, options.onNext);
                     break;
                 case 2:
                     // init id
@@ -615,7 +615,7 @@
                     options.dataValidate = options.dataValidateUpdate1;
                     if (options.data.id === 'testCase_crudUpdateOneById_default') {
                         // ajax - crudSetOneById
-                        options.crudSetOneById._ajax({
+                        options.crudSetOneById.ajax({
                             paramDict: { body: {
                                 id: 'testCase_crudUpdateOneById_default',
                                 propRequired: true
@@ -640,7 +640,7 @@
                     // test application/x-www-form-urlencoded's handling-behavior
                     local.objectSetOverride(paramDict, paramDict.body);
                     // ajax - crudUpdateOneById
-                    options.crudUpdateOneById._ajax({
+                    options.crudUpdateOneById.ajax({
                         paramDict: paramDict
                     }, options.onNext);
                     break;
@@ -692,7 +692,7 @@
                         idValue: 'testCase_fileGetOneById_default'
                     });
                     // ajax - fileGetOneById
-                    local.apiDict['file fileGetOneById.id.id']._ajax({
+                    local.apiDict['file fileGetOneById.id.id'].ajax({
                         paramDict: options.queryById
                     }, onNext);
                     break;
@@ -706,7 +706,7 @@
                     options.data = local.base64FromBuffer(data.response);
                     local.assertJsonEqual(options.data, local.templateSwaggerUiLogoSmallBase64);
                     // test fileGetOneById's 404 handling-behavior
-                    local.apiDict['file fileGetOneById.id.id']._ajax({
+                    local.apiDict['file fileGetOneById.id.id'].ajax({
                         paramDict: { id: 'testCase_fileGetOneById_default_undefined' }
                     }, onNext);
                     break;
@@ -740,7 +740,7 @@
                     );
                     options.blob.name = 'a00.png';
                     // ajax - fileUploadManyByForm
-                    local.apiDict['file fileUploadManyByForm.2']._ajax({
+                    local.apiDict['file fileUploadManyByForm.2'].ajax({
                         paramDict: {
                             fileDescription: 'hello',
                             file1: options.blob,
@@ -780,7 +780,7 @@
                 switch (options.modeNext) {
                 case 1:
                     // ajax - fileUploadManyByForm
-                    local.apiDict['file fileUploadManyByForm.2']._ajax(options, options.onNext);
+                    local.apiDict['file fileUploadManyByForm.2'].ajax(options, options.onNext);
                     break;
                 case 2:
                     // validate data
@@ -809,7 +809,7 @@
             ].forEach(function (_) {
                 options = _;
                 onParallel.counter += 1;
-                local.apiDict['x-test onErrorJsonapi']._ajax({
+                local.apiDict['x-test onErrorJsonapi'].ajax({
                     paramDict: { data: JSON.stringify(options) }
                 }, function (error, data) {
                     // validate no error occurred
@@ -831,7 +831,7 @@
             onParallel.counter += 1;
             options = { paramDict: { data: '[]' } };
             onParallel.counter += 1;
-            local.apiDict['x-test onErrorJsonapi']._ajax(options, function (error, data) {
+            local.apiDict['x-test onErrorJsonapi'].ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate data
@@ -840,7 +840,7 @@
             });
             options = { paramDict: { error: '[]' } };
             onParallel.counter += 1;
-            local.apiDict['x-test onErrorJsonapi']._ajax(options, function (error, data) {
+            local.apiDict['x-test onErrorJsonapi'].ajax(options, function (error, data) {
                 // validate error occurred
                 local.assert(error, error);
                 // validate error
@@ -869,7 +869,7 @@
             ].forEach(function (data) {
                 options = { paramDict: { error: JSON.stringify(data) } };
                 onParallel.counter += 1;
-                local.apiDict['x-test onErrorJsonapi']._ajax(options, function (error, data) {
+                local.apiDict['x-test onErrorJsonapi'].ajax(options, function (error, data) {
                     // validate error occurred
                     local.assert(error, error);
                     // validate error
@@ -888,7 +888,7 @@
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
-                    local.apiDict['store getInventory']._ajax(options, options.onNext);
+                    local.apiDict['store getInventory'].ajax(options, options.onNext);
                     break;
                 case 2:
                     // validate data
@@ -957,7 +957,7 @@
                     // validate userJwtEncrypted exists
                     local.assert(local.userJwtEncrypted, local.userJwtEncrypted);
                     // test persistent-session handling-behavior
-                    local.apiDict['x-test crudNullGet']._ajax({}, onNext);
+                    local.apiDict['x-test crudNullGet'].ajax({}, onNext);
                     break;
                 case 6:
                     // validate no error occurred
@@ -1058,7 +1058,7 @@
                 }
             };
             onParallel.counter += 1;
-            local.apiDict['x-test paramDefault']._ajax(options, function (error, data) {
+            local.apiDict['x-test paramDefault'].ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate object
@@ -1090,7 +1090,7 @@
                 }
             };
             onParallel.counter += 1;
-            local.apiDict['x-test paramBodyArray']._ajax(options, function (error, data) {
+            local.apiDict['x-test paramBodyArray'].ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate object
@@ -1107,7 +1107,7 @@
                 }
             };
             onParallel.counter += 1;
-            local.apiDict['x-test paramBodyString']._ajax(options, function (error, data) {
+            local.apiDict['x-test paramBodyString'].ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate object
@@ -1146,7 +1146,7 @@
                 element.paramDict = local.jsonCopy(options);
                 element.paramDict[element.key] = element.value;
                 onParallel.counter += 1;
-                local.apiDict['x-test paramDefault']._ajax(element, function (error) {
+                local.apiDict['x-test paramDefault'].ajax(element, function (error) {
                     // validate error occurred
                     local.assert(error, element);
                     onParallel();
@@ -1166,7 +1166,7 @@
                     paramFormData2: 'hello formData2'
                 }
             };
-            local.apiDict['x-test paramFormData']._ajax(options, function (error, data) {
+            local.apiDict['x-test paramFormData'].ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate object
@@ -1297,7 +1297,10 @@
                     local.validateBySchema(element);
                 }, local.nop);
                 // validate error occurred
-                local.assert(local.utility2._debugTryCatchErrorCaught, element.data);
+                local.assert(
+                    local.utility2._debugTryCatchErrorCaught,
+                    JSON.stringify(element.data)
+                );
             });
             onError();
         };
@@ -1475,6 +1478,7 @@
             // test onEventUiReload's key handling-behavior
             onParallel.counter += 1;
             local.uiEventListenerDict['.onEventUiReload']({
+                swggInit: true,
                 target: { id: 'swggApiKeyInput1' },
                 type: 'keyup'
             });
@@ -1521,11 +1525,12 @@
 
     // run shared js-env code - init-after
     (function () {
-        // coverage-hack - root basePath
-        local.apiDictUpdate({ basePath: '/' });
-        local.apiDictUpdate({ basePath: '/api/v0' });
+        // coverage-hack - test apidDictUpdate's misc handling-behavior
+        local.apiUpdate();
+        local.apiUpdate({ basePath: '/' });
+        local.apiUpdate({ basePath: '/api/v0' });
         // init test api
-        local.apiDictUpdate({
+        local.apiUpdate({
             definitions: {
                 // init onErrorJsonapi schema
                 onErrorJsonapi: {
@@ -1774,7 +1779,8 @@
                         in: 'query',
                         name: 'paramOptional',
                         type: 'string',
-                        'x-apiKey': true
+                        'x-apiKey': true,
+                        'x-ref': 'x-test-param'
                     }, {
                         // test path-param handling-behavior
                         description: 'path-param',
@@ -1932,6 +1938,9 @@
                 'file fileUploadManyByForm.2': {
                     _schemaName: 'File'
                 }
+            },
+            "x-definitionsParameters": {
+                'x-test-param': {}
             },
             'x-swgg-datatableDict': {
                 'x-test': {

@@ -36,6 +36,7 @@
         ? window
         : global;
     local.local = local.global.utility2_rollup = local.global.utility2_rollup_old || local;
+    local.global.utility2_rollup_old = null;
 }());
 /* script-end /assets.utility2.rollup.begin.js */
 
@@ -797,8 +798,8 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             ).forEach(function (key) {
                 tmp = options.env.npm_package_name + '.swgg.apiDict';
                 tmp = options.moduleDict[tmp] = options.moduleDict[tmp] || {};
-                tmp[encodeURIComponent(key) + '._ajax'] = moduleMain.swgg.apiDict[key] &&
-                    moduleMain.swgg.apiDict[key]._ajax;
+                tmp[encodeURIComponent(key) + '.ajax'] = moduleMain.swgg.apiDict[key] &&
+                    moduleMain.swgg.apiDict[key].ajax;
             });
             // init moduleExtraDict
             module = options.moduleExtraDict[options.env.npm_package_name] =
@@ -3801,7 +3802,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 console.assert(!error, error);
             });
         };
-        local.cliDict.touchlist = function () {
+        local.cliDict.touchList = function () {
         /*
          * fileRemoteList commitMessage
          * touch comma-separated fileRemoteList on github
@@ -15312,6 +15313,7 @@ local.assetsDict['/assets.utility2.rollup.begin.js'] = '\
         ? window\n\
         : global;\n\
     local.local = local.global.utility2_rollup = local.global.utility2_rollup_old || local;\n\
+    local.global.utility2_rollup_old = null;\n\
 }());\n\
 ';
 
@@ -16078,7 +16080,7 @@ local.assetsDict['/favicon.ico'] = '';
                             (event.type === 'abort' ||
                             event.type === 'error' ||
                             xhr.statusCode >= 400)) {
-                        xhr.error = new Error(event.type);
+                        xhr.error = new Error('ajax - event ' + event.type);
                     }
                     // handle completed xhr request
                     if (xhr.readyState === 4) {
@@ -19854,7 +19856,7 @@ instruction\n\
             local.objectSetOverride(local, options, Infinity);
             // init swgg
             // coverage-hack - ignore else-statement
-            local.nop(local.swgg && local.swgg.apiDictUpdate(local.swgg.swaggerJson));
+            local.nop(local.swgg && local.swgg.apiUpdate(local.swgg.swaggerJson));
         };
 
         local.streamListCleanup = function (streamList) {
@@ -21559,6 +21561,13 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .cursorPointer input {\n\
     cursor: pointer;\n\
 }\n\
+.swggUiContainer .code,\n\
+.swggUiContainer .operation > .content .code {\n\
+    background: #ddd;\n\
+    border: 1px solid #bbb;\n\
+    color: #555;\n\
+    max-height: 50rem;\n\
+}\n\
 .swggUiContainer .flex1 {\n\
     flex: 1;\n\
 }\n\
@@ -21588,6 +21597,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     font-size: small;\n\
     line-height: 1.25rem;\n\
     max-height: 20rem;\n\
+    min-height: 1.75rem;\n\
     overflow: auto;\n\
     padding: 0.25rem;\n\
     white-space: pre;\n\
@@ -21636,7 +21646,8 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     padding-top: 0.5rem;\n\
 }\n\
 /* border-error*/\n\
-.swggUiContainer .error {\n\
+.swggUiContainer .error,\n\
+.swggUiContainer .operation > .content .error {\n\
     border: 5px solid #b00;\n\
 }\n\
 \n\
@@ -21725,7 +21736,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     height: 2rem;\n\
 }\n\
 .swggUiContainer > .header > .td3 {\n\
-border: 0;\n\
+    border: 0;\n\
     color: #fff;\n\
     padding: 6px 8px;\n\
     background: #580;\n\
@@ -21882,15 +21893,22 @@ border: 0;\n\
         style="width: 8rem;"\n\
         type="text"\n\
     >\n\
+    <button class="eventDelegateClick onEventUiReload td3">Explore</button>\n\
     <button\n\
         class="eventDelegateClick onEventUiReload td3"\n\
         id="swggApiKeyClearButton1"\n\
     >Clear api-keys</button>\n\
-    <button class="eventDelegateClick onEventUiReload td3">Explore</button>\n\
 </div>\n\
+<pre class="code" id="swggAjaxProgressPre1">\n\
+fetching resource-list ...\n\
+</pre>\n\
 <div class="coverageHack reset"></div>\n\
 </div>\n\
-<div class="swggAjaxProgressDiv" style="margin-top: 1rem; text-align: center;">fetching resource-list ...</div>\n\
+<div class="utility2FooterDiv">\n\
+    [ this document was created with\n\
+    <a href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
+    ]\n\
+</div>\n\
 <script>\n\
 /*jslint\n\
     bitwise: true,\n\
@@ -21908,7 +21926,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         "assets.swgg.swagger.json";\n\
 </script>\n\
 <script src="assets.utility2.rollup.js"></script>\n\
-<script>window.swgg.uiEventListenerDict[".onEventUiReload"]();</script>\n\
+<script>window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });</script>\n\
 </body>\n\
 </html>\n\
 ');
@@ -22637,12 +22655,37 @@ local.templateUiMain = '\
         type="text"\n\
         value="{{apiKeyValue}}"\n\
     >\n\
+    <button class="eventDelegateClick onEventUiReload td3">Explore</button>\n\
     <button\n\
         class="eventDelegateClick onEventUiReload td3"\n\
         id="swggApiKeyClearButton1"\n\
     >Clear api-keys</button>\n\
-    <button class="eventDelegateClick onEventUiReload td3">Explore</button>\n\
 </div>\n\
+{{#if url}}\n\
+<pre class="code" id="swggAjaxProgressPre1">\n\
+/*\n\
+ * initialize client-api\n\
+ * 1. if using browser, then embed the client in your webpage\n\
+ *        &lt;script src="https://kaizhu256.github.io/node-utility2/build..beta..travis-ci.org/app/assets.utility2.rollup.js"&gt;&lt;/script&gt;\n\
+ * 2. if using node, then download the client from cdn\n\
+ *        curl -LO https://kaizhu256.github.io/node-utility2/build..beta..travis-ci.org/app/assets.utility2.rollup.js\n\
+ * 3. run the code below in browser or node to initialize client-api\n\
+ */\n\
+var swgg;\n\
+swgg = typeof window === "object" && window && window.swgg // browser\n\
+swgg = swgg || require("./assets.utility2.rollup.js"); // node\n\
+swgg.apiUpdate(\n\
+    "{{url}}",\n\
+    function (error) {\n\
+        if (error) {\n\
+            console.error(error);\n\
+            return;\n\
+        }\n\
+        console.log("initialized client-api");\n\
+    }\n\
+);\n\
+</pre>\n\
+{{/if url}}\n\
 <div class="info reset">\n\
     {{#if info}}\n\
     {{#if info.x-homepage}}\n\
@@ -22699,7 +22742,7 @@ local.templateUiMain = '\
 <div class="color777 reset">\n\
     [ <span>base url</span>: {{basePath}} ]\n\
 </div>\n\
-<div class="swggAjaxProgressDiv reset resourceList" style="margin-top: 1rem; text-align: center;">rendering resource-list ...</div>\n\
+<div class="reset resourceList" style="margin-top: 1rem; text-align: center;">rendering resource-list ...</div>\n\
 ';
 
 
@@ -22842,20 +22885,36 @@ local.templateUiResource = '\
 
 
 local.templateUiResponseAjax = '\
+{{#if error}}\n\
+<h4 class="label marginTop10"></h4>\n\
+<pre class="code error">\n\
+ERROR\n\
+\n\
+{{error.message htmlSafe}}\n\
+</pre>\n\
+{{/if error}}\n\
+<h4 class="label marginTop10"></h4>\n\
+<pre class="code">\n\
+/*\n\
+ * client-api request {{options.api._keyPath}}\n\
+ * run the code below in browser or node to reproduce client-api request\n\
+ */\n\
+swgg.apiDict[{{options.api._keyPath jsonStringify}}].ajax({{optionsJson}}, \
+function (error, data) {\n\
+    if (error) {\n\
+        console.error(error);\n\
+        return;\n\
+    }\n\
+    console.log(data.responseJson || data.responseText);\n\
+}\
+);\n\
+</pre>\n\
 <h4 class="label marginTop10">Curl Request</h4>\n\
-{{#if errorValidate}}\n\
-<pre>n/a</pre>\n\
-{{#unless errorValidate}}\n\
 <pre>{{curl htmlSafe}}</pre>\n\
-{{/if errorValidate}}\n\
 <h4 class="label marginTop10">Response Code</h4>\n\
 <pre>{{statusCode}}</pre>\n\
 <h4 class="label marginTop10">Response Headers</h4>\n\
-{{#if errorValidate}}\n\
-<pre>n/a</pre>\n\
-{{#unless errorValidate}}\n\
 <pre>{{responseHeaders htmlSafe}}</pre>\n\
-{{/if errorValidate}}\n\
 <h4 class="label marginTop10">Response Body</h4>\n\
 {{responseBody}}\n\
 ';
@@ -22889,7 +22948,7 @@ swgg\n\
         /*
          * this function will send a swagger-api ajax-request with the pathObject self
          */
-            var isMultipartFormData, tmp;
+            var errorValidate, isMultipartFormData, tmp;
             isMultipartFormData = (self.consumes && self.consumes[0]) === 'multipart/form-data';
             local.objectSetDefault(options, { data: '', paramDict: {}, url: '' });
             // try to validate paramDict
@@ -22905,10 +22964,10 @@ swgg\n\
                     paramDefList: self.parameters
                 });
             }, function (error) {
-                options.errorValidate = error;
-                onError(error);
+                errorValidate = error;
             });
-            if (options.errorValidate) {
+            if (errorValidate) {
+                onError(errorValidate);
                 return;
             }
             // init options-defaults
@@ -23013,9 +23072,10 @@ swgg\n\
                     'Bearer ' + options.jwtEncrypted;
             }
             // init url
-            options.url = (((local.normalizeValue('list', local.swaggerJson.schemes)[0] ||
+            options.url = (((local.normalizeValue('list', self['x-schemes'] ||
+                local.swaggerJson.schemes)[0] ||
                 local.urlParse('').protocol.slice(0, -1)) + '://' +
-                (local.swaggerJson.host || local.urlParse('').host) +
+                (self['x-host'] || local.swaggerJson.host || local.urlParse('').host) +
                 local.swaggerJsonBasePath) + options.inPath + '?' + options.inQuery.slice(1))
                 .replace((/\?$/), '');
             if (!(options.headers['Content-Type'] || options.headers['content-type'])) {
@@ -23035,13 +23095,32 @@ swgg\n\
             });
         };
 
-        local.apiDictUpdate = function (options) {
+        local.apiUpdate = function (options, onError) {
         /*
          * this function will update the swagger-api dict of api-calls
          */
             var tmp;
+            if (typeof options === 'string') {
+                local.ajax({ url: options}, function (error, xhr) {
+                    local.tryCatchOnError(function () {
+                        // validate no error occurred
+                        local.assert(!error, error);
+                        // reset state
+                        local.apiDict = local.swaggerJson = null;
+                        tmp = '{}';
+                        // coverage-hack - ignore else-statement
+                        local.nop(xhr.responseText && (function () {
+                            tmp = xhr.responseText;
+                        }()));
+                        tmp = JSON.parse(tmp);
+                        local.apiUpdate(tmp);
+                        onError(null, tmp);
+                    }, onError);
+                });
+                return;
+            }
             // init options
-            options = local.normalizeValue('dict', options);
+            options = options || {};
             // init apiDict
             local.apiDict = local.apiDict || {};
             // init swaggerJson
@@ -23156,7 +23235,7 @@ swgg\n\
             // save tags
             tmp = {};
             [local.swaggerJson.tags, options.tags].forEach(function (tagList) {
-                local.normalizeValue('list', tagList).forEach(function (tag) {
+                (tagList || []).forEach(function (tag) {
                     local.objectSetOverride(tmp, local.objectLiteralize({
                         '$[]': [tag.name, tag]
                     }));
@@ -23253,17 +23332,27 @@ swgg\n\
                 self._method = self._method.toUpperCase();
                 // init _keyPath
                 self._keyPath = self._method + ' ' + self._path.replace((/\{.*?\}/g), '');
-                // init _idField.format and _idField.type
-                if (self._schemaName) {
-                    self.parameters.forEach(function (param) {
-                        if (param.name === self._idField) {
-                            param.format = options.definitions[self._schemaName]
-                                .properties[self._idAlias].format;
-                            param.type = options.definitions[self._schemaName]
-                                .properties[self._idAlias].type;
-                        }
-                    });
-                }
+                self.parameters.forEach(function (param) {
+                    // init _idField.format and _idField.type
+                    if (self._schemaName && param.name === self._idField) {
+                        param.format = options.definitions[self._schemaName]
+                            .properties[self._idAlias].format;
+                        param.type = options.definitions[self._schemaName]
+                            .properties[self._idAlias].type;
+                    }
+                    // copy x-ref from x-definitionsParameters
+                    if (param['x-ref']) {
+                        // validate x-ref
+                        local.assert(
+                            options['x-definitionsParameters'][param['x-ref']],
+                            param['x-ref']
+                        );
+                        local.objectSetDefault(
+                            param,
+                            local.jsonCopy(options['x-definitionsParameters'][param['x-ref']])
+                        );
+                    }
+                });
                 switch (self.operationId.split('.')[0]) {
                 // add extra file-upload forms
                 case 'fileUploadManyByForm':
@@ -23275,8 +23364,8 @@ swgg\n\
                 }
                 // update apiDict
                 self = local.apiDict[key] = local.apiDict[self._keyPath] = local.jsonCopy(self);
-                // init _ajax
-                self._ajax = function (options, onError) {
+                // init ajax
+                self.ajax = function (options, onError) {
                     return local.apiAjax(self, options, onError);
                 };
                 // remove underscored keys from self
@@ -24486,7 +24575,7 @@ swgg\n\
                 _queryWhere: options.queryWhere
             };
             // request data
-            local.apiDict[options.crudGetManyByQuery]._ajax(options, function (error, options) {
+            local.apiDict[options.crudGetManyByQuery].ajax(options, function (error, options) {
                 // validate no error occurred
                 local.assert(!error, error);
                 local.uiDatatableRender(options);
@@ -24509,7 +24598,7 @@ swgg\n\
                 // remove data
                 local.apiDict[
                     local.uiState.datatable.crudRemoveOneById
-                ]._ajax(local.objectLiteralize({
+                ].ajax(local.objectLiteralize({
                     paramDict: { '$[]': [
                         local.uiState.datatable._idField,
                         JSON.parse(decodeURIComponent(element.dataset.id))
@@ -24555,7 +24644,17 @@ swgg\n\
         /*
          * this function will submit the operation to the backend
          */
-            var options, tmp;
+            var options, jsonParse, tmp;
+            jsonParse = function (text) {
+            /*
+             * this function will try to JSON.parse(text)
+             */
+                return local.tryCatchOnError(function () {
+                    return JSON.parse(text);
+                }, function () {
+                    return text;
+                });
+            };
             options = {};
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
@@ -24565,112 +24664,119 @@ swgg\n\
                     options.headers = {};
                     options.paramDict = {};
                     options.api.parameters.forEach(function (paramDef) {
-                        local.tryCatchOnError(function () {
-                            tmp = options.domOperationContent.querySelector(
-                                '.paramDef[name=' + paramDef.name + '] > .td3'
-                            ).children[0];
-                            switch (tmp.tagName) {
-                            case 'INPUT':
-                                // parse file
-                                if (tmp.type === 'file') {
-                                    tmp = tmp.files && tmp.files[0];
-                                    break;
-                                }
-                                tmp = tmp.value;
-                                if (!tmp) {
-                                    return;
-                                }
-                                // parse string
-                                if (paramDef.type !== 'string') {
-                                    tmp = JSON.parse(tmp);
-                                }
-                                break;
-                            case 'SELECT':
-                                tmp = Array.from(tmp.options)
-                                    .filter(function (element) {
-                                        return element.selected;
-                                    })
-                                    .map(function (element) {
-                                        return JSON.parse(decodeURIComponent(
-                                            element.dataset.valueDecoded
-                                        ));
-                                    });
-                                if (!tmp.length || tmp[0] === '$swggUndefined') {
-                                    return;
-                                }
-                                if (paramDef.type !== 'array') {
-                                    tmp = tmp[0];
-                                }
-                                break;
-                            case 'TEXTAREA':
-                                tmp = tmp.value;
-                                if (!tmp) {
-                                    return;
-                                }
-                                if (paramDef.schema && paramDef.schema.type === 'string' &&
-                                        typeof tmp === 'string') {
-                                    break;
-                                }
-                                // parse schema
-                                if (paramDef.in === 'body') {
-                                    tmp = JSON.parse(tmp);
-                                    break;
-                                }
-                                // parse array
-                                tmp = tmp.split('\n').map(function (element) {
-                                    return paramDef.items.type === 'string'
-                                        ? element
-                                        : JSON.parse(element);
-                                });
+                        tmp = options.domOperationContent.querySelector(
+                            '.paramDef[name=' + paramDef.name + '] > .td3'
+                        ).children[0];
+                        switch (tmp.tagName) {
+                        case 'INPUT':
+                            // parse file
+                            if (tmp.type === 'file') {
+                                tmp = tmp.files && tmp.files[0];
                                 break;
                             }
-                            options.paramDict[paramDef.name] = tmp;
-                        }, function (error) {
-                            options.errorValidate = error;
-                            options.errorValidate.options = { key: paramDef.name };
-                            options.onNext(error);
-                        });
+                            tmp = tmp.value;
+                            if (!tmp) {
+                                return;
+                            }
+                            // parse string
+                            if (paramDef.type !== 'string') {
+                                tmp = jsonParse(tmp);
+                            }
+                            break;
+                        case 'SELECT':
+                            tmp = Array.from(tmp.options)
+                                .filter(function (element) {
+                                    return element.selected;
+                                })
+                                .map(function (element) {
+                                    return jsonParse(decodeURIComponent(
+                                        element.dataset.valueDecoded
+                                    ));
+                                });
+                            if (!tmp.length || tmp[0] === '$swggUndefined') {
+                                return;
+                            }
+                            if (paramDef.type !== 'array') {
+                                tmp = tmp[0];
+                            }
+                            break;
+                        case 'TEXTAREA':
+                            tmp = tmp.value;
+                            if (!tmp) {
+                                return;
+                            }
+                            if (paramDef.schema &&
+                                    paramDef.schema.type === 'string' &&
+                                    typeof tmp === 'string') {
+                                break;
+                            }
+                            // parse schema
+                            if (paramDef.in === 'body') {
+                                tmp = jsonParse(tmp);
+                                break;
+                            }
+                            // parse array
+                            tmp = tmp.split('\n').map(function (element) {
+                                return paramDef.items.type === 'string'
+                                    ? element
+                                    : jsonParse(element);
+                            });
+                            break;
+                        }
+                        options.paramDict[paramDef.name] = tmp;
                     });
-                    options.api._ajax(options, options.onNext);
+                    options.api.ajax(options, options.onNext);
                     break;
                 default:
+                    data = local.objectSetDefault(data, {
+                        error: error,
+                        options: options,
+                        statusCode: 'error'
+                    });
                     // remove previous error
                     Array.from(
                         options.domOperationContent.querySelectorAll('.paramDef .input')
                     ).forEach(function (element) {
                         element.classList.remove('error');
                     });
-                    if (options.errorValidate) {
-                        // shake input on Error
+                    // shake invalid-input
+                    if (error && error.options && error.options.key) {
                         Array.from(options.domOperationContent.querySelectorAll(
-                            '.paramDef[name=' + options.errorValidate.options.key + '] .input'
+                            '.paramDef[name=' + error.options.key + '] .input'
                         )).forEach(function (element) {
                             element.classList.add('error');
                             local.uiAnimateShake(element.closest('span'));
                         });
-                        data = {
-                            errorValidate: options.errorValidate,
-                            responseText: error.message,
-                            statusCode: 400
-                        };
                     }
+                    // init optionsJson
+                    data.optionsJson = JSON.stringify({
+                        paramDict: options.paramDict
+                    }, null, 4);
+                    // init curl
+                    local.tryCatchOnError(function () {
+                        options.data = JSON.stringify(JSON.parse(options.data), null, 4);
+                    }, local.nop);
+                    data.curl = 'curl \\\n' +
+                        '--request ' + options.api._method.toUpperCase() + ' \\\n' +
+                        Object.keys(options.headers).map(function (key) {
+                            return "--header '" + key + ': ' + options.headers[key] + "' \\\n";
+                        }).join('') + '--data-binary ' + (typeof options.data === 'string'
+                            ? "'" + options.data.replace(/'/g, "'\"'\"'") + "'"
+                            : '<blob>') + ' \\\n"' + options.url + '"';
                     // init responseHeaders
-                    data.responseHeaders = {};
-                    (
-                        (data.getAllResponseHeaders && data.getAllResponseHeaders()) || ''
-                    ).replace(
-                        (/.+/g),
-                        function (item) {
-                            item = item.split(':');
-                            data.responseHeaders[item[0].trim().toLowerCase()] =
-                                item.slice(1).join(':').trim();
-                        }
-                    );
-                    // init contentType
-                    data.contentType =
-                        String(data.responseHeaders['content-type']).split(';')[0];
+                    data.responseHeaders = data.getAllResponseHeaders
+                        ? data.getAllResponseHeaders().trim()
+                        : 'error';
                     // init responseBody
-                    switch (data.contentType.split('/')[0]) {
+                    ('\r\n' + (data.getAllResponseHeaders
+                        ? data.getAllResponseHeaders()
+                        : ''))
+                        .replace((/\r\ncontent-type:(.*?)\r\n/gi), function (match0, match1) {
+                            // jslint-hack - nop
+                            local.nop(match0);
+                            data.contentType = match1.trim();
+                        });
+                    switch (data.contentType && data.contentType.split('/')[0]) {
                     case 'audio':
                     case 'video':
                         data.responseBody = '<' + data.contentType.split('/')[0] +
@@ -24687,26 +24793,12 @@ swgg\n\
                         data.responseBody = '<pre>' + local.stringHtmlSafe(
                             data.responseJson
                                 ? JSON.stringify(data.responseJson, null, 4)
-                                : data.responseText
+                                : String(data.responseText || '')
                         ) + '</pre>';
                     }
-                    // init curl
-                    local.tryCatchOnError(function () {
-                        options.data = JSON.stringify(JSON.parse(options.data), null, 4);
-                    }, local.nop);
-                    data.curl = 'curl \\\n' +
-                        '--request ' + options.api._method.toUpperCase() + ' \\\n' +
-                        Object.keys(options.headers).map(function (key) {
-                            return "--header '" + key + ': ' + options.headers[key] + "' \\\n";
-                        }).join('') + '--data-binary ' + (typeof options.data === 'string'
-                            ? "'" + options.data.replace(/'/g, "'\"'\"'") + "'"
-                            : '<blob>') + ' \\\n"' + options.url + '"';
-                    data.responseHeaders = data.getAllResponseHeaders &&
-                        data.getAllResponseHeaders().trim();
                     // templateRender response
-                    options.domOperationContent.querySelector(
-                        '.responseAjax'
-                    ).innerHTML = local.templateRender(local.templateUiResponseAjax, data);
+                    options.domOperationContent.querySelector('.responseAjax').innerHTML =
+                        local.templateRender(local.templateUiResponseAjax, data);
                     break;
                 }
             });
@@ -24779,37 +24871,38 @@ swgg\n\
         /*
          * this function will reload the ui
          */
-            var notify, tmp;
-            switch (event && event.target && event.target.id) {
+            var notify;
+            event = event || {};
             // clear all apiKeyValue's from localStorage
-            case 'swggApiKeyClearButton1':
+            if (event.target && event.target.id === 'swggApiKeyClearButton1') {
                 local.apiKeyValue = '';
                 Object.keys(localStorage).forEach(function (key) {
                     if (key.indexOf('utility2_swgg_apiKeyKey_') === 0) {
                         localStorage.removeItem(key);
                     }
                 });
-                break;
-            // persist apiKeyValue to localStorage
-            case 'swggApiKeyInput1':
-                local.apiKeyValue = event.target.value;
-                local.localStorageSetItemOrClear(local.apiKeyKey, event.target.value);
-                break;
+            // restore apiKeyValue
+            } else if (event.swggInit) {
+                local.apiKeyKey = 'utility2_swgg_apiKeyKey_' + encodeURIComponent(
+                    document.querySelector('.swggUiContainer > .header > .td2').value
+                );
+                local.apiKeyValue = localStorage.getItem(local.apiKeyKey) || '';
+            // save apiKeyValue
+            } else {
+                local.apiKeyValue = document.querySelector('#swggApiKeyInput1').value;
+                local.localStorageSetItemOrClear(local.apiKeyKey, local.apiKeyValue);
             }
             // if keyup-event is not return-key, then return
-            if (event && event.type === 'keyup' && event.code !== 'Enter') {
-                return;
-            }
-            // do not reload ui during test
-            if (local.global.utility2_modeTestRun >= 2) {
+            if ((event.type === 'keyup' && event.code !== 'Enter') ||
+                    // do not reload ui during test
+                    local.global.utility2_modeTestRun >= 2) {
                 return;
             }
             notify = function (message) {
             /*
              * this function will notify with the given message
              */
-                document.querySelector('.swggAjaxProgressDiv').style.display = 'block';
-                document.querySelector('.swggAjaxProgressDiv').textContent = message;
+                document.querySelector('#swggAjaxProgressPre1').textContent = message;
             };
             // reset ui
             Array.from(
@@ -24823,38 +24916,26 @@ swgg\n\
                     document.querySelector('.swggUiContainer > .header > .td2').value
                         .replace((/^\//), '')
                 ).href;
-            // display .swggAjaxProgressDiv
             notify('fetching resource-list ' +
                 document.querySelector('.swggUiContainer > .header > .td2').value + ' ...');
-            document.querySelector('.swggAjaxProgressDiv').style.display = 'block';
-            local.ajax({
-                url: document.querySelector('.swggUiContainer > .header > .td2').value
-            }, function (error, xhr) {
-                local.tryCatchOnError(function () {
-                    // validate no error occurred
-                    local.assert(!error, error);
-                    // hide .swggAjaxProgressDiv
-                    document.querySelector('.swggAjaxProgressDiv').style.display = 'none';
-                    // reset state
-                    local.apiDict = local.swaggerJson = null;
-                    tmp = '{}';
-                    // coverage-hack - ignore else-statement
-                    local.nop(xhr.responseText && (function () {
-                        tmp = xhr.responseText;
-                    }()));
-                    tmp = JSON.parse(tmp);
-                    local.objectSetDefault(tmp, {
-                        host: local.githubCorsUrlOverride(
-                            local.urlParse(document.querySelector(
-                                '.swggUiContainer > .header > .td2'
-                            ).value).host,
-                            tmp['x-github-cors-host']
-                        )
-                    });
-                    local.apiDictUpdate(tmp);
-                    local.uiRender();
-                }, notify);
-            });
+            local.apiUpdate(
+                document.querySelector('.swggUiContainer > .header > .td2').value,
+                function (error, data) {
+                    local.tryCatchOnError(function () {
+                        // validate no error occurred
+                        local.assert(!error, error);
+                        local.objectSetDefault(data, {
+                            host: local.githubCorsUrlOverride(
+                                local.urlParse(document.querySelector(
+                                    '.swggUiContainer > .header > .td2'
+                                ).value).host,
+                                data['x-github-cors-host']
+                            )
+                        });
+                        local.uiRender();
+                    }, notify);
+                }
+            );
         };
 
         local.uiParamRender = function (paramDef) {
@@ -25013,14 +25094,13 @@ swgg\n\
          */
             var resource, options;
             options = local.uiState = local.jsonCopy(local.swaggerJson);
+            // init apiKeyValue
+            options.apiKeyValue = local.apiKeyValue;
             // init title
             document.querySelector('head > title').textContent =
                 local.templateRender(local.templateUiTitle, options).trim();
             // init url
             options.url = document.querySelector('.swggUiContainer > .header > .td2').value;
-            // init apiKeyValue
-            local.apiKeyKey = 'utility2_swgg_apiKeyKey_' + encodeURIComponent(options.url);
-            local.apiKeyValue = options.apiKeyValue = localStorage[local.apiKeyKey] || '';
             // templateRender main
             document.querySelector('.swggUiContainer').innerHTML =
                 local.templateRender(local.templateUiMain, options);
@@ -25140,7 +25220,7 @@ swgg\n\
         /*
          * this function will send a login-by-password request
          */
-            local.apiDict["GET /user/userLoginByPassword"]._ajax({
+            local.apiDict["GET /user/userLoginByPassword"].ajax({
                 paramDict: { password: options.password, username: options.username }
             }, onError);
         };
@@ -25149,7 +25229,7 @@ swgg\n\
         /*
          * this function will send a logout request
          */
-            local.apiDict["GET /user/userLogout"]._ajax(options, onError);
+            local.apiDict["GET /user/userLogout"].ajax(options, onError);
         };
 
         local.utility2.middlewareError = function (error, request, response) {
@@ -25446,7 +25526,10 @@ swgg\n\
                         local.assert((local.regexpPhoneValidate).test(data));
                         break;
                     case 'json':
-                        JSON.parse(data);
+                        local.tryCatchOnError(function () {
+                            JSON.parse(data);
+                        }, local.nop);
+                        local.assert(!local.utility2._debugTryCatchErrorCaught);
                         break;
                     }
                     break;
@@ -25595,14 +25678,10 @@ swgg\n\
     // run node js-env code - init-after
     /* istanbul ignore next */
     case 'node':
-        // init cli
-        switch (process.argv[2]) {
-        case 'swagger-ui':
-            local.replStart();
-            local.global.local = local;
-            local.assetsDict['/'] = local.assetsDict['/assets.swgg.html'];
-            local.testRunServer({});
-            break;
+        if (local.fs.existsSync(local.__dirname + '/assets.swgg.swagger.json')) {
+            local.swgg.apiUpdate(JSON.parse(
+                local.fs.readFileSync(local.__dirname + '/assets.swgg.swagger.json')
+            ));
         }
         break;
     }

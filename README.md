@@ -69,14 +69,13 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2017.10.5
-- npm publish 2017.10.5
-- add api-key form-input, and persist in localStorage
-- add param-property 'x-apiKey'
-- add param-property 'x-example' (similar to 'default' param-property, except used in input-placeholder)
-- allow degenerate method-path's by appending # comment
-- fix double '//' bug when basePath is '/'
-- rename ajaxForwardProxyUrlTest to githubForwardProxyUrlTest
+#### changelog for v2017.10.11
+- npm publish 2017.10.11
+- add swgg credit to bottom on assets.swgg.html
+- add top-level swagger-json property x-definitionsParameters
+- add param-property x-host
+- document library-call equivalent to curl-request
+- rename function swgg.apiDictUpdate -> swgg.apiUpdate
 - none
 
 #### this package requires
@@ -353,9 +352,9 @@ utility2-comment -->\n\
         delete local.tmp.basePath;
         delete local.tmp.host;
         delete local.tmp.schemes;
-        local.swgg.apiDictUpdate(local.tmp);
+        local.swgg.apiUpdate(local.tmp);
         // init petstore-api - backend
-        local.swgg.apiDictUpdate({
+        local.swgg.apiUpdate({
             definitions: {
                 File: {
                     allOf: [{ $ref: '#/definitions/BuiltinFile' }]
@@ -993,7 +992,7 @@ utility2-comment -->\n\
         "start": "PORT=${PORT:-8080} utility2 start test.js",
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2017.10.5"
+    "version": "2017.10.11"
 }
 ```
 
