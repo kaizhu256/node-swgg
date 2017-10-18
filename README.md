@@ -58,6 +58,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
+- add auto-operationId feature
 - improve notification of unreachable network
 - revamp datatable with card-expansion ui
 - add forward-proxy ui-checkbox
@@ -69,13 +70,11 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2017.10.11
-- npm publish 2017.10.11
-- add swgg credit to bottom on assets.swgg.html
-- add top-level swagger-json property x-definitionsParameters
-- add param-property x-host
-- document library-call equivalent to curl-request
-- rename function swgg.apiDictUpdate -> swgg.apiUpdate
+#### changelog for v2017.10.17
+- npm publish 2017.10.17
+- auto-scroll to first operation if hashbang fails
+- fix client-api initialization in browser
+- fix bug where missing required-param in ui does not give error
 - none
 
 #### this package requires
@@ -992,7 +991,7 @@ utility2-comment -->\n\
         "start": "PORT=${PORT:-8080} utility2 start test.js",
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2017.10.11"
+    "version": "2017.10.17"
 }
 ```
 

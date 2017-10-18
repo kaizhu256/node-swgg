@@ -1412,6 +1412,23 @@
             setTimeout(onError, 1500);
         };
 
+        local.testCase_uiNotify_default = function (options, onError) {
+        /*
+         * this function will test uiNotify's default handling-behavior
+         */
+            options = {};
+            // test error handling-behavior
+            options.data = local.uiNotify(local.errorDefault, 'aa');
+            // validate error occurred
+            local.assert(options.data.classList.contains('error'));
+            // test message handling-behavior
+            options.data = local.uiNotify(null, 'bb');
+            // validate no error occurred
+            local.assert(!options.data.classList.contains('error'), options.data.classList);
+            local.assertJsonEqual(options.data.textContent, 'bb');
+            onError(null, options);
+        };
+
         local.testCase_ui_datatable = function (options, onError) {
         /*
          * this function will test ui's datatable handling-behavior
@@ -1488,7 +1505,7 @@
 
         local.testCase_ui_fileMedia = function (options, onError) {
         /*
-         * this function will test ui's file-media handling-behavior
+         * this function will test ui's fileMedia handling-behavior
          */
             options = [
                 'testCase_ui_fileMedia_audioNull',
@@ -1501,22 +1518,6 @@
                     .click();
             });
             onError();
-        };
-        break;
-
-
-
-    // run node js-env code - function
-    case 'node':
-        local.testCase_webpage_default = function (options, onError) {
-        /*
-         * this function will test webpage's default handling-behavior
-         */
-            options = {
-                modeCoverageMerge: true,
-                url: local.serverLocalHost + '/?modeTest=1' + '#!/swgg_id_pet/swgg_id_addPet'
-            };
-            local.browserTest(options, onError);
         };
         break;
     }
@@ -1673,7 +1674,7 @@
                         type: 'array'
                     }, {
                         // test array-default-param handling-behavior
-                        collectionFormat: 'default',
+                        collectionFormat: undefined,
                         default: ['aa', 'bb'],
                         description: 'default-array param',
                         in: 'query',
