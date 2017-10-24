@@ -58,8 +58,8 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
-- add auto-operationId feature
-- improve notification of unreachable network
+- remove redundant operationId-keyed entries from apiDict
+- un-magic property operation._keyPath
 - revamp datatable with card-expansion ui
 - add forward-proxy ui-checkbox
 - datatable - allow optional sub-level input for swagger-models
@@ -70,11 +70,17 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2017.10.17
-- npm publish 2017.10.17
-- auto-scroll to first operation if hashbang fails
-- fix client-api initialization in browser
-- fix bug where missing required-param in ui does not give error
+#### changelog for v2017.10.24
+- npm publish 2017.10.24
+- remove datatable for future revamp
+- add feature \$SWGG_TAGS0_FILTER to filter x-swgg-tags0
+- add feature x-swgg-operationIdFromPath to auto-create operationId from path
+- fix property items.enum not rendering multi-select input bug
+- fix missing resource.id bug
+- rename function normalizeParamDictSwagger -> swaggerParamDictNormalize
+- rename property pathObject._operationId -> pathObject._keyCrud
+- rename property swgg.pathname -> swgg.keyPath
+- remove operationId display from ui
 - none
 
 #### this package requires
@@ -132,7 +138,7 @@ instruction
     bitwise: true,
     browser: true,
     maxerr: 8,
-    maxlen: 96,
+    maxlen: 100,
     node: true,
     nomen: true,
     regexp: true,
@@ -409,40 +415,40 @@ utility2-comment -->\n\
                     _schemaName: 'File'
                 },
                 'pet addPet': {
-                    _operationId: 'crudSetOneById.petId.id',
+                    _keyCrud: 'crudSetOneById.petId.id',
                     _schemaName: 'Pet'
                 },
                 'pet crudGetManyByQuery': {
                     _schemaName: 'Pet'
                 },
                 'pet deletePet': {
-                    _operationId: 'crudRemoveOneById.petId.id',
+                    _keyCrud: 'crudRemoveOneById.petId.id',
                     _schemaName: 'Pet'
                 },
                 'pet findPetsByStatus': {
-                    _operationId: 'crudGetManyByQuery',
+                    _keyCrud: 'crudGetManyByQuery',
                     _queryWhere: '{"status":{"$in":{{status jsonStringify}}}}',
                     _schemaName: 'Pet'
                 },
                 'pet findPetsByTags': {
-                    _operationId: 'crudGetManyByQuery',
+                    _keyCrud: 'crudGetManyByQuery',
                     _queryWhere: '{"tags.name":{"$in":{{tags jsonStringify}}}}',
                     _schemaName: 'Pet'
                 },
                 'pet getPetById': {
-                    _operationId: 'crudGetOneById.petId.id',
+                    _keyCrud: 'crudGetOneById.petId.id',
                     _schemaName: 'Pet'
                 },
                 'pet updatePet': {
-                    _operationId: 'crudUpdateOneById.petId.id',
+                    _keyCrud: 'crudUpdateOneById.petId.id',
                     _schemaName: 'Pet'
                 },
                 'pet updatePetWithForm': {
-                    _operationId: 'crudUpdateOneById.petId.id',
+                    _keyCrud: 'crudUpdateOneById.petId.id',
                     _schemaName: 'Pet'
                 },
                 'pet uploadFile': {
-                    _operationId: 'fileUploadManyByForm',
+                    _keyCrud: 'fileUploadManyByForm',
                     _schemaName: 'User'
                 },
                 'store crudGetManyByQuery': {
@@ -452,30 +458,30 @@ utility2-comment -->\n\
                     _schemaName: 'Order'
                 },
                 'store deleteOrder': {
-                    _operationId: 'crudRemoveOneById.orderId.id',
+                    _keyCrud: 'crudRemoveOneById.orderId.id',
                     _schemaName: 'Order'
                 },
                 'store getInventory': {
                     _schemaName: 'Order'
                 },
                 'store getOrderById': {
-                    _operationId: 'crudGetOneById.orderId.id',
+                    _keyCrud: 'crudGetOneById.orderId.id',
                     _schemaName: 'Order'
                 },
                 'store placeOrder': {
-                    _operationId: 'crudSetOneById.orderId.id',
+                    _keyCrud: 'crudSetOneById.orderId.id',
                     _schemaName: 'Order'
                 },
                 'user createUser': {
-                    _operationId: 'crudSetOneById.username.username',
+                    _keyCrud: 'crudSetOneById.username.username',
                     _schemaName: 'User'
                 },
                 'user createUsersWithArrayInput': {
-                    _operationId: 'crudSetManyById',
+                    _keyCrud: 'crudSetManyById',
                     _schemaName: 'User'
                 },
                 'user createUsersWithListInput': {
-                    _operationId: 'crudSetManyById',
+                    _keyCrud: 'crudSetManyById',
                     _schemaName: 'User'
                 },
                 'user crudCountManyByQuery': {
@@ -494,23 +500,23 @@ utility2-comment -->\n\
                     _schemaName: 'User'
                 },
                 'user deleteUser': {
-                    _operationId: 'crudRemoveOneById.username.username',
+                    _keyCrud: 'crudRemoveOneById.username.username',
                     _schemaName: 'User'
                 },
                 'user getUserByName': {
-                    _operationId: 'crudGetOneById.username.username',
+                    _keyCrud: 'crudGetOneById.username.username',
                     _schemaName: 'User'
                 },
                 'user loginUser': {
-                    _operationId: 'userLoginByPassword',
+                    _keyCrud: 'userLoginByPassword',
                     _schemaName: 'User'
                 },
                 'user logoutUser': {
-                    _operationId: 'userLogout',
+                    _keyCrud: 'userLogout',
                     _schemaName: 'User'
                 },
                 'user updateUser': {
-                    _operationId: 'crudUpdateOneById.username.username',
+                    _keyCrud: 'crudUpdateOneById.username.username',
                     _schemaName: 'User'
                 },
                 'user userLoginByPassword': {
@@ -518,32 +524,6 @@ utility2-comment -->\n\
                 },
                 'user userLogout': {
                     _schemaName: 'User'
-                }
-            },
-            'x-swgg-datatableDict': {
-                file: {
-                    crudSetOneById: 'file crudSetOneById.id.id',
-                    crudRemoveOneById: 'file crudRemoveOneById.id.id',
-                    crudGetManyByQuery: 'file crudGetManyByQuery',
-                    schema: { $ref: '#/definitions/File' }
-                },
-                pet: {
-                    crudSetOneById: 'pet addPet',
-                    crudRemoveOneById: 'pet deletePet',
-                    crudGetManyByQuery: 'pet crudGetManyByQuery',
-                    schema: { $ref: '#/definitions/Pet' }
-                },
-                store: {
-                    crudSetOneById: 'store placeOrder',
-                    crudRemoveOneById: 'store deleteOrder',
-                    crudGetManyByQuery: 'store crudGetManyByQuery',
-                    schema: { $ref: '#/definitions/Order' }
-                },
-                user: {
-                    crudSetOneById: 'user createUser',
-                    crudRemoveOneById: 'user deleteUser',
-                    crudGetManyByQuery: 'user crudGetManyByQuery',
-                    schema: { $ref: '#/definitions/User' }
                 }
             }
         });
@@ -991,7 +971,7 @@ utility2-comment -->\n\
         "start": "PORT=${PORT:-8080} utility2 start test.js",
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2017.10.17"
+    "version": "2017.10.24"
 }
 ```
 

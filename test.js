@@ -3,7 +3,7 @@
     bitwise: true,
     browser: true,
     maxerr: 8,
-    maxlen: 96,
+    maxlen: 100,
     node: true,
     nomen: true,
     regexp: true,
@@ -116,6 +116,10 @@
                 // test 404 undefined-api-error-2 handling-behavior
                 statusCode: 404,
                 url: '/api/v0/x-test/errorUndefinedApi'
+            }, {
+                // test 404 x-swgg-operationIdFromPath handling-behavior
+                statusCode: 404,
+                url: '/api/v0/x-test/x-swgg-operationIdFromPath'
             }, {
                 // test 404 undefined-map-file handling-behavior
                 statusCode: 404,
@@ -259,8 +263,8 @@
                 'x-test crudErrorLogin',
                 'x-test crudErrorOptions',
                 'x-test crudErrorPatch',
-                'x-test crudErrorPre',
                 'x-test crudErrorPost',
+                'x-test crudErrorPre',
                 'x-test crudErrorPut'
             ].forEach(function (key) {
                 onParallel.counter += 1;
@@ -1175,7 +1179,7 @@
                     paramFormData1: 'hello formData1',
                     paramFormData2: 'hello formData2'
                 });
-                onError();
+                onError(null, options);
             });
         };
 
@@ -1210,10 +1214,7 @@
                 { key: 'propString', value: 'hello' },
                 { key: 'propString2', value: 'hello_0123456789_0123456789' },
                 { key: 'propStringBinary', value: '\u1234' },
-                {
-                    key: 'propStringByte',
-                    value: local.base64FromString(local.stringAsciiCharset)
-                },
+                { key: 'propStringByte', value: local.base64FromString(local.stringAsciiCharset) },
                 { key: 'propStringDate', value: '1971-01-01' },
                 { key: 'propStringDatetime', value: '1971-01-01T00:00:00Z' },
                 { key: 'propStringEmail', value: 'a@a.com' },
@@ -1229,7 +1230,7 @@
                 element.data.propObjectSubdoc = element.data.propObjectSubdoc || element.data;
                 local.validateBySchema(element);
             });
-            onError();
+            onError(null, options);
         };
 
         local.testCase_validateBySchema_error = function (options, onError) {
@@ -1245,7 +1246,6 @@
                 { key: 'propArray', value: true },
                 { key: 'propArray2', value: [] },
                 { key: 'propArray2', value: [null, null] },
-                { key: 'propArraySubdoc', value: [{ propRequired: null }] },
                 { key: 'propArraySubdoc', value: [ 'non-object' ] },
                 { key: 'propArraySubdoc', value: [{ propRequired: null }] },
                 { key: 'propBoolean', value: 0 },
@@ -1302,7 +1302,7 @@
                     JSON.stringify(element.data)
                 );
             });
-            onError();
+            onError(null, options);
         };
 
         local.testCase_validateBySwagger_default = function (options, onError) {
@@ -1318,6 +1318,11 @@
                 // validate error occurred
                 local.assert(local.utility2._debugTryCatchErrorCaught, element);
             });
+            local.validateBySwagger({
+                info: { title: 'undefined', version: 'undefined' },
+                paths: {},
+                swagger: '2.0'
+            });
             options.templateData = JSON.stringify({
                 definitions: {
                     Test: {
@@ -1328,9 +1333,9 @@
                         allOf: [null],
                         default: {},
                         description: 'hello',
-                        format: 'undefined',
                         exclusiveMaximum: true,
                         exclusiveMinimum: true,
+                        format: 'undefined',
                         items: {},
                         maxItems: 100,
                         maxProperties: 100,
@@ -1355,13 +1360,12 @@
             // test error handling-behavior
             local.validateBySwagger(JSON.parse(options.templateData));
             [
-                { propUndefined: {} },
                 { definitions: { Test: { $ref: true } } },
                 { definitions: { Test: { allOf: [] } } },
                 { definitions: { Test: { description: true } } },
-                { definitions: { Test: { format: true } } },
                 { definitions: { Test: { exclusiveMaximum: 1 } } },
                 { definitions: { Test: { exclusiveMinimum: 1 } } },
+                { definitions: { Test: { format: true } } },
                 { definitions: { Test: { items: true } } },
                 { definitions: { Test: { maxItems: true } } },
                 { definitions: { Test: { maxProperties: true } } },
@@ -1375,7 +1379,8 @@
                 { definitions: { Test: { required: [] } } },
                 { definitions: { Test: { title: true } } },
                 { definitions: { Test: { type: true } } },
-                { definitions: { Test: { uniqueItems: 'undefined' } } }
+                { definitions: { Test: { uniqueItems: 'undefined' } } },
+                { propUndefined: {} }
             ].forEach(function (element) {
                 local.tryCatchOnError(function () {
                     local.validateBySwagger(local.objectSetOverride(
@@ -1386,7 +1391,7 @@
                 // validate error occurred
                 local.assert(local.utility2._debugTryCatchErrorCaught, element);
             });
-            onError();
+            onError(null, options);
         };
 
         local.utility2.serverLocalUrlTest = function (url) {
@@ -1429,31 +1434,6 @@
             onError(null, options);
         };
 
-        local.testCase_ui_datatable = function (options, onError) {
-        /*
-         * this function will test ui's datatable handling-behavior
-         */
-            options = {};
-            options.onEvent = function () {
-                document.removeEventListener('uiDatatableRendered', options.onEvent);
-                // test onEventModalHide's null-case handling-behavior
-                document.querySelector('.onEventModalHide div').click();
-                // select dbRow
-                document.querySelector('.onEventDatatableTrSelect').click();
-                // un-select dbRow
-                document.querySelector('.onEventDatatableTrSelect input').click();
-                // bug-workaround - select last (hopefully not important) dbRow to remove
-                Array.from(document.querySelectorAll('.onEventDatatableTrSelect'))
-                    .slice(-1)[0].click();
-                document.querySelector('.onEventDatatableSelectedRemove').click();
-                // hide modal
-                document.querySelector('.onEventModalHide').click();
-                onError();
-            };
-            document.addEventListener('uiDatatableRendered', options.onEvent);
-            document.querySelector('[data-resource-name=pet]').click();
-        };
-
         local.testCase_ui_default = function (options, onError) {
         /*
          * this function will test ui's default handling-behavior
@@ -1461,8 +1441,6 @@
             var onParallel;
             onParallel = local.onParallel(function (error) {
                 setTimeout(function () {
-                    // hide modal
-                    document.querySelector('.onEventModalHide').click();
                     // reset location.hash
                     document.querySelector('#swgg_id_pet .td1').click();
                     onError(error);
@@ -1517,7 +1495,7 @@
                 document.querySelector('#swgg_id_fileGetOneById_id_id .onEventOperationAjax')
                     .click();
             });
-            onError();
+            onError(null, options);
         };
         break;
     }
@@ -1526,12 +1504,25 @@
 
     // run shared js-env code - init-after
     (function () {
-        // coverage-hack - test apidDictUpdate's misc handling-behavior
+        // test apiUpdate's null-case handling-behavior
         local.apiUpdate();
+        // test apiUpdate's root-basePath handling-behavior
         local.apiUpdate({ basePath: '/' });
-        local.apiUpdate({ basePath: '/api/v0' });
+        local.assertJsonEqual(local.swaggerJsonBasePath, '');
+        // test apiUpdate's $SWGG_TAGS0_FILTER handling-behavior
+        local.testMock([
+            [local.env, { SWGG_TAGS0_FILTER: 'x-test-tags0-filter' }]
+        ], function (onError) {
+            local.apiUpdate({
+                definitions: { Aa: {}, Bb: { 'x-swgg-tags0': 'undefined' } },
+                paths: { '/aa': { get: {} }, '/bb': { get: { 'x-swgg-tags0': 'undefined' } } },
+                tags: [{}, { 'x-swgg-tags0': 'undefined' }]
+            });
+            onError();
+        }, local.onErrorThrow);
         // init test api
         local.apiUpdate({
+            basePath: '/api/v0',
             definitions: {
                 // init onErrorJsonapi schema
                 onErrorJsonapi: {
@@ -1661,6 +1652,12 @@
                     summary: 'test onErrorJsonapi handling-behavior',
                     tags: ['x-test']
                 } },
+                // test x-swgg-operationIdFromPath handling-behavior
+                '/x-test/x-swgg-operationIdFromPath': { get: {
+                    summary: 'test x-swgg-operationIdFromPath handling-behavior',
+                    tags: ['x-test'],
+                    'x-swgg-operationIdFromPath': true
+                } },
                 // test default-param handling-behavior
                 '/x-test/paramDefault/{paramPath}': { post: {
                     operationId: 'paramDefault',
@@ -1690,7 +1687,7 @@
                         items: { type: 'integer' },
                         name: 'paramArrayJson',
                         type: 'array',
-                        'x-example': [0, 1]
+                        'x-swgg-example': [0, 1]
                     }, {
                         // test array-multi-param handling-behavior
                         collectionFormat: 'multi',
@@ -1766,7 +1763,7 @@
                         in: 'query',
                         name: 'paramInteger',
                         type: 'integer',
-                        'x-example': 0
+                        'x-swgg-example': 0
                     }, {
                         // test json-param handling-behavior
                         description: 'json-param',
@@ -1780,8 +1777,8 @@
                         in: 'query',
                         name: 'paramOptional',
                         type: 'string',
-                        'x-apiKey': true,
-                        'x-ref': 'x-test-param'
+                        'x-swgg-apiKey': true,
+                        'x-swgg-ref': 'x-test-param'
                     }, {
                         // test path-param handling-behavior
                         description: 'path-param',
@@ -1858,6 +1855,9 @@
                 description: 'internal test-api'
             }],
             'x-swgg-apiDict': {
+                'file fileUploadManyByForm.2': {
+                    _schemaName: 'File'
+                },
                 'x-test crudCountManyByQuery': {
                     _schemaName: 'TestCrud'
                 },
@@ -1879,10 +1879,10 @@
                 'x-test crudErrorPatch': {
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudErrorPre': {
+                'x-test crudErrorPost': {
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudErrorPost': {
+                'x-test crudErrorPre': {
                     _schemaName: 'TestCrud'
                 },
                 'x-test crudErrorPut': {
@@ -1891,10 +1891,10 @@
                 'x-test crudGetManyByQuery': {
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudGetOneByQuery': {
+                'x-test crudGetOneById.id.id': {
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudGetOneById.id.id': {
+                'x-test crudGetOneByQuery': {
                     _schemaName: 'TestCrud'
                 },
                 'x-test crudNullDelete': {
@@ -1935,25 +1935,10 @@
                 },
                 'x-test crudUpdateOneById.id.id': {
                     _schemaName: 'TestCrud'
-                },
-                'file fileUploadManyByForm.2': {
-                    _schemaName: 'File'
                 }
             },
-            "x-definitionsParameters": {
+            "x-swgg-definitionsParameters": {
                 'x-test-param': {}
-            },
-            'x-swgg-datatableDict': {
-                'x-test': {
-                    crudSetOneById:
-                        'x-test crudSetOneById.id.id',
-                    crudRemoveOneById:
-                        'x-test crudRemoveOneById.id.id',
-                    crudGetManyByQuery: 'x-test crudGetManyByQuery',
-                    idField: 'id',
-                    queryLimit: 20,
-                    schema: { $ref: '#/definitions/TestCrud' }
-                }
             }
         });
         // test redundant http-body-parse-middleware handling-behavior
