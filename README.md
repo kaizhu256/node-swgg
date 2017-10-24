@@ -58,6 +58,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
+- npm publish 2017.10.25
 - remove redundant operationId-keyed entries from apiDict
 - un-magic property operation._keyPath
 - revamp datatable with card-expansion ui
@@ -70,17 +71,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2017.10.24
-- npm publish 2017.10.24
-- remove datatable for future revamp
-- add feature \$SWGG_TAGS0_FILTER to filter x-swgg-tags0
-- add feature x-swgg-operationIdFromPath to auto-create operationId from path
-- fix property items.enum not rendering multi-select input bug
-- fix missing resource.id bug
-- rename function normalizeParamDictSwagger -> swaggerParamDictNormalize
-- rename property pathObject._operationId -> pathObject._keyCrud
-- rename property swgg.pathname -> swgg.keyPath
-- remove operationId display from ui
+#### changelog for v2017.10.25
 - none
 
 #### this package requires
@@ -971,7 +962,7 @@ utility2-comment -->\n\
         "start": "PORT=${PORT:-8080} utility2 start test.js",
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2017.10.24"
+    "version": "2017.10.25"
 }
 ```
 
