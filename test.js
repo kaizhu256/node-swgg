@@ -1516,10 +1516,13 @@
             local.apiUpdate({
                 definitions: { Aa: {}, Bb: { 'x-swgg-tags0': 'undefined' } },
                 paths: { '/aa': { get: {} }, '/bb': { get: { 'x-swgg-tags0': 'undefined' } } },
-                tags: [{}, { 'x-swgg-tags0': 'undefined' }]
+                tags: [{}, { 'x-swgg-tags0': 'x-test' }]
             });
             onError();
         }, local.onErrorThrow);
+        // test apiAjax's deferred handling-behavior
+        local.apiAjaxDeferList = local.apiAjaxDeferList || [];
+        local.apiAjax('GET /x-test/crudNullGet', {}, local.onErrorThrow);
         // init test api
         local.apiUpdate({
             basePath: '/api/v0',

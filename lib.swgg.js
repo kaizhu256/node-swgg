@@ -1058,10 +1058,10 @@ local.templateUiMain = '\
 /*\n\
  * initialize swgg-client\n\
  * 1. if using browser, then embed the client in webpage:\n\
- *     &lt;script src="https://kaizhu256.github.io/node-utility2/build..beta..travis-ci.org/app/assets.utility2.rollup.js"&gt;&lt;/script&gt;\n\
+ *     &lt;script src="https://kaizhu256.github.io/node-segg/build..beta..travis-ci.org/app/assets.utility2.rollup.js"&gt;&lt;/script&gt;\n\
  *     &lt;script&gt;window.utility2.corsForwardProxyHostifNeeded=function(){return \"https://h1-proxy1.herokuapp.com\";};&lt;/script&gt;\n\
  * 2. if using node, then download the client from cdn:\n\
- *     curl -LO https://kaizhu256.github.io/node-utility2/build..beta..travis-ci.org/app/assets.utility2.rollup.js\n\
+ *     curl -LO https://kaizhu256.github.io/node-segg/build..beta..travis-ci.org/app/assets.utility2.rollup.js\n\
  * 3. run the code below in browser or node to initialize swgg-client\n\
  */\n\
 var swgg;\n\
@@ -1287,7 +1287,7 @@ ERROR\n\
  * reproduce swgg-client request {{options.api._method}} {{options.api._path}}\n\
  * run the code below in browser or node to reproduce swgg-client request\n\
  */\n\
-swgg.apiDict[{{options.api._keyPath jsonStringify}}].ajax({{optionsJson}}, \
+swgg.apiAjax({{options.api._keyPath jsonStringify}}, {{optionsJson}}, \
 function (error, data) {\n\
     if (error) {\n\
         console.error(error);\n\
@@ -1337,6 +1337,11 @@ swgg\n\
          * this function will send a swagger-api ajax-request with the pathObject self
          */
             var errorValidate, isMultipartFormData, tmp;
+            if (local.apiAjaxDeferList) {
+                local.apiAjaxDeferList.push(arguments);
+                return;
+            }
+            self = local.apiDict[self] || self;
             options.pathObject = self;
             isMultipartFormData = (self.consumes && self.consumes[0]) === 'multipart/form-data';
             local.objectSetDefault(options, { data: '', paramDict: {}, url: '' });
@@ -1486,6 +1491,8 @@ swgg\n\
             var tmp;
             // init options
             options = options || {};
+            // defer apiAjax
+            local.apiAjaxDeferList = local.apiAjaxDeferList || [];
             if (options.modeAjax) {
                 local.ajax(options, function (error, xhr) {
                     local.tryCatchOnError(function () {
@@ -1770,6 +1777,12 @@ swgg\n\
             // init assets.swgg.swagger.server.json
             local.assetsDict['/assets.swgg.swagger.server.json'] =
                 JSON.stringify(local.swaggerJson);
+            // run deferred apiAjax
+            tmp = local.apiAjaxDeferList;
+            local.apiAjaxDeferList = null;
+            while (tmp && tmp.length) {
+                local.apiAjax.apply(null, tmp.shift());
+            }
         };
 
         local.dbFieldRandomCreate = function (options) {

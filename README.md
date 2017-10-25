@@ -72,6 +72,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - none
 
 #### changelog for v2017.10.25
+- allow deferring of function apiAjax to wait for remote swaggerJson
 - none
 
 #### this package requires
