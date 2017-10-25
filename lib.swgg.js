@@ -1692,11 +1692,13 @@ swgg\n\
             Object.keys(local.apiDict).forEach(function (key) {
                 var self;
                 self = local.apiDict[key];
-                if (key === self._keyPath || key.indexOf('%') >= 0) {
-                    return;
-                }
+                //!! if (key === self._keyPath || key.indexOf('%') >= 0) {
+                    //!! return;
+                //!! }
+                //!!
+                self._id2 = encodeURIComponent(self._path + '# ' + self._method);
                 // init _keyCrud
-                self._keyCrud = self._keyCrud || key.split(' ')[1];
+                self._keyCrud = self._keyCrud || '';
                 // init _fileUploadNumber
                 self._fileUploadNumber = 1;
                 self._keyCrud.replace((/^fileUploadManyByForm\.(\d+)/), function (match0, match1) {
@@ -2786,7 +2788,7 @@ swgg\n\
          * this function will parse the options according to pathObject.parameters
          */
             var tmp;
-            options.pathObject.parameters.forEach(function (paramDef) {
+            debugInline(options.pathObject).parameters.forEach(function (paramDef) {
                 tmp = options.paramDict[paramDef.name];
                 // init default value
                 if (!options.modeNoDefault &&

@@ -1865,89 +1865,117 @@
                 description: 'internal test-api'
             }],
             'x-swgg-apiDict': {
-                'file fileUploadManyByForm.2': {
+                //!! 'file fileUploadManyByForm.2': {
+                '%2Ffile%2FfileUploadManyByForm.2%23%20post': {
+                    _keyCrud: 'fileUploadManyByForm.2',
                     _schemaName: 'File'
                 },
-                'x-test crudCountManyByQuery': {
+                '%2Fx-test%2FcrudCountManyByQuery%23%20get': {
+                    _keyCrud: 'crudCountManyByQuery',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudErrorDelete': {
+                '%2Fx-test%2FcrudErrorDelete%23%20get': {
+                    _keyCrud: 'crudErrorDelete',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudErrorGet': {
+                '%2Fx-test%2FcrudErrorGet%23%20get': {
+                    _keyCrud: 'crudErrorGet',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudErrorHead': {
+                '%2Fx-test%2FcrudErrorHead%23%20get': {
+                    _keyCrud: 'crudErrorHead',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudErrorLogin': {
+                '%2Fx-test%2FcrudErrorLogin%23%20get': {
+                    _keyCrud: 'crudErrorLogin',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudErrorOptions': {
+                '%2Fx-test%2FcrudErrorOptions%23%20get': {
+                    _keyCrud: 'crudErrorOptions',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudErrorPatch': {
+                '%2Fx-test%2FcrudErrorPatch%23%20get': {
+                    _keyCrud: 'crudErrorPatch',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudErrorPost': {
+                '%2Fx-test%2FcrudErrorPost%23%20get': {
+                    _keyCrud: 'crudErrorPost',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudErrorPre': {
+                '%2Fx-test%2FcrudErrorPre%23%20get': {
+                    _keyCrud: 'crudErrorPre',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudErrorPut': {
+                '%2Fx-test%2FcrudErrorPut%23%20get': {
+                    _keyCrud: 'crudErrorPut',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudGetManyByQuery': {
+                '%2Fx-test%2FcrudGetManyByQuery%23%20get': {
+                    _keyCrud: 'crudGetManyByQuery',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudGetOneById.id.id': {
+                '%2Fx-test%2FcrudGetOneById.id.id%23%20get': {
+                    _keyCrud: 'crudGetOneById.id.id',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudGetOneByQuery': {
+                '%2Fx-test%2FcrudGetOneByQuery%23%20get': {
+                    _keyCrud: 'crudGetOneByQuery',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudNullDelete': {
+                '%2Fx-test%2FcrudNullDelete%23%20get': {
+                    _keyCrud: 'crudNullDelete',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudNullGet': {
+                '%2Fx-test%2FcrudNullGet%23%20get': {
+                    _keyCrud: 'crudNullGet',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudNullHead': {
+                '%2Fx-test%2FcrudNullHead%23%20get': {
+                    _keyCrud: 'crudNullHead',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudNullOptions': {
+                '%2Fx-test%2FcrudNullOptions%23%20get': {
+                    _keyCrud: 'crudNullOptions',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudNullPatch': {
+                '%2Fx-test%2FcrudNullPatch%23%20get': {
+                    _keyCrud: 'crudNullPatch',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudNullPost': {
+                '%2Fx-test%2FcrudNullPost%23%20get': {
+                    _keyCrud: 'crudNullPost',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudNullPut': {
+                '%2Fx-test%2FcrudNullPut%23%20get': {
+                    _keyCrud: 'crudNullPut',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudRemoveManyByQuery': {
+                '%2Fx-test%2FcrudRemoveManyByQuery%23%20get': {
+                    _keyCrud: 'crudRemoveManyByQuery',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudRemoveOneById.id.id': {
+                '%2Fx-test%2FcrudRemoveOneById.id.id%23%20get': {
+                    _keyCrud: 'crudRemoveOneById.id.id',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudSetManyById': {
+                '%2Fx-test%2FcrudSetManyById%23%20put': {
+                    _keyCrud: 'crudSetManyById',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudSetOneById.id.id': {
+                '%2Fx-test%2FcrudSetOneById.id.id%23%20put': {
+                    _keyCrud: 'crudSetOneById.id.id',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudSetOneById.propStringUnique.propStringUnique': {
+                '%2Fx-test%2FcrudSetOneById.propStringUnique.propStringUnique%23%20put': {
+                    _keyCrud: 'crudSetOneById.propStringUnique.propStringUnique',
                     _schemaName: 'TestCrud'
                 },
-                'x-test crudUpdateOneById.id.id': {
+                '%2Fx-test%2FcrudUpdateOneById.id.id%23%20patch': {
+                    _keyCrud: 'crudUpdateOneById.id.id',
                     _schemaName: 'TestCrud'
                 }
             },
-            "x-swgg-definitionsParameters": {
+            'x-swgg-definitionsParameters': {
                 'x-test-param': {}
             }
         });
@@ -2038,12 +2066,12 @@
             }],
             name: 'File'
         }];
-        // run validation test
-        local.testCase_validateByParamDefList_default(null, local.onErrorDefault);
-        local.testCase_validateByParamDefList_error(null, local.onErrorDefault);
-        local.testCase_validateByParamDefList_formData(null, local.onErrorDefault);
-        local.testCase_validateBySchema_default(null, local.onErrorDefault);
-        local.testCase_validateBySchema_error(null, local.onErrorDefault);
-        local.testCase_validateBySwagger_default(null, local.onErrorDefault);
+        //!! // run validation test
+        //!! local.testCase_validateByParamDefList_default(null, local.onErrorDefault);
+        //!! local.testCase_validateByParamDefList_error(null, local.onErrorDefault);
+        //!! local.testCase_validateByParamDefList_formData(null, local.onErrorDefault);
+        //!! local.testCase_validateBySchema_default(null, local.onErrorDefault);
+        //!! local.testCase_validateBySchema_error(null, local.onErrorDefault);
+        //!! local.testCase_validateBySwagger_default(null, local.onErrorDefault);
     }());
 }());

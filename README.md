@@ -386,24 +386,31 @@ utility2-comment -->\n\
             tags: [{ description: 'builtin-file model', name: 'file' }],
             'x-swgg-apiDict': {
                 '%2Ffile%2FcrudCountManyByQuery%23%20get': {
+                    _keyCrud: 'crudCountManyByQuery',
                     _schemaName: 'File'
                 },
                 '%2Ffile%2FcrudGetManyByQuery%23%20get': {
+                    _keyCrud: 'crudGetManyByQuery',
                     _schemaName: 'File'
                 },
                 '%2Ffile%2FcrudRemoveOneById.id.id%23%20delete': {
+                    _keyCrud: 'crudRemoveOneById.id.id',
                     _schemaName: 'File'
                 },
                 '%2Ffile%2FcrudSetOneById.id.id%23%20put': {
+                    _keyCrud: 'crudSetOneById.id.id',
                     _schemaName: 'File'
                 },
                 '%2Ffile%2FcrudUpdateOneById.id.id%23%20patch': {
+                    _keyCrud: 'crudUpdateOneById.id.id',
                     _schemaName: 'File'
                 },
                 '%2Ffile%2FfileGetOneById.id.id%23%20get': {
+                    _keyCrud: 'fileGetOneById.id.id',
                     _schemaName: 'File'
                 },
                 '%2Ffile%2FfileUploadManyByForm.1%23%20post': {
+                    _keyCrud: 'fileUploadManyByForm.1',
                     _schemaName: 'File'
                 },
                 '%2Fpet%23%20post': {
@@ -431,6 +438,7 @@ utility2-comment -->\n\
                     _schemaName: 'User'
                 },
                 '%2Fpet%2FcrudGetManyByQuery%23%20get': {
+                    _keyCrud: 'crudGetManyByQuery',
                     _schemaName: 'Pet'
                 },
                 '%2Fpet%2FfindByStatus%23%20get': {
@@ -444,9 +452,11 @@ utility2-comment -->\n\
                     _schemaName: 'Pet'
                 },
                 '%2Fstore%2FcrudGetManyByQuery%23%20get': {
+                    _keyCrud: 'crudGetManyByQuery',
                     _schemaName: 'Order'
                 },
                 '%2Fstore%2FcrudUpdateOneById.id.id%23%20patch': {
+                    _keyCrud: 'crudUpdateOneById.id.id',
                     _schemaName: 'Order'
                 },
                 '%2Fstore%2Finventory%23%20get': {
@@ -489,18 +499,23 @@ utility2-comment -->\n\
                     _schemaName: 'User'
                 },
                 '%2Fuser%2FcrudCountManyByQuery%23%20get': {
+                    _keyCrud: 'crudCountManyByQuery',
                     _schemaName: 'User'
                 },
                 '%2Fuser%2FcrudGetManyByQuery%23%20get': {
+                    _keyCrud: 'crudGetManyByQuery',
                     _schemaName: 'User'
                 },
                 '%2Fuser%2FcrudRemoveOneById.username.username%23%20delete': {
+                    _keyCrud: 'crudRemoveOneById.username.username',
                     _schemaName: 'User'
                 },
                 '%2Fuser%2FcrudSetOneById.username.username%23%20put': {
+                    _keyCrud: 'crudSetOneById.username.username',
                     _schemaName: 'User'
                 },
                 '%2Fuser%2FcrudUpdateOneById.username.username%23%20patch': {
+                    _keyCrud: 'crudUpdateOneById.username.username',
                     _schemaName: 'User'
                 },
                 '%2Fuser%2Flogin%23%20get': {
@@ -512,9 +527,11 @@ utility2-comment -->\n\
                     _schemaName: 'User'
                 },
                 '%2Fuser%2FuserLoginByPassword%23%20get': {
+                    _keyCrud: 'userLoginByPassword',
                     _schemaName: 'User'
                 },
-                'user userLogout': {
+                '%2Fuser%2FuserLogout%23%20get': {
+                    _keyCrud: 'userLogout',
                     _schemaName: 'User'
                 }
             }
