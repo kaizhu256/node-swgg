@@ -1665,12 +1665,6 @@ swgg\n\
                         local.apiDict[self._id2],
                         self
                     );
-                    //!!
-                    tmp = self.tags[0] + ' ' + self.operationId;
-                    self = local.apiDict[tmp] = local.objectSetOverride(
-                        self,
-                        local.apiDict[tmp]
-                    );
                 });
             });
             // override apiDict from x-swgg-apiDict
@@ -1681,13 +1675,6 @@ swgg\n\
                     Infinity
                 );
             });
-            //!! // init apiDict from x-swgg-apiDict
-            //!! Object.keys(options['x-swgg-apiDict'] || {}).forEach(function (key) {
-                //!! // init self
-                //!! local.objectSetOverride(local.apiDict, local.objectLiteralize({
-                    //!! '$[]': [key, local.jsonCopy(options['x-swgg-apiDict'][key])]
-                //!! }), Infinity);
-            //!! });
             // init apiDict
             Object.keys(local.apiDict).forEach(function (key) {
                 var self;
@@ -2788,7 +2775,7 @@ swgg\n\
          * this function will parse the options according to pathObject.parameters
          */
             var tmp;
-            debugInline(options.pathObject).parameters.forEach(function (paramDef) {
+            options.pathObject.parameters.forEach(function (paramDef) {
                 tmp = options.paramDict[paramDef.name];
                 // init default value
                 if (!options.modeNoDefault &&

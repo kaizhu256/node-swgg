@@ -1510,7 +1510,7 @@
     // run shared js-env code - init-after
     (function () {
         // test apiAjax's deferred handling-behavior
-        local.apiAjax('GET /x-test/crudNullGet', {}, local.onErrorThrow);
+        local.apiAjax('%2Fx-test%2FcrudNullGet%23%20get', {}, local.onErrorThrow);
         // test apiUpdate's null-case handling-behavior
         local.apiUpdate();
         // test apiUpdate's root-basePath handling-behavior
@@ -1865,7 +1865,6 @@
                 description: 'internal test-api'
             }],
             'x-swgg-apiDict': {
-                //!! 'file fileUploadManyByForm.2': {
                 '%2Ffile%2FfileUploadManyByForm.2%23%20post': {
                     _keyCrud: 'fileUploadManyByForm.2',
                     _schemaName: 'File'
@@ -1874,7 +1873,7 @@
                     _keyCrud: 'crudCountManyByQuery',
                     _schemaName: 'TestCrud'
                 },
-                '%2Fx-test%2FcrudErrorDelete%23%20get': {
+                '%2Fx-test%2FcrudErrorDelete%23%20delete': {
                     _keyCrud: 'crudErrorDelete',
                     _schemaName: 'TestCrud'
                 },
@@ -1882,7 +1881,7 @@
                     _keyCrud: 'crudErrorGet',
                     _schemaName: 'TestCrud'
                 },
-                '%2Fx-test%2FcrudErrorHead%23%20get': {
+                '%2Fx-test%2FcrudErrorHead%23%20head': {
                     _keyCrud: 'crudErrorHead',
                     _schemaName: 'TestCrud'
                 },
@@ -1890,15 +1889,15 @@
                     _keyCrud: 'crudErrorLogin',
                     _schemaName: 'TestCrud'
                 },
-                '%2Fx-test%2FcrudErrorOptions%23%20get': {
+                '%2Fx-test%2FcrudErrorOptions%23%20options': {
                     _keyCrud: 'crudErrorOptions',
                     _schemaName: 'TestCrud'
                 },
-                '%2Fx-test%2FcrudErrorPatch%23%20get': {
+                '%2Fx-test%2FcrudErrorPatch%23%20patch': {
                     _keyCrud: 'crudErrorPatch',
                     _schemaName: 'TestCrud'
                 },
-                '%2Fx-test%2FcrudErrorPost%23%20get': {
+                '%2Fx-test%2FcrudErrorPost%23%20post': {
                     _keyCrud: 'crudErrorPost',
                     _schemaName: 'TestCrud'
                 },
@@ -1906,7 +1905,7 @@
                     _keyCrud: 'crudErrorPre',
                     _schemaName: 'TestCrud'
                 },
-                '%2Fx-test%2FcrudErrorPut%23%20get': {
+                '%2Fx-test%2FcrudErrorPut%23%20put': {
                     _keyCrud: 'crudErrorPut',
                     _schemaName: 'TestCrud'
                 },
@@ -1922,7 +1921,7 @@
                     _keyCrud: 'crudGetOneByQuery',
                     _schemaName: 'TestCrud'
                 },
-                '%2Fx-test%2FcrudNullDelete%23%20get': {
+                '%2Fx-test%2FcrudNullDelete%23%20delete': {
                     _keyCrud: 'crudNullDelete',
                     _schemaName: 'TestCrud'
                 },
@@ -1930,23 +1929,23 @@
                     _keyCrud: 'crudNullGet',
                     _schemaName: 'TestCrud'
                 },
-                '%2Fx-test%2FcrudNullHead%23%20get': {
+                '%2Fx-test%2FcrudNullHead%23%20head': {
                     _keyCrud: 'crudNullHead',
                     _schemaName: 'TestCrud'
                 },
-                '%2Fx-test%2FcrudNullOptions%23%20get': {
+                '%2Fx-test%2FcrudNullOptions%23%20options': {
                     _keyCrud: 'crudNullOptions',
                     _schemaName: 'TestCrud'
                 },
-                '%2Fx-test%2FcrudNullPatch%23%20get': {
+                '%2Fx-test%2FcrudNullPatch%23%20patch': {
                     _keyCrud: 'crudNullPatch',
                     _schemaName: 'TestCrud'
                 },
-                '%2Fx-test%2FcrudNullPost%23%20get': {
+                '%2Fx-test%2FcrudNullPost%23%20post': {
                     _keyCrud: 'crudNullPost',
                     _schemaName: 'TestCrud'
                 },
-                '%2Fx-test%2FcrudNullPut%23%20get': {
+                '%2Fx-test%2FcrudNullPut%23%20put': {
                     _keyCrud: 'crudNullPut',
                     _schemaName: 'TestCrud'
                 },
@@ -2005,67 +2004,67 @@
                 local.middlewareFileServer(request, response, nextMiddleware);
             }
         });
-        // init db
-        local.dbSeedTestList = [{
-            dbRowList: local.dbRowListRandomCreate({
-                // init 100 extra random objects
-                length: 100,
-                dbRowList: [{
-                    id: 'testCase_crudCountManyByQuery_default',
-                    propRequired: true
-                }, {
-                    id: 'testCase_crudGetManyByQuery_default',
-                    propRequired: true
-                }, {
-                    id: 'testCase_crudGetOneById_default',
-                    propRequired: true
-                }, {
-                    id: 'testCase_crudGetOneByQuery_default',
-                    propRequired: true
-                }],
-                override: function (options) {
-                    return {
-                        id: 'testCase_dbRowListRandomCreate_' + (options.ii + 100)
-                    };
-                },
-                properties: local.swaggerJson.definitions.TestCrud.properties
-            }),
-            idIndexCreateList: [{
-                name: 'id'
-            }, {
-                name: 'propStringUnique'
-            }],
-            name: 'TestCrud'
-        }, {
-            dbRowList: [{
-                id: 'testCase_fileGetOneById_default',
-                fileBlob: local.templateSwaggerUiLogoSmallBase64,
-                fileContentType: 'image/png',
-                propRequired: true
-            }, {
-                id: 'testCase_ui_fileMedia_audioNull',
-                fileBlob: '',
-                fileContentType: 'audio/wav',
-                fileDescription: 'null audio file',
-                fileFilename: 'testCase_ui_fileMedia_audioNull.wav'
-            }, {
-                id: 'testCase_ui_fileMedia_imageNull',
-                fileBlob: '',
-                fileContentType: 'image/bmp',
-                fileDescription: 'null image file',
-                fileFilename: 'testCase_ui_fileMedia_imageNull.wav'
-            }, {
-                id: 'testCase_ui_fileMedia_videoNull',
-                fileBlob: '',
-                fileContentType: 'video/mpeg',
-                fileDescription: 'null video file',
-                fileFilename: 'testCase_ui_fileMedia_videoNull.mpg'
-            }],
-            idIndexCreateList: [{
-                name: 'id'
-            }],
-            name: 'File'
-        }];
+        //!! // init db
+        //!! local.dbSeedTestList = [{
+            //!! dbRowList: local.dbRowListRandomCreate({
+                //!! // init 100 extra random objects
+                //!! length: 100,
+                //!! dbRowList: [{
+                    //!! id: 'testCase_crudCountManyByQuery_default',
+                    //!! propRequired: true
+                //!! }, {
+                    //!! id: 'testCase_crudGetManyByQuery_default',
+                    //!! propRequired: true
+                //!! }, {
+                    //!! id: 'testCase_crudGetOneById_default',
+                    //!! propRequired: true
+                //!! }, {
+                    //!! id: 'testCase_crudGetOneByQuery_default',
+                    //!! propRequired: true
+                //!! }],
+                //!! override: function (options) {
+                    //!! return {
+                        //!! id: 'testCase_dbRowListRandomCreate_' + (options.ii + 100)
+                    //!! };
+                //!! },
+                //!! properties: local.swaggerJson.definitions.TestCrud.properties
+            //!! }),
+            //!! idIndexCreateList: [{
+                //!! name: 'id'
+            //!! }, {
+                //!! name: 'propStringUnique'
+            //!! }],
+            //!! name: 'TestCrud'
+        //!! }, {
+            //!! dbRowList: [{
+                //!! id: 'testCase_fileGetOneById_default',
+                //!! fileBlob: local.templateSwaggerUiLogoSmallBase64,
+                //!! fileContentType: 'image/png',
+                //!! propRequired: true
+            //!! }, {
+                //!! id: 'testCase_ui_fileMedia_audioNull',
+                //!! fileBlob: '',
+                //!! fileContentType: 'audio/wav',
+                //!! fileDescription: 'null audio file',
+                //!! fileFilename: 'testCase_ui_fileMedia_audioNull.wav'
+            //!! }, {
+                //!! id: 'testCase_ui_fileMedia_imageNull',
+                //!! fileBlob: '',
+                //!! fileContentType: 'image/bmp',
+                //!! fileDescription: 'null image file',
+                //!! fileFilename: 'testCase_ui_fileMedia_imageNull.wav'
+            //!! }, {
+                //!! id: 'testCase_ui_fileMedia_videoNull',
+                //!! fileBlob: '',
+                //!! fileContentType: 'video/mpeg',
+                //!! fileDescription: 'null video file',
+                //!! fileFilename: 'testCase_ui_fileMedia_videoNull.mpg'
+            //!! }],
+            //!! idIndexCreateList: [{
+                //!! name: 'id'
+            //!! }],
+            //!! name: 'File'
+        //!! }];
         //!! // run validation test
         //!! local.testCase_validateByParamDefList_default(null, local.onErrorDefault);
         //!! local.testCase_validateByParamDefList_error(null, local.onErrorDefault);
