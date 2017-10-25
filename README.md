@@ -193,7 +193,7 @@ instruction
                 switch (options.modeNext) {
                 case 1:
                     crud = request.swgg.crud;
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.keyCrud.split('.')[0]) {
                     // coverage-hack - test error handling-behavior
                     case 'crudErrorPre':
                         options.onNext(local.errorDefault);
@@ -210,7 +210,7 @@ instruction
                     }
                     break;
                 case 2:
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.keyCrud.split('.')[0]) {
                     case 'getInventory':
                         result = {};
                         data.forEach(function (element) {

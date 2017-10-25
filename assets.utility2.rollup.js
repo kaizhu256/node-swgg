@@ -23756,6 +23756,8 @@ swgg\n\
             // jslint-hack - nop
             local.nop(response);
             // init swgg object
+            local.objectSetDefault(request, { swgg: { crud: { keyCrud: '' }, user: {} } }, 2);
+            //!! init swgg object
             local.objectSetDefault(request, { swgg: { crud: { operationId: '' }, user: {} } }, 2);
             // if request.url is not prefixed with swaggerJsonBasePath,
             // then default to nextMiddleware
@@ -23776,7 +23778,9 @@ swgg\n\
                 // if pathObject exists, then break
                 if (request.swgg.pathObject) {
                     request.swgg.pathObject = local.jsonCopy(request.swgg.pathObject);
-                    // init crud.operationId
+                    // init crud.keyCrud
+                    request.swgg.crud.keyCrud = request.swgg.pathObject._keyCrud;
+                    //!! init crud.keyCrud
                     request.swgg.crud.operationId = request.swgg.pathObject._keyCrud;
                     break;
                 }
