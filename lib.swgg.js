@@ -1664,22 +1664,29 @@ swgg\n\
                     //!!
                     tmp = self.tags[0] + ' ' + self.operationId;
                     self = local.apiDict[tmp] = local.objectSetOverride(local.apiDict[tmp], self);
-                    local.apiDict[self._id2] = self;
+                    //!! local.apiDict[self._id2] = self;
                 });
             });
-            // init apiDict from x-swgg-apiDict
+            // override apiDict from x-swgg-apiDict
             Object.keys(options['x-swgg-apiDict'] || {}).forEach(function (key) {
-                // init self
                 local.apiDict[key] = local.objectSetOverride(
                     local.apiDict[key],
-                    local.jsonCopy(options['x-swgg-apiDict'][key])
+                    local.jsonCopy(options['x-swgg-apiDict'][key]),
+                    Infinity
                 );
             });
+            //!! // init apiDict from x-swgg-apiDict
+            //!! Object.keys(options['x-swgg-apiDict'] || {}).forEach(function (key) {
+                //!! // init self
+                //!! local.objectSetOverride(local.apiDict, local.objectLiteralize({
+                    //!! '$[]': [key, local.jsonCopy(options['x-swgg-apiDict'][key])]
+                //!! }), Infinity);
+            //!! });
             // init apiDict
             Object.keys(local.apiDict).forEach(function (key) {
                 var self;
                 self = local.apiDict[key];
-                if (key === self._keyPath) {
+                if (key === self._keyPath || key.indexOf('%') >= 0) {
                     return;
                 }
                 // init _keyCrud
@@ -2729,7 +2736,7 @@ swgg\n\
                     // auto-create operationId
                     local.objectSetDefault(tmp, { tags: [] });
                     if (!tmp.operationId || tmp['x-swgg-operationIdFromPath']) {
-                        tmp.operationId = encodeURIComponent(path + '# ' + method);
+                        tmp.operationId = path + '# ' + method;
                     }
                 });
             });

@@ -388,130 +388,130 @@ utility2-comment -->\n\
                 '%2Ffile%2FcrudCountManyByQuery%23%20get': {
                     _schemaName: 'File'
                 },
-                'file crudSetOneById.id.id': {
+                '%2Ffile%2FcrudGetManyByQuery%23%20get': {
                     _schemaName: 'File'
                 },
-                'file crudGetManyByQuery': {
+                '%2Ffile%2FcrudRemoveOneById.id.id%23%20delete': {
                     _schemaName: 'File'
                 },
-                'file crudRemoveOneById.id.id': {
+                '%2Ffile%2FcrudSetOneById.id.id%23%20put': {
                     _schemaName: 'File'
                 },
-                'file crudUpdateOneById.id.id': {
+                '%2Ffile%2FcrudUpdateOneById.id.id%23%20patch': {
                     _schemaName: 'File'
                 },
-                'file fileGetOneById.id.id': {
+                '%2Ffile%2FfileGetOneById.id.id%23%20get': {
                     _schemaName: 'File'
                 },
-                'file fileUploadManyByForm.1': {
+                '%2Ffile%2FfileUploadManyByForm.1%23%20post': {
                     _schemaName: 'File'
                 },
-                'pet addPet': {
+                '%2Fpet%23%20post': {
                     _keyCrud: 'crudSetOneById.petId.id',
                     _schemaName: 'Pet'
                 },
-                'pet crudGetManyByQuery': {
+                '%2Fpet%23%20put': {
+                    _keyCrud: 'crudUpdateOneById.petId.id',
                     _schemaName: 'Pet'
                 },
-                'pet deletePet': {
+                '%2Fpet%2F%7BpetId%7D%23%20delete': {
                     _keyCrud: 'crudRemoveOneById.petId.id',
                     _schemaName: 'Pet'
                 },
-                'pet findPetsByStatus': {
+                '%2Fpet%2F%7BpetId%7D%23%20get': {
+                    _keyCrud: 'crudGetOneById.petId.id',
+                    _schemaName: 'Pet'
+                },
+                '%2Fpet%2F%7BpetId%7D%23%20post': {
+                    _keyCrud: 'crudUpdateOneById.petId.id',
+                    _schemaName: 'Pet'
+                },
+                '%2Fpet%2F%7BpetId%7D%2FuploadImage%23%20post': {
+                    _keyCrud: 'fileUploadManyByForm',
+                    _schemaName: 'User'
+                },
+                '%2Fpet%2FcrudGetManyByQuery%23%20get': {
+                    _schemaName: 'Pet'
+                },
+                '%2Fpet%2FfindByStatus%23%20get': {
                     _keyCrud: 'crudGetManyByQuery',
                     _queryWhere: '{"status":{"$in":{{status jsonStringify}}}}',
                     _schemaName: 'Pet'
                 },
-                'pet findPetsByTags': {
+                '%2Fpet%2FfindByTags%23%20get': {
                     _keyCrud: 'crudGetManyByQuery',
                     _queryWhere: '{"tags.name":{"$in":{{tags jsonStringify}}}}',
                     _schemaName: 'Pet'
                 },
-                'pet getPetById': {
-                    _keyCrud: 'crudGetOneById.petId.id',
-                    _schemaName: 'Pet'
-                },
-                'pet updatePet': {
-                    _keyCrud: 'crudUpdateOneById.petId.id',
-                    _schemaName: 'Pet'
-                },
-                'pet updatePetWithForm': {
-                    _keyCrud: 'crudUpdateOneById.petId.id',
-                    _schemaName: 'Pet'
-                },
-                'pet uploadFile': {
-                    _keyCrud: 'fileUploadManyByForm',
-                    _schemaName: 'User'
-                },
-                'store crudGetManyByQuery': {
+                '%2Fstore%2FcrudGetManyByQuery%23%20get': {
                     _schemaName: 'Order'
                 },
-                'store crudUpdateOneById.id.id': {
+                '%2Fstore%2FcrudUpdateOneById.id.id%23%20patch': {
                     _schemaName: 'Order'
                 },
-                'store deleteOrder': {
-                    _keyCrud: 'crudRemoveOneById.orderId.id',
+                '%2Fstore%2Finventory%23%20get': {
                     _schemaName: 'Order'
                 },
-                'store getInventory': {
-                    _schemaName: 'Order'
-                },
-                'store getOrderById': {
-                    _keyCrud: 'crudGetOneById.orderId.id',
-                    _schemaName: 'Order'
-                },
-                'store placeOrder': {
+                '%2Fstore%2Forder%23%20post': {
                     _keyCrud: 'crudSetOneById.orderId.id',
                     _schemaName: 'Order'
                 },
-                'user createUser': {
+                '%2Fstore%2Forder%2F%7BorderId%7D%23%20delete': {
+                    _keyCrud: 'crudRemoveOneById.orderId.id',
+                    _schemaName: 'Order'
+                },
+                '%2Fstore%2Forder%2F%7BorderId%7D%23%20get': {
+                    _keyCrud: 'crudGetOneById.orderId.id',
+                    _schemaName: 'Order'
+                },
+                '%2Fuser%23%20post': {
                     _keyCrud: 'crudSetOneById.username.username',
                     _schemaName: 'User'
                 },
-                'user createUsersWithArrayInput': {
-                    _keyCrud: 'crudSetManyById',
-                    _schemaName: 'User'
-                },
-                'user createUsersWithListInput': {
-                    _keyCrud: 'crudSetManyById',
-                    _schemaName: 'User'
-                },
-                'user crudCountManyByQuery': {
-                    _schemaName: 'User'
-                },
-                'user crudSetOneById.username.username': {
-                    _schemaName: 'User'
-                },
-                'user crudRemoveOneById.username.username': {
-                    _schemaName: 'User'
-                },
-                'user crudGetManyByQuery': {
-                    _schemaName: 'User'
-                },
-                'user crudUpdateOneById.username.username': {
-                    _schemaName: 'User'
-                },
-                'user deleteUser': {
+                '%2Fuser%2F%7Busername%7D%23%20delete': {
                     _keyCrud: 'crudRemoveOneById.username.username',
                     _schemaName: 'User'
                 },
-                'user getUserByName': {
+                '%2Fuser%2F%7Busername%7D%23%20get': {
                     _keyCrud: 'crudGetOneById.username.username',
                     _schemaName: 'User'
                 },
-                'user loginUser': {
-                    _keyCrud: 'userLoginByPassword',
-                    _schemaName: 'User'
-                },
-                'user logoutUser': {
-                    _keyCrud: 'userLogout',
-                    _schemaName: 'User'
-                },
-                'user updateUser': {
+                '%2Fuser%2F%7Busername%7D%23%20put': {
                     _keyCrud: 'crudUpdateOneById.username.username',
                     _schemaName: 'User'
                 },
-                'user userLoginByPassword': {
+                '%2Fuser%2FcreateWithArray%23%20post': {
+                    _keyCrud: 'crudSetManyById',
+                    _schemaName: 'User'
+                },
+                '%2Fuser%2FcreateWithList%23%20post': {
+                    _keyCrud: 'crudSetManyById',
+                    _schemaName: 'User'
+                },
+                '%2Fuser%2FcrudCountManyByQuery%23%20get': {
+                    _schemaName: 'User'
+                },
+                '%2Fuser%2FcrudGetManyByQuery%23%20get': {
+                    _schemaName: 'User'
+                },
+                '%2Fuser%2FcrudRemoveOneById.username.username%23%20delete': {
+                    _schemaName: 'User'
+                },
+                '%2Fuser%2FcrudSetOneById.username.username%23%20put': {
+                    _schemaName: 'User'
+                },
+                '%2Fuser%2FcrudUpdateOneById.username.username%23%20patch': {
+                    _schemaName: 'User'
+                },
+                '%2Fuser%2Flogin%23%20get': {
+                    _keyCrud: 'userLoginByPassword',
+                    _schemaName: 'User'
+                },
+                '%2Fuser%2Flogout%23%20get': {
+                    _keyCrud: 'userLogout',
+                    _schemaName: 'User'
+                },
+                '%2Fuser%2FuserLoginByPassword%23%20get': {
                     _schemaName: 'User'
                 },
                 'user userLogout': {
