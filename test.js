@@ -1515,8 +1515,11 @@
         ], function (onError) {
             local.apiUpdate({
                 definitions: { Aa: {}, Bb: { 'x-swgg-tags0': 'undefined' } },
-                paths: { '/aa': { get: {} }, '/bb': { get: { 'x-swgg-tags0': 'undefined' } } },
-                tags: [{}, { 'x-swgg-tags0': 'x-test' }]
+                paths: {
+                    '/x-test/tags0-filter': { get: { tags: ['x-test'] } },
+                    '/x-test/tags0-filter-undefined': { get: { 'x-swgg-tags0': 'undefined' } }
+                },
+                tags: [{}, { 'x-swgg-tags0': 'undefined' }]
             });
             onError();
         }, local.onErrorThrow);
