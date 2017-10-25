@@ -2293,7 +2293,7 @@ swgg\n\
             // init swgg object
             local.objectSetDefault(request, { swgg: { crud: { keyCrud: '' }, user: {} } }, 2);
             //!! init swgg object
-            local.objectSetDefault(request, { swgg: { crud: { operationId: '' }, user: {} } }, 2);
+            local.objectSetDefault(request, { swgg: { crud: { operationId: '' }, user: {} } }, 3);
             // if request.url is not prefixed with swaggerJsonBasePath,
             // then default to nextMiddleware
             if (request.urlParsed.pathname.indexOf(local.swaggerJsonBasePath) !== 0) {
