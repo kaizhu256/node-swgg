@@ -744,7 +744,7 @@
                     );
                     options.blob.name = 'a00.png';
                     // ajax - fileUploadManyByForm
-                    local.apiDict['file fileUploadManyByForm.2'].ajax({
+                    local.apiDict['POST /file/fileUploadManyByForm.2'].ajax({
                         paramDict: {
                             fileDescription: 'hello',
                             file1: options.blob,
@@ -784,7 +784,10 @@
                 switch (options.modeNext) {
                 case 1:
                     // ajax - fileUploadManyByForm
-                    local.apiDict['file fileUploadManyByForm.2'].ajax(options, options.onNext);
+                    local.apiDict['POST /file/fileUploadManyByForm.2'].ajax(
+                        options,
+                        options.onNext
+                    );
                     break;
                 case 2:
                     // validate data
@@ -813,7 +816,7 @@
             ].forEach(function (_) {
                 options = _;
                 onParallel.counter += 1;
-                local.apiDict['x-test onErrorJsonapi'].ajax({
+                local.apiDict['GET /x-test/onErrorJsonapi'].ajax({
                     paramDict: { data: JSON.stringify(options) }
                 }, function (error, data) {
                     // validate no error occurred
@@ -835,7 +838,7 @@
             onParallel.counter += 1;
             options = { paramDict: { data: '[]' } };
             onParallel.counter += 1;
-            local.apiDict['x-test onErrorJsonapi'].ajax(options, function (error, data) {
+            local.apiDict['GET /x-test/onErrorJsonapi'].ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate data
@@ -844,7 +847,7 @@
             });
             options = { paramDict: { error: '[]' } };
             onParallel.counter += 1;
-            local.apiDict['x-test onErrorJsonapi'].ajax(options, function (error, data) {
+            local.apiDict['GET /x-test/onErrorJsonapi'].ajax(options, function (error, data) {
                 // validate error occurred
                 local.assert(error, error);
                 // validate error
@@ -873,7 +876,7 @@
             ].forEach(function (data) {
                 options = { paramDict: { error: JSON.stringify(data) } };
                 onParallel.counter += 1;
-                local.apiDict['x-test onErrorJsonapi'].ajax(options, function (error, data) {
+                local.apiDict['GET /x-test/onErrorJsonapi'].ajax(options, function (error, data) {
                     // validate error occurred
                     local.assert(error, error);
                     // validate error
@@ -892,7 +895,7 @@
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
-                    local.apiDict['store getInventory'].ajax(options, options.onNext);
+                    local.apiDict['GET /store/inventory'].ajax(options, options.onNext);
                     break;
                 case 2:
                     // validate data
@@ -961,7 +964,7 @@
                     // validate userJwtEncrypted exists
                     local.assert(local.userJwtEncrypted, local.userJwtEncrypted);
                     // test persistent-session handling-behavior
-                    local.apiDict['x-test crudNullGet'].ajax({}, onNext);
+                    local.apiDict['GET /x-test/crudNullGet'].ajax({}, onNext);
                     break;
                 case 6:
                     // validate no error occurred
@@ -1062,7 +1065,7 @@
                 }
             };
             onParallel.counter += 1;
-            local.apiDict['x-test paramDefault'].ajax(options, function (error, data) {
+            local.apiDict['POST /x-test/paramDefault/'].ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate object
@@ -1094,7 +1097,7 @@
                 }
             };
             onParallel.counter += 1;
-            local.apiDict['x-test paramBodyArray'].ajax(options, function (error, data) {
+            local.apiDict['POST /x-test/paramBodyArray'].ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate object
@@ -1111,7 +1114,7 @@
                 }
             };
             onParallel.counter += 1;
-            local.apiDict['x-test paramBodyString'].ajax(options, function (error, data) {
+            local.apiDict['POST /x-test/paramBodyString'].ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate object
@@ -1150,7 +1153,7 @@
                 element.paramDict = local.jsonCopy(options);
                 element.paramDict[element.key] = element.value;
                 onParallel.counter += 1;
-                local.apiDict['x-test paramDefault'].ajax(element, function (error) {
+                local.apiDict['POST /x-test/paramDefault/'].ajax(element, function (error) {
                     // validate error occurred
                     local.assert(error, element);
                     onParallel();
@@ -1170,7 +1173,7 @@
                     paramFormData2: 'hello formData2'
                 }
             };
-            local.apiDict['x-test paramFormData'].ajax(options, function (error, data) {
+            local.apiDict['POST /x-test/paramFormData'].ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate object
