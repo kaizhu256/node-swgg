@@ -56,28 +56,28 @@
             switch (options._tags0) {
             case 'pet':
                 local.objectSetDefault(options, {
-                    crudGetOneById: local.apiDict['pet getPetById'],
-                    crudRemoveOneById: local.apiDict['pet deletePet'],
-                    crudSetOneById: local.apiDict['pet addPet'],
-                    crudUpdateOneById: local.apiDict['pet updatePetWithForm'],
+                    crudGetOneById: local.apiDict['GET /pet/'],
+                    crudRemoveOneById: local.apiDict['DELETE /pet/'],
+                    crudSetOneById: local.apiDict['POST /pet'],
+                    crudUpdateOneById: local.apiDict['POST /pet/'],
                     operationId: 'undefined.petId.id'
                 });
                 break;
             case 'store':
                 local.objectSetDefault(options, {
-                    crudGetOneById: local.apiDict['store getOrderById'],
-                    crudRemoveOneById: local.apiDict['store deleteOrder'],
-                    crudSetOneById: local.apiDict['store placeOrder'],
-                    crudUpdateOneById: local.apiDict['store crudUpdateOneById.id.id'],
+                    crudGetOneById: local.apiDict['GET /store/order/'],
+                    crudRemoveOneById: local.apiDict['DELETE /store/order/'],
+                    crudSetOneById: local.apiDict['POST /store/order'],
+                    crudUpdateOneById: local.apiDict['PATCH /store/crudUpdateOneById.id.id'],
                     operationId: 'undefined.orderId.id'
                 });
                 break;
             case 'user':
                 local.objectSetDefault(options, {
-                    crudGetOneById: local.apiDict['user getUserByName'],
-                    crudRemoveOneById: local.apiDict['user deleteUser'],
-                    crudSetOneById: local.apiDict['user createUser'],
-                    crudUpdateOneById: local.apiDict['user updateUser'],
+                    crudGetOneById: local.apiDict['GET /user/'],
+                    crudRemoveOneById: local.apiDict['DELETE /user/'],
+                    crudSetOneById: local.apiDict['POST /user'],
+                    crudUpdateOneById: local.apiDict['PUT /user/'],
                     operationId: 'undefined.username.username'
                 });
                 break;
@@ -257,27 +257,26 @@
             onParallel = local.onParallel(onError);
             onParallel.counter += 1;
             [
-                'x-test crudErrorDelete',
-                'x-test crudErrorGet',
-                'x-test crudErrorHead',
-                'x-test crudErrorLogin',
-                'x-test crudErrorOptions',
-                'x-test crudErrorPatch',
-                'x-test crudErrorPost',
-                'x-test crudErrorPre',
-                'x-test crudErrorPut'
+                'DELETE /x-test/crudErrorDelete',
+                'GET /x-test/crudErrorGet',
+                'GET /x-test/crudErrorLogin',
+                'GET /x-test/crudErrorPre',
+                'HEAD /x-test/crudErrorHead',
+                'OPTIONS /x-test/crudErrorOptions',
+                'PATCH /x-test/crudErrorPatch',
+                'POST /x-test/crudErrorPost',
+                'PUT /x-test/crudErrorPut'
             ].forEach(function (key) {
                 onParallel.counter += 1;
-                options = {};
-                local.apiDict[key].ajax(options, function (error, data) {
+                local.apiDict[key].ajax({}, function (error, data) {
                     // validate error occurred
                     local.assert(error, error);
                     // validate statusCode
                     local.assertJsonEqual(data.statusCode, 500);
-                    onParallel();
+                    onParallel(null, options);
                 });
             });
-            onParallel();
+            onParallel(null, options);
         };
 
         local.testCase_crudGetManyByQuery_default = function (options, onError) {
@@ -395,13 +394,13 @@
             onParallel.counter += 1;
             options = {};
             [
-                'x-test crudNullDelete',
-                'x-test crudNullGet',
-                'x-test crudNullHead',
-                'x-test crudNullOptions',
-                'x-test crudNullPatch',
-                'x-test crudNullPost',
-                'x-test crudNullPut'
+                'DELETE /x-test/crudNullDelete',
+                'GET /x-test/crudNullGet',
+                'HEAD /x-test/crudNullHead',
+                'OPTIONS /x-test/crudNullOptions',
+                'PATCH /x-test/crudNullPatch',
+                'POST /x-test/crudNullPost',
+                'PUT /x-test/crudNullPut'
             ].forEach(function (key) {
                 onParallel.counter += 1;
                 local.apiDict[key].ajax(options, onParallel);
@@ -696,7 +695,7 @@
                         idValue: 'testCase_fileGetOneById_default'
                     });
                     // ajax - fileGetOneById
-                    local.apiDict['file fileGetOneById.id.id'].ajax({
+                    local.apiDict['GET /file/fileGetOneById.id.id'].ajax({
                         paramDict: options.queryById
                     }, onNext);
                     break;
@@ -710,7 +709,7 @@
                     options.data = local.base64FromBuffer(data.response);
                     local.assertJsonEqual(options.data, local.templateSwaggerUiLogoSmallBase64);
                     // test fileGetOneById's 404 handling-behavior
-                    local.apiDict['file fileGetOneById.id.id'].ajax({
+                    local.apiDict['GET /file/fileGetOneById.id.id'].ajax({
                         paramDict: { id: 'testCase_fileGetOneById_default_undefined' }
                     }, onNext);
                     break;
