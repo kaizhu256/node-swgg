@@ -22609,7 +22609,7 @@ swgg.apiUpdate({\n\
 local.templateUiOperation = '\
 <div\n\
     class="eventDelegateClick eventDelegateSubmit marginTop05 operation {{_method}}"\n\
-    data-_key-path="{{_keyPath}}"\n\
+    data-_key-path="{{_keyPath encodeURIComponent}}"\n\
     id="{{id}}"\n\
 >\n\
     <div\n\
@@ -22816,7 +22816,7 @@ swgg\n\
                     // normalize paramDict
                     data: local.swaggerParamDictNormalize(options).paramDict,
                     dataReadonlyRemove: options.paramDict,
-                    key: self.operationId,
+                    key: JSON.stringify(self._keyPath),
                     paramDefList: self.parameters
                 });
             }, function (error) {
@@ -23138,7 +23138,6 @@ swgg\n\
             Object.keys(local.apiDict).forEach(function (key) {
                 var self;
                 self = local.apiDict[key];
-                //!!
                 if (key === self._keyPath) {
                     return;
                 }
@@ -23165,8 +23164,7 @@ swgg\n\
                             .replace((/\{\{_idAlias\}\}/g), self._idAlias)
                             .replace((/\{\{_idField\}\}/g), self._idField)
                             .replace((/\{\{_schemaName\}\}/g), self._schemaName)
-                            .replace((/\{\{_tags0\}\}/g), self._tags0)
-                            .replace((/\{\{operationId\}\}/g), self._keyCrud))
+                            .replace((/\{\{_tags0\}\}/g), self._tags0))
                     );
                 }
                 // init default
@@ -23204,7 +23202,7 @@ swgg\n\
                         );
                     }
                 });
-                switch (self.operationId.split('.')[0]) {
+                switch (self._keyCrud.split('.')[0]) {
                 // add extra file-upload forms
                 case 'fileUploadManyByForm':
                     for (tmp = 1; tmp <= self._fileUploadNumber; tmp += 1) {
@@ -24351,7 +24349,8 @@ swgg\n\
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
-                    options.api = local.apiDict[event.currentTarget.dataset._keyPath];
+                    options.api =
+                        local.apiDict[decodeURIComponent(event.currentTarget.dataset._keyPath)];
                     options.domOperationContent = event.target.closest('.operation > .content');
                     options.headers = {};
                     options.modeNoDefault = true;
@@ -24863,7 +24862,7 @@ swgg\n\
                         : 1;
                 }).forEach(function (operation) {
                     operation = options.operationDict[operation];
-                    operation.id = local.idDomElementCreate('swgg_id_' + operation.operationId);
+                    operation.id = local.idDomElementCreate('swgg_id_' + operation._keyPath);
                     operation.tags.forEach(function (tag) {
                         operation = local.jsonCopy(operation);
                         resource = options.resourceDict[tag];
@@ -25372,7 +25371,7 @@ swgg\n\
                     tmp = options.paths[path][method];
                     Object.keys(tmp.parameters).forEach(function (param) {
                         schema = tmp.parameters[param];
-                        key = tmp.tags[0] + '.' + tmp.operationId + '.' + param;
+                        key = JSON.stringify(tmp._keyPath) + '.' + param;
                         validateDefault();
                     });
                 });

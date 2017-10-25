@@ -1469,7 +1469,9 @@
             document.querySelector('#swgg_id_paramOptional .input').value = '';
             // test onEventOperationAjax's error handling-behavior
             document.querySelector('#swgg_id_paramInteger .input').value = 'syntax error';
-            document.querySelector('#swgg_id_paramDefault .onEventOperationAjax').click();
+            document.querySelector(
+                '#swgg_id_POST_20_2Fx_test_2FparamDefault_2F .onEventOperationAjax'
+            ).click();
             // test onEventUiReload's key handling-behavior
             onParallel.counter += 1;
             local.uiEventListenerDict['.onEventUiReload']({
@@ -1485,15 +1487,17 @@
         /*
          * this function will test ui's fileMedia handling-behavior
          */
-            options = [
+            [
                 'testCase_ui_fileMedia_audioNull',
                 'testCase_ui_fileMedia_imageNull',
                 'testCase_ui_fileMedia_videoNull'
-            ];
-            options.forEach(function (id) {
-                document.querySelector('#swgg_id_fileGetOneById_id_id .input').value = id;
-                document.querySelector('#swgg_id_fileGetOneById_id_id .onEventOperationAjax')
-                    .click();
+            ].forEach(function (id) {
+                document.querySelector(
+                    '#swgg_id_GET_20_2Ffile_2FfileGetOneById_id_id .input'
+                ).value = id;
+                document.querySelector(
+                    '#swgg_id_GET_20_2Ffile_2FfileGetOneById_id_id .onEventOperationAjax'
+                ).click();
             });
             onError(null, options);
         };
