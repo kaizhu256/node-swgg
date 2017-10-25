@@ -84,9 +84,8 @@
             default:
                 Object.keys(local.apiDict).forEach(function (key) {
                     key.replace((/^x-test (\w+)/), function (match0, match1) {
-                        // jslint-hack - nop
-                        local.nop(match0);
-                        options[match1] = options[match1] || local.apiDict[key];
+                        match0 = match1;
+                        options[match0] = options[match0] || local.apiDict[key];
                     });
                 });
                 local.objectSetDefault(options, { operationId: 'undefined.id.id' });

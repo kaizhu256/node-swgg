@@ -1493,7 +1493,7 @@ swgg\n\
             var tmp;
             // init options
             options = options || {};
-            // defer apiAjax
+            // init apiDefer
             clearTimeout(local.apiDeferTimeout);
             local.apiDeferList = local.apiDeferList || [];
             if (options.modeAjax) {
@@ -1658,11 +1658,13 @@ swgg\n\
                 Object.keys(options.paths[path]).forEach(function (method) {
                     var self;
                     self = options.paths[path][method];
+                    self._id = encodeURIComponent(path + '# ' + method);
                     self._method = method;
                     self._path = path;
-                    local.objectSetOverride(local.apiDict, local.objectLiteralize({
-                        '$[]': [self.tags[0] + ' ' + self.operationId, self]
-                    }), 2);
+                    //!!
+                    tmp = self.tags[0] + ' ' + self.operationId;
+                    self = local.apiDict[tmp] = local.objectSetOverride(local.apiDict[tmp], self);
+                    local.apiDict[self._id] = self;
                 });
             });
             // init apiDict from x-swgg-apiDict
@@ -2726,7 +2728,7 @@ swgg\n\
                     // auto-create operationId
                     local.objectSetDefault(tmp, { tags: [] });
                     if (!tmp.operationId || tmp['x-swgg-operationIdFromPath']) {
-                        tmp.operationId = path + ' ' + method;
+                        tmp.operationId = encodeURIComponent(path + '# ' + method);
                     }
                 });
             });
