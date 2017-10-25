@@ -2084,7 +2084,7 @@ swgg\n\
                 case 1:
                     crud = request.swgg.crud;
                     user = request.swgg.user;
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.keyCrud.split('.')[0]) {
                     case 'crudCountManyByQuery':
                         crud.dbTable.crudCountManyByQuery(crud.queryWhere, options.onNext);
                         break;
@@ -2209,7 +2209,7 @@ swgg\n\
                     }
                     break;
                 case 2:
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.keyCrud.split('.')[0]) {
                     case 'crudSetOneById':
                     case 'crudUpdateOneById':
                         options.onNext(null, data);
@@ -2239,7 +2239,7 @@ swgg\n\
                     }
                     break;
                 case 3:
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.keyCrud.split('.')[0]) {
                     case 'fileGetOneById':
                         if (!data) {
                             local.serverRespondDefault(request, response, 404);
@@ -2341,7 +2341,7 @@ swgg\n\
                         request.headers.authorization &&
                         request.headers.authorization.replace('Bearer ', '');
                     user.jwtDecrypted = local.jwtA256GcmDecrypt(user.jwtEncrypted);
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.keyCrud.split('.')[0]) {
                     // coverage-hack - test error handling-behavior
                     case 'crudErrorLogin':
                         options.onNext(local.errorDefault);
@@ -2370,7 +2370,7 @@ swgg\n\
                     options.onNext();
                     break;
                 case 2:
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.keyCrud.split('.')[0]) {
                     case 'userLoginByPassword':
                         user.data = data;
                         if (!local.sjclHashScryptValidate(
@@ -2560,7 +2560,7 @@ swgg\n\
                     crud.modeQueryByIdInvert = true;
                     local.idFieldInit(crud);
                     // init crud.data.id
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.keyCrud.split('.')[0]) {
                     case 'crudSetOneById':
                     case 'crudUpdateOneById':
                         if (!local.isNullOrUndefined(crud.data[crud.idField])) {
