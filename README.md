@@ -385,7 +385,7 @@ utility2-comment -->\n\
             },
             tags: [{ description: 'builtin-file model', name: 'file' }],
             'x-swgg-apiDict': {
-                'file crudCountManyByQuery': {
+                '%2Ffile%2FcrudCountManyByQuery%23%20get': {
                     _schemaName: 'File'
                 },
                 'file crudSetOneById.id.id': {

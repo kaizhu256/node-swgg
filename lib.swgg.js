@@ -1658,21 +1658,22 @@ swgg\n\
                 Object.keys(options.paths[path]).forEach(function (method) {
                     var self;
                     self = options.paths[path][method];
-                    self._id = encodeURIComponent(path + '# ' + method);
+                    self._id2 = encodeURIComponent(path + '# ' + method);
                     self._method = method;
                     self._path = path;
                     //!!
                     tmp = self.tags[0] + ' ' + self.operationId;
                     self = local.apiDict[tmp] = local.objectSetOverride(local.apiDict[tmp], self);
-                    local.apiDict[self._id] = self;
+                    local.apiDict[self._id2] = self;
                 });
             });
             // init apiDict from x-swgg-apiDict
             Object.keys(options['x-swgg-apiDict'] || {}).forEach(function (key) {
                 // init self
-                local.objectSetOverride(local.apiDict, local.objectLiteralize({
-                    '$[]': [key, local.jsonCopy(options['x-swgg-apiDict'][key])]
-                }), Infinity);
+                local.apiDict[key] = local.objectSetOverride(
+                    local.apiDict[key],
+                    local.jsonCopy(options['x-swgg-apiDict'][key])
+                );
             });
             // init apiDict
             Object.keys(local.apiDict).forEach(function (key) {
