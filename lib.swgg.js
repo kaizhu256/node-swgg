@@ -1144,7 +1144,7 @@ swgg.apiUpdate({\n\
 local.templateUiOperation = '\
 <div\n\
     class="eventDelegateClick eventDelegateSubmit marginTop05 operation {{_method}}"\n\
-    data-_key-operation-id="{{_keyOperationId}}"\n\
+    data-_key-path="{{_keyPath}}"\n\
     id="{{id}}"\n\
 >\n\
     <div\n\
@@ -1673,6 +1673,7 @@ swgg\n\
             Object.keys(local.apiDict).forEach(function (key) {
                 var self;
                 self = local.apiDict[key];
+                //!!
                 if (key === self._keyPath) {
                     return;
                 }
@@ -1705,7 +1706,7 @@ swgg\n\
                 }
                 // init default
                 local.objectSetDefault(self, {
-                    _keyOperationId: key,
+                    _keyPath: key,
                     operationId: self._keyCrud,
                     parameters: [],
                     responses: { 200: {
@@ -2885,7 +2886,7 @@ swgg\n\
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
-                    options.api = local.apiDict[event.currentTarget.dataset._keyOperationId];
+                    options.api = local.apiDict[event.currentTarget.dataset._keyPath];
                     options.domOperationContent = event.target.closest('.operation > .content');
                     options.headers = {};
                     options.modeNoDefault = true;
@@ -3362,7 +3363,7 @@ swgg\n\
                     // init operation
                     operation = local.jsonCopy(local.apiDict[operation]);
                     operation.tags.forEach(function (tag) {
-                        options.operationDict[operation._keyOperationId] = operation;
+                        options.operationDict[operation._keyPath] = operation;
                         // init resource
                         resource = options.resourceDict[tag] = local.objectSetDefault(
                             options.resourceDict[tag] || options.tagDict[tag],
