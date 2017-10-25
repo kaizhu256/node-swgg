@@ -1657,14 +1657,20 @@ swgg\n\
             Object.keys(options.paths).forEach(function (path) {
                 Object.keys(options.paths[path]).forEach(function (method) {
                     var self;
-                    self = options.paths[path][method];
+                    self = local.jsonCopy(options.paths[path][method]);
                     self._id2 = encodeURIComponent(path + '# ' + method);
                     self._method = method;
                     self._path = path;
+                    self = local.apiDict[self._id2] = local.objectSetOverride(
+                        local.apiDict[self._id2],
+                        self
+                    );
                     //!!
                     tmp = self.tags[0] + ' ' + self.operationId;
-                    self = local.apiDict[tmp] = local.objectSetOverride(local.apiDict[tmp], self);
-                    //!! local.apiDict[self._id2] = self;
+                    self = local.apiDict[tmp] = local.objectSetOverride(
+                        self,
+                        local.apiDict[tmp]
+                    );
                 });
             });
             // override apiDict from x-swgg-apiDict
