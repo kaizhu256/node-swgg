@@ -1510,6 +1510,8 @@
 
     // run shared js-env code - init-after
     (function () {
+        // test apiAjax's deferred handling-behavior
+        local.apiAjax('GET /x-test/crudNullGet', {}, local.onErrorThrow);
         // test apiUpdate's null-case handling-behavior
         local.apiUpdate();
         // test apiUpdate's root-basePath handling-behavior
@@ -1529,9 +1531,6 @@
             });
             onError();
         }, local.onErrorThrow);
-        // test apiAjax's deferred handling-behavior
-        local.apiAjaxDeferList = local.apiAjaxDeferList || [];
-        local.apiAjax('GET /x-test/crudNullGet', {}, local.onErrorThrow);
         // init test api
         local.apiUpdate({
             basePath: '/api/v0',

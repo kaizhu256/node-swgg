@@ -1337,8 +1337,8 @@ swgg\n\
          * this function will send a swagger-api ajax-request with the pathObject self
          */
             var errorValidate, isMultipartFormData, tmp;
-            if (local.apiAjaxDeferList) {
-                local.apiAjaxDeferList.push(arguments);
+            if (local.apiDeferList) {
+                local.apiDeferList.push(arguments);
                 return;
             }
             self = local.apiDict[self] || self;
@@ -1484,6 +1484,8 @@ swgg\n\
             });
         };
 
+        local.apiDeferList = [];
+
         local.apiUpdate = function (options, onError) {
         /*
          * this function will update the swagger-api dict of api-calls
@@ -1492,7 +1494,8 @@ swgg\n\
             // init options
             options = options || {};
             // defer apiAjax
-            local.apiAjaxDeferList = local.apiAjaxDeferList || [];
+            clearTimeout(local.apiDeferTimeout);
+            local.apiDeferList = local.apiDeferList || [];
             if (options.modeAjax) {
                 local.ajax(options, function (error, xhr) {
                     local.tryCatchOnError(function () {
@@ -1777,11 +1780,13 @@ swgg\n\
             local.assetsDict['/assets.swgg.swagger.server.json'] =
                 JSON.stringify(local.swaggerJson);
             // run deferred apiAjax
-            tmp = local.apiAjaxDeferList;
-            local.apiAjaxDeferList = null;
-            while (tmp && tmp.length) {
-                local.apiAjax.apply(null, tmp.shift());
-            }
+            setTimeout(function () {
+                tmp = local.apiDeferList;
+                local.apiDeferList = null;
+                while (tmp && tmp.length) {
+                    local.apiAjax.apply(null, tmp.shift());
+                }
+            });
         };
 
         local.dbFieldRandomCreate = function (options) {
