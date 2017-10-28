@@ -56,42 +56,41 @@
             switch (options._tags0) {
             case 'pet':
                 local.objectSetDefault(options, {
-                    crudGetOneById: local.apiDict['pet getPetById'],
-                    crudRemoveOneById: local.apiDict['pet deletePet'],
-                    crudSetOneById: local.apiDict['pet addPet'],
-                    crudUpdateOneById: local.apiDict['pet updatePetWithForm'],
-                    operationId: 'undefined.petId.id'
+                    crudGetOneById: local.apiDict['operationId.getPetById'],
+                    crudRemoveOneById: local.apiDict['operationId.deletePet'],
+                    crudSetOneById: local.apiDict['operationId.addPet'],
+                    crudType: ['undefined', 'petId', 'id'],
+                    crudUpdateOneById: local.apiDict['operationId.updatePetWithForm']
                 });
                 break;
             case 'store':
                 local.objectSetDefault(options, {
-                    crudGetOneById: local.apiDict['store getOrderById'],
-                    crudRemoveOneById: local.apiDict['store deleteOrder'],
-                    crudSetOneById: local.apiDict['store placeOrder'],
-                    crudUpdateOneById: local.apiDict['store crudUpdateOneById.id.id'],
-                    operationId: 'undefined.orderId.id'
+                    crudGetOneById: local.apiDict['operationId.getOrderById'],
+                    crudRemoveOneById: local.apiDict['operationId.deleteOrder'],
+                    crudSetOneById: local.apiDict['operationId.placeOrder'],
+                    crudType: ['undefined', 'orderId', 'id'],
+                    crudUpdateOneById: local.apiDict['operationId.store.crudUpdateOneById.id.id']
                 });
                 break;
             case 'user':
                 local.objectSetDefault(options, {
-                    crudGetOneById: local.apiDict['user getUserByName'],
-                    crudRemoveOneById: local.apiDict['user deleteUser'],
-                    crudSetOneById: local.apiDict['user createUser'],
-                    crudUpdateOneById: local.apiDict['user updateUser'],
-                    operationId: 'undefined.username.username'
+                    crudGetOneById: local.apiDict['operationId.getUserByName'],
+                    crudRemoveOneById: local.apiDict['operationId.deleteUser'],
+                    crudSetOneById: local.apiDict['operationId.createUser'],
+                    crudType: ['undefined', 'username', 'username'],
+                    crudUpdateOneById: local.apiDict['operationId.updateUser']
                 });
                 break;
             default:
                 Object.keys(local.apiDict).forEach(function (key) {
-                    key.replace((/^x-test (\w+)/), function (match0, match1) {
-                        // jslint-hack - nop
-                        local.nop(match0);
-                        options[match1] = options[match1] || local.apiDict[key];
+                    key.replace((/^operationId\.x-test\.(\w+)/), function (match0, match1) {
+                        match0 = match1;
+                        options[match0] = options[match0] || local.apiDict[key];
                     });
                 });
-                local.objectSetDefault(options, { operationId: 'undefined.id.id' });
+                local.objectSetDefault(options, { crudType: ['undefined', 'id', 'id'] });
             }
-            local.idFieldInit(options);
+            local.idNameInit(options);
             // shallow-copy options
             return local.objectSetDefault({}, options);
         };
@@ -103,7 +102,7 @@
             var onParallel;
             onParallel = local.onParallel(onError);
             onParallel.counter += 1;
-            options = [{
+            [{
                 method: 'POST',
                 // test 400 param-parse-error handling-behavior
                 statusCode: 400,
@@ -117,15 +116,10 @@
                 statusCode: 404,
                 url: '/api/v0/x-test/errorUndefinedApi'
             }, {
-                // test 404 x-swgg-operationIdFromPath handling-behavior
-                statusCode: 404,
-                url: '/api/v0/x-test/x-swgg-operationIdFromPath'
-            }, {
                 // test 404 undefined-map-file handling-behavior
                 statusCode: 404,
                 url: '/api/v0/x-test/undefined.map'
-            }];
-            options.forEach(function (options) {
+            }].forEach(function (options) {
                 onParallel.counter += 1;
                 local.ajax(options, function (error, xhr) {
                     // validate error occurred
@@ -141,7 +135,7 @@
                     onParallel();
                 });
             });
-            onParallel();
+            onParallel(null, options);
         };
 
         local.testCase_crudCountManyByQuery_default = function (options, onError) {
@@ -201,22 +195,19 @@
                 dataValidateReplace: { firstName: 'firstName', userStatus: 1 },
                 dataValidateUpdate1: { firstName: 'firstName', userStatus: 1 },
                 dataValidateUpdate2: { userStatus: 2 }
-            }].forEach(function (_) {
-                options = _;
+            }].forEach(function (options) {
                 onParallel.counter += 1;
                 // test crudCreateReplaceUpdateRemoveOne's default handling-behavior
                 local.testCase_crudCreateReplaceUpdateRemoveOne_default(options, onParallel);
             });
-            onParallel();
+            onParallel(null, options);
         };
 
         local.testCase_crudCreateReplaceUpdateRemoveOne_default = function (options, onError) {
         /*
          * this function will test crudCreateReplaceUpdateRemoveOne's default handling-behavior
          */
-            options = local.crudOptionsSetDefault(options, {
-                data: {}
-            });
+            options = local.crudOptionsSetDefault(options, { data: {} });
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
@@ -257,15 +248,15 @@
             onParallel = local.onParallel(onError);
             onParallel.counter += 1;
             [
-                'x-test crudErrorDelete',
-                'x-test crudErrorGet',
-                'x-test crudErrorHead',
-                'x-test crudErrorLogin',
-                'x-test crudErrorOptions',
-                'x-test crudErrorPatch',
-                'x-test crudErrorPost',
-                'x-test crudErrorPre',
-                'x-test crudErrorPut'
+                'operationId.x-test.crudErrorDelete',
+                'operationId.x-test.crudErrorGet',
+                'operationId.x-test.crudErrorHead',
+                'operationId.x-test.crudErrorLogin',
+                'operationId.x-test.crudErrorOptions',
+                'operationId.x-test.crudErrorPatch',
+                'operationId.x-test.crudErrorPost',
+                'operationId.x-test.crudErrorPre',
+                'operationId.x-test.crudErrorPut'
             ].forEach(function (key) {
                 onParallel.counter += 1;
                 options = {};
@@ -277,7 +268,7 @@
                     onParallel();
                 });
             });
-            onParallel();
+            onParallel(null, options);
         };
 
         local.testCase_crudGetManyByQuery_default = function (options, onError) {
@@ -299,7 +290,7 @@
                     // validate data
                     local.assertJsonEqual(data.responseJson.data.length, 1);
                     local.assert(
-                        data.responseJson.data[0][options.idAlias] === options.idValue,
+                        data.responseJson.data[0][options.idBackend] === options.idValue,
                         data.responseJson
                     );
                     options.onNext();
@@ -332,7 +323,7 @@
                     // validate data
                     local.assertJsonEqual(data.responseJson.data.length, 1);
                     local.assert(
-                        data.responseJson.data[0][options.idAlias] === options.idValue,
+                        data.responseJson.data[0][options.idBackend] === options.idValue,
                         data.responseJson
                     );
                     // validate dataValidate
@@ -373,7 +364,7 @@
                     // validate data
                     local.assertJsonEqual(data.responseJson.data.length, 1);
                     local.assert(
-                        data.responseJson.data[0][options.idAlias] === options.idValue,
+                        data.responseJson.data[0][options.idBackend] === options.idValue,
                         data.responseJson
                     );
                     options.onNext();
@@ -395,18 +386,18 @@
             onParallel.counter += 1;
             options = {};
             [
-                'x-test crudNullDelete',
-                'x-test crudNullGet',
-                'x-test crudNullHead',
-                'x-test crudNullOptions',
-                'x-test crudNullPatch',
-                'x-test crudNullPost',
-                'x-test crudNullPut'
+                'operationId.x-test.crudNullDelete',
+                'operationId.x-test.crudNullGet',
+                'operationId.x-test.crudNullHead',
+                'operationId.x-test.crudNullOptions',
+                'operationId.x-test.crudNullPatch',
+                'operationId.x-test.crudNullPost',
+                'operationId.x-test.crudNullPut'
             ].forEach(function (key) {
                 onParallel.counter += 1;
                 local.apiDict[key].ajax(options, onParallel);
             });
-            onParallel();
+            onParallel(null, options);
         };
 
         local.testCase_crudRemoveManyByQuery_default = function (options, onError) {
@@ -696,7 +687,7 @@
                         idValue: 'testCase_fileGetOneById_default'
                     });
                     // ajax - fileGetOneById
-                    local.apiDict['file fileGetOneById.id.id'].ajax({
+                    local.apiDict['operationId.file.fileGetOneById.id.id'].ajax({
                         paramDict: options.queryById
                     }, onNext);
                     break;
@@ -710,7 +701,7 @@
                     options.data = local.base64FromBuffer(data.response);
                     local.assertJsonEqual(options.data, local.templateSwaggerUiLogoSmallBase64);
                     // test fileGetOneById's 404 handling-behavior
-                    local.apiDict['file fileGetOneById.id.id'].ajax({
+                    local.apiDict['operationId.file.fileGetOneById.id.id'].ajax({
                         paramDict: { id: 'testCase_fileGetOneById_default_undefined' }
                     }, onNext);
                     break;
@@ -744,7 +735,7 @@
                     );
                     options.blob.name = 'a00.png';
                     // ajax - fileUploadManyByForm
-                    local.apiDict['file fileUploadManyByForm.2'].ajax({
+                    local.apiDict['operationId.file.fileUploadManyByForm.2'].ajax({
                         paramDict: {
                             fileDescription: 'hello',
                             file1: options.blob,
@@ -784,7 +775,10 @@
                 switch (options.modeNext) {
                 case 1:
                     // ajax - fileUploadManyByForm
-                    local.apiDict['file fileUploadManyByForm.2'].ajax(options, options.onNext);
+                    local.apiDict['operationId.file.fileUploadManyByForm.2'].ajax(
+                        options,
+                        options.onNext
+                    );
                     break;
                 case 2:
                     // validate data
@@ -813,7 +807,7 @@
             ].forEach(function (_) {
                 options = _;
                 onParallel.counter += 1;
-                local.apiDict['x-test onErrorJsonapi'].ajax({
+                local.apiDict['operationId.x-test.onErrorJsonapi'].ajax({
                     paramDict: { data: JSON.stringify(options) }
                 }, function (error, data) {
                     // validate no error occurred
@@ -823,7 +817,7 @@
                     onParallel();
                 });
             });
-            onParallel();
+            onParallel(null, options);
         };
 
         local.testCase_onErrorJsonapi_emptyArray = function (options, onError) {
@@ -835,7 +829,10 @@
             onParallel.counter += 1;
             options = { paramDict: { data: '[]' } };
             onParallel.counter += 1;
-            local.apiDict['x-test onErrorJsonapi'].ajax(options, function (error, data) {
+            local.apiDict['operationId.x-test.onErrorJsonapi'].ajax(options, function (
+                error,
+                data
+            ) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate data
@@ -844,14 +841,17 @@
             });
             options = { paramDict: { error: '[]' } };
             onParallel.counter += 1;
-            local.apiDict['x-test onErrorJsonapi'].ajax(options, function (error, data) {
+            local.apiDict['operationId.x-test.onErrorJsonapi'].ajax(options, function (
+                error,
+                data
+            ) {
                 // validate error occurred
                 local.assert(error, error);
                 // validate error
                 local.assert(data.responseJson.errors[0].message === 'null', error);
                 onParallel();
             });
-            onParallel();
+            onParallel(null, options);
         };
 
         local.testCase_onErrorJsonapi_error = function (options, onError) {
@@ -873,7 +873,10 @@
             ].forEach(function (data) {
                 options = { paramDict: { error: JSON.stringify(data) } };
                 onParallel.counter += 1;
-                local.apiDict['x-test onErrorJsonapi'].ajax(options, function (error, data) {
+                local.apiDict['operationId.x-test.onErrorJsonapi'].ajax(options, function (
+                    error,
+                    data
+                ) {
                     // validate error occurred
                     local.assert(error, error);
                     // validate error
@@ -881,7 +884,7 @@
                     onParallel();
                 });
             });
-            onParallel();
+            onParallel(null, options);
         };
 
         local.testCase_petstoreStoreGetInventory_default = function (options, onError) {
@@ -892,7 +895,7 @@
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
-                    local.apiDict['store getInventory'].ajax(options, options.onNext);
+                    local.apiDict['operationId.getInventory'].ajax(options, options.onNext);
                     break;
                 case 2:
                     // validate data
@@ -961,7 +964,7 @@
                     // validate userJwtEncrypted exists
                     local.assert(local.userJwtEncrypted, local.userJwtEncrypted);
                     // test persistent-session handling-behavior
-                    local.apiDict['x-test crudNullGet'].ajax({}, onNext);
+                    local.apiDict['operationId.x-test.crudNullGet'].ajax({}, onNext);
                     break;
                 case 6:
                     // validate no error occurred
@@ -1062,7 +1065,7 @@
                 }
             };
             onParallel.counter += 1;
-            local.apiDict['x-test paramDefault'].ajax(options, function (error, data) {
+            local.apiDict['operationId.x-test.paramDefault'].ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate object
@@ -1094,7 +1097,10 @@
                 }
             };
             onParallel.counter += 1;
-            local.apiDict['x-test paramBodyArray'].ajax(options, function (error, data) {
+            local.apiDict['operationId.x-test.paramBodyArray'].ajax(options, function (
+                error,
+                data
+            ) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate object
@@ -1111,7 +1117,10 @@
                 }
             };
             onParallel.counter += 1;
-            local.apiDict['x-test paramBodyString'].ajax(options, function (error, data) {
+            local.apiDict['operationId.x-test.paramBodyString'].ajax(options, function (
+                error,
+                data
+            ) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate object
@@ -1120,7 +1129,7 @@
                 });
                 onParallel();
             });
-            onParallel();
+            onParallel(null, options);
         };
 
         local.testCase_validateByParamDefList_error = function (options, onError) {
@@ -1150,13 +1159,13 @@
                 element.paramDict = local.jsonCopy(options);
                 element.paramDict[element.key] = element.value;
                 onParallel.counter += 1;
-                local.apiDict['x-test paramDefault'].ajax(element, function (error) {
+                local.apiDict['operationId.x-test.paramDefault'].ajax(element, function (error) {
                     // validate error occurred
                     local.assert(error, element);
                     onParallel();
                 });
             });
-            onParallel();
+            onParallel(null, options);
         };
 
         local.testCase_validateByParamDefList_formData = function (options, onError) {
@@ -1170,7 +1179,7 @@
                     paramFormData2: 'hello formData2'
                 }
             };
-            local.apiDict['x-test paramFormData'].ajax(options, function (error, data) {
+            local.apiDict['operationId.x-test.paramFormData'].ajax(options, function (error, data) {
                 // validate no error occurred
                 local.assert(!error, error);
                 // validate object
@@ -1469,7 +1478,7 @@
             document.querySelector('#swgg_id_paramOptional .input').value = '';
             // test onEventOperationAjax's error handling-behavior
             document.querySelector('#swgg_id_paramInteger .input').value = 'syntax error';
-            document.querySelector('#swgg_id_paramDefault .onEventOperationAjax').click();
+            document.querySelector('#swgg_id_x_test_paramDefault .onEventOperationAjax').click();
             // test onEventUiReload's key handling-behavior
             onParallel.counter += 1;
             local.uiEventListenerDict['.onEventUiReload']({
@@ -1478,7 +1487,7 @@
                 type: 'keyup'
             });
             onParallel();
-            onParallel();
+            onParallel(null, options);
         };
 
         local.testCase_ui_fileMedia = function (options, onError) {
@@ -1491,8 +1500,8 @@
                 'testCase_ui_fileMedia_videoNull'
             ];
             options.forEach(function (id) {
-                document.querySelector('#swgg_id_fileGetOneById_id_id .input').value = id;
-                document.querySelector('#swgg_id_fileGetOneById_id_id .onEventOperationAjax')
+                document.querySelector('#swgg_id_file_fileGetOneById_id_id .input').value = id;
+                document.querySelector('#swgg_id_file_fileGetOneById_id_id .onEventOperationAjax')
                     .click();
             });
             onError(null, options);
@@ -1504,8 +1513,12 @@
 
     // run shared js-env code - init-after
     (function () {
+        // test apiUpdate's apiDeferList handling-behavior
+        local.apiDeferList = null;
         // test apiUpdate's null-case handling-behavior
         local.apiUpdate();
+        // test apiAjax's deferred handling-behavior
+        local.apiAjax('operationId.x-test.crudNullGet', {}, local.onErrorThrow);
         // test apiUpdate's root-basePath handling-behavior
         local.apiUpdate({ basePath: '/' });
         local.assertJsonEqual(local.swaggerJsonBasePath, '');
@@ -1515,437 +1528,606 @@
         ], function (onError) {
             local.apiUpdate({
                 definitions: { Aa: {}, Bb: { 'x-swgg-tags0': 'undefined' } },
-                paths: { '/aa': { get: {} }, '/bb': { get: { 'x-swgg-tags0': 'undefined' } } },
+                // test operationId's auto-create handling-behavior
+                paths: {
+                    '/x-test/tags0Filter': { get: { tags: ['x-test'] } },
+                    '/x-test/tags0FilterUndefined': { get: { 'x-swgg-tags0': 'undefined' } }
+                },
                 tags: [{}, { 'x-swgg-tags0': 'undefined' }]
             });
             onError();
         }, local.onErrorThrow);
         // init test api
-        local.apiUpdate({
-            basePath: '/api/v0',
-            definitions: {
-                // init onErrorJsonapi schema
-                onErrorJsonapi: {
-                    properties: {
-                        data: { type: 'object' },
-                        error: { default: {}, type: 'object' }
-                    }
+        local.apiUpdate(
+/* jslint-ignore-begin */
+{
+    "basePath": "/api/v0",
+    "definitions": {
+        "TestCrud": {
+            "properties": {
+                "_id": {
+                    "readOnly": true,
+                    "type": "string"
                 },
-                // init TestCrud schema
-                TestCrud: {
-                    properties: {
-                        _id: { readOnly: true, type: 'string' },
-                        _timeCreated: { format: 'date-time', readOnly: true, type: 'string' },
-                        _timeUpdated: { format: 'date-time', readOnly: true, type: 'string' },
-                        id: { type: 'string' },
-                        propArray: { items: {}, type: 'array' },
-                        propArray2: {
-                            items: {},
-                            maxItems: 1,
-                            minItems: 1,
-                            type: 'array',
-                            uniqueItems: true
-                        },
-                        propArraySubdoc: {
-                            default: [{ propRequired: true }],
-                            items: { $ref: '#/definitions/TestCrud' },
-                            type: 'array'
-                        },
-                        propBoolean: { type: 'boolean' },
-                        propEnum: { enum: [0, 1], type: 'integer' },
-                        propEnumMulti: {
-                            enum: [0, 1],
-                            items: { type: 'integer' },
-                            type: 'array'
-                        },
-                        propInteger: { type: 'integer' },
-                        propInteger2: {
-                            exclusiveMaximum: true,
-                            exclusiveMinimum: true,
-                            maximum: 2,
-                            minimum: -2,
-                            multipleOf: 2,
-                            type: 'integer'
-                        },
-                        propIntegerInt32: { format: 'int32', type: 'integer' },
-                        propIntegerInt64: { format: 'int64', type: 'integer' },
-                        propNumber: { type: 'number' },
-                        propNumber2: {
-                            default: -0.5,
-                            exclusiveMaximum: true,
-                            exclusiveMinimum: true,
-                            maximum: 0,
-                            minimum: -1,
-                            multipleOf: 0.5,
-                            type: 'number'
-                        },
-                        propNumber3: {
-                            default: 0.5,
-                            exclusiveMaximum: true,
-                            exclusiveMinimum: true,
-                            maximum: 1,
-                            minimum: 0,
-                            multipleOf: 0.5,
-                            type: 'number'
-                        },
-                        propNumberDouble: { format: 'double', type: 'number' },
-                        propNumberFloat: { format: 'float', type: 'number' },
-                        propObject: { type: 'object' },
-                        propObject2: {
-                            default: { aa: true },
-                            maxProperties: 1,
-                            minProperties: 1,
-                            type: 'object'
-                        },
-                        // test null-schema-validation handling-behavior
-                        propObjectSubdoc: { $ref: '#/definitions/TestNull' },
-                        propRequired: { default: true, type: 'boolean' },
-                        propString: { type: 'string' },
-                        propString2: {
-                            maxLength: 50,
-                            minLength: 25,
-                            pattern: '^\\w*$',
-                            type: 'string'
-                        },
-                        propStringBinary: { format: 'binary', type: 'string' },
-                        propStringByte: { format: 'byte', type: 'string' },
-                        propStringDate: { format: 'date', type: 'string' },
-                        propStringDatetime: { format: 'date-time', type: 'string' },
-                        propStringEmail:
-                            { default: 'a@a.com', format: 'email', type: 'string' },
-                        propStringJson: { default: 'null', format: 'json', type: 'string' },
-                        propStringPhone: {
-                            default: '+123 (1234) 1234-1234',
-                            format: 'phone',
-                            type: 'string'
-                        },
-                        propStringUnique: { type: 'string' }
+                "_timeCreated": {
+                    "format": "date-time",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "_timeUpdated": {
+                    "format": "date-time",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "propArray": {
+                    "items": {},
+                    "type": "array"
+                },
+                "propArray2": {
+                    "items": {},
+                    "maxItems": 1,
+                    "minItems": 1,
+                    "type": "array",
+                    "uniqueItems": true
+                },
+                "propArraySubdoc": {
+                    "default": [
+                        {
+                            "propRequired": true
+                        }
+                    ],
+                    "items": {
+                        "$ref": "#/definitions/TestCrud"
                     },
-                    required: ['propRequired']
+                    "type": "array"
                 },
-                // init TestNull schema
-                TestNull: {}
-            },
-            paths: {
-                // test undefined api handling-behavior
-                '/x-test/errorUndefinedApi': { get: {
-                    operationId: 'errorUndefinedApi',
-                    summary: 'test undefined api handling-behavior',
-                    tags: ['x-test']
-                } },
-                // test onErrorJsonapi handling-behavior
-                '/x-test/onErrorJsonapi': { get: {
-                    operationId: 'onErrorJsonapi',
-                    parameters: [{
-                        description: 'data param',
-                        format: 'json',
-                        in: 'query',
-                        name: 'data',
-                        type: 'string'
-                    }, {
-                        description: 'error param',
-                        format: 'json',
-                        in: 'query',
-                        name: 'error',
-                        type: 'string'
-                    }],
-                    summary: 'test onErrorJsonapi handling-behavior',
-                    tags: ['x-test']
-                } },
-                // test x-swgg-operationIdFromPath handling-behavior
-                '/x-test/x-swgg-operationIdFromPath': { get: {
-                    summary: 'test x-swgg-operationIdFromPath handling-behavior',
-                    tags: ['x-test'],
-                    'x-swgg-operationIdFromPath': true
-                } },
-                // test default-param handling-behavior
-                '/x-test/paramDefault/{paramPath}': { post: {
-                    operationId: 'paramDefault',
-                    parameters: [{
-                        // test array-csv-param handling-behavior
-                        collectionFormat: 'csv',
-                        description: 'csv-array param',
-                        in: 'query',
-                        items: { type: 'string' },
-                        name: 'paramArrayCsv',
-                        type: 'array'
-                    }, {
-                        // test array-default-param handling-behavior
-                        collectionFormat: undefined,
-                        default: ['aa', 'bb'],
-                        description: 'default-array param',
-                        in: 'query',
-                        items: { type: 'string' },
-                        name: 'paramArrayDefault',
-                        type: 'array'
-                    }, {
-                        // test array-json-param handling-behavior
-                        collectionFormat: 'json',
-                        default: [0, 1],
-                        description: 'json-array param',
-                        in: 'query',
-                        items: { type: 'integer' },
-                        name: 'paramArrayJson',
-                        type: 'array',
-                        'x-swgg-example': [0, 1]
-                    }, {
-                        // test array-multi-param handling-behavior
-                        collectionFormat: 'multi',
-                        description: 'multi-array param',
-                        in: 'query',
-                        items: { type: 'string' },
-                        name: 'paramArrayMulti',
-                        type: 'array'
-                    }, {
-                        // test array-pipes-param handling-behavior
-                        collectionFormat: 'pipes',
-                        description: 'pipes-array param',
-                        in: 'query',
-                        items: { type: 'string' },
-                        name: 'paramArrayPipes',
-                        type: 'array'
-                    }, {
-                        // test array-ssv-param handling-behavior
-                        collectionFormat: 'ssv',
-                        description: 'ssv-array param',
-                        in: 'query',
-                        items: { type: 'string' },
-                        name: 'paramArraySsv',
-                        type: 'array'
-                    }, {
-                        // test array-tsv-param handling-behavior
-                        collectionFormat: 'tsv',
-                        description: 'tsv-array param',
-                        in: 'query',
-                        items: { type: 'string' },
-                        name: 'paramArrayTsv',
-                        type: 'array'
-                    }, {
-                        // test body-param handling-behavior
-                        description: 'body-param',
-                        in: 'body',
-                        name: 'paramBody',
-                        schema: { type: 'object' }
-                    }, {
-                        // test boolean-param handling-behavior
-                        default: false,
-                        description: 'boolean-param',
-                        in: 'query',
-                        name: 'paramBoolean',
-                        type: 'boolean'
-                    }, {
-                        // test enum-multiple-param handling-behavior
-                        // coverage-hack - test default multi-select handling-behavio
-                        default: [1, 3],
-                        description: 'enum-multiple-param',
-                        enum: [0, 1, 2, 3],
-                        in: 'query',
-                        items: { type: 'integer' },
-                        name: 'paramEnumMulti',
-                        required: true,
-                        type: 'array'
-                    }, {
-                        // test enum-single-param handling-behavior
-                        description: 'enum-single-param',
-                        enum: [0, 1, 2, 3],
-                        in: 'query',
-                        name: 'paramEnumSingle',
-                        type: 'integer'
-                    }, {
-                        // test header-param handling-behavior
-                        description: 'header-param',
-                        in: 'header',
-                        name: 'paramHeader',
-                        type: 'string'
-                    }, {
-                        // test integer-param handling-behavior
-                        description: 'integer-param',
-                        in: 'query',
-                        name: 'paramInteger',
-                        type: 'integer',
-                        'x-swgg-example': 0
-                    }, {
-                        // test json-param handling-behavior
-                        description: 'json-param',
-                        format: 'json',
-                        in: 'query',
-                        name: 'paramJson',
-                        type: 'string'
-                    }, {
-                        // test optional-param handling-behavior
-                        description: 'optional-param',
-                        in: 'query',
-                        name: 'paramOptional',
-                        type: 'string',
-                        'x-swgg-apiKey': true,
-                        'x-swgg-ref': 'x-test-param'
-                    }, {
-                        // test path-param handling-behavior
-                        description: 'path-param',
-                        in: 'path',
-                        name: 'paramPath',
-                        required: true,
-                        type: 'string'
-                    }, {
-                        // test required-param handling-behavior
-                        description: 'required-param',
-                        in: 'query',
-                        name: 'paramRequired',
-                        required: true,
-                        type: 'string'
-                    }],
-                    summary: 'test default-param handling-behavior',
-                    tags: ['x-test']
-                } },
-                // test body-array-param handling-behavior
-                '/x-test/paramBodyArray': { post: {
-                    operationId: 'paramBodyArray',
-                    parameters: [{
-                        // test body-array-param handling-behavior
-                        description: 'body-array-param',
-                        in: 'body',
-                        name: 'paramBodyArray',
-                        schema: { items: { type: 'object' }, type: 'array' }
-                    }],
-                    summary: 'test body-array-param handling-behavior',
-                    tags: ['x-test']
-                } },
-                // test body-string-param handling-behavior
-                '/x-test/paramBodyString': { post: {
-                    operationId: 'paramBodyString',
-                    parameters: [{
-                        // test body-string-param handling-behavior
-                        description: 'body-string-param',
-                        in: 'body',
-                        name: 'paramBodyString',
-                        schema: { type: 'string' }
-                    }],
-                    summary: 'test body-string-param handling-behavior',
-                    tags: ['x-test']
-                } },
-                // test form-data-param handling-behavior
-                '/x-test/paramFormData': { post: {
-                    consumes: ['application/x-www-form-urlencoded'],
-                    operationId: 'paramFormData',
-                    parameters: [{
-                        // test array-multi-param handling-behavior
-                        collectionFormat: 'multi',
-                        description: 'multi-array param',
-                        in: 'formData',
-                        items: { type: 'integer' },
-                        name: 'paramArrayMulti',
-                        type: 'array'
-                    }, {
-                        description: 'form-data-param 1',
-                        in: 'formData',
-                        name: 'paramFormData1',
-                        type: 'string'
-                    }, {
-                        description: 'form-data-param 2',
-                        in: 'formData',
-                        name: 'paramFormData2',
-                        type: 'string'
-                    }],
-                    summary: 'test form-data-param handling-behavior',
-                    tags: ['x-test']
-                } }
-            },
-            tags: [{
-                name: 'x-test',
-                description: 'internal test-api'
-            }],
-            'x-swgg-apiDict': {
-                'file fileUploadManyByForm.2': {
-                    _schemaName: 'File'
+                "propBoolean": {
+                    "type": "boolean"
                 },
-                'x-test crudCountManyByQuery': {
-                    _schemaName: 'TestCrud'
+                "propEnum": {
+                    "enum": [
+                        0,
+                        1
+                    ],
+                    "type": "integer"
                 },
-                'x-test crudErrorDelete': {
-                    _schemaName: 'TestCrud'
+                "propEnumMulti": {
+                    "enum": [
+                        0,
+                        1
+                    ],
+                    "items": {
+                        "type": "integer"
+                    },
+                    "type": "array"
                 },
-                'x-test crudErrorGet': {
-                    _schemaName: 'TestCrud'
+                "propInteger": {
+                    "type": "integer"
                 },
-                'x-test crudErrorHead': {
-                    _schemaName: 'TestCrud'
+                "propInteger2": {
+                    "exclusiveMaximum": true,
+                    "exclusiveMinimum": true,
+                    "maximum": 2,
+                    "minimum": -2,
+                    "multipleOf": 2,
+                    "type": "integer"
                 },
-                'x-test crudErrorLogin': {
-                    _schemaName: 'TestCrud'
+                "propIntegerInt32": {
+                    "format": "int32",
+                    "type": "integer"
                 },
-                'x-test crudErrorOptions': {
-                    _schemaName: 'TestCrud'
+                "propIntegerInt64": {
+                    "format": "int64",
+                    "type": "integer"
                 },
-                'x-test crudErrorPatch': {
-                    _schemaName: 'TestCrud'
+                "propNumber": {
+                    "type": "number"
                 },
-                'x-test crudErrorPost': {
-                    _schemaName: 'TestCrud'
+                "propNumber2": {
+                    "default": -0.5,
+                    "exclusiveMaximum": true,
+                    "exclusiveMinimum": true,
+                    "maximum": 0,
+                    "minimum": -1,
+                    "multipleOf": 0.5,
+                    "type": "number"
                 },
-                'x-test crudErrorPre': {
-                    _schemaName: 'TestCrud'
+                "propNumber3": {
+                    "default": 0.5,
+                    "exclusiveMaximum": true,
+                    "exclusiveMinimum": true,
+                    "maximum": 1,
+                    "minimum": 0,
+                    "multipleOf": 0.5,
+                    "type": "number"
                 },
-                'x-test crudErrorPut': {
-                    _schemaName: 'TestCrud'
+                "propNumberDouble": {
+                    "format": "double",
+                    "type": "number"
                 },
-                'x-test crudGetManyByQuery': {
-                    _schemaName: 'TestCrud'
+                "propNumberFloat": {
+                    "format": "float",
+                    "type": "number"
                 },
-                'x-test crudGetOneById.id.id': {
-                    _schemaName: 'TestCrud'
+                "propObject": {
+                    "type": "object"
                 },
-                'x-test crudGetOneByQuery': {
-                    _schemaName: 'TestCrud'
+                "propObject2": {
+                    "default": {
+                        "aa": true
+                    },
+                    "maxProperties": 1,
+                    "minProperties": 1,
+                    "type": "object"
                 },
-                'x-test crudNullDelete': {
-                    _schemaName: 'TestCrud'
+                "propObjectSubdoc": {
+                    "$ref": "#/definitions/TestNull"
                 },
-                'x-test crudNullGet': {
-                    _schemaName: 'TestCrud'
+                "propRequired": {
+                    "default": true,
+                    "type": "boolean"
                 },
-                'x-test crudNullHead': {
-                    _schemaName: 'TestCrud'
+                "propString": {
+                    "type": "string"
                 },
-                'x-test crudNullOptions': {
-                    _schemaName: 'TestCrud'
+                "propString2": {
+                    "maxLength": 50,
+                    "minLength": 25,
+                    "pattern": "^\\w*$",
+                    "type": "string"
                 },
-                'x-test crudNullPatch': {
-                    _schemaName: 'TestCrud'
+                "propStringBinary": {
+                    "format": "binary",
+                    "type": "string"
                 },
-                'x-test crudNullPost': {
-                    _schemaName: 'TestCrud'
+                "propStringByte": {
+                    "format": "byte",
+                    "type": "string"
                 },
-                'x-test crudNullPut': {
-                    _schemaName: 'TestCrud'
+                "propStringDate": {
+                    "format": "date",
+                    "type": "string"
                 },
-                'x-test crudRemoveManyByQuery': {
-                    _schemaName: 'TestCrud'
+                "propStringDatetime": {
+                    "format": "date-time",
+                    "type": "string"
                 },
-                'x-test crudRemoveOneById.id.id': {
-                    _schemaName: 'TestCrud'
+                "propStringEmail": {
+                    "default": "a@a.com",
+                    "format": "email",
+                    "type": "string"
                 },
-                'x-test crudSetManyById': {
-                    _schemaName: 'TestCrud'
+                "propStringJson": {
+                    "default": "null",
+                    "format": "json",
+                    "type": "string"
                 },
-                'x-test crudSetOneById.id.id': {
-                    _schemaName: 'TestCrud'
+                "propStringPhone": {
+                    "default": "+123 (1234) 1234-1234",
+                    "format": "phone",
+                    "type": "string"
                 },
-                'x-test crudSetOneById.propStringUnique.propStringUnique': {
-                    _schemaName: 'TestCrud'
-                },
-                'x-test crudUpdateOneById.id.id': {
-                    _schemaName: 'TestCrud'
+                "propStringUnique": {
+                    "type": "string"
                 }
             },
-            "x-swgg-definitionsParameters": {
-                'x-test-param': {}
+            "required": [
+                "propRequired"
+            ]
+        },
+        "TestNull": {},
+        "onErrorJsonapi": {
+            "properties": {
+                "data": {
+                    "type": "object"
+                },
+                "error": {
+                    "default": {},
+                    "type": "object"
+                }
             }
-        });
+        }
+    },
+    "info": {
+        "x-swgg-urlApp": "http://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js"
+    },
+    "paths": {
+        "/x-test/errorUndefinedApi": {
+            "get": {
+                "operationId": "x-test.errorUndefinedApi",
+                "summary": "test undefined api handling-behavior",
+                "tags": [
+                    "x-test"
+                ]
+            }
+        },
+        "/x-test/onErrorJsonapi": {
+            "get": {
+                "operationId": "x-test.onErrorJsonapi",
+                "parameters": [
+                    {
+                        "description": "data param",
+                        "format": "json",
+                        "in": "query",
+                        "name": "data",
+                        "type": "string"
+                    },
+                    {
+                        "description": "error param",
+                        "format": "json",
+                        "in": "query",
+                        "name": "error",
+                        "type": "string"
+                    }
+                ],
+                "summary": "test onErrorJsonapi handling-behavior",
+                "tags": [
+                    "x-test"
+                ]
+            }
+        },
+        "/x-test/paramBodyArray": {
+            "post": {
+                "operationId": "x-test.paramBodyArray",
+                "parameters": [
+                    {
+                        "description": "body-array-param",
+                        "in": "body",
+                        "name": "paramBodyArray",
+                        "schema": {
+                            "items": {
+                                "type": "object"
+                            },
+                            "type": "array"
+                        }
+                    }
+                ],
+                "summary": "test body-array-param handling-behavior",
+                "tags": [
+                    "x-test"
+                ]
+            }
+        },
+        "/x-test/paramBodyString": {
+            "post": {
+                "operationId": "x-test.paramBodyString",
+                "parameters": [
+                    {
+                        "description": "body-string-param",
+                        "in": "body",
+                        "name": "paramBodyString",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "summary": "test body-string-param handling-behavior",
+                "tags": [
+                    "x-test"
+                ]
+            }
+        },
+        "/x-test/paramDefault/{paramPath}": {
+            "post": {
+                "operationId": "x-test.paramDefault",
+                "parameters": [
+                    {
+                        "collectionFormat": "csv",
+                        "description": "csv-array param",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "paramArrayCsv",
+                        "type": "array"
+                    },
+                    {
+                        "default": [
+                            "aa",
+                            "bb"
+                        ],
+                        "description": "default-array param",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "paramArrayDefault",
+                        "type": "array"
+                    },
+                    {
+                        "default": [
+                            0,
+                            1
+                        ],
+                        "description": "json-array param",
+                        "in": "query",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "name": "paramArrayJson",
+                        "type": "array",
+                        "x-collectionFormat": "json",
+                        "x-swgg-example": [
+                            0,
+                            1
+                        ]
+                    },
+                    {
+                        "collectionFormat": "multi",
+                        "description": "multi-array param",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "paramArrayMulti",
+                        "type": "array"
+                    },
+                    {
+                        "collectionFormat": "pipes",
+                        "description": "pipes-array param",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "paramArrayPipes",
+                        "type": "array"
+                    },
+                    {
+                        "collectionFormat": "ssv",
+                        "description": "ssv-array param",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "paramArraySsv",
+                        "type": "array"
+                    },
+                    {
+                        "collectionFormat": "tsv",
+                        "description": "tsv-array param",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "paramArrayTsv",
+                        "type": "array"
+                    },
+                    {
+                        "description": "body-param",
+                        "in": "body",
+                        "name": "paramBody",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    {
+                        "default": false,
+                        "description": "boolean-param",
+                        "in": "query",
+                        "name": "paramBoolean",
+                        "type": "boolean"
+                    },
+                    {
+                        "default": [
+                            1,
+                            3
+                        ],
+                        "description": "enum-multiple-param",
+                        "enum": [
+                            0,
+                            1,
+                            2,
+                            3
+                        ],
+                        "in": "query",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "name": "paramEnumMulti",
+                        "required": true,
+                        "type": "array"
+                    },
+                    {
+                        "description": "enum-single-param",
+                        "enum": [
+                            0,
+                            1,
+                            2,
+                            3
+                        ],
+                        "in": "query",
+                        "name": "paramEnumSingle",
+                        "type": "integer"
+                    },
+                    {
+                        "description": "header-param",
+                        "in": "header",
+                        "name": "paramHeader",
+                        "type": "string"
+                    },
+                    {
+                        "description": "integer-param",
+                        "in": "query",
+                        "name": "paramInteger",
+                        "type": "integer",
+                        "x-swgg-example": 0
+                    },
+                    {
+                        "description": "json-param",
+                        "format": "json",
+                        "in": "query",
+                        "name": "paramJson",
+                        "type": "string"
+                    },
+                    {
+                        "description": "optional-param",
+                        "in": "query",
+                        "name": "paramOptional",
+                        "type": "string",
+                        "x-swgg-apiKey": true,
+                        "x-swgg-ref": "x-test-param"
+                    },
+                    {
+                        "description": "path-param",
+                        "in": "path",
+                        "name": "paramPath",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "required-param",
+                        "in": "query",
+                        "name": "paramRequired",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "summary": "test default-param handling-behavior",
+                "tags": [
+                    "x-test"
+                ]
+            }
+        },
+        "/x-test/paramFormData": {
+            "post": {
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "operationId": "x-test.paramFormData",
+                "parameters": [
+                    {
+                        "collectionFormat": "multi",
+                        "description": "multi-array param",
+                        "in": "formData",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "name": "paramArrayMulti",
+                        "type": "array"
+                    },
+                    {
+                        "description": "form-data-param 1",
+                        "in": "formData",
+                        "name": "paramFormData1",
+                        "type": "string"
+                    },
+                    {
+                        "description": "form-data-param 2",
+                        "in": "formData",
+                        "name": "paramFormData2",
+                        "type": "string"
+                    }
+                ],
+                "summary": "test form-data-param handling-behavior",
+                "tags": [
+                    "x-test"
+                ]
+            }
+        }
+    },
+    "tags": [
+        {
+            "description": "internal test-api",
+            "name": "x-test"
+        }
+    ],
+    "x-swgg-apiDict": {
+        "operationId.file.fileUploadManyByForm.2": {
+            "_schemaName": "File"
+        },
+        "operationId.x-test.crudCountManyByQuery": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudErrorDelete": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudErrorGet": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudErrorHead": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudErrorLogin": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudErrorOptions": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudErrorPatch": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudErrorPost": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudErrorPre": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudErrorPut": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudGetManyByQuery": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudGetOneById.id.id": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudGetOneByQuery": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudNullDelete": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudNullGet": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudNullHead": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudNullOptions": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudNullPatch": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudNullPost": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudNullPut": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudRemoveManyByQuery": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudRemoveOneById.id.id": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudSetManyById": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudSetOneById.id.id": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudSetOneById.propStringUnique.propStringUnique": {
+            "_schemaName": "TestCrud"
+        },
+        "operationId.x-test.crudUpdateOneById.id.id": {
+            "_schemaName": "TestCrud"
+        }
+    },
+    "x-swgg-definitionsParameters": {
+        "x-test-param": {}
+    }
+}
+/* jslint-ignore-end */
+        );
         // test redundant http-body-parse-middleware handling-behavior
         local.middlewareList.push(local.middlewareBodyParse);
         // init test-middleware
         local.middlewareList.push(function (request, response, nextMiddleware) {
-            switch (request.swgg.pathObject && request.swgg.pathObject.operationId) {
+            switch (request.swgg.crud && request.swgg.crud.crudType[0]) {
             case 'onErrorJsonapi':
                 // test redundant onErrorJsonapi handling-behavior
                 local.onErrorJsonapi(function (error, data) {

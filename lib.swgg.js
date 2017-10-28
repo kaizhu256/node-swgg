@@ -129,12 +129,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer > * {\n\
     margin-top: 1rem;\n\
 }\n\
-.swggUiContainer a {\n\
-    text-decoration: none;\n\
-}\n\
-.swggUiContainer a:hover {\n\
-    color: black;\n\
-}\n\
 .swggUiContainer a,\n\
 .swggUiContainer input,\n\
 .swggUiContainer span {\n\
@@ -166,6 +160,12 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer .fontWeightBold {\n\
     font-weight: bold;\n\
+}\n\
+.swggUiContainer .header a {\n\
+    text-decoration: none;\n\
+}\n\
+.swggUiContainer .header a:hover {\n\
+    color: black;\n\
 }\n\
 .swggUiContainer input {\n\
     height: 1.5rem;\n\
@@ -258,7 +258,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer > .info a {\n\
     color: #370;\n\
-    text-decoration: underline;\n\
 }\n\
 .swggUiContainer > .info > .fontWeightBold {\n\
     font-size: x-large;\n\
@@ -384,10 +383,13 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
         id="swggApiKeyClearButton1"\n\
     >Clear api-keys</button>\n\
 </div>\n\
+<div class="info reset">\n\
+</div>\n\
 <pre class="code" id="swggAjaxProgressPre1">\n\
-loading scripts ...\n\
 </pre>\n\
-<div class="coverageHack reset"></div>\n\
+<div class="color777 reset">\n\
+</div>\n\
+<div id="swggAjaxProgressDiv1" style="text-align: center;"><span>loading script &nbsp;</span><span class="uiAnimateSpin"></span></div>\n\
 </div>\n\
 <div class="utility2FooterDiv">\n\
     [ this document was created with\n\
@@ -449,7 +451,7 @@ local.assetsDict['/assets.swgg.swagger.petstore.json'] = JSON.stringify(
 
 local.templateApiDict = {
     "crudCountManyByQuery": {
-        "_method": "get",
+        "_method": "GET",
         "_path": "/{{_tags0}}/crudCountManyByQuery",
         "parameters": [
             {
@@ -464,7 +466,7 @@ local.templateApiDict = {
         "summary": "count many {{_schemaName}} objects by query"
     },
     "crudErrorDelete": {
-        "_method": "delete",
+        "_method": "DELETE",
         "_path": "/{{_tags0}}/crudErrorDelete",
         "responses": {
             "500": {
@@ -477,7 +479,7 @@ local.templateApiDict = {
         "summary": "return error response"
     },
     "crudErrorGet": {
-        "_method": "get",
+        "_method": "GET",
         "_path": "/{{_tags0}}/crudErrorGet",
         "responses": {
             "500": {
@@ -490,7 +492,7 @@ local.templateApiDict = {
         "summary": "return error response"
     },
     "crudErrorHead": {
-        "_method": "head",
+        "_method": "HEAD",
         "_path": "/{{_tags0}}/crudErrorHead",
         "responses": {
             "500": {
@@ -503,7 +505,7 @@ local.templateApiDict = {
         "summary": "return error response"
     },
     "crudErrorLogin": {
-        "_method": "get",
+        "_method": "GET",
         "_path": "/{{_tags0}}/crudErrorLogin",
         "responses": {
             "500": {
@@ -516,7 +518,7 @@ local.templateApiDict = {
         "summary": "login by password"
     },
     "crudErrorOptions": {
-        "_method": "options",
+        "_method": "OPTIONS",
         "_path": "/{{_tags0}}/crudErrorOptions",
         "responses": {
             "500": {
@@ -529,7 +531,7 @@ local.templateApiDict = {
         "summary": "return error response"
     },
     "crudErrorPatch": {
-        "_method": "patch",
+        "_method": "PATCH",
         "_path": "/{{_tags0}}/crudErrorPatch",
         "responses": {
             "500": {
@@ -542,7 +544,7 @@ local.templateApiDict = {
         "summary": "return error response"
     },
     "crudErrorPost": {
-        "_method": "post",
+        "_method": "POST",
         "_path": "/{{_tags0}}/crudErrorPost",
         "responses": {
             "500": {
@@ -555,7 +557,7 @@ local.templateApiDict = {
         "summary": "return error response"
     },
     "crudErrorPre": {
-        "_method": "get",
+        "_method": "GET",
         "_path": "/{{_tags0}}/crudErrorPre",
         "responses": {
             "500": {
@@ -568,7 +570,7 @@ local.templateApiDict = {
         "summary": "return error response"
     },
     "crudErrorPut": {
-        "_method": "put",
+        "_method": "PUT",
         "_path": "/{{_tags0}}/crudErrorPut",
         "responses": {
             "500": {
@@ -581,7 +583,7 @@ local.templateApiDict = {
         "summary": "return error response"
     },
     "crudGetManyByQuery": {
-        "_method": "get",
+        "_method": "GET",
         "_path": "/{{_tags0}}/crudGetManyByQuery",
         "parameters": [
             {
@@ -636,14 +638,14 @@ local.templateApiDict = {
         "summary": "get many {{_schemaName}} objects by query"
     },
     "crudGetOneById": {
-        "_idField": "{{_idField}}",
-        "_method": "get",
-        "_path": "/{{_tags0}}/crudGetOneById.{{_idField}}.{{_idAlias}}",
+        "_idName": "{{_idName}}",
+        "_method": "GET",
+        "_path": "/{{_tags0}}/crudGetOneById.{{_idName}}.{{_idBackend}}",
         "parameters": [
             {
-                "description": "{{_schemaName}} {{_idField}}",
+                "description": "{{_schemaName}} {{_idName}}",
                 "in": "query",
-                "name": "{{_idField}}",
+                "name": "{{_idName}}",
                 "required": true,
                 "type": "string"
             }
@@ -656,10 +658,10 @@ local.templateApiDict = {
                 }
             }
         },
-        "summary": "get one {{_schemaName}} object by {{_idField}}"
+        "summary": "get one {{_schemaName}} object by {{_idName}}"
     },
     "crudGetOneByQuery": {
-        "_method": "get",
+        "_method": "GET",
         "_path": "/{{_tags0}}/crudGetOneByQuery",
         "parameters": [
             {
@@ -683,7 +685,7 @@ local.templateApiDict = {
         "summary": "get one {{_schemaName}} object by query"
     },
     "crudNullDelete": {
-        "_method": "delete",
+        "_method": "DELETE",
         "_path": "/{{_tags0}}/crudNullDelete",
         "responses": {
             "200": {
@@ -696,7 +698,7 @@ local.templateApiDict = {
         "summary": "return null response"
     },
     "crudNullGet": {
-        "_method": "get",
+        "_method": "GET",
         "_path": "/{{_tags0}}/crudNullGet",
         "responses": {
             "200": {
@@ -709,7 +711,7 @@ local.templateApiDict = {
         "summary": "return null response"
     },
     "crudNullHead": {
-        "_method": "head",
+        "_method": "HEAD",
         "_path": "/{{_tags0}}/crudNullHead",
         "responses": {
             "200": {
@@ -722,7 +724,7 @@ local.templateApiDict = {
         "summary": "return null response"
     },
     "crudNullOptions": {
-        "_method": "options",
+        "_method": "OPTIONS",
         "_path": "/{{_tags0}}/crudNullOptions",
         "responses": {
             "200": {
@@ -735,7 +737,7 @@ local.templateApiDict = {
         "summary": "return null response"
     },
     "crudNullPatch": {
-        "_method": "patch",
+        "_method": "PATCH",
         "_path": "/{{_tags0}}/crudNullPatch",
         "responses": {
             "200": {
@@ -748,7 +750,7 @@ local.templateApiDict = {
         "summary": "return null response"
     },
     "crudNullPost": {
-        "_method": "post",
+        "_method": "POST",
         "_path": "/{{_tags0}}/crudNullPost",
         "responses": {
             "200": {
@@ -761,7 +763,7 @@ local.templateApiDict = {
         "summary": "return null response"
     },
     "crudNullPut": {
-        "_method": "put",
+        "_method": "PUT",
         "_path": "/{{_tags0}}/crudNullPut",
         "responses": {
             "200": {
@@ -774,7 +776,7 @@ local.templateApiDict = {
         "summary": "return null response"
     },
     "crudRemoveManyByQuery": {
-        "_method": "delete",
+        "_method": "DELETE",
         "_path": "/{{_tags0}}/crudRemoveManyByQuery",
         "parameters": [
             {
@@ -798,22 +800,22 @@ local.templateApiDict = {
         "summary": "remove many {{_schemaName}} objects by query"
     },
     "crudRemoveOneById": {
-        "_idField": "{{_idField}}",
-        "_method": "delete",
-        "_path": "/{{_tags0}}/crudRemoveOneById.{{_idField}}.{{_idAlias}}",
+        "_idName": "{{_idName}}",
+        "_method": "DELETE",
+        "_path": "/{{_tags0}}/crudRemoveOneById.{{_idName}}.{{_idBackend}}",
         "parameters": [
             {
-                "description": "{{_schemaName}} {{_idField}}",
+                "description": "{{_schemaName}} {{_idName}}",
                 "in": "query",
-                "name": "{{_idField}}",
+                "name": "{{_idName}}",
                 "required": true,
                 "type": "string"
             }
         ],
-        "summary": "remove one {{_schemaName}} object by {{_idField}}"
+        "summary": "remove one {{_schemaName}} object by {{_idName}}"
     },
     "crudSetManyById": {
-        "_method": "put",
+        "_method": "PUT",
         "_path": "/{{_tags0}}/crudSetManyById",
         "parameters": [
             {
@@ -840,14 +842,14 @@ local.templateApiDict = {
         "summary": "create or replace many {{_schemaName}} objects"
     },
     "crudSetOneById": {
-        "_idField": "{{_idField}}",
-        "_method": "put",
-        "_path": "/{{_tags0}}/crudSetOneById.{{_idField}}.{{_idAlias}}",
+        "_idName": "{{_idName}}",
+        "_method": "PUT",
+        "_path": "/{{_tags0}}/crudSetOneById.{{_idName}}.{{_idBackend}}",
         "parameters": [
             {
-                "description": "{{_schemaName}} {{_idField}}",
+                "description": "{{_schemaName}} {{_idName}}",
                 "in": "query",
-                "name": "{{_idField}}",
+                "name": "{{_idName}}",
                 "type": "string"
             },
             {
@@ -868,17 +870,17 @@ local.templateApiDict = {
                 }
             }
         },
-        "summary": "create or replace one {{_schemaName}} object by {{_idField}}"
+        "summary": "create or replace one {{_schemaName}} object by {{_idName}}"
     },
     "crudUpdateOneById": {
-        "_idField": "{{_idField}}",
-        "_method": "patch",
-        "_path": "/{{_tags0}}/crudUpdateOneById.{{_idField}}.{{_idAlias}}",
+        "_idName": "{{_idName}}",
+        "_method": "PATCH",
+        "_path": "/{{_tags0}}/crudUpdateOneById.{{_idName}}.{{_idBackend}}",
         "parameters": [
             {
-                "description": "{{_schemaName}} {{_idField}}",
+                "description": "{{_schemaName}} {{_idName}}",
                 "in": "query",
-                "name": "{{_idField}}",
+                "name": "{{_idName}}",
                 "type": "string"
             },
             {
@@ -900,17 +902,17 @@ local.templateApiDict = {
                 }
             }
         },
-        "summary": "create or update one {{_schemaName}} object by {{_idField}}"
+        "summary": "create or update one {{_schemaName}} object by {{_idName}}"
     },
     "fileGetOneById": {
-        "_idField": "{{_idField}}",
-        "_method": "get",
-        "_path": "/{{_tags0}}/fileGetOneById.{{_idField}}.{{_idAlias}}",
+        "_idName": "{{_idName}}",
+        "_method": "GET",
+        "_path": "/{{_tags0}}/fileGetOneById.{{_idName}}.{{_idBackend}}",
         "parameters": [
             {
-                "description": "{{_schemaName}} {{_idField}}",
+                "description": "{{_schemaName}} {{_idName}}",
                 "in": "query",
-                "name": "{{_idField}}",
+                "name": "{{_idName}}",
                 "required": true,
                 "type": "string"
             }
@@ -926,11 +928,11 @@ local.templateApiDict = {
                 }
             }
         },
-        "summary": "get one {{_schemaName}} file by {{_idField}}"
+        "summary": "get one {{_schemaName}} file by {{_idName}}"
     },
     "fileUploadManyByForm": {
         "_fileUploadNumber": "{{_fileUploadNumber}}",
-        "_method": "post",
+        "_method": "POST",
         "_path": "/{{_tags0}}/fileUploadManyByForm.{{_fileUploadNumber}}",
         "consumes": [
             "multipart/form-data"
@@ -960,7 +962,7 @@ local.templateApiDict = {
         "summary": "upload many {{_schemaName}} files by form"
     },
     "userLoginByPassword": {
-        "_method": "get",
+        "_method": "GET",
         "_path": "/{{_tags0}}/userLoginByPassword",
         "parameters": [
             {
@@ -989,7 +991,7 @@ local.templateApiDict = {
         "summary": "login by password"
     },
     "userLogout": {
-        "_method": "get",
+        "_method": "GET",
         "_path": "/{{_tags0}}/userLogout",
         "responses": {
             "200": {
@@ -1001,7 +1003,7 @@ local.templateApiDict = {
         },
         "summary": "logout"
     }
-}
+};
 // JSON.stringify templateApiDict items to prevent side-effects
 Object.keys(local.templateApiDict).forEach(function (key) {
     local.templateApiDict[key] = JSON.stringify(local.templateApiDict[key]);
@@ -1030,7 +1032,6 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
 
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/main.handlebars
 local.templateUiMain = '\
-</div>\n\
 <div class="eventDelegateKeyup eventDelegateSubmit form header onEventUiReload tr">\n\
     <a class="td1" href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
     <input\n\
@@ -1053,32 +1054,6 @@ local.templateUiMain = '\
         id="swggApiKeyClearButton1"\n\
     >Clear api-keys</button>\n\
 </div>\n\
-{{#if url}}\n\
-<pre class="code" id="swggAjaxProgressPre1">\n\
-/*\n\
- * initialize swgg-client\n\
- * 1. if using browser, then embed the client in webpage:\n\
- *     &lt;script src="https://kaizhu256.github.io/node-utility2/build..beta..travis-ci.org/app/assets.utility2.rollup.js"&gt;&lt;/script&gt;\n\
- *     &lt;script&gt;window.utility2.corsForwardProxyHostifNeeded=function(){return \"https://h1-proxy1.herokuapp.com\";};&lt;/script&gt;\n\
- * 2. if using node, then download the client from cdn:\n\
- *     curl -LO https://kaizhu256.github.io/node-utility2/build..beta..travis-ci.org/app/assets.utility2.rollup.js\n\
- * 3. run the code below in browser or node to initialize swgg-client\n\
- */\n\
-var swgg;\n\
-swgg = typeof window === "object" && window && window.swgg; // browser\n\
-swgg = swgg || require("./assets.utility2.rollup.js"); // node\n\
-swgg.apiUpdate({\n\
-    modeAjax: true,\n\
-    url: "{{url htmlSafe}}"\n\
-}, function (error) {\n\
-    if (error) {\n\
-        console.error(error);\n\
-        return;\n\
-    }\n\
-    console.log("initialized swgg-client");\n\
-});\n\
-</pre>\n\
-{{/if url}}\n\
 <div class="info reset">\n\
     {{#if info}}\n\
     {{#if info.x-swgg-homepage}}\n\
@@ -1094,6 +1069,9 @@ swgg.apiUpdate({\n\
     {{#if info.description}}\n\
     <div>{{info.description htmlSafe}}</div>\n\
     {{/if info.description}}\n\
+    {{#if info.x-swgg-urlApp}}\n\
+    <h4><a download href="{{info.x-swgg-urlApp}}">download standalone app</a></h4>\n\
+    {{/if info.x-swgg-urlApp}}\n\
     <ul>\n\
         {{#if externalDocs}}\n\
         <li class="marginTop05">\n\
@@ -1132,10 +1110,27 @@ swgg.apiUpdate({\n\
     </ul>\n\
     {{/if info}}\n\
 </div>\n\
+<pre class="code" id="swggAjaxProgressPre1">\n\
+/*\n\
+ * initialize swgg-client\n\
+ * 1. download this api as swagger.json:\n\
+ *     $ curl "{{url htmlSafe}}" > swagger.json\n\
+ * 2. npm install swgg\n\
+ *     $ npm install swgg\n\
+ * 3. run code below to initialize swgg-client\n\
+ * 4. (optional) edit swagger.json to suit your needs\n\
+ */\n\
+var swgg;\n\
+swgg = require("swgg");\n\
+swgg.apiUpdate(require("./swagger.json"));\n\
+console.log("printing initialized apis ...");\n\
+console.log(JSON.stringify(Object.keys(swgg.apiDict).sort(), null, 4));\n\
+console.log("initialized swgg-client");\n\
+</pre>\n\
 <div class="color777 reset">\n\
     [ <span>base url</span>: {{basePath}} ]\n\
 </div>\n\
-<div id="swggAjaxProgressResourceListDiv1" style="margin-top: 1rem; text-align: center;">rendering resource-list &nbsp;<span class="uiAnimateSpin"></span></div>\n\
+<div id="swggAjaxProgressDiv1" style="text-align: center;"><span>rendering swagger.json &nbsp;</span><span class="uiAnimateSpin"></span></div>\n\
 ';
 
 
@@ -1144,7 +1139,7 @@ swgg.apiUpdate({\n\
 local.templateUiOperation = '\
 <div\n\
     class="eventDelegateClick eventDelegateSubmit marginTop05 operation {{_method}}"\n\
-    data-_key-operation-id="{{_keyOperationId}}"\n\
+    data-_method-path="{{_methodPath}}"\n\
     id="{{id}}"\n\
 >\n\
     <div\n\
@@ -1284,10 +1279,11 @@ ERROR\n\
 <h4 class="label marginTop10"></h4>\n\
 <pre class="code">\n\
 /*\n\
- * reproduce swgg-client request {{options.api._method}} {{options.api._path}}\n\
- * run the code below in browser or node to reproduce swgg-client request\n\
+ * reproduce swgg-client request {{options.api._methodPath jsonStringify}}\n\
+ * 1. initialize swgg-client from previous step\n\
+ * 2. run code below to reproduce swgg-client request\n\
  */\n\
-swgg.apiDict[{{options.api._keyPath jsonStringify}}].ajax({{optionsJson}}, \
+swgg.apiAjax({{options.api._methodPath jsonStringify htmlSafe}}, {{optionsJson htmlSafe}}, \
 function (error, data) {\n\
     if (error) {\n\
         console.error(error);\n\
@@ -1337,6 +1333,11 @@ swgg\n\
          * this function will send a swagger-api ajax-request with the pathObject self
          */
             var errorValidate, isMultipartFormData, tmp;
+            if (local.apiDeferList) {
+                local.apiDeferList.push(arguments);
+                return;
+            }
+            self = local.apiDict[self] || self;
             options.pathObject = self;
             isMultipartFormData = (self.consumes && self.consumes[0]) === 'multipart/form-data';
             local.objectSetDefault(options, { data: '', paramDict: {}, url: '' });
@@ -1346,7 +1347,7 @@ swgg\n\
                     // normalize paramDict
                     data: local.swaggerParamDictNormalize(options).paramDict,
                     dataReadonlyRemove: options.paramDict,
-                    key: self.operationId,
+                    key: JSON.stringify(self._methodPath),
                     paramDefList: self.parameters
                 });
             }, function (error) {
@@ -1379,7 +1380,7 @@ swgg\n\
                 }
                 // serialize array
                 if (paramDef.type === 'array' && paramDef.in !== 'body') {
-                    switch (paramDef.collectionFormat) {
+                    switch (paramDef.collectionFormat || paramDef['x-collectionFormat']) {
                     case 'json':
                         tmp = JSON.stringify(tmp);
                         break;
@@ -1479,6 +1480,8 @@ swgg\n\
             });
         };
 
+        local.apiDeferList = [];
+
         local.apiUpdate = function (options, onError) {
         /*
          * this function will update the swagger-api dict of api-calls
@@ -1486,25 +1489,29 @@ swgg\n\
             var tmp;
             // init options
             options = options || {};
+            // init apiDefer
+            clearTimeout(local.apiDeferTimeout);
+            local.apiDeferList = local.apiDeferList || [];
+            // fetch swagger.json file
             if (options.modeAjax) {
                 local.ajax(options, function (error, xhr) {
+                    // JSON.parse swagger.json string
                     local.tryCatchOnError(function () {
-                        // validate no error occurred
-                        local.assert(!error, error);
-                        // reset state
-                        local.apiDict = local.swaggerJson = null;
-                        tmp = '{}';
-                        // coverage-hack - ignore else-statement
-                        local.nop(xhr.responseText && (function () {
-                            tmp = xhr.responseText;
-                        }()));
-                        tmp = JSON.parse(tmp);
-                        local.apiUpdate(tmp);
-                        onError(null, tmp);
-                    }, onError);
+                        tmp = JSON.parse(xhr.responseText);
+                    }, local.nop);
+                    error = error || local.utility2._debugTryCatchErrorCaught;
+                    // reset state
+                    local.apiDict = local.swaggerJson = null;
+                    // apiUpdate swagger.json object
+                    local.apiUpdate(!error && tmp, function (error2, data) {
+                        onError(error || error2, data);
+                    });
                 });
                 return;
             }
+            local.tryCatchOnError(function () {
+                options = JSON.parse(options.utility2.assetsDict['/assets.swgg.swagger.json']);
+            }, local.nop);
             // normalize options
             options = local.swaggerJsonNormalize(options);
             // init apiDict
@@ -1622,10 +1629,8 @@ swgg\n\
             tmp = {};
             [local.swaggerJson.tags, options.tags].forEach(function (tagList) {
                 tagList.forEach(function (tag) {
-                    local.objectSetOverride(tmp, local.objectLiteralize({
-                        '$[]': [tag.name, tag]
-                    }));
-                }, 2);
+                    tmp[tag.name] = local.objectSetOverride(tmp[tag.name], tag);
+                });
             });
             tmp = Object.keys(tmp).sort().map(function (key) {
                 return tmp[key];
@@ -1640,85 +1645,83 @@ swgg\n\
                 : local.swaggerJson.basePath;
             // normalize definition
             Object.keys(options.definitions).forEach(function (schemaName) {
-                options.definitions[schemaName] =
-                    local.schemaNormalizeAndCopy(options.definitions[schemaName]);
+                options.definitions[schemaName] = local.schemaNormalizeAndCopy(
+                    options.definitions[schemaName]
+                );
             });
             // init apiDict from paths
             Object.keys(options.paths).forEach(function (path) {
                 Object.keys(options.paths[path]).forEach(function (method) {
                     var self;
-                    self = options.paths[path][method];
-                    self._method = method;
+                    self = local.jsonCopy(options.paths[path][method]);
+                    self._method = method.toUpperCase();
                     self._path = path;
-                    local.objectSetOverride(local.apiDict, local.objectLiteralize({
-                        '$[]': [self.tags[0] + ' ' + self.operationId, self]
-                    }), 2);
+                    tmp = 'operationId.' + self.operationId;
+                    local.apiDict[tmp] = local.objectSetOverride(local.apiDict[tmp], self);
                 });
             });
             // init apiDict from x-swgg-apiDict
             Object.keys(options['x-swgg-apiDict'] || {}).forEach(function (key) {
                 // init self
-                local.objectSetOverride(local.apiDict, local.objectLiteralize({
-                    '$[]': [key, local.jsonCopy(options['x-swgg-apiDict'][key])]
-                }), Infinity);
+                local.apiDict[key] = local.objectSetOverride(
+                    local.apiDict[key],
+                    local.jsonCopy(options['x-swgg-apiDict'][key])
+                );
             });
             // init apiDict
             Object.keys(local.apiDict).forEach(function (key) {
                 var self;
-                self = local.apiDict[key];
-                if (key === self._keyPath) {
+                if (key.indexOf('operationId.') !== 0) {
                     return;
                 }
-                // init _keyCrud
-                self._keyCrud = self._keyCrud || key.split(' ')[1];
+                key = key.split('.');
+                self = local.apiDict[key.join('.')];
+                // init operationId
+                self.operationId = self.operationId || key.slice(1).join('.');
+                // init _crudType
+                self._crudType = self._crudType || key.slice(2);
+                self._crudType[0] = self._crudType[0] || self.operationId;
                 // init _fileUploadNumber
-                self._fileUploadNumber = 1;
-                self._keyCrud.replace((/^fileUploadManyByForm\.(\d+)/), function (match0, match1) {
-                    match0 = match1;
-                    self._fileUploadNumber = Number(match0);
-                });
-                // init _idAlias and _idField
-                tmp = local.idFieldInit({ operationId: self._keyCrud });
-                self._idAlias = tmp.idAlias;
-                self._idField = tmp.idField;
-                // init _tags0
-                self._tags0 = key.split(' ')[0];
+                self._fileUploadNumber = Number(
+                    self._crudType[0] === 'fileUploadManyByForm' && self._crudType[1]
+                ) || 1;
+                // init _idBackend and _idName
+                tmp = local.idNameInit({ crudType: self._crudType });
+                self._idBackend = tmp.idBackend;
+                self._idName = tmp.idName;
+                // init tags
+                self.tags = self.tags || [];
+                self.tags[0] = self.tags[0] || key[1];
                 // init templateApiDict
-                if (local.templateApiDict[self._keyCrud.split('.')[0]]) {
+                if (local.templateApiDict[self._crudType[0]]) {
                     local.objectSetDefault(
                         self,
-                        JSON.parse(local.templateApiDict[self._keyCrud.split('.')[0]]
+                        JSON.parse(local.templateApiDict[self._crudType[0]]
                             .replace((/\{\{_fileUploadNumber\}\}/g), self._fileUploadNumber)
-                            .replace((/\{\{_idAlias\}\}/g), self._idAlias)
-                            .replace((/\{\{_idField\}\}/g), self._idField)
+                            .replace((/\{\{_idBackend\}\}/g), self._idBackend)
+                            .replace((/\{\{_idName\}\}/g), self._idName)
+                            .replace((/\{\{_operationId\}\}/g), self.operationId)
                             .replace((/\{\{_schemaName\}\}/g), self._schemaName)
-                            .replace((/\{\{_tags0\}\}/g), self._tags0)
-                            .replace((/\{\{operationId\}\}/g), self._keyCrud))
+                            .replace((/\{\{_tags0\}\}/g), self.tags[0]))
                     );
                 }
                 // init default
                 local.objectSetDefault(self, {
-                    _keyOperationId: key,
-                    operationId: self._keyCrud,
                     parameters: [],
                     responses: { 200: {
                         description: 'ok - ' + 'http://jsonapi.org/format/#document-top-level',
                         schema: { $ref: '#/definitions/BuiltinJsonapiResponse' }
-                    } },
-                    tags: []
+                    } }
                 });
-                self.tags[0] = self.tags[0] || self._tags0;
-                // init _method
-                self._method = self._method.toUpperCase();
-                // init _keyPath
-                self._keyPath = self._method + ' ' + self._path.replace((/\{.*?\}/g), '');
+                // init _methodPath
+                self._methodPath = self._method + ' ' + self._path.replace((/\{.*?\}/g), '');
                 self.parameters.forEach(function (param) {
-                    // init _idField.format and _idField.type
-                    if (self._schemaName && param.name === self._idField) {
+                    // init _idName.format and _idName.type
+                    if (self._schemaName && param.name === self._idName) {
                         param.format = options.definitions[self._schemaName]
-                            .properties[self._idAlias].format;
+                            .properties[self._idBackend].format;
                         param.type = options.definitions[self._schemaName]
-                            .properties[self._idAlias].type;
+                            .properties[self._idBackend].type;
                     }
                     // copy x-swgg-ref from x-swgg-definitionsParameters
                     if (param['x-swgg-ref'] && options['x-swgg-definitionsParameters'] &&
@@ -1731,7 +1734,7 @@ swgg\n\
                         );
                     }
                 });
-                switch (self.operationId.split('.')[0]) {
+                switch (self._crudType[0]) {
                 // add extra file-upload forms
                 case 'fileUploadManyByForm':
                     for (tmp = 1; tmp <= self._fileUploadNumber; tmp += 1) {
@@ -1741,10 +1744,33 @@ swgg\n\
                     break;
                 }
                 // update apiDict
-                self = local.apiDict[key] = local.apiDict[self._keyPath] = local.jsonCopy(self);
+                self = local.apiDict[key.join('.')] = local.apiDict[self._methodPath] =
+                    local.jsonCopy(self);
                 // init ajax
                 self.ajax = function (options, onError) {
                     return local.apiAjax(self, options, onError);
+                };
+                self.ajax._toString = self.ajax._toString || self.ajax.toString()
+                    .replace('{', ('{\n' +
+                        '/*\n' +
+                        ' * this function will call swgg-client request ' +
+                        JSON.stringify(self._methodPath) + '\n' +
+                        ' * example usage:' + ('\n' +
+                        'swgg.apiDict[' + JSON.stringify(key.join('.')) + '].ajax(' +
+                        JSON.stringify(local.swaggerParamDictNormalize({
+                                paramDict: {},
+                                pathObject: self
+                            }).paramDict, null, 4) +
+                        ', function (error, data) {\n' +
+                        '    if (error) {\n' +
+                        '        conosle.error(error);\n' +
+                        '        return;\n' +
+                        '    }\n' +
+                        '    console.log(data.responseJson || data.responseText);\n' +
+                        '});').replace((/\n/g), '\n    ') + '\n */')
+                        .replace((/\n/g), '\n                '));
+                self.ajax.toString = function () {
+                    return self.ajax._toString;
                 };
                 // remove underscored keys from self
                 tmp = local.jsonCopy(self);
@@ -1768,8 +1794,18 @@ swgg\n\
             local.corsForwardProxyHost = local.corsForwardProxyHost ||
                 local.swaggerJson['x-swgg-corsForwardProxyHost'];
             // init assets.swgg.swagger.server.json
-            local.assetsDict['/assets.swgg.swagger.server.json'] =
-                JSON.stringify(local.swaggerJson);
+            local.assetsDict['/assets.swgg.swagger.server.json'] = JSON.stringify(
+                local.swaggerJson
+            );
+            // run deferred apiAjax
+            local.apiDeferTimeout = setTimeout(function () {
+                tmp = local.apiDeferList;
+                local.apiDeferList = null;
+                while (tmp && tmp.length) {
+                    local.apiAjax.apply(null, tmp.shift());
+                }
+            });
+            local.setTimeoutOnError(onError, null, options);
         };
 
         local.dbFieldRandomCreate = function (options) {
@@ -1946,25 +1982,24 @@ swgg\n\
             return id;
         };
 
-        local.idFieldInit = function (options) {
+        local.idNameInit = function (options) {
         /*
-         * this function will init options.idAlias, options.idField, and options.queryById
+         * this function will init options.idBackend, options.idName, and options.queryById
          */
-            var idAlias, idField;
-            // init idField
-            options.idAlias = options.operationId.split('.');
-            idField = options.idField = options.idAlias[1] || 'id';
-            // init idAlias
-            idAlias = options.idAlias = options.idAlias[2] || options.idField;
+            var idBackend, idName;
+            // init idName
+            idName = options.idName = options.crudType[1] || 'id';
+            // init idBackend
+            idBackend = options.idBackend = options.crudType[2] || options.idName;
             // invert queryById
             if (options.modeQueryByIdInvert) {
-                idAlias = options.idField;
-                idField = options.idAlias;
+                idBackend = options.idName;
+                idName = options.idBackend;
             }
             // init queryById
-            options.idValue = (options.data && options.data[idAlias]) || options.idValue;
+            options.idValue = (options.data && options.data[idBackend]) || options.idValue;
             options.queryById = {};
-            options.queryById[idField] = options.idValue;
+            options.queryById[idName] = options.idValue;
             return options;
         };
 
@@ -2071,7 +2106,7 @@ swgg\n\
                 case 1:
                     crud = request.swgg.crud;
                     user = request.swgg.user;
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.crudType[0]) {
                     case 'crudCountManyByQuery':
                         crud.dbTable.crudCountManyByQuery(crud.queryWhere, options.onNext);
                         break;
@@ -2079,17 +2114,17 @@ swgg\n\
                         crud.dbTable.crudSetManyById(crud.body, options.onNext);
                         break;
                     case 'crudSetOneById':
-                        // replace idField with idAlias in body
+                        // replace idName with idBackend in body
                         delete crud.body.id;
-                        delete crud.body[crud.idField];
-                        crud.body[crud.idAlias] = crud.data[crud.idField];
+                        delete crud.body[crud.idName];
+                        crud.body[crud.idBackend] = crud.data[crud.idName];
                         crud.dbTable.crudSetOneById(crud.body, options.onNext);
                         break;
                     case 'crudUpdateOneById':
-                        // replace idField with idAlias in body
+                        // replace idName with idBackend in body
                         delete crud.body.id;
-                        delete crud.body[crud.idField];
-                        crud.body[crud.idAlias] = crud.data[crud.idField];
+                        delete crud.body[crud.idName];
+                        crud.body[crud.idBackend] = crud.data[crud.idName];
                         crud.dbTable.crudUpdateOneById(crud.body, options.onNext);
                         break;
                     // coverage-hack - test error handling-behavior
@@ -2153,8 +2188,9 @@ swgg\n\
                         request.swgg.paramDict = {};
                         Object.keys(request.swgg.bodyMeta).forEach(function (key) {
                             if (typeof request.swgg.bodyMeta[key].filename !== 'string') {
-                                request.swgg.paramDict[key] =
-                                    local.bufferToString(request.swgg.bodyParsed[key]);
+                                request.swgg.paramDict[key] = local.bufferToString(
+                                    request.swgg.bodyParsed[key]
+                                );
                             }
                         });
                         crud.body = Object.keys(request.swgg.bodyMeta)
@@ -2171,7 +2207,7 @@ swgg\n\
                                     fileInputName: request.swgg.bodyMeta[key].name,
                                     fileSize: request.swgg.bodyParsed[key].length,
                                     fileUrl: local.swaggerJsonBasePath +
-                                        '/' + request.swgg.pathObject._tags0 +
+                                        '/' + request.swgg.pathObject.tags[0] +
                                         '/fileGetOneById/' + tmp.id
                                 });
                                 return tmp;
@@ -2196,7 +2232,7 @@ swgg\n\
                     }
                     break;
                 case 2:
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.crudType[0]) {
                     case 'crudSetOneById':
                     case 'crudUpdateOneById':
                         options.onNext(null, data);
@@ -2226,7 +2262,7 @@ swgg\n\
                     }
                     break;
                 case 3:
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.crudType[0]) {
                     case 'fileGetOneById':
                         if (!data) {
                             local.serverRespondDefault(request, response, 404);
@@ -2272,38 +2308,41 @@ swgg\n\
         local.middlewareRouter = function (request, response, nextMiddleware) {
         /*
          * this function will run the middleware that will
-         * map the request's method-path to swagger's tags[0]-operationId
+         * map the request's method-path to swagger's tags[0]-crudType
          */
             var tmp;
             // jslint-hack - nop
             local.nop(response);
             // init swgg object
-            local.objectSetDefault(request, { swgg: { crud: { operationId: '' }, user: {} } }, 2);
+            local.objectSetDefault(request, { swgg: { crud: { crudType: [] }, user: {} } }, 3);
             // if request.url is not prefixed with swaggerJsonBasePath,
             // then default to nextMiddleware
             if (request.urlParsed.pathname.indexOf(local.swaggerJsonBasePath) !== 0) {
                 nextMiddleware();
                 return;
             }
-            // init keyPath
-            request.swgg.keyPath =
-                request.method + ' ' +
+            // init methodPath
+            request.swgg.methodPath = request.method + ' ' +
                 request.urlParsed.pathname.replace(local.swaggerJsonBasePath, '');
             // init pathObject
-            while (request.swgg.keyPath !== tmp) {
-                request.swgg.pathObject =
-                    local.apiDict[request.swgg.keyPath] ||
+            while (request.swgg.methodPath !== tmp) {
+                request.swgg.pathObject = local.apiDict[request.swgg.methodPath] ||
                     // handle /foo/{id}/bar case
-                    local.apiDict[request.swgg.keyPath.replace((/\/[^\/]+\/([^\/]*?)$/), '//$1')];
+                    local.apiDict[
+                        request.swgg.methodPath.replace((/\/[^\/]+\/([^\/]*?)$/), '//$1')
+                    ];
                 // if pathObject exists, then break
                 if (request.swgg.pathObject) {
                     request.swgg.pathObject = local.jsonCopy(request.swgg.pathObject);
-                    // init crud.operationId
-                    request.swgg.crud.operationId = request.swgg.pathObject._keyCrud;
+                    // init crud.crudType
+                    request.swgg.crud.crudType = request.swgg.pathObject._crudType;
                     break;
                 }
-                tmp = request.swgg.keyPath;
-                request.swgg.keyPath = request.swgg.keyPath.replace((/\/[^\/]+?(\/*?)$/), '/$1');
+                tmp = request.swgg.methodPath;
+                request.swgg.methodPath = request.swgg.methodPath.replace(
+                    (/\/[^\/]+?(\/*?)$/),
+                    '/$1'
+                );
             }
             nextMiddleware();
         };
@@ -2320,11 +2359,10 @@ swgg\n\
                     local.dbTableUser = local.db.dbTableCreateOne({ name: 'User' });
                     crud = request.swgg.crud;
                     user = request.swgg.user = {};
-                    user.jwtEncrypted =
-                        request.headers.authorization &&
+                    user.jwtEncrypted = request.headers.authorization &&
                         request.headers.authorization.replace('Bearer ', '');
                     user.jwtDecrypted = local.jwtA256GcmDecrypt(user.jwtEncrypted);
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.crudType[0]) {
                     // coverage-hack - test error handling-behavior
                     case 'crudErrorLogin':
                         options.onNext(local.errorDefault);
@@ -2353,7 +2391,7 @@ swgg\n\
                     options.onNext();
                     break;
                 case 2:
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.crudType[0]) {
                     case 'userLoginByPassword':
                         user.data = data;
                         if (!local.sjclHashScryptValidate(
@@ -2475,8 +2513,9 @@ swgg\n\
                         // init default param
                         if (local.isNullOrUndefined(request.swgg.paramDict[paramDef.name]) &&
                                 paramDef.default !== undefined) {
-                            request.swgg.paramDict[paramDef.name] =
-                                local.jsonCopy(paramDef.default);
+                            request.swgg.paramDict[paramDef.name] = local.jsonCopy(
+                                paramDef.default
+                            );
                         }
                     });
                     // normalize paramDict
@@ -2484,7 +2523,7 @@ swgg\n\
                     // validate paramDict
                     local.validateByParamDefList({
                         data: request.swgg.paramDict,
-                        key: request.swgg.keyPath,
+                        key: JSON.stringify(request.swgg.methodPath),
                         paramDefList: request.swgg.pathObject.parameters
                     });
                     onNext();
@@ -2493,8 +2532,7 @@ swgg\n\
                     // init crud
                     crud = request.swgg.crud;
                     // init crud.dbTable
-                    crud.dbTable =
-                        request.swgg.pathObject &&
+                    crud.dbTable = request.swgg.pathObject &&
                         request.swgg.pathObject._schemaName &&
                         local.db.dbTableCreateOne({ name: request.swgg.pathObject._schemaName });
                     if (!crud.dbTable) {
@@ -2539,22 +2577,22 @@ swgg\n\
                             )
                         ) || element.value;
                     });
-                    // init-before crud.idField
+                    // init-before crud.idName
                     crud.modeQueryByIdInvert = true;
-                    local.idFieldInit(crud);
+                    local.idNameInit(crud);
                     // init crud.data.id
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.crudType[0]) {
                     case 'crudSetOneById':
                     case 'crudUpdateOneById':
-                        if (!local.isNullOrUndefined(crud.data[crud.idField])) {
+                        if (!local.isNullOrUndefined(crud.data[crud.idName])) {
                             break;
                         }
-                        crud.data[crud.idField] = (crud.body && crud.body[crud.idAlias]);
+                        crud.data[crud.idName] = (crud.body && crud.body[crud.idBackend]);
                         break;
                     }
-                    // init-after crud.idField
+                    // init-after crud.idName
                     crud.modeQueryByIdInvert = true;
-                    local.idFieldInit(crud);
+                    local.idNameInit(crud);
                     nextMiddleware();
                     break;
                 default:
@@ -2704,8 +2742,11 @@ swgg\n\
                     tmp = options.paths[path][method];
                     // auto-create operationId
                     local.objectSetDefault(tmp, { tags: [] });
-                    if (!tmp.operationId || tmp['x-swgg-operationIdFromPath']) {
-                        tmp.operationId = path + ' ' + method;
+                    if (options['x-swgg-operationIdFromPath'] ||
+                            tmp['x-swgg-operationIdFromPath'] ||
+                            !tmp.operationId) {
+                        tmp.operationId = encodeURIComponent(path + ' ' + method)
+                            .replace((/[^\w\-.]/g), '_');
                     }
                 });
             });
@@ -2760,7 +2801,7 @@ swgg\n\
                 // parse array
                 if (paramDef.type === 'array' && paramDef.in !== 'body') {
                     if (typeof tmp === 'string') {
-                        switch (paramDef.collectionFormat) {
+                        switch (paramDef.collectionFormat || paramDef['x-collectionFormat']) {
                         case 'json':
                             local.tryCatchOnError(function () {
                                 tmp = JSON.parse(tmp);
@@ -2868,11 +2909,12 @@ swgg\n\
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
-                    options.api = local.apiDict[event.currentTarget.dataset._keyOperationId];
+                    options.api = local.apiDict[event.currentTarget.dataset._methodPath];
                     options.domOperationContent = event.target.closest('.operation > .content');
                     options.headers = {};
                     options.modeNoDefault = true;
                     options.paramDict = {};
+                    options.url = 'error';
                     options.api.parameters.forEach(function (paramDef) {
                         tmp = options.domOperationContent.querySelector(
                             '.paramDef[name=' + paramDef.name + '] > .td3'
@@ -2967,7 +3009,7 @@ swgg\n\
                         options.data = JSON.stringify(JSON.parse(options.data), null, 4);
                     }, local.nop);
                     data.curl = 'curl \\\n' +
-                        '--request ' + options.api._method.toUpperCase() + ' \\\n' +
+                        '--request ' + options.api._method + ' \\\n' +
                         Object.keys(options.headers).map(function (key) {
                             return "--header '" + key + ': ' + options.headers[key] + "' \\\n";
                         }).join('') + '--data-binary ' + (typeof options.data === 'string'
@@ -3079,7 +3121,7 @@ swgg\n\
             });
         };
 
-        local.uiEventListenerDict['.onEventUiReload'] = function (event) {
+        local.uiEventListenerDict['.onEventUiReload'] = function (event, onError) {
         /*
          * this function will reload the ui
          */
@@ -3121,8 +3163,9 @@ swgg\n\
                 document.querySelector('.swggUiContainer > .header > .td2').value
                     .replace((/^\//), '')
             ).href;
-            local.uiNotify(null, 'fetching resource-list ' +
-                document.querySelector('.swggUiContainer > .header > .td2').value + ' ...');
+            document.querySelector('#swggAjaxProgressDiv1 span').innerHTML =
+                'loading swagger.json &nbsp;';
+            // fetch swagger.json file
             local.apiUpdate({
                 modeAjax: true,
                 url: document.querySelector('.swggUiContainer > .header > .td2').value
@@ -3138,7 +3181,7 @@ swgg\n\
                             data['x-swgg-corsBackendHost']
                         )
                     });
-                    local.uiRender();
+                    local.uiRender(null, onError);
                 }, local.uiNotify);
             });
         };
@@ -3152,7 +3195,7 @@ swgg\n\
             if (error) {
                 element.classList.add('error');
                 local.uiAnimateShake(element);
-                element.textContent = error;
+                element.textContent = error.stack;
                 return element;
             }
             element.classList.remove('error');
@@ -3189,8 +3232,8 @@ swgg\n\
                 paramDef.selectOptionList = (paramDef.type === 'boolean'
                     ? [false, true]
                     : paramDef.enum2).map(function (element) {
-                    paramDef.hasDefault =
-                        paramDef.hasDefault || paramDef.enumDefault.indexOf(element) >= 0;
+                    paramDef.hasDefault = paramDef.hasDefault ||
+                        paramDef.enumDefault.indexOf(element) >= 0;
                     return {
                         id: local.idDomElementCreate('swgg_id_' + paramDef.name),
                         selected: paramDef.enumDefault.indexOf(element) >= 0
@@ -3311,130 +3354,125 @@ swgg\n\
             paramDef.innerHTML = local.templateRender(local.templateUiParam, paramDef);
         };
 
-        local.uiRender = function () {
+        local.uiRender = function (options, onError) {
         /*
          * this function will render swagger-ui
          */
-            var resource, options;
-            options = local.uiState = local.jsonCopy(local.swaggerJson);
-            // init apiKeyValue
-            options.apiKeyValue = local.apiKeyValue;
-            // init title
-            document.querySelector('head > title').textContent =
-                local.templateRender(local.templateUiTitle, options).trim();
-            // init url
-            options.url = document.querySelector('.swggUiContainer > .header > .td2').value;
-            // templateRender main
-            document.querySelector('.swggUiContainer').innerHTML =
-                local.templateRender(local.templateUiMain, options);
-            // optimization - render .swggUiContainer and .resourceList in 2 separate processes
-            setTimeout(function () {
-                // reset state
-                local.idDomElementDict = {};
-                local.objectSetDefault(options, {
-                    resourceDict: {},
-                    operationDict: {},
-                    tagDict: {}
-                });
-                // init tagDict
-                options.tags.forEach(function (tag) {
-                    options.tagDict[tag.name] = tag;
-                });
-                // init operationDict
-                Object.keys(local.apiDict).sort().forEach(function (operation) {
-                    // init operation
-                    operation = local.jsonCopy(local.apiDict[operation]);
-                    operation.tags.forEach(function (tag) {
-                        options.operationDict[operation._keyOperationId] = operation;
-                        // init resource
-                        resource = options.resourceDict[tag] = local.objectSetDefault(
-                            options.resourceDict[tag] || options.tagDict[tag],
-                            {
-                                description: 'no description',
-                                name: tag,
-                                operationListInnerHtml: ''
-                            }
-                        );
-                        resource.id = resource.id || local.idDomElementCreate('swgg_id_' + tag);
-                    });
-                });
-                // init uiFragment
-                options.uiFragment =
-                    local.domFragmentRender('<div class="reset resourceList"></div>');
-                // init resourceDict
-                Object.keys(options.resourceDict).sort().forEach(function (key) {
-                    // templateRender resource
-                    options.uiFragment.querySelector('.resourceList')
-                        .appendChild(local.domFragmentRender(
-                            local.templateUiResource,
-                            options.resourceDict[key]
-                        ));
-                });
-                Object.keys(options.operationDict).sort(function (aa, bb) {
-                    aa = options.operationDict[aa];
-                    aa = aa._path + ' ' + aa._method;
-                    bb = options.operationDict[bb];
-                    bb = bb._path + ' ' + bb._method;
-                    return aa < bb
-                        ? -1
-                        : 1;
-                }).forEach(function (operation) {
-                    operation = options.operationDict[operation];
-                    operation.id = local.idDomElementCreate('swgg_id_' + operation.operationId);
-                    operation.tags.forEach(function (tag) {
-                        operation = local.jsonCopy(operation);
-                        resource = options.resourceDict[tag];
-                        local.objectSetDefault(operation, {
-                            description: 'no description',
-                            responseList: Object.keys(operation.responses).sort()
-                                .map(function (key) {
-                                    return { key: key, value: operation.responses[key] };
-                                }),
-                            summary: 'no summary'
-                        });
-                        operation.parameters.forEach(function (element) {
-                            // init element.id
-                            element.id = local.idDomElementCreate('swgg_id_' + element.name);
-                            local.uiParamRender(element);
-                        });
-                        // templateRender operation
-                        options.uiFragment.querySelector('#' + resource.id + ' .operationList')
-                            .appendChild(
-                                local.domFragmentRender(local.templateUiOperation, operation)
-                            );
-                    });
-                });
-                // append uiFragment to swggUiContainer
-                document.querySelector('#swggAjaxProgressResourceListDiv1').style.display =
-                    'none';
-                document.querySelector('.swggUiContainer').appendChild(options.uiFragment);
-                // render valueEncoded
-                Array.from(
-                    document.querySelectorAll('.swggUiContainer [data-value-encoded]')
-                ).forEach(function (element) {
-                    element.value = decodeURIComponent(element.dataset.valueEncoded);
-                });
-                // init event-handling
-                local.uiEventInit(document);
-                // scrollTo location.hash
-                local.tryCatchOnError(function () {
-                    var element, parent;
-                    local.tryCatchOnError(function () {
-                        element = document.querySelector('#' + location.hash.slice(2));
-                    }, local.nop);
-                    element = element || document.querySelector(
-                        '.swggUiContainer .operation, .swggUiContainer .operation'
-                    );
-                    parent = element.querySelector('.uiAnimateSlide');
-                    while (parent) {
-                        local.uiAnimateSlideDown(parent);
-                        parent = parent.parentElement;
-                    }
-                    setTimeout(function () {
-                        element.querySelector('.header').focus();
-                    }, 250);
-                }, local.nop);
+            var resource;
+            // optimization - render .swggUiContainer first
+            if (!(options && options.swagger)) {
+                options = local.uiState = local.jsonCopy(local.swaggerJson);
+                // init apiKeyValue
+                options.apiKeyValue = local.apiKeyValue;
+                // init title
+                document.querySelector('head > title').textContent = local.templateRender(
+                    local.templateUiTitle,
+                    options
+                ).trim();
+                // init url
+                options.url = document.querySelector('.swggUiContainer > .header > .td2').value;
+                // templateRender main
+                document.querySelector('.swggUiContainer').innerHTML = local.templateRender(
+                    local.templateUiMain,
+                    options
+                );
+                setTimeout(function () {
+                    local.uiRender(options, onError);
+                }, 100);
+                return;
+            }
+            // optimization - render .resourceList in separate event-loop
+            // reset state
+            local.idDomElementDict = {};
+            local.objectSetDefault(options, { resourceDict: {}, operationDict: {}, tagDict: {} });
+            // init tagDict
+            options.tags.forEach(function (tag) {
+                options.tagDict[tag.name] = tag;
             });
+            // init operationDict
+            Object.keys(local.apiDict).sort().forEach(function (operation) {
+                // init operation
+                operation = local.jsonCopy(local.apiDict[operation]);
+                operation.tags.forEach(function (tag) {
+                    options.operationDict[operation._methodPath] = operation;
+                    // init resource
+                    resource = options.resourceDict[tag] = local.objectSetDefault(
+                        options.resourceDict[tag] || options.tagDict[tag],
+                        { description: 'no description', name: tag, operationListInnerHtml: '' }
+                    );
+                    resource.id = resource.id || local.idDomElementCreate('swgg_id_' + tag);
+                });
+            });
+            // init uiFragment
+            options.uiFragment = local.domFragmentRender('<div class="reset resourceList"></div>');
+            // init resourceDict
+            Object.keys(options.resourceDict).sort().forEach(function (key) {
+                // templateRender resource
+                options.uiFragment.querySelector('.resourceList').appendChild(
+                    local.domFragmentRender(local.templateUiResource, options.resourceDict[key])
+                );
+            });
+            Object.keys(options.operationDict).sort(function (aa, bb) {
+                aa = options.operationDict[aa];
+                aa = aa._path + ' ' + aa._method;
+                bb = options.operationDict[bb];
+                bb = bb._path + ' ' + bb._method;
+                return aa < bb
+                    ? -1
+                    : 1;
+            }).forEach(function (operation) {
+                operation = options.operationDict[operation];
+                operation.id = local.idDomElementCreate('swgg_id_' + operation.operationId);
+                operation.tags.forEach(function (tag) {
+                    operation = local.jsonCopy(operation);
+                    resource = options.resourceDict[tag];
+                    local.objectSetDefault(operation, {
+                        description: 'no description',
+                        responseList: Object.keys(operation.responses).sort().map(function (key) {
+                            return { key: key, value: operation.responses[key] };
+                        }),
+                        summary: 'no summary'
+                    });
+                    operation.parameters.forEach(function (element) {
+                        // init element.id
+                        element.id = local.idDomElementCreate('swgg_id_' + element.name);
+                        local.uiParamRender(element);
+                    });
+                    // templateRender operation
+                    options.uiFragment.querySelector('#' + resource.id + ' .operationList')
+                        .appendChild(local.domFragmentRender(local.templateUiOperation, operation));
+                });
+            });
+            // append uiFragment to swggUiContainer
+            document.querySelector('#swggAjaxProgressDiv1').style.display = 'none';
+            document.querySelector('.swggUiContainer').appendChild(options.uiFragment);
+            // render valueEncoded
+            Array.from(
+                document.querySelectorAll('.swggUiContainer [data-value-encoded]')
+            ).forEach(function (element) {
+                element.value = decodeURIComponent(element.dataset.valueEncoded);
+            });
+            // init event-handling
+            local.uiEventInit(document);
+            // scrollTo location.hash
+            local.tryCatchOnError(function () {
+                var element, parent;
+                local.tryCatchOnError(function () {
+                    element = document.querySelector('#' + location.hash.slice(2));
+                }, local.nop);
+                element = element || document.querySelector(
+                    '.swggUiContainer .operation, .swggUiContainer .operation'
+                );
+                parent = element.querySelector('.uiAnimateSlide');
+                while (parent) {
+                    local.uiAnimateSlideDown(parent);
+                    parent = parent.parentElement;
+                }
+                setTimeout(function () {
+                    element.querySelector('.header').focus();
+                }, 250);
+            }, local.nop);
+            local.setTimeoutOnError(onError);
         };
 
         local.userLoginByPassword = function (options, onError) {
@@ -3889,7 +3927,7 @@ swgg\n\
                     tmp = options.paths[path][method];
                     Object.keys(tmp.parameters).forEach(function (param) {
                         schema = tmp.parameters[param];
-                        key = tmp.tags[0] + '.' + tmp.operationId + '.' + param;
+                        key = (tmp.tags && tmp.tags[0]) + '.' + tmp.operationId + '.' + param;
                         validateDefault();
                     });
                 });

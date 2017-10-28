@@ -58,10 +58,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
-- remove redundant operationId-keyed entries from apiDict
-- un-magic property operation._keyPath
 - revamp datatable with card-expansion ui
-- add forward-proxy ui-checkbox
 - datatable - allow optional sub-level input for swagger-models
 - add authorization-header hook
 - add middlewareAcl
@@ -70,17 +67,19 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2017.10.24
-- npm publish 2017.10.24
-- remove datatable for future revamp
-- add feature \$SWGG_TAGS0_FILTER to filter x-swgg-tags0
-- add feature x-swgg-operationIdFromPath to auto-create operationId from path
-- fix property items.enum not rendering multi-select input bug
-- fix missing resource.id bug
-- rename function normalizeParamDictSwagger -> swaggerParamDictNormalize
-- rename property pathObject._operationId -> pathObject._keyCrud
-- rename property swgg.pathname -> swgg.keyPath
-- remove operationId display from ui
+#### changelog for v2017.10.28
+- npm publish 2017.10.28
+- add jsonp ability to function swgg.apiUpdate
+- add property swaggerJson['x-swgg-operationIdFromPath']
+- add property swaggerJson.info['x-swgg-urlApp'] and 'download standalone app' link
+- allow deferring of function apiAjax to wait for remote swaggerJson
+- document apiDict.ajax methods
+- rename pathObject._idAlias -> pathObject._idBackend
+- rename pathObject._idField -> pathObject._idName
+- rename pathObject._keyCrud -> pathObject._crudType
+- rename pathObject._keyPath -> pathObject._methodPath
+- rename request.swgg.crud.operationId -> request.swgg.crud.crudType
+- split pathObject.operationId into pathObject.crudType from pathObject.operationId
 - none
 
 #### this package requires
@@ -94,13 +93,13 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 ```shell
 # example.sh
 
-# this shell script will download and run a web demo of swgg as a standalone app
+# this shell script will download and run a web-demo of swgg as a standalone app
 
 # 1. download standalone app
 curl -O https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js
 # 2. run standalone app
 node ./assets.app.js
-# 3. open a browser to http://127.0.0.1:8081 and play with the web demo
+# 3. open a browser to http://127.0.0.1:8081 and play with the web-demo
 # 4. edit file assets.app.js to suit your needs
 ```
 
@@ -121,13 +120,13 @@ node ./assets.app.js
 /*
 example.js
 
-this script will run a web demo of swgg
+this script will run a web-demo of swgg
 
 instruction
     1. save this script as example.js
     2. run the shell command:
         $ npm install swgg && PORT=8081 node example.js
-    3. open a browser to http://127.0.0.1:8081 and play with the web demo
+    3. open a browser to http://127.0.0.1:8081 and play with the web-demo
     4. edit this script to suit your needs
 */
 
@@ -201,7 +200,7 @@ instruction
                 switch (options.modeNext) {
                 case 1:
                     crud = request.swgg.crud;
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.crudType[0]) {
                     // coverage-hack - test error handling-behavior
                     case 'crudErrorPre':
                         options.onNext(local.errorDefault);
@@ -218,7 +217,7 @@ instruction
                     }
                     break;
                 case 2:
-                    switch (crud.operationId.split('.')[0]) {
+                    switch (crud.crudType[0]) {
                     case 'getInventory':
                         result = {};
                         data.forEach(function (element) {
@@ -393,136 +392,136 @@ utility2-comment -->\n\
             },
             tags: [{ description: 'builtin-file model', name: 'file' }],
             'x-swgg-apiDict': {
-                'file crudCountManyByQuery': {
+                'operationId.file.crudCountManyByQuery': {
                     _schemaName: 'File'
                 },
-                'file crudSetOneById.id.id': {
+                'operationId.file.crudSetOneById.id.id': {
                     _schemaName: 'File'
                 },
-                'file crudGetManyByQuery': {
+                'operationId.file.crudGetManyByQuery': {
                     _schemaName: 'File'
                 },
-                'file crudRemoveOneById.id.id': {
+                'operationId.file.crudRemoveOneById.id.id': {
                     _schemaName: 'File'
                 },
-                'file crudUpdateOneById.id.id': {
+                'operationId.file.crudUpdateOneById.id.id': {
                     _schemaName: 'File'
                 },
-                'file fileGetOneById.id.id': {
+                'operationId.file.fileGetOneById.id.id': {
                     _schemaName: 'File'
                 },
-                'file fileUploadManyByForm.1': {
+                'operationId.file.fileUploadManyByForm.1': {
                     _schemaName: 'File'
                 },
-                'pet addPet': {
-                    _keyCrud: 'crudSetOneById.petId.id',
+                'operationId.addPet': {
+                    _crudType: ['crudSetOneById', 'petId', 'id'],
                     _schemaName: 'Pet'
                 },
-                'pet crudGetManyByQuery': {
+                'operationId.pet.crudGetManyByQuery': {
                     _schemaName: 'Pet'
                 },
-                'pet deletePet': {
-                    _keyCrud: 'crudRemoveOneById.petId.id',
+                'operationId.deletePet': {
+                    _crudType: ['crudRemoveOneById', 'petId', 'id'],
                     _schemaName: 'Pet'
                 },
-                'pet findPetsByStatus': {
-                    _keyCrud: 'crudGetManyByQuery',
+                'operationId.findPetsByStatus': {
+                    _crudType: ['crudGetManyByQuery'],
                     _queryWhere: '{"status":{"$in":{{status jsonStringify}}}}',
                     _schemaName: 'Pet'
                 },
-                'pet findPetsByTags': {
-                    _keyCrud: 'crudGetManyByQuery',
+                'operationId.findPetsByTags': {
+                    _crudType: ['crudGetManyByQuery'],
                     _queryWhere: '{"tags.name":{"$in":{{tags jsonStringify}}}}',
                     _schemaName: 'Pet'
                 },
-                'pet getPetById': {
-                    _keyCrud: 'crudGetOneById.petId.id',
+                'operationId.getPetById': {
+                    _crudType: ['crudGetOneById', 'petId', 'id'],
                     _schemaName: 'Pet'
                 },
-                'pet updatePet': {
-                    _keyCrud: 'crudUpdateOneById.petId.id',
+                'operationId.updatePet': {
+                    _crudType: ['crudUpdateOneById', 'petId', 'id'],
                     _schemaName: 'Pet'
                 },
-                'pet updatePetWithForm': {
-                    _keyCrud: 'crudUpdateOneById.petId.id',
+                'operationId.updatePetWithForm': {
+                    _crudType: ['crudUpdateOneById', 'petId', 'id'],
                     _schemaName: 'Pet'
                 },
-                'pet uploadFile': {
-                    _keyCrud: 'fileUploadManyByForm',
+                'operationId.uploadFile': {
+                    _crudType: ['fileUploadManyByForm'],
                     _schemaName: 'User'
                 },
-                'store crudGetManyByQuery': {
+                'operationId.store.crudGetManyByQuery': {
                     _schemaName: 'Order'
                 },
-                'store crudUpdateOneById.id.id': {
+                'operationId.store.crudUpdateOneById.id.id': {
                     _schemaName: 'Order'
                 },
-                'store deleteOrder': {
-                    _keyCrud: 'crudRemoveOneById.orderId.id',
+                'operationId.deleteOrder': {
+                    _crudType: ['crudRemoveOneById', 'orderId', 'id'],
                     _schemaName: 'Order'
                 },
-                'store getInventory': {
+                'operationId.getInventory': {
                     _schemaName: 'Order'
                 },
-                'store getOrderById': {
-                    _keyCrud: 'crudGetOneById.orderId.id',
+                'operationId.getOrderById': {
+                    _crudType: ['crudGetOneById', 'orderId', 'id'],
                     _schemaName: 'Order'
                 },
-                'store placeOrder': {
-                    _keyCrud: 'crudSetOneById.orderId.id',
+                'operationId.placeOrder': {
+                    _crudType: ['crudSetOneById', 'orderId', 'id'],
                     _schemaName: 'Order'
                 },
-                'user createUser': {
-                    _keyCrud: 'crudSetOneById.username.username',
+                'operationId.createUser': {
+                    _crudType: ['crudSetOneById', 'username', 'username'],
                     _schemaName: 'User'
                 },
-                'user createUsersWithArrayInput': {
-                    _keyCrud: 'crudSetManyById',
+                'operationId.createUsersWithArrayInput': {
+                    _crudType: ['crudSetManyById'],
                     _schemaName: 'User'
                 },
-                'user createUsersWithListInput': {
-                    _keyCrud: 'crudSetManyById',
+                'operationId.createUsersWithListInput': {
+                    _crudType: ['crudSetManyById'],
                     _schemaName: 'User'
                 },
-                'user crudCountManyByQuery': {
+                'operationId.user.crudCountManyByQuery': {
                     _schemaName: 'User'
                 },
-                'user crudSetOneById.username.username': {
+                'operationId.user.crudSetOneById.username.username': {
                     _schemaName: 'User'
                 },
-                'user crudRemoveOneById.username.username': {
+                'operationId.user.crudRemoveOneById.username.username': {
                     _schemaName: 'User'
                 },
-                'user crudGetManyByQuery': {
+                'operationId.user.crudGetManyByQuery': {
                     _schemaName: 'User'
                 },
-                'user crudUpdateOneById.username.username': {
+                'operationId.user.crudUpdateOneById.username.username': {
                     _schemaName: 'User'
                 },
-                'user deleteUser': {
-                    _keyCrud: 'crudRemoveOneById.username.username',
+                'operationId.deleteUser': {
+                    _crudType: ['crudRemoveOneById', 'username', 'username'],
                     _schemaName: 'User'
                 },
-                'user getUserByName': {
-                    _keyCrud: 'crudGetOneById.username.username',
+                'operationId.getUserByName': {
+                    _crudType: ['crudGetOneById', 'username', 'username'],
                     _schemaName: 'User'
                 },
-                'user loginUser': {
-                    _keyCrud: 'userLoginByPassword',
+                'operationId.loginUser': {
+                    _crudType: ['userLoginByPassword'],
                     _schemaName: 'User'
                 },
-                'user logoutUser': {
-                    _keyCrud: 'userLogout',
+                'operationId.logoutUser': {
+                    _crudType: ['userLogout'],
                     _schemaName: 'User'
                 },
-                'user updateUser': {
-                    _keyCrud: 'crudUpdateOneById.username.username',
+                'operationId.updateUser': {
+                    _crudType: ['crudUpdateOneById', 'username', 'username'],
                     _schemaName: 'User'
                 },
-                'user userLoginByPassword': {
+                'operationId.user.userLoginByPassword': {
                     _schemaName: 'User'
                 },
-                'user userLogout': {
+                'operationId.user.userLogout': {
                     _schemaName: 'User'
                 }
             }
@@ -741,7 +740,8 @@ utility2-comment -->\n\
                 break;
             case undefined:
                 // init ui
-                local.swgg.uiEventListenerDict['.onEventUiReload']();
+                local.onReadyBefore.counter += 1;
+                local.swgg.uiEventListenerDict['.onEventUiReload'](null, local.onReadyBefore);
                 // coverage-hack - ignore else-statement
                 local.nop(local.modeTest && (function () {
                     document.querySelector('#testRunButton1').textContent =
@@ -952,7 +952,7 @@ utility2-comment -->\n\
     "license": "MIT",
     "main": "lib.swgg.js",
     "name": "swgg",
-    "nameAliasPublish": "swagger-lite",
+    "nameAliasPublish": "petstore swagger-lite swaggerdoc",
     "nameLib": "swgg",
     "nameOriginal": "swgg",
     "os": [
@@ -971,7 +971,7 @@ utility2-comment -->\n\
         "start": "PORT=${PORT:-8080} utility2 start test.js",
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2017.10.24"
+    "version": "2017.10.28"
 }
 ```
 

@@ -17,7 +17,7 @@
     "license": "MIT",
     "main": "lib.swgg.js",
     "name": "swgg",
-    "nameAliasPublish": "swagger-lite",
+    "nameAliasPublish": "petstore swagger-lite swaggerdoc",
     "nameLib": "swgg",
     "nameOriginal": "swgg",
     "os": [
@@ -36,5 +36,5 @@
         "start": "PORT=${PORT:-8080} utility2 start test.js",
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2017.10.24"
+    "version": "2017.10.28"
 }
