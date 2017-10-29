@@ -1113,7 +1113,7 @@ local.templateUiMain = '\
 <pre class="code" id="swggAjaxProgressPre1">\n\
 /*\n\
  * initialize swgg-client\n\
- * 1. download this api as swagger.json:\n\
+ * 1. download currently loaded apis as swagger.json:\n\
  *     $ curl "{{url htmlSafe}}" > swagger.json\n\
  * 2. npm install swgg\n\
  *     $ npm install swgg\n\
@@ -1123,7 +1123,7 @@ local.templateUiMain = '\
 var swgg;\n\
 swgg = require("swgg");\n\
 swgg.apiUpdate(require("./swagger.json"));\n\
-console.log("printing initialized apis ...");\n\
+console.log("printing currently loaded apis ...");\n\
 console.log(JSON.stringify(Object.keys(swgg.apiDict).sort(), null, 4));\n\
 console.log("initialized swgg-client");\n\
 </pre>\n\
@@ -1279,9 +1279,9 @@ ERROR\n\
 <h4 class="label marginTop10"></h4>\n\
 <pre class="code">\n\
 /*\n\
- * reproduce swgg-client request {{options.api._methodPath jsonStringify}}\n\
+ * reproduce api-call {{options.api._methodPath jsonStringify}}\n\
  * 1. initialize swgg-client from previous step\n\
- * 2. run code below to reproduce swgg-client request\n\
+ * 2. run code below to reproduce api-call\n\
  */\n\
 swgg.apiAjax({{options.api._methodPath jsonStringify htmlSafe}}, {{optionsJson htmlSafe}}, \
 function (error, data) {\n\
@@ -1616,7 +1616,7 @@ swgg\n\
                     }
                 },
                 "info": {
-                    "description": "demo of swagger-ui server",
+                    "description": "web-demo of swagger-ui server",
                     "title": "swgg api",
                     "version": "0.0.1"
                 },
@@ -1750,10 +1750,10 @@ swgg\n\
                 self.ajax = function (options, onError) {
                     return local.apiAjax(self, options, onError);
                 };
-                self.ajax._toString = self.ajax._toString || self.ajax.toString()
+                self._ajaxToString = self.ajax.toString()
                     .replace('{', ('{\n' +
                         '/*\n' +
-                        ' * this function will call swgg-client request ' +
+                        ' * this function will make the api-call ' +
                         JSON.stringify(self._methodPath) + '\n' +
                         ' * example usage:' + ('\n' +
                         'swgg.apiDict[' + JSON.stringify(key.join('.')) + '].ajax(' +
@@ -1770,7 +1770,7 @@ swgg\n\
                         '});').replace((/\n/g), '\n    ') + '\n */')
                         .replace((/\n/g), '\n                '));
                 self.ajax.toString = function () {
-                    return self.ajax._toString;
+                    return self._ajaxToString;
                 };
                 // remove underscored keys from self
                 tmp = local.jsonCopy(self);

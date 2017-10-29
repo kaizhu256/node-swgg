@@ -1,7 +1,7 @@
 # swgg
-this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend)
+this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend), with a working web-demo
 
-# live demo
+# live web-demo
 - [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app)
 
 [![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app)
@@ -58,6 +58,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
+- npm publish 2017.10.29
 - revamp datatable with card-expansion ui
 - datatable - allow optional sub-level input for swagger-models
 - add authorization-header hook
@@ -67,19 +68,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2017.10.28
-- npm publish 2017.10.28
-- add jsonp ability to function swgg.apiUpdate
-- add property swaggerJson['x-swgg-operationIdFromPath']
-- add property swaggerJson.info['x-swgg-urlApp'] and 'download standalone app' link
-- allow deferring of function apiAjax to wait for remote swaggerJson
-- document apiDict.ajax methods
-- rename pathObject._idAlias -> pathObject._idBackend
-- rename pathObject._idField -> pathObject._idName
-- rename pathObject._keyCrud -> pathObject._crudType
-- rename pathObject._keyPath -> pathObject._methodPath
-- rename request.swgg.crud.operationId -> request.swgg.crud.crudType
-- split pathObject.operationId into pathObject.crudType from pathObject.operationId
+#### changelog for v2017.10.29
 - none
 
 #### this package requires
@@ -935,7 +924,7 @@ utility2-comment -->\n\
 ```json
 {
     "author": "kai zhu <kaizhu256@gmail.com>",
-    "description": "this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend)",
+    "description": "this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend), with a working web-demo",
     "devDependencies": {
         "electron-lite": "kaizhu256/node-electron-lite#alpha",
         "utility2": "kaizhu256/node-utility2#alpha"
@@ -971,7 +960,7 @@ utility2-comment -->\n\
         "start": "PORT=${PORT:-8080} utility2 start test.js",
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2017.10.28"
+    "version": "2017.10.29"
 }
 ```
 

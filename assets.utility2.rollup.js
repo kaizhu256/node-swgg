@@ -14782,7 +14782,7 @@ local.assetsDict['/assets.readme.template.md'] = '\
 # jslint-lite\n\
 the greatest app in the world!\n\
 \n\
-# live demo\n\
+# live web-demo\n\
 - [https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app/](https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app)\n\
 \n\
 [![screenshot](https://kaizhu256.github.io/node-jslint-lite/build/screenshot.deployGithub.browser.%252Fnode-jslint-lite%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app)\n\
@@ -15558,7 +15558,6 @@ local.assetsDict['/favicon.ico'] = '';
          * overwhelmed by a fast readable stream
          */
             this.on('data', function (chunk) {
-                chunk = local.normalizeChunk(chunk);
                 writable.write(chunk);
             });
             this.on('end', function () {
@@ -17507,8 +17506,8 @@ return Utf8ArrayToStr(bff);
                 (/.*?\n.*?\n/),
                 // customize cdn-download
                 (/\n# cdn download\n[\S\s]*?\n\n\n\n/),
-                // customize demo
-                (/\n# live demo\n[\S\s]*?\n\n\n\n/),
+                // customize live web-demo
+                (/\n# live web-demo\n[\S\s]*?\n\n\n\n/),
                 // customize todo
                 (/\n#### todo\n[\S\s]*?\n\n\n\n/),
                 // customize quickstart-example-js
@@ -17537,19 +17536,28 @@ return Utf8ArrayToStr(bff);
                 });
             });
             // customize swaggerdoc
-            if (process.env.npm_package_name === 'utility2' ||
-                    !local.assetsDict['/assets.swgg.swagger.json'] ||
-                    (/\bswggUiContainer\b/).exec(local.assetsDict['/index.html'])) {
+            if (!local.assetsDict['/assets.swgg.swagger.json'] ||
+                    (/\bswggUiContainer\b/).test(local.assetsDict['/index.html']) ||
+                    process.env.npm_package_name === 'utility2') {
                 options.dataTo = options.dataTo.replace((/\n#### swagger doc\n[\S\s]*?\n#### /),
                     '\n#### ');
             }
+            // customize example.js
+            if (local.assetsDict['/index.html']
+                    .indexOf('<script src="assets.example.js"></script>') < 0) {
+                options.dataTo = options.dataTo.replace(
+                    (/\n {4}case 'browser':\n[\S\s]+?\n {8}break;\n/g),
+                    "\n    case 'browser':\n        break;\n"
+                );
+            }
             // customize comment
-            options.dataFrom.replace(
-                (/^( *?)(?:#!\! |#\/\/ |\/\/!\! )(.*?)$/gm),
-                function (match0, match1, match2) {
-                    options.dataTo = options.dataTo.replace(match1 + match2, match0);
-                }
-            );
+            options.dataFrom.replace((/^( *?)(?:#!\! |#\/\/ |\/\/!\! )(.*?)$/gm), function (
+                match0,
+                match1,
+                match2
+            ) {
+                options.dataTo = options.dataTo.replace(match1 + match2, match0);
+            });
             options.customize();
             // customize shDeployCustom
             if (options.dataFrom.indexOf(' shDeployCustom\n') >= 0) {
@@ -18200,7 +18208,6 @@ return Utf8ArrayToStr(bff);
                 chunkList = [];
                 response
                     .on('data', function (chunk) {
-                        chunk = local.normalizeChunk(chunk);
                         chunkList.push(chunk);
                     })
                     .on('end', function () {
@@ -18516,7 +18523,7 @@ return Utf8ArrayToStr(bff);
                 case 1:
                     // skip gzip
                     if (response.headersSent ||
-                            !(/\bgzip\b/).exec(request.headers['accept-encoding'])) {
+                            !(/\bgzip\b/).test(request.headers['accept-encoding'])) {
                         options.modeNext += 1;
                         options.onNext();
                         return;
@@ -19367,7 +19374,6 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             process.stdout._writeDefault = process.stdout._writeDefault ||
                 process.stdout._write;
             process.stdout._write = function (chunk, encoding, callback) {
-                chunk = local.normalizeChunk(chunk);
                 process.stdout._writeDefault(chunk, encoding, callback);
                 // coverage-hack - ignore else-statement
                 self.nop(self.socket.writable && (function () {
@@ -22615,7 +22621,7 @@ local.templateUiMain = '\
 <pre class="code" id="swggAjaxProgressPre1">\n\
 /*\n\
  * initialize swgg-client\n\
- * 1. download this api as swagger.json:\n\
+ * 1. download currently loaded apis as swagger.json:\n\
  *     $ curl "{{url htmlSafe}}" > swagger.json\n\
  * 2. npm install swgg\n\
  *     $ npm install swgg\n\
@@ -22625,7 +22631,7 @@ local.templateUiMain = '\
 var swgg;\n\
 swgg = require("swgg");\n\
 swgg.apiUpdate(require("./swagger.json"));\n\
-console.log("printing initialized apis ...");\n\
+console.log("printing currently loaded apis ...");\n\
 console.log(JSON.stringify(Object.keys(swgg.apiDict).sort(), null, 4));\n\
 console.log("initialized swgg-client");\n\
 </pre>\n\
@@ -22781,9 +22787,9 @@ ERROR\n\
 <h4 class="label marginTop10"></h4>\n\
 <pre class="code">\n\
 /*\n\
- * reproduce swgg-client request {{options.api._methodPath jsonStringify}}\n\
+ * reproduce api-call {{options.api._methodPath jsonStringify}}\n\
  * 1. initialize swgg-client from previous step\n\
- * 2. run code below to reproduce swgg-client request\n\
+ * 2. run code below to reproduce api-call\n\
  */\n\
 swgg.apiAjax({{options.api._methodPath jsonStringify htmlSafe}}, {{optionsJson htmlSafe}}, \
 function (error, data) {\n\
@@ -23118,7 +23124,7 @@ swgg\n\
                     }
                 },
                 "info": {
-                    "description": "demo of swagger-ui server",
+                    "description": "web-demo of swagger-ui server",
                     "title": "swgg api",
                     "version": "0.0.1"
                 },
@@ -23252,10 +23258,10 @@ swgg\n\
                 self.ajax = function (options, onError) {
                     return local.apiAjax(self, options, onError);
                 };
-                self.ajax._toString = self.ajax._toString || self.ajax.toString()
+                self._ajaxToString = self.ajax.toString()
                     .replace('{', ('{\n' +
                         '/*\n' +
-                        ' * this function will call swgg-client request ' +
+                        ' * this function will make the api-call ' +
                         JSON.stringify(self._methodPath) + '\n' +
                         ' * example usage:' + ('\n' +
                         'swgg.apiDict[' + JSON.stringify(key.join('.')) + '].ajax(' +
@@ -23272,7 +23278,7 @@ swgg\n\
                         '});').replace((/\n/g), '\n    ') + '\n */')
                         .replace((/\n/g), '\n                '));
                 self.ajax.toString = function () {
-                    return self.ajax._toString;
+                    return self._ajaxToString;
                 };
                 // remove underscored keys from self
                 tmp = local.jsonCopy(self);
