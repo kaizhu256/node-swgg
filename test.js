@@ -1906,6 +1906,7 @@
                         "description": "boolean-param",
                         "in": "query",
                         "name": "paramBoolean",
+                        "required": true,
                         "type": "boolean"
                     },
                     {
@@ -1979,7 +1980,7 @@
                         "required": true,
                         "type": "string",
                         "x-swgg-apiKey": true,
-                        "x-swgg-ref": "x-test-param"
+                        "x-swgg-$ref": "x-test-param"
                     }
                 ],
                 "summary": "test default-param handling-behavior",

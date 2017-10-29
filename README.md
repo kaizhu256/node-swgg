@@ -70,7 +70,8 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 #### changelog for v2017.10.29
 - merge properties paramDef.x-swgg-example and paramDef.default -> paramDef.default
-- modify function swaggerParamDictNormalize to only set default-value if required
+- modify function swaggerParamDictNormalize to only set default-value if required (or modeDefault flag is enabled)
+- rename x-swgg-ref -> x-swgg-$ref
 - none
 
 #### this package requires

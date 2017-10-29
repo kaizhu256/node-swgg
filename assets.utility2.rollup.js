@@ -22716,7 +22716,7 @@ local.templateUiParam = '\
     <textarea\n\
         class="input"\n\
         data-value-encoded="{{valueEncoded encodeURIComponent}}"\n\
-        placeholder="{{placeholder}}"></textarea>\n\
+        placeholder="{{placeholder htmlSafe}}"></textarea>\n\
     {{/if isTextarea}}\n\
     {{#if isFile}}\n\
     <input class="input" type="file">\n\
@@ -22736,7 +22736,7 @@ local.templateUiParam = '\
     <input\n\
         class="input"\n\
         data-value-encoded="{{valueEncoded encodeURIComponent}}"\n\
-        placeholder="{{placeholder}}"\n\
+        placeholder="{{placeholder htmlSafe}}"\n\
         type="text"\n\
     >\n\
     {{/if isInputText}}\n\
@@ -23231,13 +23231,13 @@ swgg\n\
                         param.type = options.definitions[self._schemaName]
                             .properties[self._idBackend].type;
                     }
-                    // copy x-swgg-ref from x-swgg-definitionsParameters
-                    if (param['x-swgg-ref'] && options['x-swgg-definitionsParameters'] &&
-                            options['x-swgg-definitionsParameters'][param['x-swgg-ref']]) {
+                    // copy x-swgg-$ref from x-swgg-definitionsParameters
+                    if (param['x-swgg-$ref'] && options['x-swgg-definitionsParameters'] &&
+                            options['x-swgg-definitionsParameters'][param['x-swgg-$ref']]) {
                         local.objectSetDefault(
                             param,
                             local.jsonCopy(
-                                options['x-swgg-definitionsParameters'][param['x-swgg-ref']]
+                                options['x-swgg-definitionsParameters'][param['x-swgg-$ref']]
                             )
                         );
                     }
@@ -23266,6 +23266,7 @@ swgg\n\
                         ' * example usage:' + ('\n' +
                         'swgg.apiDict[' + JSON.stringify(key.join('.')) + '].ajax(' +
                         JSON.stringify(local.swaggerParamDictNormalize({
+                                modeDefault: true,
                                 paramDict: {},
                                 pathObject: self
                             }).paramDict, null, 4) +
@@ -24302,6 +24303,7 @@ swgg\n\
                 tmp = options.paramDict[paramDef.name];
                 // init default value
                 if (!options.modeNoDefault &&
+                        (options.modeDefault || paramDef.required) &&
                         local.isNullOrUndefined(tmp) &&
                         paramDef.default !== undefined) {
                     tmp = local.jsonCopy(paramDef.default);
@@ -24715,11 +24717,13 @@ swgg\n\
         /*
          * this function will render the param
          */
-            paramDef.placeholder = !local.isNullOrUndefined(paramDef['x-swgg-example'])
-                ? String(paramDef['x-swgg-example'])
+            paramDef.placeholder = String(!local.isNullOrUndefined(paramDef['default'])
+                ? (paramDef.type === 'string'
+                    ? paramDef['default']
+                    : JSON.stringify(paramDef['default']))
                 : paramDef.required
                 ? '(required)'
-                : '';
+                : '');
             paramDef.enum2 = paramDef.enum || (paramDef.items && paramDef.items.enum);
             // init input - file
             if (paramDef.type === 'file') {
@@ -24729,8 +24733,9 @@ swgg\n\
                 paramDef.isTextarea = true;
             // init input - select
             } else if (paramDef.enum2 || paramDef.type === 'boolean') {
+                // init enumDefault
                 paramDef.enumDefault = [];
-                if (paramDef.default !== undefined) {
+                if (paramDef.required && paramDef.default !== undefined) {
                     paramDef.enumDefault = paramDef.type === 'array'
                         ? paramDef.default
                         : [paramDef.default];
@@ -24740,6 +24745,7 @@ swgg\n\
                 paramDef.selectOptionList = (paramDef.type === 'boolean'
                     ? [false, true]
                     : paramDef.enum2).map(function (element) {
+                    // init hasDefault
                     paramDef.hasDefault = paramDef.hasDefault ||
                         paramDef.enumDefault.indexOf(element) >= 0;
                     return {
@@ -24755,7 +24761,7 @@ swgg\n\
                     };
                 });
                 // init 'undefined' value
-                if (!(paramDef.hasDefault || paramDef.required)) {
+                if (!paramDef.hasDefault) {
                     paramDef.selectOptionList.unshift({
                         id: local.idDomElementCreate('swgg_id_' + paramDef.name),
                         selected: 'selected',
@@ -24778,11 +24784,11 @@ swgg\n\
             // init input - textarea
             } else if (paramDef.type === 'array') {
                 paramDef.isTextarea = true;
-                paramDef.placeholder = Array.isArray(paramDef['x-swgg-example'])
-                    ? paramDef['x-swgg-example'].join('\n')
+                paramDef.placeholder = String(Array.isArray(paramDef['default'])
+                    ? paramDef['default'].join('\n')
                     : 'provide multiple values in new lines' + (paramDef.required
                         ? ' (at least one required)'
-                        : '');
+                        : ''));
             // init input - text
             } else {
                 paramDef.isInputText = true;
@@ -24816,23 +24822,25 @@ swgg\n\
                     : paramDef.schema2, null, 4);
             }
             // init valueEncoded
-            paramDef.valueEncoded = paramDef['x-swgg-apiKey']
-                ? local.apiKeyValue
-                : paramDef.default;
-            if (paramDef.valueEncoded === undefined &&
-                    local.isNullOrUndefined(paramDef['x-swgg-example'])) {
-                paramDef.valueEncoded = local.dbFieldRandomCreate({
-                    modeNotRandom: true,
-                    propDef: paramDef
-                });
-            }
-            // init valueEncoded for array
-            if (paramDef.valueEncoded && paramDef.type2 === 'array' && paramDef.in !== 'body') {
-                paramDef.valueEncoded = paramDef.valueEncoded.map(function (element) {
-                    return typeof element === 'string'
-                        ? element
-                        : JSON.stringify(element);
-                }).join('\n');
+            if (paramDef.required || paramDef.in === 'body') {
+                paramDef.valueEncoded = paramDef['x-swgg-apiKey']
+                    ? local.apiKeyValue
+                    : paramDef.default;
+                if (paramDef.valueEncoded === undefined &&
+                        local.isNullOrUndefined(paramDef['default'])) {
+                    paramDef.valueEncoded = local.dbFieldRandomCreate({
+                        modeNotRandom: true,
+                        propDef: paramDef
+                    });
+                }
+                // init valueEncoded for array
+                if (paramDef.valueEncoded && paramDef.type2 === 'array' && paramDef.in !== 'body') {
+                    paramDef.valueEncoded = paramDef.valueEncoded.map(function (element) {
+                        return typeof element === 'string'
+                            ? element
+                            : JSON.stringify(element);
+                    }).join('\n');
+                }
             }
             // init valueEncoded for schema
             if (paramDef.in === 'body' && paramDef.schema2) {
@@ -25051,9 +25059,9 @@ swgg\n\
                 propDef = options.schema;
                 // validate x-swgg-definitionsParameters
                 local.assert(
-                    !(propDef['x-swgg-ref'] && options['x-swgg-definitionsParameters']) ||
-                        options['x-swgg-definitionsParameters'][propDef['x-swgg-ref']],
-                    prefix + ' missing x-swgg-definitionsParameters.' + propDef['x-swgg-ref']
+                    !(propDef['x-swgg-$ref'] && options['x-swgg-definitionsParameters']) ||
+                        options['x-swgg-definitionsParameters'][propDef['x-swgg-$ref']],
+                    prefix + ' missing x-swgg-definitionsParameters.' + propDef['x-swgg-$ref']
                 );
                 // validate undefined data
                 if (local.isNullOrUndefined(data)) {
