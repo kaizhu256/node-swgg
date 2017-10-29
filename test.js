@@ -2115,7 +2115,7 @@
             "_schemaName": "TestCrud"
         }
     },
-    "x-swgg-definitionsParameters": {
+    "x-swgg-parameters": {
         "x-test-param": {}
     }
 }

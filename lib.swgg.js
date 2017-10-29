@@ -1723,13 +1723,13 @@ swgg\n\
                         param.type = options.definitions[self._schemaName]
                             .properties[self._idBackend].type;
                     }
-                    // copy x-swgg-$ref from x-swgg-definitionsParameters
-                    if (param['x-swgg-$ref'] && options['x-swgg-definitionsParameters'] &&
-                            options['x-swgg-definitionsParameters'][param['x-swgg-$ref']]) {
+                    // copy x-swgg-$ref from x-swgg-parameters
+                    if (param['x-swgg-$ref'] && options['x-swgg-parameters'] &&
+                            options['x-swgg-parameters'][param['x-swgg-$ref']]) {
                         local.objectSetDefault(
                             param,
                             local.jsonCopy(
-                                options['x-swgg-definitionsParameters'][param['x-swgg-$ref']]
+                                options['x-swgg-parameters'][param['x-swgg-$ref']]
                             )
                         );
                     }
@@ -2757,7 +2757,7 @@ swgg\n\
             if (!local.env.SWGG_TAGS0_FILTER) {
                 return options;
             }
-            ['definitions', 'x-swgg-definitionsParameters'].forEach(function (dict) {
+            ['definitions', 'x-swgg-parameters'].forEach(function (dict) {
                 dict = options[dict] || {};
                 Object.keys(dict).forEach(function (key) {
                     if (dict[key]['x-swgg-tags0'] &&
@@ -3549,11 +3549,11 @@ swgg\n\
                 data = options.data;
                 prefix = 'property ' + options.key;
                 propDef = options.schema;
-                // validate x-swgg-definitionsParameters
+                // validate x-swgg-parameters
                 local.assert(
-                    !(propDef['x-swgg-$ref'] && options['x-swgg-definitionsParameters']) ||
-                        options['x-swgg-definitionsParameters'][propDef['x-swgg-$ref']],
-                    prefix + ' missing x-swgg-definitionsParameters.' + propDef['x-swgg-$ref']
+                    !(propDef['x-swgg-$ref'] && options['x-swgg-parameters']) ||
+                        options['x-swgg-parameters'][propDef['x-swgg-$ref']],
+                    prefix + ' missing x-swgg-parameters.' + propDef['x-swgg-$ref']
                 );
                 // validate undefined data
                 if (local.isNullOrUndefined(data)) {
@@ -3916,7 +3916,7 @@ swgg\n\
                     data: schema.default,
                     key: key + '.default',
                     schema: schema,
-                    'x-swgg-definitionsParameters': options['x-swgg-definitionsParameters']
+                    'x-swgg-parameters': options['x-swgg-parameters']
                 });
             };
             Object.keys(options.definitions || {}).forEach(function (schemaName) {
