@@ -2794,6 +2794,7 @@ swgg\n\
                 tmp = options.paramDict[paramDef.name];
                 // init default value
                 if (!options.modeNoDefault &&
+                        paramDef.required &&
                         local.isNullOrUndefined(tmp) &&
                         paramDef.default !== undefined) {
                     tmp = local.jsonCopy(paramDef.default);
@@ -3207,8 +3208,8 @@ swgg\n\
         /*
          * this function will render the param
          */
-            paramDef.placeholder = !local.isNullOrUndefined(paramDef['x-swgg-example'])
-                ? String(paramDef['x-swgg-example'])
+            paramDef.placeholder = !local.isNullOrUndefined(paramDef['default'])
+                ? String(paramDef['default'])
                 : paramDef.required
                 ? '(required)'
                 : '';
@@ -3270,8 +3271,8 @@ swgg\n\
             // init input - textarea
             } else if (paramDef.type === 'array') {
                 paramDef.isTextarea = true;
-                paramDef.placeholder = Array.isArray(paramDef['x-swgg-example'])
-                    ? paramDef['x-swgg-example'].join('\n')
+                paramDef.placeholder = Array.isArray(paramDef['default'])
+                    ? paramDef['default'].join('\n')
                     : 'provide multiple values in new lines' + (paramDef.required
                         ? ' (at least one required)'
                         : '');
@@ -3308,23 +3309,25 @@ swgg\n\
                     : paramDef.schema2, null, 4);
             }
             // init valueEncoded
-            paramDef.valueEncoded = paramDef['x-swgg-apiKey']
-                ? local.apiKeyValue
-                : paramDef.default;
-            if (paramDef.valueEncoded === undefined &&
-                    local.isNullOrUndefined(paramDef['x-swgg-example'])) {
-                paramDef.valueEncoded = local.dbFieldRandomCreate({
-                    modeNotRandom: true,
-                    propDef: paramDef
-                });
-            }
-            // init valueEncoded for array
-            if (paramDef.valueEncoded && paramDef.type2 === 'array' && paramDef.in !== 'body') {
-                paramDef.valueEncoded = paramDef.valueEncoded.map(function (element) {
-                    return typeof element === 'string'
-                        ? element
-                        : JSON.stringify(element);
-                }).join('\n');
+            if (paramDef.required) {
+                paramDef.valueEncoded = paramDef['x-swgg-apiKey']
+                    ? local.apiKeyValue
+                    : paramDef.default;
+                if (paramDef.valueEncoded === undefined &&
+                        local.isNullOrUndefined(paramDef['default'])) {
+                    paramDef.valueEncoded = local.dbFieldRandomCreate({
+                        modeNotRandom: true,
+                        propDef: paramDef
+                    });
+                }
+                // init valueEncoded for array
+                if (paramDef.valueEncoded && paramDef.type2 === 'array' && paramDef.in !== 'body') {
+                    paramDef.valueEncoded = paramDef.valueEncoded.map(function (element) {
+                        return typeof element === 'string'
+                            ? element
+                            : JSON.stringify(element);
+                    }).join('\n');
+                }
             }
             // init valueEncoded for schema
             if (paramDef.in === 'body' && paramDef.schema2) {

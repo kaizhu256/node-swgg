@@ -1835,6 +1835,7 @@
                             "type": "string"
                         },
                         "name": "paramArrayDefault",
+                        "required": true,
                         "type": "array"
                     },
                     {
@@ -1848,12 +1849,9 @@
                             "type": "integer"
                         },
                         "name": "paramArrayJson",
+                        "required": true,
                         "type": "array",
-                        "x-collectionFormat": "json",
-                        "x-swgg-example": [
-                            0,
-                            1
-                        ]
+                        "x-collectionFormat": "json"
                     },
                     {
                         "collectionFormat": "multi",
@@ -1952,8 +1950,7 @@
                         "description": "integer-param",
                         "in": "query",
                         "name": "paramInteger",
-                        "type": "integer",
-                        "x-swgg-example": 0
+                        "type": "integer"
                     },
                     {
                         "description": "json-param",
@@ -1966,9 +1963,7 @@
                         "description": "optional-param",
                         "in": "query",
                         "name": "paramOptional",
-                        "type": "string",
-                        "x-swgg-apiKey": true,
-                        "x-swgg-ref": "x-test-param"
+                        "type": "string"
                     },
                     {
                         "description": "path-param",
@@ -1982,7 +1977,9 @@
                         "in": "query",
                         "name": "paramRequired",
                         "required": true,
-                        "type": "string"
+                        "type": "string",
+                        "x-swgg-apiKey": true,
+                        "x-swgg-ref": "x-test-param"
                     }
                 ],
                 "summary": "test default-param handling-behavior",
