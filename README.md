@@ -59,6 +59,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 #### todo
 - npm publish 2017.10.29
+- remove function normalizeSwaggerSchema
 - validate default against type in function validateBySwaggerSchema
 - add xml support for wechat
 - add property parameters.x-swgg-persist to persist to localStorage

@@ -1711,7 +1711,7 @@ swgg\n\
                     } }
                 });
                 // init _methodPath
-                self._methodPath = self._method + ' ' + self._path.replace((/\{.*?\}/g), '');
+                self._methodPath = self._method + ' ' + self._path.replace((/\{.*?\}/g), '{}');
                 self.parameters.forEach(function (param) {
                     // init _idName.format and _idName.type
                     if (self._schemaName && param.name === self._idName) {
@@ -2324,7 +2324,7 @@ swgg\n\
                 request.swgg.operation = local.apiDict[request.swgg.methodPath] ||
                     // handle /foo/{id}/bar case
                     local.apiDict[
-                        request.swgg.methodPath.replace((/\/[^\/]+\/([^\/]*?)$/), '//$1')
+                        request.swgg.methodPath.replace((/\/[^\/]+\/([^\/]*?)$/), '/{}/$1')
                     ];
                 // if operation exists, then break
                 if (request.swgg.operation) {
@@ -2334,9 +2334,10 @@ swgg\n\
                     break;
                 }
                 tmp = request.swgg.methodPath;
+                // handle /foo/{id} case
                 request.swgg.methodPath = request.swgg.methodPath.replace(
                     (/\/[^\/]+?(\/*?)$/),
-                    '/$1'
+                    '/$1{}'
                 );
             }
             nextMiddleware();
