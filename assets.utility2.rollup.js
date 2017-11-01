@@ -1281,7 +1281,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 return JSON.stringify(element);
             };
             circularList = [];
-            return JSON.stringify(element && typeof element === 'object'
+            return JSON.stringify(typeof element === 'object' && element
                 // recurse
                 ? JSON.parse(stringify(element))
                 : element, replacer, space);
@@ -1316,7 +1316,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
          */
             switch (type) {
             case 'dict':
-                return value && typeof value === 'object' && !Array.isArray(value)
+                return typeof value === 'object' && value && !Array.isArray(value)
                     ? value
                     : valueDefault || {};
             case 'list':
@@ -2054,7 +2054,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             /*
              * this function will recursively normalize dbRow
              */
-                if (dbRow && typeof dbRow === 'object') {
+                if (typeof dbRow === 'object' && dbRow) {
                     Object.keys(dbRow).forEach(function (key) {
                         // remove invalid property
                         if (key[0] === '$' || key.indexOf('.') >= 0 || dbRow[key] === null) {
@@ -2067,7 +2067,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                     });
                 }
             };
-            dbRow = local.jsonCopy(dbRow && typeof dbRow === 'object'
+            dbRow = local.jsonCopy(typeof dbRow === 'object' && dbRow
                 ? dbRow
                 : {});
             // update timestamp
@@ -2560,7 +2560,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             value = dbRow;
             key = String(key).split('.');
             // optimization - for-loop
-            for (ii = 0; ii < key.length && value && typeof value === 'object'; ii += 1) {
+            for (ii = 0; ii < key.length && typeof value === 'object' && value; ii += 1) {
                 value = value[key[ii]];
             }
             return value === undefined
@@ -2692,7 +2692,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             // optimization - convert to boolean
             not = !!not;
             result = dbRowList;
-            if (!(query && typeof query === 'object')) {
+            if (!(typeof query === 'object' && query)) {
                 result = local.dbRowListGetManyByOperator(result, fieldName, '$eq', query, not);
                 return result;
             }
@@ -14782,7 +14782,7 @@ local.assetsDict['/assets.readme.template.md'] = '\
 # jslint-lite\n\
 the greatest app in the world!\n\
 \n\
-# live web-demo\n\
+# live web demo\n\
 - [https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app/](https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app)\n\
 \n\
 [![screenshot](https://kaizhu256.github.io/node-jslint-lite/build/screenshot.deployGithub.browser.%252Fnode-jslint-lite%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app)\n\
@@ -17487,7 +17487,7 @@ return Utf8ArrayToStr(bff);
                 // save assets.swgg.swagger.json
                 local.fs.writeFileSync('assets.swgg.swagger.json', local.jsonStringifyOrdered(
                     // normalize assets.swgg.swagger.json
-                    local.objectSetOverride(local.swgg.swaggerJsonNormalize(JSON.parse(
+                    local.objectSetOverride(local.swgg.normalizeSwaggerJson(JSON.parse(
                         // read assets.swgg.swagger.json
                         local.fs.readFileSync('assets.swgg.swagger.json', 'utf8')
                     )), { info: {
@@ -17506,8 +17506,8 @@ return Utf8ArrayToStr(bff);
                 (/.*?\n.*?\n/),
                 // customize cdn-download
                 (/\n# cdn download\n[\S\s]*?\n\n\n\n/),
-                // customize live web-demo
-                (/\n# live web-demo\n[\S\s]*?\n\n\n\n/),
+                // customize live web demo
+                (/\n# live web demo\n[\S\s]*?\n\n\n\n/),
                 // customize todo
                 (/\n#### todo\n[\S\s]*?\n\n\n\n/),
                 // customize quickstart-example-js
@@ -18336,7 +18336,7 @@ return Utf8ArrayToStr(bff);
                 return JSON.stringify(element);
             };
             circularList = [];
-            return JSON.stringify(element && typeof element === 'object'
+            return JSON.stringify(typeof element === 'object' && element
                 // recurse
                 ? JSON.parse(stringify(element))
                 : element, replacer, space);
@@ -18380,7 +18380,7 @@ return Utf8ArrayToStr(bff);
                 data,
                 { adata: local.sjcl.codec.base64url.toBits(adata), ks: 256, mode: 'gcm' }
             ));
-            return local.jwtBase64UrlNormalize('eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..' +
+            return local.normalizeJwtBase64Url('eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..' +
                 data.iv + '.' + data.ct + '.' + adata);
         };
 
@@ -18388,7 +18388,7 @@ return Utf8ArrayToStr(bff);
         /*
          * this function will create a random, aes-256-base64url-jwt-key
          */
-            return local.jwtBase64UrlNormalize(
+            return local.normalizeJwtBase64Url(
                 local.base64FromBuffer(local.bufferRandomBytes(32))
             );
         };
@@ -18402,16 +18402,6 @@ return Utf8ArrayToStr(bff);
             local.env.npm_config_jwtAes256Key = local.env.npm_config_jwtAes256Key ||
                 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
             return key || local.env.npm_config_jwtAes256Key;
-        };
-
-        local.jwtBase64UrlNormalize = function (text) {
-        /*
-         * this function will normlize the text to base64url format
-         */
-            return text
-                .replace((/\=/g), '')
-                .replace((/\+/g), '-')
-                .replace((/\//g), '_');
         };
 
         local.jwtHs256Decode = function (token, key) {
@@ -18449,27 +18439,12 @@ return Utf8ArrayToStr(bff);
          * with the given base64-encode key
          */
             data = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
-                local.jwtBase64UrlNormalize(local.base64FromString(JSON.stringify(data)));
+                local.normalizeJwtBase64Url(local.base64FromString(JSON.stringify(data)));
             return data + '.' + local.sjcl.codec.base64url.fromBits(
                 new local.sjcl.misc.hmac(local.sjcl.codec.base64url.toBits(
                     local.jwtAes256KeyInit(key)
                 )).encrypt(data)
             );
-        };
-
-        local.jwtNormalize = function (data) {
-        /*
-         * https://tools.ietf.org/html/rfc7519#section-4.1
-         * this function will normalize the jwt-data with registered-headers
-         */
-            var timeNow;
-            timeNow = Date.now() / 1000;
-            return local.objectSetDefault(data, {
-                exp: timeNow + 5 * 60,
-                iat: timeNow,
-                jti: Math.random().toString(16).slice(2),
-                nbf: timeNow
-            });
         };
 
         local.listGetElementRandom = function (list) {
@@ -18836,13 +18811,38 @@ return Utf8ArrayToStr(bff);
             return chunk || '';
         };
 
+        local.normalizeJwt = function (data) {
+        /*
+         * https://tools.ietf.org/html/rfc7519#section-4.1
+         * this function will normalize the jwt-data with registered-headers
+         */
+            var timeNow;
+            timeNow = Date.now() / 1000;
+            return local.objectSetDefault(data, {
+                exp: timeNow + 5 * 60,
+                iat: timeNow,
+                jti: Math.random().toString(16).slice(2),
+                nbf: timeNow
+            });
+        };
+
+        local.normalizeJwtBase64Url = function (text) {
+        /*
+         * this function will normlize the text to base64url format
+         */
+            return text
+                .replace((/\=/g), '')
+                .replace((/\+/g), '-')
+                .replace((/\//g), '_');
+        };
+
         local.normalizeValue = function (type, value, valueDefault) {
         /*
          * this function will normalize the value by type
          */
             switch (type) {
             case 'dict':
-                return value && typeof value === 'object' && !Array.isArray(value)
+                return typeof value === 'object' && value && !Array.isArray(value)
                     ? value
                     : valueDefault || {};
             case 'list':
@@ -18884,7 +18884,7 @@ return Utf8ArrayToStr(bff);
          * with its object literal [key, value]
          */
             local.objectTraverse(arg, function (element) {
-                if (element && typeof element === 'object' && !Array.isArray(element)) {
+                if (typeof element === 'object' && element && !Array.isArray(element)) {
                     Object.keys(element).forEach(function (key) {
                         if (key.indexOf('$[]') === 0) {
                             element[element[key][0]] = element[key][1];
@@ -18980,9 +18980,7 @@ return Utf8ArrayToStr(bff);
          */
             onSelf(arg);
             circularList = circularList || [];
-            if (arg &&
-                    typeof arg === 'object' &&
-                    circularList.indexOf(arg) < 0) {
+            if (arg && typeof arg === 'object' && circularList.indexOf(arg) < 0) {
                 circularList.push(arg);
                 Object.keys(arg).forEach(function (key) {
                     // recurse with arg[key]
@@ -19474,9 +19472,9 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                                 local.assert(!error, error);
                                 // coverage-hack - ignore else-statement
                                 local.nop(local.swgg &&
-                                    local.swgg.validateBySwagger &&
+                                    local.swgg.validateBySwaggerJson &&
                                     (function () {
-                                        local.swgg.validateBySwagger(JSON.parse(data));
+                                        local.swgg.validateBySwaggerJson(JSON.parse(data));
                                     }()));
                             }, console.error);
                         });
@@ -19903,7 +19901,7 @@ instruction\n\
             local.objectSetOverride(local, options, 10);
             // init swgg
             // coverage-hack - ignore else-statement
-            local.nop(local.swgg && local.swgg.apiUpdate(local.swgg.swaggerJson));
+            local.nop(local.swgg && local.swgg.apiUpdate(local.swgg.swaggerJson || {}));
         };
 
         local.streamListCleanup = function (streamList) {
@@ -20351,7 +20349,7 @@ instruction\n\
                 }, 8);
                 // security - handle malformed testReport
                 local.assert(
-                    testReport && typeof testReport === 'object',
+                    typeof testReport === 'object' && testReport,
                     ii + ' invalid testReport ' + typeof testReport
                 );
                 // validate timeElapsed
@@ -21088,7 +21086,7 @@ instruction\n\
         );
         // https://en.wikipedia.org/wiki/E.164
         local.regexpPhoneValidate =
-            (/^(?:\+\d{1,3}[ \-]{0,1}){0,1}(?:\(\d{1,4}\)[ \-]{0,1}){0,1}\d[\d \-]{7,16}$/);
+            (/^(?:\+\d{1,3}[ \-]{0,1}){0,1}(?:\(\d{1,4}\)[ \-]{0,1}){0,1}\d[\d \-]{7,17}$/);
         local.regexpUriComponentCharset = (/[\w\!\%\'\(\)\*\-\.\~]/);
         local.regexpUuidValidate =
             (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
@@ -21340,7 +21338,7 @@ instruction\n\
                     break;
                 case 2:
                     // validate data
-                    local.swgg.validateBySwagger(JSON.parse(data));
+                    local.swgg.validateBySwaggerJson(JSON.parse(data));
                     break;
                 default:
                     local.assert(!error, error);
@@ -21362,8 +21360,9 @@ instruction\n\
         case 'utility2.browserTest':
             break;
         }
-        if (module === require.main && (!local.global.utility2_rollup ||
-                (process.argv[2] && process.argv[2].indexOf('utility2.') === 0))) {
+        if (module === require.main && (!local.global.utility2_rollup || (process.argv[2] &&
+                local.cliDict[process.argv[2]] &&
+                process.argv[2].indexOf('utility2.') === 0))) {
             local.cliRun(local.nop);
             if (local.cliDict[process.argv[2]]) {
                 local.cliDict[process.argv[2]]();
@@ -21929,16 +21928,16 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
 
 
 
-// https://github.com/json-schema-org/json-schema-org.github.io/blob/master/draft-04/schema
-// curl -Ls https://raw.githubusercontent.com/json-schema-org/json-schema-org.github.io/master/draft-04/schema > /tmp/aa.json; node -e "console.log(JSON.stringify(require('/tmp/aa.json')));"
+// https://github.com/json-schema-org/json-schema-org.github.io/blob/eb4805e94c3e27932352344767d19cc4c3c3381c/draft-04/schema
+// curl -Ls https://raw.githubusercontent.com/json-schema-org/json-schema-org.github.io/eb4805e94c3e27932352344767d19cc4c3c3381c/draft-04/schema > /tmp/aa.json; node -e "console.log(JSON.stringify(require('/tmp/aa.json')));"
 local.assetsDict['/assets.swgg.json-schema.json'] = JSON.stringify(
 {"id":"http://json-schema.org/draft-04/schema#","$schema":"http://json-schema.org/draft-04/schema#","description":"Core schema meta-schema","definitions":{"schemaArray":{"type":"array","minItems":1,"items":{"$ref":"#"}},"positiveInteger":{"type":"integer","minimum":0},"positiveIntegerDefault0":{"allOf":[{"$ref":"#/definitions/positiveInteger"},{"default":0}]},"simpleTypes":{"enum":["array","boolean","integer","null","number","object","string"]},"stringArray":{"type":"array","items":{"type":"string"},"minItems":1,"uniqueItems":true}},"type":"object","properties":{"id":{"type":"string","format":"uri"},"$schema":{"type":"string","format":"uri"},"title":{"type":"string"},"description":{"type":"string"},"default":{},"multipleOf":{"type":"number","minimum":0,"exclusiveMinimum":true},"maximum":{"type":"number"},"exclusiveMaximum":{"type":"boolean","default":false},"minimum":{"type":"number"},"exclusiveMinimum":{"type":"boolean","default":false},"maxLength":{"$ref":"#/definitions/positiveInteger"},"minLength":{"$ref":"#/definitions/positiveIntegerDefault0"},"pattern":{"type":"string","format":"regex"},"additionalItems":{"anyOf":[{"type":"boolean"},{"$ref":"#"}],"default":{}},"items":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/schemaArray"}],"default":{}},"maxItems":{"$ref":"#/definitions/positiveInteger"},"minItems":{"$ref":"#/definitions/positiveIntegerDefault0"},"uniqueItems":{"type":"boolean","default":false},"maxProperties":{"$ref":"#/definitions/positiveInteger"},"minProperties":{"$ref":"#/definitions/positiveIntegerDefault0"},"required":{"$ref":"#/definitions/stringArray"},"additionalProperties":{"anyOf":[{"type":"boolean"},{"$ref":"#"}],"default":{}},"definitions":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"properties":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"patternProperties":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"dependencies":{"type":"object","additionalProperties":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/stringArray"}]}},"enum":{"type":"array","minItems":1,"uniqueItems":true},"type":{"anyOf":[{"$ref":"#/definitions/simpleTypes"},{"type":"array","items":{"$ref":"#/definitions/simpleTypes"},"minItems":1,"uniqueItems":true}]},"allOf":{"$ref":"#/definitions/schemaArray"},"anyOf":{"$ref":"#/definitions/schemaArray"},"oneOf":{"$ref":"#/definitions/schemaArray"},"not":{"$ref":"#"}},"dependencies":{"exclusiveMaximum":["maximum"],"exclusiveMinimum":["minimum"]},"default":{}}
 );
 
 
 
-// https://github.com/OAI/OpenAPI-Specification/blob/master/schemas/v2.0/schema.json
-// curl -Ls https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/schemas/v2.0/schema.json > /tmp/aa.json; node -e "console.log(JSON.stringify(require('/tmp/aa.json')));"
+// https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/schemas/v2.0/schema.json
+// curl -Ls https://raw.githubusercontent.com/OAI/OpenAPI-Specification/3.0.0/schemas/v2.0/schema.json > /tmp/aa.json; node -e "console.log(JSON.stringify(require('/tmp/aa.json')));"
 local.assetsDict['/assets.swgg.schema.json'] = JSON.stringify(
 {"title":"A JSON Schema for Swagger 2.0 API.","id":"http://swagger.io/v2/schema.json#","$schema":"http://json-schema.org/draft-04/schema#","type":"object","required":["swagger","info","paths"],"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"swagger":{"type":"string","enum":["2.0"],"description":"The Swagger version of this document."},"info":{"$ref":"#/definitions/info"},"host":{"type":"string","pattern":"^[^{}/ :\\\\]+(?::\\d+)?$","description":"The host (name or ip) of the API. Example: 'swagger.io'"},"basePath":{"type":"string","pattern":"^/","description":"The base path to the API. Example: '/api'."},"schemes":{"$ref":"#/definitions/schemesList"},"consumes":{"description":"A list of MIME types accepted by the API.","allOf":[{"$ref":"#/definitions/mediaTypeList"}]},"produces":{"description":"A list of MIME types the API can produce.","allOf":[{"$ref":"#/definitions/mediaTypeList"}]},"paths":{"$ref":"#/definitions/paths"},"definitions":{"$ref":"#/definitions/definitions"},"parameters":{"$ref":"#/definitions/parameterDefinitions"},"responses":{"$ref":"#/definitions/responseDefinitions"},"security":{"$ref":"#/definitions/security"},"securityDefinitions":{"$ref":"#/definitions/securityDefinitions"},"tags":{"type":"array","items":{"$ref":"#/definitions/tag"},"uniqueItems":true},"externalDocs":{"$ref":"#/definitions/externalDocs"}},"definitions":{"info":{"type":"object","description":"General information about the API.","required":["version","title"],"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"title":{"type":"string","description":"A unique and precise title of the API."},"version":{"type":"string","description":"A semantic version number of the API."},"description":{"type":"string","description":"A longer description of the API. Should be different from the title.  GitHub Flavored Markdown is allowed."},"termsOfService":{"type":"string","description":"The terms of service for the API."},"contact":{"$ref":"#/definitions/contact"},"license":{"$ref":"#/definitions/license"}}},"contact":{"type":"object","description":"Contact information for the owners of the API.","additionalProperties":false,"properties":{"name":{"type":"string","description":"The identifying name of the contact person/organization."},"url":{"type":"string","description":"The URL pointing to the contact information.","format":"uri"},"email":{"type":"string","description":"The email address of the contact person/organization.","format":"email"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"license":{"type":"object","required":["name"],"additionalProperties":false,"properties":{"name":{"type":"string","description":"The name of the license type. It's encouraged to use an OSI compatible license."},"url":{"type":"string","description":"The URL pointing to the license.","format":"uri"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"paths":{"type":"object","description":"Relative paths to the individual endpoints. They must be relative to the 'basePath'.","patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"},"^/":{"$ref":"#/definitions/pathItem"}},"additionalProperties":false},"definitions":{"type":"object","additionalProperties":{"$ref":"#/definitions/schema"},"description":"One or more JSON objects describing the schemas being consumed and produced by the API."},"parameterDefinitions":{"type":"object","additionalProperties":{"$ref":"#/definitions/parameter"},"description":"One or more JSON representations for parameters"},"responseDefinitions":{"type":"object","additionalProperties":{"$ref":"#/definitions/response"},"description":"One or more JSON representations for parameters"},"externalDocs":{"type":"object","additionalProperties":false,"description":"information about external documentation","required":["url"],"properties":{"description":{"type":"string"},"url":{"type":"string","format":"uri"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"examples":{"type":"object","additionalProperties":true},"mimeType":{"type":"string","description":"The MIME type of the HTTP message."},"operation":{"type":"object","required":["responses"],"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"tags":{"type":"array","items":{"type":"string"},"uniqueItems":true},"summary":{"type":"string","description":"A brief summary of the operation."},"description":{"type":"string","description":"A longer description of the operation, GitHub Flavored Markdown is allowed."},"externalDocs":{"$ref":"#/definitions/externalDocs"},"operationId":{"type":"string","description":"A unique identifier of the operation."},"produces":{"description":"A list of MIME types the API can produce.","allOf":[{"$ref":"#/definitions/mediaTypeList"}]},"consumes":{"description":"A list of MIME types the API can consume.","allOf":[{"$ref":"#/definitions/mediaTypeList"}]},"parameters":{"$ref":"#/definitions/parametersList"},"responses":{"$ref":"#/definitions/responses"},"schemes":{"$ref":"#/definitions/schemesList"},"deprecated":{"type":"boolean","default":false},"security":{"$ref":"#/definitions/security"}}},"pathItem":{"type":"object","additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"$ref":{"type":"string"},"get":{"$ref":"#/definitions/operation"},"put":{"$ref":"#/definitions/operation"},"post":{"$ref":"#/definitions/operation"},"delete":{"$ref":"#/definitions/operation"},"options":{"$ref":"#/definitions/operation"},"head":{"$ref":"#/definitions/operation"},"patch":{"$ref":"#/definitions/operation"},"parameters":{"$ref":"#/definitions/parametersList"}}},"responses":{"type":"object","description":"Response objects names can either be any valid HTTP status code or 'default'.","minProperties":1,"additionalProperties":false,"patternProperties":{"^([0-9]{3})$|^(default)$":{"$ref":"#/definitions/responseValue"},"^x-":{"$ref":"#/definitions/vendorExtension"}},"not":{"type":"object","additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}}},"responseValue":{"oneOf":[{"$ref":"#/definitions/response"},{"$ref":"#/definitions/jsonReference"}]},"response":{"type":"object","required":["description"],"properties":{"description":{"type":"string"},"schema":{"oneOf":[{"$ref":"#/definitions/schema"},{"$ref":"#/definitions/fileSchema"}]},"headers":{"$ref":"#/definitions/headers"},"examples":{"$ref":"#/definitions/examples"}},"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"headers":{"type":"object","additionalProperties":{"$ref":"#/definitions/header"}},"header":{"type":"object","additionalProperties":false,"required":["type"],"properties":{"type":{"type":"string","enum":["string","number","integer","boolean","array"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormat"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"vendorExtension":{"description":"Any property starting with x- is valid.","additionalProperties":true,"additionalItems":true},"bodyParameter":{"type":"object","required":["name","in","schema"],"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"description":{"type":"string","description":"A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed."},"name":{"type":"string","description":"The name of the parameter."},"in":{"type":"string","description":"Determines the location of the parameter.","enum":["body"]},"required":{"type":"boolean","description":"Determines whether or not this parameter is required or optional.","default":false},"schema":{"$ref":"#/definitions/schema"}},"additionalProperties":false},"headerParameterSubSchema":{"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"required":{"type":"boolean","description":"Determines whether or not this parameter is required or optional.","default":false},"in":{"type":"string","description":"Determines the location of the parameter.","enum":["header"]},"description":{"type":"string","description":"A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed."},"name":{"type":"string","description":"The name of the parameter."},"type":{"type":"string","enum":["string","number","boolean","integer","array"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormat"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"}}},"queryParameterSubSchema":{"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"required":{"type":"boolean","description":"Determines whether or not this parameter is required or optional.","default":false},"in":{"type":"string","description":"Determines the location of the parameter.","enum":["query"]},"description":{"type":"string","description":"A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed."},"name":{"type":"string","description":"The name of the parameter."},"allowEmptyValue":{"type":"boolean","default":false,"description":"allows sending a parameter by name only or with an empty value."},"type":{"type":"string","enum":["string","number","boolean","integer","array"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormatWithMulti"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"}}},"formDataParameterSubSchema":{"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"required":{"type":"boolean","description":"Determines whether or not this parameter is required or optional.","default":false},"in":{"type":"string","description":"Determines the location of the parameter.","enum":["formData"]},"description":{"type":"string","description":"A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed."},"name":{"type":"string","description":"The name of the parameter."},"allowEmptyValue":{"type":"boolean","default":false,"description":"allows sending a parameter by name only or with an empty value."},"type":{"type":"string","enum":["string","number","boolean","integer","array","file"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormatWithMulti"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"}}},"pathParameterSubSchema":{"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"required":["required"],"properties":{"required":{"type":"boolean","enum":[true],"description":"Determines whether or not this parameter is required or optional."},"in":{"type":"string","description":"Determines the location of the parameter.","enum":["path"]},"description":{"type":"string","description":"A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed."},"name":{"type":"string","description":"The name of the parameter."},"type":{"type":"string","enum":["string","number","boolean","integer","array"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormat"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"}}},"nonBodyParameter":{"type":"object","required":["name","in","type"],"oneOf":[{"$ref":"#/definitions/headerParameterSubSchema"},{"$ref":"#/definitions/formDataParameterSubSchema"},{"$ref":"#/definitions/queryParameterSubSchema"},{"$ref":"#/definitions/pathParameterSubSchema"}]},"parameter":{"oneOf":[{"$ref":"#/definitions/bodyParameter"},{"$ref":"#/definitions/nonBodyParameter"}]},"schema":{"type":"object","description":"A deterministic version of a JSON Schema object.","patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"$ref":{"type":"string"},"format":{"type":"string"},"title":{"$ref":"http://json-schema.org/draft-04/schema#/properties/title"},"description":{"$ref":"http://json-schema.org/draft-04/schema#/properties/description"},"default":{"$ref":"http://json-schema.org/draft-04/schema#/properties/default"},"multipleOf":{"$ref":"http://json-schema.org/draft-04/schema#/properties/multipleOf"},"maximum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/maximum"},"exclusiveMaximum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum"},"minimum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/minimum"},"exclusiveMinimum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum"},"maxLength":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveInteger"},"minLength":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"},"pattern":{"$ref":"http://json-schema.org/draft-04/schema#/properties/pattern"},"maxItems":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveInteger"},"minItems":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"},"uniqueItems":{"$ref":"http://json-schema.org/draft-04/schema#/properties/uniqueItems"},"maxProperties":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveInteger"},"minProperties":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"},"required":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/stringArray"},"enum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/enum"},"additionalProperties":{"anyOf":[{"$ref":"#/definitions/schema"},{"type":"boolean"}],"default":{}},"type":{"$ref":"http://json-schema.org/draft-04/schema#/properties/type"},"items":{"anyOf":[{"$ref":"#/definitions/schema"},{"type":"array","minItems":1,"items":{"$ref":"#/definitions/schema"}}],"default":{}},"allOf":{"type":"array","minItems":1,"items":{"$ref":"#/definitions/schema"}},"properties":{"type":"object","additionalProperties":{"$ref":"#/definitions/schema"},"default":{}},"discriminator":{"type":"string"},"readOnly":{"type":"boolean","default":false},"xml":{"$ref":"#/definitions/xml"},"externalDocs":{"$ref":"#/definitions/externalDocs"},"example":{}},"additionalProperties":false},"fileSchema":{"type":"object","description":"A deterministic version of a JSON Schema object.","patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"required":["type"],"properties":{"format":{"type":"string"},"title":{"$ref":"http://json-schema.org/draft-04/schema#/properties/title"},"description":{"$ref":"http://json-schema.org/draft-04/schema#/properties/description"},"default":{"$ref":"http://json-schema.org/draft-04/schema#/properties/default"},"required":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/stringArray"},"type":{"type":"string","enum":["file"]},"readOnly":{"type":"boolean","default":false},"externalDocs":{"$ref":"#/definitions/externalDocs"},"example":{}},"additionalProperties":false},"primitivesItems":{"type":"object","additionalProperties":false,"properties":{"type":{"type":"string","enum":["string","number","integer","boolean","array"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormat"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"security":{"type":"array","items":{"$ref":"#/definitions/securityRequirement"},"uniqueItems":true},"securityRequirement":{"type":"object","additionalProperties":{"type":"array","items":{"type":"string"},"uniqueItems":true}},"xml":{"type":"object","additionalProperties":false,"properties":{"name":{"type":"string"},"namespace":{"type":"string"},"prefix":{"type":"string"},"attribute":{"type":"boolean","default":false},"wrapped":{"type":"boolean","default":false}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"tag":{"type":"object","additionalProperties":false,"required":["name"],"properties":{"name":{"type":"string"},"description":{"type":"string"},"externalDocs":{"$ref":"#/definitions/externalDocs"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"securityDefinitions":{"type":"object","additionalProperties":{"oneOf":[{"$ref":"#/definitions/basicAuthenticationSecurity"},{"$ref":"#/definitions/apiKeySecurity"},{"$ref":"#/definitions/oauth2ImplicitSecurity"},{"$ref":"#/definitions/oauth2PasswordSecurity"},{"$ref":"#/definitions/oauth2ApplicationSecurity"},{"$ref":"#/definitions/oauth2AccessCodeSecurity"}]}},"basicAuthenticationSecurity":{"type":"object","additionalProperties":false,"required":["type"],"properties":{"type":{"type":"string","enum":["basic"]},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"apiKeySecurity":{"type":"object","additionalProperties":false,"required":["type","name","in"],"properties":{"type":{"type":"string","enum":["apiKey"]},"name":{"type":"string"},"in":{"type":"string","enum":["header","query"]},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"oauth2ImplicitSecurity":{"type":"object","additionalProperties":false,"required":["type","flow","authorizationUrl"],"properties":{"type":{"type":"string","enum":["oauth2"]},"flow":{"type":"string","enum":["implicit"]},"scopes":{"$ref":"#/definitions/oauth2Scopes"},"authorizationUrl":{"type":"string","format":"uri"},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"oauth2PasswordSecurity":{"type":"object","additionalProperties":false,"required":["type","flow","tokenUrl"],"properties":{"type":{"type":"string","enum":["oauth2"]},"flow":{"type":"string","enum":["password"]},"scopes":{"$ref":"#/definitions/oauth2Scopes"},"tokenUrl":{"type":"string","format":"uri"},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"oauth2ApplicationSecurity":{"type":"object","additionalProperties":false,"required":["type","flow","tokenUrl"],"properties":{"type":{"type":"string","enum":["oauth2"]},"flow":{"type":"string","enum":["application"]},"scopes":{"$ref":"#/definitions/oauth2Scopes"},"tokenUrl":{"type":"string","format":"uri"},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"oauth2AccessCodeSecurity":{"type":"object","additionalProperties":false,"required":["type","flow","authorizationUrl","tokenUrl"],"properties":{"type":{"type":"string","enum":["oauth2"]},"flow":{"type":"string","enum":["accessCode"]},"scopes":{"$ref":"#/definitions/oauth2Scopes"},"authorizationUrl":{"type":"string","format":"uri"},"tokenUrl":{"type":"string","format":"uri"},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"oauth2Scopes":{"type":"object","additionalProperties":{"type":"string"}},"mediaTypeList":{"type":"array","items":{"$ref":"#/definitions/mimeType"},"uniqueItems":true},"parametersList":{"type":"array","description":"The parameters needed to send a valid API call.","additionalItems":false,"items":{"oneOf":[{"$ref":"#/definitions/parameter"},{"$ref":"#/definitions/jsonReference"}]},"uniqueItems":true},"schemesList":{"type":"array","description":"The transfer protocol of the API.","items":{"type":"string","enum":["http","https","ws","wss"]},"uniqueItems":true},"collectionFormat":{"type":"string","enum":["csv","ssv","tsv","pipes"],"default":"csv"},"collectionFormatWithMulti":{"type":"string","enum":["csv","ssv","tsv","pipes","multi"],"default":"csv"},"title":{"$ref":"http://json-schema.org/draft-04/schema#/properties/title"},"description":{"$ref":"http://json-schema.org/draft-04/schema#/properties/description"},"default":{"$ref":"http://json-schema.org/draft-04/schema#/properties/default"},"multipleOf":{"$ref":"http://json-schema.org/draft-04/schema#/properties/multipleOf"},"maximum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/maximum"},"exclusiveMaximum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum"},"minimum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/minimum"},"exclusiveMinimum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum"},"maxLength":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveInteger"},"minLength":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"},"pattern":{"$ref":"http://json-schema.org/draft-04/schema#/properties/pattern"},"maxItems":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveInteger"},"minItems":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"},"uniqueItems":{"$ref":"http://json-schema.org/draft-04/schema#/properties/uniqueItems"},"enum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/enum"},"jsonReference":{"type":"object","required":["$ref"],"additionalProperties":false,"properties":{"$ref":{"type":"string"}}}}}
 );
@@ -22791,7 +22790,7 @@ ERROR\n\
  * 1. initialize swgg-client from previous step\n\
  * 2. run code below to reproduce api-call\n\
  */\n\
-swgg.apiAjax({{options.api._methodPath jsonStringify htmlSafe}}, {{optionsJson htmlSafe}}, \
+swgg.apiDict[{{options.api._methodPath jsonStringify htmlSafe}}].ajax({{optionsJson htmlSafe}}, \
 function (error, data) {\n\
     if (error) {\n\
         console.error(error);\n\
@@ -22825,11 +22824,20 @@ swgg\n\
 {{/if info.title}}\n\
 ';
 /* jslint-ignore-end */
-        local.swaggerSchemaJson = local.jsonCopy(local.objectSetOverride(
-            JSON.parse(local.assetsDict['/assets.swgg.json-schema.json']),
-            JSON.parse(local.assetsDict['/assets.swgg.schema.json']),
-            2
-        ));
+        local.assetsDict['/assets.swgg.swagger.schema.json'] = local.jsonStringifyOrdered(
+            local.objectSetOverride(
+                JSON.parse(local.assetsDict['/assets.swgg.json-schema.json'].replace(
+                    (/"\$ref":".*?#/g),
+                    '"$ref":"http://json-schema.org/draft-04/schema#'
+                )),
+                JSON.parse(local.assetsDict['/assets.swgg.schema.json'].replace(
+                    (/"\$ref":".*?#/g),
+                    '"$ref":"http://json-schema.org/draft-04/schema#'
+                )),
+                2
+            )
+        );
+        local.swaggerSchemaJson = JSON.parse(local.assetsDict['/assets.swgg.swagger.schema.json']);
     }());
 
 
@@ -22838,25 +22846,21 @@ swgg\n\
     (function () {
         local.apiAjax = function (self, options, onError) {
         /*
-         * this function will send a swagger-api ajax-request with the pathObject self
+         * this function will send a swagger-api ajax-request with the operation self
          */
             var errorValidate, isMultipartFormData, tmp;
-            if (local.apiDeferList) {
-                local.apiDeferList.push(arguments);
-                return;
-            }
-            self = local.apiDict[self] || self;
-            options.pathObject = self;
+            options.operation = self;
             isMultipartFormData = (self.consumes && self.consumes[0]) === 'multipart/form-data';
             local.objectSetDefault(options, { data: '', paramDict: {}, url: '' });
             // try to validate paramDict
             local.tryCatchOnError(function () {
-                local.validateByParamDefList({
+                local.validateBySwaggerParameters({
                     // normalize paramDict
-                    data: local.swaggerParamDictNormalize(options).paramDict,
+                    data: local.normalizeSwaggerParamDict(options).paramDict,
                     dataReadonlyRemove: options.paramDict,
-                    key: JSON.stringify(self._methodPath),
-                    paramDefList: self.parameters
+                    prefix: 'operation[' + JSON.stringify(self._methodPath) + ']',
+                    parameters: self.parameters,
+                    swaggerJson: local.swaggerJson
                 });
             }, function (error) {
                 errorValidate = error;
@@ -22896,8 +22900,7 @@ swgg\n\
                         tmp.forEach(function (value) {
                             options[paramDef.in === 'formData'
                                 ? 'inForm'
-                                : 'inQuery'] += '&' +
-                                encodeURIComponent(paramDef.name) + '=' +
+                                : 'inQuery'] += '&' + encodeURIComponent(paramDef.name) + '=' +
                                 encodeURIComponent(paramDef.items.type === 'string'
                                     ? value
                                     : JSON.stringify(value));
@@ -22988,18 +22991,11 @@ swgg\n\
             });
         };
 
-        local.apiDeferList = [];
-
         local.apiUpdate = function (options, onError) {
         /*
          * this function will update the swagger-api dict of api-calls
          */
             var tmp;
-            // init options
-            options = options || {};
-            // init apiDefer
-            clearTimeout(local.apiDeferTimeout);
-            local.apiDeferList = local.apiDeferList || [];
             // fetch swagger.json file
             if (options.modeAjax) {
                 local.ajax(options, function (error, xhr) {
@@ -23021,7 +23017,7 @@ swgg\n\
                 options = JSON.parse(options.utility2.assetsDict['/assets.swgg.swagger.json']);
             }, local.nop);
             // normalize options
-            options = local.swaggerJsonNormalize(options);
+            options = local.normalizeSwaggerJson(options);
             // init apiDict
             local.apiDict = local.apiDict || {};
             // init swaggerJson
@@ -23153,7 +23149,7 @@ swgg\n\
                 : local.swaggerJson.basePath;
             // normalize definition
             Object.keys(options.definitions).forEach(function (schemaName) {
-                options.definitions[schemaName] = local.schemaNormalizeAndCopy(
+                options.definitions[schemaName] = local.normalizeSwaggerSchema(
                     options.definitions[schemaName]
                 );
             });
@@ -23233,11 +23229,15 @@ swgg\n\
                     }
                     // copy x-swgg-$ref from x-swgg-parameters
                     if (param['x-swgg-$ref'] && options['x-swgg-parameters'] &&
-                            options['x-swgg-parameters'][param['x-swgg-$ref']]) {
+                            options['x-swgg-parameters'][
+                                param['x-swgg-$ref'].replace('#/x-swgg-parameters/', '')
+                            ]) {
                         local.objectSetDefault(
                             param,
                             local.jsonCopy(
-                                options['x-swgg-parameters'][param['x-swgg-$ref']]
+                                options['x-swgg-parameters'][
+                                    param['x-swgg-$ref'].replace('#/x-swgg-parameters/', '')
+                                ]
                             )
                         );
                     }
@@ -23265,10 +23265,10 @@ swgg\n\
                         JSON.stringify(self._methodPath) + '\n' +
                         ' * example usage:' + ('\n' +
                         'swgg.apiDict[' + JSON.stringify(key.join('.')) + '].ajax(' +
-                        JSON.stringify(local.swaggerParamDictNormalize({
+                        JSON.stringify(local.normalizeSwaggerParamDict({
                                 modeDefault: true,
-                                paramDict: {},
-                                pathObject: self
+                                operation: self,
+                                paramDict: {}
                             }).paramDict, null, 4) +
                         ', function (error, data) {\n' +
                         '    if (error) {\n' +
@@ -23297,7 +23297,7 @@ swgg\n\
             local.swaggerJson = JSON.parse(local.jsonStringifyOrdered(options));
             // try to validate swaggerJson
             local.tryCatchOnError(function () {
-                local.validateBySwagger(local.swaggerJson);
+                local.validateBySwaggerJson({ swaggerJson: local.swaggerJson });
             }, local.onErrorDefault);
             // init corsForwardProxyHost
             local.corsForwardProxyHost = local.corsForwardProxyHost ||
@@ -23306,14 +23306,6 @@ swgg\n\
             local.assetsDict['/assets.swgg.swagger.server.json'] = JSON.stringify(
                 local.swaggerJson
             );
-            // run deferred apiAjax
-            local.apiDeferTimeout = setTimeout(function () {
-                tmp = local.apiDeferList;
-                local.apiDeferList = null;
-                while (tmp && tmp.length) {
-                    local.apiAjax.apply(null, tmp.shift());
-                }
-            });
             local.setTimeoutOnError(onError, null, options);
         };
 
@@ -23334,8 +23326,8 @@ swgg\n\
                     ? [tmp]
                     : tmp;
             }
-            // http://json-schema.org/latest/json-schema-validation.html#anchor13
-            // 5.1.  Validation keywords for numeric instances (number and integer)
+            // 5.1. Validation keywords for numeric instances (number and integer)
+            // http://json-schema.org/draft-04/json-schema-validation.html#rfc.section.5.1
             max = isFinite(propDef.maximum)
                 ? propDef.maximum
                 : 999;
@@ -23345,8 +23337,8 @@ swgg\n\
             switch (propDef.type || (propDef.schema && propDef.schema.type)) {
             case 'array':
                 tmp = [];
-                // http://json-schema.org/latest/json-schema-validation.html#anchor36
-                // 5.3.  Validation keywords for arrays
+                // 5.3. Validation keywords for arrays
+                // http://json-schema.org/draft-04/json-schema-validation.html#rfc.section.5.3
                 for (ii = 0; ii < (propDef.minItems || 0); ii += 1) {
                     tmp.push(null);
                 }
@@ -23373,8 +23365,8 @@ swgg\n\
                 break;
             case 'object':
                 tmp = {};
-                // http://json-schema.org/latest/json-schema-validation.html#anchor53
-                // 5.4.  Validation keywords for objects
+                // 5.4. Validation keywords for objects
+                // http://json-schema.org/draft-04/json-schema-validation.html#rfc.section.5.4
                 for (ii = 0; ii < (propDef.minProperties || 0); ii += 1) {
                     tmp['property' + ii] = null;
                 }
@@ -23423,16 +23415,16 @@ swgg\n\
                             Math.random().toString().slice(-4);
                     break;
                 }
-                // http://json-schema.org/latest/json-schema-validation.html#anchor25
-                // 5.2.  Validation keywords for strings
+                // 5.2. Validation keywords for strings
+                // http://json-schema.org/draft-04/json-schema-validation.html#rfc.section.5.2
                 while (tmp.length < (propDef.minLength || 0)) {
                     tmp += tmp;
                 }
                 tmp = tmp.slice(0, propDef.maxLength || Infinity);
                 break;
             }
-            // http://json-schema.org/latest/json-schema-validation.html#anchor13
-            // 5.1.  Validation keywords for numeric instances (number and integer)
+            // 5.1. Validation keywords for numeric instances (number and integer)
+            // http://json-schema.org/draft-04/json-schema-validation.html#rfc.section.5.1
             if (propDef.multipleOf) {
                 tmp = propDef.multipleOf * Math.floor(tmp / propDef.multipleOf);
                 if (tmp < min) {
@@ -23466,10 +23458,11 @@ swgg\n\
                         modeNotRandom: options.modeNotRandom,
                         propDef: options.properties[key]
                     });
-                    local.validateByPropDef({
+                    local.validateBySwaggerSchema({
                         data: tmp,
-                        key: options.properties[key].name,
-                        schema: options.properties[key]
+                        modeParameter: true,
+                        schema: options.properties[key],
+                        swaggerJson: local.swaggerJson
                     });
                     dbRow[key] = tmp;
                 }, local.nop);
@@ -23716,7 +23709,7 @@ swgg\n\
                                     fileInputName: request.swgg.bodyMeta[key].name,
                                     fileSize: request.swgg.bodyParsed[key].length,
                                     fileUrl: local.swaggerJsonBasePath +
-                                        '/' + request.swgg.pathObject.tags[0] +
+                                        '/' + request.swgg.operation.tags[0] +
                                         '/fileGetOneById/' + tmp.id
                                 });
                                 return tmp;
@@ -23833,18 +23826,18 @@ swgg\n\
             // init methodPath
             request.swgg.methodPath = request.method + ' ' +
                 request.urlParsed.pathname.replace(local.swaggerJsonBasePath, '');
-            // init pathObject
+            // init operation
             while (request.swgg.methodPath !== tmp) {
-                request.swgg.pathObject = local.apiDict[request.swgg.methodPath] ||
+                request.swgg.operation = local.apiDict[request.swgg.methodPath] ||
                     // handle /foo/{id}/bar case
                     local.apiDict[
                         request.swgg.methodPath.replace((/\/[^\/]+\/([^\/]*?)$/), '//$1')
                     ];
-                // if pathObject exists, then break
-                if (request.swgg.pathObject) {
-                    request.swgg.pathObject = local.jsonCopy(request.swgg.pathObject);
+                // if operation exists, then break
+                if (request.swgg.operation) {
+                    request.swgg.operation = local.jsonCopy(request.swgg.operation);
                     // init crud.crudType
-                    request.swgg.crud.crudType = request.swgg.pathObject._crudType;
+                    request.swgg.crud.crudType = request.swgg.operation._crudType;
                     break;
                 }
                 tmp = request.swgg.methodPath;
@@ -23913,8 +23906,8 @@ swgg\n\
                         }
                         // init isAuthenticated
                         user.isAuthenticated = true;
-                        // https://tools.ietf.org/html/rfc7519
                         // create JSON Web Token (JWT)
+                        // https://tools.ietf.org/html/rfc7519
                         user.jwtDecrypted = {};
                         user.jwtDecrypted.sub = user.data.username;
                         // update jwtEncrypted in client
@@ -23965,7 +23958,7 @@ swgg\n\
                 modeNext += 1;
                 switch (modeNext) {
                 case 1:
-                    if (!request.swgg.pathObject) {
+                    if (!request.swgg.operation) {
                         modeNext = Infinity;
                         onNext();
                         return;
@@ -23976,12 +23969,12 @@ swgg\n\
                     tmp = request.urlParsed.pathname
                         .replace(local.swaggerJsonBasePath, '')
                         .split('/');
-                    request.swgg.pathObject._path.split('/').forEach(function (key, ii) {
+                    request.swgg.operation._path.split('/').forEach(function (key, ii) {
                         if ((/^\{\S*?\}$/).test(key)) {
                             request.swgg.paramDict[key.slice(1, -1)] = decodeURIComponent(tmp[ii]);
                         }
                     });
-                    request.swgg.pathObject.parameters.forEach(function (paramDef) {
+                    request.swgg.operation.parameters.forEach(function (paramDef) {
                         switch (paramDef.in) {
                         // parse body param
                         case 'body':
@@ -24028,12 +24021,13 @@ swgg\n\
                         }
                     });
                     // normalize paramDict
-                    local.swaggerParamDictNormalize(request.swgg);
+                    local.normalizeSwaggerParamDict(request.swgg);
                     // validate paramDict
-                    local.validateByParamDefList({
+                    local.validateBySwaggerParameters({
                         data: request.swgg.paramDict,
-                        key: JSON.stringify(request.swgg.methodPath),
-                        paramDefList: request.swgg.pathObject.parameters
+                        prefix: 'operation[' + JSON.stringify(request.swgg.methodPath) + ']',
+                        parameters: request.swgg.operation.parameters,
+                        swaggerJson: local.swaggerJson
                     });
                     onNext();
                     break;
@@ -24041,9 +24035,9 @@ swgg\n\
                     // init crud
                     crud = request.swgg.crud;
                     // init crud.dbTable
-                    crud.dbTable = request.swgg.pathObject &&
-                        request.swgg.pathObject._schemaName &&
-                        local.db.dbTableCreateOne({ name: request.swgg.pathObject._schemaName });
+                    crud.dbTable = request.swgg.operation &&
+                        request.swgg.operation._schemaName &&
+                        local.db.dbTableCreateOne({ name: request.swgg.operation._schemaName });
                     if (!crud.dbTable) {
                         nextMiddleware();
                         return;
@@ -24054,7 +24048,7 @@ swgg\n\
                     }
                     // init crud.data
                     crud.data = local.jsonCopy(request.swgg.paramDict);
-                    request.swgg.pathObject.parameters.forEach(function (param) {
+                    request.swgg.operation.parameters.forEach(function (param) {
                         // JSON.parse json-string
                         if (param.format === 'json' &&
                                 param.type === 'string' &&
@@ -24081,7 +24075,7 @@ swgg\n\
                     }].forEach(function (element) {
                         crud[element.key] = crud.data['_' + element.key] || JSON.parse(
                             local.templateRender(
-                                request.swgg.pathObject['_' + element.key] || 'null',
+                                request.swgg.operation['_' + element.key] || 'null',
                                 request.swgg.paramDict
                             )
                         ) || element.value;
@@ -24111,135 +24105,7 @@ swgg\n\
             onNext();
         };
 
-        local.onErrorJsonapi = function (onError) {
-        /*
-         * http://jsonapi.org/format/#errors
-         * http://jsonapi.org/format/#document-structure-resource-objects
-         * this function will normalize the error and data to jsonapi format,
-         * and pass them to onError
-         */
-            return function (error, data, meta) {
-                data = [error, data].map(function (data, ii) {
-                    // if no error occurred, then return
-                    if ((ii === 0 && !data) ||
-                            // if data is already normalized, then return it
-                            (data && data.meta && data.meta.isJsonapiResponse)) {
-                        return data;
-                    }
-                    // normalize data-list
-                    if (!Array.isArray(data)) {
-                        data = [data];
-                    }
-                    // normalize error-list to contain non-null objects
-                    if (ii === 0) {
-                        // normalize error-list to be non-empty
-                        if (!data.length) {
-                            data.push(null);
-                        }
-                        data = data.map(function (element) {
-                            if (!(element && typeof element === 'object')) {
-                                element = { message: String(element) };
-                            }
-                            // normalize error-object to plain json-object
-                            error = local.jsonCopy(element);
-                            error.message = element.message;
-                            error.stack = element.stack;
-                            error.statusCode = Number(error.statusCode) || 500;
-                            return error;
-                        });
-                        error = local.jsonCopy(data[0]);
-                        error.errors = data;
-                        return error;
-                    }
-                    return { data: data };
-                });
-                // init data.meta
-                data.forEach(function (data, ii) {
-                    if (!data) {
-                        return;
-                    }
-                    data.meta = local.jsonCopy(meta || {});
-                    data.meta.isJsonapiResponse = true;
-                    if (ii === 0) {
-                        data.meta.errorsLength = (data.errors && data.errors.length) | 0;
-                    } else {
-                        data.meta.dataLength = (data.data && data.data.length) | 0;
-                    }
-                    data.meta.statusCode = Number(data.meta.statusCode) ||
-                        Number(data.statusCode) ||
-                        0;
-                });
-                onError(data[0], data[1]);
-            };
-        };
-
-        local.schemaNormalizeAndCopy = function (schema) {
-        /*
-         * this function will return a normalized copy the schema
-         */
-            var tmp;
-            // dereference $ref
-            if (schema.$ref) {
-                [local.swaggerJson, local.swaggerSchemaJson].some(function (options) {
-                    local.tryCatchOnError(function () {
-                        schema.$ref.replace(
-                            (/#\/(.*?)\/(.*?)$/),
-                            function (match0, match1, match2) {
-                                // jslint-hack - nop
-                                local.nop(match0);
-                                tmp = options[match1][match2];
-                            }
-                        );
-                    }, local.nop);
-                    return tmp;
-                });
-                // validate schema
-                local.assert(tmp, schema.$ref);
-                // recurse
-                schema = local.schemaNormalizeAndCopy(tmp);
-            }
-            // inherit allOf
-            if (schema.allOf) {
-                tmp = local.jsonCopy(schema);
-                delete tmp.allOf;
-                schema.allOf.reverse().forEach(function (element) {
-                    // recurse
-                    local.objectSetDefault(tmp, local.schemaNormalizeAndCopy(element), 2);
-                });
-                schema = tmp;
-            }
-            schema = local.jsonCopy(schema);
-            if (schema.type === 'object') {
-                schema.properties = local.normalizeValue('dict', schema.properties);
-            }
-            return schema;
-        };
-
-        local.serverRespondJsonapi = function (request, response, error, data, meta) {
-        /*
-         * http://jsonapi.org/format/#errors
-         * http://jsonapi.org/format/#document-structure-resource-objects
-         * this function will respond in jsonapi format
-         */
-            local.onErrorJsonapi(function (error, data) {
-                local.serverRespondHeadSet(request, response, error && error.statusCode, {
-                    'Content-Type': 'application/json; charset=UTF-8'
-                });
-                if (error) {
-                    // debug statusCode / method / url
-                    local.errorMessagePrepend(error, response.statusCode + ' ' +
-                        request.method + ' ' + request.url + '\n');
-                    // print error.stack to stderr
-                    local.onErrorDefault(error);
-                }
-                data = error || data;
-                data.meta.statusCode = response.statusCode = data.meta.statusCode ||
-                    response.statusCode;
-                response.end(JSON.stringify(data));
-            })(error, data, meta);
-        };
-
-        local.swaggerJsonNormalize = function (options) {
+        local.normalizeSwaggerJson = function (options) {
         /*
          * this function will normalize swaggerJson
          */
@@ -24249,8 +24115,8 @@ swgg\n\
             Object.keys(options.paths).forEach(function (path) {
                 Object.keys(options.paths[path]).forEach(function (method) {
                     tmp = options.paths[path][method];
+                    local.objectSetDefault(tmp, { parameters: [], tags: [] });
                     // auto-create operationId
-                    local.objectSetDefault(tmp, { tags: [] });
                     if (options['x-swgg-operationIdFromPath'] ||
                             tmp['x-swgg-operationIdFromPath'] ||
                             !tmp.operationId) {
@@ -24294,12 +24160,12 @@ swgg\n\
             return options;
         };
 
-        local.swaggerParamDictNormalize = function (options) {
+        local.normalizeSwaggerParamDict = function (options) {
         /*
-         * this function will parse the options according to pathObject.parameters
+         * this function will parse the options according to options.operation.parameters
          */
             var tmp;
-            options.pathObject.parameters.forEach(function (paramDef) {
+            options.operation.parameters.forEach(function (paramDef) {
                 tmp = options.paramDict[paramDef.name];
                 // init default value
                 if (!options.modeNoDefault &&
@@ -24355,6 +24221,134 @@ swgg\n\
                 options.paramDict[paramDef.name] = tmp;
             });
             return options;
+        };
+
+        local.normalizeSwaggerSchema = function (schema) {
+        /*
+         * this function will return a dereferenced and normalized copy the schema
+         */
+            var tmp;
+            // dereference $ref
+            if (schema.$ref) {
+                [local.swaggerJson, local.swaggerSchemaJson].some(function (options) {
+                    local.tryCatchOnError(function () {
+                        schema.$ref.replace(
+                            (/#\/(.*?)\/(.*?)$/),
+                            function (match0, match1, match2) {
+                                match0 = match1;
+                                tmp = options[match0][match2];
+                            }
+                        );
+                    }, local.nop);
+                    return tmp;
+                });
+                // validate schema
+                local.assert(tmp, schema.$ref);
+                // recurse
+                schema = local.normalizeSwaggerSchema(tmp);
+            }
+            // 5.5.3. allOf
+            // http://json-schema.org/draft-04/json-schema-validation.html#rfc.section.5.5.3
+            if (schema.allOf) {
+                tmp = local.jsonCopy(schema);
+                delete tmp.allOf;
+                schema.allOf.reverse().forEach(function (element) {
+                    // recurse
+                    local.objectSetDefault(tmp, local.normalizeSwaggerSchema(element), 2);
+                });
+                schema = tmp;
+            }
+            schema = local.jsonCopy(schema);
+            if (schema.type === 'object') {
+                schema.properties = schema.properties || {};
+            }
+            return schema;
+        };
+
+        local.onErrorJsonapi = function (onError) {
+        /*
+         * http://jsonapi.org/format/#errors
+         * http://jsonapi.org/format/#document-structure-resource-objects
+         * this function will normalize the error and data to jsonapi format,
+         * and pass them to onError
+         */
+            return function (error, data, meta) {
+                data = [error, data].map(function (data, ii) {
+                    // if no error occurred, then return
+                    if ((ii === 0 && !data) ||
+                            // if data is already normalized, then return it
+                            (data && data.meta && data.meta.isJsonapiResponse)) {
+                        return data;
+                    }
+                    // normalize data-list
+                    if (!Array.isArray(data)) {
+                        data = [data];
+                    }
+                    // normalize error-list to contain non-null objects
+                    if (ii === 0) {
+                        // normalize error-list to be non-empty
+                        if (!data.length) {
+                            data.push(null);
+                        }
+                        data = data.map(function (element) {
+                            if (!(typeof element === 'object' && element)) {
+                                element = { message: String(element) };
+                            }
+                            // normalize error-object to plain json-object
+                            error = local.jsonCopy(element);
+                            error.message = element.message;
+                            error.stack = element.stack;
+                            error.statusCode = Number(error.statusCode) || 500;
+                            return error;
+                        });
+                        error = local.jsonCopy(data[0]);
+                        error.errors = data;
+                        return error;
+                    }
+                    return { data: data };
+                });
+                // init data.meta
+                data.forEach(function (data, ii) {
+                    if (!data) {
+                        return;
+                    }
+                    data.meta = local.jsonCopy(meta || {});
+                    data.meta.isJsonapiResponse = true;
+                    if (ii === 0) {
+                        data.meta.errorsLength = (data.errors && data.errors.length) | 0;
+                    } else {
+                        data.meta.dataLength = (data.data && data.data.length) | 0;
+                    }
+                    data.meta.statusCode = Number(data.meta.statusCode) ||
+                        Number(data.statusCode) ||
+                        0;
+                });
+                onError(data[0], data[1]);
+            };
+        };
+
+        local.serverRespondJsonapi = function (request, response, error, data, meta) {
+        /*
+         * http://jsonapi.org/format/#errors
+         * http://jsonapi.org/format/#document-structure-resource-objects
+         * this function will respond in jsonapi format
+         */
+            local.onErrorJsonapi(function (error, data) {
+                local.serverRespondHeadSet(request, response, error && error.statusCode, {
+                    'Content-Type': 'application/json; charset=UTF-8'
+                });
+                if (error) {
+                    // debug statusCode / method / url
+                    local.errorMessagePrepend(error, response.statusCode + ' ' + request.method +
+                        ' ' + request.url + '\n');
+                    // print error.stack to stderr
+                    local.onErrorDefault(error);
+                }
+                data = error || data;
+                data.meta.statusCode = response.statusCode = data.meta.statusCode ||
+                    response.statusCode;
+                response.end(JSON.stringify(data));
+            })(error, data, meta);
         };
 
         local.uiAnimateShake = function (element) {
@@ -24502,9 +24496,9 @@ swgg\n\
                         element.classList.remove('error');
                     });
                     // shake invalid-input
-                    if (error && error.options && error.options.key) {
+                    if (error && error.options && error.schema) {
                         Array.from(options.domOperationContent.querySelectorAll(
-                            '.paramDef[name=' + error.options.key + '] .input'
+                            '.paramDef[name=' + error.schema.name + '] .input'
                         )).forEach(function (element) {
                             element.classList.add('error');
                             local.uiAnimateShake(element.closest('span'));
@@ -24518,8 +24512,7 @@ swgg\n\
                     local.tryCatchOnError(function () {
                         options.data = JSON.stringify(JSON.parse(options.data), null, 4);
                     }, local.nop);
-                    data.curl = 'curl \\\n' +
-                        '--request ' + options.api._method + ' \\\n' +
+                    data.curl = 'curl \\\n' + '--request ' + options.api._method + ' \\\n' +
                         Object.keys(options.headers).map(function (key) {
                             return "--header '" + key + ': ' + options.headers[key] + "' \\\n";
                         }).join('') + '--data-binary ' + (typeof options.data === 'string'
@@ -24534,9 +24527,8 @@ swgg\n\
                         ? data.getAllResponseHeaders()
                         : ''))
                         .replace((/\r\ncontent-type:(.*?)\r\n/gi), function (match0, match1) {
-                            // jslint-hack - nop
-                            local.nop(match0);
-                            data.contentType = match1.trim();
+                            match0 = match1;
+                            data.contentType = match0.trim();
                         });
                     switch (data.contentType && data.contentType.split('/')[0]) {
                     case 'audio':
@@ -24813,7 +24805,7 @@ swgg\n\
                 paramDef.schema,
                 paramDef.schema && paramDef.schema.items
             ].some(function (element) {
-                paramDef.schema2 = local.schemaNormalizeAndCopy(element || {}).properties;
+                paramDef.schema2 = local.normalizeSwaggerSchema(element || {}).properties;
                 return paramDef.schema2;
             });
             if (paramDef.schema2) {
@@ -25019,435 +25011,442 @@ swgg\n\
             local.serverRespondJsonapi(request, response, error);
         };
 
-        local.validateByParamDefList = function (options) {
-        /*
-         * this function will validate options.data against options.paramDefList
-         */
-            var data, key;
-            local.tryCatchOnError(function () {
-                data = options.data;
-                // validate data
-                local.assert(data && typeof data === 'object', data);
-                (options.paramDefList || []).forEach(function (paramDef) {
-                    key = paramDef.name;
-                    // recurse - validateByPropDef
-                    local.validateByPropDef({
-                        circularList: options.circularList,
-                        data: data[key],
-                        dataReadonlyRemove: (options.dataReadonlyRemove || {})[key],
-                        key: key,
-                        schema: paramDef,
-                        required: paramDef.required,
-                        'x-swgg-notRequired': paramDef['x-swgg-notRequired']
-                    });
-                });
-            }, function (error) {
-                error.statusCode = error.statusCode || 400;
-                local.errorMessagePrepend(error, options.key + '.' + key + ' -> ');
-                throw error;
-            });
-        };
-
-        local.validateByPropDef = function (options) {
-        /*
-         * this function will validate options.data against options.schema
-         */
-            var data, enum2, prefix, propDef, tmp;
-            local.tryCatchOnError(function () {
-                data = options.data;
-                prefix = 'property ' + options.key;
-                propDef = options.schema;
-                // validate x-swgg-parameters
-                local.assert(
-                    !(propDef['x-swgg-$ref'] && options['x-swgg-parameters']) ||
-                        options['x-swgg-parameters'][propDef['x-swgg-$ref']],
-                    prefix + ' missing x-swgg-parameters.' + propDef['x-swgg-$ref']
-                );
-                // validate undefined data
-                if (local.isNullOrUndefined(data)) {
-                    if (options.required && !options['x-swgg-notRequired']) {
-                        tmp = new Error(prefix + ' cannot be null or undefined');
-                        tmp.options = options;
-                        throw tmp;
-                    }
-                    return;
-                }
-                // handle schema
-                if (propDef.schema) {
-                    local.assert(!propDef.$ref, prefix + ' cannot have both schema and $ref');
-                    local.assert(!propDef.type, prefix + ' cannot have both schema and type');
-                    // recurse - validateByPropDef
-                    local.validateByPropDef({
-                        circularList: options.circularList,
-                        data: data,
-                        dataReadonlyRemove: options.dataReadonlyRemove,
-                        key: options.key,
-                        schema: propDef.schema,
-                        'x-swgg-notRequired': options['x-swgg-notRequired']
-                    });
-                    return;
-                }
-                // handle $ref
-                if (propDef.$ref) {
-                    local.assert(!propDef.schema, prefix + ' cannot have both $ref and schema');
-                    local.assert(!propDef.type, prefix + ' cannot have both $ref and type');
-                    // recurse - validateBySchema
-                    local.validateBySchema({
-                        circularList: options.circularList,
-                        data: data,
-                        dataReadonlyRemove: options.dataReadonlyRemove,
-                        key: propDef.$ref,
-                        schema: local.schemaNormalizeAndCopy({ $ref: propDef.$ref }),
-                        'x-swgg-notRequired': options['x-swgg-notRequired']
-                    });
-                    return;
-                }
-                // handle anyOf
-                if (propDef.anyOf) {
-                    tmp = propDef.anyOf.some(function (element) {
-                        local.tryCatchOnError(function () {
-                            // recurse - validateBySchema
-                            local.validateBySchema({
-                                circularList: options.circularList,
-                                data: data,
-                                key: 'anyOf',
-                                schema: local.schemaNormalizeAndCopy(element),
-                                'x-swgg-notRequired': options['x-swgg-notRequired']
-                            });
-                        }, local.nop);
-                        return !local.utility2._debugTryCatchErrorCaught;
-                    });
-                    local.assert(tmp, local.utility2._debugTryCatchErrorCaught);
-                    return;
-                }
-                // normalize propDef
-                propDef = local.schemaNormalizeAndCopy(options.schema);
-                // init circularList
-                if (data && typeof data === 'object') {
-                    options.circularList = options.circularList || [];
-                    if (options.circularList.indexOf(data) >= 0) {
-                        return;
-                    }
-                    options.circularList.push(data);
-                }
-                // http://json-schema.org/latest/json-schema-validation.html#anchor13
-                // 5.1.  Validation keywords for numeric instances (number and integer)
-                if (typeof data === 'number') {
-                    if (typeof propDef.multipleOf === 'number') {
-                        local.assert(
-                            data % propDef.multipleOf === 0,
-                            prefix + ' must be a multiple of ' + propDef.multipleOf
-                        );
-                    }
-                    if (typeof propDef.maximum === 'number') {
-                        local.assert(
-                            propDef.exclusiveMaximum
-                                ? data < propDef.maximum
-                                : data <= propDef.maximum,
-                            prefix + ' must be ' + (propDef.exclusiveMaximum
-                                ? '< '
-                                : '<= ') + propDef.maximum
-                        );
-                    }
-                    if (typeof propDef.minimum === 'number') {
-                        local.assert(
-                            propDef.exclusiveMinimum
-                                ? data > propDef.minimum
-                                : data >= propDef.minimum,
-                            prefix + ' must be ' + (propDef.exclusiveMinimum
-                                ? '> '
-                                : '>= ') + propDef.minimum
-                        );
-                    }
-                // http://json-schema.org/latest/json-schema-validation.html#anchor25
-                // 5.2.  Validation keywords for strings
-                } else if (typeof data === 'string') {
-                    if (propDef.maxLength) {
-                        local.assert(
-                            data.length <= propDef.maxLength,
-                            prefix + ' must have <= ' + propDef.maxLength + ' characters'
-                        );
-                    }
-                    if (propDef.minLength) {
-                        local.assert(
-                            data.length >= propDef.minLength,
-                            prefix + ' must have >= ' + propDef.minLength + ' characters'
-                        );
-                    }
-                    if (propDef.pattern) {
-                        local.assert(
-                            new RegExp(propDef.pattern).test(data),
-                            prefix + ' must match regex pattern /' + propDef.pattern + '/'
-                        );
-                    }
-                // http://json-schema.org/latest/json-schema-validation.html#anchor36
-                // 5.3.  Validation keywords for arrays
-                } else if (Array.isArray(data)) {
-                    if (propDef.maxItems) {
-                        local.assert(
-                            data.length <= propDef.maxItems,
-                            prefix + ' must have <= ' + propDef.maxItems + ' items'
-                        );
-                    }
-                    if (propDef.minItems) {
-                        local.assert(
-                            data.length >= propDef.minItems,
-                            prefix + ' must have >= ' + propDef.minItems + ' items'
-                        );
-                    }
-                    if (propDef.uniqueItems) {
-                        tmp = {};
-                        data.forEach(function (element) {
-                            element = JSON.stringify(element);
-                            local.assert(!tmp[element], prefix + ' must have only unique items');
-                            tmp[element] = true;
-                        });
-                    }
-                // http://json-schema.org/latest/json-schema-validation.html#anchor53
-                // 5.4.  Validation keywords for objects
-                } else if (typeof data === 'object') {
-                    if (propDef.maxProperties) {
-                        local.assert(
-                            Object.keys(data).length <= propDef.maxProperties,
-                            prefix + ' must have <= ' + propDef.maxProperties + ' items'
-                        );
-                    }
-                    if (propDef.minProperties) {
-                        local.assert(
-                            Object.keys(data).length >= propDef.minProperties,
-                            prefix + ' must have >= ' + propDef.minProperties + ' items'
-                        );
-                    }
-                }
-                // http://json-schema.org/latest/json-schema-validation.html#anchor75
-                // 5.5.  Validation keywords for any instance type
-                enum2 = propDef.enum || (propDef.items && propDef.items.enum);
-                if (enum2) {
-                    (Array.isArray(data)
-                        ? data
-                        : [data]).forEach(function (element) {
-                        local.assert(
-                            enum2.indexOf(element) >= 0,
-                            prefix + ' must only have items in the list ' + JSON.stringify(enum2)
-                        );
-                    });
-                }
-                // https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md
-                // #data-types
-                // validate schema.type
-                switch (propDef.type) {
-                case 'array':
-                    local.assert(Array.isArray(data) && propDef.items);
-                    data.forEach(function (element, ii) {
-                        // recurse - validateByPropDef
-                        local.validateByPropDef({
-                            circularList: options.circularList,
-                            data: element,
-                            dataReadonlyRemove: (options.dataReadonlyRemove || {})[ii],
-                            key: ii,
-                            schema: propDef.items,
-                            'x-swgg-notRequired': options['x-swgg-notRequired']
-                        });
-                    });
-                    switch (propDef.collectionFormat) {
-                    case 'multi':
-                        local.assert(
-                            propDef.in === 'formData' || propDef.in === 'query',
-                            prefix + ' with collectionFormat "multi" ' +
-                                'is valid only for parameters in "query" or "formData"'
-                        );
-                        break;
-                    }
-                    break;
-                case 'boolean':
-                    local.assert(typeof data === 'boolean');
-                    break;
-                case 'file':
-                    break;
-                case 'integer':
-                    local.assert(typeof data === 'number' &&
-                        isFinite(data) &&
-                        Math.floor(data) === data);
-                    switch (propDef.format) {
-                    case 'int32':
-                    case 'int64':
-                        break;
-                    }
-                    break;
-                case 'number':
-                    local.assert(typeof data === 'number' && isFinite(data));
-                    switch (propDef.format) {
-                    case 'double':
-                    case 'float':
-                        break;
-                    }
-                    break;
-                case 'object':
-                    local.assert(typeof data === 'object');
-                    break;
-                case 'string':
-                    local.assert(typeof data === 'string' || propDef.format === 'binary');
-                    switch (propDef.format) {
-                    // https://github.com/swagger-api/swagger-spec/issues/50
-                    // Clarify 'byte' format #50
-                    case 'byte':
-                        local.assert(!(/[^\n\r\+\/0-9\=A-Za-z]/).test(data));
-                        break;
-                    case 'date':
-                    case 'date-time':
-                        local.assert(JSON.stringify(new Date(data)) !== 'null');
-                        break;
-                    case 'email':
-                        local.assert((local.regexpEmailValidate).test(data));
-                        break;
-                    case 'phone':
-                        local.assert((local.regexpPhoneValidate).test(data));
-                        break;
-                    case 'json':
-                        local.tryCatchOnError(function () {
-                            JSON.parse(data);
-                        }, local.nop);
-                        local.assert(!local.utility2._debugTryCatchErrorCaught);
-                        break;
-                    }
-                    break;
-                default:
-                    local.assert(
-                        propDef.type === undefined,
-                        prefix + ' has invalid type ' + propDef.type
-                    );
-                }
-            }, function (error) {
-                error.message = error.message || prefix + ' is not a valid ' + propDef.type +
-                    (propDef.format
-                    ? ' (' + propDef.format + ')'
-                    : '');
-                error.options = options;
-                throw error;
-            });
-        };
-
-        local.validateBySchema = function (options) {
-        /*
-         * this function will validate options.data against options.schema
-         */
-            var data, key, prefix, propDefDict, schema, tmp, validateByPropDef;
-            // recurse - validateByPropDef
-            local.validateByPropDef(options);
-            local.tryCatchOnError(function () {
-                data = options.data;
-                prefix = 'schema ' + options.key;
-                schema = options.schema;
-                // validate schema
-                local.assert(
-                    schema && typeof schema === 'object',
-                    prefix + ' must be an object (not ' + typeof schema + ')'
-                );
-                // init propDefDict
-                propDefDict = schema.properties || {};
-                // validate data
-                local.assert(
-                    (data && typeof data === 'object') || !Object.keys(propDefDict).length,
-                    'data for ' + prefix + ' must be an object (not ' + typeof data + ')'
-                );
-                if (typeof data !== 'object') {
-                    return;
-                }
-                validateByPropDef = function (propDef) {
-                    // remove options.dataReadonlyRemove[key]
-                    if (propDef.readOnly &&
-                            (options.dataReadonlyRemove || {}).hasOwnProperty(key)) {
-                        delete options.dataReadonlyRemove[key];
-                    }
-                    // recurse - validateByPropDef
-                    local.validateByPropDef({
-                        circularList: options.circularList,
-                        data: data[key],
-                        dataReadonlyRemove: (options.dataReadonlyRemove || {})[key],
-                        key: key,
-                        schema: propDef,
-                        required: schema.required && schema.required.indexOf(key) >= 0,
-                        'x-swgg-notRequired': options['x-swgg-notRequired']
-                    });
-                };
-                Object.keys(propDefDict).forEach(function (_) {
-                    key = _;
-                    validateByPropDef(propDefDict[key]);
-                });
-                Object.keys(data).forEach(function (_) {
-                    key = _;
-                    if (propDefDict[key]) {
-                        return;
-                    }
-                    tmp = Object.keys(schema.patternProperties || {}).some(function (_) {
-                        if (new RegExp(_).test(key)) {
-                            validateByPropDef(schema.patternProperties[_]);
-                            return true;
-                        }
-                    });
-                    if (tmp) {
-                        return;
-                    }
-                    // https://tools.ietf.org/html/draft-fge-json-schema-validation-00
-                    // #section-5.4.4
-                    // validate additionalProperties
-                    local.assert(
-                        schema.additionalProperties !== false,
-                        prefix + ' must not have additionalProperties - ' + key
-                    );
-                    if (schema.additionalProperties) {
-                        validateByPropDef(schema.additionalProperties);
-                    }
-                });
-            }, function (error) {
-                local.errorMessagePrepend(error, options.key + '.' + key + ' -> ');
-                throw error;
-            });
-        };
-
-        local.validateBySwagger = function (options) {
+        local.validateBySwaggerJson = function (options) {
         /*
          * this function will validate the entire swagger json object
          */
-            var key, schema, tmp, validateDefault;
-            local.validateBySchema({
-                data: options,
-                key: 'swaggerJson',
-                schema: local.swaggerSchemaJson
+            var swaggerJson;
+            swaggerJson = options.swaggerJson;
+            // normalize swaggerJson
+            swaggerJson = local.objectSetDefault(swaggerJson, {
+                paths: {}
             });
-            // validate default
-            validateDefault = function () {
-                if (schema.default !== undefined) {
+            Object.keys(swaggerJson.paths).forEach(function (path) {
+                Object.keys(swaggerJson.paths[path]).forEach(function (method) {
+                    local.objectSetDefault(swaggerJson.paths[path][method], { parameters: [] });
+                });
+            });
+            options = local.objectSetDefault(options, {
+                data: swaggerJson,
+                prefix: 'swaggerJson',
+                schema: local.swaggerSchemaJson,
+                swaggerJson: swaggerJson
+            });
+            local.validateBySwaggerSchema(options);
+        };
+
+        local.validateBySwaggerParameters = function (options) {
+        /*
+         * this function will validate options.data against options.parameters
+         */
+            var dataReadonlyRemove;
+            dataReadonlyRemove = options.dataReadonlyRemove || {};
+            (options.parameters || []).forEach(function (paramDef) {
+                local.validateBySwaggerSchema({
+                    data: options.data[paramDef.name],
+                    dataReadonlyRemove: [
+                        dataReadonlyRemove,
+                        paramDef.name,
+                        dataReadonlyRemove[paramDef.name]
+                    ],
+                    modeDebug: options.modeDebug,
+                    modeParameter: true,
+                    prefix: options.prefix + '[' + JSON.stringify(paramDef.name) + ']',
+                    schema: paramDef,
+                    swaggerJson: local.swaggerJson
+                });
+            });
+        };
+
+        local.validateBySwaggerSchema = function (options) {
+        /*
+         * this function will validate data against schema
+         * http://json-schema.org/draft-04/json-schema-validation.html#rfc.section.5
+         */
+            var data, dataReadonlyRemove, enum2, error, prefix, schema, tmp, test, throwError;
+            throwError = function (message) {
+            /*
+             * this function will throw an error with the given message
+             */
+                if (!message) {
                     return;
                 }
-                local.validateByPropDef({
-                    data: schema.default,
-                    key: key + '.default',
-                    schema: schema,
-                    'x-swgg-parameters': options['x-swgg-parameters']
-                });
+                if (options.modeDebug && (typeof options.modeDebug !== 'string' ||
+                        message.indexOf(options.modeDebug) >= 0)) {
+                    console.error(JSON.stringify({
+                        data: data,
+                        prefix: prefix,
+                        schema: schema,
+                        message: message
+                    }, null, 4));
+                }
+                message = new Error(message);
+                message.options = options;
+                message.schema = schema;
+                message.statusCode = 400;
+                throw message;
             };
-            Object.keys(options.definitions || {}).forEach(function (schemaName) {
-                schema = options.definitions[schemaName];
-                key = schemaName;
-                validateDefault();
-                Object.keys(options.definitions[schemaName].properties || {
-                }).forEach(function (propName) {
-                    schema = options.definitions[schemaName].properties[propName];
-                    key = schemaName + '.' + propName;
-                    validateDefault();
+            data = options.data;
+            options.dataReadonlyRemove = options.dataReadonlyRemove || [{}, '', null];
+            dataReadonlyRemove = options.dataReadonlyRemove[2] || {};
+            prefix = options.prefix;
+            schema = options.schema;
+            // validate required parameter
+            test = !(options.modeParameter &&
+                local.isNullOrUndefined(data) &&
+                schema &&
+                schema.required &&
+                !schema['x-swgg-notRequired']);
+            throwError(!test && prefix + ' must not be null or undefined');
+            if (local.isNullOrUndefined(data) || !schema) {
+                return;
+            }
+            // dereference schema.$ref
+            local.tryCatchOnError(function () {
+                while (schema.$ref) {
+                    tmp = schema.$ref.split('/').slice(-2);
+                    tmp[3] = schema;
+                    schema = schema.$ref.indexOf('http://json-schema.org/draft-04/schema#/') === 0
+                        ? local.swaggerSchemaJson[tmp[0]][tmp[1]]
+                        : options.swaggerJson[tmp[0]][tmp[1]];
+                }
+            }, local.nop);
+            test = !local.utility2._debugTryCatchErrorCaught && schema;
+            throwError(!test && prefix + ' cannot dereference schema.$ref ' +
+                (schema || tmp[3]).$ref);
+            switch (schema === local.swaggerSchemaJson.definitions.parameter && data.in) {
+            case 'body':
+                schema = local.swaggerSchemaJson.definitions.bodyParameter;
+                break;
+            case 'formData':
+                schema = local.swaggerSchemaJson.definitions.formDataParameterSubSchema;
+                break;
+            case 'header':
+                schema = local.swaggerSchemaJson.definitions.headerParameterSubSchema;
+                break;
+            case 'path':
+                schema = local.swaggerSchemaJson.definitions.pathParameterSubSchema;
+                break;
+            case 'query':
+                schema = local.swaggerSchemaJson.definitions.queryParameterSubSchema;
+                break;
+            }
+            // remove readOnly property
+            if (schema.readOnly) {
+                delete options.dataReadonlyRemove[0][options.dataReadonlyRemove[1]];
+            }
+            if (options.modeParameter && schema.schema) {
+                // recurse - schema.schema
+                local.validateBySwaggerSchema({
+                    data: data,
+                    dataReadonlyRemove: options.dataReadonlyRemove,
+                    modeDebug: options.modeDebug,
+                    prefix: prefix,
+                    schema: schema.schema,
+                    swaggerJson: options.swaggerJson
                 });
-            });
-            Object.keys(options.paths).forEach(function (path) {
-                Object.keys(options.paths[path]).forEach(function (method) {
-                    tmp = options.paths[path][method];
-                    Object.keys(tmp.parameters).forEach(function (param) {
-                        schema = tmp.parameters[param];
-                        key = (tmp.tags && tmp.tags[0]) + '.' + tmp.operationId + '.' + param;
-                        validateDefault();
+            }
+            // optimization - validate schema.type first
+            // 5.5.2. type
+            // https://swagger.io/docs/specification/data-models/data-types/
+            // https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#data-types
+            test = !(options.modeParameter && schema.type);
+            switch (schema.type) {
+            case 'array':
+                test = Array.isArray(data);
+                break;
+            case 'boolean':
+                test = typeof data === 'boolean';
+                break;
+            case 'file':
+                test = options.modeParameter;
+                break;
+            case 'integer':
+                test = typeof data === 'number' && isFinite(data) && Math.floor(data) === data;
+                break;
+            case 'number':
+                test = typeof data === 'number' && isFinite(data);
+                break;
+            case 'object':
+                test = typeof data === 'object';
+                break;
+            case 'string':
+                test = typeof data === 'string' ||
+                    (options.modeParameter && schema.format === 'binary');
+                switch (test && options.modeParameter && schema.format) {
+                // Clarify 'byte' format #50
+                // https://github.com/swagger-api/swagger-spec/issues/50
+                case 'byte':
+                    test = !(/[^\n\r\+\/0-9\=A-Za-z]/).test(data);
+                    break;
+                case 'date':
+                case 'date-time':
+                    test = JSON.stringify(new Date(data)) !== 'null';
+                    break;
+                case 'email':
+                    test = local.regexpEmailValidate.test(data);
+                    break;
+                case 'phone':
+                    test = local.regexpPhoneValidate.test(data);
+                    break;
+                case 'json':
+                    test = local.tryCatchOnError(function () {
+                        JSON.parse(data);
+                        return true;
+                    }, local.nop);
+                    break;
+                }
+                break;
+            }
+            throwError(!test && options.modeParameter && prefix + ' is not a valid ' + schema.type +
+                (schema.format
+                ? ' (' + schema.format + ')'
+                : ''));
+            throwError(!test && prefix + ' must have type ' + JSON.stringify(schema.type));
+            // 5.1. Validation keywords for numeric instances (number and integer)
+            if (typeof data === 'number') {
+                // 5.1.1. multipleOf
+                test = schema.multipleOf !== 'number' || data % schema.multipleOf === 0;
+                throwError(!test && prefix + ' must be a multiple of ' + schema.multipleOf);
+                // 5.1.2. maximum and exclusiveMaximum
+                test = typeof schema.maximum !== 'number' || (schema.exclusiveMaximum
+                    ? data < schema.maximum
+                    : data <= schema.maximum);
+                throwError(!test && prefix + ' must be ' + (schema.exclusiveMaximum
+                    ? '< '
+                    : '<= ') + schema.maximum);
+                // 5.1.3. minimum and exclusiveMinimum
+                test = typeof schema.minimum !== 'number' || (schema.exclusiveMinimum
+                    ? data > schema.minimum
+                    : data >= schema.minimum);
+                throwError(!test && prefix + ' must be ' + (schema.exclusiveMinimum
+                    ? '> '
+                    : '>= ') + schema.minimum);
+            // 5.2. Validation keywords for strings
+            } else if (typeof data === 'string') {
+                // 5.2.1. maxLength
+                test = typeof schema.maxLength !== 'number' || data.length <= schema.maxLength;
+                throwError(!test && prefix + ' must have <= ' + schema.maxLength + ' characters');
+                // 5.2.2. minLength
+                test = typeof schema.minLength !== 'number' || data.length >= schema.minLength;
+                throwError(!test && prefix + ' must have >= ' + schema.minLength + ' characters');
+                // 5.2.3. pattern
+                test = !schema.pattern || new RegExp(schema.pattern).test(data);
+                throwError(!test && prefix + ' must match pattern ' +
+                    JSON.stringify(schema.pattern));
+            // 5.3. Validation keywords for arrays
+            } else if (Array.isArray(data)) {
+                // 5.3.1. additionalItems and items
+/*
+ * validate
+ * Successful validation of an array instance with regards to these two keywords
+ * is determined as follows:
+ *
+ * if "items" is not present, or its value is an object,
+ * validation of the instance always succeeds, regardless of the value of "additionalItems";
+ * if the value of "additionalItems" is boolean value true or an object,
+ * validation of the instance always succeeds;
+ * if the value of "additionalItems" is boolean value false and the value of "items" is an array,
+ * the instance is valid if its size is less than, or equal to, the size of "items".
+ */
+                test = !Array.isArray(schema.items) ||
+                    schema.additionalItems !== false ||
+                    data.length <= schema.items.length;
+                throwError(!test && prefix + ' must not have additional items ' +
+                    JSON.stringify(data.slice(schema.items.length)));
+                data.forEach(function (element, ii) {
+                    // recurse - schema.additionalItems and schema.items
+                    local.validateBySwaggerSchema({
+                        data: element,
+                        dataReadonlyRemove: [dataReadonlyRemove, ii, dataReadonlyRemove[ii]],
+                        modeDebug: options.modeDebug,
+                        prefix: prefix + '[' + ii + ']',
+                        schema: Array.isArray(schema.items)
+                            ? schema.items[ii] || schema.additionalItems
+                            : schema.items || schema.additionalItems,
+                        swaggerJson: options.swaggerJson
                     });
                 });
+                // 5.3.2. maxItems
+                test = typeof schema.maxItems !== 'number' || data.length <= schema.maxItems;
+                throwError(!test && prefix + ' must have <= ' + schema.maxItems + ' items');
+                // 5.3.3. minItems
+                test = typeof schema.minItems !== 'number' || data.length >= schema.minItems;
+                throwError(!test && prefix + ' must have >= ' + schema.minItems + ' items');
+                // 5.3.4. uniqueItems
+                data.forEach(function (element) {
+                    test = !schema.uniqueItems ||
+                        data.indexOf(element) === data.lastIndexOf(element);
+                    throwError(!test && prefix + ' must not have non-unique item ' + element);
+                });
+            // 5.4. Validation keywords for objects
+            } else {
+                // 5.4.1. maxProperties
+                test = typeof schema.maxProperties !== 'number' ||
+                    Object.keys(data).length <= schema.maxProperties;
+                throwError(!test && prefix + ' must have <= ' + schema.maxProperties + ' items');
+                // 5.4.2. minProperties
+                test = typeof schema.minProperties !== 'number' ||
+                    Object.keys(data).length >= schema.minProperties;
+                throwError(!test && prefix + ' must have >= ' + schema.minProperties + ' items');
+                // 5.4.3. required
+                local.normalizeValue('list', schema.required).forEach(function (key) {
+                    test = !local.isNullOrUndefined(data[key]);
+                    throwError(!test && prefix + '[' + JSON.stringify(key) +
+                        '] must not be null or undefined');
+                });
+                // 5.4.4. additionalProperties, properties and patternProperties
+                Object.keys(data).forEach(function (key) {
+                    tmp = null;
+                    if (schema.properties && schema.properties[key]) {
+                        tmp = true;
+                        // recurse - schema.properties
+                        local.validateBySwaggerSchema({
+                            data: data[key],
+                            dataReadonlyRemove: [dataReadonlyRemove, key, dataReadonlyRemove[key]],
+                            modeDebug: options.modeDebug,
+                            prefix: prefix + '[' + JSON.stringify(key) + ']',
+                            schema: schema.properties[key],
+                            swaggerJson: options.swaggerJson
+                        });
+                    }
+                    Object.keys(schema.patternProperties || {}).forEach(function (rgx) {
+                        if (new RegExp(rgx).test(key)) {
+                            tmp = true;
+                            // recurse - schema.patternProperties
+                            local.validateBySwaggerSchema({
+                                data: data[key],
+                                modeDebug: options.modeDebug,
+                                prefix: prefix + '[' + JSON.stringify(key) + ']',
+                                schema: schema.patternProperties[rgx],
+                                swaggerJson: options.swaggerJson
+                            });
+                        }
+                    });
+/*
+ * validate
+ * 5.4.4.4. If "additionalProperties" has boolean value false
+ *
+ * In this case, validation of the instance depends on the property set of
+ * "properties" and "patternProperties". In this section, the property names of
+ * "patternProperties" will be called regexes for convenience.
+ *
+ * The first step is to collect the following sets:
+ *
+ * s
+ * The property set of the instance to validate.
+ * p
+ * The property set from "properties".
+ * pp
+ * The property set from "patternProperties".
+ * Having collected these three sets, the process is as follows:
+ *
+ * remove from "s" all elements of "p", if any;
+ * for each regex in "pp", remove all elements of "s" which this regex matches.
+ * Validation of the instance succeeds if, after these two steps, set "s" is empty.
+ */
+                    test = tmp || schema.additionalProperties !== false;
+                    throwError(!test && prefix + ' must not have additional property ' +
+                        JSON.stringify(key));
+                    // recurse - schema.additionalProperties
+                    local.validateBySwaggerSchema({
+                        data: data[key],
+                        modeDebug: options.modeDebug,
+                        prefix: prefix + '[' + JSON.stringify(key) + ']',
+                        schema: schema.additionalProperties,
+                        swaggerJson: options.swaggerJson
+                    });
+                });
+                // 5.4.5. dependencies
+                Object.keys(schema.dependencies || {}).forEach(function (key) {
+                    // recurse - schema.dependencies
+                    local.validateBySwaggerSchema({
+                        data: data[key],
+                        modeDebug: options.modeDebug,
+                        prefix: prefix + '[' + JSON.stringify(key) + ']',
+                        schema: schema.dependencies[key],
+                        swaggerJson: options.swaggerJson
+                    });
+                });
+            }
+            // 5.5. Validation keywords for any instance type
+            // 5.5.1. enum
+            enum2 = schema.enum || (options.modeParameter && schema.items && schema.items.enum);
+            test = !enum2 || (Array.isArray(data)
+                ? data
+                : [data]).every(function (element) {
+                return enum2.indexOf(element) >= 0;
             });
+            throwError(!test &&
+                prefix + ' must only have items in the list ' + JSON.stringify(enum2));
+            // 5.5.2. type
+            local.nop();
+            // 5.5.3. allOf
+            (schema.allOf || []).forEach(function (element) {
+                // recurse - schema.allOf
+                local.validateBySwaggerSchema({
+                    data: data,
+                    modeDebug: options.modeDebug,
+                    prefix: prefix,
+                    schema: element,
+                    swaggerJson: options.swaggerJson
+                });
+            });
+            // 5.5.4. anyOf
+            error = null;
+            test = !schema.anyOf || schema.anyOf.some(function (element) {
+                local.tryCatchOnError(function () {
+                    // recurse - schema.anyOf
+                    local.validateBySwaggerSchema({
+                        data: data,
+                        modeDebug: options.modeDebug,
+                        prefix: prefix,
+                        schema: element,
+                        swaggerJson: options.swaggerJson
+                    });
+                    return true;
+                }, local.nop);
+                error = error || local.utility2._debugTryCatchErrorCaught;
+                return !error;
+            });
+            throwError(!test && error);
+            // 5.5.5. oneOf
+            tmp = !schema.oneOf
+                ? 1
+                : 0;
+            (schema.oneOf || []).some(function (element) {
+                local.tryCatchOnError(function () {
+                    // recurse - schema.oneOf
+                    local.validateBySwaggerSchema({
+                        data: data,
+                        modeDebug: options.modeDebug,
+                        prefix: prefix,
+                        schema: element,
+                        swaggerJson: options.swaggerJson
+                    });
+                    tmp += 1;
+                }, local.nop);
+                return tmp > 1;
+            });
+            test = tmp === 1;
+            throwError(!test && prefix + ' validated against ' + tmp + ' schema.oneOf in ' +
+                JSON.stringify(schema.oneOf));
+            // 5.5.6. not
+            test = !schema.not || !local.tryCatchOnError(function () {
+                // recurse - schema.not
+                local.validateBySwaggerSchema({
+                    data: data,
+                    modeDebug: options.modeDebug,
+                    prefix: prefix,
+                    schema: schema.not,
+                    swaggerJson: options.swaggerJson
+                });
+                return true;
+            }, local.nop);
+            throwError(!test && prefix + ' must not validate against schama.not ' +
+                JSON.stringify(schema.not));
+            // 5.5.7. definitions
+            local.nop();
         };
     }());
     switch (local.modeJs) {

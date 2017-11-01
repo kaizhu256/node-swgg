@@ -1018,18 +1018,39 @@
             onNext();
         };
 
-        local.testCase_validateByParamDefList_default = function (options, onError) {
+        local.testCase_validateBySwaggerJson_default = function (options, onError) {
         /*
-         * this function will test validateByParamDefList's default handling-behavior
+         * this function will test validateBySwaggerJson's default handling-behavior
+         */
+            options = {};
+            // test null-case handling-behavior
+            [null, undefined, {}].forEach(function (element) {
+                local.tryCatchOnError(function () {
+                    local.validateBySwaggerJson({ swaggerJson: element });
+                }, local.nop);
+                // validate error occurred
+                local.assert(local.utility2._debugTryCatchErrorCaught, element);
+            });
+            local.validateBySwaggerJson({ swaggerJson: {
+                info: { title: 'undefined', version: 'undefined' },
+                paths: {},
+                swagger: '2.0'
+            } });
+            onError(null, options);
+        };
+
+        local.testCase_validateBySwaggerParameters_default = function (options, onError) {
+        /*
+         * this function will test validateBySwaggerParameters's default handling-behavior
          */
             var onParallel;
             onParallel = local.onParallel(onError);
             onParallel.counter += 1;
             // test nop handling-behavior
-            local.validateByParamDefList({ data: {} });
+            local.validateBySwaggerParameters({ data: {} });
             options = {
                 paramDict: {
-                    id: 'testCase_validateByParamDefList_default',
+                    id: 'testCase_validateBySwaggerParameters_default',
                     // test array-csv-param handling-behavior
                     paramArrayCsv: ['aa', 'bb'],
                     // test array-default-param handling-behavior
@@ -1092,7 +1113,7 @@
             // test body-array-param handling-behavior
             options = {
                 paramDict: {
-                    id: 'testCase_validateByParamDefList_default',
+                    id: 'testCase_validateBySwaggerParameters_default',
                     paramBodyArray: [{ aa: { bb: 'hello body' } }, null]
                 }
             };
@@ -1112,7 +1133,7 @@
             // test body-string-param handling-behavior
             options = {
                 paramDict: {
-                    id: 'testCase_validateByParamDefList_default',
+                    id: 'testCase_validateBySwaggerParameters_default',
                     paramBodyString: 'hello body'
                 }
             };
@@ -1132,9 +1153,9 @@
             onParallel(null, options);
         };
 
-        local.testCase_validateByParamDefList_error = function (options, onError) {
+        local.testCase_validateBySwaggerParameters_error = function (options, onError) {
         /*
-         * this function will test validateByParamDefList's error handling-behavior
+         * this function will test validateBySwaggerParameters's error handling-behavior
          */
             var onParallel;
             onParallel = local.onParallel(onError);
@@ -1168,9 +1189,9 @@
             onParallel(null, options);
         };
 
-        local.testCase_validateByParamDefList_formData = function (options, onError) {
+        local.testCase_validateBySwaggerParameters_formData = function (options, onError) {
         /*
-         * this function will test validateByParamDefList's formData handling-behavior
+         * this function will test validateBySwaggerParameters's formData handling-behavior
          */
             options = {
                 paramDict: {
@@ -1192,214 +1213,257 @@
             });
         };
 
-        local.testCase_validateBySchema_default = function (options, onError) {
+        local.testCase_validateBySwaggerSchema_default = function (options, onError) {
         /*
-         * this function will test validateBySchema's default handling-behavior
+         * this function will test validateBySwaggerSchema's default handling-behavior
          */
             options = {
-                data: { propRequired: true },
-                schema: local.swaggerJson.definitions.TestCrud
-            };
-            [
-                { key: 'propArray', value: [null] },
-                { key: 'propArray2', value: [null] },
-                { key: 'propArraySubdoc', value: [{ propRequired: true }] },
-                { key: 'propBoolean', value: true },
-                { key: 'propEnum', value: 0 },
-                { key: 'propEnumMulti', value: [0, 1] },
-                { key: 'propInteger', value: 0 },
-                { key: 'propInteger2', value: 0 },
-                { key: 'propIntegerInt32', value: 0 },
-                { key: 'propIntegerInt64', value: 0 },
-                { key: 'propNumber', value: 0.5 },
-                { key: 'propNumber2', value: -0.5 },
-                { key: 'propNumber3', value: 0.5 },
-                { key: 'propNumberDouble', value: 0.5 },
-                { key: 'propNumberFloat', value: 0.5 },
-                { key: 'propObject', value: { aa: true } },
-                { key: 'propObject2', value: { aa: true } },
-                { key: 'propObjectSubdoc', value: {} },
-                { key: 'propRequired', value: true },
-                { key: 'propString', value: 'hello' },
-                { key: 'propString2', value: 'hello_0123456789_0123456789' },
-                { key: 'propStringBinary', value: '\u1234' },
-                { key: 'propStringByte', value: local.base64FromString(local.stringAsciiCharset) },
-                { key: 'propStringDate', value: '1971-01-01' },
-                { key: 'propStringDatetime', value: '1971-01-01T00:00:00Z' },
-                { key: 'propStringEmail', value: 'a@a.com' },
-                { key: 'propStringJson', value: 'true' },
-                { key: 'propStringPhone', value: '+123 (1234) 1234-1234' }
-            ].forEach(function (element) {
-                element.data = local.jsonCopy(options.data);
-                element.data[element.key] = element.value;
-                element.schema = options.schema;
-                // test circular-reference handling-behavior
-                element.data.propArraySubdoc = element.data.propArraySubdoc || [element.data];
-                element.data.propObject = element.data.propObject || element.data;
-                element.data.propObjectSubdoc = element.data.propObjectSubdoc || element.data;
-                local.validateBySchema(element);
-            });
-            onError(null, options);
-        };
-
-        local.testCase_validateBySchema_error = function (options, onError) {
-        /*
-         * this function will test validateBySchema's error handling-behavior
-         */
-            options = {
-                data: { propRequired: true },
-                schema: local.swaggerJson.definitions.TestCrud
-            };
-            [
-                { data: null },
-                { key: 'propArray', value: true },
-                { key: 'propArray2', value: [] },
-                { key: 'propArray2', value: [null, null] },
-                { key: 'propArraySubdoc', value: [ 'non-object' ] },
-                { key: 'propArraySubdoc', value: [{ propRequired: null }] },
-                { key: 'propBoolean', value: 0 },
-                { key: 'propEnum', value: -1 },
-                { key: 'propEnumMulti', value: 0 },
-                { key: 'propInteger', value: 0.5 },
-                { key: 'propInteger', value: Infinity },
-                { key: 'propInteger', value: NaN },
-                { key: 'propInteger', value: true },
-                { key: 'propInteger2', value: -2 },
-                { key: 'propInteger2', value: -1 },
-                { key: 'propInteger2', value: 1 },
-                { key: 'propInteger2', value: 2 },
-                { key: 'propIntegerInt32', value: 0.5 },
-                { key: 'propIntegerInt64', value: 0.5 },
-                { key: 'propNumber', value: Infinity },
-                { key: 'propNumber', value: NaN },
-                { key: 'propNumber', value: true },
-                { key: 'propNumber2', value: -1 },
-                { key: 'propNumber2', value: -0.25 },
-                { key: 'propNumber2', value: 0 },
-                { key: 'propNumber3', value: 0 },
-                { key: 'propNumber3', value: 0.25 },
-                { key: 'propNumber3', value: 1 },
-                { key: 'propNumberDouble', value: true },
-                { key: 'propNumberFloat', value: true },
-                { key: 'propObject', value: true },
-                { key: 'propObject2', value: {} },
-                { key: 'propObject2', value: { aa: 1, bb: 2 } },
-                { key: 'propRequired', value: null },
-                { key: 'propRequired', value: undefined },
-                { key: 'propString', value: true },
-                { key: 'propString2', value: '' },
-                { key: 'propString2', value: '!' },
-                { key: 'propString2', value: local.stringAsciiCharset },
-                { key: 'propStringByte', value: local.stringAsciiCharset },
-                { key: 'propStringDate', value: 'null' },
-                { key: 'propStringDatetime', value: 'null' },
-                { key: 'propStringEmail', value: 'null' },
-                { key: 'propStringJson', value: 'syntax error' },
-                { key: 'propStringPhone', value: 'null' }
-            ].forEach(function (element) {
-                local.tryCatchOnError(function () {
-                    if (element.data === undefined) {
-                        element.data = local.jsonCopy(options.data);
-                        element.data[element.key] = element.value;
-                    }
-                    element.schema = options.schema;
-                    local.validateBySchema(element);
-                }, local.nop);
-                // validate error occurred
-                local.assert(
-                    local.utility2._debugTryCatchErrorCaught,
-                    JSON.stringify(element.data)
-                );
-            });
-            onError(null, options);
-        };
-
-        local.testCase_validateBySwagger_default = function (options, onError) {
-        /*
-         * this function will test validateBySwagger's default handling-behavior
-         */
-            options = {};
-            // test null-case handling-behavior
-            [null, undefined, {}].forEach(function (element) {
-                local.tryCatchOnError(function () {
-                    local.validateBySwagger(element);
-                }, local.nop);
-                // validate error occurred
-                local.assert(local.utility2._debugTryCatchErrorCaught, element);
-            });
-            local.validateBySwagger({
-                info: { title: 'undefined', version: 'undefined' },
-                paths: {},
-                swagger: '2.0'
-            });
-            options.templateData = JSON.stringify({
-                definitions: {
-                    Test: {
-                        // https://github.com/OAI/OpenAPI-Specification/blob/master/versions
-                        // /2.0.md#schema-object
-                        $ref: '#/definitions/definitions',
-                        additionalProperties: true,
-                        allOf: [null],
-                        default: {},
-                        description: 'hello',
-                        exclusiveMaximum: true,
-                        exclusiveMinimum: true,
-                        format: 'undefined',
-                        items: {},
-                        maxItems: 100,
-                        maxProperties: 100,
-                        maximum: 100,
-                        minItems: 0,
-                        minProperties: 0,
-                        minimum: -100,
-                        multipleOf: 1,
-                        pattern: 'undefined',
-                        properties: {},
-                        required: [null],
-                        title: 'hello',
-                        type: 'object',
-                        uniqueItems: true
-                    }
+/* jslint-ignore-begin */
+data0:
+{
+    "definitions": {
+        "Aa": {
+            "properties": {
+                "typeArray": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 },
-                info: { title: '', version: '' },
-                paths: {},
-                swagger: '2.0'
+                "typeBoolean": {
+                    "type": "boolean"
+                },
+                "typeInteger": {
+                    "type": "integer"
+                },
+                "typeNumber": {
+                    "type": "number"
+                },
+                "typeNumberExclusiveMaximum": {
+                    "exclusiveMaximum": true,
+                    "type": "number"
+                },
+                "typeNumberExclusiveMinimum": {
+                    "exclusiveMinimum": true,
+                    "type": "number"
+                },
+                "typeObject": {
+                    "type": "object"
+                },
+                "typeString": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "info": {
+        "title": "",
+        "version": ""
+    },
+    "parameters": {
+        "body": {
+            "in": "body",
+            "name": "body",
+            "schema": {
+                "$ref": "#/definitions/Aa"
+            }
+        },
+        "header": {
+            "in": "header",
+            "name": "header",
+            "type": "string"
+        },
+        "path": {
+            "in": "path",
+            "name": "path",
+            "required": true,
+            "type": "string"
+        },
+        "query": {
+            "in": "query",
+            "name": "query",
+            "type": "string"
+        },
+        "typeArray": {
+            "in": "query",
+            "items": {
+                "type": "string"
+            },
+            "name": "typeArray",
+            "type": "array"
+        },
+        "typeBoolean": {
+            "in": "query",
+            "name": "typeBoolean",
+            "type": "boolean"
+        },
+        "typeInteger": {
+            "in": "query",
+            "name": "typeInteger",
+            "type": "integer"
+        },
+        "typeNumber": {
+            "in": "query",
+            "name": "typeNumber",
+            "type": "number"
+        },
+        "typeNumberExclusiveMaximum": {
+            "exclusiveMaximum": true,
+            "in": "query",
+            "name": "typeNumberExclusiveMaximum",
+            "type": "number"
+        },
+        "typeNumberExclusiveMinimum": {
+            "exclusiveMinimum": true,
+            "in": "query",
+            "name": "typeNumberExclusiveMinimum",
+            "type": "number"
+        },
+        "typeString": {
+            "in": "query",
+            "name": "typeString",
+            "type": "string"
+        }
+    },
+    "paths": {
+        "/aa/{path}": {
+            "post": {
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/body"
+                    },
+                    {
+                        "$ref": "#/parameters/header"
+                    },
+                    {
+                        "$ref": "#/parameters/path"
+                    },
+                    {
+                        "$ref": "#/parameters/query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/responses/200"
+                    }
+                }
+            }
+        }
+    },
+    "responses": {
+        "200": {
+            "description": ""
+        }
+    },
+    "swagger": "2.0"
+}
+,
+/* jslint-ignore-end */
+                schema: local.swaggerSchemaJson
+            };
+            options.data = local.jsonCopy(options.data0);
+            local.validateBySwaggerSchema(options);
+            // test default handling-behavior
+            [{
+                // null-case
+                key: ''
+            }, {
+                // 5.1.1. multipleOf
+                key: 'multipleOf',
+                'valueList.definitionProperty.fail': [0, '', [], {}],
+                'valueList.definitionProperty.pass': [0.5],
+                'valueList.parameter.fail': [0, '', [], {}],
+                'valueList.parameter.pass': [0.5]
+            }, {
+                // 5.1.2. maximum and exclusiveMaximum
+                key: 'maximum',
+                'valueList.definitionProperty.fail': [Infinity, '', [], {}],
+                'valueList.definitionProperty.pass': [0.5],
+                'valueList.parameter.fail': [Infinity, '', [], {}],
+                'valueList.parameter.pass': [0.5]
+            }, {
+                // 5.1.3. minimum and exclusiveMinimum
+                key: 'minimum',
+                'valueList.definitionProperty.fail': [Infinity, '', [], {}],
+                'valueList.definitionProperty.pass': [0.5],
+                'valueList.parameter.fail': [Infinity, '', [], {}],
+                'valueList.parameter.pass': [0.5]
+            }].forEach(function (element) {
+                [
+                    'valueList.definitionProperty.fail',
+                    'valueList.definitionProperty.pass',
+                    'valueList.parameter.fail',
+                    'valueList.parameter.pass'
+                ].forEach(function (valueList) {
+                    valueList = valueList.split('.');
+                    (element[valueList.join('.')] || []).forEach(function (value) {
+                        [
+                            'typeArray',
+                            'typeBoolean',
+                            'typeInteger',
+                            'typeNumber',
+                            'typeNumberExclusiveMaximum',
+                            'typeNumberExclusiveMinimum',
+                            'typeObject',
+                            'typeString'
+                        ].forEach(function (name) {
+                            options.data = local.jsonCopy(options.data0);
+                            switch (valueList[1]) {
+                            case 'definitionProperty':
+                                if (!options.data.definitions.Aa.properties[name]) {
+                                    return;
+                                }
+                                options.data.definitions.Aa.properties[name][element.key] = value;
+                                break;
+                            case 'parameter':
+                                if (!options.data.parameters[name]) {
+                                    return;
+                                }
+                                options.data.parameters[name][element.key] = value;
+                                break;
+                            }
+                            local.tryCatchOnError(function () {
+                                local.validateBySwaggerSchema(options);
+                            }, local.nop);
+                            options.error = local.utility2._debugTryCatchErrorCaught;
+                            switch (valueList[2]) {
+                            case 'fail':
+                                // validate error occurred
+                                local.assert(
+                                    options.error,
+                                    [element.key, value, valueList.join('.'), options.error]
+                                );
+                                break;
+                            case 'pass':
+                                // validate no error occurred
+                                local.assert(
+                                    !options.error,
+                                    [element.key, value, valueList.join('.'), options.error]
+                                );
+                                break;
+                            }
+                        });
+                    });
+                });
             });
-            // validate templateData
-            // test error handling-behavior
-            local.validateBySwagger(JSON.parse(options.templateData));
-            [
-                { definitions: { Test: { $ref: true } } },
-                { definitions: { Test: { allOf: [] } } },
-                { definitions: { Test: { description: true } } },
-                { definitions: { Test: { exclusiveMaximum: 1 } } },
-                { definitions: { Test: { exclusiveMinimum: 1 } } },
-                { definitions: { Test: { format: true } } },
-                { definitions: { Test: { items: true } } },
-                { definitions: { Test: { maxItems: true } } },
-                { definitions: { Test: { maxProperties: true } } },
-                { definitions: { Test: { maximum: true } } },
-                { definitions: { Test: { minItems: -1 } } },
-                { definitions: { Test: { minProperties: -1 } } },
-                { definitions: { Test: { minimum: true } } },
-                { definitions: { Test: { multipleOf: true } } },
-                { definitions: { Test: { pattern: true } } },
-                { definitions: { Test: { properties: true } } },
-                { definitions: { Test: { required: [] } } },
-                { definitions: { Test: { title: true } } },
-                { definitions: { Test: { type: true } } },
-                { definitions: { Test: { uniqueItems: 'undefined' } } },
-                { propUndefined: {} }
-            ].forEach(function (element) {
+            // test modeDebug handling-behavior
+            local.testMock([], function (onError) {
                 local.tryCatchOnError(function () {
-                    local.validateBySwagger(local.objectSetOverride(
-                        JSON.parse(options.templateData),
-                        element
-                    ), Infinity);
+                    local.validateBySwaggerSchema({
+                        data: {},
+                        modeDebug: 'undefined',
+                        schema: local.swaggerSchemaJson
+                    });
                 }, local.nop);
-                // validate error occurred
-                local.assert(local.utility2._debugTryCatchErrorCaught, element);
-            });
+                onError(null, options);
+            }, local.onErrorThrow);
+            onError(null, options);
+        };
+
+        local.testCase_validateBySwaggerSchema_error = function (options, onError) {
+        /*
+         * this function will test validateBySwaggerSchema's error handling-behavior
+         */
             onError(null, options);
         };
 
@@ -1513,12 +1577,6 @@
 
     // run shared js-env code - init-after
     (function () {
-        // test apiUpdate's apiDeferList handling-behavior
-        local.apiDeferList = null;
-        // test apiUpdate's null-case handling-behavior
-        local.apiUpdate();
-        // test apiAjax's deferred handling-behavior
-        local.apiAjax('operationId.x-test.crudNullGet', {}, local.onErrorThrow);
         // test apiUpdate's root-basePath handling-behavior
         local.apiUpdate({ basePath: '/' });
         local.assertJsonEqual(local.swaggerJsonBasePath, '');
@@ -1710,9 +1768,38 @@
                     "format": "phone",
                     "type": "string"
                 },
-                "propStringUnique": {
+                "typeArray": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "typeBoolean": {
+                    "type": "boolean"
+                },
+                "typeInteger": {
+                    "type": "integer"
+                },
+                "typeNumber": {
+                    "type": "number"
+                },
+                "typeNumberExclusiveMaximum": {
+                    "exclusiveMaximum": true,
+                    "type": "number"
+                },
+                "typeNumberExclusiveMinimum": {
+                    "exclusiveMinimum": true,
+                    "type": "number"
+                },
+                "typeObject": {
+                    "type": "object"
+                },
+                "typeString": {
                     "type": "string"
-                }
+                },
+                "typeStringUnique": {
+                    "type": "string"
+                },
             },
             "required": [
                 "propRequired"
@@ -1980,7 +2067,7 @@
                         "required": true,
                         "type": "string",
                         "x-swgg-apiKey": true,
-                        "x-swgg-$ref": "x-test-param"
+                        "x-swgg-$ref": "#/x-swgg-parameters/x-test-param"
                     }
                 ],
                 "summary": "test default-param handling-behavior",
@@ -2108,7 +2195,7 @@
         "operationId.x-test.crudSetOneById.id.id": {
             "_schemaName": "TestCrud"
         },
-        "operationId.x-test.crudSetOneById.propStringUnique.propStringUnique": {
+        "operationId.x-test.crudSetOneById.typeStringUnique.typeStringUnique": {
             "_schemaName": "TestCrud"
         },
         "operationId.x-test.crudUpdateOneById.id.id": {
@@ -2175,7 +2262,7 @@
             idIndexCreateList: [{
                 name: 'id'
             }, {
-                name: 'propStringUnique'
+                name: 'typeStringUnique'
             }],
             name: 'TestCrud'
         }, {
@@ -2209,11 +2296,13 @@
             name: 'File'
         }];
         // run validation test
-        local.testCase_validateByParamDefList_default(null, local.onErrorDefault);
-        local.testCase_validateByParamDefList_error(null, local.onErrorDefault);
-        local.testCase_validateByParamDefList_formData(null, local.onErrorDefault);
-        local.testCase_validateBySchema_default(null, local.onErrorDefault);
-        local.testCase_validateBySchema_error(null, local.onErrorDefault);
-        local.testCase_validateBySwagger_default(null, local.onErrorDefault);
+        local.tryCatchOnError(function () {
+            local.testCase_validateBySwaggerJson_default(null, local.onErrorDefault);
+            local.testCase_validateBySwaggerParameters_default(null, local.onErrorDefault);
+            local.testCase_validateBySwaggerParameters_error(null, local.onErrorDefault);
+            local.testCase_validateBySwaggerParameters_formData(null, local.onErrorDefault);
+            local.testCase_validateBySwaggerSchema_default(null, local.onErrorDefault);
+            local.testCase_validateBySwaggerSchema_error(null, local.onErrorDefault);
+        }, console.error);
     }());
 }());

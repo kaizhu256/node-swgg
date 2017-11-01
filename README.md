@@ -1,7 +1,7 @@
 # swgg
 this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend), with a working web-demo
 
-# live web-demo
+# live web demo
 - [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app)
 
 [![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.deployGithub.browser.%252Fnode-swgg%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app)
@@ -59,6 +59,9 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 #### todo
 - npm publish 2017.10.29
+- validate default against type in function validateBySwaggerSchema
+- add xml support for wechat
+- add property parameters.x-swgg-persist to persist to localStorage
 - revamp datatable with card-expansion ui
 - datatable - allow optional sub-level input for swagger-models
 - add authorization-header hook
@@ -70,9 +73,19 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 #### changelog for v2017.10.29
 - merge properties paramDef.x-swgg-example and paramDef.default -> paramDef.default
-- modify function swaggerParamDictNormalize to only set default-value if required (or modeDefault flag is enabled)
+- modify function normalizeSwaggerParamDict to only set default-value if required (or modeDefault flag is enabled)
+- rename function schemaNormalizeAndCopy -> normalizeSwaggerSchema
+- rename function swaggerParamDictNormalize -> normalizeSwaggerParamDict
+- rename function swaggerJsonNormalize -> normalizeSwaggerJson
+- rename function validateByParamDefList -> validateBySwaggerParameters
+- rename function validateByPropDef -> validateBySwaggerProperties
+- rename function validateBySchema -> validateBySwaggerSchema
+- rename function validateBySwagger -> validateBySwaggerJson
+- rename pathObject -> operation
 - rename x-swgg-definitionsParameters -> x-swgg-parameters
-- rename x-swgg-ref -> x-swgg-$ref
+- rename x-swgg-ref -> x-swgg-\$ref
+- remove unused defer-routine
+- revamp function validateBySwaggerSchema
 - none
 
 #### this package requires
