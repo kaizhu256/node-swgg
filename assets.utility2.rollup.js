@@ -376,6 +376,9 @@
                     case 'alphanumeric':
                         value = value.replace((/\W/g), '_');
                         break;
+                    case 'br':
+                        value = value.replace((/\n/g), '<br>');
+                        break;
                     case 'decodeURIComponent':
                         value = decodeURIComponent(value);
                         break;
@@ -410,12 +413,15 @@
          * this function will try to run the fnc in a try-catch block,
          * else call onError with the errorCaught
          */
+            var result;
             // validate onError
             local.assert(typeof onError === 'function', typeof onError);
             try {
                 // reset errorCaught
                 local._debugTryCatchErrorCaught = null;
-                return fnc();
+                result = fnc();
+                local._debugTryCatchErrorCaught = null;
+                return result;
             } catch (errorCaught) {
                 // debug errorCaught
                 local._debugTryCatchErrorCaught = errorCaught;
@@ -795,7 +801,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             local.apidocModuleDictAdd(options, options.moduleDict);
             // init swgg.apiDict
             Object.keys((moduleMain.swgg && moduleMain.swgg.apiDict) || {}).forEach(function (key) {
-                tmp = options.env.npm_package_name + '.swgg.apiDict';
+                tmp = 'swgg.apiDict';
                 tmp = options.moduleDict[tmp] = options.moduleDict[tmp] || {};
                 tmp[key + '.ajax'] = moduleMain.swgg.apiDict[key] &&
                     moduleMain.swgg.apiDict[key].ajax;
@@ -1281,7 +1287,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 return JSON.stringify(element);
             };
             circularList = [];
-            return JSON.stringify(element && typeof element === 'object'
+            return JSON.stringify(typeof element === 'object' && element
                 // recurse
                 ? JSON.parse(stringify(element))
                 : element, replacer, space);
@@ -1316,7 +1322,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
          */
             switch (type) {
             case 'dict':
-                return value && typeof value === 'object' && !Array.isArray(value)
+                return typeof value === 'object' && value && !Array.isArray(value)
                     ? value
                     : valueDefault || {};
             case 'list':
@@ -2054,7 +2060,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             /*
              * this function will recursively normalize dbRow
              */
-                if (dbRow && typeof dbRow === 'object') {
+                if (typeof dbRow === 'object' && dbRow) {
                     Object.keys(dbRow).forEach(function (key) {
                         // remove invalid property
                         if (key[0] === '$' || key.indexOf('.') >= 0 || dbRow[key] === null) {
@@ -2067,7 +2073,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                     });
                 }
             };
-            dbRow = local.jsonCopy(dbRow && typeof dbRow === 'object'
+            dbRow = local.jsonCopy(typeof dbRow === 'object' && dbRow
                 ? dbRow
                 : {});
             // update timestamp
@@ -2560,7 +2566,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             value = dbRow;
             key = String(key).split('.');
             // optimization - for-loop
-            for (ii = 0; ii < key.length && value && typeof value === 'object'; ii += 1) {
+            for (ii = 0; ii < key.length && typeof value === 'object' && value; ii += 1) {
                 value = value[key[ii]];
             }
             return value === undefined
@@ -2692,7 +2698,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             // optimization - convert to boolean
             not = !!not;
             result = dbRowList;
-            if (!(query && typeof query === 'object')) {
+            if (!(typeof query === 'object' && query)) {
                 result = local.dbRowListGetManyByOperator(result, fieldName, '$eq', query, not);
                 return result;
             }
@@ -14303,10 +14309,10 @@ local.assetsDict['/assets.index.template.html'] = '\
 body {\n\
     background: #dde;\n\
     font-family: Arial, Helvetica, sans-serif;\n\
-    margin: 2rem;\n\
+    margin: 20px;\n\
 }\n\
 body > * {\n\
-    margin-bottom: 1rem;\n\
+    margin-bottom: 10px;\n\
 }\n\
 body > button {\n\
     width: 20rem;\n\
@@ -14333,7 +14339,6 @@ button {\n\
     width: 2rem;\n\
 }\n\
 .utility2FooterDiv {\n\
-    margin-top: 20px;\n\
     text-align: center;\n\
 }\n\
 .zeroPixel {\n\
@@ -14782,7 +14787,7 @@ local.assetsDict['/assets.readme.template.md'] = '\
 # jslint-lite\n\
 the greatest app in the world!\n\
 \n\
-# live demo\n\
+# live web demo\n\
 - [https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app/](https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app)\n\
 \n\
 [![screenshot](https://kaizhu256.github.io/node-jslint-lite/build/screenshot.deployGithub.browser.%252Fnode-jslint-lite%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app)\n\
@@ -15147,57 +15152,55 @@ local.assetsDict['/assets.testReport.template.html'] = '\
 <div class="testReportDiv">\n\
 <style>\n\
 /*csslint\n\
-    adjoining-classes: false\n\
 */\n\
 .testReportDiv {\n\
     font-family: Arial, Helvetica, sans-serif;\n\
 }\n\
-.testReportFooterDiv {\n\
-    margin-top: 20px;\n\
-    text-align: center;\n\
-}\n\
-.testReportPlatformDiv {\n\
-    background: #fff;\n\
-    border: 1px solid black;\n\
-    margin-top: 20px;\n\
-    padding: 0 10px 10px 10px;\n\
-    text-align: left;\n\
-}\n\
-.testReportPlatformDiv .displayNone {\n\
+.testReportDiv .displayNone {\n\
     display: none;\n\
 }\n\
-.testReportPlatformDiv img {\n\
+.testReportDiv .footer {\n\
+    text-align: center;\n\
+}\n\
+.testReportDiv img {\n\
     border: 1px solid black;\n\
     margin: 5px 0 5px 0;\n\
     max-height: 256px;\n\
     max-width: 512px;\n\
 }\n\
-.testReportPlatformDiv pre {\n\
+.testReportDiv .platform {\n\
+    background: #fff;\n\
+    border: 1px solid black;\n\
+    margin-bottom: 20px;\n\
+    padding: 0 10px 10px 10px;\n\
+    text-align: left;\n\
+}\n\
+.testReportDiv pre {\n\
     background: #fdd;\n\
     border-top: 1px solid black;\n\
     margin-bottom: 0;\n\
     padding: 10px;\n\
     white-space: pre-wrap;\n\
 }\n\
-.testReportPlatformDiv span {\n\
+.testReportDiv span {\n\
     display: inline-block;\n\
     width: 120px;\n\
 }\n\
-.testReportPlatformDiv.summary {\n\
+.testReportDiv .summary {\n\
     background: #bfb;\n\
 }\n\
-.testReportPlatformDiv table {\n\
+.testReportDiv table {\n\
     border-top: 1px solid black;\n\
     text-align: left;\n\
     width: 100%;\n\
 }\n\
-.testReportPlatformDiv table > tbody > tr:nth-child(odd) {\n\
+.testReportDiv table > tbody > tr:nth-child(odd) {\n\
     background: #bfb;\n\
 }\n\
-.testReportPlatformDiv .testFailed {\n\
+.testReportDiv .testFailed {\n\
     background: #f99;\n\
 }\n\
-.testReportPlatformDiv .testPending {\n\
+.testReportDiv .testPending {\n\
     background: #99f;\n\
 }\n\
 </style>\n\
@@ -15208,7 +15211,7 @@ local.assetsDict['/assets.testReport.template.html'] = '\
         {{/if env.npm_package_homepage}}\n\
     >{{env.npm_package_name}} (v{{env.npm_package_version}})</a>\n\
 </h1>\n\
-<div class="testReportPlatformDiv summary">\n\
+<div class="platform summary">\n\
 <h2>summary</h2>\n\
 <h4>\n\
     <span>version</span>-\n\
@@ -15239,7 +15242,7 @@ local.assetsDict['/assets.testReport.template.html'] = '\
 </table>\n\
 </div>\n\
 {{#each testPlatformList}}\n\
-<div class="testReportPlatformDiv">\n\
+<div class="platform">\n\
 <h4>\n\
     {{testPlatformNumber}}. {{name htmlSafe}}<br>\n\
     {{#if screenshot}}\n\
@@ -15278,7 +15281,7 @@ local.assetsDict['/assets.testReport.template.html'] = '\
 </pre>\n\
 </div>\n\
 {{/each testPlatformList}}\n\
-<div class="testReportFooterDiv">\n\
+<div class="footer">\n\
     [ this document was created with\n\
     <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>\n\
     ]\n\
@@ -15558,7 +15561,6 @@ local.assetsDict['/favicon.ico'] = '';
          * overwhelmed by a fast readable stream
          */
             this.on('data', function (chunk) {
-                chunk = local.normalizeChunk(chunk);
                 writable.write(chunk);
             });
             this.on('end', function () {
@@ -17488,7 +17490,7 @@ return Utf8ArrayToStr(bff);
                 // save assets.swgg.swagger.json
                 local.fs.writeFileSync('assets.swgg.swagger.json', local.jsonStringifyOrdered(
                     // normalize assets.swgg.swagger.json
-                    local.objectSetOverride(local.swgg.swaggerJsonNormalize(JSON.parse(
+                    local.objectSetOverride(local.swgg.normalizeSwaggerJson(JSON.parse(
                         // read assets.swgg.swagger.json
                         local.fs.readFileSync('assets.swgg.swagger.json', 'utf8')
                     )), { info: {
@@ -17507,8 +17509,8 @@ return Utf8ArrayToStr(bff);
                 (/.*?\n.*?\n/),
                 // customize cdn-download
                 (/\n# cdn download\n[\S\s]*?\n\n\n\n/),
-                // customize demo
-                (/\n# live demo\n[\S\s]*?\n\n\n\n/),
+                // customize live web demo
+                (/\n# live web demo\n[\S\s]*?\n\n\n\n/),
                 // customize todo
                 (/\n#### todo\n[\S\s]*?\n\n\n\n/),
                 // customize quickstart-example-js
@@ -17537,19 +17539,28 @@ return Utf8ArrayToStr(bff);
                 });
             });
             // customize swaggerdoc
-            if (process.env.npm_package_name === 'utility2' ||
-                    !local.assetsDict['/assets.swgg.swagger.json'] ||
-                    (/\bswggUiContainer\b/).exec(local.assetsDict['/index.html'])) {
+            if (!local.assetsDict['/assets.swgg.swagger.json'] ||
+                    (/\bswggUiContainer\b/).test(local.assetsDict['/index.html']) ||
+                    process.env.npm_package_name === 'utility2') {
                 options.dataTo = options.dataTo.replace((/\n#### swagger doc\n[\S\s]*?\n#### /),
                     '\n#### ');
             }
+            // customize example.js
+            if (local.assetsDict['/index.html']
+                    .indexOf('<script src="assets.example.js"></script>') < 0) {
+                options.dataTo = options.dataTo.replace(
+                    (/\n {4}case 'browser':\n[\S\s]+?\n {8}break;\n/g),
+                    "\n    case 'browser':\n        break;\n"
+                );
+            }
             // customize comment
-            options.dataFrom.replace(
-                (/^( *?)(?:#!\! |#\/\/ |\/\/!\! )(.*?)$/gm),
-                function (match0, match1, match2) {
-                    options.dataTo = options.dataTo.replace(match1 + match2, match0);
-                }
-            );
+            options.dataFrom.replace((/^( *?)(?:#!\! |#\/\/ |\/\/!\! )(.*?)$/gm), function (
+                match0,
+                match1,
+                match2
+            ) {
+                options.dataTo = options.dataTo.replace(match1 + match2, match0);
+            });
             options.customize();
             // customize shDeployCustom
             if (options.dataFrom.indexOf(' shDeployCustom\n') >= 0) {
@@ -18200,7 +18211,6 @@ return Utf8ArrayToStr(bff);
                 chunkList = [];
                 response
                     .on('data', function (chunk) {
-                        chunk = local.normalizeChunk(chunk);
                         chunkList.push(chunk);
                     })
                     .on('end', function () {
@@ -18329,7 +18339,7 @@ return Utf8ArrayToStr(bff);
                 return JSON.stringify(element);
             };
             circularList = [];
-            return JSON.stringify(element && typeof element === 'object'
+            return JSON.stringify(typeof element === 'object' && element
                 // recurse
                 ? JSON.parse(stringify(element))
                 : element, replacer, space);
@@ -18373,7 +18383,7 @@ return Utf8ArrayToStr(bff);
                 data,
                 { adata: local.sjcl.codec.base64url.toBits(adata), ks: 256, mode: 'gcm' }
             ));
-            return local.jwtBase64UrlNormalize('eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..' +
+            return local.normalizeJwtBase64Url('eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..' +
                 data.iv + '.' + data.ct + '.' + adata);
         };
 
@@ -18381,7 +18391,7 @@ return Utf8ArrayToStr(bff);
         /*
          * this function will create a random, aes-256-base64url-jwt-key
          */
-            return local.jwtBase64UrlNormalize(
+            return local.normalizeJwtBase64Url(
                 local.base64FromBuffer(local.bufferRandomBytes(32))
             );
         };
@@ -18395,16 +18405,6 @@ return Utf8ArrayToStr(bff);
             local.env.npm_config_jwtAes256Key = local.env.npm_config_jwtAes256Key ||
                 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
             return key || local.env.npm_config_jwtAes256Key;
-        };
-
-        local.jwtBase64UrlNormalize = function (text) {
-        /*
-         * this function will normlize the text to base64url format
-         */
-            return text
-                .replace((/\=/g), '')
-                .replace((/\+/g), '-')
-                .replace((/\//g), '_');
         };
 
         local.jwtHs256Decode = function (token, key) {
@@ -18442,27 +18442,12 @@ return Utf8ArrayToStr(bff);
          * with the given base64-encode key
          */
             data = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
-                local.jwtBase64UrlNormalize(local.base64FromString(JSON.stringify(data)));
+                local.normalizeJwtBase64Url(local.base64FromString(JSON.stringify(data)));
             return data + '.' + local.sjcl.codec.base64url.fromBits(
                 new local.sjcl.misc.hmac(local.sjcl.codec.base64url.toBits(
                     local.jwtAes256KeyInit(key)
                 )).encrypt(data)
             );
-        };
-
-        local.jwtNormalize = function (data) {
-        /*
-         * https://tools.ietf.org/html/rfc7519#section-4.1
-         * this function will normalize the jwt-data with registered-headers
-         */
-            var timeNow;
-            timeNow = Date.now() / 1000;
-            return local.objectSetDefault(data, {
-                exp: timeNow + 5 * 60,
-                iat: timeNow,
-                jti: Math.random().toString(16).slice(2),
-                nbf: timeNow
-            });
         };
 
         local.listGetElementRandom = function (list) {
@@ -18516,7 +18501,7 @@ return Utf8ArrayToStr(bff);
                 case 1:
                     // skip gzip
                     if (response.headersSent ||
-                            !(/\bgzip\b/).exec(request.headers['accept-encoding'])) {
+                            !(/\bgzip\b/).test(request.headers['accept-encoding'])) {
                         options.modeNext += 1;
                         options.onNext();
                         return;
@@ -18829,13 +18814,38 @@ return Utf8ArrayToStr(bff);
             return chunk || '';
         };
 
+        local.normalizeJwt = function (data) {
+        /*
+         * https://tools.ietf.org/html/rfc7519#section-4.1
+         * this function will normalize the jwt-data with registered-headers
+         */
+            var timeNow;
+            timeNow = Date.now() / 1000;
+            return local.objectSetDefault(data, {
+                exp: timeNow + 5 * 60,
+                iat: timeNow,
+                jti: Math.random().toString(16).slice(2),
+                nbf: timeNow
+            });
+        };
+
+        local.normalizeJwtBase64Url = function (text) {
+        /*
+         * this function will normlize the text to base64url format
+         */
+            return text
+                .replace((/\=/g), '')
+                .replace((/\+/g), '-')
+                .replace((/\//g), '_');
+        };
+
         local.normalizeValue = function (type, value, valueDefault) {
         /*
          * this function will normalize the value by type
          */
             switch (type) {
             case 'dict':
-                return value && typeof value === 'object' && !Array.isArray(value)
+                return typeof value === 'object' && value && !Array.isArray(value)
                     ? value
                     : valueDefault || {};
             case 'list':
@@ -18877,7 +18887,7 @@ return Utf8ArrayToStr(bff);
          * with its object literal [key, value]
          */
             local.objectTraverse(arg, function (element) {
-                if (element && typeof element === 'object' && !Array.isArray(element)) {
+                if (typeof element === 'object' && element && !Array.isArray(element)) {
                     Object.keys(element).forEach(function (key) {
                         if (key.indexOf('$[]') === 0) {
                             element[element[key][0]] = element[key][1];
@@ -18973,9 +18983,7 @@ return Utf8ArrayToStr(bff);
          */
             onSelf(arg);
             circularList = circularList || [];
-            if (arg &&
-                    typeof arg === 'object' &&
-                    circularList.indexOf(arg) < 0) {
+            if (arg && typeof arg === 'object' && circularList.indexOf(arg) < 0) {
                 circularList.push(arg);
                 Object.keys(arg).forEach(function (key) {
                     // recurse with arg[key]
@@ -19367,7 +19375,6 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             process.stdout._writeDefault = process.stdout._writeDefault ||
                 process.stdout._write;
             process.stdout._write = function (chunk, encoding, callback) {
-                chunk = local.normalizeChunk(chunk);
                 process.stdout._writeDefault(chunk, encoding, callback);
                 // coverage-hack - ignore else-statement
                 self.nop(self.socket.writable && (function () {
@@ -19468,9 +19475,11 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                                 local.assert(!error, error);
                                 // coverage-hack - ignore else-statement
                                 local.nop(local.swgg &&
-                                    local.swgg.validateBySwagger &&
+                                    local.swgg.validateBySwaggerJson &&
                                     (function () {
-                                        local.swgg.validateBySwagger(JSON.parse(data));
+                                        local.swgg.validateBySwaggerJson({
+                                            swaggerJson: JSON.parse(data)
+                                        });
                                     }()));
                             }, console.error);
                         });
@@ -19897,7 +19906,7 @@ instruction\n\
             local.objectSetOverride(local, options, 10);
             // init swgg
             // coverage-hack - ignore else-statement
-            local.nop(local.swgg && local.swgg.apiUpdate(local.swgg.swaggerJson));
+            local.nop(local.swgg && local.swgg.apiUpdate(local.swgg.swaggerJson || {}));
         };
 
         local.streamListCleanup = function (streamList) {
@@ -20126,6 +20135,9 @@ instruction\n\
                     case 'alphanumeric':
                         value = value.replace((/\W/g), '_');
                         break;
+                    case 'br':
+                        value = value.replace((/\n/g), '<br>');
+                        break;
                     case 'decodeURIComponent':
                         value = decodeURIComponent(value);
                         break;
@@ -20345,7 +20357,7 @@ instruction\n\
                 }, 8);
                 // security - handle malformed testReport
                 local.assert(
-                    testReport && typeof testReport === 'object',
+                    typeof testReport === 'object' && testReport,
                     ii + ' invalid testReport ' + typeof testReport
                 );
                 // validate timeElapsed
@@ -20835,12 +20847,15 @@ instruction\n\
          * this function will try to run the fnc in a try-catch block,
          * else call onError with the errorCaught
          */
+            var result;
             // validate onError
             local.assert(typeof onError === 'function', typeof onError);
             try {
                 // reset errorCaught
                 local._debugTryCatchErrorCaught = null;
-                return fnc();
+                result = fnc();
+                local._debugTryCatchErrorCaught = null;
+                return result;
             } catch (errorCaught) {
                 // debug errorCaught
                 local._debugTryCatchErrorCaught = errorCaught;
@@ -21082,7 +21097,7 @@ instruction\n\
         );
         // https://en.wikipedia.org/wiki/E.164
         local.regexpPhoneValidate =
-            (/^(?:\+\d{1,3}[ \-]{0,1}){0,1}(?:\(\d{1,4}\)[ \-]{0,1}){0,1}\d[\d \-]{7,16}$/);
+            (/^(?:\+\d{1,3}[ \-]{0,1}){0,1}(?:\(\d{1,4}\)[ \-]{0,1}){0,1}\d[\d \-]{7,17}$/);
         local.regexpUriComponentCharset = (/[\w\!\%\'\(\)\*\-\.\~]/);
         local.regexpUuidValidate =
             (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
@@ -21334,7 +21349,7 @@ instruction\n\
                     break;
                 case 2:
                     // validate data
-                    local.swgg.validateBySwagger(JSON.parse(data));
+                    local.swgg.validateBySwaggerJson({ swaggerJson: JSON.parse(data) });
                     break;
                 default:
                     local.assert(!error, error);
@@ -21356,8 +21371,9 @@ instruction\n\
         case 'utility2.browserTest':
             break;
         }
-        if (module === require.main && (!local.global.utility2_rollup ||
-                (process.argv[2] && process.argv[2].indexOf('utility2.') === 0))) {
+        if (module === require.main && (!local.global.utility2_rollup || (process.argv[2] &&
+                local.cliDict[process.argv[2]] &&
+                process.argv[2].indexOf('utility2.') === 0))) {
             local.cliRun(local.nop);
             if (local.cliDict[process.argv[2]]) {
                 local.cliDict[process.argv[2]]();
@@ -21581,358 +21597,16 @@ instruction\n\
         local.utility2.swgg = local;
         // init assets and templates
 /* jslint-ignore-begin */
-local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.template.html']
-    .replace('assets.index.default.template.html', '')
-    .replace((/<title>.*?<\/title>/), '<title>swgg</title>')
-    .replace('\n<!-- utility2-comment\n', '\n')
-    .replace((/\n<\/style>\n<style>\n[\S\s]*\n<\/style>\n/), '\
-\n\
-</style>\n\
-<style>\n\
-/*csslint\n\
-    adjoining-classes: false,\n\
-    box-model: false,\n\
-    box-sizing: false,\n\
-    outline-none: false,\n\
-    universal-selector: false\n\
-*/\n\
-/* animate */\n\
-@keyframes uiAnimateShake {\n\
-    100% {\n\
-        transform: translateX(0);\n\
-    }\n\
-    0%, 20%, 60% {\n\
-        transform: translateX(1rem);\n\
-    }\n\
-    40%, 80% {\n\
-        transform: translateX(-1rem);\n\
-    }\n\
-}\n\
-.uiAnimateShake {\n\
-    animation-duration: 500ms;\n\
-    animation-name: uiAnimateShake;\n\
-}\n\
-\n\
-\n\
-\n\
-/* general */\n\
-.swggUiContainer,\n\
-.swggUiContainer * {\n\
-    box-sizing: border-box;\n\
-    margin: 0;\n\
-    padding: 0;\n\
-}\n\
-.swggUiContainer {\n\
-    font-family: Arial, Helvetica, sans-serif;\n\
-    margin-left: auto;\n\
-    margin-right: auto;\n\
-    max-width: 1024px;\n\
-}\n\
-.swggUiContainer > * {\n\
-    margin-top: 1rem;\n\
-}\n\
-.swggUiContainer a,\n\
-.swggUiContainer input,\n\
-.swggUiContainer span {\n\
-    min-height: 1.5rem;\n\
-}\n\
-.swggUiContainer button {\n\
-    padding: 0.5rem;\n\
-}\n\
-.swggUiContainer .color777 {\n\
-    color: #777;\n\
-}\n\
-.swggUiContainer button,\n\
-.swggUiContainer .cursorPointer,\n\
-.swggUiContainer .cursorPointer input {\n\
-    cursor: pointer;\n\
-}\n\
-.swggUiContainer .code,\n\
-.swggUiContainer .operation > .content .code {\n\
-    background: #ddd;\n\
-    border: 1px solid #777;\n\
-    color: #555;\n\
-    max-height: 50rem;\n\
-}\n\
-.swggUiContainer .flex1 {\n\
-    flex: 1;\n\
-}\n\
-.swggUiContainer .fontLineThrough {\n\
-    text-decoration: line-through;\n\
-}\n\
-.swggUiContainer .fontWeightBold {\n\
-    font-weight: bold;\n\
-}\n\
-.swggUiContainer .header a {\n\
-    text-decoration: none;\n\
-}\n\
-.swggUiContainer .header a:hover {\n\
-    color: black;\n\
-}\n\
-.swggUiContainer input {\n\
-    height: 1.5rem;\n\
-    padding-left: 0.25rem;\n\
-    padding-right: 0.25rem;\n\
-}\n\
-.swggUiContainer .marginTop05 {\n\
-    margin-top: 0.5rem;\n\
-}\n\
-.swggUiContainer .marginTop10 {\n\
-    margin-top: 1rem;\n\
-}\n\
-.swggUiContainer select[multiple] {\n\
-    height: 10rem;\n\
-}\n\
-.swggUiContainer pre,\n\
-.swggUiContainer textarea {\n\
-    font-family: Menlo, Monaco, Consolas, Courier New, monospace;\n\
-    font-size: small;\n\
-    line-height: 1.25rem;\n\
-    max-height: 20rem;\n\
-    min-height: 1.75rem;\n\
-    overflow: auto;\n\
-    padding: 0.25rem;\n\
-    white-space: pre;\n\
-}\n\
-.swggUiContainer .tr {\n\
-    display: flex;\n\
-}\n\
-.swggUiContainer .tr > * {\n\
-    margin-left: 1rem;\n\
-    overflow: auto;\n\
-    padding-top: 0.1rem;\n\
-    word-wrap: break-word;\n\
-}\n\
-.swggUiContainer .tr > *:first-child {\n\
-    margin-left: 0;\n\
-}\n\
-.swggUiContainer .tr > * > * {\n\
-    width: 100%;\n\
-}\n\
-\n\
-\n\
-\n\
-/* border */\n\
-/* border-bottom-bold */\n\
-.swggUiContainer .borderBottom {\n\
-    border-bottom: 1px solid #777;\n\
-    margin-bottom: 0.5rem;\n\
-    padding-bottom: 0.5rem;\n\
-}\n\
-/* border-top */\n\
-.swggUiContainer .borderTop,\n\
-.swggUiContainer .resourceList {\n\
-    border-top: 1px solid #777;\n\
-    margin-top: 0.5rem;\n\
-    padding-top: 0.5rem;\n\
-}\n\
-/* border-error*/\n\
-.swggUiContainer .error,\n\
-.swggUiContainer .operation > .content .error {\n\
-    border: 5px solid #b00;\n\
-}\n\
-\n\
-\n\
-\n\
-/* section */\n\
-.swggUiContainer > .header {\n\
-    background: #8c0;\n\
-    padding: 0.5rem;\n\
-}\n\
-.swggUiContainer > .header > .td1 {\n\
-    font-size: x-large;\n\
-    background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAqRJREFUeNrEVz1s00AUfnGXii5maMXoEUEHVwIpEkPNgkBdMnQoU5ytiKHJwpp2Q2JIO8DCUDOxIJFIVOoWZyJSh3pp1Q2PVVlcCVBH3ufeVZZ9Zye1Ay86nXV+ue/9fO/lheg/Se02X1rvksmbnTiKvuxQMBNgBnN4a/LCbmnUAP6JV58NCUsBC8CuAJxGPF47OgNqBaA93tolUhnx6jC4NxGwyOEwlccyAs+3kwdzKq0HDn2vEBTi8J2XpyMaywNDE157BhXUE3zJhlq8GKq+Zd2zaWHepPA8oN9XkfLmRdOiJV4XUUg/IyWncLjCYY/SHndV2u7zHr3bPKZtdxgboJOnthvrfGj/oMf3G0r7JVmNlLfKklmrt2MvvcNO7LFOhoFHfuAJI5o6ta10jpt5CQLgwXhXG2YIwvu+34qf78ybOjWTnWwkgR36d7JqJOrW0hHmNrKg9xhiS4+1jFmrxymh03B0w+6kURIAu3yHtOD5oaUNojMnGgbcctNvwdAnyxvxRR+/vaJnjzbpzcZX+nN1SdGv85i9eH8w3qPO+mdm/y4dnQ1iI8Fq6Nf4cxL6GWSjiFDSs0VRnxC5g0xSB2cgHpaseTxfqOv5uoHkNQ6Ha/N1Yz9mNMppEkEkYKj79q6uCq4bCHcSX3fJ0Vk/k9siASjCm1N6gZH6Ec9IXt2WkFES2K/ixoIyktJPAu/ptOA1SgO5zqtr6KASJPF0nMV8dgMsRhRPOcMwqQAOoi0VAIMLAEWJ6YYC1c8ibj1GP51RqwzYwZVMHQuvOzMCBUtb2tGHx5NAdLKqp5AX7Ng4d+Zi8AGDI9z1ijx9yaCH04y3GCP2S+QcvaGl+pcxyUBvinFlawoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=) no-repeat left center;\n\
-    padding-left: 2.5rem;\n\
-    color: white;\n\
-}\n\
-.swggUiContainer > .header > .td2 {\n\
-    font-size: medium;\n\
-    height: 2rem;\n\
-}\n\
-.swggUiContainer > .header > .td3 {\n\
-    border: 0;\n\
-    color: #fff;\n\
-    padding: 6px 8px;\n\
-    background: #580;\n\
-}\n\
-.swggUiContainer > .info > * {\n\
-    margin-top: 1rem;\n\
-}\n\
-.swggUiContainer > .info a {\n\
-    color: #370;\n\
-}\n\
-.swggUiContainer > .info > .fontWeightBold {\n\
-    font-size: x-large;\n\
-}\n\
-.swggUiContainer > .info > ul {\n\
-    margin-left: 2rem;\n\
-}\n\
-.swggUiContainer .operation {\n\
-    background: #dfd;\n\
-    font-size: smaller;\n\
-}\n\
-.swggUiContainer .operation > .content {\n\
-    padding: 1rem;\n\
-}\n\
-.swggUiContainer .operation > .content .label {\n\
-    color: #0b0;\n\
-}\n\
-.swggUiContainer .operation > .content pre {\n\
-    border: 1px solid #bbb;\n\
-    background: #ffd;\n\
-}\n\
-.swggUiContainer .operation > .content .tr {\n\
-    margin-left: 0.5rem;\n\
-}\n\
-.swggUiContainer .operation > .header:focus,\n\
-.swggUiContainer .operation > .header:hover {\n\
-    background: #bfb;\n\
-    outline: none;\n\
-}\n\
-.swggUiContainer .operation > .header > span {\n\
-    padding: 2px 0 2px 0;\n\
-}\n\
-.swggUiContainer .operation > .header > span:first-child {\n\
-    margin-left: 0;\n\
-}\n\
-.swggUiContainer .operation > .header > .td1 {\n\
-    background: #777;\n\
-    color: white;\n\
-    padding-top: 5px;\n\
-    height: 1.5rem;\n\
-    text-align: center;\n\
-    width: 5rem;\n\
-}\n\
-.swggUiContainer .operation .paramDef pre,\n\
-.swggUiContainer .operation .paramDef textarea {\n\
-    height: 10rem;\n\
-}\n\
-.swggUiContainer .operation .paramDef > .td1 {\n\
-    flex: 2;\n\
-}\n\
-.swggUiContainer .operation .paramDef > .td2 {\n\
-    flex: 1;\n\
-}\n\
-.swggUiContainer .operation .paramDef > .td3 {\n\
-    flex: 4;\n\
-}\n\
-.swggUiContainer .operation .paramDef > .td4 {\n\
-    flex: 3;\n\
-}\n\
-.swggUiContainer .operation .responseList > .td1 {\n\
-    flex: 1;\n\
-}\n\
-.swggUiContainer .operation .responseList > .td2 {\n\
-    flex: 4;\n\
-}\n\
-.swggUiContainer .resource > .header {\n\
-    outline: none;\n\
-}\n\
-.swggUiContainer .resource > .header > .td1 {\n\
-    font-size: large;\n\
-}\n\
-.swggUiContainer .resource > .header > .td2 {\n\
-    border-left: 1px solid;\n\
-    border-right: 1px solid;\n\
-    padding-left: 1rem;\n\
-    padding-right: 1rem;\n\
-}\n\
-\n\
-\n\
-\n\
-/* method */\n\
-.swggUiContainer .operation.DELETE > .header > .td1 {\n\
-    background: #b00;\n\
-}\n\
-.swggUiContainer .operation.GET > .header > .td1 {\n\
-    background: #093;\n\
-}\n\
-.swggUiContainer .operation.HEAD > .header > .td1 {\n\
-    background: #f30;\n\
-}\n\
-.swggUiContainer .operation.PATCH > .header > .td1 {\n\
-    background: #b0b;\n\
-}\n\
-.swggUiContainer .operation.POST > .header > .td1 {\n\
-    background: #07b;\n\
-}\n\
-.swggUiContainer .operation.PUT > .header > .td1 {\n\
-    background: #70b;\n\
-}\n\
-</style>\n\
-')
-    .replace((/\n<\/script>\n[\S\s]*\n<\/html>\n/), '\
-\n\
-</script>\n\
-<div class="swggUiContainer">\n\
-<div class="eventDelegateKeyup eventDelegateSubmit form header onEventUiReload tr">\n\
-    <a class="td1" href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
-    <input\n\
-        class="flex1 td2"\n\
-        placeholder="http://petstore.swagger.io/v2/swagger.json"\n\
-        type="text"\n\
-    >\n\
-    <input\n\
-        class="td2"\n\
-        id="swggApiKeyInput1"\n\
-        placeholder="api-key"\n\
-        style="width: 8rem;"\n\
-        type="text"\n\
-    >\n\
-    <button class="eventDelegateClick onEventUiReload td3">Explore</button>\n\
-    <button\n\
-        class="eventDelegateClick onEventUiReload td3"\n\
-        id="swggApiKeyClearButton1"\n\
-    >Clear api-keys</button>\n\
-</div>\n\
-<div class="info reset">\n\
-</div>\n\
-<pre class="code" id="swggAjaxProgressPre1">\n\
-</pre>\n\
-<div class="color777 reset">\n\
-</div>\n\
-<div id="swggAjaxProgressDiv1" style="text-align: center;"><span>loading script &nbsp;</span><span class="uiAnimateSpin"></span></div>\n\
-</div>\n\
-<div class="utility2FooterDiv">\n\
-    [ this document was created with\n\
-    <a href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
-    ]\n\
-</div>\n\
-<script>\n\
-/*jslint\n\
-    bitwise: true,\n\
-    browser: true,\n\
-    maxerr: 8,\n\
-    maxlen: 100,\n\
-    node: true,\n\
-    nomen: true,\n\
-    regexp: true,\n\
-    stupid: true\n\
-*/\n\
-"use strict";\n\
-document.querySelector(".swggUiContainer > .header > .td2").value =\n\
-    ((/\\bmodeSwaggerJsonUrl=([^&]+)/g).exec(location.search) || {})[1] ||\n\
-        "assets.swgg.swagger.json";\n\
-</script>\n\
-<script src="assets.utility2.rollup.js"></script>\n\
-<script>window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });</script>\n\
-</body>\n\
-</html>\n\
-');
-
-
-
-
-// https://github.com/json-schema-org/json-schema-org.github.io/blob/master/draft-04/schema
-// curl -Ls https://raw.githubusercontent.com/json-schema-org/json-schema-org.github.io/master/draft-04/schema > /tmp/aa.json; node -e "console.log(JSON.stringify(require('/tmp/aa.json')));"
+// https://github.com/json-schema-org/json-schema-org.github.io/blob/eb4805e94c3e27932352344767d19cc4c3c3381c/draft-04/schema
+// curl -Ls https://raw.githubusercontent.com/json-schema-org/json-schema-org.github.io/eb4805e94c3e27932352344767d19cc4c3c3381c/draft-04/schema > /tmp/aa.json; node -e "console.log(JSON.stringify(require('/tmp/aa.json')));"
 local.assetsDict['/assets.swgg.json-schema.json'] = JSON.stringify(
 {"id":"http://json-schema.org/draft-04/schema#","$schema":"http://json-schema.org/draft-04/schema#","description":"Core schema meta-schema","definitions":{"schemaArray":{"type":"array","minItems":1,"items":{"$ref":"#"}},"positiveInteger":{"type":"integer","minimum":0},"positiveIntegerDefault0":{"allOf":[{"$ref":"#/definitions/positiveInteger"},{"default":0}]},"simpleTypes":{"enum":["array","boolean","integer","null","number","object","string"]},"stringArray":{"type":"array","items":{"type":"string"},"minItems":1,"uniqueItems":true}},"type":"object","properties":{"id":{"type":"string","format":"uri"},"$schema":{"type":"string","format":"uri"},"title":{"type":"string"},"description":{"type":"string"},"default":{},"multipleOf":{"type":"number","minimum":0,"exclusiveMinimum":true},"maximum":{"type":"number"},"exclusiveMaximum":{"type":"boolean","default":false},"minimum":{"type":"number"},"exclusiveMinimum":{"type":"boolean","default":false},"maxLength":{"$ref":"#/definitions/positiveInteger"},"minLength":{"$ref":"#/definitions/positiveIntegerDefault0"},"pattern":{"type":"string","format":"regex"},"additionalItems":{"anyOf":[{"type":"boolean"},{"$ref":"#"}],"default":{}},"items":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/schemaArray"}],"default":{}},"maxItems":{"$ref":"#/definitions/positiveInteger"},"minItems":{"$ref":"#/definitions/positiveIntegerDefault0"},"uniqueItems":{"type":"boolean","default":false},"maxProperties":{"$ref":"#/definitions/positiveInteger"},"minProperties":{"$ref":"#/definitions/positiveIntegerDefault0"},"required":{"$ref":"#/definitions/stringArray"},"additionalProperties":{"anyOf":[{"type":"boolean"},{"$ref":"#"}],"default":{}},"definitions":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"properties":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"patternProperties":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"dependencies":{"type":"object","additionalProperties":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/stringArray"}]}},"enum":{"type":"array","minItems":1,"uniqueItems":true},"type":{"anyOf":[{"$ref":"#/definitions/simpleTypes"},{"type":"array","items":{"$ref":"#/definitions/simpleTypes"},"minItems":1,"uniqueItems":true}]},"allOf":{"$ref":"#/definitions/schemaArray"},"anyOf":{"$ref":"#/definitions/schemaArray"},"oneOf":{"$ref":"#/definitions/schemaArray"},"not":{"$ref":"#"}},"dependencies":{"exclusiveMaximum":["maximum"],"exclusiveMinimum":["minimum"]},"default":{}}
 );
 
 
 
-// https://github.com/OAI/OpenAPI-Specification/blob/master/schemas/v2.0/schema.json
-// curl -Ls https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/schemas/v2.0/schema.json > /tmp/aa.json; node -e "console.log(JSON.stringify(require('/tmp/aa.json')));"
+// https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/schemas/v2.0/schema.json
+// curl -Ls https://raw.githubusercontent.com/OAI/OpenAPI-Specification/3.0.0/schemas/v2.0/schema.json > /tmp/aa.json; node -e "console.log(JSON.stringify(require('/tmp/aa.json')));"
 local.assetsDict['/assets.swgg.schema.json'] = JSON.stringify(
 {"title":"A JSON Schema for Swagger 2.0 API.","id":"http://swagger.io/v2/schema.json#","$schema":"http://json-schema.org/draft-04/schema#","type":"object","required":["swagger","info","paths"],"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"swagger":{"type":"string","enum":["2.0"],"description":"The Swagger version of this document."},"info":{"$ref":"#/definitions/info"},"host":{"type":"string","pattern":"^[^{}/ :\\\\]+(?::\\d+)?$","description":"The host (name or ip) of the API. Example: 'swagger.io'"},"basePath":{"type":"string","pattern":"^/","description":"The base path to the API. Example: '/api'."},"schemes":{"$ref":"#/definitions/schemesList"},"consumes":{"description":"A list of MIME types accepted by the API.","allOf":[{"$ref":"#/definitions/mediaTypeList"}]},"produces":{"description":"A list of MIME types the API can produce.","allOf":[{"$ref":"#/definitions/mediaTypeList"}]},"paths":{"$ref":"#/definitions/paths"},"definitions":{"$ref":"#/definitions/definitions"},"parameters":{"$ref":"#/definitions/parameterDefinitions"},"responses":{"$ref":"#/definitions/responseDefinitions"},"security":{"$ref":"#/definitions/security"},"securityDefinitions":{"$ref":"#/definitions/securityDefinitions"},"tags":{"type":"array","items":{"$ref":"#/definitions/tag"},"uniqueItems":true},"externalDocs":{"$ref":"#/definitions/externalDocs"}},"definitions":{"info":{"type":"object","description":"General information about the API.","required":["version","title"],"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"title":{"type":"string","description":"A unique and precise title of the API."},"version":{"type":"string","description":"A semantic version number of the API."},"description":{"type":"string","description":"A longer description of the API. Should be different from the title.  GitHub Flavored Markdown is allowed."},"termsOfService":{"type":"string","description":"The terms of service for the API."},"contact":{"$ref":"#/definitions/contact"},"license":{"$ref":"#/definitions/license"}}},"contact":{"type":"object","description":"Contact information for the owners of the API.","additionalProperties":false,"properties":{"name":{"type":"string","description":"The identifying name of the contact person/organization."},"url":{"type":"string","description":"The URL pointing to the contact information.","format":"uri"},"email":{"type":"string","description":"The email address of the contact person/organization.","format":"email"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"license":{"type":"object","required":["name"],"additionalProperties":false,"properties":{"name":{"type":"string","description":"The name of the license type. It's encouraged to use an OSI compatible license."},"url":{"type":"string","description":"The URL pointing to the license.","format":"uri"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"paths":{"type":"object","description":"Relative paths to the individual endpoints. They must be relative to the 'basePath'.","patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"},"^/":{"$ref":"#/definitions/pathItem"}},"additionalProperties":false},"definitions":{"type":"object","additionalProperties":{"$ref":"#/definitions/schema"},"description":"One or more JSON objects describing the schemas being consumed and produced by the API."},"parameterDefinitions":{"type":"object","additionalProperties":{"$ref":"#/definitions/parameter"},"description":"One or more JSON representations for parameters"},"responseDefinitions":{"type":"object","additionalProperties":{"$ref":"#/definitions/response"},"description":"One or more JSON representations for parameters"},"externalDocs":{"type":"object","additionalProperties":false,"description":"information about external documentation","required":["url"],"properties":{"description":{"type":"string"},"url":{"type":"string","format":"uri"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"examples":{"type":"object","additionalProperties":true},"mimeType":{"type":"string","description":"The MIME type of the HTTP message."},"operation":{"type":"object","required":["responses"],"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"tags":{"type":"array","items":{"type":"string"},"uniqueItems":true},"summary":{"type":"string","description":"A brief summary of the operation."},"description":{"type":"string","description":"A longer description of the operation, GitHub Flavored Markdown is allowed."},"externalDocs":{"$ref":"#/definitions/externalDocs"},"operationId":{"type":"string","description":"A unique identifier of the operation."},"produces":{"description":"A list of MIME types the API can produce.","allOf":[{"$ref":"#/definitions/mediaTypeList"}]},"consumes":{"description":"A list of MIME types the API can consume.","allOf":[{"$ref":"#/definitions/mediaTypeList"}]},"parameters":{"$ref":"#/definitions/parametersList"},"responses":{"$ref":"#/definitions/responses"},"schemes":{"$ref":"#/definitions/schemesList"},"deprecated":{"type":"boolean","default":false},"security":{"$ref":"#/definitions/security"}}},"pathItem":{"type":"object","additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"$ref":{"type":"string"},"get":{"$ref":"#/definitions/operation"},"put":{"$ref":"#/definitions/operation"},"post":{"$ref":"#/definitions/operation"},"delete":{"$ref":"#/definitions/operation"},"options":{"$ref":"#/definitions/operation"},"head":{"$ref":"#/definitions/operation"},"patch":{"$ref":"#/definitions/operation"},"parameters":{"$ref":"#/definitions/parametersList"}}},"responses":{"type":"object","description":"Response objects names can either be any valid HTTP status code or 'default'.","minProperties":1,"additionalProperties":false,"patternProperties":{"^([0-9]{3})$|^(default)$":{"$ref":"#/definitions/responseValue"},"^x-":{"$ref":"#/definitions/vendorExtension"}},"not":{"type":"object","additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}}},"responseValue":{"oneOf":[{"$ref":"#/definitions/response"},{"$ref":"#/definitions/jsonReference"}]},"response":{"type":"object","required":["description"],"properties":{"description":{"type":"string"},"schema":{"oneOf":[{"$ref":"#/definitions/schema"},{"$ref":"#/definitions/fileSchema"}]},"headers":{"$ref":"#/definitions/headers"},"examples":{"$ref":"#/definitions/examples"}},"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"headers":{"type":"object","additionalProperties":{"$ref":"#/definitions/header"}},"header":{"type":"object","additionalProperties":false,"required":["type"],"properties":{"type":{"type":"string","enum":["string","number","integer","boolean","array"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormat"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"vendorExtension":{"description":"Any property starting with x- is valid.","additionalProperties":true,"additionalItems":true},"bodyParameter":{"type":"object","required":["name","in","schema"],"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"description":{"type":"string","description":"A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed."},"name":{"type":"string","description":"The name of the parameter."},"in":{"type":"string","description":"Determines the location of the parameter.","enum":["body"]},"required":{"type":"boolean","description":"Determines whether or not this parameter is required or optional.","default":false},"schema":{"$ref":"#/definitions/schema"}},"additionalProperties":false},"headerParameterSubSchema":{"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"required":{"type":"boolean","description":"Determines whether or not this parameter is required or optional.","default":false},"in":{"type":"string","description":"Determines the location of the parameter.","enum":["header"]},"description":{"type":"string","description":"A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed."},"name":{"type":"string","description":"The name of the parameter."},"type":{"type":"string","enum":["string","number","boolean","integer","array"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormat"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"}}},"queryParameterSubSchema":{"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"required":{"type":"boolean","description":"Determines whether or not this parameter is required or optional.","default":false},"in":{"type":"string","description":"Determines the location of the parameter.","enum":["query"]},"description":{"type":"string","description":"A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed."},"name":{"type":"string","description":"The name of the parameter."},"allowEmptyValue":{"type":"boolean","default":false,"description":"allows sending a parameter by name only or with an empty value."},"type":{"type":"string","enum":["string","number","boolean","integer","array"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormatWithMulti"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"}}},"formDataParameterSubSchema":{"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"required":{"type":"boolean","description":"Determines whether or not this parameter is required or optional.","default":false},"in":{"type":"string","description":"Determines the location of the parameter.","enum":["formData"]},"description":{"type":"string","description":"A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed."},"name":{"type":"string","description":"The name of the parameter."},"allowEmptyValue":{"type":"boolean","default":false,"description":"allows sending a parameter by name only or with an empty value."},"type":{"type":"string","enum":["string","number","boolean","integer","array","file"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormatWithMulti"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"}}},"pathParameterSubSchema":{"additionalProperties":false,"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"required":["required"],"properties":{"required":{"type":"boolean","enum":[true],"description":"Determines whether or not this parameter is required or optional."},"in":{"type":"string","description":"Determines the location of the parameter.","enum":["path"]},"description":{"type":"string","description":"A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed."},"name":{"type":"string","description":"The name of the parameter."},"type":{"type":"string","enum":["string","number","boolean","integer","array"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormat"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"}}},"nonBodyParameter":{"type":"object","required":["name","in","type"],"oneOf":[{"$ref":"#/definitions/headerParameterSubSchema"},{"$ref":"#/definitions/formDataParameterSubSchema"},{"$ref":"#/definitions/queryParameterSubSchema"},{"$ref":"#/definitions/pathParameterSubSchema"}]},"parameter":{"oneOf":[{"$ref":"#/definitions/bodyParameter"},{"$ref":"#/definitions/nonBodyParameter"}]},"schema":{"type":"object","description":"A deterministic version of a JSON Schema object.","patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"properties":{"$ref":{"type":"string"},"format":{"type":"string"},"title":{"$ref":"http://json-schema.org/draft-04/schema#/properties/title"},"description":{"$ref":"http://json-schema.org/draft-04/schema#/properties/description"},"default":{"$ref":"http://json-schema.org/draft-04/schema#/properties/default"},"multipleOf":{"$ref":"http://json-schema.org/draft-04/schema#/properties/multipleOf"},"maximum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/maximum"},"exclusiveMaximum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum"},"minimum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/minimum"},"exclusiveMinimum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum"},"maxLength":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveInteger"},"minLength":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"},"pattern":{"$ref":"http://json-schema.org/draft-04/schema#/properties/pattern"},"maxItems":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveInteger"},"minItems":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"},"uniqueItems":{"$ref":"http://json-schema.org/draft-04/schema#/properties/uniqueItems"},"maxProperties":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveInteger"},"minProperties":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"},"required":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/stringArray"},"enum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/enum"},"additionalProperties":{"anyOf":[{"$ref":"#/definitions/schema"},{"type":"boolean"}],"default":{}},"type":{"$ref":"http://json-schema.org/draft-04/schema#/properties/type"},"items":{"anyOf":[{"$ref":"#/definitions/schema"},{"type":"array","minItems":1,"items":{"$ref":"#/definitions/schema"}}],"default":{}},"allOf":{"type":"array","minItems":1,"items":{"$ref":"#/definitions/schema"}},"properties":{"type":"object","additionalProperties":{"$ref":"#/definitions/schema"},"default":{}},"discriminator":{"type":"string"},"readOnly":{"type":"boolean","default":false},"xml":{"$ref":"#/definitions/xml"},"externalDocs":{"$ref":"#/definitions/externalDocs"},"example":{}},"additionalProperties":false},"fileSchema":{"type":"object","description":"A deterministic version of a JSON Schema object.","patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}},"required":["type"],"properties":{"format":{"type":"string"},"title":{"$ref":"http://json-schema.org/draft-04/schema#/properties/title"},"description":{"$ref":"http://json-schema.org/draft-04/schema#/properties/description"},"default":{"$ref":"http://json-schema.org/draft-04/schema#/properties/default"},"required":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/stringArray"},"type":{"type":"string","enum":["file"]},"readOnly":{"type":"boolean","default":false},"externalDocs":{"$ref":"#/definitions/externalDocs"},"example":{}},"additionalProperties":false},"primitivesItems":{"type":"object","additionalProperties":false,"properties":{"type":{"type":"string","enum":["string","number","integer","boolean","array"]},"format":{"type":"string"},"items":{"$ref":"#/definitions/primitivesItems"},"collectionFormat":{"$ref":"#/definitions/collectionFormat"},"default":{"$ref":"#/definitions/default"},"maximum":{"$ref":"#/definitions/maximum"},"exclusiveMaximum":{"$ref":"#/definitions/exclusiveMaximum"},"minimum":{"$ref":"#/definitions/minimum"},"exclusiveMinimum":{"$ref":"#/definitions/exclusiveMinimum"},"maxLength":{"$ref":"#/definitions/maxLength"},"minLength":{"$ref":"#/definitions/minLength"},"pattern":{"$ref":"#/definitions/pattern"},"maxItems":{"$ref":"#/definitions/maxItems"},"minItems":{"$ref":"#/definitions/minItems"},"uniqueItems":{"$ref":"#/definitions/uniqueItems"},"enum":{"$ref":"#/definitions/enum"},"multipleOf":{"$ref":"#/definitions/multipleOf"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"security":{"type":"array","items":{"$ref":"#/definitions/securityRequirement"},"uniqueItems":true},"securityRequirement":{"type":"object","additionalProperties":{"type":"array","items":{"type":"string"},"uniqueItems":true}},"xml":{"type":"object","additionalProperties":false,"properties":{"name":{"type":"string"},"namespace":{"type":"string"},"prefix":{"type":"string"},"attribute":{"type":"boolean","default":false},"wrapped":{"type":"boolean","default":false}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"tag":{"type":"object","additionalProperties":false,"required":["name"],"properties":{"name":{"type":"string"},"description":{"type":"string"},"externalDocs":{"$ref":"#/definitions/externalDocs"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"securityDefinitions":{"type":"object","additionalProperties":{"oneOf":[{"$ref":"#/definitions/basicAuthenticationSecurity"},{"$ref":"#/definitions/apiKeySecurity"},{"$ref":"#/definitions/oauth2ImplicitSecurity"},{"$ref":"#/definitions/oauth2PasswordSecurity"},{"$ref":"#/definitions/oauth2ApplicationSecurity"},{"$ref":"#/definitions/oauth2AccessCodeSecurity"}]}},"basicAuthenticationSecurity":{"type":"object","additionalProperties":false,"required":["type"],"properties":{"type":{"type":"string","enum":["basic"]},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"apiKeySecurity":{"type":"object","additionalProperties":false,"required":["type","name","in"],"properties":{"type":{"type":"string","enum":["apiKey"]},"name":{"type":"string"},"in":{"type":"string","enum":["header","query"]},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"oauth2ImplicitSecurity":{"type":"object","additionalProperties":false,"required":["type","flow","authorizationUrl"],"properties":{"type":{"type":"string","enum":["oauth2"]},"flow":{"type":"string","enum":["implicit"]},"scopes":{"$ref":"#/definitions/oauth2Scopes"},"authorizationUrl":{"type":"string","format":"uri"},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"oauth2PasswordSecurity":{"type":"object","additionalProperties":false,"required":["type","flow","tokenUrl"],"properties":{"type":{"type":"string","enum":["oauth2"]},"flow":{"type":"string","enum":["password"]},"scopes":{"$ref":"#/definitions/oauth2Scopes"},"tokenUrl":{"type":"string","format":"uri"},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"oauth2ApplicationSecurity":{"type":"object","additionalProperties":false,"required":["type","flow","tokenUrl"],"properties":{"type":{"type":"string","enum":["oauth2"]},"flow":{"type":"string","enum":["application"]},"scopes":{"$ref":"#/definitions/oauth2Scopes"},"tokenUrl":{"type":"string","format":"uri"},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"oauth2AccessCodeSecurity":{"type":"object","additionalProperties":false,"required":["type","flow","authorizationUrl","tokenUrl"],"properties":{"type":{"type":"string","enum":["oauth2"]},"flow":{"type":"string","enum":["accessCode"]},"scopes":{"$ref":"#/definitions/oauth2Scopes"},"authorizationUrl":{"type":"string","format":"uri"},"tokenUrl":{"type":"string","format":"uri"},"description":{"type":"string"}},"patternProperties":{"^x-":{"$ref":"#/definitions/vendorExtension"}}},"oauth2Scopes":{"type":"object","additionalProperties":{"type":"string"}},"mediaTypeList":{"type":"array","items":{"$ref":"#/definitions/mimeType"},"uniqueItems":true},"parametersList":{"type":"array","description":"The parameters needed to send a valid API call.","additionalItems":false,"items":{"oneOf":[{"$ref":"#/definitions/parameter"},{"$ref":"#/definitions/jsonReference"}]},"uniqueItems":true},"schemesList":{"type":"array","description":"The transfer protocol of the API.","items":{"type":"string","enum":["http","https","ws","wss"]},"uniqueItems":true},"collectionFormat":{"type":"string","enum":["csv","ssv","tsv","pipes"],"default":"csv"},"collectionFormatWithMulti":{"type":"string","enum":["csv","ssv","tsv","pipes","multi"],"default":"csv"},"title":{"$ref":"http://json-schema.org/draft-04/schema#/properties/title"},"description":{"$ref":"http://json-schema.org/draft-04/schema#/properties/description"},"default":{"$ref":"http://json-schema.org/draft-04/schema#/properties/default"},"multipleOf":{"$ref":"http://json-schema.org/draft-04/schema#/properties/multipleOf"},"maximum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/maximum"},"exclusiveMaximum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum"},"minimum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/minimum"},"exclusiveMinimum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum"},"maxLength":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveInteger"},"minLength":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"},"pattern":{"$ref":"http://json-schema.org/draft-04/schema#/properties/pattern"},"maxItems":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveInteger"},"minItems":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"},"uniqueItems":{"$ref":"http://json-schema.org/draft-04/schema#/properties/uniqueItems"},"enum":{"$ref":"http://json-schema.org/draft-04/schema#/properties/enum"},"jsonReference":{"type":"object","required":["$ref"],"additionalProperties":false,"properties":{"$ref":{"type":"string"}}}}}
 );
@@ -22540,19 +22214,18 @@ local.templateUiMain = '\
         class="flex1 td2"\n\
         placeholder="http://petstore.swagger.io/v2/swagger.json"\n\
         type="text"\n\
-        value="{{url}}"\n\
+        value="{{urlSwaggerJson}}"\n\
     >\n\
     <input\n\
-        class="td2"\n\
+        class="td3"\n\
         id="swggApiKeyInput1"\n\
         placeholder="api-key"\n\
-        style="width: 8rem;"\n\
         type="text"\n\
         value="{{apiKeyValue}}"\n\
     >\n\
-    <button class="eventDelegateClick onEventUiReload td3">Explore</button>\n\
+    <button class="eventDelegateClick onEventUiReload td4">Explore</button>\n\
     <button\n\
-        class="eventDelegateClick onEventUiReload td3"\n\
+        class="eventDelegateClick onEventUiReload td5"\n\
         id="swggApiKeyClearButton1"\n\
     >Clear api-keys</button>\n\
 </div>\n\
@@ -22576,7 +22249,7 @@ local.templateUiMain = '\
     {{/if info.x-swgg-urlApp}}\n\
     <ul>\n\
         {{#if externalDocs}}\n\
-        <li class="marginTop05">\n\
+        <li>\n\
             {{#if externalDocs.description}}\n\
             <p>{{externalDocs.description htmlSafe}}</p>\n\
             {{/if externalDocs.description}}\n\
@@ -22584,20 +22257,18 @@ local.templateUiMain = '\
         </li>\n\
         {{/if externalDocs}}\n\
         {{#if info.termsOfService}}\n\
-        <li class="marginTop05">\n\
-            <a target="_blank" href="{{info.termsOfService}}">Terms of service</a>\n\
-        </li>\n\
+        <li><a target="_blank" href="{{info.termsOfService}}">Terms of service</a></li>\n\
         {{/if info.termsOfService}}\n\
         {{#if info.contact.name}}\n\
-        <li class="marginTop05">Created by {{info.contact.name htmlSafe}}</li>\n\
+        <li>Created by {{info.contact.name htmlSafe}}</li>\n\
         {{/if info.contact.name}}\n\
         {{#if info.contact.url}}\n\
-        <li class="marginTop05">\n\
+        <li>\n\
             See more at <a href="{{info.contact.url}}">{{info.contact.url}}</a>\n\
         </li>\n\
         {{/if info.contact.url}}\n\
         {{#if info.contact.email}}\n\
-        <li class="marginTop05">\n\
+        <li>\n\
             <a\n\
                 target="_parent"\n\
                 href="mailto:{{info.contact.email}}?subject={{info.title htmlSafe}}"\n\
@@ -22605,18 +22276,17 @@ local.templateUiMain = '\
         </li>\n\
         {{/if info.contact.email}}\n\
         {{#if info.license}}\n\
-        <li class="marginTop05">\n\
-            <a target="_blank" href="{{info.license.url}}">{{info.license.name}}</a>\n\
-        </li>\n\
+        <li><a target="_blank" href="{{info.license.url}}">{{info.license.name}}</a></li>\n\
         {{/if info.license}}\n\
     </ul>\n\
     {{/if info}}\n\
 </div>\n\
+{{#if urlSwaggerJson}}\n\
 <pre class="code" id="swggAjaxProgressPre1">\n\
 /*\n\
  * initialize swgg-client\n\
- * 1. download this api as swagger.json:\n\
- *     $ curl "{{url htmlSafe}}" > swagger.json\n\
+ * 1. download currently-loaded apis as file swagger.json:\n\
+ *     $ curl -L "{{urlSwaggerJson htmlSafe}}" > swagger.json\n\
  * 2. npm install swgg\n\
  *     $ npm install swgg\n\
  * 3. run code below to initialize swgg-client\n\
@@ -22625,14 +22295,18 @@ local.templateUiMain = '\
 var swgg;\n\
 swgg = require("swgg");\n\
 swgg.apiUpdate(require("./swagger.json"));\n\
-console.log("printing initialized apis ...");\n\
+console.log("printing currently loaded apis ...");\n\
 console.log(JSON.stringify(Object.keys(swgg.apiDict).sort(), null, 4));\n\
 console.log("initialized swgg-client");\n\
 </pre>\n\
 <div class="color777 reset">\n\
     [ <span>base url</span>: {{basePath}} ]\n\
 </div>\n\
-<div id="swggAjaxProgressDiv1" style="text-align: center;"><span>rendering swagger.json &nbsp;</span><span class="uiAnimateSpin"></span></div>\n\
+{{/if urlSwaggerJson}}\n\
+<div id="swggAjaxProgressDiv1" style="text-align: center;">\n\
+    <span>{{ajaxProgressText}}</span>\n\
+    <span class="uiAnimateSpin"></span>\n\
+</div>\n\
 ';
 
 
@@ -22640,7 +22314,7 @@ console.log("initialized swgg-client");\n\
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/operation.handlebars
 local.templateUiOperation = '\
 <div\n\
-    class="eventDelegateClick eventDelegateSubmit marginTop05 operation {{_method}}"\n\
+    class="eventDelegateClick eventDelegateSubmit operation {{_method}}"\n\
     data-_method-path="{{_methodPath}}"\n\
     id="{{id}}"\n\
 >\n\
@@ -22648,48 +22322,49 @@ local.templateUiOperation = '\
         class="cursorPointer eventDelegateClick onEventOperationDisplayShow header tr"\n\
         tabindex="0"\n\
     >\n\
-        <span class="td1">{{_method}}</span>\n\
+        <span class="td1">{{_ii}}</span>\n\
+        <span class="td2">{{_method}}</span>\n\
         <span\n\
-            class="flex1 td2 {{#if deprecated}}fontLineThrough{{/if deprecated}}"\n\
+            class="flex1 td3 {{#if deprecated}}deprecated{{/if deprecated}}"\n\
         >{{_path}}</span>\n\
-        <span class="color777 flex1 td3">{{summary htmlSafe}}</span>\n\
+        <span class="color777 flex1 td4">{{summary htmlSafe}}</span>\n\
     </div>\n\
     <form accept-charset="UTF-8"\n\
         class="content uiAnimateSlide"\n\
         style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
     >\n\
         {{#if deprecated}}\n\
-        <h4 class="label marginTop10">Warning: Deprecated</h4>\n\
+        <h4 class="label">Warning: Deprecated</h4>\n\
         {{/if deprecated}}\n\
-        <h4 class="label marginTop10">Description</h4>\n\
-        <div class="marginTop05 tr">{{description htmlSafe}}</div>\n\
+        <h4 class="label">Description</h4>\n\
+        <div class="tr">{{description htmlSafe br}}</div>\n\
         {{#if parameters.length}}\n\
-        <h4 class="label marginTop10">Parameters</h4>\n\
-        <div class="marginTop05 paramDef tr">\n\
+        <h4 class="label">Parameters</h4>\n\
+        <div class="borderBottom schemaP tr">\n\
             <span class="color777 td1">Name and Description</span>\n\
             <span class="color777 td2">Data Type</span>\n\
             <span class="color777 td3">Value</span>\n\
             <span class="color777 td4">Schema</span>\n\
         </div>\n\
         {{#each parameters}}\n\
-        <div class="borderTop paramDef tr" id="{{id}}" name="{{name}}">{{innerHTML}}</div>\n\
+        <div class="borderBottom schemaP tr" id="{{id}}" name="{{name}}">{{innerHTML}}</div>\n\
         {{/each parameters}}\n\
         {{/if parameters.length}}\n\
-        <h4 class="label marginTop10">Response Messages</h4>\n\
-        <div class="marginTop05 responseList tr">\n\
+        <h4 class="label">Response Messages</h4>\n\
+        <div class="responseList tr">\n\
             <span class="color777 td1">HTTP Status Code</span>\n\
             <span class="color777 td2">Reason</span>\n\
         </div>\n\
         {{#each responseList}}\n\
-        <div class="borderTop responseList tr">\n\
+        <div class="borderBottom responseList tr">\n\
             <span class="td1">{{key}}</span>\n\
             {{#if value.description}}\n\
             <span class="td2">{{value.description htmlSafe}}</span>\n\
             {{/if value.description}}\n\
         </div>\n\
         {{/each responseList}}\n\
-        <button class="marginTop10 onEventOperationAjax">Try it out!</button>\n\
-        <div class="marginTop05 responseAjax"></div>\n\
+        <button class="onEventOperationAjax">Try it out!</button>\n\
+        <div class="responseAjax"></div>\n\
     </form>\n\
 </div>\n\
 ';
@@ -22701,7 +22376,7 @@ local.templateUiParam = '\
 <span class="td1 {{#if required}}fontWeightBold{{/if required}}">\n\
     {{name}}\n\
     {{#if description}}\n\
-    <br><span class="color777">{{description htmlSafe}}</span>\n\
+    <br><span class="color777">{{description htmlSafe br}}</span>\n\
     {{/if description}}\n\
 </span>\n\
 <span class="td2">{{type2}}{{#if format2}}<br>({{format2}}){{/if format2}}</span>\n\
@@ -22710,7 +22385,7 @@ local.templateUiParam = '\
     <textarea\n\
         class="input"\n\
         data-value-encoded="{{valueEncoded encodeURIComponent}}"\n\
-        placeholder="{{placeholder}}"></textarea>\n\
+        placeholder="{{placeholder htmlSafe}}"></textarea>\n\
     {{/if isTextarea}}\n\
     {{#if isFile}}\n\
     <input class="input" type="file">\n\
@@ -22730,7 +22405,7 @@ local.templateUiParam = '\
     <input\n\
         class="input"\n\
         data-value-encoded="{{valueEncoded encodeURIComponent}}"\n\
-        placeholder="{{placeholder}}"\n\
+        placeholder="{{placeholder htmlSafe}}"\n\
         type="text"\n\
     >\n\
     {{/if isInputText}}\n\
@@ -22747,19 +22422,20 @@ local.templateUiResource = '\
     data-name="{{name}}"\n\
     id="{{id}}"\n\
 >\n\
-    <div class="fontWeightBold header tr" tabindex="0">\n\
-        <a class="color777 flex1 onEventResourceDisplayAction td1" href="#">{{name}} :\n\
-        {{description htmlSafe}}\n\
-        </a>\n\
-        <a\n\
+    <div class="cursorPointer fontWeightBold header tr">\n\
+        <span class="color777 flex1 onEventResourceDisplayAction td1"\n\
+            tabindex="0"\n\
+        >{{name}} :\n\
+        {{description htmlSafe br}}</span>\n\
+        <span\n\
             class="color777 onEventResourceDisplayAction td2"\n\
-            href="#"\n\
-        >Expand / Collapse Operations</a>\n\
-        <a\n\
+            tabindex="0"\n\
+        >Expand / Collapse Operations</span>\n\
+        <span\n\
             class="color777 onEventDatatableReload td3"\n\
             data-resource-name="{{name}}"\n\
-            href="#"\n\
-        >Datatable</a>\n\
+            tabindex="0"\n\
+        >Datatable</span>\n\
     </div>\n\
     <div class="operationList uiAnimateSlide"\n\
         style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
@@ -22771,21 +22447,21 @@ local.templateUiResource = '\
 
 local.templateUiResponseAjax = '\
 {{#if error}}\n\
-<h4 class="label marginTop10"></h4>\n\
+<h4 class="label"></h4>\n\
 <pre class="code error uiAnimateShake">\n\
 ERROR\n\
 \n\
 {{error.message htmlSafe}}\n\
 </pre>\n\
 {{/if error}}\n\
-<h4 class="label marginTop10"></h4>\n\
+<h4 class="label"></h4>\n\
 <pre class="code">\n\
 /*\n\
- * reproduce swgg-client request {{options.api._methodPath jsonStringify}}\n\
+ * reproduce api-call {{options.api._methodPath jsonStringify}}\n\
  * 1. initialize swgg-client from previous step\n\
- * 2. run code below to reproduce swgg-client request\n\
+ * 2. run code below to reproduce api-call\n\
  */\n\
-swgg.apiAjax({{options.api._methodPath jsonStringify htmlSafe}}, {{optionsJson htmlSafe}}, \
+swgg.apiDict[{{options.api._methodPath jsonStringify htmlSafe}}].ajax({{optionsJson htmlSafe}}, \
 function (error, data) {\n\
     if (error) {\n\
         console.error(error);\n\
@@ -22795,13 +22471,13 @@ function (error, data) {\n\
 }\
 );\n\
 </pre>\n\
-<h4 class="label marginTop10">Curl Request</h4>\n\
+<h4 class="label">Curl Request</h4>\n\
 <pre>{{curl htmlSafe}}</pre>\n\
-<h4 class="label marginTop10">Response Code</h4>\n\
+<h4 class="label">Response Code</h4>\n\
 <pre>{{statusCode}}</pre>\n\
-<h4 class="label marginTop10">Response Headers</h4>\n\
+<h4 class="label">Response Headers</h4>\n\
 <pre>{{responseHeaders htmlSafe}}</pre>\n\
-<h4 class="label marginTop10">Response Body</h4>\n\
+<h4 class="label">Response Body</h4>\n\
 {{responseBody}}\n\
 ';
 
@@ -22818,12 +22494,334 @@ local.templateUiTitle = '\
 swgg\n\
 {{/if info.title}}\n\
 ';
+
+
+
+local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.template.html']
+    .replace('assets.index.default.template.html', '')
+    .replace((/<title>.*?<\/title>/), '<title>swgg</title>')
+    .replace('\n<!-- utility2-comment\n', '\n')
+    .replace((/\n<\/style>\n<style>\n[\S\s]*\n<\/style>\n/), '\
+\n\
+</style>\n\
+<style>\n\
+/*csslint\n\
+    adjoining-classes: false,\n\
+    universal-selector: false\n\
+*/\n\
+/* animate */\n\
+@keyframes uiAnimateShake {\n\
+    100% {\n\
+        transform: translateX(0);\n\
+    }\n\
+    0%, 20%, 60% {\n\
+        transform: translateX(1rem);\n\
+    }\n\
+    40%, 80% {\n\
+        transform: translateX(-1rem);\n\
+    }\n\
+}\n\
+.uiAnimateShake {\n\
+    animation-duration: 500ms;\n\
+    animation-name: uiAnimateShake;\n\
+}\n\
+\n\
+\n\
+\n\
+/* general */\n\
+.swggUiContainer,\n\
+.swggUiContainer * {\n\
+    margin: 0;\n\
+    margin-bottom: 10px;\n\
+    padding: 0;\n\
+}\n\
+.swggUiContainer {\n\
+    font-family: Arial, Helvetica, sans-serif;\n\
+    margin-left: auto;\n\
+    margin-right: auto;\n\
+    max-width: 1024px;\n\
+}\n\
+.swggUiContainer a,\n\
+.swggUiContainer input,\n\
+.swggUiContainer span {\n\
+    min-height: 1.5rem;\n\
+}\n\
+.swggUiContainer button {\n\
+    padding: 10px;\n\
+}\n\
+.swggUiContainer .color777 {\n\
+    color: #777;\n\
+}\n\
+.swggUiContainer button,\n\
+.swggUiContainer .cursorPointer,\n\
+.swggUiContainer .cursorPointer input {\n\
+    cursor: pointer;\n\
+}\n\
+.swggUiContainer .code,\n\
+.swggUiContainer .operation > .content .code {\n\
+    background: #ddd;\n\
+    color: #555;\n\
+    max-height: 50rem;\n\
+}\n\
+.swggUiContainer .deprecated {\n\
+    text-decoration: line-through;\n\
+}\n\
+.swggUiContainer .flex1 {\n\
+    flex: 1;\n\
+}\n\
+.swggUiContainer .fontWeightBold {\n\
+    font-weight: bold;\n\
+}\n\
+.swggUiContainer .operation .header,\n\
+.swggUiContainer option,\n\
+.swggUiContainer .tr > * {\n\
+    margin-bottom: 0;\n\
+}\n\
+.swggUiContainer input {\n\
+    height: 1.5rem;\n\
+    padding-left: 0.25rem;\n\
+    padding-right: 0.25rem;\n\
+}\n\
+.swggUiContainer select[multiple] {\n\
+    height: 10rem;\n\
+}\n\
+.swggUiContainer pre,\n\
+.swggUiContainer textarea {\n\
+    border: 1px solid #777;\n\
+    font-family: Menlo, Monaco, Consolas, Courier New, monospace;\n\
+    font-size: small;\n\
+    line-height: 1.25rem;\n\
+    max-height: 20rem;\n\
+    min-height: 1.75rem;\n\
+    overflow: auto;\n\
+    padding: 0.25rem;\n\
+    white-space: pre;\n\
+}\n\
+.swggUiContainer .tr {\n\
+    display: flex;\n\
+}\n\
+.swggUiContainer .tr > * {\n\
+    margin-left: 1rem;\n\
+    overflow: auto;\n\
+    padding-top: 0.1rem;\n\
+    word-wrap: break-word;\n\
+}\n\
+.swggUiContainer .tr > *:first-child {\n\
+    margin-left: 0;\n\
+}\n\
+.swggUiContainer .tr > * > * {\n\
+    width: 100%;\n\
+}\n\
+\n\
+\n\
+\n\
+/* border */\n\
+.swggUiContainer .borderBottom {\n\
+    border-bottom: 1px solid #777;\n\
+}\n\
+.swggUiContainer .resource:first-child {\n\
+    border-top: 1px solid #777;\n\
+    padding-top: 10px;\n\
+}\n\
+/* border-error*/\n\
+.swggUiContainer .error,\n\
+.swggUiContainer .operation > .content .error {\n\
+    border: 5px solid #b00;\n\
+}\n\
+\n\
+\n\
+\n\
+/* section */\n\
+.swggUiContainer > .header {\n\
+    background: #8c0;\n\
+    padding: 10px;\n\
+}\n\
+.swggUiContainer > .header > * {\n\
+    font-size: small;\n\
+    height: 2rem;\n\
+}\n\
+@media screen and (max-width: 640px){\n\
+    .swggUiContainer > .header {\n\
+        display: block;\n\
+        padding: 0;\n\
+    }\n\
+    .swggUiContainer > .header > * {\n\
+        display: block;\n\
+        margin: 0;\n\
+        width: 100%;\n\
+    }\n\
+}\n\
+.swggUiContainer > .header > .td1 {\n\
+    background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAqRJREFUeNrEVz1s00AUfnGXii5maMXoEUEHVwIpEkPNgkBdMnQoU5ytiKHJwpp2Q2JIO8DCUDOxIJFIVOoWZyJSh3pp1Q2PVVlcCVBH3ufeVZZ9Zye1Ay86nXV+ue/9fO/lheg/Se02X1rvksmbnTiKvuxQMBNgBnN4a/LCbmnUAP6JV58NCUsBC8CuAJxGPF47OgNqBaA93tolUhnx6jC4NxGwyOEwlccyAs+3kwdzKq0HDn2vEBTi8J2XpyMaywNDE157BhXUE3zJhlq8GKq+Zd2zaWHepPA8oN9XkfLmRdOiJV4XUUg/IyWncLjCYY/SHndV2u7zHr3bPKZtdxgboJOnthvrfGj/oMf3G0r7JVmNlLfKklmrt2MvvcNO7LFOhoFHfuAJI5o6ta10jpt5CQLgwXhXG2YIwvu+34qf78ybOjWTnWwkgR36d7JqJOrW0hHmNrKg9xhiS4+1jFmrxymh03B0w+6kURIAu3yHtOD5oaUNojMnGgbcctNvwdAnyxvxRR+/vaJnjzbpzcZX+nN1SdGv85i9eH8w3qPO+mdm/y4dnQ1iI8Fq6Nf4cxL6GWSjiFDSs0VRnxC5g0xSB2cgHpaseTxfqOv5uoHkNQ6Ha/N1Yz9mNMppEkEkYKj79q6uCq4bCHcSX3fJ0Vk/k9siASjCm1N6gZH6Ec9IXt2WkFES2K/ixoIyktJPAu/ptOA1SgO5zqtr6KASJPF0nMV8dgMsRhRPOcMwqQAOoi0VAIMLAEWJ6YYC1c8ibj1GP51RqwzYwZVMHQuvOzMCBUtb2tGHx5NAdLKqp5AX7Ng4d+Zi8AGDI9z1ijx9yaCH04y3GCP2S+QcvaGl+pcxyUBvinFlawoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=) no-repeat left center;\n\
+    color: white;\n\
+    font-size: x-large;\n\
+    padding-left: 2.5rem;\n\
+    text-decoration: none;\n\
+}\n\
+.swggUiContainer > .header > .td3 {\n\
+    flex: 0.25;\n\
+}\n\
+.swggUiContainer > .header > .td4,\n\
+.swggUiContainer > .header > .td5 {\n\
+    border: 0;\n\
+    color: #fff;\n\
+    padding: 6px 8px;\n\
+    background: #580;\n\
+}\n\
+.swggUiContainer > .info a {\n\
+    color: #370;\n\
+}\n\
+.swggUiContainer > .info > .fontWeightBold {\n\
+    font-size: x-large;\n\
+}\n\
+.swggUiContainer > .info > ul {\n\
+    margin-left: 2rem;\n\
+}\n\
+.swggUiContainer .operation {\n\
+    background: #dfd;\n\
+    font-size: smaller;\n\
+}\n\
+.swggUiContainer .operation > .content {\n\
+    padding: 1rem;\n\
+}\n\
+.swggUiContainer .operation > .content .label {\n\
+    color: #0b0;\n\
+}\n\
+.swggUiContainer .operation > .content pre {\n\
+    background: #ffd;\n\
+}\n\
+.swggUiContainer .operation > .content .tr {\n\
+    margin-left: 10px;\n\
+}\n\
+.swggUiContainer .operation > .header:focus,\n\
+.swggUiContainer .operation > .header:hover {\n\
+    background: #bfb;\n\
+    outline: none;\n\
+}\n\
+.swggUiContainer .operation > .header > span {\n\
+    padding-top: 5px;\n\
+}\n\
+.swggUiContainer .operation > .header > .td1 {\n\
+    margin-left: 1rem;\n\
+    width: 1rem;\n\
+}\n\
+.swggUiContainer .operation > .header > .td2 {\n\
+    background: #777;\n\
+    color: white;\n\
+    text-align: center;\n\
+    width: 5rem;\n\
+}\n\
+.swggUiContainer .operation .responseList > .td1 {\n\
+    flex: 1;\n\
+}\n\
+.swggUiContainer .operation .responseList > .td2 {\n\
+    flex: 4;\n\
+}\n\
+.swggUiContainer .operation .schemaP pre,\n\
+.swggUiContainer .operation .schemaP textarea {\n\
+    height: 10rem;\n\
+}\n\
+.swggUiContainer .operation .schemaP > .td1 {\n\
+    flex: 2;\n\
+}\n\
+.swggUiContainer .operation .schemaP > .td2 {\n\
+    flex: 1;\n\
+}\n\
+.swggUiContainer .operation .schemaP > .td3 {\n\
+    flex: 4;\n\
+}\n\
+.swggUiContainer .operation .schemaP > .td4 {\n\
+    flex: 3;\n\
+}\n\
+.swggUiContainer .resource > .header > span:focus,\n\
+.swggUiContainer .resource > .header > span:hover {\n\
+    color: black;\n\
+    outline: none;\n\
+}\n\
+.swggUiContainer .resource > .header > .td1 {\n\
+    font-size: large;\n\
+}\n\
+.swggUiContainer .resource > .header > .td2 {\n\
+    border-left: 1px solid;\n\
+    border-right: 1px solid;\n\
+    padding-left: 1rem;\n\
+    padding-right: 1rem;\n\
+}\n\
+\n\
+\n\
+\n\
+/* method */\n\
+.swggUiContainer .operation.DELETE > .header > .td2 {\n\
+    background: #b00;\n\
+}\n\
+.swggUiContainer .operation.GET > .header > .td2 {\n\
+    background: #093;\n\
+}\n\
+.swggUiContainer .operation.HEAD > .header > .td2 {\n\
+    background: #f30;\n\
+}\n\
+.swggUiContainer .operation.PATCH > .header > .td2 {\n\
+    background: #b0b;\n\
+}\n\
+.swggUiContainer .operation.POST > .header > .td2 {\n\
+    background: #07b;\n\
+}\n\
+.swggUiContainer .operation.PUT > .header > .td2 {\n\
+    background: #70b;\n\
+}\n\
+</style>\n\
+')
+    .replace((/\n<\/script>\n[\S\s]*\n<\/html>\n/), '\
+\n\
+</script>\n\
+<div class="swggUiContainer">\n\
+' + local.templateRender(local.templateUiMain, {
+    ajaxProgressText: 'loading script',
+    apiKeyValue: '',
+    urlSwaggerJson: ''
+}) + '\
+</div>\n\
+<div class="utility2FooterDiv">\n\
+    [ this document was created with\n\
+    <a href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
+    ]\n\
+</div>\n\
+<script>\n\
+/*jslint\n\
+    bitwise: true,\n\
+    browser: true,\n\
+    maxerr: 8,\n\
+    maxlen: 100,\n\
+    node: true,\n\
+    nomen: true,\n\
+    regexp: true,\n\
+    stupid: true\n\
+*/\n\
+"use strict";\n\
+document.querySelector(".swggUiContainer > .header > .td2").value =\n\
+    ((/\\bmodeSwaggerJsonUrl=([^&]+)/g).exec(location.search) || {})[1] ||\n\
+        "assets.swgg.swagger.json";\n\
+</script>\n\
+<script src="assets.utility2.rollup.js"></script>\n\
+<script>window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });</script>\n\
+</body>\n\
+</html>\n\
+');
 /* jslint-ignore-end */
-        local.swaggerSchemaJson = local.jsonCopy(local.objectSetOverride(
-            JSON.parse(local.assetsDict['/assets.swgg.json-schema.json']),
-            JSON.parse(local.assetsDict['/assets.swgg.schema.json']),
-            2
-        ));
+        local.assetsDict['/assets.swgg.swagger.schema.json'] = local.jsonStringifyOrdered(
+            local.objectSetOverride(
+                JSON.parse(local.assetsDict['/assets.swgg.json-schema.json'].replace(
+                    (/"\$ref":".*?#/g),
+                    '"$ref":"http://json-schema.org/draft-04/schema#'
+                )),
+                JSON.parse(local.assetsDict['/assets.swgg.schema.json'].replace(
+                    (/"\$ref":".*?#/g),
+                    '"$ref":"http://json-schema.org/draft-04/schema#'
+                )),
+                2
+            )
+        );
+        local.swaggerSchemaJson = JSON.parse(local.assetsDict['/assets.swgg.swagger.schema.json']);
     }());
 
 
@@ -22832,25 +22830,21 @@ swgg\n\
     (function () {
         local.apiAjax = function (self, options, onError) {
         /*
-         * this function will send a swagger-api ajax-request with the pathObject self
+         * this function will send a swagger-api ajax-request with the operation self
          */
             var errorValidate, isMultipartFormData, tmp;
-            if (local.apiDeferList) {
-                local.apiDeferList.push(arguments);
-                return;
-            }
-            self = local.apiDict[self] || self;
-            options.pathObject = self;
+            options.operation = self;
             isMultipartFormData = (self.consumes && self.consumes[0]) === 'multipart/form-data';
             local.objectSetDefault(options, { data: '', paramDict: {}, url: '' });
             // try to validate paramDict
             local.tryCatchOnError(function () {
-                local.validateByParamDefList({
+                local.validateBySwaggerParameters({
                     // normalize paramDict
-                    data: local.swaggerParamDictNormalize(options).paramDict,
+                    data: local.normalizeSwaggerParamDict(options).paramDict,
                     dataReadonlyRemove: options.paramDict,
-                    key: JSON.stringify(self._methodPath),
-                    paramDefList: self.parameters
+                    prefix: ['operation', self._methodPath],
+                    parameters: self.parameters,
+                    swaggerJson: local.swaggerJson
                 });
             }, function (error) {
                 errorValidate = error;
@@ -22875,24 +22869,23 @@ swgg\n\
                     : ''
             });
             // init paramDict
-            self.parameters.forEach(function (paramDef) {
-                tmp = options.paramDict[paramDef.name];
+            self.parameters.forEach(function (schemaP) {
+                tmp = options.paramDict[schemaP.name];
                 if (tmp === undefined) {
                     return;
                 }
                 // serialize array
-                if (paramDef.type === 'array' && paramDef.in !== 'body') {
-                    switch (paramDef.collectionFormat || paramDef['x-collectionFormat']) {
+                if (schemaP.type === 'array' && schemaP.in !== 'body') {
+                    switch (schemaP.collectionFormat || schemaP['x-swgg-collectionFormat']) {
                     case 'json':
                         tmp = JSON.stringify(tmp);
                         break;
                     case 'multi':
                         tmp.forEach(function (value) {
-                            options[paramDef.in === 'formData'
+                            options[schemaP.in === 'formData'
                                 ? 'inForm'
-                                : 'inQuery'] += '&' +
-                                encodeURIComponent(paramDef.name) + '=' +
-                                encodeURIComponent(paramDef.items.type === 'string'
+                                : 'inQuery'] += '&' + encodeURIComponent(schemaP.name) + '=' +
+                                encodeURIComponent(schemaP.items.type === 'string'
                                     ? value
                                     : JSON.stringify(value));
                         });
@@ -22910,33 +22903,33 @@ swgg\n\
                     default:
                         tmp = tmp.join(',');
                     }
-                } else if (!(paramDef.type === 'string' ||
-                        (paramDef.schema && paramDef.schema.type === 'string') ||
+                } else if (!(schemaP.type === 'string' ||
+                        (schemaP.schema && schemaP.schema.type === 'string') ||
                         tmp instanceof local.Blob)) {
                     tmp = JSON.stringify(tmp);
                 }
-                switch (paramDef.in) {
+                switch (schemaP.in) {
                 case 'body':
                     options.inBody = tmp;
                     break;
                 case 'formData':
                     if (isMultipartFormData) {
-                        options.inForm.append(paramDef.name, tmp, tmp && tmp.name);
+                        options.inForm.append(schemaP.name, tmp, tmp && tmp.name);
                         break;
                     }
-                    options.inForm += '&' + encodeURIComponent(paramDef.name) + '=' +
+                    options.inForm += '&' + encodeURIComponent(schemaP.name) + '=' +
                         encodeURIComponent(tmp);
                     break;
                 case 'header':
-                    options.inHeader[encodeURIComponent(paramDef.name.toLowerCase())] = tmp;
+                    options.inHeader[encodeURIComponent(schemaP.name.toLowerCase())] = tmp;
                     break;
                 case 'query':
-                    options.inQuery += '&' + encodeURIComponent(paramDef.name) + '=' +
+                    options.inQuery += '&' + encodeURIComponent(schemaP.name) + '=' +
                         encodeURIComponent(tmp);
                     break;
                 case 'path':
                     options.inPath = options.inPath
-                        .replace('{' + paramDef.name + '}', encodeURIComponent(tmp));
+                        .replace('{' + schemaP.name + '}', encodeURIComponent(tmp));
                     break;
                 }
             });
@@ -22982,18 +22975,11 @@ swgg\n\
             });
         };
 
-        local.apiDeferList = [];
-
         local.apiUpdate = function (options, onError) {
         /*
          * this function will update the swagger-api dict of api-calls
          */
             var tmp;
-            // init options
-            options = options || {};
-            // init apiDefer
-            clearTimeout(local.apiDeferTimeout);
-            local.apiDeferList = local.apiDeferList || [];
             // fetch swagger.json file
             if (options.modeAjax) {
                 local.ajax(options, function (error, xhr) {
@@ -23015,7 +23001,7 @@ swgg\n\
                 options = JSON.parse(options.utility2.assetsDict['/assets.swgg.swagger.json']);
             }, local.nop);
             // normalize options
-            options = local.swaggerJsonNormalize(options);
+            options = local.normalizeSwaggerJson(options);
             // init apiDict
             local.apiDict = local.apiDict || {};
             // init swaggerJson
@@ -23118,7 +23104,7 @@ swgg\n\
                     }
                 },
                 "info": {
-                    "description": "demo of swagger-ui server",
+                    "description": "web-demo of swagger-ui server",
                     "title": "swgg api",
                     "version": "0.0.1"
                 },
@@ -23145,11 +23131,26 @@ swgg\n\
             local.swaggerJsonBasePath = local.swaggerJson.basePath === '/'
                 ? ''
                 : local.swaggerJson.basePath;
-            // normalize definition
             Object.keys(options.definitions).forEach(function (schemaName) {
-                options.definitions[schemaName] = local.schemaNormalizeAndCopy(
-                    options.definitions[schemaName]
+                tmp = options.definitions[schemaName] = local.jsonCopy(
+                    local.validateBySwaggerSchema({
+                        // dereference definition
+                        modeDereference: true,
+                        prefix: ['swaggerJson', 'definitions', schemaName],
+                        schema: options.definitions[schemaName],
+                        swaggerJson: local.swaggerJson
+                    })
                 );
+                (tmp.allOf || []).forEach(function (element) {
+                    local.objectSetDefault(tmp, local.jsonCopy(local.validateBySwaggerSchema({
+                        // dereference definition.allOf
+                        modeDereference: true,
+                        prefix: ['swaggerJson', 'definitions', schemaName, 'allOf'],
+                        schema: element,
+                        swaggerJson: local.swaggerJson
+                    })), 2);
+                });
+                delete tmp.allOf;
             });
             // init apiDict from paths
             Object.keys(options.paths).forEach(function (path) {
@@ -23216,25 +23217,24 @@ swgg\n\
                     } }
                 });
                 // init _methodPath
-                self._methodPath = self._method + ' ' + self._path.replace((/\{.*?\}/g), '');
-                self.parameters.forEach(function (param) {
+                self._methodPath = self._method + ' ' + self._path.replace((/\{.*?\}/g), '{}');
+                self.parameters.forEach(function (schemaP, ii) {
                     // init _idName.format and _idName.type
-                    if (self._schemaName && param.name === self._idName) {
-                        param.format = options.definitions[self._schemaName]
+                    if (self._schemaName && schemaP.name === self._idName) {
+                        schemaP.format = options.definitions[self._schemaName]
                             .properties[self._idBackend].format;
-                        param.type = options.definitions[self._schemaName]
+                        schemaP.type = options.definitions[self._schemaName]
                             .properties[self._idBackend].type;
                     }
-                    // copy x-swgg-ref from x-swgg-definitionsParameters
-                    if (param['x-swgg-ref'] && options['x-swgg-definitionsParameters'] &&
-                            options['x-swgg-definitionsParameters'][param['x-swgg-ref']]) {
-                        local.objectSetDefault(
-                            param,
-                            local.jsonCopy(
-                                options['x-swgg-definitionsParameters'][param['x-swgg-ref']]
-                            )
-                        );
-                    }
+                    local.tryCatchOnError(function () {
+                        // dereference schemaP.$ref
+                        local.objectSetDefault(self.parameters[ii], local.jsonCopy(
+                            options.parameters[
+                                (schemaP.$ref || schemaP['x-swgg-$ref']).split('#/parameters/')[1]
+                            ]
+                        ));
+                        delete self.parameters[ii].$ref;
+                    }, local.nop);
                 });
                 switch (self._crudType[0]) {
                 // add extra file-upload forms
@@ -23252,27 +23252,28 @@ swgg\n\
                 self.ajax = function (options, onError) {
                     return local.apiAjax(self, options, onError);
                 };
-                self.ajax._toString = self.ajax._toString || self.ajax.toString()
+                self._ajaxToString = self.ajax.toString()
                     .replace('{', ('{\n' +
                         '/*\n' +
-                        ' * this function will call swgg-client request ' +
+                        ' * this function will make the api-call ' +
                         JSON.stringify(self._methodPath) + '\n' +
                         ' * example usage:' + ('\n' +
                         'swgg.apiDict[' + JSON.stringify(key.join('.')) + '].ajax(' +
-                        JSON.stringify(local.swaggerParamDictNormalize({
-                                paramDict: {},
-                                pathObject: self
+                        JSON.stringify(local.normalizeSwaggerParamDict({
+                                modeDefault: true,
+                                operation: self,
+                                paramDict: {}
                             }).paramDict, null, 4) +
                         ', function (error, data) {\n' +
                         '    if (error) {\n' +
-                        '        conosle.error(error);\n' +
+                        '        console.error(error);\n' +
                         '        return;\n' +
                         '    }\n' +
                         '    console.log(data.responseJson || data.responseText);\n' +
                         '});').replace((/\n/g), '\n    ') + '\n */')
                         .replace((/\n/g), '\n                '));
                 self.ajax.toString = function () {
-                    return self.ajax._toString;
+                    return self._ajaxToString;
                 };
                 // remove underscored keys from self
                 tmp = local.jsonCopy(self);
@@ -23290,7 +23291,7 @@ swgg\n\
             local.swaggerJson = JSON.parse(local.jsonStringifyOrdered(options));
             // try to validate swaggerJson
             local.tryCatchOnError(function () {
-                local.validateBySwagger(local.swaggerJson);
+                local.validateBySwaggerJson({ swaggerJson: local.swaggerJson });
             }, local.onErrorDefault);
             // init corsForwardProxyHost
             local.corsForwardProxyHost = local.corsForwardProxyHost ||
@@ -23299,101 +23300,77 @@ swgg\n\
             local.assetsDict['/assets.swgg.swagger.server.json'] = JSON.stringify(
                 local.swaggerJson
             );
-            // run deferred apiAjax
-            local.apiDeferTimeout = setTimeout(function () {
-                tmp = local.apiDeferList;
-                local.apiDeferList = null;
-                while (tmp && tmp.length) {
-                    local.apiAjax.apply(null, tmp.shift());
-                }
-            });
             local.setTimeoutOnError(onError, null, options);
         };
 
         local.dbFieldRandomCreate = function (options) {
         /*
-         * this function will create a random dbField from options.propDef
+         * this function will create a random dbField from options.schemaP
          */
-            var ii, max, min, propDef, tmp;
-            propDef = options.propDef;
-            if (propDef.readOnly) {
+            var ii, max, min, schemaP, tmp, type;
+            schemaP = options.schemaP;
+            if (schemaP.readOnly) {
                 return;
             }
-            if (propDef.enum) {
+            if (schemaP.enum) {
                 tmp = options.modeNotRandom
-                    ? propDef.enum[0]
-                    : local.listGetElementRandom(propDef.enum);
-                return propDef.type === 'array'
+                    ? schemaP.enum[0]
+                    : local.listGetElementRandom(schemaP.enum);
+                return schemaP.type === 'array'
                     ? [tmp]
                     : tmp;
             }
-            // http://json-schema.org/latest/json-schema-validation.html#anchor13
-            // 5.1.  Validation keywords for numeric instances (number and integer)
-            max = isFinite(propDef.maximum)
-                ? propDef.maximum
-                : 999;
-            min = isFinite(propDef.maximum)
-                ? propDef.minimum
-                : 0;
-            switch (propDef.type || (propDef.schema && propDef.schema.type)) {
-            case 'array':
-                tmp = [];
-                // http://json-schema.org/latest/json-schema-validation.html#anchor36
-                // 5.3.  Validation keywords for arrays
-                for (ii = 0; ii < (propDef.minItems || 0); ii += 1) {
-                    tmp.push(null);
-                }
-                break;
-            case 'boolean':
-                tmp = options.modeNotRandom
-                    ? false
-                    : Math.random() <= 0.5
-                    ? false
-                    : true;
-                break;
+            type = schemaP.type || (schemaP.schema && schemaP.schema.type);
+            switch (type) {
+            // 5.1. Validation keywords for numeric instances (number and integer)
             case 'integer':
-                if (propDef.exclusiveMaximum) {
-                    max -= 1;
-                }
-                if (propDef.exclusiveMinimum) {
-                    min += 1;
-                }
-                min = Math.min(min, max);
-                tmp = options.modeNotRandom
-                    ? 0
-                    : Math.random();
-                tmp = Math.floor(min + tmp * (max - min));
-                break;
-            case 'object':
-                tmp = {};
-                // http://json-schema.org/latest/json-schema-validation.html#anchor53
-                // 5.4.  Validation keywords for objects
-                for (ii = 0; ii < (propDef.minProperties || 0); ii += 1) {
-                    tmp['property' + ii] = null;
-                }
-                break;
             case 'number':
-                if (propDef.exclusiveMinimum) {
-                    min = min < 0
-                        ? min * 0.99999
-                        : min * 1.00001 + 0.00001;
+                max = schemaP.maximum;
+                min = schemaP.minimum;
+                if (options.modeNotRandom) {
+                    tmp = !(0 < min || max < 0)
+                        ? 0
+                        : min || max;
+                } else {
+                    if (!(isFinite(max) && isFinite(min))) {
+                        if (!isFinite(max) && !isFinite(min)) {
+                            max = 1000;
+                            min = 0;
+                        } else if (isFinite(max)) {
+                            min = max - 1000;
+                        } else {
+                            max = min + 1000;
+                        }
+                    }
+                    tmp = min + (max - min) * Math.max(Math.random(), 0.00000000001);
+                    if (type === 'integer') {
+                        tmp = Math.round(tmp);
+                    }
                 }
-                if (propDef.exclusiveMaximum) {
-                    max = max > 0
-                        ? max * 0.99999
-                        : max * 1.00001 - 0.00001;
+                max = schemaP.maximum;
+                min = schemaP.minimum;
+                // exclusiveMaximum
+                if (schemaP.exclusiveMaximum && tmp === max) {
+                    tmp -= 1;
                 }
-                min = Math.min(min, max);
-                tmp = options.modeNotRandom
-                    ? 0
-                    : Math.random();
-                tmp = min + tmp * (max - min);
+                // exclusiveMinimum
+                if (schemaP.exclusiveMaximum && tmp === min) {
+                    tmp += 1;
+                }
+                // multipleOf
+                if (schemaP.multipleOf > 0) {
+                    tmp = schemaP.multipleOf * Math.floor(tmp / schemaP.multipleOf);
+                    if (tmp < min || (schemaP.exclusiveMinimum && tmp <= min)) {
+                        tmp += schemaP.multipleOf;
+                    }
+                }
                 break;
+            // 5.2. Validation keywords for strings
             case 'string':
                 tmp = options.modeNotRandom
                     ? 'abcd1234'
                     : ((1 + Math.random()) * 0x10000000000000).toString(36).slice(1);
-                switch (propDef.format) {
+                switch (schemaP.format) {
                 case 'byte':
                     tmp = local.base64FromString(tmp);
                     break;
@@ -23416,21 +23393,32 @@ swgg\n\
                             Math.random().toString().slice(-4);
                     break;
                 }
-                // http://json-schema.org/latest/json-schema-validation.html#anchor25
-                // 5.2.  Validation keywords for strings
-                while (tmp.length < (propDef.minLength || 0)) {
+                while (tmp.length < schemaP.minLength) {
                     tmp += tmp;
                 }
-                tmp = tmp.slice(0, propDef.maxLength || Infinity);
+                tmp = tmp.slice(0, schemaP.maxLength || Infinity);
                 break;
-            }
-            // http://json-schema.org/latest/json-schema-validation.html#anchor13
-            // 5.1.  Validation keywords for numeric instances (number and integer)
-            if (propDef.multipleOf) {
-                tmp = propDef.multipleOf * Math.floor(tmp / propDef.multipleOf);
-                if (tmp < min) {
-                    tmp += propDef.multipleOf;
+            // 5.3. Validation keywords for arrays
+            case 'array':
+                tmp = [];
+                for (ii = 0; ii < schemaP.minItems; ii += 1) {
+                    tmp.push(null);
                 }
+                break;
+            // 5.4. Validation keywords for objects
+            case 'object':
+                tmp = {};
+                for (ii = 0; ii < schemaP.minProperties; ii += 1) {
+                    tmp['property' + ii] = null;
+                }
+                break;
+            case 'boolean':
+                tmp = options.modeNotRandom
+                    ? false
+                    : Math.random() <= 0.5
+                    ? false
+                    : true;
+                break;
             }
             return tmp;
         };
@@ -23439,7 +23427,16 @@ swgg\n\
         /*
          * this function will create a dbRowList of options.length random dbRow's
          */
-            local.objectSetDefault(options, { dbRowList: [] });
+            local.objectSetDefault(options, { dbRowList: [], properties: [] });
+            Object.keys(options.properties).forEach(function (key) {
+                options.properties[key] = local.validateBySwaggerSchema({
+                    // dereference property
+                    modeDereference: true,
+                    prefix: ['dbRow', key],
+                    schema: options.properties[key],
+                    swaggerJson: local.swaggerJson
+                });
+            });
             for (options.ii = 0; options.ii < options.length; options.ii += 1) {
                 options.dbRowList.push(local.dbRowRandomCreate(options));
             }
@@ -23455,17 +23452,25 @@ swgg\n\
             Object.keys(options.properties).forEach(function (key) {
                 // try to validate data
                 local.tryCatchOnError(function () {
+                    options.properties[key] = local.validateBySwaggerSchema({
+                        // dereference property
+                        modeDereference: true,
+                        prefix: ['dbRow', key],
+                        schema: options.properties[key],
+                        swaggerJson: local.swaggerJson
+                    });
                     tmp = local.dbFieldRandomCreate({
                         modeNotRandom: options.modeNotRandom,
-                        propDef: options.properties[key]
+                        schemaP: options.properties[key]
                     });
-                    local.validateByPropDef({
+                    local.validateBySwaggerSchema({
                         data: tmp,
-                        key: options.properties[key].name,
-                        schema: options.properties[key]
+                        prefix: ['dbRow', 'properties', key],
+                        schema: options.properties[key],
+                        swaggerJson: local.swaggerJson
                     });
                     dbRow[key] = tmp;
-                }, local.nop);
+                }, console.error);
             });
             return local.jsonCopy(local.objectSetOverride(dbRow, options.override(options)));
         };
@@ -23709,7 +23714,7 @@ swgg\n\
                                     fileInputName: request.swgg.bodyMeta[key].name,
                                     fileSize: request.swgg.bodyParsed[key].length,
                                     fileUrl: local.swaggerJsonBasePath +
-                                        '/' + request.swgg.pathObject.tags[0] +
+                                        '/' + request.swgg.operation.tags[0] +
                                         '/fileGetOneById/' + tmp.id
                                 });
                                 return tmp;
@@ -23826,24 +23831,25 @@ swgg\n\
             // init methodPath
             request.swgg.methodPath = request.method + ' ' +
                 request.urlParsed.pathname.replace(local.swaggerJsonBasePath, '');
-            // init pathObject
+            // init operation
             while (request.swgg.methodPath !== tmp) {
-                request.swgg.pathObject = local.apiDict[request.swgg.methodPath] ||
+                request.swgg.operation = local.apiDict[request.swgg.methodPath] ||
                     // handle /foo/{id}/bar case
                     local.apiDict[
-                        request.swgg.methodPath.replace((/\/[^\/]+\/([^\/]*?)$/), '//$1')
+                        request.swgg.methodPath.replace((/\/[^\/]+\/([^\/]*?)$/), '/{}/$1')
                     ];
-                // if pathObject exists, then break
-                if (request.swgg.pathObject) {
-                    request.swgg.pathObject = local.jsonCopy(request.swgg.pathObject);
+                // if operation exists, then break
+                if (request.swgg.operation) {
+                    request.swgg.operation = local.jsonCopy(request.swgg.operation);
                     // init crud.crudType
-                    request.swgg.crud.crudType = request.swgg.pathObject._crudType;
+                    request.swgg.crud.crudType = request.swgg.operation._crudType;
                     break;
                 }
                 tmp = request.swgg.methodPath;
+                // handle /foo/{id} case
                 request.swgg.methodPath = request.swgg.methodPath.replace(
                     (/\/[^\/]+?(\/*?)$/),
-                    '/$1'
+                    '/$1{}'
                 );
             }
             nextMiddleware();
@@ -23906,8 +23912,8 @@ swgg\n\
                         }
                         // init isAuthenticated
                         user.isAuthenticated = true;
-                        // https://tools.ietf.org/html/rfc7519
                         // create JSON Web Token (JWT)
+                        // https://tools.ietf.org/html/rfc7519
                         user.jwtDecrypted = {};
                         user.jwtDecrypted.sub = user.data.username;
                         // update jwtEncrypted in client
@@ -23958,7 +23964,7 @@ swgg\n\
                 modeNext += 1;
                 switch (modeNext) {
                 case 1:
-                    if (!request.swgg.pathObject) {
+                    if (!request.swgg.operation) {
                         modeNext = Infinity;
                         onNext();
                         return;
@@ -23969,64 +23975,65 @@ swgg\n\
                     tmp = request.urlParsed.pathname
                         .replace(local.swaggerJsonBasePath, '')
                         .split('/');
-                    request.swgg.pathObject._path.split('/').forEach(function (key, ii) {
+                    request.swgg.operation._path.split('/').forEach(function (key, ii) {
                         if ((/^\{\S*?\}$/).test(key)) {
                             request.swgg.paramDict[key.slice(1, -1)] = decodeURIComponent(tmp[ii]);
                         }
                     });
-                    request.swgg.pathObject.parameters.forEach(function (paramDef) {
-                        switch (paramDef.in) {
+                    request.swgg.operation.parameters.forEach(function (schemaP) {
+                        switch (schemaP.in) {
                         // parse body param
                         case 'body':
-                            request.swgg.paramDict[paramDef.name] = request.swgg.bodyParsed ||
+                            request.swgg.paramDict[schemaP.name] = request.swgg.bodyParsed ||
                                 undefined;
                             break;
                         // parse formData param
                         case 'formData':
                             switch (String(request.headers['content-type']).split(';')[0]) {
                             case 'application/x-www-form-urlencoded':
-                                request.swgg.paramDict[paramDef.name] =
-                                    request.swgg.bodyParsed[paramDef.name];
+                                request.swgg.paramDict[schemaP.name] =
+                                    request.swgg.bodyParsed[schemaP.name];
                                 break;
                             }
                             break;
                         // parse header param
                         case 'header':
-                            request.swgg.paramDict[paramDef.name] =
-                                request.headers[paramDef.name.toLowerCase()];
+                            request.swgg.paramDict[schemaP.name] =
+                                request.headers[schemaP.name.toLowerCase()];
                             break;
                         // parse query param
                         case 'query':
-                            request.swgg.paramDict[paramDef.name] =
-                                request.urlParsed.query[paramDef.name];
+                            request.swgg.paramDict[schemaP.name] =
+                                request.urlParsed.query[schemaP.name];
                             break;
                         }
                         // parse array-multi
-                        if (request.swgg.paramDict[paramDef.name] &&
-                                paramDef.type === 'array' &&
-                                paramDef.collectionFormat === 'multi') {
+                        if (request.swgg.paramDict[schemaP.name] &&
+                                schemaP.type === 'array' &&
+                                schemaP.collectionFormat === 'multi') {
                             tmp = '';
-                            request.swgg.paramDict[paramDef.name].forEach(function (value) {
-                                tmp += '&' + encodeURIComponent(paramDef.name) + '=' +
+                            request.swgg.paramDict[schemaP.name].forEach(function (value) {
+                                tmp += '&' + encodeURIComponent(schemaP.name) + '=' +
                                     encodeURIComponent(value);
                             });
-                            request.swgg.paramDict[paramDef.name] = tmp.slice(1);
+                            request.swgg.paramDict[schemaP.name] = tmp.slice(1);
                         }
                         // init default param
-                        if (local.isNullOrUndefined(request.swgg.paramDict[paramDef.name]) &&
-                                paramDef.default !== undefined) {
-                            request.swgg.paramDict[paramDef.name] = local.jsonCopy(
-                                paramDef.default
+                        if (local.isNullOrUndefined(request.swgg.paramDict[schemaP.name]) &&
+                                schemaP.default !== undefined) {
+                            request.swgg.paramDict[schemaP.name] = local.jsonCopy(
+                                schemaP.default
                             );
                         }
                     });
                     // normalize paramDict
-                    local.swaggerParamDictNormalize(request.swgg);
+                    local.normalizeSwaggerParamDict(request.swgg);
                     // validate paramDict
-                    local.validateByParamDefList({
+                    local.validateBySwaggerParameters({
                         data: request.swgg.paramDict,
-                        key: JSON.stringify(request.swgg.methodPath),
-                        paramDefList: request.swgg.pathObject.parameters
+                        prefix: ['operation', request.swgg.methodPath],
+                        parameters: request.swgg.operation.parameters,
+                        swaggerJson: local.swaggerJson
                     });
                     onNext();
                     break;
@@ -24034,9 +24041,9 @@ swgg\n\
                     // init crud
                     crud = request.swgg.crud;
                     // init crud.dbTable
-                    crud.dbTable = request.swgg.pathObject &&
-                        request.swgg.pathObject._schemaName &&
-                        local.db.dbTableCreateOne({ name: request.swgg.pathObject._schemaName });
+                    crud.dbTable = request.swgg.operation &&
+                        request.swgg.operation._schemaName &&
+                        local.db.dbTableCreateOne({ name: request.swgg.operation._schemaName });
                     if (!crud.dbTable) {
                         nextMiddleware();
                         return;
@@ -24047,12 +24054,12 @@ swgg\n\
                     }
                     // init crud.data
                     crud.data = local.jsonCopy(request.swgg.paramDict);
-                    request.swgg.pathObject.parameters.forEach(function (param) {
+                    request.swgg.operation.parameters.forEach(function (schemaP) {
                         // JSON.parse json-string
-                        if (param.format === 'json' &&
-                                param.type === 'string' &&
-                                crud.data[param.name]) {
-                            crud.data[param.name] = JSON.parse(crud.data[param.name]);
+                        if (schemaP.format === 'json' &&
+                                schemaP.type === 'string' &&
+                                crud.data[schemaP.name]) {
+                            crud.data[schemaP.name] = JSON.parse(crud.data[schemaP.name]);
                         }
                     });
                     // init crud.query*
@@ -24074,7 +24081,7 @@ swgg\n\
                     }].forEach(function (element) {
                         crud[element.key] = crud.data['_' + element.key] || JSON.parse(
                             local.templateRender(
-                                request.swgg.pathObject['_' + element.key] || 'null',
+                                request.swgg.operation['_' + element.key] || 'null',
                                 request.swgg.paramDict
                             )
                         ) || element.value;
@@ -24104,6 +24111,129 @@ swgg\n\
             onNext();
         };
 
+        local.normalizeSwaggerJson = function (options) {
+        /*
+         * this function will normalize swaggerJson and filter $SWGG_TAGS0_FILTER
+         */
+            var tmp;
+            local.objectSetDefault(options, { paths: {}, tags: [] });
+            // auto-create operationId from path
+            Object.keys(options.paths).forEach(function (path) {
+                Object.keys(options.paths[path]).forEach(function (method) {
+                    tmp = options.paths[path][method];
+                    local.objectSetDefault(tmp, { parameters: [], tags: [] });
+                    // auto-create operationId
+                    if (options['x-swgg-operationIdFromPath'] ||
+                            tmp['x-swgg-operationIdFromPath'] ||
+                            !tmp.operationId) {
+                        tmp.operationId = encodeURIComponent(path + ' ' + method)
+                            .replace((/[^\w\-.]/g), '_');
+                    }
+                });
+            });
+            // filter $SWGG_TAGS0_FILTER
+            // example usage:
+            // $ SWGG_TAGS0_FILTER=google-maps shBuildApp
+            // filter $SWGG_TAGS0_FILTER - definitions and parameters
+            ['definitions', 'parameters'].forEach(function (schema) {
+                schema = options[schema] || {};
+                Object.keys(schema).forEach(function (key) {
+                    if (local.env.SWGG_TAGS0_FILTER && schema[key]['x-swgg-tags0'] &&
+                            schema[key]['x-swgg-tags0'] !== local.env.SWGG_TAGS0_FILTER) {
+                        delete schema[key];
+                    }
+                });
+            });
+            // filter $SWGG_TAGS0_FILTER - paths
+            Object.keys(options.paths).forEach(function (path) {
+                Object.keys(options.paths[path]).forEach(function (method) {
+                    tmp = options.paths[path][method];
+                    if (local.env.SWGG_TAGS0_FILTER && tmp['x-swgg-tags0'] &&
+                            tmp['x-swgg-tags0'] !== local.env.SWGG_TAGS0_FILTER) {
+                        delete options.paths[path][method];
+                        return;
+                    }
+                });
+                if (!Object.keys(options.paths[path]).length) {
+                    delete options.paths[path];
+                }
+            });
+            // filter $SWGG_TAGS0_FILTER - tags
+            options.tags = options.tags.filter(function (tag) {
+                return !local.env.SWGG_TAGS0_FILTER ||
+                    (tag['x-swgg-tags0'] && tag['x-swgg-tags0'] === local.env.SWGG_TAGS0_FILTER);
+            });
+            return options;
+        };
+
+        local.normalizeSwaggerParamDict = function (options) {
+        /*
+         * this function will parse the options according to options.operation.parameters
+         */
+            var tmp;
+            options.operation.parameters.forEach(function (schemaP) {
+                tmp = options.paramDict[schemaP.name];
+                // init default value
+                if (!options.modeNoDefault &&
+                        (options.modeDefault || schemaP.required) &&
+                        local.isNullOrUndefined(tmp)) {
+                    tmp = local.jsonCopy(schemaP.default);
+                }
+                if (options.modeDefault && local.isNullOrUndefined(tmp)) {
+                    tmp = local.dbFieldRandomCreate({
+                        modeNotRandom: true,
+                        schemaP: schemaP
+                    });
+                }
+                // parse array
+                if (schemaP.type === 'array' && schemaP.in !== 'body') {
+                    if (typeof tmp === 'string') {
+                        switch (schemaP.collectionFormat || schemaP['x-swgg-collectionFormat']) {
+                        case 'json':
+                            local.tryCatchOnError(function () {
+                                tmp = JSON.parse(tmp);
+                            }, local.nop);
+                            options.paramDict[schemaP.name] = tmp;
+                            return;
+                        case 'multi':
+                            tmp = local.urlParse('?' + tmp, true).query[schemaP.name];
+                            break;
+                        case 'pipes':
+                            tmp = tmp.split('|');
+                            break;
+                        case 'ssv':
+                            tmp = tmp.split(' ');
+                            break;
+                        case 'tsv':
+                            tmp = tmp.split('\t');
+                            break;
+                        // default to csv
+                        default:
+                            tmp = tmp.split(',');
+                        }
+                        if (schemaP.items && schemaP.items.type !== 'string') {
+                            // try to JSON.parse the string
+                            local.tryCatchOnError(function () {
+                                tmp = tmp.map(function (element) {
+                                    return JSON.parse(element);
+                                });
+                            }, local.nop);
+                        }
+                    }
+                // JSON.parse paramDict
+                } else if (schemaP.type !== 'file' &&
+                        schemaP.type !== 'string' &&
+                        (typeof tmp === 'string' || tmp instanceof local.global.Uint8Array)) {
+                    // try to JSON.parse the string
+                    local.tryCatchOnError(function () {
+                        tmp = JSON.parse(local.bufferToString(tmp));
+                    }, local.nop);
+                }
+                options.paramDict[schemaP.name] = tmp;
+            });
+            return options;
+        };
+
         local.onErrorJsonapi = function (onError) {
         /*
          * http://jsonapi.org/format/#errors
@@ -24130,7 +24260,7 @@ swgg\n\
                             data.push(null);
                         }
                         data = data.map(function (element) {
-                            if (!(element && typeof element === 'object')) {
+                            if (!(typeof element === 'object' && element)) {
                                 element = { message: String(element) };
                             }
                             // normalize error-object to plain json-object
@@ -24166,48 +24296,6 @@ swgg\n\
             };
         };
 
-        local.schemaNormalizeAndCopy = function (schema) {
-        /*
-         * this function will return a normalized copy the schema
-         */
-            var tmp;
-            // dereference $ref
-            if (schema.$ref) {
-                [local.swaggerJson, local.swaggerSchemaJson].some(function (options) {
-                    local.tryCatchOnError(function () {
-                        schema.$ref.replace(
-                            (/#\/(.*?)\/(.*?)$/),
-                            function (match0, match1, match2) {
-                                // jslint-hack - nop
-                                local.nop(match0);
-                                tmp = options[match1][match2];
-                            }
-                        );
-                    }, local.nop);
-                    return tmp;
-                });
-                // validate schema
-                local.assert(tmp, schema.$ref);
-                // recurse
-                schema = local.schemaNormalizeAndCopy(tmp);
-            }
-            // inherit allOf
-            if (schema.allOf) {
-                tmp = local.jsonCopy(schema);
-                delete tmp.allOf;
-                schema.allOf.reverse().forEach(function (element) {
-                    // recurse
-                    local.objectSetDefault(tmp, local.schemaNormalizeAndCopy(element), 2);
-                });
-                schema = tmp;
-            }
-            schema = local.jsonCopy(schema);
-            if (schema.type === 'object') {
-                schema.properties = local.normalizeValue('dict', schema.properties);
-            }
-            return schema;
-        };
-
         local.serverRespondJsonapi = function (request, response, error, data, meta) {
         /*
          * http://jsonapi.org/format/#errors
@@ -24220,8 +24308,8 @@ swgg\n\
                 });
                 if (error) {
                     // debug statusCode / method / url
-                    local.errorMessagePrepend(error, response.statusCode + ' ' +
-                        request.method + ' ' + request.url + '\n');
+                    local.errorMessagePrepend(error, response.statusCode + ' ' + request.method +
+                        ' ' + request.url + '\n');
                     // print error.stack to stderr
                     local.onErrorDefault(error);
                 }
@@ -24230,123 +24318,6 @@ swgg\n\
                     response.statusCode;
                 response.end(JSON.stringify(data));
             })(error, data, meta);
-        };
-
-        local.swaggerJsonNormalize = function (options) {
-        /*
-         * this function will normalize swaggerJson
-         */
-            var tmp;
-            local.objectSetDefault(options, { paths: {}, tags: [] });
-            // auto-create operationId from path
-            Object.keys(options.paths).forEach(function (path) {
-                Object.keys(options.paths[path]).forEach(function (method) {
-                    tmp = options.paths[path][method];
-                    // auto-create operationId
-                    local.objectSetDefault(tmp, { tags: [] });
-                    if (options['x-swgg-operationIdFromPath'] ||
-                            tmp['x-swgg-operationIdFromPath'] ||
-                            !tmp.operationId) {
-                        tmp.operationId = encodeURIComponent(path + ' ' + method)
-                            .replace((/[^\w\-.]/g), '_');
-                    }
-                });
-            });
-            // filter $SWGG_TAGS0_FILTER
-            // example usage:
-            // $ SWGG_TAGS0_FILTER=google-maps shBuildApp
-            if (!local.env.SWGG_TAGS0_FILTER) {
-                return options;
-            }
-            ['definitions', 'x-swgg-definitionsParameters'].forEach(function (dict) {
-                dict = options[dict] || {};
-                Object.keys(dict).forEach(function (key) {
-                    if (dict[key]['x-swgg-tags0'] &&
-                            dict[key]['x-swgg-tags0'] !== local.env.SWGG_TAGS0_FILTER) {
-                        delete dict[key];
-                    }
-                });
-            });
-            Object.keys(options.paths).forEach(function (path) {
-                Object.keys(options.paths[path]).forEach(function (method) {
-                    tmp = options.paths[path][method];
-                    // filter $SWGG_TAGS0_FILTER
-                    if (tmp['x-swgg-tags0'] &&
-                            tmp['x-swgg-tags0'] !== local.env.SWGG_TAGS0_FILTER) {
-                        delete options.paths[path][method];
-                        return;
-                    }
-                });
-                if (!Object.keys(options.paths[path]).length) {
-                    delete options.paths[path];
-                }
-            });
-            options.tags = options.tags.filter(function (tag) {
-                return tag['x-swgg-tags0'] && tag['x-swgg-tags0'] === local.env.SWGG_TAGS0_FILTER;
-            });
-            return options;
-        };
-
-        local.swaggerParamDictNormalize = function (options) {
-        /*
-         * this function will parse the options according to pathObject.parameters
-         */
-            var tmp;
-            options.pathObject.parameters.forEach(function (paramDef) {
-                tmp = options.paramDict[paramDef.name];
-                // init default value
-                if (!options.modeNoDefault &&
-                        local.isNullOrUndefined(tmp) &&
-                        paramDef.default !== undefined) {
-                    tmp = local.jsonCopy(paramDef.default);
-                }
-                // parse array
-                if (paramDef.type === 'array' && paramDef.in !== 'body') {
-                    if (typeof tmp === 'string') {
-                        switch (paramDef.collectionFormat || paramDef['x-collectionFormat']) {
-                        case 'json':
-                            local.tryCatchOnError(function () {
-                                tmp = JSON.parse(tmp);
-                            }, local.nop);
-                            options.paramDict[paramDef.name] = tmp;
-                            return;
-                        case 'multi':
-                            tmp = local.urlParse('?' + tmp, true).query[paramDef.name];
-                            break;
-                        case 'pipes':
-                            tmp = tmp.split('|');
-                            break;
-                        case 'ssv':
-                            tmp = tmp.split(' ');
-                            break;
-                        case 'tsv':
-                            tmp = tmp.split('\t');
-                            break;
-                        // default to csv
-                        default:
-                            tmp = tmp.split(',');
-                        }
-                        if (paramDef.items && paramDef.items.type !== 'string') {
-                            // try to JSON.parse the string
-                            local.tryCatchOnError(function () {
-                                tmp = tmp.map(function (element) {
-                                    return JSON.parse(element);
-                                });
-                            }, local.nop);
-                        }
-                    }
-                // JSON.parse paramDict
-                } else if (paramDef.type !== 'file' &&
-                        paramDef.type !== 'string' &&
-                        (typeof tmp === 'string' || tmp instanceof local.global.Uint8Array)) {
-                    // try to JSON.parse the string
-                    local.tryCatchOnError(function () {
-                        tmp = JSON.parse(local.bufferToString(tmp));
-                    }, local.nop);
-                }
-                options.paramDict[paramDef.name] = tmp;
-            });
-            return options;
         };
 
         local.uiAnimateShake = function (element) {
@@ -24365,7 +24336,6 @@ swgg\n\
                     return;
                 }
                 switch (event.target.tagName) {
-                case 'A':
                 case 'BUTTON':
                 case 'FORM':
                     event.preventDefault();
@@ -24417,9 +24387,9 @@ swgg\n\
                     options.modeNoDefault = true;
                     options.paramDict = {};
                     options.url = 'error';
-                    options.api.parameters.forEach(function (paramDef) {
+                    options.api.parameters.forEach(function (schemaP) {
                         tmp = options.domOperationContent.querySelector(
-                            '.paramDef[name=' + paramDef.name + '] > .td3'
+                            '.schemaP[name=' + schemaP.name + '] > .td3'
                         ).children[0];
                         switch (tmp.tagName) {
                         case 'INPUT':
@@ -24433,7 +24403,7 @@ swgg\n\
                                 return;
                             }
                             // parse string
-                            if (paramDef.type !== 'string') {
+                            if (schemaP.type !== 'string') {
                                 tmp = jsonParse(tmp);
                             }
                             break;
@@ -24450,7 +24420,7 @@ swgg\n\
                             if (!tmp.length || tmp[0] === '$swggUndefined') {
                                 return;
                             }
-                            if (paramDef.type !== 'array') {
+                            if (schemaP.type !== 'array') {
                                 tmp = tmp[0];
                             }
                             break;
@@ -24459,25 +24429,25 @@ swgg\n\
                             if (!tmp) {
                                 return;
                             }
-                            if (paramDef.schema &&
-                                    paramDef.schema.type === 'string' &&
+                            if (schemaP.schema &&
+                                    schemaP.schema.type === 'string' &&
                                     typeof tmp === 'string') {
                                 break;
                             }
                             // parse schema
-                            if (paramDef.in === 'body') {
+                            if (schemaP.in === 'body') {
                                 tmp = jsonParse(tmp);
                                 break;
                             }
                             // parse array
                             tmp = tmp.split('\n').map(function (element) {
-                                return paramDef.items.type === 'string'
+                                return schemaP.items.type === 'string'
                                     ? element
                                     : jsonParse(element);
                             });
                             break;
                         }
-                        options.paramDict[paramDef.name] = tmp;
+                        options.paramDict[schemaP.name] = tmp;
                     });
                     options.api.ajax(options, options.onNext);
                     break;
@@ -24489,14 +24459,14 @@ swgg\n\
                     });
                     // remove previous error
                     Array.from(
-                        options.domOperationContent.querySelectorAll('.paramDef .input')
+                        options.domOperationContent.querySelectorAll('.schemaP .input')
                     ).forEach(function (element) {
                         element.classList.remove('error');
                     });
                     // shake invalid-input
-                    if (error && error.options && error.options.key) {
+                    if (error && error.options && error.schema) {
                         Array.from(options.domOperationContent.querySelectorAll(
-                            '.paramDef[name=' + error.options.key + '] .input'
+                            '.schemaP[name=' + error.schema.name + '] .input'
                         )).forEach(function (element) {
                             element.classList.add('error');
                             local.uiAnimateShake(element.closest('span'));
@@ -24510,8 +24480,7 @@ swgg\n\
                     local.tryCatchOnError(function () {
                         options.data = JSON.stringify(JSON.parse(options.data), null, 4);
                     }, local.nop);
-                    data.curl = 'curl \\\n' +
-                        '--request ' + options.api._method + ' \\\n' +
+                    data.curl = 'curl \\\n' + '--request ' + options.api._method + ' \\\n' +
                         Object.keys(options.headers).map(function (key) {
                             return "--header '" + key + ': ' + options.headers[key] + "' \\\n";
                         }).join('') + '--data-binary ' + (typeof options.data === 'string'
@@ -24526,9 +24495,8 @@ swgg\n\
                         ? data.getAllResponseHeaders()
                         : ''))
                         .replace((/\r\ncontent-type:(.*?)\r\n/gi), function (match0, match1) {
-                            // jslint-hack - nop
-                            local.nop(match0);
-                            data.contentType = match1.trim();
+                            match0 = match1;
+                            data.contentType = match0.trim();
                         });
                     switch (data.contentType && data.contentType.split('/')[0]) {
                     case 'audio':
@@ -24575,8 +24543,8 @@ swgg\n\
                     element.closest('.operationList').querySelectorAll('.operation > .content')
                 ),
                 function () {
-                    element.querySelector('.header').blur();
-                    element.querySelector('.header').focus();
+                    element.querySelector('[tabIndex]').blur();
+                    element.querySelector('[tabIndex]').focus();
                 }
             );
         };
@@ -24665,83 +24633,79 @@ swgg\n\
                 document.querySelector('.swggUiContainer > .header > .td2').value
                     .replace((/^\//), '')
             ).href;
-            document.querySelector('#swggAjaxProgressDiv1 span').innerHTML =
-                'loading swagger.json &nbsp;';
+            document.querySelector('#swggAjaxProgressDiv1 span').innerHTML = 'loading swagger.json';
             // fetch swagger.json file
             local.apiUpdate({
                 modeAjax: true,
                 url: document.querySelector('.swggUiContainer > .header > .td2').value
-            }, function (error, data) {
+            }, function (error) {
+                local.uiRender(null, onError);
                 local.tryCatchOnError(function () {
-                    // validate no error occurred
-                    local.assert(!error, error);
-                    local.objectSetDefault(data, {
-                        host: local.corsBackendHostInject(
-                            local.urlParse(document.querySelector(
-                                '.swggUiContainer > .header > .td2'
-                            ).value).host,
-                            data['x-swgg-corsBackendHost']
-                        )
-                    });
-                    local.uiRender(null, onError);
+                    local.validateBySwaggerJson({ swaggerJson: local.swaggerJson });
                 }, local.uiNotify);
+                local.uiNotify(error);
             });
         };
 
-        local.uiNotify = function (error, message) {
+        local.uiNotify = function (error) {
         /*
-         * this function will notify with the given error or message
+         * this function will notify with the given error
          */
             var element;
             element = document.querySelector('#swggAjaxProgressPre1');
-            if (error) {
-                element.classList.add('error');
-                local.uiAnimateShake(element);
-                element.textContent = error.stack;
+            if (!error) {
                 return element;
             }
-            element.classList.remove('error');
-            element.textContent = message;
+            element.classList.add('error');
+            local.uiAnimateShake(element);
+            element.textContent = error.stack + '\n' + element.textContent;
             return element;
         };
 
-        local.uiParamRender = function (paramDef) {
+        local.uiParamRender = function (schemaP) {
         /*
-         * this function will render the param
+         * this function will render schemaP
          */
-            paramDef.placeholder = !local.isNullOrUndefined(paramDef['x-swgg-example'])
-                ? String(paramDef['x-swgg-example'])
-                : paramDef.required
-                ? '(required)'
-                : '';
-            paramDef.enum2 = paramDef.enum || (paramDef.items && paramDef.items.enum);
+            schemaP.placeholder = !local.isNullOrUndefined(schemaP.default)
+                ? schemaP.default
+                : local.dbFieldRandomCreate({
+                    modeNotRandom: true,
+                    schemaP: schemaP
+                });
+            if (schemaP.type !== 'string') {
+                schemaP.placeholder = JSON.stringify(schemaP.placeholder);
+            }
+            schemaP.placeholder = String(schemaP.placeholder || '');
+            schemaP.enum2 = schemaP.enum || (schemaP.items && schemaP.items.enum);
             // init input - file
-            if (paramDef.type === 'file') {
-                paramDef.isFile = true;
+            if (schemaP.type === 'file') {
+                schemaP.isFile = true;
             // init input - textarea
-            } else if (paramDef.in === 'body') {
-                paramDef.isTextarea = true;
+            } else if (schemaP.in === 'body') {
+                schemaP.isTextarea = true;
             // init input - select
-            } else if (paramDef.enum2 || paramDef.type === 'boolean') {
-                paramDef.enumDefault = [];
-                if (paramDef.default !== undefined) {
-                    paramDef.enumDefault = paramDef.type === 'array'
-                        ? paramDef.default
-                        : [paramDef.default];
+            } else if (schemaP.enum2 || schemaP.type === 'boolean') {
+                // init enumDefault
+                schemaP.enumDefault = [];
+                if (schemaP.required && schemaP.default !== undefined) {
+                    schemaP.enumDefault = schemaP.type === 'array'
+                        ? schemaP.default
+                        : [schemaP.default];
                 }
-                paramDef.isSelect = true;
-                paramDef.isSelectMultiple = paramDef.type === 'array';
-                paramDef.selectOptionList = (paramDef.type === 'boolean'
+                schemaP.isSelect = true;
+                schemaP.isSelectMultiple = schemaP.type === 'array';
+                schemaP.selectOptionList = (schemaP.type === 'boolean'
                     ? [false, true]
-                    : paramDef.enum2).map(function (element) {
-                    paramDef.hasDefault = paramDef.hasDefault ||
-                        paramDef.enumDefault.indexOf(element) >= 0;
+                    : schemaP.enum2).map(function (element) {
+                    // init hasDefault
+                    schemaP.hasDefault = schemaP.hasDefault ||
+                        schemaP.enumDefault.indexOf(element) >= 0;
                     return {
-                        id: local.idDomElementCreate('swgg_id_' + paramDef.name),
-                        selected: paramDef.enumDefault.indexOf(element) >= 0
+                        id: local.idDomElementCreate('swgg_id_' + schemaP.name),
+                        selected: schemaP.enumDefault.indexOf(element) >= 0
                             ? 'selected'
                             : '',
-                        type: (paramDef.items && paramDef.items.type) || paramDef.type,
+                        type: (schemaP.items && schemaP.items.type) || schemaP.type,
                         valueDecoded: element,
                         valueEncoded: typeof element === 'string'
                             ? element
@@ -24749,111 +24713,116 @@ swgg\n\
                     };
                 });
                 // init 'undefined' value
-                if (!(paramDef.hasDefault || paramDef.required)) {
-                    paramDef.selectOptionList.unshift({
-                        id: local.idDomElementCreate('swgg_id_' + paramDef.name),
+                if (!schemaP.required && !schemaP.hasDefault) {
+                    schemaP.selectOptionList.unshift({
+                        id: local.idDomElementCreate('swgg_id_' + schemaP.name),
                         selected: 'selected',
-                        type: paramDef.type,
+                        type: schemaP.type,
                         valueDecoded: '$swggUndefined',
                         valueEncoded: '<none>'
                     });
                 }
-                // if required, then select at least one value
-                if (paramDef.required && paramDef.selectOptionList.length) {
-                    paramDef.selected = paramDef.selectOptionList[0];
-                    paramDef.selectOptionList.some(function (element) {
-                        if (element.selected) {
-                            paramDef.selected = element.selected;
-                            return true;
+                // select at least one value
+                if (!schemaP.isSelectMultiple) {
+                    schemaP.selectOptionList.some(function (element, ii) {
+                        if (ii === 0 || element.selected) {
+                            element.selected = 'selected';
+                            if (ii !== 0) {
+                                schemaP.selectOptionList[0].selected = '';
+                                return true;
+                            }
                         }
                     });
-                    paramDef.selected = 'selected';
                 }
             // init input - textarea
-            } else if (paramDef.type === 'array') {
-                paramDef.isTextarea = true;
-                paramDef.placeholder = Array.isArray(paramDef['x-swgg-example'])
-                    ? paramDef['x-swgg-example'].join('\n')
-                    : 'provide multiple values in new lines' + (paramDef.required
+            } else if (schemaP.type === 'array') {
+                schemaP.isTextarea = true;
+                schemaP.placeholder = String(Array.isArray(schemaP.default)
+                    ? schemaP.default.join('\n')
+                    : 'provide multiple values in new lines' + (schemaP.required
                         ? ' (at least one required)'
-                        : '');
+                        : ''));
             // init input - text
             } else {
-                paramDef.isInputText = true;
+                schemaP.isInputText = true;
             }
             // init format2 / type2
-            [
-                paramDef,
-                paramDef.schema
-            ].some(function (element) {
-                local.tryCatchOnError(function () {
-                    paramDef.format2 = paramDef.format2 || element.format;
-                }, local.nop);
-                local.tryCatchOnError(function () {
-                    paramDef.type2 = paramDef.type2 || element.type;
-                }, local.nop);
-                return paramDef.type2;
+            [schemaP, schemaP.schema || {}].some(function (element) {
+                local.objectSetDefault(schemaP, {
+                    format2: element.format,
+                    type2: element.type
+                });
+                return schemaP.type2;
             });
-            paramDef.type2 = paramDef.type2 || 'object';
+            schemaP.type2 = schemaP.type2 || 'object';
             // init schema2
             [
-                paramDef.items,
-                paramDef.schema,
-                paramDef.schema && paramDef.schema.items
+                schemaP,
+                schemaP.items,
+                schemaP.schema,
+                schemaP.schema && schemaP.schema.items
             ].some(function (element) {
-                paramDef.schema2 = local.schemaNormalizeAndCopy(element || {}).properties;
-                return paramDef.schema2;
+                schemaP.schema2 = (local.validateBySwaggerSchema({
+                    // dereference schemaP
+                    modeDereference: true,
+                    prefix: ['parameters', schemaP.name],
+                    schema: element,
+                    swaggerJson: local.swaggerJson
+                }) || {}).properties;
+                return schemaP.schema2;
             });
-            if (paramDef.schema2) {
-                paramDef.schemaText = JSON.stringify(paramDef.type2 === 'array'
-                    ? [paramDef.schema2]
-                    : paramDef.schema2, null, 4);
+            if (schemaP.schema2) {
+                schemaP.schemaText = JSON.stringify(schemaP.type2 === 'array'
+                    ? [schemaP.schema2]
+                    : schemaP.schema2, null, 4);
             }
             // init valueEncoded
-            paramDef.valueEncoded = paramDef['x-swgg-apiKey']
-                ? local.apiKeyValue
-                : paramDef.default;
-            if (paramDef.valueEncoded === undefined &&
-                    local.isNullOrUndefined(paramDef['x-swgg-example'])) {
-                paramDef.valueEncoded = local.dbFieldRandomCreate({
-                    modeNotRandom: true,
-                    propDef: paramDef
-                });
-            }
-            // init valueEncoded for array
-            if (paramDef.valueEncoded && paramDef.type2 === 'array' && paramDef.in !== 'body') {
-                paramDef.valueEncoded = paramDef.valueEncoded.map(function (element) {
-                    return typeof element === 'string'
-                        ? element
-                        : JSON.stringify(element);
-                }).join('\n');
+            if (schemaP.required || schemaP.in === 'body' || schemaP['x-swgg-apiKey']) {
+                schemaP.valueEncoded = schemaP['x-swgg-apiKey']
+                    ? local.apiKeyValue
+                    : schemaP.default;
+                if (schemaP.valueEncoded === undefined &&
+                        local.isNullOrUndefined(schemaP.default)) {
+                    schemaP.valueEncoded = local.dbFieldRandomCreate({
+                        modeNotRandom: true,
+                        schemaP: schemaP
+                    });
+                }
+                // init valueEncoded for array
+                if (schemaP.valueEncoded && schemaP.type2 === 'array' && schemaP.in !== 'body') {
+                    schemaP.valueEncoded = schemaP.valueEncoded.map(function (element) {
+                        return typeof element === 'string'
+                            ? element
+                            : JSON.stringify(element);
+                    }).join('\n');
+                }
             }
             // init valueEncoded for schema
-            if (paramDef.in === 'body' && paramDef.schema2) {
-                paramDef.valueEncoded = local.dbRowRandomCreate({
+            if (schemaP.in === 'body' && schemaP.schema2) {
+                schemaP.valueEncoded = local.dbRowRandomCreate({
                     modeNotRandom: true,
                     override: function () {
                         var override = {};
                         // preserve default value
-                        Object.keys(paramDef.schema2).forEach(function (key) {
-                            if (paramDef.schema2[key].default !== undefined) {
-                                override[key] = paramDef.schema2[key].default;
+                        Object.keys(schemaP.schema2).forEach(function (key) {
+                            if (schemaP.schema2[key].default !== undefined) {
+                                override[key] = schemaP.schema2[key].default;
                             }
                         });
                         return override;
                     },
-                    properties: paramDef.schema2
+                    properties: schemaP.schema2
                 });
-                if (paramDef.type2 === 'array') {
-                    paramDef.valueEncoded = [paramDef.valueEncoded];
+                if (schemaP.type2 === 'array') {
+                    schemaP.valueEncoded = [schemaP.valueEncoded];
                 }
-                paramDef.valueEncoded = JSON.stringify(paramDef.valueEncoded, null, 4);
+                schemaP.valueEncoded = JSON.stringify(schemaP.valueEncoded, null, 4);
             }
-            if (typeof paramDef.valueEncoded !== 'string') {
-                paramDef.valueEncoded = JSON.stringify(paramDef.valueEncoded) || '';
+            if (typeof schemaP.valueEncoded !== 'string') {
+                schemaP.valueEncoded = JSON.stringify(schemaP.valueEncoded) || '';
             }
-            // templateRender paramDef
-            paramDef.innerHTML = local.templateRender(local.templateUiParam, paramDef);
+            // templateRender schemaP
+            schemaP.innerHTML = local.templateRender(local.templateUiParam, schemaP);
         };
 
         local.uiRender = function (options, onError) {
@@ -24864,6 +24833,8 @@ swgg\n\
             // optimization - render .swggUiContainer first
             if (!(options && options.swagger)) {
                 options = local.uiState = local.jsonCopy(local.swaggerJson);
+                // init ajaxProgressText
+                options.ajaxProgressText = 'rendering swagger.json';
                 // init apiKeyValue
                 options.apiKeyValue = local.apiKeyValue;
                 // init title
@@ -24871,8 +24842,10 @@ swgg\n\
                     local.templateUiTitle,
                     options
                 ).trim();
-                // init url
-                options.url = document.querySelector('.swggUiContainer > .header > .td2').value;
+                // init urlSwaggerJson
+                options.urlSwaggerJson = document.querySelector(
+                    '.swggUiContainer > .header > .td2'
+                ).value;
                 // templateRender main
                 document.querySelector('.swggUiContainer').innerHTML = local.templateRender(
                     local.templateUiMain,
@@ -24935,15 +24908,20 @@ swgg\n\
                         }),
                         summary: 'no summary'
                     });
-                    operation.parameters.forEach(function (element) {
-                        // init element.id
-                        element.id = local.idDomElementCreate('swgg_id_' + element.name);
-                        local.uiParamRender(element);
+                    operation.parameters.forEach(function (schemaP) {
+                        // init schemaP.id
+                        schemaP.id = local.idDomElementCreate('swgg_id_' + schemaP.name);
+                        local.uiParamRender(schemaP);
                     });
                     // templateRender operation
                     options.uiFragment.querySelector('#' + resource.id + ' .operationList')
                         .appendChild(local.domFragmentRender(local.templateUiOperation, operation));
                 });
+            });
+            Array.from(
+                options.uiFragment.querySelectorAll('.operation > .header > .td1')
+            ).forEach(function (element, ii) {
+                element.innerHTML = ii + 1;
             });
             // append uiFragment to swggUiContainer
             document.querySelector('#swggAjaxProgressDiv1').style.display = 'none';
@@ -24971,7 +24949,7 @@ swgg\n\
                     parent = parent.parentElement;
                 }
                 setTimeout(function () {
-                    element.querySelector('.header').focus();
+                    element.querySelector('[tabIndex]').focus();
                 }, 250);
             }, local.nop);
             local.setTimeoutOnError(onError);
@@ -25005,435 +24983,549 @@ swgg\n\
             local.serverRespondJsonapi(request, response, error);
         };
 
-        local.validateByParamDefList = function (options) {
-        /*
-         * this function will validate options.data against options.paramDefList
-         */
-            var data, key;
-            local.tryCatchOnError(function () {
-                data = options.data;
-                // validate data
-                local.assert(data && typeof data === 'object', data);
-                (options.paramDefList || []).forEach(function (paramDef) {
-                    key = paramDef.name;
-                    // recurse - validateByPropDef
-                    local.validateByPropDef({
-                        circularList: options.circularList,
-                        data: data[key],
-                        dataReadonlyRemove: (options.dataReadonlyRemove || {})[key],
-                        key: key,
-                        schema: paramDef,
-                        required: paramDef.required,
-                        'x-swgg-notRequired': paramDef['x-swgg-notRequired']
-                    });
-                });
-            }, function (error) {
-                error.statusCode = error.statusCode || 400;
-                local.errorMessagePrepend(error, options.key + '.' + key + ' -> ');
-                throw error;
-            });
-        };
-
-        local.validateByPropDef = function (options) {
-        /*
-         * this function will validate options.data against options.schema
-         */
-            var data, enum2, prefix, propDef, tmp;
-            local.tryCatchOnError(function () {
-                data = options.data;
-                prefix = 'property ' + options.key;
-                propDef = options.schema;
-                // validate x-swgg-definitionsParameters
-                local.assert(
-                    !(propDef['x-swgg-ref'] && options['x-swgg-definitionsParameters']) ||
-                        options['x-swgg-definitionsParameters'][propDef['x-swgg-ref']],
-                    prefix + ' missing x-swgg-definitionsParameters.' + propDef['x-swgg-ref']
-                );
-                // validate undefined data
-                if (local.isNullOrUndefined(data)) {
-                    if (options.required && !options['x-swgg-notRequired']) {
-                        tmp = new Error(prefix + ' cannot be null or undefined');
-                        tmp.options = options;
-                        throw tmp;
-                    }
-                    return;
-                }
-                // handle schema
-                if (propDef.schema) {
-                    local.assert(!propDef.$ref, prefix + ' cannot have both schema and $ref');
-                    local.assert(!propDef.type, prefix + ' cannot have both schema and type');
-                    // recurse - validateByPropDef
-                    local.validateByPropDef({
-                        circularList: options.circularList,
-                        data: data,
-                        dataReadonlyRemove: options.dataReadonlyRemove,
-                        key: options.key,
-                        schema: propDef.schema,
-                        'x-swgg-notRequired': options['x-swgg-notRequired']
-                    });
-                    return;
-                }
-                // handle $ref
-                if (propDef.$ref) {
-                    local.assert(!propDef.schema, prefix + ' cannot have both $ref and schema');
-                    local.assert(!propDef.type, prefix + ' cannot have both $ref and type');
-                    // recurse - validateBySchema
-                    local.validateBySchema({
-                        circularList: options.circularList,
-                        data: data,
-                        dataReadonlyRemove: options.dataReadonlyRemove,
-                        key: propDef.$ref,
-                        schema: local.schemaNormalizeAndCopy({ $ref: propDef.$ref }),
-                        'x-swgg-notRequired': options['x-swgg-notRequired']
-                    });
-                    return;
-                }
-                // handle anyOf
-                if (propDef.anyOf) {
-                    tmp = propDef.anyOf.some(function (element) {
-                        local.tryCatchOnError(function () {
-                            // recurse - validateBySchema
-                            local.validateBySchema({
-                                circularList: options.circularList,
-                                data: data,
-                                key: 'anyOf',
-                                schema: local.schemaNormalizeAndCopy(element),
-                                'x-swgg-notRequired': options['x-swgg-notRequired']
-                            });
-                        }, local.nop);
-                        return !local.utility2._debugTryCatchErrorCaught;
-                    });
-                    local.assert(tmp, local.utility2._debugTryCatchErrorCaught);
-                    return;
-                }
-                // normalize propDef
-                propDef = local.schemaNormalizeAndCopy(options.schema);
-                // init circularList
-                if (data && typeof data === 'object') {
-                    options.circularList = options.circularList || [];
-                    if (options.circularList.indexOf(data) >= 0) {
-                        return;
-                    }
-                    options.circularList.push(data);
-                }
-                // http://json-schema.org/latest/json-schema-validation.html#anchor13
-                // 5.1.  Validation keywords for numeric instances (number and integer)
-                if (typeof data === 'number') {
-                    if (typeof propDef.multipleOf === 'number') {
-                        local.assert(
-                            data % propDef.multipleOf === 0,
-                            prefix + ' must be a multiple of ' + propDef.multipleOf
-                        );
-                    }
-                    if (typeof propDef.maximum === 'number') {
-                        local.assert(
-                            propDef.exclusiveMaximum
-                                ? data < propDef.maximum
-                                : data <= propDef.maximum,
-                            prefix + ' must be ' + (propDef.exclusiveMaximum
-                                ? '< '
-                                : '<= ') + propDef.maximum
-                        );
-                    }
-                    if (typeof propDef.minimum === 'number') {
-                        local.assert(
-                            propDef.exclusiveMinimum
-                                ? data > propDef.minimum
-                                : data >= propDef.minimum,
-                            prefix + ' must be ' + (propDef.exclusiveMinimum
-                                ? '> '
-                                : '>= ') + propDef.minimum
-                        );
-                    }
-                // http://json-schema.org/latest/json-schema-validation.html#anchor25
-                // 5.2.  Validation keywords for strings
-                } else if (typeof data === 'string') {
-                    if (propDef.maxLength) {
-                        local.assert(
-                            data.length <= propDef.maxLength,
-                            prefix + ' must have <= ' + propDef.maxLength + ' characters'
-                        );
-                    }
-                    if (propDef.minLength) {
-                        local.assert(
-                            data.length >= propDef.minLength,
-                            prefix + ' must have >= ' + propDef.minLength + ' characters'
-                        );
-                    }
-                    if (propDef.pattern) {
-                        local.assert(
-                            new RegExp(propDef.pattern).test(data),
-                            prefix + ' must match regex pattern /' + propDef.pattern + '/'
-                        );
-                    }
-                // http://json-schema.org/latest/json-schema-validation.html#anchor36
-                // 5.3.  Validation keywords for arrays
-                } else if (Array.isArray(data)) {
-                    if (propDef.maxItems) {
-                        local.assert(
-                            data.length <= propDef.maxItems,
-                            prefix + ' must have <= ' + propDef.maxItems + ' items'
-                        );
-                    }
-                    if (propDef.minItems) {
-                        local.assert(
-                            data.length >= propDef.minItems,
-                            prefix + ' must have >= ' + propDef.minItems + ' items'
-                        );
-                    }
-                    if (propDef.uniqueItems) {
-                        tmp = {};
-                        data.forEach(function (element) {
-                            element = JSON.stringify(element);
-                            local.assert(!tmp[element], prefix + ' must have only unique items');
-                            tmp[element] = true;
-                        });
-                    }
-                // http://json-schema.org/latest/json-schema-validation.html#anchor53
-                // 5.4.  Validation keywords for objects
-                } else if (typeof data === 'object') {
-                    if (propDef.maxProperties) {
-                        local.assert(
-                            Object.keys(data).length <= propDef.maxProperties,
-                            prefix + ' must have <= ' + propDef.maxProperties + ' items'
-                        );
-                    }
-                    if (propDef.minProperties) {
-                        local.assert(
-                            Object.keys(data).length >= propDef.minProperties,
-                            prefix + ' must have >= ' + propDef.minProperties + ' items'
-                        );
-                    }
-                }
-                // http://json-schema.org/latest/json-schema-validation.html#anchor75
-                // 5.5.  Validation keywords for any instance type
-                enum2 = propDef.enum || (propDef.items && propDef.items.enum);
-                if (enum2) {
-                    (Array.isArray(data)
-                        ? data
-                        : [data]).forEach(function (element) {
-                        local.assert(
-                            enum2.indexOf(element) >= 0,
-                            prefix + ' must only have items in the list ' + JSON.stringify(enum2)
-                        );
-                    });
-                }
-                // https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md
-                // #data-types
-                // validate schema.type
-                switch (propDef.type) {
-                case 'array':
-                    local.assert(Array.isArray(data) && propDef.items);
-                    data.forEach(function (element, ii) {
-                        // recurse - validateByPropDef
-                        local.validateByPropDef({
-                            circularList: options.circularList,
-                            data: element,
-                            dataReadonlyRemove: (options.dataReadonlyRemove || {})[ii],
-                            key: ii,
-                            schema: propDef.items,
-                            'x-swgg-notRequired': options['x-swgg-notRequired']
-                        });
-                    });
-                    switch (propDef.collectionFormat) {
-                    case 'multi':
-                        local.assert(
-                            propDef.in === 'formData' || propDef.in === 'query',
-                            prefix + ' with collectionFormat "multi" ' +
-                                'is valid only for parameters in "query" or "formData"'
-                        );
-                        break;
-                    }
-                    break;
-                case 'boolean':
-                    local.assert(typeof data === 'boolean');
-                    break;
-                case 'file':
-                    break;
-                case 'integer':
-                    local.assert(typeof data === 'number' &&
-                        isFinite(data) &&
-                        Math.floor(data) === data);
-                    switch (propDef.format) {
-                    case 'int32':
-                    case 'int64':
-                        break;
-                    }
-                    break;
-                case 'number':
-                    local.assert(typeof data === 'number' && isFinite(data));
-                    switch (propDef.format) {
-                    case 'double':
-                    case 'float':
-                        break;
-                    }
-                    break;
-                case 'object':
-                    local.assert(typeof data === 'object');
-                    break;
-                case 'string':
-                    local.assert(typeof data === 'string' || propDef.format === 'binary');
-                    switch (propDef.format) {
-                    // https://github.com/swagger-api/swagger-spec/issues/50
-                    // Clarify 'byte' format #50
-                    case 'byte':
-                        local.assert(!(/[^\n\r\+\/0-9\=A-Za-z]/).test(data));
-                        break;
-                    case 'date':
-                    case 'date-time':
-                        local.assert(JSON.stringify(new Date(data)) !== 'null');
-                        break;
-                    case 'email':
-                        local.assert((local.regexpEmailValidate).test(data));
-                        break;
-                    case 'phone':
-                        local.assert((local.regexpPhoneValidate).test(data));
-                        break;
-                    case 'json':
-                        local.tryCatchOnError(function () {
-                            JSON.parse(data);
-                        }, local.nop);
-                        local.assert(!local.utility2._debugTryCatchErrorCaught);
-                        break;
-                    }
-                    break;
-                default:
-                    local.assert(
-                        propDef.type === undefined,
-                        prefix + ' has invalid type ' + propDef.type
-                    );
-                }
-            }, function (error) {
-                error.message = error.message || prefix + ' is not a valid ' + propDef.type +
-                    (propDef.format
-                    ? ' (' + propDef.format + ')'
-                    : '');
-                error.options = options;
-                throw error;
-            });
-        };
-
-        local.validateBySchema = function (options) {
-        /*
-         * this function will validate options.data against options.schema
-         */
-            var data, key, prefix, propDefDict, schema, tmp, validateByPropDef;
-            // recurse - validateByPropDef
-            local.validateByPropDef(options);
-            local.tryCatchOnError(function () {
-                data = options.data;
-                prefix = 'schema ' + options.key;
-                schema = options.schema;
-                // validate schema
-                local.assert(
-                    schema && typeof schema === 'object',
-                    prefix + ' must be an object (not ' + typeof schema + ')'
-                );
-                // init propDefDict
-                propDefDict = schema.properties || {};
-                // validate data
-                local.assert(
-                    (data && typeof data === 'object') || !Object.keys(propDefDict).length,
-                    'data for ' + prefix + ' must be an object (not ' + typeof data + ')'
-                );
-                if (typeof data !== 'object') {
-                    return;
-                }
-                validateByPropDef = function (propDef) {
-                    // remove options.dataReadonlyRemove[key]
-                    if (propDef.readOnly &&
-                            (options.dataReadonlyRemove || {}).hasOwnProperty(key)) {
-                        delete options.dataReadonlyRemove[key];
-                    }
-                    // recurse - validateByPropDef
-                    local.validateByPropDef({
-                        circularList: options.circularList,
-                        data: data[key],
-                        dataReadonlyRemove: (options.dataReadonlyRemove || {})[key],
-                        key: key,
-                        schema: propDef,
-                        required: schema.required && schema.required.indexOf(key) >= 0,
-                        'x-swgg-notRequired': options['x-swgg-notRequired']
-                    });
-                };
-                Object.keys(propDefDict).forEach(function (_) {
-                    key = _;
-                    validateByPropDef(propDefDict[key]);
-                });
-                Object.keys(data).forEach(function (_) {
-                    key = _;
-                    if (propDefDict[key]) {
-                        return;
-                    }
-                    tmp = Object.keys(schema.patternProperties || {}).some(function (_) {
-                        if (new RegExp(_).test(key)) {
-                            validateByPropDef(schema.patternProperties[_]);
-                            return true;
-                        }
-                    });
-                    if (tmp) {
-                        return;
-                    }
-                    // https://tools.ietf.org/html/draft-fge-json-schema-validation-00
-                    // #section-5.4.4
-                    // validate additionalProperties
-                    local.assert(
-                        schema.additionalProperties !== false,
-                        prefix + ' must not have additionalProperties - ' + key
-                    );
-                    if (schema.additionalProperties) {
-                        validateByPropDef(schema.additionalProperties);
-                    }
-                });
-            }, function (error) {
-                local.errorMessagePrepend(error, options.key + '.' + key + ' -> ');
-                throw error;
-            });
-        };
-
-        local.validateBySwagger = function (options) {
+        local.validateBySwaggerJson = function (options) {
         /*
          * this function will validate the entire swagger json object
          */
-            var key, schema, tmp, validateDefault;
-            local.validateBySchema({
-                data: options,
-                key: 'swaggerJson',
-                schema: local.swaggerSchemaJson
-            });
-            // validate default
-            validateDefault = function () {
-                if (schema.default !== undefined) {
-                    return;
-                }
-                local.validateByPropDef({
-                    data: schema.default,
-                    key: key + '.default',
-                    schema: schema,
-                    'x-swgg-definitionsParameters': options['x-swgg-definitionsParameters']
+            var swaggerJson, tmp;
+            swaggerJson = options.swaggerJson || {};
+            local.validateBySwaggerSchema(local.objectSetDefault(options, {
+                data: swaggerJson,
+                modeSchema: true,
+                prefix: ['swaggerJson'],
+                schema: local.swaggerSchemaJson,
+                swaggerJson: swaggerJson
+            }));
+            // validate swaggerJson.definitions[key].properties[ii].default
+            Object.keys(swaggerJson.definitions || {}).forEach(function (schemaName) {
+                tmp = local.validateBySwaggerSchema({
+                    // dereference definition
+                    modeDereference: true,
+                    prefix: ['swaggerJson', 'definitions', schemaName],
+                    schema: swaggerJson.definitions[schemaName],
+                    swaggerJson: swaggerJson
                 });
-            };
-            Object.keys(options.definitions || {}).forEach(function (schemaName) {
-                schema = options.definitions[schemaName];
-                key = schemaName;
-                validateDefault();
-                Object.keys(options.definitions[schemaName].properties || {
-                }).forEach(function (propName) {
-                    schema = options.definitions[schemaName].properties[propName];
-                    key = schemaName + '.' + propName;
-                    validateDefault();
-                });
-            });
-            Object.keys(options.paths).forEach(function (path) {
-                Object.keys(options.paths[path]).forEach(function (method) {
-                    tmp = options.paths[path][method];
-                    Object.keys(tmp.parameters).forEach(function (param) {
-                        schema = tmp.parameters[param];
-                        key = (tmp.tags && tmp.tags[0]) + '.' + tmp.operationId + '.' + param;
-                        validateDefault();
+                Object.keys(tmp.properties || {}).forEach(function (key) {
+                    local.validateBySwaggerSchema({
+                        modeDefault: true,
+                        prefix: ['swaggerJson', 'definitions', schemaName, 'properties', key],
+                        schema: tmp.properties[key],
+                        swaggerJson: swaggerJson
                     });
                 });
             });
+            // validate swaggerJson.parameters[key].default
+            Object.keys(swaggerJson.parameters || []).forEach(function (key) {
+                local.validateBySwaggerSchema({
+                    modeDefault: true,
+                    prefix: ['swaggerJson', 'parameters', key],
+                    schema: swaggerJson.parameters[key],
+                    swaggerJson: swaggerJson
+                });
+            });
+            // validate swaggerJson.paths[key][key].parameters[ii].default
+            Object.keys(swaggerJson.paths).forEach(function (path) {
+                Object.keys(swaggerJson.paths[path]).forEach(function (method) {
+                    (swaggerJson.paths[path][method].parameters || []).forEach(function (schemaP) {
+                        local.validateBySwaggerSchema({
+                            modeDefault: true,
+                            prefix: [
+                                'swaggerJson',
+                                'paths',
+                                path,
+                                method,
+                                'parameters',
+                                schemaP.name
+                            ],
+                            schema: schemaP,
+                            swaggerJson: swaggerJson
+                        });
+                    });
+                });
+            });
+        };
+
+        local.validateBySwaggerParameters = function (options) {
+        /*
+         * this function will validate options.data against options.parameters
+         */
+            options.parameters.forEach(function (schemaP) {
+                local.validateBySwaggerSchema({
+                    data: options.data[schemaP.name],
+                    dataReadonlyRemove: [
+                        options.dataReadonlyRemove || {},
+                        schemaP.name,
+                        (options.dataReadonlyRemove || {})[schemaP.name]
+                    ],
+                    prefix: options.prefix.concat(schemaP.name),
+                    schema: schemaP,
+                    swaggerJson: local.swaggerJson
+                });
+            });
+        };
+
+        local.validateBySwaggerSchema = function (options) {
+        /*
+         * this function will validate data against schema
+         * http://json-schema.org/draft-04/json-schema-validation.html#rfc.section.5
+         */
+            var $ref,
+                circularList,
+                data,
+                dataReadonlyRemove2,
+                ii,
+                oneOf,
+                prefix,
+                schema,
+                test,
+                throwError,
+                tmp;
+            if (!options.schema) {
+                return;
+            }
+            throwError = function (message) {
+            /*
+             * this function will throw an error with the given message
+             */
+                if (!message) {
+                    return;
+                }
+                message = new Error(message);
+                message.options = options;
+                message.schema = schema;
+                message.statusCode = 400;
+                throw message;
+            };
+            data = options.data;
+            options.dataReadonlyRemove = options.dataReadonlyRemove || [{}, '', null];
+            dataReadonlyRemove2 = options.dataReadonlyRemove[2] || {};
+            prefix = Array.isArray(options.prefix)
+                ? options.prefix[0] + options.prefix.slice(1).map(function (element) {
+                    return '[' + JSON.stringify(element) + ']';
+                }).join('')
+                : options.prefix;
+            schema = options.schema;
+            circularList = [];
+            while (true) {
+                // dereference schema.oneOf
+                oneOf = (data && schema.oneOf) || [];
+                for (ii = 0; ii < oneOf.length; ii += 1) {
+                    tmp = String(oneOf[ii] && oneOf[ii].$ref)
+                        .replace('http://json-schema.org/draft-04/schema#', '#');
+                    switch (tmp + ' ' + (!local.isNullOrUndefined(data.$ref) || data.in)) {
+                    case '#/definitions/bodyParameter body':
+                    case '#/definitions/formDataParameterSubSchema formData':
+                    case '#/definitions/headerParameterSubSchema header':
+                    case '#/definitions/jsonReference true':
+                    case '#/definitions/pathParameterSubSchema path':
+                    case '#/definitions/queryParameterSubSchema query':
+                        schema = local.swaggerSchemaJson.definitions[tmp.split('/')[2]];
+                        break;
+                    default:
+                        switch (tmp) {
+                        case '#/definitions/bodyParameter':
+                        case '#/definitions/jsonReference':
+                            schema = oneOf[ii ^ 1];
+                            break;
+                        }
+                    }
+                    if (!schema.oneOf) {
+                        break;
+                    }
+                }
+                // dereference schema.$ref
+                $ref = schema && schema.$ref;
+                if ($ref === '#/x-test/aa') {
+                    local.nop();
+                }
+                if (!$ref) {
+                    break;
+                }
+                test = circularList.indexOf($ref) < 0;
+                throwError(!test && prefix +
+                    ' cannot dereference circular-reference schema.$ref = ' + JSON.stringify($ref));
+                circularList.push($ref);
+                tmp = $ref.split('/').slice(-2);
+                schema = $ref.indexOf('http://json-schema.org/draft-04/schema#/') === 0
+                    ? local.swaggerSchemaJson[tmp[0]]
+                    : options.swaggerJson[tmp[0]];
+                schema = schema && schema[tmp[1]];
+                test = schema;
+                throwError(!test && prefix + ' cannot dereference schema.$ref =' +
+                    JSON.stringify($ref));
+            }
+            if (options.modeDereference) {
+                return schema;
+            }
+            // validate schema.default
+            if (options.modeDefault) {
+                data = schema.default;
+            }
+            // swagger-validate items-required-for-array-objects
+            // https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation
+            // /semantic-validators/validators/items-required-for-array-objects.js
+            test = options.modeDefault ||
+                !local.isNullOrUndefined(data) ||
+                schema.required !== true ||
+                schema['x-swgg-notRequired'];
+            throwError(!test && prefix +
+                " - Schema properties specified as 'required' must be defined");
+            if (local.isNullOrUndefined(data)) {
+                return;
+            }
+            // swagger-validate items-required-for-array-objects
+            // https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation
+            // /semantic-validators/validators/items-required-for-array-objects.js
+            test = !options.modeSchema || data.type !== 'array' ||
+                (typeof data.items === 'object' && data.items);
+            throwError(!test && prefix +
+                " - Schema objects with 'array' type require an 'items' property");
+            // remove readOnly property
+            if (schema.readOnly) {
+                delete options.dataReadonlyRemove[0][options.dataReadonlyRemove[1]];
+            }
+            // validate schemaP.schema
+            // recurse - schema.schema
+            local.validateBySwaggerSchema({
+                data: data,
+                dataReadonlyRemove: options.dataReadonlyRemove,
+                modeSchema: options.modeSchema,
+                prefix: prefix,
+                schema: schema.schema,
+                swaggerJson: options.swaggerJson
+            });
+            // optimization - validate schema.type first
+            // 5.5.2. type
+            // https://swagger.io/docs/specification/data-models/data-types/
+            // https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#data-types
+            test = local.isNullOrUndefined(schema.type);
+            switch (schema.type) {
+            case 'array':
+                test = Array.isArray(data);
+                break;
+            case 'boolean':
+                test = typeof data === 'boolean';
+                break;
+            case 'file':
+                test = !options.modeSchema;
+                break;
+            case 'integer':
+                test = typeof data === 'number' && isFinite(data) && Math.floor(data) === data;
+                switch (schema.format) {
+                case 'int32':
+                    break;
+                case 'int64':
+                    break;
+                }
+                break;
+            case 'number':
+                test = typeof data === 'number' && isFinite(data);
+                switch (schema.format) {
+                case 'double':
+                    break;
+                case 'float':
+                    break;
+                }
+                break;
+            case 'object':
+                test = typeof data === 'object';
+                break;
+            case 'string':
+                test = typeof data === 'string' ||
+                    (!options.modeSchema && schema.format === 'binary');
+                switch (test && !options.modeSchema && schema.format) {
+                // Clarify 'byte' format #50
+                // https://github.com/swagger-api/swagger-spec/issues/50
+                case 'byte':
+                    test = !(/[^\n\r\+\/0-9\=A-Za-z]/).test(data);
+                    break;
+                case 'date':
+                case 'date-time':
+                    test = JSON.stringify(new Date(data)) !== 'null';
+                    break;
+                case 'email':
+                    test = local.regexpEmailValidate.test(data);
+                    break;
+                case 'json':
+                    test = local.tryCatchOnError(function () {
+                        JSON.parse(data);
+                        return true;
+                    }, local.nop);
+                    break;
+                case 'phone':
+                    test = local.regexpPhoneValidate.test(data);
+                    break;
+                }
+                break;
+            }
+            throwError(!test && prefix + ' (' + (typeof data) +
+                ') is not a valid ' + schema.type + (schema.format
+                ? ' (' + schema.format + ')'
+                : ''));
+            tmp = typeof data;
+            if (tmp === 'object' && Array.isArray(data)) {
+                tmp = 'array';
+            }
+            switch (tmp) {
+            // 5.1. Validation keywords for numeric instances (number and integer)
+            case 'number':
+                // 5.1.1. multipleOf
+                test = typeof schema.multipleOf !== 'number' || data % schema.multipleOf === 0;
+                throwError(!test && prefix + ' = ' + data + ' must be a multiple of ' +
+                    schema.multipleOf);
+                // 5.1.2. maximum and exclusiveMaximum
+                test = typeof schema.maximum !== 'number' || (schema.exclusiveMaximum
+                    ? data < schema.maximum
+                    : data <= schema.maximum);
+                throwError(!test && prefix + ' = ' + data + ' must be ' + (schema.exclusiveMaximum
+                    ? '< '
+                    : '<= ') + schema.maximum);
+                // 5.1.3. minimum and exclusiveMinimum
+                test = typeof schema.minimum !== 'number' || (schema.exclusiveMinimum
+                    ? data > schema.minimum
+                    : data >= schema.minimum);
+                throwError(!test && prefix + ' = ' + data + ' must be ' + (schema.exclusiveMinimum
+                    ? '> '
+                    : '>= ') + schema.minimum);
+                break;
+            // 5.2. Validation keywords for strings
+            case 'string':
+                // 5.2.1. maxLength
+                test = typeof schema.maxLength !== 'number' || data.length <= schema.maxLength;
+                throwError(!test && prefix + ' must have <= ' + schema.maxLength + ' characters');
+                // 5.2.2. minLength
+                test = typeof schema.minLength !== 'number' || data.length >= schema.minLength;
+                throwError(!test && prefix + ' must have >= ' + schema.minLength + ' characters');
+                // 5.2.3. pattern
+                test = !schema.pattern || new RegExp(schema.pattern).test(data);
+                throwError(!test && prefix + ' must match regex pattern ' +
+                    JSON.stringify(schema.pattern));
+                break;
+            // 5.3. Validation keywords for arrays
+            case 'array':
+                // 5.3.1. additionalItems and items
+                // swagger disallows array items
+                data.forEach(function (element, ii) {
+                    // recurse - schema.additionalItems and schema.items
+                    local.validateBySwaggerSchema({
+                        data: element,
+                        dataReadonlyRemove: [dataReadonlyRemove2, ii, dataReadonlyRemove2[ii]],
+                        modeSchema: options.modeSchema,
+                        prefix: prefix + '[' + ii + ']',
+                        schema: schema.items || schema.additionalItems,
+                        swaggerJson: options.swaggerJson
+                    });
+                });
+                // 5.3.2. maxItems
+                test = typeof schema.maxItems !== 'number' || data.length <= schema.maxItems;
+                throwError(!test && prefix + ' must have <= ' + schema.maxItems + ' items');
+                // 5.3.3. minItems
+                test = typeof schema.minItems !== 'number' || data.length >= schema.minItems;
+                throwError(!test && prefix + ' must have >= ' + schema.minItems + ' items');
+                // 5.3.4. uniqueItems
+                test = !schema.uniqueItems || data.every(function (element) {
+                    tmp = element;
+                    return data.indexOf(element) === data.lastIndexOf(element);
+                });
+                throwError(!test && prefix + ' must have unique items (contains duplicate item ' +
+                    JSON.stringify(tmp) + ')');
+                break;
+            // 5.4. Validation keywords for objects
+            case 'object':
+                // 5.4.1. maxProperties
+                test = typeof schema.maxProperties !== 'number' ||
+                    Object.keys(data).length <= schema.maxProperties;
+                throwError(!test && prefix + ' must have <= ' + schema.maxProperties + ' items');
+                // 5.4.2. minProperties
+                test = typeof schema.minProperties !== 'number' ||
+                    Object.keys(data).length >= schema.minProperties;
+                throwError(!test && prefix + ' must have >= ' + schema.minProperties + ' items');
+                // 5.4.3. required
+                local.normalizeValue('list', schema.required).forEach(function (key) {
+                    test = !local.isNullOrUndefined(data[key]);
+                    throwError(!test && prefix + '[' + JSON.stringify(key) +
+                        "] - Schema properties specified as 'required' must be defined");
+                });
+                // 5.4.4. additionalProperties, properties and patternProperties
+                Object.keys(data).forEach(function (key) {
+                    tmp = null;
+                    if (schema.properties && schema.properties[key]) {
+                        tmp = true;
+                        // recurse - schema.properties
+                        local.validateBySwaggerSchema({
+                            data: data[key],
+                            dataReadonlyRemove: [
+                                dataReadonlyRemove2,
+                                key,
+                                dataReadonlyRemove2[key]
+                            ],
+                            modeSchema: options.modeSchema,
+                            prefix: prefix + '[' + JSON.stringify(key) + ']',
+                            schema: schema.properties[key],
+                            swaggerJson: options.swaggerJson
+                        });
+                    }
+                    Object.keys(schema.patternProperties || {}).forEach(function (rgx) {
+                        if (new RegExp(rgx).test(key)) {
+                            tmp = true;
+                            // recurse - schema.patternProperties
+                            local.validateBySwaggerSchema({
+                                data: data[key],
+                                modeSchema: options.modeSchema,
+                                prefix: prefix + '[' + JSON.stringify(key) + ']',
+                                schema: schema.patternProperties[rgx],
+                                swaggerJson: options.swaggerJson
+                            });
+                        }
+                    });
+/*
+ * validate
+ * 5.4.4.4. If "additionalProperties" has boolean value false
+ *
+ * In this case, validation of the instance depends on the property set of
+ * "properties" and "patternProperties". In this section, the property names of
+ * "patternProperties" will be called regexes for convenience.
+ *
+ * The first step is to collect the following sets:
+ *
+ * s
+ * The property set of the instance to validate.
+ * p
+ * The property set from "properties".
+ * pp
+ * The property set from "patternProperties".
+ * Having collected these three sets, the process is as follows:
+ *
+ * remove from "s" all elements of "p", if any;
+ * for each regex in "pp", remove all elements of "s" which this regex matches.
+ * Validation of the instance succeeds if, after these two steps, set "s" is empty.
+ */
+                    test = tmp || schema.additionalProperties !== false;
+                    throwError(!test && prefix + ' cannot have additional property ' +
+                        JSON.stringify(key));
+                    // recurse - schema.additionalProperties
+                    local.validateBySwaggerSchema({
+                        data: data[key],
+                        modeSchema: options.modeSchema,
+                        prefix: prefix + '[' + JSON.stringify(key) + ']',
+                        schema: schema.additionalProperties,
+                        swaggerJson: options.swaggerJson
+                    });
+                });
+                // 5.4.5. dependencies
+                Object.keys(schema.dependencies || {}).forEach(function (key) {
+                    if (local.isNullOrUndefined(data[key])) {
+                        return;
+                    }
+                    // 5.4.5.2.1. Schema dependencies
+                    // recurse - schema.dependencies
+                    local.validateBySwaggerSchema({
+                        data: data[key],
+                        modeSchema: options.modeSchema,
+                        prefix: prefix + '[' + JSON.stringify(key) + ']',
+                        schema: schema.dependencies[key],
+                        swaggerJson: options.swaggerJson
+                    });
+                    // 5.4.5.2.2. Property dependencies
+                    local.normalizeValue('list', schema.dependencies[key]).every(function (key2) {
+                        test = !local.isNullOrUndefined(data[key2]);
+                        throwError(!test && prefix + '[' + JSON.stringify(key) +
+                            '] is missing dependency ' + prefix + '[' + JSON.stringify(key2) + ']');
+                    });
+                });
+                break;
+            }
+            // 5.5. Validation keywords for any instance type
+            // 5.5.1. enum
+            tmp = schema.enum || (!options.modeSchema && schema.items && schema.items.enum);
+            test = !tmp || (Array.isArray(data)
+                ? data
+                : [data]).every(function (element) {
+                return tmp.indexOf(element) >= 0;
+            });
+            throwError(!test && prefix + ' can only have items from the list ' +
+                JSON.stringify(tmp));
+            // 5.5.2. type
+            local.nop();
+            // 5.5.3. allOf
+            (schema.allOf || []).forEach(function (element) {
+                // recurse - schema.allOf
+                local.validateBySwaggerSchema({
+                    data: data,
+                    prefix: prefix,
+                    modeSchema: options.modeSchema,
+                    schema: element,
+                    swaggerJson: options.swaggerJson
+                });
+            });
+            // 5.5.4. anyOf
+            tmp = null;
+            test = !schema.anyOf || schema.anyOf.some(function (element) {
+                local.tryCatchOnError(function () {
+                    // recurse - schema.anyOf
+                    local.validateBySwaggerSchema({
+                        data: data,
+                        modeSchema: options.modeSchema,
+                        prefix: prefix,
+                        schema: element,
+                        swaggerJson: options.swaggerJson
+                    });
+                    return true;
+                }, local.nop);
+                tmp = tmp || local.utility2._debugTryCatchErrorCaught;
+                return !tmp;
+            });
+            throwError(!test && tmp.message + ' (from schema.anyOf ' +
+                JSON.stringify(schema.anyOf) + ')');
+            // 5.5.5. oneOf
+            tmp = !schema.oneOf
+                ? 1
+                : 0;
+            (schema.oneOf || []).some(function (element) {
+                local.tryCatchOnError(function () {
+                    // recurse - schema.oneOf
+                    local.validateBySwaggerSchema({
+                        data: data,
+                        modeSchema: options.modeSchema,
+                        prefix: prefix,
+                        schema: element,
+                        swaggerJson: options.swaggerJson
+                    });
+                    tmp += 1;
+                }, local.nop);
+                return tmp > 1;
+            });
+            test = tmp === 1;
+            throwError(!test && prefix +
+                ' did not validate against exactly one schema (validated ' + tmp +
+                ') in schema.oneOf = ' + JSON.stringify(schema.oneOf));
+            // 5.5.6. not
+            test = !schema.not || !local.tryCatchOnError(function () {
+                // recurse - schema.not
+                local.validateBySwaggerSchema({
+                    data: data,
+                    modeSchema: options.modeSchema,
+                    prefix: prefix,
+                    schema: schema.not,
+                    swaggerJson: options.swaggerJson
+                });
+                return true;
+            }, local.nop);
+            throwError(!test && prefix + ' must not validate against schama.not = ' +
+                JSON.stringify(schema.not));
+            // 5.5.7. definitions
+            local.nop();
+            // validate data.$ref
+            if (schema === local.swaggerSchemaJson.definitions.jsonReference) {
+                local.validateBySwaggerSchema({
+                    modeDereference: true,
+                    modeSchema: options.modeSchema,
+                    prefix: prefix,
+                    schema: data,
+                    swaggerJson: options.swaggerJson
+                });
+            }
+            return schema;
         };
     }());
     switch (local.modeJs) {
