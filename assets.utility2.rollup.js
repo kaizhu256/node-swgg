@@ -24566,9 +24566,12 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
          * this function will toggle the display of the operation
          */
             var element;
-            location.hash = '!' + event.target.closest('.operation').id;
-            element = event.target.closest('.operation');
+            element = event.target;
+            element = element.querySelector('.operation') || element.closest('.operation');
+            location.hash = '!' + element.id;
             element.closest('.resource').classList.remove('expanded');
+            // show parent resource
+            local.uiAnimateSlideDown(element.closest('.resource').querySelector('.operationList'));
             // show the operation, but hide all other operations
             local.uiAnimateSlideAccordian(
                 element.querySelector('.operation > .content'),
@@ -24589,19 +24592,25 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             location.hash = '!' + event.currentTarget.id;
             event.target.className.split(' ').some(function (className) {
                 switch (className) {
-                // show the resource, but hide all other resources
                 case 'td1':
-                case 'td2':
+                    // show the resource, but hide all other resources
                     local.uiAnimateSlideAccordian(
                         event.currentTarget.querySelector('.operationList'),
                         Array.from(document.querySelectorAll('.swggUiContainer .operationList'))
                     );
-                    break;
-                }
-                switch (className) {
-                case 'td1':
+                    // show at least one operation in the resource
+                    local.uiEventListenerDict['.onEventOperationDisplayShow']({
+                        target: event.currentTarget.querySelector(
+                            '.operation .uiAnimateSlide[style*="max-height: 100%"]'
+                        ) || event.currentTarget.querySelector('.operation')
+                    });
                     return true;
                 case 'td2':
+                    // show the resource, but hide all other resources
+                    local.uiAnimateSlideAccordian(
+                        event.currentTarget.querySelector('.operationList'),
+                        Array.from(document.querySelectorAll('.swggUiContainer .operationList'))
+                    );
                     // collapse all operations in the resource
                     if (event.currentTarget.classList.contains('expanded')) {
                         event.currentTarget.classList.remove('expanded');
@@ -24968,25 +24977,10 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             // init event-handling
             local.uiEventInit(document);
             // scrollTo location.hash
-            local.tryCatchOnError(function () {
-                var element, parent;
-                local.tryCatchOnError(function () {
-                    element = document.querySelector('#' + location.hash.slice(2));
-                }, local.nop);
-                element = (element && element.querySelector('.operation')) ||
-                    element ||
-                    document.querySelector(
-                        '.swggUiContainer .operation, .swggUiContainer .operation'
-                    );
-                parent = element.querySelector('.uiAnimateSlide');
-                while (parent) {
-                    local.uiAnimateSlideDown(parent);
-                    parent = parent.parentElement;
-                }
-                setTimeout(function () {
-                    element.querySelector('[tabIndex]').focus();
-                }, 250);
-            }, local.nop);
+            local.uiEventListenerDict['.onEventOperationDisplayShow']({
+                target: document.querySelector('#' + (location.hash.slice(2) || 'undefined')) ||
+                    document.querySelector('.swggUiContainer .operation')
+            });
             local.setTimeoutOnError(onError);
         };
 
