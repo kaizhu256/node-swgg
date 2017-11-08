@@ -1321,7 +1321,8 @@
                     '/x-test/tags0Filter': { get: { tags: ['x-test'] } },
                     '/x-test/tags0FilterUndefined': { get: { 'x-swgg-tags0': 'undefined' } }
                 },
-                tags: [{}, { 'x-swgg-tags0': 'undefined' }]
+                tags: [{}, { 'x-swgg-tags0': 'undefined' }],
+                'x-swgg-tags0-override': {}
             });
             onError();
         }, local.onErrorThrow);
@@ -1385,7 +1386,7 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
         }
     },
     "info": {
-        "x-swgg-urlApp": "http://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js"
+        "x-swgg-downloadStandaloneApp": "http://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js"
     },
     "parameters": {
         "typeArrayItemsBoolean1": {

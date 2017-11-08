@@ -17485,24 +17485,6 @@ return Utf8ArrayToStr(bff);
                     match0.replace(match1, local.jsonStringifyOrdered(options.packageJson, null, 4))
                 );
             });
-            // init assets.swgg.swagger.json
-            if (local.fs.existsSync('assets.swgg.swagger.json')) {
-                // save assets.swgg.swagger.json
-                local.fs.writeFileSync('assets.swgg.swagger.json', local.jsonStringifyOrdered(
-                    // normalize assets.swgg.swagger.json
-                    local.objectSetOverride(local.swgg.normalizeSwaggerJson(JSON.parse(
-                        // read assets.swgg.swagger.json
-                        local.fs.readFileSync('assets.swgg.swagger.json', 'utf8')
-                    )), { info: {
-                        description: options.packageJson.description,
-                        title: options.packageJson.name,
-                        version: options.packageJson.version,
-                        'x-swgg-homepage': options.packageJson.homepage
-                    } }, 2),
-                    null,
-                    4
-                ) + '\n');
-            }
             // search-and-replace - customize dataTo
             [
                 // customize name and description
@@ -17613,6 +17595,33 @@ return Utf8ArrayToStr(bff);
                 .replace((/(\S)\n{3}(\S)/g), '$1\n\n$2');
             // save README.md
             local.fs.writeFileSync('README.md', options.dataTo);
+            // customize assets.swgg.swagger.json
+            if (local.fs.existsSync('assets.swgg.swagger.json')) {
+                // normalize assets.swgg.swagger.json
+                options.swaggerJson = local.swgg.normalizeSwaggerJson(JSON.parse(
+                    // read assets.swgg.swagger.json
+                    local.fs.readFileSync('assets.swgg.swagger.json', 'utf8')
+                ));
+                local.objectSetOverride(options.swaggerJson, { info: {
+                    description: options.packageJson.description,
+                    title: options.packageJson.name,
+                    version: options.packageJson.version,
+                    'x-swgg-downloadStandaloneApp': ((/\bhttps:\/\/.*?\/assets\.app\.js/).exec(
+                        options.dataTo.replace(new RegExp(
+                            'https:\/\/kaizhu256.github.io' +
+                                '\/node-utility2\/build..beta..travis-ci.org\/app\/assets.app.js',
+                            'g'
+                        ), '')
+                    ) || {})[0],
+                    'x-swgg-homepage': options.packageJson.homepage
+                } }, 2);
+                // save assets.swgg.swagger.json
+                local.fs.writeFileSync('assets.swgg.swagger.json', local.jsonStringifyOrdered(
+                    options.swaggerJson,
+                    null,
+                    4
+                ) + '\n');
+            }
             onError();
         };
 
@@ -22242,16 +22251,16 @@ local.templateUiMain = '\
     <div class="fontWeightBold">{{info.title htmlSafe}} ({{info.version htmlSafe}})</div>\n\
     {{/if info.x-swgg-homepage}}\n\
     {{#if info.description}}\n\
-    <div>{{info.description htmlSafe}}</div>\n\
+    <div>{{info.description htmlSafe br}}</div>\n\
     {{/if info.description}}\n\
-    {{#if info.x-swgg-urlApp}}\n\
-    <h4><a download href="{{info.x-swgg-urlApp}}">download standalone app</a></h4>\n\
-    {{/if info.x-swgg-urlApp}}\n\
+    {{#if info.x-swgg-downloadStandaloneApp}}\n\
+    <h4><a download href="{{info.x-swgg-downloadStandaloneApp}}">download standalone app</a></h4>\n\
+    {{/if info.x-swgg-downloadStandaloneApp}}\n\
     <ul>\n\
         {{#if externalDocs}}\n\
         <li>\n\
             {{#if externalDocs.description}}\n\
-            <p>{{externalDocs.description htmlSafe}}</p>\n\
+            <p>{{externalDocs.description htmlSafe br}}</p>\n\
             {{/if externalDocs.description}}\n\
             <a href="{{externalDocs.url}}" target="_blank">{{externalDocs.url}}</a>\n\
         </li>\n\
@@ -24136,11 +24145,17 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     }
                 });
             });
+            if (!local.env.npm_package_swggTags0) {
+                return options;
+            }
+            // override options with x-swgg-tags0-override
+            local.objectSetOverride(options, options['x-swgg-tags0-override'] &&
+                options['x-swgg-tags0-override'][local.env.npm_package_swggTags0], 10);
             // filter $npm_package_swggTags0 - definitions and parameters
             ['definitions', 'parameters'].forEach(function (schema) {
                 schema = options[schema] || {};
                 Object.keys(schema).forEach(function (key) {
-                    if (local.env.npm_package_swggTags0 && schema[key]['x-swgg-tags0'] &&
+                    if (schema[key]['x-swgg-tags0'] &&
                             schema[key]['x-swgg-tags0'] !== local.env.npm_package_swggTags0) {
                         delete schema[key];
                     }
@@ -24150,7 +24165,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             Object.keys(options.paths).forEach(function (path) {
                 Object.keys(options.paths[path]).forEach(function (method) {
                     tmp = options.paths[path][method];
-                    if (local.env.npm_package_swggTags0 && tmp['x-swgg-tags0'] &&
+                    if (tmp['x-swgg-tags0'] &&
                             tmp['x-swgg-tags0'] !== local.env.npm_package_swggTags0) {
                         delete options.paths[path][method];
                         return;
@@ -24162,8 +24177,8 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             });
             // filter $npm_package_swggTags0 - tags
             options.tags = options.tags.filter(function (tag) {
-                return !local.env.npm_package_swggTags0 || (tag['x-swgg-tags0'] &&
-                    tag['x-swgg-tags0'] === local.env.npm_package_swggTags0);
+                return tag['x-swgg-tags0'] &&
+                    tag['x-swgg-tags0'] === local.env.npm_package_swggTags0;
             });
             return options;
         };

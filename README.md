@@ -59,6 +59,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 #### todo
 - npm publish 2017.11.8
+- update ui to show required attribute only in 'name and desscription' section
 - add validators from https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation/semantic-validators/validators/items-required-for-array-objects.js
 - add xml support for wechat
 - add property parameters.x-swgg-persist to persist to localStorage
@@ -72,11 +73,19 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - none
 
 #### changelog for v2017.11.8
-- and env tags filter \$npm_package_swggTags0
+- add env tags filter \$npm_package_swggTags0
+- rename property x-swgg-urlApp -> x-swgg-downloadStandaloneApp
+- update function normalizeSwaggerJson to override swaggerJson with x-swgg-tags0-override
 - none
 
 #### this package requires
 - darwin or linux os
+
+#### this swagger-implementation is compliant with json-schema-validation (draft-04)
+- [http://json-schema.org/draft-04/json-schema-validation.html](http://json-schema.org/draft-04/json-schema-validation.html)
+
+#### this swagger-implementation is compliant with OpenAPI Specification (2.0)
+- [https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md](https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md)
 
 
 

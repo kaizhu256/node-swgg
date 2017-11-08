@@ -724,16 +724,16 @@ local.templateUiMain = '\
     <div class="fontWeightBold">{{info.title htmlSafe}} ({{info.version htmlSafe}})</div>\n\
     {{/if info.x-swgg-homepage}}\n\
     {{#if info.description}}\n\
-    <div>{{info.description htmlSafe}}</div>\n\
+    <div>{{info.description htmlSafe br}}</div>\n\
     {{/if info.description}}\n\
-    {{#if info.x-swgg-urlApp}}\n\
-    <h4><a download href="{{info.x-swgg-urlApp}}">download standalone app</a></h4>\n\
-    {{/if info.x-swgg-urlApp}}\n\
+    {{#if info.x-swgg-downloadStandaloneApp}}\n\
+    <h4><a download href="{{info.x-swgg-downloadStandaloneApp}}">download standalone app</a></h4>\n\
+    {{/if info.x-swgg-downloadStandaloneApp}}\n\
     <ul>\n\
         {{#if externalDocs}}\n\
         <li>\n\
             {{#if externalDocs.description}}\n\
-            <p>{{externalDocs.description htmlSafe}}</p>\n\
+            <p>{{externalDocs.description htmlSafe br}}</p>\n\
             {{/if externalDocs.description}}\n\
             <a href="{{externalDocs.url}}" target="_blank">{{externalDocs.url}}</a>\n\
         </li>\n\
@@ -2618,11 +2618,17 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     }
                 });
             });
+            if (!local.env.npm_package_swggTags0) {
+                return options;
+            }
+            // override options with x-swgg-tags0-override
+            local.objectSetOverride(options, options['x-swgg-tags0-override'] &&
+                options['x-swgg-tags0-override'][local.env.npm_package_swggTags0], 10);
             // filter $npm_package_swggTags0 - definitions and parameters
             ['definitions', 'parameters'].forEach(function (schema) {
                 schema = options[schema] || {};
                 Object.keys(schema).forEach(function (key) {
-                    if (local.env.npm_package_swggTags0 && schema[key]['x-swgg-tags0'] &&
+                    if (schema[key]['x-swgg-tags0'] &&
                             schema[key]['x-swgg-tags0'] !== local.env.npm_package_swggTags0) {
                         delete schema[key];
                     }
@@ -2632,7 +2638,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             Object.keys(options.paths).forEach(function (path) {
                 Object.keys(options.paths[path]).forEach(function (method) {
                     tmp = options.paths[path][method];
-                    if (local.env.npm_package_swggTags0 && tmp['x-swgg-tags0'] &&
+                    if (tmp['x-swgg-tags0'] &&
                             tmp['x-swgg-tags0'] !== local.env.npm_package_swggTags0) {
                         delete options.paths[path][method];
                         return;
@@ -2644,8 +2650,8 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             });
             // filter $npm_package_swggTags0 - tags
             options.tags = options.tags.filter(function (tag) {
-                return !local.env.npm_package_swggTags0 || (tag['x-swgg-tags0'] &&
-                    tag['x-swgg-tags0'] === local.env.npm_package_swggTags0);
+                return tag['x-swgg-tags0'] &&
+                    tag['x-swgg-tags0'] === local.env.npm_package_swggTags0;
             });
             return options;
         };
