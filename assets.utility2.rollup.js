@@ -19486,14 +19486,9 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                             local.tryCatchOnError(function () {
                                 // validate no error occurred
                                 local.assert(!error, error);
-                                // coverage-hack - ignore else-statement
-                                local.nop(local.swgg &&
-                                    local.swgg.validateBySwaggerJson &&
-                                    (function () {
-                                        local.swgg.validateBySwaggerJson({
-                                            swaggerJson: JSON.parse(data)
-                                        });
-                                    }()));
+                                ((local.swgg && local.swgg.validateBySwaggerJson) || local.nop)({
+                                    swaggerJson: JSON.parse(data)
+                                });
                             }, console.error);
                         });
                         break;
@@ -19550,18 +19545,13 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 local.assetsDict['/assets.example.template.js'],
                 {}
             );
-            // coverage-hack - ignore else-statement
-            local.nop(!local.env.npm_package_buildCustomOrg && (function () {
-                local.fs.readFileSync('README.md', 'utf8').replace(
-                    (/```\w*?(\n[\W\s]*?example\.js[\n\"][\S\s]+?)\n```/),
-                    function (match0, match1, ii, text) {
-                        // jslint-hack
-                        local.nop(match0);
-                        // preserve lineno
-                        script = text.slice(0, ii).replace((/.+/g), '') + match1;
-                    }
-                );
-            }()));
+            local.tryCatchOnError(function () {
+                tmp = !local.env.npm_package_buildCustomOrg &&
+                    (/```\w*?(\n[\W\s]*?example\.js[\n\"][\S\s]+?)\n```/).exec(
+                        local.fs.readFileSync('README.md', 'utf8')
+                    );
+                script = tmp.input.slice(0, tmp.index).replace((/.+/g), '') + tmp[1];
+            }, local.nop);
             script = script
                 // alias require($npm_package_name) to utility2_moduleExports;
                 .replace(
@@ -19918,9 +19908,12 @@ instruction\n\
          */
             local.objectSetOverride(local, options, 10);
             // init swgg
-            // coverage-hack - ignore else-statement
-            local.nop(local.swgg && local.swgg.apiUpdate(local.swgg.swaggerJson || {}));
+            if (local.swgg) {
+                local.swgg.apiUpdate(local.swgg.swaggerJson);
+            }
         };
+        // coverage-hack
+        local.stateInit();
 
         local.streamListCleanup = function (streamList) {
         /*
@@ -23007,6 +23000,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
          * this function will update the swagger-api dict of api-calls
          */
             var tmp;
+            options = options || {};
             // fetch swagger.json file
             if (options.modeAjax) {
                 local.ajax(options, function (error, xhr) {

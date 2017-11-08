@@ -1476,6 +1476,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
          * this function will update the swagger-api dict of api-calls
          */
             var tmp;
+            options = options || {};
             // fetch swagger.json file
             if (options.modeAjax) {
                 local.ajax(options, function (error, xhr) {

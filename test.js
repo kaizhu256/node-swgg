@@ -1307,6 +1307,8 @@
 
     // run shared js-env code - init-after
     (function () {
+        // test apiUpdate's null-case handling-behavior
+        local.apiUpdate();
         // test apiUpdate's root-basePath handling-behavior
         local.apiUpdate({ basePath: '/' });
         local.assertJsonEqual(local.swaggerJsonBasePath, '');
