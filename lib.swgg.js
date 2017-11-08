@@ -858,8 +858,7 @@ local.templateUiParam = '\
 <span class="td1">\n\
     {{name}}\n\
     {{#if required}}\n\
-    <br>\n\
-    <span class="fontWeightBold">(required)</span>\n\
+    &nbsp;<span class="fontWeightBold">(required)</span>\n\
     {{/if required}}\n\
     {{#if description}}\n\
     <br>\n\
@@ -910,23 +909,25 @@ local.templateUiResource = '\
     id="{{id}}"\n\
 >\n\
     <div class="cursorPointer fontWeightBold header tr">\n\
-        <span class="color777 flex1 onEventResourceDisplayAction td1"\n\
-            tabindex="0"\n\
-        >{{name}} :\n\
-        {{description htmlSafe br}}</span>\n\
         <span\n\
-            class="color777 onEventResourceDisplayAction td2"\n\
+            class="flex1 onEventResourceDisplayAction td1"\n\
+            tabindex="0"\n\
+        >{{name}}</span>\n\
+        <span\n\
+            class="onEventResourceDisplayAction td2"\n\
             tabindex="0"\n\
         >Expand / Collapse Operations</span>\n\
         <span\n\
-            class="color777 onEventDatatableReload td3"\n\
+            class="onEventDatatableReload td3"\n\
             data-resource-name="{{name}}"\n\
             tabindex="0"\n\
         >Datatable</span>\n\
     </div>\n\
     <div class="operationList uiAnimateSlide"\n\
         style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
-    ></div>\n\
+    >\n\
+        <div class="description">{{description htmlSafe br}}</div>\n\
+    </div>\n\
 </div>\n\
 ';
 
@@ -1120,7 +1121,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 \n\
 /* section */\n\
 .swggUiContainer > .header {\n\
-    background: #8c0;\n\
+    background: #7b0;\n\
     padding: 10px;\n\
 }\n\
 .swggUiContainer > .header > * {\n\
@@ -1153,10 +1154,10 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     border: 0;\n\
     color: #fff;\n\
     padding: 6px 8px;\n\
-    background: #580;\n\
+    background: #370;\n\
 }\n\
 .swggUiContainer > .info a {\n\
-    color: #370;\n\
+    color: #373;\n\
 }\n\
 .swggUiContainer > .info > .fontWeightBold {\n\
     font-size: x-large;\n\
@@ -1182,7 +1183,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer .operation > .header:focus,\n\
 .swggUiContainer .operation > .header:hover {\n\
-    background: #bfb;\n\
+    background: #7d7;\n\
     outline: none;\n\
 }\n\
 .swggUiContainer .operation > .header > span {\n\
@@ -1190,7 +1191,8 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer .operation > .header > .td1 {\n\
     margin-left: 1rem;\n\
-    width: 1rem;\n\
+    text-align: center;\n\
+    width: 2rem;\n\
 }\n\
 .swggUiContainer .operation > .header > .td2 {\n\
     background: #777;\n\
@@ -1220,24 +1222,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .operation .schemaP > .td4 {\n\
     flex: 3;\n\
 }\n\
-.swggUiContainer .resource > .header > span:focus,\n\
-.swggUiContainer .resource > .header > span:hover {\n\
-    color: black;\n\
-    outline: none;\n\
-}\n\
-.swggUiContainer .resource > .header > .td1 {\n\
-    font-size: large;\n\
-}\n\
-.swggUiContainer .resource > .header > .td2 {\n\
-    border-left: 1px solid;\n\
-    border-right: 1px solid;\n\
-    padding-left: 1rem;\n\
-    padding-right: 1rem;\n\
-}\n\
-\n\
-\n\
-\n\
-/* method */\n\
 .swggUiContainer .operation.DELETE > .header > .td2 {\n\
     background: #b00;\n\
 }\n\
@@ -1255,6 +1239,29 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer .operation.PUT > .header > .td2 {\n\
     background: #70b;\n\
+}\n\
+.swggUiContainer .resource > .header > span {\n\
+    color: #373;\n\
+}\n\
+.swggUiContainer .resource > .header > span:focus,\n\
+.swggUiContainer .resource > .header > span:hover {\n\
+    color: black;\n\
+    outline: none;\n\
+}\n\
+.swggUiContainer .resource > .header > .td1 {\n\
+    font-size: large;\n\
+}\n\
+.swggUiContainer .resource > .header > .td2 {\n\
+    border-left: 1px solid #777;\n\
+    border-right: 1px solid #777;\n\
+    padding-left: 1rem;\n\
+    padding-right: 1rem;\n\
+}\n\
+.swggUiContainer .resource > .operationList > .description {\n\
+    background: #ddd;\n\
+    border: 1px solid #777;\n\
+    color: #555;\n\
+    padding: 0.5rem;\n\
 }\n\
 </style>\n\
 ')
@@ -3363,7 +3370,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     // init resource
                     resource = options.resourceDict[tag] = local.objectSetDefault(
                         options.resourceDict[tag] || options.tagDict[tag],
-                        { description: 'no description', name: tag, operationListInnerHtml: '' }
+                        { description: 'no description', name: tag }
                     );
                     resource.id = resource.id || local.idDomElementCreate('swgg_id_' + tag);
                 });
@@ -3411,7 +3418,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             Array.from(
                 options.uiFragment.querySelectorAll('.operation > .header > .td1')
             ).forEach(function (element, ii) {
-                element.innerHTML = ii + 1;
+                element.innerHTML = ii + 1 + '.';
             });
             // append uiFragment to swggUiContainer
             document.querySelector('#swggAjaxProgressDiv1').style.display = 'none';
