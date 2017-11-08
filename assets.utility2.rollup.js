@@ -14320,6 +14320,10 @@ body > button {\n\
 button {\n\
     cursor: pointer;\n\
 }\n\
+.textOverflowEllipsis {\n\
+    text-overflow: ellipsis;\n\
+    white-space: nowrap;\n\
+}\n\
 .uiAnimateSlide {\n\
     overflow-y: hidden;\n\
     transition: border-bottom 250ms, border-top 250ms, margin-bottom 250ms, margin-top 250ms, max-height 250ms, min-height 250ms, padding-bottom 250ms, padding-top 250ms;\n\
@@ -22262,7 +22266,9 @@ local.templateUiMain = '\
             {{#if externalDocs.description}}\n\
             <p>{{externalDocs.description htmlSafe br}}</p>\n\
             {{/if externalDocs.description}}\n\
+            {{#if externalDocs.url}}\n\
             <a href="{{externalDocs.url}}" target="_blank">{{externalDocs.url}}</a>\n\
+            {{/if externalDocs.url}}\n\
         </li>\n\
         {{/if externalDocs}}\n\
         {{#if info.termsOfService}}\n\
@@ -22336,7 +22342,7 @@ local.templateUiOperation = '\
         <span\n\
             class="flex1 td3 {{#if deprecated}}deprecated{{/if deprecated}}"\n\
         >{{_path}}</span>\n\
-        <span class="color777 flex1 td4">{{summary htmlSafe}}</span>\n\
+        <span class="color777 flex1 td4 textOverflowEllipsis">{{summary htmlSafe}}</span>\n\
     </div>\n\
     <form accept-charset="UTF-8"\n\
         class="content uiAnimateSlide"\n\
@@ -22383,9 +22389,9 @@ local.templateUiOperation = '\
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/param.handlebars
 local.templateUiParam = '\
 <span class="td1">\n\
-    {{name}}\n\
+    {{name}}&nbsp;\n\
     {{#if required}}\n\
-    &nbsp;<span class="fontWeightBold">(required)</span>\n\
+    <span class="fontWeightBold">(required)</span>\n\
     {{/if required}}\n\
     {{#if description}}\n\
     <br>\n\
@@ -22437,9 +22443,9 @@ local.templateUiResource = '\
 >\n\
     <div class="cursorPointer fontWeightBold header tr">\n\
         <span\n\
-            class="flex1 onEventResourceDisplayAction td1"\n\
+            class="flex1 onEventResourceDisplayAction td1 textOverflowEllipsis"\n\
             tabindex="0"\n\
-        >{{name}}</span>\n\
+        >{{name}} : {{description htmlSafe}}</span>\n\
         <span\n\
             class="onEventResourceDisplayAction td2"\n\
             tabindex="0"\n\
@@ -24163,6 +24169,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 schema = options[schema] || {};
                 Object.keys(schema).forEach(function (key) {
                     if (schema[key]['x-swgg-tags0'] &&
+                            schema[key]['x-swgg-tags0'] !== 'all' &&
                             schema[key]['x-swgg-tags0'] !== local.env.npm_package_swggTags0) {
                         delete schema[key];
                     }
@@ -24173,6 +24180,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 Object.keys(options.paths[path]).forEach(function (method) {
                     tmp = options.paths[path][method];
                     if (tmp['x-swgg-tags0'] &&
+                            tmp['x-swgg-tags0'] !== 'all' &&
                             tmp['x-swgg-tags0'] !== local.env.npm_package_swggTags0) {
                         delete options.paths[path][method];
                         return;
@@ -24184,7 +24192,8 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             });
             // filter $npm_package_swggTags0 - tags
             options.tags = options.tags.filter(function (tag) {
-                return tag['x-swgg-tags0'] &&
+                return !tag['x-swgg-tags0'] ||
+                    tmp['x-swgg-tags0'] === 'all' ||
                     tag['x-swgg-tags0'] === local.env.npm_package_swggTags0;
             });
             return options;
@@ -24930,7 +24939,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                         responseList: Object.keys(operation.responses).sort().map(function (key) {
                             return { key: key, value: operation.responses[key] };
                         }),
-                        summary: 'no summary'
+                        summary: operation.description || 'no summary'
                     });
                     operation.parameters.forEach(function (schemaP) {
                         // init schemaP.id
@@ -24964,9 +24973,11 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 local.tryCatchOnError(function () {
                     element = document.querySelector('#' + location.hash.slice(2));
                 }, local.nop);
-                element = element || document.querySelector(
-                    '.swggUiContainer .operation, .swggUiContainer .operation'
-                );
+                element = (element && element.querySelector('.operation')) ||
+                    element ||
+                    document.querySelector(
+                        '.swggUiContainer .operation, .swggUiContainer .operation'
+                    );
                 parent = element.querySelector('.uiAnimateSlide');
                 while (parent) {
                     local.uiAnimateSlideDown(parent);

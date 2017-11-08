@@ -1321,7 +1321,7 @@
                     '/x-test/tags0Filter': { get: { tags: ['x-test'] } },
                     '/x-test/tags0FilterUndefined': { get: { 'x-swgg-tags0': 'undefined' } }
                 },
-                tags: [{}, { 'x-swgg-tags0': 'undefined' }],
+                tags: [{ 'x-swgg-tags0': 'undefined' }],
                 'x-swgg-tags0-override': {}
             });
             onError();
