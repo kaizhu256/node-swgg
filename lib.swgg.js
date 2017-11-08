@@ -767,7 +767,7 @@ local.templateUiMain = '\
 <pre class="code" id="swggAjaxProgressPre1">\n\
 /*\n\
  * initialize swgg-client\n\
- * 1. download currently-loaded apis as file swagger.json:\n\
+ * 1. download currently-loaded apis to file swagger.json:\n\
  *     $ curl -L "{{urlSwaggerJson htmlSafe}}" > swagger.json\n\
  * 2. npm install swgg\n\
  *     $ npm install swgg\n\
@@ -855,10 +855,15 @@ local.templateUiOperation = '\
 
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/param.handlebars
 local.templateUiParam = '\
-<span class="td1 {{#if required}}fontWeightBold{{/if required}}">\n\
+<span class="td1">\n\
     {{name}}\n\
+    {{#if required}}\n\
+    <br>\n\
+    <span class="fontWeightBold">(required)</span>\n\
+    {{/if required}}\n\
     {{#if description}}\n\
-    <br><span class="color777">{{description htmlSafe br}}</span>\n\
+    <br>\n\
+    <span class="color777">{{description htmlSafe br}}</span>\n\
     {{/if description}}\n\
 </span>\n\
 <span class="td2">{{type2}}{{#if format2}}<br>({{format2}}){{/if format2}}</span>\n\
@@ -2595,7 +2600,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
 
         local.normalizeSwaggerJson = function (options) {
         /*
-         * this function will normalize swaggerJson and filter $SWGG_TAGS0_FILTER
+         * this function will normalize swaggerJson and filter $npm_package_swggTags0
          */
             var tmp;
             local.objectSetDefault(options, { paths: {}, tags: [] });
@@ -2613,25 +2618,22 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     }
                 });
             });
-            // filter $SWGG_TAGS0_FILTER
-            // example usage:
-            // $ SWGG_TAGS0_FILTER=google-maps shBuildApp
-            // filter $SWGG_TAGS0_FILTER - definitions and parameters
+            // filter $npm_package_swggTags0 - definitions and parameters
             ['definitions', 'parameters'].forEach(function (schema) {
                 schema = options[schema] || {};
                 Object.keys(schema).forEach(function (key) {
-                    if (local.env.SWGG_TAGS0_FILTER && schema[key]['x-swgg-tags0'] &&
-                            schema[key]['x-swgg-tags0'] !== local.env.SWGG_TAGS0_FILTER) {
+                    if (local.env.npm_package_swggTags0 && schema[key]['x-swgg-tags0'] &&
+                            schema[key]['x-swgg-tags0'] !== local.env.npm_package_swggTags0) {
                         delete schema[key];
                     }
                 });
             });
-            // filter $SWGG_TAGS0_FILTER - paths
+            // filter $npm_package_swggTags0 - paths
             Object.keys(options.paths).forEach(function (path) {
                 Object.keys(options.paths[path]).forEach(function (method) {
                     tmp = options.paths[path][method];
-                    if (local.env.SWGG_TAGS0_FILTER && tmp['x-swgg-tags0'] &&
-                            tmp['x-swgg-tags0'] !== local.env.SWGG_TAGS0_FILTER) {
+                    if (local.env.npm_package_swggTags0 && tmp['x-swgg-tags0'] &&
+                            tmp['x-swgg-tags0'] !== local.env.npm_package_swggTags0) {
                         delete options.paths[path][method];
                         return;
                     }
@@ -2640,10 +2642,10 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     delete options.paths[path];
                 }
             });
-            // filter $SWGG_TAGS0_FILTER - tags
+            // filter $npm_package_swggTags0 - tags
             options.tags = options.tags.filter(function (tag) {
-                return !local.env.SWGG_TAGS0_FILTER ||
-                    (tag['x-swgg-tags0'] && tag['x-swgg-tags0'] === local.env.SWGG_TAGS0_FILTER);
+                return !local.env.npm_package_swggTags0 || (tag['x-swgg-tags0'] &&
+                    tag['x-swgg-tags0'] === local.env.npm_package_swggTags0);
             });
             return options;
         };

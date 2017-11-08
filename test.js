@@ -1310,9 +1310,9 @@
         // test apiUpdate's root-basePath handling-behavior
         local.apiUpdate({ basePath: '/' });
         local.assertJsonEqual(local.swaggerJsonBasePath, '');
-        // test apiUpdate's $SWGG_TAGS0_FILTER handling-behavior
+        // test apiUpdate's $npm_package_swggTags0 handling-behavior
         local.testMock([
-            [local.env, { SWGG_TAGS0_FILTER: 'x-test-tags0-filter' }]
+            [local.env, { npm_package_swggTags0: 'x-test-tags0-filter' }]
         ], function (onError) {
             local.apiUpdate({
                 definitions: { Aa: {}, Bb: { 'x-swgg-tags0': 'undefined' } },

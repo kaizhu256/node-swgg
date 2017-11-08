@@ -58,6 +58,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
+- npm publish 2017.11.8
 - add validators from https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation/semantic-validators/validators/items-required-for-array-objects.js
 - add xml support for wechat
 - add property parameters.x-swgg-persist to persist to localStorage
@@ -70,16 +71,8 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2017.11.7
-- npm publish 2017.11.7
-- add responsive css to header
-- merge properties paramDef.x-swgg-example and paramDef.default -> paramDef.default
-- modify function normalizeSwaggerParamDict to only set default-value if required (or modeDefault flag is enabled)
-- rename x-swgg-definitionsParameter -> #/parameters
-- remove unused apiAjax defer-routine
-- revamp normalizers normalizeSwaggerJson, normalizeSwaggerParamDict
-- revamp validators validateBySwaggerJson, validateBySwaggerParameters, validateBySwaggerSchema
-- validate schema.default
+#### changelog for v2017.11.8
+- and env tags filter \$npm_package_swggTags0
 - none
 
 #### this package requires
@@ -945,10 +938,9 @@ utility2-comment -->\n\
     },
     "homepage": "https://github.com/kaizhu256/node-swgg",
     "keywords": [
-        "oai",
         "openapi",
         "swagger-client",
-        "swagger-ui"
+        "swagger-server"
     ],
     "license": "MIT",
     "main": "lib.swgg.js",
@@ -972,7 +964,7 @@ utility2-comment -->\n\
         "start": "PORT=${PORT:-8080} utility2 start test.js",
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2017.11.7"
+    "version": "2017.11.8"
 }
 ```
 
