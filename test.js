@@ -1995,7 +1995,7 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
                         id: 'testCase_dbRowListRandomCreate_' + (options.ii + 100)
                     };
                 },
-                properties: local.swaggerJson.definitions.TestCrud.properties
+                schema: { properties: local.swaggerJson.definitions.TestCrud.properties }
             }),
             idIndexCreateList: [{
                 name: 'id'

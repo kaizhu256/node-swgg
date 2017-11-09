@@ -578,7 +578,7 @@ utility2-comment -->\n\
                         ]
                     };
                 },
-                properties: local.swgg.swaggerJson.definitions.Pet.properties
+                schema: { properties: local.swgg.swaggerJson.definitions.Pet.properties }
             }),
             idIndexCreateList: [{
                 isInteger: true,
@@ -608,7 +608,7 @@ utility2-comment -->\n\
                         petId: options.ii + 100
                     };
                 },
-                properties: local.swgg.swaggerJson.definitions.Order.properties
+                schema: { properties: local.swgg.swaggerJson.definitions.Order.properties }
             }),
             idIndexCreateList: [{
                 isInteger: true,
@@ -659,7 +659,7 @@ utility2-comment -->\n\
                         ]
                     };
                 },
-                properties: local.swgg.swaggerJson.definitions.User.properties
+                schema: { properties: local.swgg.swaggerJson.definitions.User.properties }
             }),
             idIndexCreateList: [{
                 name: 'email'

@@ -1928,17 +1928,15 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         /*
          * this function will create a dbRowList of options.length random dbRow's
          */
-            local.objectSetDefault(options, { dbRowList: [], properties: {} });
-            Object.keys(options.properties).forEach(function (key) {
-                options.properties[key] = local.validateBySwaggerSchema({
-                    // dereference property
-                    modeDereference: true,
-                    prefix: ['dbRow', key],
-                    schema: options.properties[key],
-                    swaggerJson: local.swaggerJson
-                });
+            var ii;
+            options.schema = local.validateBySwaggerSchema({
+                // dereference property
+                modeDereference: true,
+                prefix: ['dbRowListRandomCreate'],
+                schema: options.schema,
+                swaggerJson: local.swaggerJson
             });
-            for (options.ii = 0; options.ii < options.length; options.ii += 1) {
+            for (ii = 0; ii < options.length; ii += 1) {
                 options.dbRowList.push(local.dbRowRandomCreate(options));
             }
             return options.dbRowList;
@@ -1948,27 +1946,34 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         /*
          * this function will create a random dbRow from options.properties
          */
-            var dbRow, tmp;
+            var dbRow, properties, schemaP, tmp;
             dbRow = {};
-            Object.keys(options.properties).forEach(function (key) {
+            properties = (local.validateBySwaggerSchema({
+                // dereference property
+                modeDereference: true,
+                prefix: ['dbRowRandomCreate'],
+                schema: options.schema,
+                swaggerJson: local.swaggerJson
+            }) || {}).properties || {};
+            Object.keys(properties).forEach(function (key) {
                 // try to validate data
                 local.tryCatchOnError(function () {
-                    options.properties[key] = local.validateBySwaggerSchema({
+                    schemaP = local.validateBySwaggerSchema({
                         // dereference property
                         modeDereference: true,
                         prefix: ['dbRow', key],
-                        schema: options.properties[key],
+                        schema: properties[key],
                         swaggerJson: local.swaggerJson
                     });
                     tmp = local.dbFieldRandomCreate({
                         modeNotRandom: options.modeNotRandom,
                         modeSubdoc: options.modeSubdoc,
-                        schemaP: options.properties[key]
+                        schemaP: schemaP
                     });
                     local.validateBySwaggerSchema({
                         data: tmp,
-                        prefix: ['dbRow', 'properties', key],
-                        schema: options.properties[key],
+                        prefix: ['dbRow', key],
+                        schema: schemaP,
                         swaggerJson: local.swaggerJson
                     });
                     dbRow[key] = tmp;
@@ -3285,13 +3290,13 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     prefix: ['parameters', schemaP.name],
                     schema: element,
                     swaggerJson: local.swaggerJson
-                }) || {}).properties;
+                }) || {});
                 return schemaP.schema2;
             });
             if (schemaP.schema2) {
                 schemaP.schemaText = JSON.stringify(schemaP.type2 === 'array'
-                    ? [schemaP.schema2]
-                    : schemaP.schema2, null, 4);
+                    ? [schemaP.schema2.properties]
+                    : schemaP.schema2.properties, null, 4);
             }
             // init valueEncoded
             if (schemaP.required || schemaP.in === 'body' || schemaP['x-swgg-apiKey']) {
@@ -3315,20 +3320,20 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 }
             }
             // init valueEncoded for schema
-            if (schemaP.in === 'body' && schemaP.schema2) {
+            if (schemaP.in === 'body' && schemaP.schema2.properties) {
                 schemaP.valueEncoded = local.dbRowRandomCreate({
                     modeNotRandom: true,
                     override: function () {
                         var override = {};
                         // preserve default value
-                        Object.keys(schemaP.schema2).forEach(function (key) {
-                            if (schemaP.schema2[key].default !== undefined) {
-                                override[key] = schemaP.schema2[key].default;
+                        Object.keys(schemaP.schema2.properties).forEach(function (key) {
+                            if (schemaP.schema2.properties[key].default !== undefined) {
+                                override[key] = schemaP.schema2.properties[key].default;
                             }
                         });
                         return override;
                     },
-                    properties: schemaP.schema2
+                    schema: schemaP.schema2
                 });
                 if (schemaP.type2 === 'array') {
                     schemaP.valueEncoded = [schemaP.valueEncoded];
@@ -3815,7 +3820,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                         data: element,
                         dataReadonlyRemove: [dataReadonlyRemove2, ii, dataReadonlyRemove2[ii]],
                         modeSchema: options.modeSchema,
-                        prefix: prefix + '[' + ii + ']',
+                        prefix: [prefix, ii],
                         schema: schema.items || schema.additionalItems,
                         swaggerJson: options.swaggerJson
                     });
@@ -3864,7 +3869,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                                 dataReadonlyRemove2[key]
                             ],
                             modeSchema: options.modeSchema,
-                            prefix: prefix + '[' + JSON.stringify(key) + ']',
+                            prefix: [prefix, key],
                             schema: schema.properties[key],
                             swaggerJson: options.swaggerJson
                         });
@@ -3876,7 +3881,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                             local.validateBySwaggerSchema({
                                 data: data[key],
                                 modeSchema: options.modeSchema,
-                                prefix: prefix + '[' + JSON.stringify(key) + ']',
+                                prefix: [prefix, key],
                                 schema: schema.patternProperties[rgx],
                                 swaggerJson: options.swaggerJson
                             });
@@ -3911,7 +3916,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     local.validateBySwaggerSchema({
                         data: data[key],
                         modeSchema: options.modeSchema,
-                        prefix: prefix + '[' + JSON.stringify(key) + ']',
+                        prefix: [prefix, key],
                         schema: schema.additionalProperties,
                         swaggerJson: options.swaggerJson
                     });
@@ -3926,7 +3931,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     local.validateBySwaggerSchema({
                         data: data[key],
                         modeSchema: options.modeSchema,
-                        prefix: prefix + '[' + JSON.stringify(key) + ']',
+                        prefix: [prefix, key],
                         schema: schema.dependencies[key],
                         swaggerJson: options.swaggerJson
                     });
