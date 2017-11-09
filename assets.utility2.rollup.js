@@ -14863,7 +14863,7 @@ the greatest app in the world!\n\
 # 1. download standalone app\n\
 curl -O https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app/assets.app.js\n\
 # 2. run standalone app\n\
-node ./assets.app.js\n\
+PORT=8081 node ./assets.app.js\n\
 # 3. open a browser to http://127.0.0.1:8081 and play with the web-demo\n\
 # 4. edit file assets.app.js to suit your needs\n\
 ```\n\
@@ -16207,10 +16207,9 @@ local.assetsDict['/favicon.ico'] = '';
                 local.ajaxProgressState = 0;
                 // reset ajaxProgress
                 setTimeout(function () {
-                    // coverage-hack - ignore else-statement
-                    local.nop(!local.ajaxProgressState && (function () {
+                    if (!local.ajaxProgressState) {
                         ajaxProgressDiv1.style.width = '0%';
-                    }()));
+                    }
                 }, 500);
             }, local.ajaxProgressCounter > 0
                 ? local.timeoutDefault
@@ -16703,7 +16702,7 @@ function TranslateElementInit() {\n\
                     options.browserTestScript = local.browserTestElectron
                         .toString()
                         .replace((/<\//g), '<\\/')
-                        // coverage-hack - un-instrument
+                        // coverage-hack - un-instrument function
                         .replace((/\b__cov_.*?\+\+/g), '0');
                     options.fileElectronHtml = options.npm_config_dir_tmp + '/electron.' +
                         Date.now().toString(16) + Math.random().toString(16) + '.html';
@@ -19486,7 +19485,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                             local.tryCatchOnError(function () {
                                 // validate no error occurred
                                 local.assert(!error, error);
-                                ((local.swgg && local.swgg.validateBySwaggerJson) || local.nop)({
+                                local.swgg.validateBySwaggerJson({
                                     swaggerJson: JSON.parse(data)
                                 });
                             }, console.error);
@@ -19908,12 +19907,8 @@ instruction\n\
          */
             local.objectSetOverride(local, options, 10);
             // init swgg
-            if (local.swgg) {
-                local.swgg.apiUpdate(local.swgg.swaggerJson);
-            }
+            local.swgg.apiUpdate(local.swgg.swaggerJson);
         };
-        // coverage-hack
-        local.stateInit();
 
         local.streamListCleanup = function (streamList) {
         /*
@@ -21115,6 +21110,12 @@ instruction\n\
             '`abcdefghijklmnopqrstuvwxyz{|}~\x7f';
         local.stringUriComponentCharset = '!%\'()*-.' +
             '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~';
+        // mock swgg
+        local.swgg = local.swgg || {
+            apiUpdate: local.nop,
+            normalizeSwaggerJson: local.nop,
+            validateBySwaggerJson: local.nop
+        };
         local.taskOnTaskDict = {};
         local.testReport = { testPlatformList: [{
             name: local.modeJs === 'browser'

@@ -59,6 +59,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 #### todo
 - npm publish 2017.11.8
+- allow function dbRowListRandomCreate to recurse objects and stop with modeSubdoc flag
 - update ui to show required attribute only in 'name and desscription' section
 - add validators from https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation/semantic-validators/validators/items-required-for-array-objects.js
 - add xml support for wechat
@@ -102,7 +103,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 # 1. download standalone app
 curl -O https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js
 # 2. run standalone app
-node ./assets.app.js
+PORT=8081 node ./assets.app.js
 # 3. open a browser to http://127.0.0.1:8081 and play with the web-demo
 # 4. edit file assets.app.js to suit your needs
 ```

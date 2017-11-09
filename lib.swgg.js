@@ -1819,6 +1819,13 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             }
             type = schemaP.type || (schemaP.schema && schemaP.schema.type);
             switch (type) {
+            case 'boolean':
+                tmp = options.modeNotRandom
+                    ? false
+                    : Math.random() > 0.5
+                    ? false
+                    : true;
+                break;
             // 5.1. Validation keywords for numeric instances (number and integer)
             case 'integer':
             case 'number':
@@ -1839,18 +1846,19 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                             max = min + 1000;
                         }
                     }
-                    tmp = min + (max - min) * Math.max(Math.random(), 0.00000000001);
+                    // exclusiveMaximum and exclusiveMinimum for float
+                    tmp = min + (max - min) * Math.max(Math.random(), min * 0.000000000000001);
                     if (type === 'integer') {
                         tmp = Math.round(tmp);
                     }
                 }
                 max = schemaP.maximum;
                 min = schemaP.minimum;
-                // exclusiveMaximum
+                // exclusiveMaximum for integer
                 if (schemaP.exclusiveMaximum && tmp === max) {
                     tmp -= 1;
                 }
-                // exclusiveMinimum
+                // exclusiveMinimum for integer
                 if (schemaP.exclusiveMaximum && tmp === min) {
                     tmp += 1;
                 }
@@ -1898,23 +1906,19 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             // 5.3. Validation keywords for arrays
             case 'array':
                 tmp = [];
-                for (ii = 0; ii < schemaP.minItems; ii += 1) {
+                for (ii = 0; ii < (schemaP.minItems || 1); ii += 1) {
+                    //!! local.dbRowRandomCreate({
+                        //!! modeNotRandom: options.modeNotRandom
+                    //!! });
                     tmp.push(null);
                 }
                 break;
             // 5.4. Validation keywords for objects
-            case 'object':
+            default:
                 tmp = {};
-                for (ii = 0; ii < schemaP.minProperties; ii += 1) {
+                for (ii = 0; ii < (schemaP.minProperties || 1); ii += 1) {
                     tmp['property' + ii] = null;
                 }
-                break;
-            case 'boolean':
-                tmp = options.modeNotRandom
-                    ? false
-                    : Math.random() <= 0.5
-                    ? false
-                    : true;
                 break;
             }
             return tmp;
@@ -1924,7 +1928,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         /*
          * this function will create a dbRowList of options.length random dbRow's
          */
-            local.objectSetDefault(options, { dbRowList: [], properties: [] });
+            local.objectSetDefault(options, { dbRowList: [], properties: {} });
             Object.keys(options.properties).forEach(function (key) {
                 options.properties[key] = local.validateBySwaggerSchema({
                     // dereference property
@@ -1958,6 +1962,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     });
                     tmp = local.dbFieldRandomCreate({
                         modeNotRandom: options.modeNotRandom,
+                        modeSubdoc: options.modeSubdoc,
                         schemaP: options.properties[key]
                     });
                     local.validateBySwaggerSchema({
@@ -3187,7 +3192,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             if (schemaP.type !== 'string') {
                 schemaP.placeholder = JSON.stringify(schemaP.placeholder);
             }
-            schemaP.placeholder = String(schemaP.placeholder || '');
+            schemaP.placeholder = String(schemaP.placeholder);
             schemaP.enum2 = schemaP.enum || (schemaP.items && schemaP.items.enum);
             // init input - file
             if (schemaP.type === 'file') {
