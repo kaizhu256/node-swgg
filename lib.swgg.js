@@ -937,14 +937,12 @@ local.templateUiResource = '\
 
 local.templateUiResponseAjax = '\
 {{#if error}}\n\
-<h4 class="label"></h4>\n\
+<h4 class="label">Error</h4>\n\
 <pre class="code error uiAnimateShake">\n\
-ERROR\n\
-\n\
 {{error.message htmlSafe}}\n\
 </pre>\n\
 {{/if error}}\n\
-<h4 class="label"></h4>\n\
+<h4 class="label">Javascript Code</h4>\n\
 <pre class="code">\n\
 /*\n\
  * reproduce api-call {{options.api._methodPath jsonStringify}}\n\
@@ -1085,7 +1083,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     min-height: 1.75rem;\n\
     overflow: auto;\n\
     padding: 0.25rem;\n\
-    white-space: pre;\n\
+    white-space: pre-wrap;\n\
 }\n\
 .swggUiContainer .tr {\n\
     display: flex;\n\
@@ -3192,7 +3190,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     schemaP: schemaP
                 });
             if (typeof schemaP.placeholder !== 'string' || schemaP.type !== 'string') {
-                schemaP.placeholder = JSON.stringify(schemaP.placeholder);
+                schemaP.placeholder = JSON.stringify(schemaP.placeholder, null, 4);
             }
             // init input - file
             if (schemaP.type === 'file') {
