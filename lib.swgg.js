@@ -3181,6 +3181,9 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         /*
          * this function will render schemaP
          */
+            schemaP.schemaText = JSON.stringify(schemaP, null, 4);
+            // init schemaP.id
+            schemaP.id = local.idDomElementCreate('swgg_id_' + schemaP.name);
             schemaP.enum2 = schemaP.enum || (schemaP.items && schemaP.items.enum);
             schemaP.placeholder = !local.isNullOrUndefined(schemaP.default)
                 ? schemaP.default
@@ -3377,11 +3380,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                         }),
                         summary: operation.description || 'no summary'
                     });
-                    operation.parameters.forEach(function (schemaP) {
-                        // init schemaP.id
-                        schemaP.id = local.idDomElementCreate('swgg_id_' + schemaP.name);
-                        local.uiParamRender(schemaP);
-                    });
+                    operation.parameters.forEach(local.uiParamRender);
                     // templateRender operation
                     options.uiFragment.querySelector('#' + resource.id + ' .operationList')
                         .appendChild(local.domFragmentRender(local.templateUiOperation, operation));
