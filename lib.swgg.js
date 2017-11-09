@@ -1939,42 +1939,40 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         /*
          * this function will create a random dbRow from options.properties
          */
-            var dbRow, properties, schemaP, tmp;
+            var dbRow, properties;
             dbRow = {};
             options = local.objectSetDefault(options, { override: local.nop });
             properties = local.validateBySwaggerSchema({
                 // dereference property
                 modeDereference: true,
-                prefix: ['dbRowRandomCreate'],
+                prefix: ['dbRow'],
                 schema: options.schema,
                 swaggerJson: local.swaggerJson
             });
             properties = (properties && properties.properties) || {};
             Object.keys(properties).forEach(function (key) {
-                // try to validate data
-                local.tryCatchOnError(function () {
-                    schemaP = local.validateBySwaggerSchema({
+                dbRow[key] = local.dbFieldRandomCreate({
+                    modeNotRandom: options.modeNotRandom,
+                    modeSubdoc: options.modeSubdoc,
+                    schemaP: local.validateBySwaggerSchema({
                         // dereference property
                         modeDereference: true,
                         prefix: ['dbRow', key],
                         schema: properties[key],
                         swaggerJson: local.swaggerJson
-                    });
-                    tmp = local.dbFieldRandomCreate({
-                        modeNotRandom: options.modeNotRandom,
-                        modeSubdoc: options.modeSubdoc,
-                        schemaP: schemaP
-                    });
-                    local.validateBySwaggerSchema({
-                        data: tmp,
-                        prefix: ['dbRow', key],
-                        schema: schemaP,
-                        swaggerJson: local.swaggerJson
-                    });
-                    dbRow[key] = tmp;
-                }, console.error);
+                    })
+                });
             });
-            return local.jsonCopy(local.objectSetOverride(dbRow, options.override(options)));
+            dbRow = local.jsonCopy(local.objectSetOverride(dbRow, options.override(options)));
+            // try to validate data
+            local.tryCatchOnError(function () {
+                local.validateBySwaggerSchema({
+                    data: dbRow,
+                    prefix: ['dbRow'],
+                    schema: options.schema,
+                    swaggerJson: local.swaggerJson
+                });
+            }, console.error);
         };
 
         local.idDomElementCreate = function (seed) {
