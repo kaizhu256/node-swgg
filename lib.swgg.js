@@ -1929,13 +1929,6 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
          * this function will create a dbRowList of options.length random dbRow's
          */
             var ii;
-            options.schema = local.validateBySwaggerSchema({
-                // dereference property
-                modeDereference: true,
-                prefix: ['dbRowListRandomCreate'],
-                schema: options.schema,
-                swaggerJson: local.swaggerJson
-            });
             for (ii = 0; ii < options.length; ii += 1) {
                 options.dbRowList.push(local.dbRowRandomCreate(options));
             }
@@ -1948,13 +1941,15 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
          */
             var dbRow, properties, schemaP, tmp;
             dbRow = {};
-            properties = (local.validateBySwaggerSchema({
+            options = local.objectSetDefault(options, { override: local.nop });
+            properties = local.validateBySwaggerSchema({
                 // dereference property
                 modeDereference: true,
                 prefix: ['dbRowRandomCreate'],
                 schema: options.schema,
                 swaggerJson: local.swaggerJson
-            }) || {}).properties || {};
+            });
+            properties = (properties && properties.properties) || {};
             Object.keys(properties).forEach(function (key) {
                 // try to validate data
                 local.tryCatchOnError(function () {
@@ -3291,9 +3286,9 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     schema: element,
                     swaggerJson: local.swaggerJson
                 }) || {});
-                return schemaP.schema2;
+                return schemaP.schema2.properties;
             });
-            if (schemaP.schema2) {
+            if (schemaP.schema2.properties) {
                 schemaP.schemaText = JSON.stringify(schemaP.type2 === 'array'
                     ? [schemaP.schema2.properties]
                     : schemaP.schema2.properties, null, 4);
@@ -3644,9 +3639,6 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 }
                 // dereference schema.$ref
                 $ref = schema && schema.$ref;
-                if ($ref === '#/x-test/aa') {
-                    local.nop();
-                }
                 if (!$ref) {
                     break;
                 }

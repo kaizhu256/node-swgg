@@ -1972,6 +1972,8 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
             }
         });
         // init db
+        // test dbRowRandomCreate's null-case handling-behavior
+        local.dbRowRandomCreate();
         local.dbSeedTestList = [{
             // test dbRowListRandomCreate's default handling-behavior
             dbRowList: local.dbRowListRandomCreate({
