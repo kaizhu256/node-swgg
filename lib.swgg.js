@@ -872,7 +872,7 @@ local.templateUiParam = '\
     {{#if isTextarea}}\n\
     <textarea\n\
         class="input"\n\
-        data-value-encoded="{{valueEncoded encodeURIComponent}}"\n\
+        data-value-text="{{valueText encodeURIComponent}}"\n\
         placeholder="{{placeholder htmlSafe}}"></textarea>\n\
     {{/if isTextarea}}\n\
     {{#if isFile}}\n\
@@ -882,17 +882,17 @@ local.templateUiParam = '\
     <select class="input" {{#if isSelectMultiple}}multiple{{/if isSelectMultiple}}>\n\
         {{#each selectOptionList}}\n\
         <option\n\
-            data-value-decoded="{{valueDecoded jsonStringify encodeURIComponent}}"\n\
+            data-value-select-option="{{valueSelectOption jsonStringify encodeURIComponent}}"\n\
             id="{{id}}"\n\
             {{selected}}\n\
-        >{{valueEncoded htmlSafe}}</option>\n\
+        >{{valueText htmlSafe}}</option>\n\
         {{/each selectOptionList}}\n\
     </select>\n\
     {{/if isSelect}}\n\
     {{#if isInputText}}\n\
     <input\n\
         class="input"\n\
-        data-value-encoded="{{valueEncoded encodeURIComponent}}"\n\
+        data-value-text="{{valueText encodeURIComponent}}"\n\
         placeholder="{{placeholder htmlSafe}}"\n\
         type="text"\n\
     >\n\
@@ -2920,7 +2920,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                                 })
                                 .map(function (element) {
                                     return jsonParse(decodeURIComponent(
-                                        element.dataset.valueDecoded
+                                        element.dataset.valueSelectOption
                                     ));
                                 });
                             if (!tmp.length || tmp[0] === '$swggUndefined') {
@@ -3181,17 +3181,16 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         /*
          * this function will render schemaP
          */
+            schemaP.enum2 = schemaP.enum || (schemaP.items && schemaP.items.enum);
             schemaP.placeholder = !local.isNullOrUndefined(schemaP.default)
                 ? schemaP.default
                 : local.dbFieldRandomCreate({
                     modeNotRandom: true,
                     schemaP: schemaP
                 });
-            if (schemaP.type !== 'string') {
+            if (typeof schemaP.placeholder !== 'string' || schemaP.type !== 'string') {
                 schemaP.placeholder = JSON.stringify(schemaP.placeholder);
             }
-            schemaP.placeholder = String(schemaP.placeholder);
-            schemaP.enum2 = schemaP.enum || (schemaP.items && schemaP.items.enum);
             // init input - file
             if (schemaP.type === 'file') {
                 schemaP.isFile = true;
@@ -3221,8 +3220,8 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                             ? 'selected'
                             : '',
                         type: (schemaP.items && schemaP.items.type) || schemaP.type,
-                        valueDecoded: element,
-                        valueEncoded: typeof element === 'string'
+                        valueSelectOption: element,
+                        valueText: typeof element === 'string'
                             ? element
                             : JSON.stringify(element)
                     };
@@ -3233,8 +3232,8 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                         id: local.idDomElementCreate('swgg_id_' + schemaP.name),
                         selected: 'selected',
                         type: schemaP.type,
-                        valueDecoded: '$swggUndefined',
-                        valueEncoded: '<none>'
+                        valueSelectOption: '$swggUndefined',
+                        valueText: '<none>'
                     });
                 }
                 // select at least one value
@@ -3252,11 +3251,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             // init input - textarea
             } else if (schemaP.type === 'array') {
                 schemaP.isTextarea = true;
-                schemaP.placeholder = String(Array.isArray(schemaP.default)
-                    ? schemaP.default.join('\n')
-                    : 'provide multiple values in new lines' + (schemaP.required
-                        ? ' (at least one required)'
-                        : ''));
+                schemaP.placeholder = JSON.parse(schemaP.placeholder).join('\n');
             // init input - text
             } else {
                 schemaP.isInputText = true;
@@ -3291,51 +3286,10 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     ? [schemaP.schema2.properties]
                     : schemaP.schema2.properties, null, 4);
             }
-            // init valueEncoded
-            if (schemaP.required || schemaP.in === 'body' || schemaP['x-swgg-apiKey']) {
-                schemaP.valueEncoded = schemaP['x-swgg-apiKey']
-                    ? local.apiKeyValue
-                    : schemaP.default;
-                if (schemaP.valueEncoded === undefined &&
-                        local.isNullOrUndefined(schemaP.default)) {
-                    schemaP.valueEncoded = local.dbFieldRandomCreate({
-                        modeNotRandom: true,
-                        schemaP: schemaP
-                    });
-                }
-                // init valueEncoded for array
-                if (schemaP.valueEncoded && schemaP.type2 === 'array' && schemaP.in !== 'body') {
-                    schemaP.valueEncoded = schemaP.valueEncoded.map(function (element) {
-                        return typeof element === 'string'
-                            ? element
-                            : JSON.stringify(element);
-                    }).join('\n');
-                }
-            }
-            // init valueEncoded for schema
-            if (schemaP.in === 'body' && schemaP.schema2.properties) {
-                schemaP.valueEncoded = local.dbRowRandomCreate({
-                    modeNotRandom: true,
-                    override: function () {
-                        var override = {};
-                        // preserve default value
-                        Object.keys(schemaP.schema2.properties).forEach(function (key) {
-                            if (schemaP.schema2.properties[key].default !== undefined) {
-                                override[key] = schemaP.schema2.properties[key].default;
-                            }
-                        });
-                        return override;
-                    },
-                    schema: schemaP.schema2
-                });
-                if (schemaP.type2 === 'array') {
-                    schemaP.valueEncoded = [schemaP.valueEncoded];
-                }
-                schemaP.valueEncoded = JSON.stringify(schemaP.valueEncoded, null, 4);
-            }
-            if (typeof schemaP.valueEncoded !== 'string') {
-                schemaP.valueEncoded = JSON.stringify(schemaP.valueEncoded) || '';
-            }
+            // init valueText
+            schemaP.valueText = schemaP['x-swgg-apiKey']
+                ? local.apiKeyValue
+                : schemaP.placeholder;
             // templateRender schemaP
             schemaP.innerHTML = local.templateRender(local.templateUiParam, schemaP);
         };
@@ -3441,11 +3395,11 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             // append uiFragment to swggUiContainer
             document.querySelector('#swggAjaxProgressDiv1').style.display = 'none';
             document.querySelector('.swggUiContainer').appendChild(options.uiFragment);
-            // render valueEncoded
+            // render valueText
             Array.from(
-                document.querySelectorAll('.swggUiContainer [data-value-encoded]')
+                document.querySelectorAll('.swggUiContainer [data-value-text]')
             ).forEach(function (element) {
-                element.value = decodeURIComponent(element.dataset.valueEncoded);
+                element.value = decodeURIComponent(element.dataset.valueText);
             });
             // init event-handling
             local.uiEventInit(document);
