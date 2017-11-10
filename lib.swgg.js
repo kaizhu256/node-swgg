@@ -705,11 +705,11 @@ local.templateUiMain = '\
         type="text"\n\
         value="{{apiKeyValue}}"\n\
     >\n\
-    <button class="eventDelegateClick onEventUiReload td4">Explore</button>\n\
+    <button class="eventDelegateClick onEventUiReload td4">explore</button>\n\
     <button\n\
         class="eventDelegateClick onEventUiReload td5"\n\
         id="swggApiKeyClearButton1"\n\
-    >Clear api-keys</button>\n\
+    >clear api-keys</button>\n\
 </div>\n\
 <div class="info reset">\n\
     {{#if info}}\n\
@@ -735,20 +735,20 @@ local.templateUiMain = '\
         </li>\n\
         {{/if externalDocs}}\n\
         {{#if info.termsOfService}}\n\
-        <li><a target="_blank" href="{{info.termsOfService}}">Terms of service</a></li>\n\
+        <li><a target="_blank" href="{{info.termsOfService}}">terms of service</a></li>\n\
         {{/if info.termsOfService}}\n\
         {{#if info.contact.name}}\n\
-        <li>Created by {{info.contact.name}}</li>\n\
+        <li>created by {{info.contact.name}}</li>\n\
         {{/if info.contact.name}}\n\
         {{#if info.contact.url}}\n\
-        <li>See more at <a href="{{info.contact.url}}">{{info.contact.url}}</a></li>\n\
+        <li>see more at <a href="{{info.contact.url}}">{{info.contact.url}}</a></li>\n\
         {{/if info.contact.url}}\n\
         {{#if info.contact.email}}\n\
         <li>\n\
             <a\n\
                 target="_parent"\n\
                 href="mailto:{{info.contact.email}}?subject={{info.title}}"\n\
-            >Contact the developer</a>\n\
+            >contact the developer</a>\n\
         </li>\n\
         {{/if info.contact.email}}\n\
         {{#if info.license}}\n\
@@ -758,7 +758,7 @@ local.templateUiMain = '\
     {{/if info}}\n\
 </div>\n\
 {{#if urlSwaggerJson}}\n\
-<h4 class="label">Javascript Code</h4>\n\
+<h4 class="label">javascript code</h4>\n\
 <pre class="styleMaxHeight50Rem" id="swggAjaxProgressPre1">\n\
 /*\n\
  * initialize swgg-client\n\
@@ -811,25 +811,25 @@ local.templateUiOperation = '\
         class="content uiAnimateSlide"\n\
         style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
     >\n\
-        {{#if deprecated}}<h4 class="label">(Warning: Deprecated)</h4><br>{{/if deprecated}}\n\
-        <h4 class="label">Description</h4>\n\
+        {{#if deprecated}}<h4 class="label">(warning: deprecated)</h4><br>{{/if deprecated}}\n\
+        <h4 class="label">description</h4>\n\
         <div class="styleColor777 tr">{{description modeHtmlBr}}</div>\n\
         {{#if parameters.length}}\n\
-        <h4 class="label">Parameters</h4>\n\
+        <h4 class="label">parameters</h4>\n\
         <div class="schemaP styleBorderBottom1px tr">\n\
-            <span class="styleColor777 td1">Name and Description</span>\n\
-            <span class="styleColor777 td2">Data Type</span>\n\
-            <span class="styleColor777 td3">Value</span>\n\
-            <span class="styleColor777 td4">Schema</span>\n\
+            <span class="styleColor777 td1">name and description</span>\n\
+            <span class="styleColor777 td2">data type</span>\n\
+            <span class="styleColor777 td3">value</span>\n\
+            <span class="styleColor777 td4">schema</span>\n\
         </div>\n\
         {{#each parameters}}\n\
         <div class="schemaP tr" id="{{id}}" name="{{name}}">{{innerHTML modeNotHtmlSafe}}</div>\n\
         {{/each parameters}}\n\
         {{/if parameters.length}}\n\
-        <h4 class="label">Response Messages</h4>\n\
+        <h4 class="label">response messages</h4>\n\
         <div class="response styleBorderBottom1px tr">\n\
-            <span class="styleColor777 td1">HTTP Status Code</span>\n\
-            <span class="styleColor777 td2">Reason</span>\n\
+            <span class="styleColor777 td1">http status code</span>\n\
+            <span class="styleColor777 td2">reason</span>\n\
         </div>\n\
         {{#each responseList}}\n\
         <div class="response tr">\n\
@@ -837,7 +837,7 @@ local.templateUiOperation = '\
             <span class="td2">{{value.description}}</span>\n\
         </div>\n\
         {{/each responseList}}\n\
-        <button class="onEventOperationAjax">Try it out!</button>\n\
+        <button class="onEventOperationAjax">try it out!</button>\n\
         <div class="responseAjax"></div>\n\
     </form>\n\
 </div>\n\
@@ -910,12 +910,12 @@ local.templateUiResource = '\
         <span\n\
             class="onEventResourceDisplayAction td2"\n\
             tabindex="0"\n\
-        >Expand / Collapse Operations</span>\n\
+        >expand / collapse operations</span>\n\
         <span\n\
             class="onEventDatatableReload td3"\n\
             data-resource-name="{{name}}"\n\
             tabindex="0"\n\
-        >Datatable</span>\n\
+        >datatable</span>\n\
     </div>\n\
     <div class="operationList uiAnimateSlide"\n\
         style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
@@ -929,12 +929,12 @@ local.templateUiResource = '\
 
 local.templateUiResponseAjax = '\
 {{#if error}}\n\
-<h4 class="label">Error</h4>\n\
+<h4 class="label">error</h4>\n\
 <pre class="error styleMaxHeight50Rem uiAnimateShake">\n\
 {{error.message}}\n\
 </pre>\n\
 {{/if error}}\n\
-<h4 class="label">Javascript Code</h4>\n\
+<h4 class="label">javascript code</h4>\n\
 <pre class="styleMaxHeight50Rem">\n\
 /*\n\
  * reproduce api-call {{options.api._methodPath jsonStringify}}\n\
@@ -951,13 +951,13 @@ function (error, data) {\n\
 }\
 );\n\
 </pre>\n\
-<h4 class="label">Curl Request</h4>\n\
+<h4 class="label">curl request</h4>\n\
 <pre>{{curl}}</pre>\n\
-<h4 class="label">Response Code</h4>\n\
+<h4 class="label">response code</h4>\n\
 <pre>{{statusCode}}</pre>\n\
-<h4 class="label">Response Headers</h4>\n\
+<h4 class="label">response headers</h4>\n\
 <pre>{{responseHeaders}}</pre>\n\
-<h4 class="label">Response Body</h4>\n\
+<h4 class="label">response body</h4>\n\
 {{responseBody modeNotHtmlSafe}}\n\
 ';
 
@@ -1116,9 +1116,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     color: #fff;\n\
     padding: 6px 8px;\n\
 }\n\
-.swggUiContainer > .info a {\n\
-    color: #393;\n\
-}\n\
 .swggUiContainer > .info > ul {\n\
     margin-left: 2rem;\n\
 }\n\
@@ -1179,9 +1176,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .operation.PUT > .header > .td2 {\n\
     background: #70b;\n\
 }\n\
-.swggUiContainer .resource > .header > span {\n\
-    color: #393;\n\
-}\n\
 .swggUiContainer .resource > .header > .td2 {\n\
     border-left: 1px solid #777;\n\
     border-right: 1px solid #777;\n\
@@ -1204,6 +1198,11 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .resource > .header > span:hover {\n\
     color: #000;\n\
 }\n\
+.swggUiContainer a,\n\
+.swggUiContainer .label,\n\
+.swggUiContainer .resource > .header > span {\n\
+    color: #080;\n\
+}\n\
 .swggUiContainer .styleColor777 {\n\
     color: #777;\n\
 }\n\
@@ -1224,7 +1223,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 /* margin-bottom */\n\
 .swggUiContainer .label {\n\
-    color: #393;\n\
     margin-bottom: 0;\n\
 }\n\
 /* min-height */\n\
