@@ -314,7 +314,7 @@
         /*
          * this function will render the template with the given dict
          */
-            var argList, getValue, match, renderPartial, rgx, value;
+            var argList, getValue, match, renderPartial, rgx, tryCatch, value;
             dict = dict || {};
             getValue = function (key) {
                 argList = key.split(' ');
@@ -353,6 +353,17 @@
                     return match0[0] + local.templateRender(match0.slice(1), dict);
                 }
             };
+            tryCatch = function (fnc, message) {
+            /*
+             * this function will prepend the message to errorCaught
+             */
+                try {
+                    return fnc();
+                } catch (errorCaught) {
+                    errorCaught.message = message + errorCaught.message;
+                    throw errorCaught;
+                }
+            };
             // render partials
             rgx = (/\{\{#(\w+) ([^}]+?)\}\}/g);
             template = template || '';
@@ -367,44 +378,56 @@
             }
             // search for keys in the template
             return template.replace((/\{\{[^}]+?\}\}/g), function (match0) {
-                getValue(match0.slice(2, -2));
-                if (value === undefined) {
-                    return match0;
-                }
-                argList.slice(1).forEach(function (arg) {
-                    switch (arg) {
-                    case 'alphanumeric':
-                        value = value.replace((/\W/g), '_');
-                        break;
-                    case 'br':
-                        value = value.replace((/\n/g), '<br>');
-                        break;
-                    case 'decodeURIComponent':
-                        value = decodeURIComponent(value);
-                        break;
-                    case 'encodeURIComponent':
-                        value = encodeURIComponent(value);
-                        break;
-                    case 'htmlSafe':
+                var modeHtmlBr, modeNotHtmlSafe;
+                return tryCatch(function () {
+                    getValue(match0.slice(2, -2));
+                    if (value === undefined) {
+                        return match0;
+                    }
+                    argList.slice(1).forEach(function (arg) {
+                        switch (arg) {
+                        case 'alphanumeric':
+                            value = value.replace((/\W/g), '_');
+                            break;
+                        case 'decodeURIComponent':
+                            value = decodeURIComponent(value);
+                            break;
+                        case 'encodeURIComponent':
+                            value = encodeURIComponent(value);
+                            break;
+                        case 'jsonStringify':
+                            value = JSON.stringify(value);
+                            break;
+                        case 'jsonStringify4':
+                            value = JSON.stringify(value, null, 4);
+                            break;
+                        case 'modeHtmlBr':
+                            modeHtmlBr = true;
+                            break;
+                        case 'modeMarkdownSafe':
+                            value = value.replace((/`/g), '\'');
+                            break;
+                        case 'modeNotHtmlSafe':
+                            modeNotHtmlSafe = true;
+                            break;
+                        // default to String.prototype[arg]()
+                        default:
+                            value = value[arg]();
+                            break;
+                        }
+                    });
+                    value = String(value);
+                    // default to htmlSafe
+                    if (!modeNotHtmlSafe) {
                         value = value.replace((/["&'<>]/g), function (match0) {
                             return '&#x' + match0.charCodeAt(0).toString(16) + ';';
                         });
-                        break;
-                    case 'jsonStringify':
-                        value = JSON.stringify(value);
-                        break;
-                    case 'jsonStringify4':
-                        value = JSON.stringify(value, null, 4);
-                        break;
-                    case 'markdownCodeSafe':
-                        value = value.replace((/`/g), '\'');
-                        break;
-                    default:
-                        value = value[arg]();
-                        break;
                     }
-                });
-                return String(value);
+                    if (modeHtmlBr) {
+                        value = value.replace((/\n/g), '<br>');
+                    }
+                    return value;
+                }, 'templateRender could not render expression ' + JSON.stringify(match0) + '\n');
             });
         };
 
@@ -15031,7 +15054,7 @@ local.assetsDict['/assets.readmeCustomOrg.npmdoc.template.md'] = '\
 \n\
 ```json\n\
 \n\
-{{packageJson jsonStringify4 markdownCodeSafe}}\n\
+{{packageJson jsonStringify4 modeMarkdownSafe}}\n\
 ```\n\
 \n\
 \n\
@@ -15086,7 +15109,7 @@ local.assetsDict['/assets.readmeCustomOrg.npmtest.template.md'] = '\
 \n\
 ```json\n\
 \n\
-{{packageJson jsonStringify4 markdownCodeSafe}}\n\
+{{packageJson jsonStringify4 modeMarkdownSafe}}\n\
 ```\n\
 \n\
 \n\
@@ -15219,7 +15242,7 @@ local.assetsDict['/assets.testReport.template.html'] = '\
     <span>test date</span>- {{date}}<br>\n\
     <span>commit info</span>-\n\
         {{#if env.CI_COMMIT_INFO}}\n\
-        {{env.CI_COMMIT_INFO htmlSafe}}<br>\n\
+        {{env.CI_COMMIT_INFO}}<br>\n\
         {{#unless env.CI_COMMIT_INFO}}\n\
         undefined<br>\n\
         {{/if env.CI_COMMIT_INFO}}\n\
@@ -15244,7 +15267,7 @@ local.assetsDict['/assets.testReport.template.html'] = '\
 {{#each testPlatformList}}\n\
 <div class="platform">\n\
 <h4>\n\
-    {{testPlatformNumber}}. {{name htmlSafe}}<br>\n\
+    {{testPlatformNumber}}. {{name}}<br>\n\
     {{#if screenshot}}\n\
     <a href="{{screenshot encodeURIComponent}}">\n\
         <img src="{{screenshot encodeURIComponent}}">\n\
@@ -15276,7 +15299,7 @@ local.assetsDict['/assets.testReport.template.html'] = '\
 </table>\n\
 <pre class="{{preClass}}">\n\
 {{#each errorStackList}}\n\
-{{errorStack htmlSafe}}\n\
+{{errorStack}}\n\
 {{/each errorStackList}}\n\
 </pre>\n\
 </div>\n\
@@ -20070,7 +20093,7 @@ instruction\n\
         /*
          * this function will render the template with the given dict
          */
-            var argList, getValue, match, renderPartial, rgx, value;
+            var argList, getValue, match, renderPartial, rgx, tryCatch, value;
             dict = dict || {};
             getValue = function (key) {
                 argList = key.split(' ');
@@ -20109,6 +20132,17 @@ instruction\n\
                     return match0[0] + local.templateRender(match0.slice(1), dict);
                 }
             };
+            tryCatch = function (fnc, message) {
+            /*
+             * this function will prepend the message to errorCaught
+             */
+                try {
+                    return fnc();
+                } catch (errorCaught) {
+                    errorCaught.message = message + errorCaught.message;
+                    throw errorCaught;
+                }
+            };
             // render partials
             rgx = (/\{\{#(\w+) ([^}]+?)\}\}/g);
             template = template || '';
@@ -20123,44 +20157,56 @@ instruction\n\
             }
             // search for keys in the template
             return template.replace((/\{\{[^}]+?\}\}/g), function (match0) {
-                getValue(match0.slice(2, -2));
-                if (value === undefined) {
-                    return match0;
-                }
-                argList.slice(1).forEach(function (arg) {
-                    switch (arg) {
-                    case 'alphanumeric':
-                        value = value.replace((/\W/g), '_');
-                        break;
-                    case 'br':
-                        value = value.replace((/\n/g), '<br>');
-                        break;
-                    case 'decodeURIComponent':
-                        value = decodeURIComponent(value);
-                        break;
-                    case 'encodeURIComponent':
-                        value = encodeURIComponent(value);
-                        break;
-                    case 'htmlSafe':
+                var modeHtmlBr, modeNotHtmlSafe;
+                return tryCatch(function () {
+                    getValue(match0.slice(2, -2));
+                    if (value === undefined) {
+                        return match0;
+                    }
+                    argList.slice(1).forEach(function (arg) {
+                        switch (arg) {
+                        case 'alphanumeric':
+                            value = value.replace((/\W/g), '_');
+                            break;
+                        case 'decodeURIComponent':
+                            value = decodeURIComponent(value);
+                            break;
+                        case 'encodeURIComponent':
+                            value = encodeURIComponent(value);
+                            break;
+                        case 'jsonStringify':
+                            value = JSON.stringify(value);
+                            break;
+                        case 'jsonStringify4':
+                            value = JSON.stringify(value, null, 4);
+                            break;
+                        case 'modeHtmlBr':
+                            modeHtmlBr = true;
+                            break;
+                        case 'modeMarkdownSafe':
+                            value = value.replace((/`/g), '\'');
+                            break;
+                        case 'modeNotHtmlSafe':
+                            modeNotHtmlSafe = true;
+                            break;
+                        // default to String.prototype[arg]()
+                        default:
+                            value = value[arg]();
+                            break;
+                        }
+                    });
+                    value = String(value);
+                    // default to htmlSafe
+                    if (!modeNotHtmlSafe) {
                         value = value.replace((/["&'<>]/g), function (match0) {
                             return '&#x' + match0.charCodeAt(0).toString(16) + ';';
                         });
-                        break;
-                    case 'jsonStringify':
-                        value = JSON.stringify(value);
-                        break;
-                    case 'jsonStringify4':
-                        value = JSON.stringify(value, null, 4);
-                        break;
-                    case 'markdownCodeSafe':
-                        value = value.replace((/`/g), '\'');
-                        break;
-                    default:
-                        value = value[arg]();
-                        break;
                     }
-                });
-                return String(value);
+                    if (modeHtmlBr) {
+                        value = value.replace((/\n/g), '<br>');
+                    }
+                    return value;
+                }, 'templateRender could not render expression ' + JSON.stringify(match0) + '\n');
             });
         };
 
@@ -22235,12 +22281,12 @@ local.templateUiMain = '\
 <div class="info reset">\n\
     {{#if info}}\n\
     {{#if info.x-swgg-homepage}}\n\
-    <a class="fontWeightBold" href="{{info.x-swgg-homepage}}" target="_blank"\n\
-    >{{info.title htmlSafe}} ({{info.version htmlSafe}})</a>\n\
+    <a class="styleFontSizeXLarge" href="{{info.x-swgg-homepage}}" target="_blank"\n\
+    >{{info.title}} ({{info.version}})</a>\n\
     {{#unless info.x-swgg-homepage}}\n\
-    <div class="fontWeightBold">{{info.title htmlSafe}} ({{info.version htmlSafe}})</div>\n\
+    <div class="styleFontSizeXLarge">{{info.title}} ({{info.version}})</div>\n\
     {{/if info.x-swgg-homepage}}\n\
-    {{#if info.description}}<div>{{info.description htmlSafe br}}</div>{{/if info.description}}\n\
+    {{#if info.description}}<div>{{info.description modeHtmlBr}}</div>{{/if info.description}}\n\
     {{#if info.x-swgg-downloadStandaloneApp}}\n\
     <h4><a download href="{{info.x-swgg-downloadStandaloneApp}}">download standalone app</a></h4>\n\
     {{/if info.x-swgg-downloadStandaloneApp}}\n\
@@ -22248,7 +22294,7 @@ local.templateUiMain = '\
         {{#if externalDocs}}\n\
         <li>\n\
             {{#if externalDocs.description}}\n\
-            <p>{{externalDocs.description htmlSafe br}}</p>\n\
+            <p>{{externalDocs.description modeHtmlBr}}</p>\n\
             {{/if externalDocs.description}}\n\
             {{#if externalDocs.url}}\n\
             <a href="{{externalDocs.url}}" target="_blank">{{externalDocs.url}}</a>\n\
@@ -22259,7 +22305,7 @@ local.templateUiMain = '\
         <li><a target="_blank" href="{{info.termsOfService}}">Terms of service</a></li>\n\
         {{/if info.termsOfService}}\n\
         {{#if info.contact.name}}\n\
-        <li>Created by {{info.contact.name htmlSafe}}</li>\n\
+        <li>Created by {{info.contact.name}}</li>\n\
         {{/if info.contact.name}}\n\
         {{#if info.contact.url}}\n\
         <li>See more at <a href="{{info.contact.url}}">{{info.contact.url}}</a></li>\n\
@@ -22268,7 +22314,7 @@ local.templateUiMain = '\
         <li>\n\
             <a\n\
                 target="_parent"\n\
-                href="mailto:{{info.contact.email}}?subject={{info.title htmlSafe}}"\n\
+                href="mailto:{{info.contact.email}}?subject={{info.title}}"\n\
             >Contact the developer</a>\n\
         </li>\n\
         {{/if info.contact.email}}\n\
@@ -22284,7 +22330,7 @@ local.templateUiMain = '\
 /*\n\
  * initialize swgg-client\n\
  * 1. download currently-loaded apis to file swagger.json:\n\
- *     $ curl -L "{{urlSwaggerJson htmlSafe}}" > swagger.json\n\
+ *     $ curl -L "{{urlSwaggerJson}}" > swagger.json\n\
  * 2. npm install swgg\n\
  *     $ npm install swgg\n\
  * 3. run code below to initialize swgg-client\n\
@@ -22328,7 +22374,7 @@ local.templateUiOperation = '\
             "\n\
         >{{_path}}</span>\n\
         <span class="styleColor777 styleFlex1 styleTextOverflowEllipsis td4"\n\
-            >{{summary htmlSafe}}</span>\n\
+            >{{summary}}</span>\n\
     </div>\n\
     <form accept-charset="UTF-8"\n\
         class="content uiAnimateSlide"\n\
@@ -22336,7 +22382,7 @@ local.templateUiOperation = '\
     >\n\
         {{#if deprecated}}<h4 class="label">(Warning: Deprecated)</h4><br>{{/if deprecated}}\n\
         <h4 class="label">Description</h4>\n\
-        <div class="tr">{{description htmlSafe br}}</div>\n\
+        <div class="tr">{{description modeHtmlBr}}</div>\n\
         {{#if parameters.length}}\n\
         <h4 class="label">Parameters</h4>\n\
         <div class="schemaP styleBorderBottom tr">\n\
@@ -22346,20 +22392,18 @@ local.templateUiOperation = '\
             <span class="styleColor777 td4">Schema</span>\n\
         </div>\n\
         {{#each parameters}}\n\
-        <div class="schemaP styleBorderBottom tr" id="{{id}}" name="{{name}}">{{innerHTML}}</div>\n\
+        <div class="schemaP tr" id="{{id}}" name="{{name}}">{{innerHTML modeNotHtmlSafe}}</div>\n\
         {{/each parameters}}\n\
         {{/if parameters.length}}\n\
         <h4 class="label">Response Messages</h4>\n\
-        <div class="responseList tr">\n\
+        <div class="response styleBorderBottom tr">\n\
             <span class="styleColor777 td1">HTTP Status Code</span>\n\
             <span class="styleColor777 td2">Reason</span>\n\
         </div>\n\
         {{#each responseList}}\n\
-        <div class="responseList styleBorderBottom tr">\n\
+        <div class="response tr">\n\
             <span class="td1">{{key}}</span>\n\
-            {{#if value.description}}\n\
-            <span class="td2">{{value.description htmlSafe}}</span>\n\
-            {{/if value.description}}\n\
+            <span class="td2">{{value.description}}</span>\n\
         </div>\n\
         {{/each responseList}}\n\
         <button class="onEventOperationAjax">Try it out!</button>\n\
@@ -22373,43 +22417,49 @@ local.templateUiOperation = '\
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/param.handlebars
 local.templateUiParam = '\
 <span class="td1">\n\
-    {{name}}&nbsp;\n\
-    {{#if required}}<span class="fontWeightBold">(required)</span>{{/if required}}\n\
+    {{name}}\n\
+    {{#if required}}<br><span class="styleFontWeightBold">(required)</span>{{/if required}}\n\
     {{#if description}}\n\
     <br>\n\
-    <span class="styleColor777">{{description htmlSafe br}}</span>\n\
+    <span class="styleColor777">{{description modeHtmlBr}}</span>\n\
     {{/if description}}\n\
 </span>\n\
 <span class="td2">{{type2}}{{#if format2}}<br>({{format2}}){{/if format2}}</span>\n\
 <span class="td3">\n\
     {{#if isTextarea}}\n\
     <textarea\n\
-        class="input"\n\
-        data-value-text="{{valueText encodeURIComponent}}"\n\
-        placeholder="{{placeholder htmlSafe}}"></textarea>\n\
+        class="input styleHeight10Rem"\n\
+        data-value-text="{{valueText encodeURIComponent modeNotHtmlSafe}}"\n\
+        placeholder="{{placeholder}}"></textarea>\n\
     {{/if isTextarea}}\n\
     {{#if isFile}}<input class="input" type="file">{{/if isFile}}\n\
     {{#if isSelect}}\n\
-    <select class="input" {{#if isSelectMultiple}}multiple{{/if isSelectMultiple}}>\n\
+    <select\n\
+        class="input {{#if isSelectMultiple}}styleHeight10Rem{{/if isSelectMultiple}}"\n\
+        {{#if isSelectMultiple}}multiple{{/if isSelectMultiple}}\n\
+    >\n\
         {{#each selectOptionList}}\n\
         <option\n\
-            data-value-select-option="{{valueSelectOption jsonStringify encodeURIComponent}}"\n\
+            data-value-select-option=\n\
+                "{{valueSelectOption jsonStringify encodeURIComponent modeNotHtmlSafe}}"\n\
             id="{{id}}"\n\
             {{selected}}\n\
-        >{{valueText htmlSafe}}</option>\n\
+        >{{valueText}}</option>\n\
         {{/each selectOptionList}}\n\
     </select>\n\
     {{/if isSelect}}\n\
     {{#if isInputText}}\n\
     <input\n\
         class="input"\n\
-        data-value-text="{{valueText encodeURIComponent}}"\n\
-        placeholder="{{placeholder htmlSafe}}"\n\
+        data-value-text="{{valueText encodeURIComponent modeNotHtmlSafe}}"\n\
+        placeholder="{{placeholder}}"\n\
         type="text"\n\
     >\n\
     {{/if isInputText}}\n\
 </span>\n\
-<span class="td4">{{#if schemaText}}<pre>{{schemaText}}</pre>{{/if schemaText}}</span>\n\
+<span class="td4">\n\
+    {{#if schemaText}}<pre class="styleHeight10Rem">{{schemaText}}</pre>{{/if schemaText}}\n\
+</span>\n\
 ';
 
 
@@ -22421,11 +22471,11 @@ local.templateUiResource = '\
     data-name="{{name}}"\n\
     id="{{id}}"\n\
 >\n\
-    <div class="styleCursorPointer fontWeightBold header tr">\n\
+    <div class="styleCursorPointer styleFontWeightBold header tr">\n\
         <span\n\
             class="onEventResourceDisplayAction styleFlex1 styleTextOverflowEllipsis td1"\n\
             tabindex="0"\n\
-        >{{name}} : {{description htmlSafe}}</span>\n\
+        >{{name}} : {{description}}</span>\n\
         <span\n\
             class="onEventResourceDisplayAction td2"\n\
             tabindex="0"\n\
@@ -22439,7 +22489,8 @@ local.templateUiResource = '\
     <div class="operationList uiAnimateSlide"\n\
         style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
     >\n\
-        <div class="description">{{description htmlSafe br}}</div>\n\
+        <h4 class="label">Description</h4>\n\
+        <pre class="styleFontFamilyArial">{{description modeHtmlBr}}</pre>\n\
     </div>\n\
 </div>\n\
 ';
@@ -22450,7 +22501,7 @@ local.templateUiResponseAjax = '\
 {{#if error}}\n\
 <h4 class="label">Error</h4>\n\
 <pre class="error styleMaxHeight50Rem uiAnimateShake">\n\
-{{error.message htmlSafe}}\n\
+{{error.message}}\n\
 </pre>\n\
 {{/if error}}\n\
 <h4 class="label">Javascript Code</h4>\n\
@@ -22460,7 +22511,7 @@ local.templateUiResponseAjax = '\
  * 1. initialize swgg-client from previous step\n\
  * 2. run code below to reproduce api-call\n\
  */\n\
-swgg.apiDict[{{options.api._methodPath jsonStringify htmlSafe}}].ajax({{optionsJson htmlSafe}}, \
+swgg.apiDict[{{options.api._methodPath jsonStringify}}].ajax({{optionsJson}}, \
 function (error, data) {\n\
     if (error) {\n\
         console.error(error);\n\
@@ -22471,11 +22522,11 @@ function (error, data) {\n\
 );\n\
 </pre>\n\
 <h4 class="label">Curl Request</h4>\n\
-<pre>{{curl htmlSafe}}</pre>\n\
+<pre>{{curl}}</pre>\n\
 <h4 class="label">Response Code</h4>\n\
 <pre>{{statusCode}}</pre>\n\
 <h4 class="label">Response Headers</h4>\n\
-<pre>{{responseHeaders htmlSafe}}</pre>\n\
+<pre>{{responseHeaders}}</pre>\n\
 <h4 class="label">Response Body</h4>\n\
 {{responseBody}}\n\
 ';
@@ -22559,9 +22610,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer option,\n\
 .swggUiContainer .tr > * {\n\
     margin-bottom: 0;\n\
-}\n\
-.swggUiContainer select[multiple] {\n\
-    height: 10rem;\n\
 }\n\
 .swggUiContainer pre {\n\
     background: #ddd;\n\
@@ -22649,9 +22697,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer > .info a {\n\
     color: #373;\n\
 }\n\
-.swggUiContainer > .info > .fontWeightBold {\n\
-    font-size: x-large;\n\
-}\n\
 .swggUiContainer > .info > ul {\n\
     margin-left: 2rem;\n\
 }\n\
@@ -22681,15 +22726,11 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     text-align: center;\n\
     width: 5rem;\n\
 }\n\
-.swggUiContainer .operation .responseList > .td1 {\n\
+.swggUiContainer .operation .response > .td1 {\n\
     flex: 1;\n\
 }\n\
-.swggUiContainer .operation .responseList > .td2 {\n\
+.swggUiContainer .operation .response > .td2 {\n\
     flex: 4;\n\
-}\n\
-.swggUiContainer .operation .schemaP pre,\n\
-.swggUiContainer .operation .schemaP textarea {\n\
-    height: 10rem;\n\
 }\n\
 .swggUiContainer .operation .schemaP > .td1 {\n\
     flex: 2;\n\
@@ -22729,20 +22770,11 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     color: black;\n\
     outline: none;\n\
 }\n\
-.swggUiContainer .resource > .header > .td1 {\n\
-    font-size: large;\n\
-}\n\
 .swggUiContainer .resource > .header > .td2 {\n\
     border-left: 1px solid #777;\n\
     border-right: 1px solid #777;\n\
     padding-left: 1rem;\n\
     padding-right: 1rem;\n\
-}\n\
-.swggUiContainer .resource > .operationList > .description {\n\
-    background: #ddd;\n\
-    border: 1px solid #777;\n\
-    color: #555;\n\
-    padding: 0.5rem;\n\
 }\n\
 \n\
 \n\
@@ -22761,8 +22793,17 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .styleFlex1 {\n\
     flex: 1;\n\
 }\n\
+.swggUiContainer styleFontFamilyArial {\n\
+    font-family: Arial, Helvetica, sans-serif;\n\
+}\n\
+.swggUiContainer .styleFontSizeXLarge {\n\
+    font-size: x-large;\n\
+}\n\
 .swggUiContainer .styleFontWeightBold {\n\
     font-weight: bold;\n\
+}\n\
+.swggUiContainer .styleHeight10Rem {\n\
+    height: 10rem;\n\
 }\n\
 .swggUiContainer .styleMaxHeight50Rem {\n\
     max-height: 50rem;\n\
@@ -24765,7 +24806,12 @@ document.querySelector(".swggUiContainer").addEventListener("click", function (e
                     local.objectSetDefault(operation, {
                         description: 'no description',
                         responseList: Object.keys(operation.responses).sort().map(function (key) {
-                            return { key: key, value: operation.responses[key] };
+                            return {
+                                key: key,
+                                value: local.objectSetDefault(operation.responses[key], {
+                                    description: 'no description'
+                                })
+                            };
                         }),
                         summary: operation.description || 'no summary'
                     });
@@ -24811,16 +24857,8 @@ document.querySelector(".swggUiContainer").addEventListener("click", function (e
          */
             // init schemaP.id
             schemaP.id = local.idDomElementCreate('swgg_id_' + schemaP.name);
+            // init enum
             schemaP.enum2 = schemaP.enum || (schemaP.items && schemaP.items.enum);
-            schemaP.placeholder = !local.isNullOrUndefined(schemaP.default)
-                ? schemaP.default
-                : local.dbFieldRandomCreate({
-                    modeNotRandom: true,
-                    schemaP: schemaP
-                });
-            if (typeof schemaP.placeholder !== 'string' || schemaP.type !== 'string') {
-                schemaP.placeholder = JSON.stringify(schemaP.placeholder, null, 4);
-            }
             // init input - file
             if (schemaP.type === 'file') {
                 schemaP.isFile = true;
@@ -24881,7 +24919,6 @@ document.querySelector(".swggUiContainer").addEventListener("click", function (e
             // init input - textarea
             } else if (schemaP.type === 'array') {
                 schemaP.isTextarea = true;
-                schemaP.placeholder = JSON.parse(schemaP.placeholder).join('\n');
             // init input - text
             } else {
                 schemaP.isInputText = true;
@@ -24915,6 +24952,22 @@ document.querySelector(".swggUiContainer").addEventListener("click", function (e
                 schemaP.schemaText = JSON.stringify(schemaP.type2 === 'array'
                     ? [schemaP.schema2.properties]
                     : schemaP.schema2.properties, null, 4);
+            }
+            // init placeholder
+            schemaP.placeholder = !local.isNullOrUndefined(schemaP.default)
+                ? schemaP.default
+                : local.dbFieldRandomCreate({
+                    modeNotRandom: true,
+                    schemaP: schemaP
+                });
+            if (typeof schemaP.placeholder !== 'string' || schemaP.type !== 'string') {
+                if (schemaP.in === 'body') {
+                    schemaP.placeholder = JSON.stringify(schemaP.placeholder, null, 4);
+                } else if (schemaP.type === 'array') {
+                    schemaP.placeholder = schemaP.placeholder.join('\n');
+                } else {
+                    schemaP.placeholder = JSON.stringify(schemaP.placeholder);
+                }
             }
             // init valueText
             schemaP.valueText = schemaP['x-swgg-apiKey']
