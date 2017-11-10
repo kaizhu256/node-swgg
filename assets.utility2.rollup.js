@@ -14320,10 +14320,6 @@ body > button {\n\
 button {\n\
     cursor: pointer;\n\
 }\n\
-.textOverflowEllipsis {\n\
-    text-overflow: ellipsis;\n\
-    white-space: nowrap;\n\
-}\n\
 .uiAnimateSlide {\n\
     overflow-y: hidden;\n\
     transition: border-bottom 250ms, border-top 250ms, margin-bottom 250ms, margin-top 250ms, max-height 250ms, min-height 250ms, padding-bottom 250ms, padding-top 250ms;\n\
@@ -22218,7 +22214,7 @@ local.templateUiMain = '\
 <div class="eventDelegateKeyup eventDelegateSubmit form header onEventUiReload tr">\n\
     <a class="td1" href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
     <input\n\
-        class="flex1 td2"\n\
+        class="styleFlex1 td2"\n\
         placeholder="http://petstore.swagger.io/v2/swagger.json"\n\
         type="text"\n\
         value="{{urlSwaggerJson}}"\n\
@@ -22230,9 +22226,9 @@ local.templateUiMain = '\
         type="text"\n\
         value="{{apiKeyValue}}"\n\
     >\n\
-    <button class="eventDelegateClick onEventUiReload td4">Explore</button>\n\
+    <button class="eventDelegateClick onEventUiReload styleCursorPointer td4">Explore</button>\n\
     <button\n\
-        class="eventDelegateClick onEventUiReload td5"\n\
+        class="eventDelegateClick onEventUiReload styleCursorPointer td5"\n\
         id="swggApiKeyClearButton1"\n\
     >Clear api-keys</button>\n\
 </div>\n\
@@ -22291,7 +22287,8 @@ local.templateUiMain = '\
     {{/if info}}\n\
 </div>\n\
 {{#if urlSwaggerJson}}\n\
-<pre class="code" id="swggAjaxProgressPre1">\n\
+<h4 class="label">Javascript Code</h4>\n\
+<pre class="styleMaxHeight50Rem" id="swggAjaxProgressPre1">\n\
 /*\n\
  * initialize swgg-client\n\
  * 1. download currently-loaded apis to file swagger.json:\n\
@@ -22308,7 +22305,7 @@ console.log("printing currently loaded apis ...");\n\
 console.log(JSON.stringify(Object.keys(swgg.apiDict).sort(), null, 4));\n\
 console.log("initialized swgg-client");\n\
 </pre>\n\
-<div class="color777 reset">\n\
+<div class="reset styleColor777">\n\
     [ <span>base url</span>: {{basePath}} ]\n\
 </div>\n\
 {{/if urlSwaggerJson}}\n\
@@ -22328,44 +22325,50 @@ local.templateUiOperation = '\
     id="{{id}}"\n\
 >\n\
     <div\n\
-        class="cursorPointer eventDelegateClick onEventOperationDisplayShow header tr"\n\
+        class="eventDelegateClick onEventOperationDisplayShow header styleCursorPointer tr"\n\
         tabindex="0"\n\
     >\n\
-        <span class="td1">{{_ii}}</span>\n\
+        <span class="td1"></span>\n\
         <span class="td2">{{_method}}</span>\n\
         <span\n\
-            class="flex1 td3 {{#if deprecated}}deprecated{{/if deprecated}}"\n\
+            class="styleFlex1 td3\n\
+                {{#if deprecated}}\n\
+                styleTextDecorationLineThrough\n\
+                {{/if deprecated}}\n\
+            "\n\
         >{{_path}}</span>\n\
-        <span class="color777 flex1 td4 textOverflowEllipsis">{{summary htmlSafe}}</span>\n\
+        <span class="styleColor777 styleFlex1 styleTextOverflowEllipsis td4"\n\
+            >{{summary htmlSafe}}</span>\n\
     </div>\n\
     <form accept-charset="UTF-8"\n\
         class="content uiAnimateSlide"\n\
         style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
     >\n\
         {{#if deprecated}}\n\
-        <h4 class="label">Warning: Deprecated</h4>\n\
+        <h4 class="label">(Warning: Deprecated)</h4>\n\
+        <br>\n\
         {{/if deprecated}}\n\
         <h4 class="label">Description</h4>\n\
         <div class="tr">{{description htmlSafe br}}</div>\n\
         {{#if parameters.length}}\n\
         <h4 class="label">Parameters</h4>\n\
-        <div class="borderBottom schemaP tr">\n\
-            <span class="color777 td1">Name and Description</span>\n\
-            <span class="color777 td2">Data Type</span>\n\
-            <span class="color777 td3">Value</span>\n\
-            <span class="color777 td4">Schema</span>\n\
+        <div class="schemaP styleBorderBottom tr">\n\
+            <span class="styleColor777 td1">Name and Description</span>\n\
+            <span class="styleColor777 td2">Data Type</span>\n\
+            <span class="styleColor777 td3">Value</span>\n\
+            <span class="styleColor777 td4">Schema</span>\n\
         </div>\n\
         {{#each parameters}}\n\
-        <div class="borderBottom schemaP tr" id="{{id}}" name="{{name}}">{{innerHTML}}</div>\n\
+        <div class="schemaP styleBorderBottom tr" id="{{id}}" name="{{name}}">{{innerHTML}}</div>\n\
         {{/each parameters}}\n\
         {{/if parameters.length}}\n\
         <h4 class="label">Response Messages</h4>\n\
         <div class="responseList tr">\n\
-            <span class="color777 td1">HTTP Status Code</span>\n\
-            <span class="color777 td2">Reason</span>\n\
+            <span class="styleColor777 td1">HTTP Status Code</span>\n\
+            <span class="styleColor777 td2">Reason</span>\n\
         </div>\n\
         {{#each responseList}}\n\
-        <div class="borderBottom responseList tr">\n\
+        <div class="responseList styleBorderBottom tr">\n\
             <span class="td1">{{key}}</span>\n\
             {{#if value.description}}\n\
             <span class="td2">{{value.description htmlSafe}}</span>\n\
@@ -22389,7 +22392,7 @@ local.templateUiParam = '\
     {{/if required}}\n\
     {{#if description}}\n\
     <br>\n\
-    <span class="color777">{{description htmlSafe br}}</span>\n\
+    <span class="styleColor777">{{description htmlSafe br}}</span>\n\
     {{/if description}}\n\
 </span>\n\
 <span class="td2">{{type2}}{{#if format2}}<br>({{format2}}){{/if format2}}</span>\n\
@@ -22431,13 +22434,13 @@ local.templateUiParam = '\
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/resource.handlebars
 local.templateUiResource = '\
 <div\n\
-    class="borderBottom resource eventDelegateClick"\n\
+    class="styleBorderBottom resource eventDelegateClick"\n\
     data-name="{{name}}"\n\
     id="{{id}}"\n\
 >\n\
-    <div class="cursorPointer fontWeightBold header tr">\n\
+    <div class="styleCursorPointer fontWeightBold header tr">\n\
         <span\n\
-            class="flex1 onEventResourceDisplayAction td1 textOverflowEllipsis"\n\
+            class="onEventResourceDisplayAction styleFlex1 styleTextOverflowEllipsis td1"\n\
             tabindex="0"\n\
         >{{name}} : {{description htmlSafe}}</span>\n\
         <span\n\
@@ -22463,12 +22466,12 @@ local.templateUiResource = '\
 local.templateUiResponseAjax = '\
 {{#if error}}\n\
 <h4 class="label">Error</h4>\n\
-<pre class="code error uiAnimateShake">\n\
+<pre class="error styleMaxHeight50Rem uiAnimateShake">\n\
 {{error.message htmlSafe}}\n\
 </pre>\n\
 {{/if error}}\n\
 <h4 class="label">Javascript Code</h4>\n\
-<pre class="code">\n\
+<pre class="styleMaxHeight50Rem">\n\
 /*\n\
  * reproduce api-call {{options.api._methodPath jsonStringify}}\n\
  * 1. initialize swgg-client from previous step\n\
@@ -22550,8 +22553,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer {\n\
     font-family: Arial, Helvetica, sans-serif;\n\
-    margin-left: auto;\n\
-    margin-right: auto;\n\
     max-width: 1024px;\n\
 }\n\
 .swggUiContainer a,\n\
@@ -22562,41 +22563,26 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer button {\n\
     padding: 10px;\n\
 }\n\
-.swggUiContainer .color777 {\n\
-    color: #777;\n\
+.swggUiContainer input {\n\
+    height: 1.5rem;\n\
+    padding-left: 0.25rem;\n\
+    padding-right: 0.25rem;\n\
 }\n\
-.swggUiContainer button,\n\
-.swggUiContainer .cursorPointer,\n\
-.swggUiContainer .cursorPointer input {\n\
-    cursor: pointer;\n\
-}\n\
-.swggUiContainer .code,\n\
-.swggUiContainer .operation > .content .code {\n\
-    background: #ddd;\n\
+.swggUiContainer .label {\n\
     color: #555;\n\
-    max-height: 50rem;\n\
-}\n\
-.swggUiContainer .deprecated {\n\
-    text-decoration: line-through;\n\
-}\n\
-.swggUiContainer .flex1 {\n\
-    flex: 1;\n\
-}\n\
-.swggUiContainer .fontWeightBold {\n\
-    font-weight: bold;\n\
+    margin-bottom: 0;\n\
 }\n\
 .swggUiContainer .operation .header,\n\
 .swggUiContainer option,\n\
 .swggUiContainer .tr > * {\n\
     margin-bottom: 0;\n\
 }\n\
-.swggUiContainer input {\n\
-    height: 1.5rem;\n\
-    padding-left: 0.25rem;\n\
-    padding-right: 0.25rem;\n\
-}\n\
 .swggUiContainer select[multiple] {\n\
     height: 10rem;\n\
+}\n\
+.swggUiContainer pre {\n\
+    background: #ddd;\n\
+    color: #555;\n\
 }\n\
 .swggUiContainer pre,\n\
 .swggUiContainer textarea {\n\
@@ -22616,7 +22602,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .tr > * {\n\
     margin-left: 1rem;\n\
     overflow: auto;\n\
-    padding-top: 0.1rem;\n\
     word-wrap: break-word;\n\
 }\n\
 .swggUiContainer .tr > *:first-child {\n\
@@ -22629,9 +22614,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 \n\
 \n\
 /* border */\n\
-.swggUiContainer .borderBottom {\n\
-    border-bottom: 1px solid #777;\n\
-}\n\
 .swggUiContainer .resource:first-child {\n\
     border-top: 1px solid #777;\n\
     padding-top: 10px;\n\
@@ -22666,7 +22648,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer > .header > .td1 {\n\
     background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAqRJREFUeNrEVz1s00AUfnGXii5maMXoEUEHVwIpEkPNgkBdMnQoU5ytiKHJwpp2Q2JIO8DCUDOxIJFIVOoWZyJSh3pp1Q2PVVlcCVBH3ufeVZZ9Zye1Ay86nXV+ue/9fO/lheg/Se02X1rvksmbnTiKvuxQMBNgBnN4a/LCbmnUAP6JV58NCUsBC8CuAJxGPF47OgNqBaA93tolUhnx6jC4NxGwyOEwlccyAs+3kwdzKq0HDn2vEBTi8J2XpyMaywNDE157BhXUE3zJhlq8GKq+Zd2zaWHepPA8oN9XkfLmRdOiJV4XUUg/IyWncLjCYY/SHndV2u7zHr3bPKZtdxgboJOnthvrfGj/oMf3G0r7JVmNlLfKklmrt2MvvcNO7LFOhoFHfuAJI5o6ta10jpt5CQLgwXhXG2YIwvu+34qf78ybOjWTnWwkgR36d7JqJOrW0hHmNrKg9xhiS4+1jFmrxymh03B0w+6kURIAu3yHtOD5oaUNojMnGgbcctNvwdAnyxvxRR+/vaJnjzbpzcZX+nN1SdGv85i9eH8w3qPO+mdm/y4dnQ1iI8Fq6Nf4cxL6GWSjiFDSs0VRnxC5g0xSB2cgHpaseTxfqOv5uoHkNQ6Ha/N1Yz9mNMppEkEkYKj79q6uCq4bCHcSX3fJ0Vk/k9siASjCm1N6gZH6Ec9IXt2WkFES2K/ixoIyktJPAu/ptOA1SgO5zqtr6KASJPF0nMV8dgMsRhRPOcMwqQAOoi0VAIMLAEWJ6YYC1c8ibj1GP51RqwzYwZVMHQuvOzMCBUtb2tGHx5NAdLKqp5AX7Ng4d+Zi8AGDI9z1ijx9yaCH04y3GCP2S+QcvaGl+pcxyUBvinFlawoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=) no-repeat left center;\n\
-    color: white;\n\
+    color: #fff;\n\
     font-size: x-large;\n\
     padding-left: 2.5rem;\n\
     text-decoration: none;\n\
@@ -22676,10 +22658,10 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer > .header > .td4,\n\
 .swggUiContainer > .header > .td5 {\n\
+    background: #370;\n\
     border: 0;\n\
     color: #fff;\n\
     padding: 6px 8px;\n\
-    background: #370;\n\
 }\n\
 .swggUiContainer > .info a {\n\
     color: #373;\n\
@@ -22696,13 +22678,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer .operation > .content {\n\
     padding: 1rem;\n\
-}\n\
-.swggUiContainer .operation > .content .label {\n\
-    color: #090;\n\
-    margin-bottom: 2px;\n\
-}\n\
-.swggUiContainer .operation > .content pre {\n\
-    background: #ffd;\n\
 }\n\
 .swggUiContainer .operation > .header:focus,\n\
 .swggUiContainer .operation > .header:hover {\n\
@@ -22785,6 +22760,36 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     border: 1px solid #777;\n\
     color: #555;\n\
     padding: 0.5rem;\n\
+}\n\
+\n\
+\n\
+\n\
+/* style */\n\
+.swggUiContainer .styleBorderBottom {\n\
+    border-bottom: 1px solid #777;\n\
+}\n\
+.swggUiContainer .styleColor777 {\n\
+    color: #777;\n\
+}\n\
+.swggUiContainer .styleCursorPointer,\n\
+.swggUiContainer .styleCursorPointer input {\n\
+    cursor: pointer;\n\
+}\n\
+.swggUiContainer .styleFlex1 {\n\
+    flex: 1;\n\
+}\n\
+.swggUiContainer .styleFontWeightBold {\n\
+    font-weight: bold;\n\
+}\n\
+.swggUiContainer .styleMaxHeight50Rem {\n\
+    max-height: 50rem;\n\
+}\n\
+.swggUiContainer .styleTextDecorationLineThrough {\n\
+    text-decoration: line-through;\n\
+}\n\
+.swggUiContainer .styleTextOverflowEllipsis {\n\
+    text-overflow: ellipsis;\n\
+    white-space: nowrap;\n\
 }\n\
 </style>\n\
 ')
