@@ -1173,8 +1173,8 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     padding: 1rem;\n\
 }\n\
 .swggUiContainer .operation > .content .label {\n\
-    color: #0b0;\n\
-    margin-bottom: 0;\n\
+    color: #090;\n\
+    margin-bottom: 2px;\n\
 }\n\
 .swggUiContainer .operation > .content pre {\n\
     background: #ffd;\n\
@@ -1293,6 +1293,19 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 document.querySelector(".swggUiContainer > .header > .td2").value =\n\
     ((/\\bmodeSwaggerJsonUrl=([^&]+)/g).exec(location.search) || {})[1] ||\n\
         "assets.swgg.swagger.json";\n\
+// select pre-text when clicked\n\
+// https://stackoverflow.com\n\
+// /questions/1173194/select-all-div-text-with-single-mouse-click\n\
+document.querySelector(".swggUiContainer").addEventListener("click", function (event) {\n\
+    var tmp;\n\
+    if (event.target.tagName === "PRE") {\n\
+        tmp = document.createRange();\n\
+        tmp.selectNodeContents(event.target);\n\
+        window.getSelection().addRange(tmp);\n\
+        window.getSelection().removeAllRanges();\n\
+        window.getSelection().addRange(tmp);\n\
+    }\n\
+});\n\
 </script>\n\
 <script src="assets.utility2.rollup.js"></script>\n\
 <script>window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });</script>\n\
@@ -3270,19 +3283,6 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 ).forEach(function (element) {
                     element.addEventListener(eventType.toLowerCase(), local.uiEventDelegate);
                 });
-            });
-            document.querySelector('.swggUiContainer').addEventListener('click', function (event) {
-                var tmp;
-                // select pre-text when clicked
-                // https://stackoverflow.com
-                // /questions/1173194/select-all-div-text-with-single-mouse-click
-                if (event.target.tagName === 'PRE') {
-                    tmp = document.createRange();
-                    tmp.selectNodeContents(event.target);
-                    window.getSelection().addRange(tmp);
-                    window.getSelection().removeAllRanges();
-                    window.getSelection().addRange(tmp);
-                }
             });
             // scrollTo location.hash
             local.uiEventListenerDict['.onEventOperationDisplayShow']({

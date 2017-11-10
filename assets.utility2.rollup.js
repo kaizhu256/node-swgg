@@ -22397,7 +22397,7 @@ local.templateUiParam = '\
     {{#if isTextarea}}\n\
     <textarea\n\
         class="input"\n\
-        data-value-encoded="{{valueEncoded encodeURIComponent}}"\n\
+        data-value-text="{{valueText encodeURIComponent}}"\n\
         placeholder="{{placeholder htmlSafe}}"></textarea>\n\
     {{/if isTextarea}}\n\
     {{#if isFile}}\n\
@@ -22407,17 +22407,17 @@ local.templateUiParam = '\
     <select class="input" {{#if isSelectMultiple}}multiple{{/if isSelectMultiple}}>\n\
         {{#each selectOptionList}}\n\
         <option\n\
-            data-value-decoded="{{valueDecoded jsonStringify encodeURIComponent}}"\n\
+            data-value-select-option="{{valueSelectOption jsonStringify encodeURIComponent}}"\n\
             id="{{id}}"\n\
             {{selected}}\n\
-        >{{valueEncoded htmlSafe}}</option>\n\
+        >{{valueText htmlSafe}}</option>\n\
         {{/each selectOptionList}}\n\
     </select>\n\
     {{/if isSelect}}\n\
     {{#if isInputText}}\n\
     <input\n\
         class="input"\n\
-        data-value-encoded="{{valueEncoded encodeURIComponent}}"\n\
+        data-value-text="{{valueText encodeURIComponent}}"\n\
         placeholder="{{placeholder htmlSafe}}"\n\
         type="text"\n\
     >\n\
@@ -22462,14 +22462,12 @@ local.templateUiResource = '\
 
 local.templateUiResponseAjax = '\
 {{#if error}}\n\
-<h4 class="label"></h4>\n\
+<h4 class="label">Error</h4>\n\
 <pre class="code error uiAnimateShake">\n\
-ERROR\n\
-\n\
 {{error.message htmlSafe}}\n\
 </pre>\n\
 {{/if error}}\n\
-<h4 class="label"></h4>\n\
+<h4 class="label">Javascript Code</h4>\n\
 <pre class="code">\n\
 /*\n\
  * reproduce api-call {{options.api._methodPath jsonStringify}}\n\
@@ -22610,7 +22608,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     min-height: 1.75rem;\n\
     overflow: auto;\n\
     padding: 0.25rem;\n\
-    white-space: pre;\n\
+    white-space: pre-wrap;\n\
 }\n\
 .swggUiContainer .tr {\n\
     display: flex;\n\
@@ -22700,13 +22698,11 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     padding: 1rem;\n\
 }\n\
 .swggUiContainer .operation > .content .label {\n\
-    color: #0b0;\n\
+    color: #090;\n\
+    margin-bottom: 2px;\n\
 }\n\
 .swggUiContainer .operation > .content pre {\n\
     background: #ffd;\n\
-}\n\
-.swggUiContainer .operation > .content .tr {\n\
-    margin-left: 10px;\n\
 }\n\
 .swggUiContainer .operation > .header:focus,\n\
 .swggUiContainer .operation > .header:hover {\n\
@@ -22822,6 +22818,19 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 document.querySelector(".swggUiContainer > .header > .td2").value =\n\
     ((/\\bmodeSwaggerJsonUrl=([^&]+)/g).exec(location.search) || {})[1] ||\n\
         "assets.swgg.swagger.json";\n\
+// select pre-text when clicked\n\
+// https://stackoverflow.com\n\
+// /questions/1173194/select-all-div-text-with-single-mouse-click\n\
+document.querySelector(".swggUiContainer").addEventListener("click", function (event) {\n\
+    var tmp;\n\
+    if (event.target.tagName === "PRE") {\n\
+        tmp = document.createRange();\n\
+        tmp.selectNodeContents(event.target);\n\
+        window.getSelection().addRange(tmp);\n\
+        window.getSelection().removeAllRanges();\n\
+        window.getSelection().addRange(tmp);\n\
+    }\n\
+});\n\
 </script>\n\
 <script src="assets.utility2.rollup.js"></script>\n\
 <script>window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });</script>\n\
@@ -23344,6 +23353,13 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             }
             type = schemaP.type || (schemaP.schema && schemaP.schema.type);
             switch (type) {
+            case 'boolean':
+                tmp = options.modeNotRandom
+                    ? false
+                    : Math.random() > 0.5
+                    ? false
+                    : true;
+                break;
             // 5.1. Validation keywords for numeric instances (number and integer)
             case 'integer':
             case 'number':
@@ -23364,18 +23380,19 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                             max = min + 1000;
                         }
                     }
-                    tmp = min + (max - min) * Math.max(Math.random(), 0.00000000001);
+                    // exclusiveMaximum and exclusiveMinimum for float
+                    tmp = min + (max - min) * Math.max(Math.random(), min * 0.000000000000001);
                     if (type === 'integer') {
                         tmp = Math.round(tmp);
                     }
                 }
                 max = schemaP.maximum;
                 min = schemaP.minimum;
-                // exclusiveMaximum
+                // exclusiveMaximum for integer
                 if (schemaP.exclusiveMaximum && tmp === max) {
                     tmp -= 1;
                 }
-                // exclusiveMinimum
+                // exclusiveMinimum for integer
                 if (schemaP.exclusiveMaximum && tmp === min) {
                     tmp += 1;
                 }
@@ -23423,23 +23440,19 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             // 5.3. Validation keywords for arrays
             case 'array':
                 tmp = [];
-                for (ii = 0; ii < schemaP.minItems; ii += 1) {
+                for (ii = 0; ii < (schemaP.minItems || 1); ii += 1) {
+                    //!! local.dbRowRandomCreate({
+                        //!! modeNotRandom: options.modeNotRandom
+                    //!! });
                     tmp.push(null);
                 }
                 break;
             // 5.4. Validation keywords for objects
-            case 'object':
+            default:
                 tmp = {};
-                for (ii = 0; ii < schemaP.minProperties; ii += 1) {
+                for (ii = 0; ii < (schemaP.minProperties || 1); ii += 1) {
                     tmp['property' + ii] = null;
                 }
-                break;
-            case 'boolean':
-                tmp = options.modeNotRandom
-                    ? false
-                    : Math.random() <= 0.5
-                    ? false
-                    : true;
                 break;
             }
             return tmp;
@@ -23449,17 +23462,8 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         /*
          * this function will create a dbRowList of options.length random dbRow's
          */
-            local.objectSetDefault(options, { dbRowList: [], properties: [] });
-            Object.keys(options.properties).forEach(function (key) {
-                options.properties[key] = local.validateBySwaggerSchema({
-                    // dereference property
-                    modeDereference: true,
-                    prefix: ['dbRow', key],
-                    schema: options.properties[key],
-                    swaggerJson: local.swaggerJson
-                });
-            });
-            for (options.ii = 0; options.ii < options.length; options.ii += 1) {
+            var ii;
+            for (ii = 0; ii < options.length; ii += 1) {
                 options.dbRowList.push(local.dbRowRandomCreate(options));
             }
             return options.dbRowList;
@@ -23469,32 +23473,40 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         /*
          * this function will create a random dbRow from options.properties
          */
-            var dbRow, tmp;
+            var dbRow, properties;
             dbRow = {};
-            Object.keys(options.properties).forEach(function (key) {
-                // try to validate data
-                local.tryCatchOnError(function () {
-                    options.properties[key] = local.validateBySwaggerSchema({
+            options = local.objectSetDefault(options, { override: local.nop });
+            properties = local.validateBySwaggerSchema({
+                // dereference property
+                modeDereference: true,
+                prefix: ['dbRow'],
+                schema: options.schema,
+                swaggerJson: local.swaggerJson
+            });
+            properties = (properties && properties.properties) || {};
+            Object.keys(properties).forEach(function (key) {
+                dbRow[key] = local.dbFieldRandomCreate({
+                    modeNotRandom: options.modeNotRandom,
+                    modeSubdoc: options.modeSubdoc,
+                    schemaP: local.validateBySwaggerSchema({
                         // dereference property
                         modeDereference: true,
                         prefix: ['dbRow', key],
-                        schema: options.properties[key],
+                        schema: properties[key],
                         swaggerJson: local.swaggerJson
-                    });
-                    tmp = local.dbFieldRandomCreate({
-                        modeNotRandom: options.modeNotRandom,
-                        schemaP: options.properties[key]
-                    });
-                    local.validateBySwaggerSchema({
-                        data: tmp,
-                        prefix: ['dbRow', 'properties', key],
-                        schema: options.properties[key],
-                        swaggerJson: local.swaggerJson
-                    });
-                    dbRow[key] = tmp;
-                }, console.error);
+                    })
+                });
             });
-            return local.jsonCopy(local.objectSetOverride(dbRow, options.override(options)));
+            dbRow = local.jsonCopy(local.objectSetOverride(dbRow, options.override(options)));
+            // try to validate data
+            local.tryCatchOnError(function () {
+                local.validateBySwaggerSchema({
+                    data: dbRow,
+                    prefix: ['dbRow'],
+                    schema: options.schema,
+                    swaggerJson: local.swaggerJson
+                });
+            }, console.error);
         };
 
         local.idDomElementCreate = function (seed) {
@@ -24375,19 +24387,6 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             });
         };
 
-        local.uiEventInit = function (element) {
-        /*
-         * this function will init event-handling for the dom-element
-         */
-            ['Click', 'Keyup', 'Submit'].forEach(function (eventType) {
-                Array.from(
-                    element.querySelectorAll('.eventDelegate' + eventType)
-                ).forEach(function (element) {
-                    element.addEventListener(eventType.toLowerCase(), local.uiEventDelegate);
-                });
-            });
-        };
-
         local.uiEventListenerDict = {};
 
         local.uiEventListenerDict['.onEventOperationAjax'] = function (event) {
@@ -24442,7 +24441,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                                 })
                                 .map(function (element) {
                                     return jsonParse(decodeURIComponent(
-                                        element.dataset.valueDecoded
+                                        element.dataset.valueSelectOption
                                     ));
                                 });
                             if (!tmp.length || tmp[0] === '$swggUndefined') {
@@ -24676,7 +24675,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 modeAjax: true,
                 url: document.querySelector('.swggUiContainer > .header > .td2').value
             }, function (error) {
-                local.uiRender(null, onError);
+                local.uiRenderAll(null, onError);
                 local.tryCatchOnError(function () {
                     local.validateBySwaggerJson({ swaggerJson: local.swaggerJson });
                 }, local.uiNotify);
@@ -24699,170 +24698,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             return element;
         };
 
-        local.uiParamRender = function (schemaP) {
-        /*
-         * this function will render schemaP
-         */
-            schemaP.placeholder = !local.isNullOrUndefined(schemaP.default)
-                ? schemaP.default
-                : local.dbFieldRandomCreate({
-                    modeNotRandom: true,
-                    schemaP: schemaP
-                });
-            if (schemaP.type !== 'string') {
-                schemaP.placeholder = JSON.stringify(schemaP.placeholder);
-            }
-            schemaP.placeholder = String(schemaP.placeholder || '');
-            schemaP.enum2 = schemaP.enum || (schemaP.items && schemaP.items.enum);
-            // init input - file
-            if (schemaP.type === 'file') {
-                schemaP.isFile = true;
-            // init input - textarea
-            } else if (schemaP.in === 'body') {
-                schemaP.isTextarea = true;
-            // init input - select
-            } else if (schemaP.enum2 || schemaP.type === 'boolean') {
-                // init enumDefault
-                schemaP.enumDefault = [];
-                if (schemaP.required && schemaP.default !== undefined) {
-                    schemaP.enumDefault = schemaP.type === 'array'
-                        ? schemaP.default
-                        : [schemaP.default];
-                }
-                schemaP.isSelect = true;
-                schemaP.isSelectMultiple = schemaP.type === 'array';
-                schemaP.selectOptionList = (schemaP.type === 'boolean'
-                    ? [false, true]
-                    : schemaP.enum2).map(function (element) {
-                    // init hasDefault
-                    schemaP.hasDefault = schemaP.hasDefault ||
-                        schemaP.enumDefault.indexOf(element) >= 0;
-                    return {
-                        id: local.idDomElementCreate('swgg_id_' + schemaP.name),
-                        selected: schemaP.enumDefault.indexOf(element) >= 0
-                            ? 'selected'
-                            : '',
-                        type: (schemaP.items && schemaP.items.type) || schemaP.type,
-                        valueDecoded: element,
-                        valueEncoded: typeof element === 'string'
-                            ? element
-                            : JSON.stringify(element)
-                    };
-                });
-                // init 'undefined' value
-                if (!schemaP.required && !schemaP.hasDefault) {
-                    schemaP.selectOptionList.unshift({
-                        id: local.idDomElementCreate('swgg_id_' + schemaP.name),
-                        selected: 'selected',
-                        type: schemaP.type,
-                        valueDecoded: '$swggUndefined',
-                        valueEncoded: '<none>'
-                    });
-                }
-                // select at least one value
-                if (!schemaP.isSelectMultiple) {
-                    schemaP.selectOptionList.some(function (element, ii) {
-                        if (ii === 0 || element.selected) {
-                            element.selected = 'selected';
-                            if (ii !== 0) {
-                                schemaP.selectOptionList[0].selected = '';
-                                return true;
-                            }
-                        }
-                    });
-                }
-            // init input - textarea
-            } else if (schemaP.type === 'array') {
-                schemaP.isTextarea = true;
-                schemaP.placeholder = String(Array.isArray(schemaP.default)
-                    ? schemaP.default.join('\n')
-                    : 'provide multiple values in new lines' + (schemaP.required
-                        ? ' (at least one required)'
-                        : ''));
-            // init input - text
-            } else {
-                schemaP.isInputText = true;
-            }
-            // init format2 / type2
-            [schemaP, schemaP.schema || {}].some(function (element) {
-                local.objectSetDefault(schemaP, {
-                    format2: element.format,
-                    type2: element.type
-                });
-                return schemaP.type2;
-            });
-            schemaP.type2 = schemaP.type2 || 'object';
-            // init schema2
-            [
-                schemaP,
-                schemaP.items,
-                schemaP.schema,
-                schemaP.schema && schemaP.schema.items
-            ].some(function (element) {
-                schemaP.schema2 = (local.validateBySwaggerSchema({
-                    // dereference schemaP
-                    modeDereference: true,
-                    prefix: ['parameters', schemaP.name],
-                    schema: element,
-                    swaggerJson: local.swaggerJson
-                }) || {}).properties;
-                return schemaP.schema2;
-            });
-            if (schemaP.schema2) {
-                schemaP.schemaText = JSON.stringify(schemaP.type2 === 'array'
-                    ? [schemaP.schema2]
-                    : schemaP.schema2, null, 4);
-            }
-            // init valueEncoded
-            if (schemaP.required || schemaP.in === 'body' || schemaP['x-swgg-apiKey']) {
-                schemaP.valueEncoded = schemaP['x-swgg-apiKey']
-                    ? local.apiKeyValue
-                    : schemaP.default;
-                if (schemaP.valueEncoded === undefined &&
-                        local.isNullOrUndefined(schemaP.default)) {
-                    schemaP.valueEncoded = local.dbFieldRandomCreate({
-                        modeNotRandom: true,
-                        schemaP: schemaP
-                    });
-                }
-                // init valueEncoded for array
-                if (schemaP.valueEncoded && schemaP.type2 === 'array' && schemaP.in !== 'body') {
-                    schemaP.valueEncoded = schemaP.valueEncoded.map(function (element) {
-                        return typeof element === 'string'
-                            ? element
-                            : JSON.stringify(element);
-                    }).join('\n');
-                }
-            }
-            // init valueEncoded for schema
-            if (schemaP.in === 'body' && schemaP.schema2) {
-                schemaP.valueEncoded = local.dbRowRandomCreate({
-                    modeNotRandom: true,
-                    override: function () {
-                        var override = {};
-                        // preserve default value
-                        Object.keys(schemaP.schema2).forEach(function (key) {
-                            if (schemaP.schema2[key].default !== undefined) {
-                                override[key] = schemaP.schema2[key].default;
-                            }
-                        });
-                        return override;
-                    },
-                    properties: schemaP.schema2
-                });
-                if (schemaP.type2 === 'array') {
-                    schemaP.valueEncoded = [schemaP.valueEncoded];
-                }
-                schemaP.valueEncoded = JSON.stringify(schemaP.valueEncoded, null, 4);
-            }
-            if (typeof schemaP.valueEncoded !== 'string') {
-                schemaP.valueEncoded = JSON.stringify(schemaP.valueEncoded) || '';
-            }
-            // templateRender schemaP
-            schemaP.innerHTML = local.templateRender(local.templateUiParam, schemaP);
-        };
-
-        local.uiRender = function (options, onError) {
+        local.uiRenderAll = function (options, onError) {
         /*
          * this function will render swagger-ui
          */
@@ -24889,7 +24725,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     options
                 );
                 setTimeout(function () {
-                    local.uiRender(options, onError);
+                    local.uiRenderAll(options, onError);
                 }, 100);
                 return;
             }
@@ -24945,11 +24781,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                         }),
                         summary: operation.description || 'no summary'
                     });
-                    operation.parameters.forEach(function (schemaP) {
-                        // init schemaP.id
-                        schemaP.id = local.idDomElementCreate('swgg_id_' + schemaP.name);
-                        local.uiParamRender(schemaP);
-                    });
+                    operation.parameters.forEach(local.uiRenderSchemaP);
                     // templateRender operation
                     options.uiFragment.querySelector('#' + resource.id + ' .operationList')
                         .appendChild(local.domFragmentRender(local.templateUiOperation, operation));
@@ -24963,20 +24795,146 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             // append uiFragment to swggUiContainer
             document.querySelector('#swggAjaxProgressDiv1').style.display = 'none';
             document.querySelector('.swggUiContainer').appendChild(options.uiFragment);
-            // render valueEncoded
+            // render valueText
             Array.from(
-                document.querySelectorAll('.swggUiContainer [data-value-encoded]')
+                document.querySelectorAll('.swggUiContainer [data-value-text]')
             ).forEach(function (element) {
-                element.value = decodeURIComponent(element.dataset.valueEncoded);
+                element.value = decodeURIComponent(element.dataset.valueText);
             });
             // init event-handling
-            local.uiEventInit(document);
+            ['Click', 'Keyup', 'Submit'].forEach(function (eventType) {
+                Array.from(
+                    document.querySelectorAll('.swggUiContainer .eventDelegate' + eventType)
+                ).forEach(function (element) {
+                    element.addEventListener(eventType.toLowerCase(), local.uiEventDelegate);
+                });
+            });
             // scrollTo location.hash
             local.uiEventListenerDict['.onEventOperationDisplayShow']({
                 target: document.querySelector('#' + (location.hash.slice(2) || 'undefined')) ||
                     document.querySelector('.swggUiContainer .operation')
             });
             local.setTimeoutOnError(onError);
+        };
+
+        local.uiRenderSchemaP = function (schemaP) {
+        /*
+         * this function will render schemaP
+         */
+            schemaP.schemaText = JSON.stringify(schemaP, null, 4);
+            // init schemaP.id
+            schemaP.id = local.idDomElementCreate('swgg_id_' + schemaP.name);
+            schemaP.enum2 = schemaP.enum || (schemaP.items && schemaP.items.enum);
+            schemaP.placeholder = !local.isNullOrUndefined(schemaP.default)
+                ? schemaP.default
+                : local.dbFieldRandomCreate({
+                    modeNotRandom: true,
+                    schemaP: schemaP
+                });
+            if (typeof schemaP.placeholder !== 'string' || schemaP.type !== 'string') {
+                schemaP.placeholder = JSON.stringify(schemaP.placeholder, null, 4);
+            }
+            // init input - file
+            if (schemaP.type === 'file') {
+                schemaP.isFile = true;
+            // init input - textarea
+            } else if (schemaP.in === 'body') {
+                schemaP.isTextarea = true;
+            // init input - select
+            } else if (schemaP.enum2 || schemaP.type === 'boolean') {
+                // init enumDefault
+                schemaP.enumDefault = [];
+                if (schemaP.required && schemaP.default !== undefined) {
+                    schemaP.enumDefault = schemaP.type === 'array'
+                        ? schemaP.default
+                        : [schemaP.default];
+                }
+                schemaP.isSelect = true;
+                schemaP.isSelectMultiple = schemaP.type === 'array';
+                schemaP.selectOptionList = (schemaP.type === 'boolean'
+                    ? [false, true]
+                    : schemaP.enum2).map(function (element) {
+                    // init hasDefault
+                    schemaP.hasDefault = schemaP.hasDefault ||
+                        schemaP.enumDefault.indexOf(element) >= 0;
+                    return {
+                        id: local.idDomElementCreate('swgg_id_' + schemaP.name),
+                        selected: schemaP.enumDefault.indexOf(element) >= 0
+                            ? 'selected'
+                            : '',
+                        type: (schemaP.items && schemaP.items.type) || schemaP.type,
+                        valueSelectOption: element,
+                        valueText: typeof element === 'string'
+                            ? element
+                            : JSON.stringify(element)
+                    };
+                });
+                // init 'undefined' value
+                if (!schemaP.required && !schemaP.hasDefault) {
+                    schemaP.selectOptionList.unshift({
+                        id: local.idDomElementCreate('swgg_id_' + schemaP.name),
+                        selected: 'selected',
+                        type: schemaP.type,
+                        valueSelectOption: '$swggUndefined',
+                        valueText: '<none>'
+                    });
+                }
+                // select at least one value
+                if (!schemaP.isSelectMultiple) {
+                    schemaP.selectOptionList.some(function (element, ii) {
+                        if (ii === 0 || element.selected) {
+                            element.selected = 'selected';
+                            if (ii !== 0) {
+                                schemaP.selectOptionList[0].selected = '';
+                                return true;
+                            }
+                        }
+                    });
+                }
+            // init input - textarea
+            } else if (schemaP.type === 'array') {
+                schemaP.isTextarea = true;
+                schemaP.placeholder = JSON.parse(schemaP.placeholder).join('\n');
+            // init input - text
+            } else {
+                schemaP.isInputText = true;
+            }
+            // init format2 / type2
+            [schemaP, schemaP.schema || {}].some(function (element) {
+                local.objectSetDefault(schemaP, {
+                    format2: element.format,
+                    type2: element.type
+                });
+                return schemaP.type2;
+            });
+            schemaP.type2 = schemaP.type2 || 'object';
+            // init schema2
+            [
+                schemaP,
+                schemaP.items,
+                schemaP.schema,
+                schemaP.schema && schemaP.schema.items
+            ].some(function (element) {
+                schemaP.schema2 = (local.validateBySwaggerSchema({
+                    // dereference schemaP
+                    modeDereference: true,
+                    prefix: ['parameters', schemaP.name],
+                    schema: element,
+                    swaggerJson: local.swaggerJson
+                }) || {});
+                return schemaP.schema2.properties;
+            });
+            if (schemaP.schema2.properties) {
+                schemaP.schemaText = JSON.stringify(schemaP.type2 === 'array'
+                    ? [schemaP.schema2.properties]
+                    : schemaP.schema2.properties, null, 4);
+            }
+            // init valueText
+            schemaP.valueText = schemaP['x-swgg-apiKey']
+                ? local.apiKeyValue
+                : schemaP.placeholder;
+            // templateRender schemaP
+            schemaP.innerHTML = local.templateRender(local.templateUiParam, schemaP);
         };
 
         local.userLoginByPassword = function (options, onError) {
@@ -25159,9 +25117,6 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 }
                 // dereference schema.$ref
                 $ref = schema && schema.$ref;
-                if ($ref === '#/x-test/aa') {
-                    local.nop();
-                }
                 if (!$ref) {
                     break;
                 }
@@ -25335,7 +25290,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                         data: element,
                         dataReadonlyRemove: [dataReadonlyRemove2, ii, dataReadonlyRemove2[ii]],
                         modeSchema: options.modeSchema,
-                        prefix: prefix + '[' + ii + ']',
+                        prefix: [prefix, ii],
                         schema: schema.items || schema.additionalItems,
                         swaggerJson: options.swaggerJson
                     });
@@ -25384,7 +25339,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                                 dataReadonlyRemove2[key]
                             ],
                             modeSchema: options.modeSchema,
-                            prefix: prefix + '[' + JSON.stringify(key) + ']',
+                            prefix: [prefix, key],
                             schema: schema.properties[key],
                             swaggerJson: options.swaggerJson
                         });
@@ -25396,7 +25351,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                             local.validateBySwaggerSchema({
                                 data: data[key],
                                 modeSchema: options.modeSchema,
-                                prefix: prefix + '[' + JSON.stringify(key) + ']',
+                                prefix: [prefix, key],
                                 schema: schema.patternProperties[rgx],
                                 swaggerJson: options.swaggerJson
                             });
@@ -25431,7 +25386,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     local.validateBySwaggerSchema({
                         data: data[key],
                         modeSchema: options.modeSchema,
-                        prefix: prefix + '[' + JSON.stringify(key) + ']',
+                        prefix: [prefix, key],
                         schema: schema.additionalProperties,
                         swaggerJson: options.swaggerJson
                     });
@@ -25446,7 +25401,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     local.validateBySwaggerSchema({
                         data: data[key],
                         modeSchema: options.modeSchema,
-                        prefix: prefix + '[' + JSON.stringify(key) + ']',
+                        prefix: [prefix, key],
                         schema: schema.dependencies[key],
                         swaggerJson: options.swaggerJson
                     });
