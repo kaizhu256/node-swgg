@@ -14335,7 +14335,7 @@ body {\n\
     margin: 20px;\n\
 }\n\
 body > * {\n\
-    margin-bottom: 10px;\n\
+    margin-top: 10px;\n\
 }\n\
 body > button {\n\
     width: 20rem;\n\
@@ -15183,6 +15183,7 @@ local.assetsDict['/assets.testReport.template.html'] = '\
     display: none;\n\
 }\n\
 .testReportDiv .footer {\n\
+    margin-top: 20px;\n\
     text-align: center;\n\
 }\n\
 .testReportDiv img {\n\
@@ -15194,7 +15195,7 @@ local.assetsDict['/assets.testReport.template.html'] = '\
 .testReportDiv .platform {\n\
     background: #fff;\n\
     border: 1px solid black;\n\
-    margin-bottom: 20px;\n\
+    margin-top: 20px;\n\
     padding: 0 10px 10px 10px;\n\
     text-align: left;\n\
 }\n\
@@ -22343,9 +22344,7 @@ console.log("printing currently loaded apis ...");\n\
 console.log(JSON.stringify(Object.keys(swgg.apiDict).sort(), null, 4));\n\
 console.log("initialized swgg-client");\n\
 </pre>\n\
-<div class="reset styleColor777">\n\
-    [ <span>base url</span>: {{basePath}} ]\n\
-</div>\n\
+<div class="reset styleColor777">[ <span>base url</span>: {{basePath}} ]</div>\n\
 {{/if urlSwaggerJson}}\n\
 <div id="swggAjaxProgressDiv1" style="text-align: center;">\n\
     <span>{{ajaxProgressText}}</span>\n\
@@ -22382,10 +22381,10 @@ local.templateUiOperation = '\
     >\n\
         {{#if deprecated}}<h4 class="label">(Warning: Deprecated)</h4><br>{{/if deprecated}}\n\
         <h4 class="label">Description</h4>\n\
-        <div class="tr">{{description modeHtmlBr}}</div>\n\
+        <div class="styleColor777 tr">{{description modeHtmlBr}}</div>\n\
         {{#if parameters.length}}\n\
         <h4 class="label">Parameters</h4>\n\
-        <div class="schemaP styleBorderBottom tr">\n\
+        <div class="schemaP styleBorderBottom1px tr">\n\
             <span class="styleColor777 td1">Name and Description</span>\n\
             <span class="styleColor777 td2">Data Type</span>\n\
             <span class="styleColor777 td3">Value</span>\n\
@@ -22396,7 +22395,7 @@ local.templateUiOperation = '\
         {{/each parameters}}\n\
         {{/if parameters.length}}\n\
         <h4 class="label">Response Messages</h4>\n\
-        <div class="response styleBorderBottom tr">\n\
+        <div class="response styleBorderBottom1px tr">\n\
             <span class="styleColor777 td1">HTTP Status Code</span>\n\
             <span class="styleColor777 td2">Reason</span>\n\
         </div>\n\
@@ -22467,11 +22466,11 @@ local.templateUiParam = '\
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/resource.handlebars
 local.templateUiResource = '\
 <div\n\
-    class="styleBorderBottom resource eventDelegateClick"\n\
+    class="styleBorderBottom1px resource eventDelegateClick"\n\
     data-name="{{name}}"\n\
     id="{{id}}"\n\
 >\n\
-    <div class="styleCursorPointer styleFontWeightBold header tr">\n\
+    <div class="header styleCursorPointer styleFontSizeLarge styleFontWeightBold tr">\n\
         <span\n\
             class="onEventResourceDisplayAction styleFlex1 styleTextOverflowEllipsis td1"\n\
             tabindex="0"\n\
@@ -22528,7 +22527,7 @@ function (error, data) {\n\
 <h4 class="label">Response Headers</h4>\n\
 <pre>{{responseHeaders}}</pre>\n\
 <h4 class="label">Response Body</h4>\n\
-{{responseBody}}\n\
+{{responseBody modeNotHtmlSafe}}\n\
 ';
 
 
@@ -22780,7 +22779,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 \n\
 \n\
 /* style */\n\
-.swggUiContainer .styleBorderBottom {\n\
+.swggUiContainer .styleBorderBottom1px {\n\
     border-bottom: 1px solid #777;\n\
 }\n\
 .swggUiContainer .styleColor777 {\n\
@@ -22796,6 +22795,9 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer styleFontFamilyArial {\n\
     font-family: Arial, Helvetica, sans-serif;\n\
 }\n\
+.swggUiContainer .styleFontSizeLarge {\n\
+    font-size: large;\n\
+}\n\
 .swggUiContainer .styleFontSizeXLarge {\n\
     font-size: x-large;\n\
 }\n\
@@ -22804,6 +22806,9 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer .styleHeight10Rem {\n\
     height: 10rem;\n\
+}\n\
+.swggUiContainer .styleMarginBottom20px {\n\
+    margin-bottom: 20px;\n\
 }\n\
 .swggUiContainer .styleMaxHeight50Rem {\n\
     max-height: 50rem;\n\
