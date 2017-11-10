@@ -837,7 +837,7 @@ local.templateUiOperation = '\
             <span class="td2">{{value.description}}</span>\n\
         </div>\n\
         {{/each responseList}}\n\
-        <button class="onEventOperationAjax">try it out!</button>\n\
+        <button class="onEventOperationAjax">try it out</button>\n\
         <div class="responseAjax"></div>\n\
     </form>\n\
 </div>\n\
