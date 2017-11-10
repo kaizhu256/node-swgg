@@ -76,7 +76,10 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 #### changelog for v2017.11.8
 - add env tags filter \$npm_package_swggTags0
 - ui - include resource description from header in operationList
+- ui - select pre-text when clicked
 - ui - truncate resource long-descriptions
+- rename function uiRender -> uiRenderAll
+- rename function uiParamRender -> uiRenderSchemaP
 - rename property x-swgg-urlApp -> x-swgg-downloadStandaloneApp
 - update function normalizeSwaggerJson to override swaggerJson with x-swgg-tags0-override
 - none

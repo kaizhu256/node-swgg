@@ -3137,7 +3137,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 modeAjax: true,
                 url: document.querySelector('.swggUiContainer > .header > .td2').value
             }, function (error) {
-                local.uiRender(null, onError);
+                local.uiRenderAll(null, onError);
                 local.tryCatchOnError(function () {
                     local.validateBySwaggerJson({ swaggerJson: local.swaggerJson });
                 }, local.uiNotify);
@@ -3160,7 +3160,139 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             return element;
         };
 
-        local.uiParamRender = function (schemaP) {
+        local.uiRenderAll = function (options, onError) {
+        /*
+         * this function will render swagger-ui
+         */
+            var resource;
+            // optimization - render .swggUiContainer first
+            if (!(options && options.swagger)) {
+                options = local.uiState = local.jsonCopy(local.swaggerJson);
+                // init ajaxProgressText
+                options.ajaxProgressText = 'rendering swagger.json';
+                // init apiKeyValue
+                options.apiKeyValue = local.apiKeyValue;
+                // init title
+                document.querySelector('head > title').textContent = local.templateRender(
+                    local.templateUiTitle,
+                    options
+                ).trim();
+                // init urlSwaggerJson
+                options.urlSwaggerJson = document.querySelector(
+                    '.swggUiContainer > .header > .td2'
+                ).value;
+                // templateRender main
+                document.querySelector('.swggUiContainer').innerHTML = local.templateRender(
+                    local.templateUiMain,
+                    options
+                );
+                setTimeout(function () {
+                    local.uiRenderAll(options, onError);
+                }, 100);
+                return;
+            }
+            // optimization - render .resourceList in separate event-loop
+            // reset state
+            local.idDomElementDict = {};
+            local.objectSetDefault(options, { resourceDict: {}, operationDict: {}, tagDict: {} });
+            // init tagDict
+            options.tags.forEach(function (tag) {
+                options.tagDict[tag.name] = tag;
+            });
+            // init operationDict
+            Object.keys(local.apiDict).sort().forEach(function (operation) {
+                // init operation
+                operation = local.jsonCopy(local.apiDict[operation]);
+                operation.tags.forEach(function (tag) {
+                    options.operationDict[operation._methodPath] = operation;
+                    // init resource
+                    resource = options.resourceDict[tag] = local.objectSetDefault(
+                        options.resourceDict[tag] || options.tagDict[tag],
+                        { description: 'no description', name: tag }
+                    );
+                    resource.id = resource.id || local.idDomElementCreate('swgg_id_' + tag);
+                });
+            });
+            // init uiFragment
+            options.uiFragment = local.domFragmentRender('<div class="reset resourceList"></div>');
+            // init resourceDict
+            Object.keys(options.resourceDict).sort().forEach(function (key) {
+                // templateRender resource
+                options.uiFragment.querySelector('.resourceList').appendChild(
+                    local.domFragmentRender(local.templateUiResource, options.resourceDict[key])
+                );
+            });
+            Object.keys(options.operationDict).sort(function (aa, bb) {
+                aa = options.operationDict[aa];
+                aa = aa._path + ' ' + aa._method;
+                bb = options.operationDict[bb];
+                bb = bb._path + ' ' + bb._method;
+                return aa < bb
+                    ? -1
+                    : 1;
+            }).forEach(function (operation) {
+                operation = options.operationDict[operation];
+                operation.id = local.idDomElementCreate('swgg_id_' + operation.operationId);
+                operation.tags.forEach(function (tag) {
+                    operation = local.jsonCopy(operation);
+                    resource = options.resourceDict[tag];
+                    local.objectSetDefault(operation, {
+                        description: 'no description',
+                        responseList: Object.keys(operation.responses).sort().map(function (key) {
+                            return { key: key, value: operation.responses[key] };
+                        }),
+                        summary: operation.description || 'no summary'
+                    });
+                    operation.parameters.forEach(local.uiRenderSchemaP);
+                    // templateRender operation
+                    options.uiFragment.querySelector('#' + resource.id + ' .operationList')
+                        .appendChild(local.domFragmentRender(local.templateUiOperation, operation));
+                });
+            });
+            Array.from(
+                options.uiFragment.querySelectorAll('.operation > .header > .td1')
+            ).forEach(function (element, ii) {
+                element.innerHTML = ii + 1 + '.';
+            });
+            // append uiFragment to swggUiContainer
+            document.querySelector('#swggAjaxProgressDiv1').style.display = 'none';
+            document.querySelector('.swggUiContainer').appendChild(options.uiFragment);
+            // render valueText
+            Array.from(
+                document.querySelectorAll('.swggUiContainer [data-value-text]')
+            ).forEach(function (element) {
+                element.value = decodeURIComponent(element.dataset.valueText);
+            });
+            // init event-handling
+            ['Click', 'Keyup', 'Submit'].forEach(function (eventType) {
+                Array.from(
+                    document.querySelectorAll('.swggUiContainer .eventDelegate' + eventType)
+                ).forEach(function (element) {
+                    element.addEventListener(eventType.toLowerCase(), local.uiEventDelegate);
+                });
+            });
+            document.querySelector('.swggUiContainer').addEventListener('click', function (event) {
+                var tmp;
+                // select pre-text when clicked
+                // https://stackoverflow.com
+                // /questions/1173194/select-all-div-text-with-single-mouse-click
+                if (event.target.tagName === 'PRE') {
+                    tmp = document.createRange();
+                    tmp.selectNodeContents(event.target);
+                    window.getSelection().addRange(tmp);
+                    window.getSelection().removeAllRanges();
+                    window.getSelection().addRange(tmp);
+                }
+            });
+            // scrollTo location.hash
+            local.uiEventListenerDict['.onEventOperationDisplayShow']({
+                target: document.querySelector('#' + (location.hash.slice(2) || 'undefined')) ||
+                    document.querySelector('.swggUiContainer .operation')
+            });
+            local.setTimeoutOnError(onError);
+        };
+
+        local.uiRenderSchemaP = function (schemaP) {
         /*
          * this function will render schemaP
          */
@@ -3278,138 +3410,6 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 : schemaP.placeholder;
             // templateRender schemaP
             schemaP.innerHTML = local.templateRender(local.templateUiParam, schemaP);
-        };
-
-        local.uiRender = function (options, onError) {
-        /*
-         * this function will render swagger-ui
-         */
-            var resource;
-            // optimization - render .swggUiContainer first
-            if (!(options && options.swagger)) {
-                options = local.uiState = local.jsonCopy(local.swaggerJson);
-                // init ajaxProgressText
-                options.ajaxProgressText = 'rendering swagger.json';
-                // init apiKeyValue
-                options.apiKeyValue = local.apiKeyValue;
-                // init title
-                document.querySelector('head > title').textContent = local.templateRender(
-                    local.templateUiTitle,
-                    options
-                ).trim();
-                // init urlSwaggerJson
-                options.urlSwaggerJson = document.querySelector(
-                    '.swggUiContainer > .header > .td2'
-                ).value;
-                // templateRender main
-                document.querySelector('.swggUiContainer').innerHTML = local.templateRender(
-                    local.templateUiMain,
-                    options
-                );
-                setTimeout(function () {
-                    local.uiRender(options, onError);
-                }, 100);
-                return;
-            }
-            // optimization - render .resourceList in separate event-loop
-            // reset state
-            local.idDomElementDict = {};
-            local.objectSetDefault(options, { resourceDict: {}, operationDict: {}, tagDict: {} });
-            // init tagDict
-            options.tags.forEach(function (tag) {
-                options.tagDict[tag.name] = tag;
-            });
-            // init operationDict
-            Object.keys(local.apiDict).sort().forEach(function (operation) {
-                // init operation
-                operation = local.jsonCopy(local.apiDict[operation]);
-                operation.tags.forEach(function (tag) {
-                    options.operationDict[operation._methodPath] = operation;
-                    // init resource
-                    resource = options.resourceDict[tag] = local.objectSetDefault(
-                        options.resourceDict[tag] || options.tagDict[tag],
-                        { description: 'no description', name: tag }
-                    );
-                    resource.id = resource.id || local.idDomElementCreate('swgg_id_' + tag);
-                });
-            });
-            // init uiFragment
-            options.uiFragment = local.domFragmentRender('<div class="reset resourceList"></div>');
-            // init resourceDict
-            Object.keys(options.resourceDict).sort().forEach(function (key) {
-                // templateRender resource
-                options.uiFragment.querySelector('.resourceList').appendChild(
-                    local.domFragmentRender(local.templateUiResource, options.resourceDict[key])
-                );
-            });
-            Object.keys(options.operationDict).sort(function (aa, bb) {
-                aa = options.operationDict[aa];
-                aa = aa._path + ' ' + aa._method;
-                bb = options.operationDict[bb];
-                bb = bb._path + ' ' + bb._method;
-                return aa < bb
-                    ? -1
-                    : 1;
-            }).forEach(function (operation) {
-                operation = options.operationDict[operation];
-                operation.id = local.idDomElementCreate('swgg_id_' + operation.operationId);
-                operation.tags.forEach(function (tag) {
-                    operation = local.jsonCopy(operation);
-                    resource = options.resourceDict[tag];
-                    local.objectSetDefault(operation, {
-                        description: 'no description',
-                        responseList: Object.keys(operation.responses).sort().map(function (key) {
-                            return { key: key, value: operation.responses[key] };
-                        }),
-                        summary: operation.description || 'no summary'
-                    });
-                    operation.parameters.forEach(local.uiParamRender);
-                    // templateRender operation
-                    options.uiFragment.querySelector('#' + resource.id + ' .operationList')
-                        .appendChild(local.domFragmentRender(local.templateUiOperation, operation));
-                });
-            });
-            Array.from(
-                options.uiFragment.querySelectorAll('.operation > .header > .td1')
-            ).forEach(function (element, ii) {
-                element.innerHTML = ii + 1 + '.';
-            });
-            // append uiFragment to swggUiContainer
-            document.querySelector('#swggAjaxProgressDiv1').style.display = 'none';
-            document.querySelector('.swggUiContainer').appendChild(options.uiFragment);
-            // render valueText
-            Array.from(
-                document.querySelectorAll('.swggUiContainer [data-value-text]')
-            ).forEach(function (element) {
-                element.value = decodeURIComponent(element.dataset.valueText);
-            });
-            // init event-handling
-            ['Click', 'Keyup', 'Submit'].forEach(function (eventType) {
-                Array.from(
-                    document.querySelectorAll('.swggUiContainer .eventDelegate' + eventType)
-                ).forEach(function (element) {
-                    element.addEventListener(eventType.toLowerCase(), local.uiEventDelegate);
-                });
-            });
-            document.querySelector('.swggUiContainer').addEventListener('click', function (event) {
-                var tmp;
-                // select pre-text when clicked
-                // https://stackoverflow.com
-                // /questions/1173194/select-all-div-text-with-single-mouse-click
-                if (event.target.tagName === 'PRE') {
-                    tmp = document.createRange();
-                    tmp.selectNodeContents(event.target);
-                    window.getSelection().addRange(tmp);
-                    window.getSelection().removeAllRanges();
-                    window.getSelection().addRange(tmp);
-                }
-            });
-            // scrollTo location.hash
-            local.uiEventListenerDict['.onEventOperationDisplayShow']({
-                target: document.querySelector('#' + (location.hash.slice(2) || 'undefined')) ||
-                    document.querySelector('.swggUiContainer .operation')
-            });
-            local.setTimeoutOnError(onError);
         };
 
         local.userLoginByPassword = function (options, onError) {
