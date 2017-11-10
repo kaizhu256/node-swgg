@@ -1174,12 +1174,10 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer .operation > .content .label {\n\
     color: #0b0;\n\
+    margin-bottom: 0;\n\
 }\n\
 .swggUiContainer .operation > .content pre {\n\
     background: #ffd;\n\
-}\n\
-.swggUiContainer .operation > .content .tr {\n\
-    margin-left: 10px;\n\
 }\n\
 .swggUiContainer .operation > .header:focus,\n\
 .swggUiContainer .operation > .header:hover {\n\
@@ -2851,19 +2849,6 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             });
         };
 
-        local.uiEventInit = function (element) {
-        /*
-         * this function will init event-handling for the dom-element
-         */
-            ['Click', 'Keyup', 'Submit'].forEach(function (eventType) {
-                Array.from(
-                    element.querySelectorAll('.eventDelegate' + eventType)
-                ).forEach(function (element) {
-                    element.addEventListener(eventType.toLowerCase(), local.uiEventDelegate);
-                });
-            });
-        };
-
         local.uiEventListenerDict = {};
 
         local.uiEventListenerDict['.onEventOperationAjax'] = function (event) {
@@ -3399,7 +3384,26 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 element.value = decodeURIComponent(element.dataset.valueText);
             });
             // init event-handling
-            local.uiEventInit(document);
+            ['Click', 'Keyup', 'Submit'].forEach(function (eventType) {
+                Array.from(
+                    document.querySelectorAll('.swggUiContainer .eventDelegate' + eventType)
+                ).forEach(function (element) {
+                    element.addEventListener(eventType.toLowerCase(), local.uiEventDelegate);
+                });
+            });
+            document.querySelector('.swggUiContainer').addEventListener('click', function (event) {
+                var tmp;
+                // select pre-text when clicked
+                // https://stackoverflow.com
+                // /questions/1173194/select-all-div-text-with-single-mouse-click
+                if (event.target.tagName === 'PRE') {
+                    tmp = document.createRange();
+                    tmp.selectNodeContents(event.target);
+                    window.getSelection().addRange(tmp);
+                    window.getSelection().removeAllRanges();
+                    window.getSelection().addRange(tmp);
+                }
+            });
             // scrollTo location.hash
             local.uiEventListenerDict['.onEventOperationDisplayShow']({
                 target: document.querySelector('#' + (location.hash.slice(2) || 'undefined')) ||
