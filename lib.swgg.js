@@ -705,9 +705,9 @@ local.templateUiMain = '\
         type="text"\n\
         value="{{apiKeyValue}}"\n\
     >\n\
-    <button class="eventDelegateClick onEventUiReload styleCursorPointer td4">Explore</button>\n\
+    <button class="eventDelegateClick onEventUiReload td4">Explore</button>\n\
     <button\n\
-        class="eventDelegateClick onEventUiReload styleCursorPointer td5"\n\
+        class="eventDelegateClick onEventUiReload td5"\n\
         id="swggApiKeyClearButton1"\n\
     >Clear api-keys</button>\n\
 </div>\n\
@@ -794,7 +794,7 @@ local.templateUiOperation = '\
     id="{{id}}"\n\
 >\n\
     <div\n\
-        class="eventDelegateClick onEventOperationDisplayShow header styleCursorPointer tr"\n\
+        class="eventDelegateClick onEventOperationDisplayShow header tr"\n\
         tabindex="0"\n\
     >\n\
         <span class="td1"></span>\n\
@@ -902,7 +902,7 @@ local.templateUiResource = '\
     data-name="{{name}}"\n\
     id="{{id}}"\n\
 >\n\
-    <div class="header styleCursorPointer styleFontSizeLarge styleFontWeightBold tr">\n\
+    <div class="header styleFontSizeLarge styleFontWeightBold tr">\n\
         <span\n\
             class="onEventResourceDisplayAction styleFlex1 styleTextOverflowEllipsis td1"\n\
             tabindex="0"\n\
@@ -920,7 +920,6 @@ local.templateUiResource = '\
     <div class="operationList uiAnimateSlide"\n\
         style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
     >\n\
-        <h4 class="label">Description</h4>\n\
         <pre class="styleFontFamilyArial">{{description modeHtmlBr}}</pre>\n\
     </div>\n\
 </div>\n\
@@ -988,6 +987,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 <style>\n\
 /*csslint\n\
     adjoining-classes: false,\n\
+    outline-none: false,\n\
     universal-selector: false\n\
 */\n\
 /* animate */\n\
@@ -1020,11 +1020,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     font-family: Arial, Helvetica, sans-serif;\n\
     max-width: 1024px;\n\
 }\n\
-.swggUiContainer a,\n\
-.swggUiContainer input,\n\
-.swggUiContainer span {\n\
-    min-height: 1.5rem;\n\
-}\n\
 .swggUiContainer button {\n\
     padding: 10px;\n\
 }\n\
@@ -1032,10 +1027,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     height: 1.5rem;\n\
     padding-left: 0.25rem;\n\
     padding-right: 0.25rem;\n\
-}\n\
-.swggUiContainer .label {\n\
-    color: #555;\n\
-    margin-bottom: 0;\n\
 }\n\
 .swggUiContainer .operation .header,\n\
 .swggUiContainer option,\n\
@@ -1126,7 +1117,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     padding: 6px 8px;\n\
 }\n\
 .swggUiContainer > .info a {\n\
-    color: #373;\n\
+    color: #393;\n\
 }\n\
 .swggUiContainer > .info > ul {\n\
     margin-left: 2rem;\n\
@@ -1138,11 +1129,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .operation > .content {\n\
     padding: 1rem;\n\
 }\n\
-.swggUiContainer .operation > .header:focus,\n\
-.swggUiContainer .operation > .header:hover {\n\
-    background: #7d7;\n\
-    outline: none;\n\
-}\n\
 .swggUiContainer .operation > .header > span {\n\
     padding-top: 5px;\n\
 }\n\
@@ -1153,7 +1139,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer .operation > .header > .td2 {\n\
     background: #777;\n\
-    color: white;\n\
+    color: #fff;\n\
     text-align: center;\n\
     width: 5rem;\n\
 }\n\
@@ -1194,12 +1180,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     background: #70b;\n\
 }\n\
 .swggUiContainer .resource > .header > span {\n\
-    color: #373;\n\
-}\n\
-.swggUiContainer .resource > .header > span:focus,\n\
-.swggUiContainer .resource > .header > span:hover {\n\
-    color: black;\n\
-    outline: none;\n\
+    color: #393;\n\
 }\n\
 .swggUiContainer .resource > .header > .td2 {\n\
     border-left: 1px solid #777;\n\
@@ -1210,22 +1191,55 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 \n\
 \n\
 \n\
-/* style */\n\
+/* important style */\n\
+/* background */\n\
+.swggUiContainer .operation > .header:hover {\n\
+    background: #7d7;\n\
+}\n\
+/* border-bottom */\n\
 .swggUiContainer .styleBorderBottom1px {\n\
     border-bottom: 1px solid #777;\n\
+}\n\
+/* color */\n\
+.swggUiContainer .resource > .header > span:hover {\n\
+    color: #000;\n\
 }\n\
 .swggUiContainer .styleColor777 {\n\
     color: #777;\n\
 }\n\
-.swggUiContainer .styleCursorPointer,\n\
-.swggUiContainer .styleCursorPointer input {\n\
+/* cursor */\n\
+.swggUiContainer .button,\n\
+.swggUiContainer .operation > .header,\n\
+.swggUiContainer .resource > .header {\n\
     cursor: pointer;\n\
 }\n\
-.swggUiContainer .styleFlex1 {\n\
-    flex: 1;\n\
+/* outline */\n\
+.swggUiContainer .operation > .header:focus,\n\
+.swggUiContainer .resource > .header > span:focus {\n\
+    outline: none;\n\
 }\n\
+/* font-family */\n\
 .swggUiContainer styleFontFamilyArial {\n\
     font-family: Arial, Helvetica, sans-serif;\n\
+}\n\
+/* margin-bottom */\n\
+.swggUiContainer .label {\n\
+    color: #393;\n\
+    margin-bottom: 0;\n\
+}\n\
+/* min-height */\n\
+.swggUiContainer input,\n\
+.swggUiContainer span {\n\
+    min-height: 1.5rem;\n\
+}\n\
+/* text-overflow */\n\
+.swggUiContainer .styleTextOverflowEllipsis {\n\
+    text-overflow: ellipsis;\n\
+    white-space: nowrap;\n\
+}\n\
+/* misc */\n\
+.swggUiContainer .styleFlex1 {\n\
+    flex: 1;\n\
 }\n\
 .swggUiContainer .styleFontSizeLarge {\n\
     font-size: large;\n\
@@ -1247,10 +1261,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer .styleTextDecorationLineThrough {\n\
     text-decoration: line-through;\n\
-}\n\
-.swggUiContainer .styleTextOverflowEllipsis {\n\
-    text-overflow: ellipsis;\n\
-    white-space: nowrap;\n\
 }\n\
 </style>\n\
 ')
