@@ -22235,18 +22235,12 @@ local.templateUiMain = '\
 <div class="info reset">\n\
     {{#if info}}\n\
     {{#if info.x-swgg-homepage}}\n\
-    <a class="fontWeightBold"\n\
-        href="{{info.x-swgg-homepage}}"\n\
-        target="_blank"\n\
-    >\n\
-        {{info.title htmlSafe}} ({{info.version htmlSafe}})\n\
-    </a>\n\
+    <a class="fontWeightBold" href="{{info.x-swgg-homepage}}" target="_blank"\n\
+    >{{info.title htmlSafe}} ({{info.version htmlSafe}})</a>\n\
     {{#unless info.x-swgg-homepage}}\n\
     <div class="fontWeightBold">{{info.title htmlSafe}} ({{info.version htmlSafe}})</div>\n\
     {{/if info.x-swgg-homepage}}\n\
-    {{#if info.description}}\n\
-    <div>{{info.description htmlSafe br}}</div>\n\
-    {{/if info.description}}\n\
+    {{#if info.description}}<div>{{info.description htmlSafe br}}</div>{{/if info.description}}\n\
     {{#if info.x-swgg-downloadStandaloneApp}}\n\
     <h4><a download href="{{info.x-swgg-downloadStandaloneApp}}">download standalone app</a></h4>\n\
     {{/if info.x-swgg-downloadStandaloneApp}}\n\
@@ -22268,9 +22262,7 @@ local.templateUiMain = '\
         <li>Created by {{info.contact.name htmlSafe}}</li>\n\
         {{/if info.contact.name}}\n\
         {{#if info.contact.url}}\n\
-        <li>\n\
-            See more at <a href="{{info.contact.url}}">{{info.contact.url}}</a>\n\
-        </li>\n\
+        <li>See more at <a href="{{info.contact.url}}">{{info.contact.url}}</a></li>\n\
         {{/if info.contact.url}}\n\
         {{#if info.contact.email}}\n\
         <li>\n\
@@ -22332,9 +22324,7 @@ local.templateUiOperation = '\
         <span class="td2">{{_method}}</span>\n\
         <span\n\
             class="styleFlex1 td3\n\
-                {{#if deprecated}}\n\
-                styleTextDecorationLineThrough\n\
-                {{/if deprecated}}\n\
+                {{#if deprecated}}styleTextDecorationLineThrough{{/if deprecated}}\n\
             "\n\
         >{{_path}}</span>\n\
         <span class="styleColor777 styleFlex1 styleTextOverflowEllipsis td4"\n\
@@ -22344,10 +22334,7 @@ local.templateUiOperation = '\
         class="content uiAnimateSlide"\n\
         style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
     >\n\
-        {{#if deprecated}}\n\
-        <h4 class="label">(Warning: Deprecated)</h4>\n\
-        <br>\n\
-        {{/if deprecated}}\n\
+        {{#if deprecated}}<h4 class="label">(Warning: Deprecated)</h4><br>{{/if deprecated}}\n\
         <h4 class="label">Description</h4>\n\
         <div class="tr">{{description htmlSafe br}}</div>\n\
         {{#if parameters.length}}\n\
@@ -22387,9 +22374,7 @@ local.templateUiOperation = '\
 local.templateUiParam = '\
 <span class="td1">\n\
     {{name}}&nbsp;\n\
-    {{#if required}}\n\
-    <span class="fontWeightBold">(required)</span>\n\
-    {{/if required}}\n\
+    {{#if required}}<span class="fontWeightBold">(required)</span>{{/if required}}\n\
     {{#if description}}\n\
     <br>\n\
     <span class="styleColor777">{{description htmlSafe br}}</span>\n\
@@ -22403,9 +22388,7 @@ local.templateUiParam = '\
         data-value-text="{{valueText encodeURIComponent}}"\n\
         placeholder="{{placeholder htmlSafe}}"></textarea>\n\
     {{/if isTextarea}}\n\
-    {{#if isFile}}\n\
-    <input class="input" type="file">\n\
-    {{/if isFile}}\n\
+    {{#if isFile}}<input class="input" type="file">{{/if isFile}}\n\
     {{#if isSelect}}\n\
     <select class="input" {{#if isSelectMultiple}}multiple{{/if isSelectMultiple}}>\n\
         {{#each selectOptionList}}\n\
@@ -23423,10 +23406,10 @@ document.querySelector(".swggUiContainer").addEventListener("click", function (e
                     tmp = new Date().toISOString();
                     break;
                 case 'email':
-                    tmp = tmp + '@random.com';
+                    tmp = tmp + '@example.com';
                     break;
                 case 'json':
-                    tmp = JSON.stringify({ random: tmp });
+                    tmp = JSON.stringify({ foo: tmp });
                     break;
                 case 'phone':
                     tmp = options.modeNotRandom
@@ -24826,7 +24809,6 @@ document.querySelector(".swggUiContainer").addEventListener("click", function (e
         /*
          * this function will render schemaP
          */
-            schemaP.schemaText = JSON.stringify(schemaP, null, 4);
             // init schemaP.id
             schemaP.id = local.idDomElementCreate('swgg_id_' + schemaP.name);
             schemaP.enum2 = schemaP.enum || (schemaP.items && schemaP.items.enum);

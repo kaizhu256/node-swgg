@@ -59,6 +59,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 #### todo
 - npm publish 2017.11.8
+- ui - pre-render responseAjax
 - allow function dbRowListRandomCreate to recurse objects and stop with modeSubdoc flag
 - update ui to show required attribute only in 'name and desscription' section
 - add validators from https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation/semantic-validators/validators/items-required-for-array-objects.js
