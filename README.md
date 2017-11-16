@@ -58,6 +58,8 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
+- allow function dbRowListRandomCreate to recurse objects and stop with modeSubdoc flag
+- update ui to show required attribute only in 'name and desscription' section
 - add validators from https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation/semantic-validators/validators/items-required-for-array-objects.js
 - add xml support for wechat
 - add property parameters.x-swgg-persist to persist to localStorage
@@ -70,20 +72,32 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2017.11.7
-- npm publish 2017.11.7
-- add responsive css to header
-- merge properties paramDef.x-swgg-example and paramDef.default -> paramDef.default
-- modify function normalizeSwaggerParamDict to only set default-value if required (or modeDefault flag is enabled)
-- rename x-swgg-definitionsParameter -> #/parameters
-- remove unused apiAjax defer-routine
-- revamp normalizers normalizeSwaggerJson, normalizeSwaggerParamDict
-- revamp validators validateBySwaggerJson, validateBySwaggerParameters, validateBySwaggerSchema
-- validate schema.default
+#### changelog for v2017.11.15
+- npm publish 2017.11.15
+- add env tags filter \$npm_package_swggTags0
+- add function assertSwaggerValidate
+- allow function dbRowListRandomCreate to recurse objects and stop with modeSubdoc flag
+- function templateRender - default to htmlSafe and override with flag notHtmlSafe
+- ui - add cross-browser multiline placeholder support for textarea
+- ui - add dynamic input validation
+- ui - include resource description from header in operationList
+- ui - merge template templateUiResponseAjax into templateUiOperation
+- ui - select pre-text when clicked
+- ui - truncate resource long-descriptions
+- ui - remove eventListeners in operation-div (and rely on resource-ui eventListeners)
+- rename function uiRender -> uiRenderAll
+- rename property x-swgg-urlApp -> x-swgg-downloadStandaloneApp
+- update function normalizeSwaggerJson to override swaggerJson with x-swgg-tags0-override
 - none
 
 #### this package requires
 - darwin or linux os
+
+#### this swagger-implementation is compliant with json-schema-validation (draft-04)
+- [http://json-schema.org/draft-04/json-schema-validation.html](http://json-schema.org/draft-04/json-schema-validation.html)
+
+#### this swagger-implementation is compliant with OpenAPI Specification (2.0)
+- [https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md](https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md)
 
 
 
@@ -98,7 +112,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 # 1. download standalone app
 curl -O https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js
 # 2. run standalone app
-node ./assets.app.js
+PORT=8081 node ./assets.app.js
 # 3. open a browser to http://127.0.0.1:8081 and play with the web-demo
 # 4. edit file assets.app.js to suit your needs
 ```
@@ -321,11 +335,6 @@ utility2-comment -->\n\
 <!-- utility2-comment\n\
 {{/if isRollup}}\n\
 utility2-comment -->\n\
-<div class="utility2FooterDiv">\n\
-    [ this app was created with\n\
-    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>\n\
-    ]\n\
-</div>\n\
 </body>\n\
 </html>\n\
 ');
@@ -573,7 +582,7 @@ utility2-comment -->\n\
                         ]
                     };
                 },
-                properties: local.swgg.swaggerJson.definitions.Pet.properties
+                schema: { properties: local.swgg.swaggerJson.definitions.Pet.properties }
             }),
             idIndexCreateList: [{
                 isInteger: true,
@@ -603,7 +612,7 @@ utility2-comment -->\n\
                         petId: options.ii + 100
                     };
                 },
-                properties: local.swgg.swaggerJson.definitions.Order.properties
+                schema: { properties: local.swgg.swaggerJson.definitions.Order.properties }
             }),
             idIndexCreateList: [{
                 isInteger: true,
@@ -654,7 +663,7 @@ utility2-comment -->\n\
                         ]
                     };
                 },
-                properties: local.swgg.swaggerJson.definitions.User.properties
+                schema: { properties: local.swgg.swaggerJson.definitions.User.properties }
             }),
             idIndexCreateList: [{
                 name: 'email'
@@ -945,10 +954,9 @@ utility2-comment -->\n\
     },
     "homepage": "https://github.com/kaizhu256/node-swgg",
     "keywords": [
-        "oai",
         "openapi",
         "swagger-client",
-        "swagger-ui"
+        "swagger-server"
     ],
     "license": "MIT",
     "main": "lib.swgg.js",
@@ -972,7 +980,7 @@ utility2-comment -->\n\
         "start": "PORT=${PORT:-8080} utility2 start test.js",
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2017.11.7"
+    "version": "2017.11.15"
 }
 ```
 

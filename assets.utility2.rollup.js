@@ -310,12 +310,13 @@
             });
         };
 
-        local.templateRender = function (template, dict) {
+        local.templateRender = function (template, dict, options) {
         /*
          * this function will render the template with the given dict
          */
-            var argList, getValue, match, renderPartial, rgx, value;
+            var argList, getValue, match, renderPartial, rgx, tryCatch, value;
             dict = dict || {};
+            options = options || {};
             getValue = function (key) {
                 argList = key.split(' ');
                 value = dict;
@@ -332,7 +333,7 @@
                     return Array.isArray(value)
                         ? value.map(function (dict) {
                             // recurse with partial
-                            return local.templateRender(partial, dict);
+                            return local.templateRender(partial, dict, options);
                         }).join('')
                         : '';
                 case 'if':
@@ -342,15 +343,26 @@
                         // handle 'unless' case
                         : partial.slice(1).join('{{#unless ' + key + '}}');
                     // recurse with partial
-                    return local.templateRender(partial, dict);
+                    return local.templateRender(partial, dict, options);
                 case 'unless':
                     return getValue(key)
                         ? ''
                         // recurse with partial
-                        : local.templateRender(partial, dict);
+                        : local.templateRender(partial, dict, options);
                 default:
                     // recurse with partial
-                    return match0[0] + local.templateRender(match0.slice(1), dict);
+                    return match0[0] + local.templateRender(match0.slice(1), dict, options);
+                }
+            };
+            tryCatch = function (fnc, message) {
+            /*
+             * this function will prepend the message to errorCaught
+             */
+                try {
+                    return fnc();
+                } catch (errorCaught) {
+                    errorCaught.message = message + errorCaught.message;
+                    throw errorCaught;
                 }
             };
             // render partials
@@ -367,44 +379,57 @@
             }
             // search for keys in the template
             return template.replace((/\{\{[^}]+?\}\}/g), function (match0) {
-                getValue(match0.slice(2, -2));
-                if (value === undefined) {
-                    return match0;
-                }
-                argList.slice(1).forEach(function (arg) {
-                    switch (arg) {
-                    case 'alphanumeric':
-                        value = value.replace((/\W/g), '_');
-                        break;
-                    case 'br':
-                        value = value.replace((/\n/g), '<br>');
-                        break;
-                    case 'decodeURIComponent':
-                        value = decodeURIComponent(value);
-                        break;
-                    case 'encodeURIComponent':
-                        value = encodeURIComponent(value);
-                        break;
-                    case 'htmlSafe':
+                var htmlBr, notHtmlSafe;
+                notHtmlSafe = options.notHtmlSafe;
+                return tryCatch(function () {
+                    getValue(match0.slice(2, -2));
+                    if (value === undefined) {
+                        return match0;
+                    }
+                    argList.slice(1).forEach(function (arg) {
+                        switch (arg) {
+                        case 'alphanumeric':
+                            value = value.replace((/\W/g), '_');
+                            break;
+                        case 'decodeURIComponent':
+                            value = decodeURIComponent(value);
+                            break;
+                        case 'encodeURIComponent':
+                            value = encodeURIComponent(value);
+                            break;
+                        case 'htmlBr':
+                            htmlBr = true;
+                            break;
+                        case 'jsonStringify':
+                            value = JSON.stringify(value);
+                            break;
+                        case 'jsonStringify4':
+                            value = JSON.stringify(value, null, 4);
+                            break;
+                        case 'markdownSafe':
+                            value = value.replace((/`/g), '\'');
+                            break;
+                        case 'notHtmlSafe':
+                            notHtmlSafe = true;
+                            break;
+                        // default to String.prototype[arg]()
+                        default:
+                            value = value[arg]();
+                            break;
+                        }
+                    });
+                    value = String(value);
+                    // default to htmlSafe
+                    if (!notHtmlSafe) {
                         value = value.replace((/["&'<>]/g), function (match0) {
                             return '&#x' + match0.charCodeAt(0).toString(16) + ';';
                         });
-                        break;
-                    case 'jsonStringify':
-                        value = JSON.stringify(value);
-                        break;
-                    case 'jsonStringify4':
-                        value = JSON.stringify(value, null, 4);
-                        break;
-                    case 'markdownCodeSafe':
-                        value = value.replace((/`/g), '\'');
-                        break;
-                    default:
-                        value = value[arg]();
-                        break;
                     }
-                });
-                return String(value);
+                    if (htmlBr) {
+                        value = value.replace((/\n/g), '<br>');
+                    }
+                    return value;
+                }, 'templateRender could not render expression ' + JSON.stringify(match0) + '\n');
             });
         };
 
@@ -418,13 +443,13 @@
             local.assert(typeof onError === 'function', typeof onError);
             try {
                 // reset errorCaught
-                local._debugTryCatchErrorCaught = null;
+                local._debugTryCatchError = null;
                 result = fnc();
-                local._debugTryCatchErrorCaught = null;
+                local._debugTryCatchError = null;
                 return result;
             } catch (errorCaught) {
                 // debug errorCaught
-                local._debugTryCatchErrorCaught = errorCaught;
+                local._debugTryCatchError = errorCaught;
                 return onError(errorCaught);
             }
         };
@@ -915,7 +940,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                     };
                 });
             // render apidoc
-            options.result = local.templateRender(options.template, options)
+            options.result = local.templateRender(options.template, options, { notHtmlSafe: true })
                 .trim()
                 .replace((/ +$/gm), '') + '\n';
             return options.result;
@@ -1321,10 +1346,6 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
          * this function will normalize the value by type
          */
             switch (type) {
-            case 'dict':
-                return typeof value === 'object' && value && !Array.isArray(value)
-                    ? value
-                    : valueDefault || {};
             case 'list':
                 return Array.isArray(value)
                     ? value
@@ -1905,7 +1926,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
         /*
          * this function will create a dbTable
          */
-            options = local.normalizeValue('dict', options);
+            options = local.objectSetOverride(options);
             this.name = String(options.name);
             // register dbTable in dbTableDict
             local.dbTableDict[this.name] = this;
@@ -2004,7 +2025,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
          * this function will get the dbRow in the dbTable with the given idDict
          */
             var id, result;
-            idDict = local.normalizeValue('dict', idDict);
+            idDict = local.objectSetOverride(idDict);
             result = null;
             this.idIndexList.some(function (idIndex) {
                 id = idDict[idIndex.name];
@@ -2112,7 +2133,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
          * will be removed
          */
             var id, result;
-            dbRow = local.jsonCopy(local.normalizeValue('dict', dbRow));
+            dbRow = local.jsonCopy(local.objectSetOverride(dbRow));
             result = null;
             this.idIndexList.some(function (idIndex) {
                 id = dbRow[idIndex.name];
@@ -2172,7 +2193,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
          * this function will get the dbRow's in the dbTable with the given options.query
          */
             this._cleanup();
-            options = local.normalizeValue('dict', options);
+            options = local.objectSetOverride(options);
             return local.setTimeoutOnError(onError, null, local.dbRowProject(
                 this._crudGetManyByQuery(
                     options.query,
@@ -2314,7 +2335,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
          */
             var result, self, tmp;
             self = this;
-            tmp = local.jsonCopy(local.normalizeValue('dict', dbRow));
+            tmp = local.jsonCopy(local.objectSetOverride(dbRow));
             result = self._crudGetManyByQuery(query).map(function (dbRow) {
                 tmp._id = dbRow._id;
                 return self._crudUpdateOneById(tmp);
@@ -2375,7 +2396,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
          * this function will create an idIndex with the given options.name
          */
             var dbRow, idIndex, ii, name;
-            options = local.normalizeValue('dict', options);
+            options = local.objectSetOverride(options);
             name = String(options.name);
             // disallow idIndex with dot-name
             if (name.indexOf('.') >= 0 || name === '_id') {
@@ -2408,7 +2429,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
          * this function will remove the idIndex with the given options.name
          */
             var name;
-            options = local.normalizeValue('dict', options);
+            options = local.objectSetOverride(options);
             name = String(options.name);
             this.idIndexList = this.idIndexList.filter(function (idIndex) {
                 return idIndex.name !== name || idIndex.name === '_id';
@@ -2820,7 +2841,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
          * this function will create a dbTable with the given options
          */
             var self;
-            options = local.normalizeValue('dict', options);
+            options = local.objectSetOverride(options);
             // register dbTable
             self = local.dbTableDict[options.name] =
                 local.dbTableDict[options.name] || new local._DbTable(options);
@@ -6731,171 +6752,61 @@ local.templateCoverageBadgeSvg =
 // init lib csslint
 /* istanbul ignore next */
 // 2013-08-15T10:18:30Z
-// https://github.com/CSSLint/csslint/blob/v0.10.0/release/csslint.js
-// utility2-uglifyjs https://raw.githubusercontent.com/CSSLint/csslint/v0.10.0/release/csslint.js
+// https://github.com/CSSLint/csslint/blob/v1.0.5/dist/csslint.js
+// utility2-uglifyjs https://raw.githubusercontent.com/CSSLint/csslint/v1.0.5/dist/csslint.js
 (function () {
-var exports=exports||{},CSSLint=function(){function Reporter(e,t){this.messages=
-[],this.stats=[],this.lines=e,this.ruleset=t}var parserlib={};(function(){function e
-(){this._listeners={}}function t(e){this._input=e.replace(/\n\r?/g,"\n"),this._line=1
-,this._col=1,this._cursor=0}function n(e,t,n){this.col=n,this.line=t,this.message=
-e}function r(e,t,n,r){this.col=n,this.line=t,this.text=e,this.type=r}function i(
-e,n){this._reader=e?new t(e.toString()):null,this._token=null,this._tokenData=n,
-this._lt=[],this._ltIndex=0,this._ltIndexCache=[]}e.prototype={constructor:e,addListener
-:function(e,t){this._listeners[e]||(this._listeners[e]=[]),this._listeners[e].push
-(t)},fire:function(e){typeof e=="string"&&(e={type:e}),typeof e.target!="undefined"&&
-(e.target=this);if(typeof e.type=="undefined")throw new Error("Event object missing 'type' property."
-);if(this._listeners[e.type]){var t=this._listeners[e.type].concat();for(var n=0
-,r=t.length;n<r;n++)t[n].call(this,e)}},removeListener:function(e,t){if(this._listeners
-[e]){var n=this._listeners[e];for(var r=0,i=n.length;r<i;r++)if(n[r]===t){n.splice
-(r,1);break}}}},t.prototype={constructor:t,getCol:function(){return this._col},getLine
-:function(){return this._line},eof:function(){return this._cursor==this._input.length
-},peek:function(e){var t=null;return e=typeof e=="undefined"?1:e,this._cursor<this
-._input.length&&(t=this._input.charAt(this._cursor+e-1)),t},read:function(){var e=
-null;return this._cursor<this._input.length&&(this._input.charAt(this._cursor)=="\n"?
-(this._line++,this._col=1):this._col++,e=this._input.charAt(this._cursor++)),e},
-mark:function(){this._bookmark={cursor:this._cursor,line:this._line,col:this._col
-}},reset:function(){this._bookmark&&(this._cursor=this._bookmark.cursor,this._line=
-this._bookmark.line,this._col=this._bookmark.col,delete this._bookmark)},readTo:
-function(e){var t="",n;while(t.length<e.length||t.lastIndexOf(e)!=t.length-e.length
-){n=this.read();if(!n)throw new Error('Expected "'+e+'" at line '+this._line+", col "+
-this._col+".");t+=n}return t},readWhile:function(e){var t="",n=this.read();while(
-n!==null&&e(n))t+=n,n=this.read();return t},readMatch:function(e){var t=this._input
-.substring(this._cursor),n=null;return typeof e=="string"?t.indexOf(e)===0&&(n=this
-.readCount(e.length)):e instanceof RegExp&&e.test(t)&&(n=this.readCount(RegExp.lastMatch
-.length)),n},readCount:function(e){var t="";while(e--)t+=this.read();return t}},
-n.prototype=new Error,r.fromToken=function(e){return new r(e.value,e.startLine,e
-.startCol)},r.prototype={constructor:r,valueOf:function(){return this.toString()
-},toString:function(){return this.text}},i.createTokenData=function(e){var t=[],
-n={},r=e.concat([]),i=0,s=r.length+1;r.UNKNOWN=-1,r.unshift({name:"EOF"});for(;i<
-s;i++)t.push(r[i].name),r[r[i].name]=i,r[i].text&&(n[r[i].text]=i);return r.name=
-function(e){return t[e]},r.type=function(e){return n[e]},r},i.prototype={constructor
-:i,match:function(e,t){e instanceof Array||(e=[e]);var n=this.get(t),r=0,i=e.length
-;while(r<i)if(n==e[r++])return!0;return this.unget(),!1},mustMatch:function(e,t)
-{var r;e instanceof Array||(e=[e]);if(!this.match.apply(this,arguments))throw r=
-this.LT(1),new n("Expected "+this._tokenData[e[0]].name+" at line "+r.startLine+", col "+
-r.startCol+".",r.startLine,r.startCol)},advance:function(e,t){while(this.LA(0)!==0&&!
-this.match(e,t))this.get();return this.LA(0)},get:function(e){var t=this._tokenData
-,n=this._reader,r,i=0,s=t.length,o=!1,u,a;if(this._lt.length&&this._ltIndex>=0&&
-this._ltIndex<this._lt.length){i++,this._token=this._lt[this._ltIndex++],a=t[this
-._token.type];while(a.channel!==undefined&&e!==a.channel&&this._ltIndex<this._lt
-.length)this._token=this._lt[this._ltIndex++],a=t[this._token.type],i++;if((a.channel===
-undefined||e===a.channel)&&this._ltIndex<=this._lt.length)return this._ltIndexCache
-.push(i),this._token.type}return u=this._getToken(),u.type>-1&&!t[u.type].hide&&
-(u.channel=t[u.type].channel,this._token=u,this._lt.push(u),this._ltIndexCache.push
-(this._lt.length-this._ltIndex+i),this._lt.length>5&&this._lt.shift(),this._ltIndexCache
-.length>5&&this._ltIndexCache.shift(),this._ltIndex=this._lt.length),a=t[u.type]
-,a&&(a.hide||a.channel!==undefined&&e!==a.channel)?this.get(e):u.type},LA:function(
-e){var t=e,n;if(e>0){if(e>5)throw new Error("Too much lookahead.");while(t)n=this
-.get(),t--;while(t<e)this.unget(),t++}else if(e<0){if(!this._lt[this._ltIndex+e]
-)throw new Error("Too much lookbehind.");n=this._lt[this._ltIndex+e].type}else n=
-this._token.type;return n},LT:function(e){return this.LA(e),this._lt[this._ltIndex+
-e-1]},peek:function(){return this.LA(1)},token:function(){return this._token},tokenName
-:function(e){return e<0||e>this._tokenData.length?"UNKNOWN_TOKEN":this._tokenData
-[e].name},tokenType:function(e){return this._tokenData[e]||-1},unget:function(){
-if(!this._ltIndexCache.length)throw new Error("Too much lookahead.");this._ltIndex-=
-this._ltIndexCache.pop(),this._token=this._lt[this._ltIndex-1]}},parserlib.util=
-{StringReader:t,SyntaxError:n,SyntaxUnit:r,EventTarget:e,TokenStreamBase:i}})(),
-function(){function Combinator(e,t,n){SyntaxUnit.call(this,e,t,n,Parser.COMBINATOR_TYPE
-),this.type="unknown",/^\s+$/.test(e)?this.type="descendant":e==">"?this.type="child"
-:e=="+"?this.type="adjacent-sibling":e=="~"&&(this.type="sibling")}function MediaFeature
-(e,t){SyntaxUnit.call(this,"("+e+(t!==null?":"+t:"")+")",e.startLine,e.startCol,
-Parser.MEDIA_FEATURE_TYPE),this.name=e,this.value=t}function MediaQuery(e,t,n,r,
-i){SyntaxUnit.call(this,(e?e+" ":"")+(t?t:"")+(t&&n.length>0?" and ":"")+n.join(" and "
-),r,i,Parser.MEDIA_QUERY_TYPE),this.modifier=e,this.mediaType=t,this.features=n}
-function Parser(e){EventTarget.call(this),this.options=e||{},this._tokenStream=null
-}function PropertyName(e,t,n,r){SyntaxUnit.call(this,e,n,r,Parser.PROPERTY_NAME_TYPE
-),this.hack=t}function PropertyValue(e,t,n){SyntaxUnit.call(this,e.join(" "),t,n
-,Parser.PROPERTY_VALUE_TYPE),this.parts=e}function PropertyValueIterator(e){this
-._i=0,this._parts=e.parts,this._marks=[],this.value=e}function PropertyValuePart
-(text,line,col){SyntaxUnit.call(this,text,line,col,Parser.PROPERTY_VALUE_PART_TYPE
-),this.type="unknown";var temp;if(/^([+\-]?[\d\.]+)([a-z]+)$/i.test(text)){this.
-type="dimension",this.value=+RegExp.$1,this.units=RegExp.$2;switch(this.units.toLowerCase
-()){case"em":case"rem":case"ex":case"px":case"cm":case"mm":case"in":case"pt":case"pc"
-:case"ch":case"vh":case"vw":case"vm":this.type="length";break;case"deg":case"rad"
-:case"grad":this.type="angle";break;case"ms":case"s":this.type="time";break;case"hz"
-:case"khz":this.type="frequency";break;case"dpi":case"dpcm":this.type="resolution"
-}}else/^([+\-]?[\d\.]+)%$/i.test(text)?(this.type="percentage",this.value=+RegExp
-.$1):/^([+\-]?[\d\.]+)%$/i.test(text)?(this.type="percentage",this.value=+RegExp
-.$1):/^([+\-]?\d+)$/i.test(text)?(this.type="integer",this.value=+RegExp.$1):/^([+\-]?[\d\.]+)$/i
-.test(text)?(this.type="number",this.value=+RegExp.$1):/^#([a-f0-9]{3,6})/i.test
-(text)?(this.type="color",temp=RegExp.$1,temp.length==3?(this.red=parseInt(temp.
-charAt(0)+temp.charAt(0),16),this.green=parseInt(temp.charAt(1)+temp.charAt(1),16
-),this.blue=parseInt(temp.charAt(2)+temp.charAt(2),16)):(this.red=parseInt(temp.
-substring(0,2),16),this.green=parseInt(temp.substring(2,4),16),this.blue=parseInt
-(temp.substring(4,6),16))):/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i.test(text
-)?(this.type="color",this.red=+RegExp.$1,this.green=+RegExp.$2,this.blue=+RegExp
-.$3):/^rgb\(\s*(\d+)%\s*,\s*(\d+)%\s*,\s*(\d+)%\s*\)/i.test(text)?(this.type="color"
-,this.red=+RegExp.$1*255/100,this.green=+RegExp.$2*255/100,this.blue=+RegExp.$3*255/100
-):/^rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d\.]+)\s*\)/i.test(text)?(this
-.type="color",this.red=+RegExp.$1,this.green=+RegExp.$2,this.blue=+RegExp.$3,this
-.alpha=+RegExp.$4):/^rgba\(\s*(\d+)%\s*,\s*(\d+)%\s*,\s*(\d+)%\s*,\s*([\d\.]+)\s*\)/i
-.test(text)?(this.type="color",this.red=+RegExp.$1*255/100,this.green=+RegExp.$2*255/100
-,this.blue=+RegExp.$3*255/100,this.alpha=+RegExp.$4):/^hsl\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*\)/i
-.test(text)?(this.type="color",this.hue=+RegExp.$1,this.saturation=+RegExp.$2/100
-,this.lightness=+RegExp.$3/100):/^hsla\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*,\s*([\d\.]+)\s*\)/i
-.test(text)?(this.type="color",this.hue=+RegExp.$1,this.saturation=+RegExp.$2/100
-,this.lightness=+RegExp.$3/100,this.alpha=+RegExp.$4):/^url\(["']?([^\)"']+)["']?\)/i
-.test(text)?(this.type="uri",this.uri=RegExp.$1):/^([^\(]+)\(/i.test(text)?(this
-.type="function",this.name=RegExp.$1,this.value=text):/^["'][^"']*["']/.test(text
-)?(this.type="string",this.value=eval(text)):Colors[text.toLowerCase()]?(this.type="color"
-,temp=Colors[text.toLowerCase()].substring(1),this.red=parseInt(temp.substring(0
-,2),16),this.green=parseInt(temp.substring(2,4),16),this.blue=parseInt(temp.substring
-(4,6),16)):/^[\,\/]$/.test(text)?(this.type="operator",this.value=text):/^[a-z\-\u0080-\uFFFF][a-z0-9\-\u0080-\uFFFF]*$/i
-.test(text)&&(this.type="identifier",this.value=text)}function Selector(e,t,n){SyntaxUnit
-.call(this,e.join(" "),t,n,Parser.SELECTOR_TYPE),this.parts=e,this.specificity=Specificity
-.calculate(this)}function SelectorPart(e,t,n,r,i){SyntaxUnit.call(this,n,r,i,Parser
-.SELECTOR_PART_TYPE),this.elementName=e,this.modifiers=t}function SelectorSubPart
-(e,t,n,r){SyntaxUnit.call(this,e,n,r,Parser.SELECTOR_SUB_PART_TYPE),this.type=t,
-this.args=[]}function Specificity(e,t,n,r){this.a=e,this.b=t,this.c=n,this.d=r}function isHexDigit
-(e){return e!==null&&h.test(e)}function isDigit(e){return e!==null&&/\d/.test(e)
-}function isWhitespace(e){return e!==null&&/\s/.test(e)}function isNewLine(e){return e!==
-null&&nl.test(e)}function isNameStart(e){return e!==null&&/[a-z_\u0080-\uFFFF\\]/i
-.test(e)}function isNameChar(e){return e!==null&&(isNameStart(e)||/[0-9\-\\]/.test
-(e))}function isIdentStart(e){return e!==null&&(isNameStart(e)||/\-\\/.test(e))}
-function mix(e,t){for(var n in t)t.hasOwnProperty(n)&&(e[n]=t[n]);return e}function TokenStream
-(e){TokenStreamBase.call(this,e,Tokens)}function ValidationError(e,t,n){this.col=
-n,this.line=t,this.message=e}var EventTarget=parserlib.util.EventTarget,TokenStreamBase=
-parserlib.util.TokenStreamBase,StringReader=parserlib.util.StringReader,SyntaxError=
-parserlib.util.SyntaxError,SyntaxUnit=parserlib.util.SyntaxUnit,Colors={aliceblue
-:"#f0f8ff",antiquewhite:"#faebd7",aqua:"#00ffff",aquamarine:"#7fffd4",azure:"#f0ffff"
-,beige:"#f5f5dc",bisque:"#ffe4c4",black:"#000000",blanchedalmond:"#ffebcd",blue:"#0000ff"
+var CSSLint=function(){function s(e,t,n,r){"use strict";this.messages=[],this.stats=
+[],this.lines=e,this.ruleset=t,this.allow=n,this.allow||(this.allow={}),this.ignore=
+r,this.ignore||(this.ignore=[])}var e=e||{},t=t||{},n=function(){var e;return e=
+function t(n,r,i){function s(u,a){if(!r[u]){if(!n[u]){var f=typeof e=="function"&&
+e;if(!a&&f)return f(u,!0);if(o)return o(u,!0);var l=new Error("Cannot find module '"+
+u+"'");throw l.code="MODULE_NOT_FOUND",l}var c=r[u]={exports:{}};n[u][0].call(c.
+exports,function(e){var t=n[u][1][e];return s(t?t:e)},c,c.exports,t,n,r,i)}return r
+[u].exports}var o=typeof e=="function"&&e;for(var u=0;u<i.length;u++)s(i[u]);return s
+}({1:[function(e,t,n){"use strict";var r=t.exports={__proto__:null,aliceblue:"#f0f8ff"
+,antiquewhite:"#faebd7",aqua:"#00ffff",aquamarine:"#7fffd4",azure:"#f0ffff",beige
+:"#f5f5dc",bisque:"#ffe4c4",black:"#000000",blanchedalmond:"#ffebcd",blue:"#0000ff"
 ,blueviolet:"#8a2be2",brown:"#a52a2a",burlywood:"#deb887",cadetblue:"#5f9ea0",chartreuse
 :"#7fff00",chocolate:"#d2691e",coral:"#ff7f50",cornflowerblue:"#6495ed",cornsilk
 :"#fff8dc",crimson:"#dc143c",cyan:"#00ffff",darkblue:"#00008b",darkcyan:"#008b8b"
-,darkgoldenrod:"#b8860b",darkgray:"#a9a9a9",darkgreen:"#006400",darkkhaki:"#bdb76b"
-,darkmagenta:"#8b008b",darkolivegreen:"#556b2f",darkorange:"#ff8c00",darkorchid:"#9932cc"
-,darkred:"#8b0000",darksalmon:"#e9967a",darkseagreen:"#8fbc8f",darkslateblue:"#483d8b"
-,darkslategray:"#2f4f4f",darkturquoise:"#00ced1",darkviolet:"#9400d3",deeppink:"#ff1493"
-,deepskyblue:"#00bfff",dimgray:"#696969",dodgerblue:"#1e90ff",firebrick:"#b22222"
-,floralwhite:"#fffaf0",forestgreen:"#228b22",fuchsia:"#ff00ff",gainsboro:"#dcdcdc"
-,ghostwhite:"#f8f8ff",gold:"#ffd700",goldenrod:"#daa520",gray:"#808080",green:"#008000"
-,greenyellow:"#adff2f",honeydew:"#f0fff0",hotpink:"#ff69b4",indianred:"#cd5c5c",
-indigo:"#4b0082",ivory:"#fffff0",khaki:"#f0e68c",lavender:"#e6e6fa",lavenderblush
+,darkgoldenrod:"#b8860b",darkgray:"#a9a9a9",darkgrey:"#a9a9a9",darkgreen:"#006400"
+,darkkhaki:"#bdb76b",darkmagenta:"#8b008b",darkolivegreen:"#556b2f",darkorange:"#ff8c00"
+,darkorchid:"#9932cc",darkred:"#8b0000",darksalmon:"#e9967a",darkseagreen:"#8fbc8f"
+,darkslateblue:"#483d8b",darkslategray:"#2f4f4f",darkslategrey:"#2f4f4f",darkturquoise
+:"#00ced1",darkviolet:"#9400d3",deeppink:"#ff1493",deepskyblue:"#00bfff",dimgray
+:"#696969",dimgrey:"#696969",dodgerblue:"#1e90ff",firebrick:"#b22222",floralwhite
+:"#fffaf0",forestgreen:"#228b22",fuchsia:"#ff00ff",gainsboro:"#dcdcdc",ghostwhite
+:"#f8f8ff",gold:"#ffd700",goldenrod:"#daa520",gray:"#808080",grey:"#808080",green
+:"#008000",greenyellow:"#adff2f",honeydew:"#f0fff0",hotpink:"#ff69b4",indianred:"#cd5c5c"
+,indigo:"#4b0082",ivory:"#fffff0",khaki:"#f0e68c",lavender:"#e6e6fa",lavenderblush
 :"#fff0f5",lawngreen:"#7cfc00",lemonchiffon:"#fffacd",lightblue:"#add8e6",lightcoral
 :"#f08080",lightcyan:"#e0ffff",lightgoldenrodyellow:"#fafad2",lightgray:"#d3d3d3"
-,lightgreen:"#90ee90",lightpink:"#ffb6c1",lightsalmon:"#ffa07a",lightseagreen:"#20b2aa"
-,lightskyblue:"#87cefa",lightslategray:"#778899",lightsteelblue:"#b0c4de",lightyellow
-:"#ffffe0",lime:"#00ff00",limegreen:"#32cd32",linen:"#faf0e6",magenta:"#ff00ff",
-maroon:"#800000",mediumaquamarine:"#66cdaa",mediumblue:"#0000cd",mediumorchid:"#ba55d3"
-,mediumpurple:"#9370d8",mediumseagreen:"#3cb371",mediumslateblue:"#7b68ee",mediumspringgreen
-:"#00fa9a",mediumturquoise:"#48d1cc",mediumvioletred:"#c71585",midnightblue:"#191970"
-,mintcream:"#f5fffa",mistyrose:"#ffe4e1",moccasin:"#ffe4b5",navajowhite:"#ffdead"
-,navy:"#000080",oldlace:"#fdf5e6",olive:"#808000",olivedrab:"#6b8e23",orange:"#ffa500"
-,orangered:"#ff4500",orchid:"#da70d6",palegoldenrod:"#eee8aa",palegreen:"#98fb98"
-,paleturquoise:"#afeeee",palevioletred:"#d87093",papayawhip:"#ffefd5",peachpuff:"#ffdab9"
-,peru:"#cd853f",pink:"#ffc0cb",plum:"#dda0dd",powderblue:"#b0e0e6",purple:"#800080"
-,red:"#ff0000",rosybrown:"#bc8f8f",royalblue:"#4169e1",saddlebrown:"#8b4513",salmon
-:"#fa8072",sandybrown:"#f4a460",seagreen:"#2e8b57",seashell:"#fff5ee",sienna:"#a0522d"
-,silver:"#c0c0c0",skyblue:"#87ceeb",slateblue:"#6a5acd",slategray:"#708090",snow
-:"#fffafa",springgreen:"#00ff7f",steelblue:"#4682b4",tan:"#d2b48c",teal:"#008080"
+,lightgrey:"#d3d3d3",lightgreen:"#90ee90",lightpink:"#ffb6c1",lightsalmon:"#ffa07a"
+,lightseagreen:"#20b2aa",lightskyblue:"#87cefa",lightslategray:"#778899",lightslategrey
+:"#778899",lightsteelblue:"#b0c4de",lightyellow:"#ffffe0",lime:"#00ff00",limegreen
+:"#32cd32",linen:"#faf0e6",magenta:"#ff00ff",maroon:"#800000",mediumaquamarine:"#66cdaa"
+,mediumblue:"#0000cd",mediumorchid:"#ba55d3",mediumpurple:"#9370d8",mediumseagreen
+:"#3cb371",mediumslateblue:"#7b68ee",mediumspringgreen:"#00fa9a",mediumturquoise
+:"#48d1cc",mediumvioletred:"#c71585",midnightblue:"#191970",mintcream:"#f5fffa",
+mistyrose:"#ffe4e1",moccasin:"#ffe4b5",navajowhite:"#ffdead",navy:"#000080",oldlace
+:"#fdf5e6",olive:"#808000",olivedrab:"#6b8e23",orange:"#ffa500",orangered:"#ff4500"
+,orchid:"#da70d6",palegoldenrod:"#eee8aa",palegreen:"#98fb98",paleturquoise:"#afeeee"
+,palevioletred:"#d87093",papayawhip:"#ffefd5",peachpuff:"#ffdab9",peru:"#cd853f"
+,pink:"#ffc0cb",plum:"#dda0dd",powderblue:"#b0e0e6",purple:"#800080",red:"#ff0000"
+,rosybrown:"#bc8f8f",royalblue:"#4169e1",saddlebrown:"#8b4513",salmon:"#fa8072",
+sandybrown:"#f4a460",seagreen:"#2e8b57",seashell:"#fff5ee",sienna:"#a0522d",silver
+:"#c0c0c0",skyblue:"#87ceeb",slateblue:"#6a5acd",slategray:"#708090",slategrey:"#708090"
+,snow:"#fffafa",springgreen:"#00ff7f",steelblue:"#4682b4",tan:"#d2b48c",teal:"#008080"
 ,thistle:"#d8bfd8",tomato:"#ff6347",turquoise:"#40e0d0",violet:"#ee82ee",wheat:"#f5deb3"
-,white:"#ffffff",whitesmoke:"#f5f5f5",yellow:"#ffff00",yellowgreen:"#9acd32",activeBorder
-:"Active window border.",activecaption:"Active window caption.",appworkspace:"Background color of multiple document interface."
+,white:"#ffffff",whitesmoke:"#f5f5f5",yellow:"#ffff00",yellowgreen:"#9acd32",currentColor
+:"The value of the 'color' property.",activeBorder:"Active window border.",activecaption
+:"Active window caption.",appworkspace:"Background color of multiple document interface."
 ,background:"Desktop background.",buttonface:"The face background color for 3-D elements that appear 3-D due to one layer of surrounding border."
 ,buttonhighlight:"The color of the border facing the light source for 3-D elements that appear 3-D due to one layer of surrounding border."
 ,buttonshadow:"The color of the border away from the light source for 3-D elements that appear 3-D due to one layer of surrounding border."
 ,buttontext:"Text on push buttons.",captiontext:"Text in caption, size box, and scrollbar arrow box."
 ,graytext:"Grayed (disabled) text. This color is set to #000 if the current display driver does not support a solid gray color."
+,greytext:"Greyed (disabled) text. This color is set to #000 if the current display driver does not support a solid grey color."
 ,highlight:"Item(s) selected in a control.",highlighttext:"Text of item(s) selected in a control."
 ,inactiveborder:"Inactive window border.",inactivecaption:"Inactive window caption."
 ,inactivecaptiontext:"Color of text in an inactive caption.",infobackground:"Background color for tooltip controls."
@@ -6906,514 +6817,701 @@ maroon:"#800000",mediumaquamarine:"#66cdaa",mediumblue:"#0000cd",mediumorchid:"#
 ,threedlightshadow:"The color of the darker (generally inner) of the two borders facing the light source for 3-D elements that appear 3-D due to two concentric layers of surrounding border."
 ,threedshadow:"The color of the lighter (generally inner) of the two borders away from the light source for 3-D elements that appear 3-D due to two concentric layers of surrounding border."
 ,window:"Window background.",windowframe:"Window frame.",windowtext:"Text in windows."
-};Combinator.prototype=new SyntaxUnit,Combinator.prototype.constructor=Combinator
-,MediaFeature.prototype=new SyntaxUnit,MediaFeature.prototype.constructor=MediaFeature
-,MediaQuery.prototype=new SyntaxUnit,MediaQuery.prototype.constructor=MediaQuery
-,Parser.DEFAULT_TYPE=0,Parser.COMBINATOR_TYPE=1,Parser.MEDIA_FEATURE_TYPE=2,Parser
-.MEDIA_QUERY_TYPE=3,Parser.PROPERTY_NAME_TYPE=4,Parser.PROPERTY_VALUE_TYPE=5,Parser
-.PROPERTY_VALUE_PART_TYPE=6,Parser.SELECTOR_TYPE=7,Parser.SELECTOR_PART_TYPE=8,Parser
-.SELECTOR_SUB_PART_TYPE=9,Parser.prototype=function(){var e=new EventTarget,t,n=
-{constructor:Parser,DEFAULT_TYPE:0,COMBINATOR_TYPE:1,MEDIA_FEATURE_TYPE:2,MEDIA_QUERY_TYPE
-:3,PROPERTY_NAME_TYPE:4,PROPERTY_VALUE_TYPE:5,PROPERTY_VALUE_PART_TYPE:6,SELECTOR_TYPE
-:7,SELECTOR_PART_TYPE:8,SELECTOR_SUB_PART_TYPE:9,_stylesheet:function(){var e=this
-._tokenStream,t=null,n,r,i;this.fire("startstylesheet"),this._charset(),this._skipCruft
-();while(e.peek()==Tokens.IMPORT_SYM)this._import(),this._skipCruft();while(e.peek
-()==Tokens.NAMESPACE_SYM)this._namespace(),this._skipCruft();i=e.peek();while(i>
-Tokens.EOF){try{switch(i){case Tokens.MEDIA_SYM:this._media(),this._skipCruft();
-break;case Tokens.PAGE_SYM:this._page(),this._skipCruft();break;case Tokens.FONT_FACE_SYM
-:this._font_face(),this._skipCruft();break;case Tokens.KEYFRAMES_SYM:this._keyframes
-(),this._skipCruft();break;case Tokens.VIEWPORT_SYM:this._viewport(),this._skipCruft
-();break;case Tokens.UNKNOWN_SYM:e.get();if(!!this.options.strict)throw new SyntaxError
-("Unknown @ rule.",e.LT(0).startLine,e.LT(0).startCol);this.fire({type:"error",error
-:null,message:"Unknown @ rule: "+e.LT(0).value+".",line:e.LT(0).startLine,col:e.
-LT(0).startCol}),n=0;while(e.advance([Tokens.LBRACE,Tokens.RBRACE])==Tokens.LBRACE
-)n++;while(n)e.advance([Tokens.RBRACE]),n--;break;case Tokens.S:this._readWhitespace
-();break;default:if(!this._ruleset())switch(i){case Tokens.CHARSET_SYM:throw r=e
-.LT(1),this._charset(!1),new SyntaxError("@charset not allowed here.",r.startLine
-,r.startCol);case Tokens.IMPORT_SYM:throw r=e.LT(1),this._import(!1),new SyntaxError
-("@import not allowed here.",r.startLine,r.startCol);case Tokens.NAMESPACE_SYM:throw r=
-e.LT(1),this._namespace(!1),new SyntaxError("@namespace not allowed here.",r.startLine
-,r.startCol);default:e.get(),this._unexpectedToken(e.token())}}}catch(s){if(!(s instanceof
-SyntaxError&&!this.options.strict))throw s;this.fire({type:"error",error:s,message
-:s.message,line:s.line,col:s.col})}i=e.peek()}i!=Tokens.EOF&&this._unexpectedToken
-(e.token()),this.fire("endstylesheet")},_charset:function(e){var t=this._tokenStream
-,n,r,i,s;t.match(Tokens.CHARSET_SYM)&&(i=t.token().startLine,s=t.token().startCol
-,this._readWhitespace(),t.mustMatch(Tokens.STRING),r=t.token(),n=r.value,this._readWhitespace
-(),t.mustMatch(Tokens.SEMICOLON),e!==!1&&this.fire({type:"charset",charset:n,line
-:i,col:s}))},_import:function(e){var t=this._tokenStream,n,r,i,s=[];t.mustMatch(
-Tokens.IMPORT_SYM),i=t.token(),this._readWhitespace(),t.mustMatch([Tokens.STRING
-,Tokens.URI]),r=t.token().value.replace(/(?:url\()?["']([^"']+)["']\)?/,"$1"),this
-._readWhitespace(),s=this._media_query_list(),t.mustMatch(Tokens.SEMICOLON),this
-._readWhitespace(),e!==!1&&this.fire({type:"import",uri:r,media:s,line:i.startLine
-,col:i.startCol})},_namespace:function(e){var t=this._tokenStream,n,r,i,s;t.mustMatch
-(Tokens.NAMESPACE_SYM),n=t.token().startLine,r=t.token().startCol,this._readWhitespace
-(),t.match(Tokens.IDENT)&&(i=t.token().value,this._readWhitespace()),t.mustMatch
-([Tokens.STRING,Tokens.URI]),s=t.token().value.replace(/(?:url\()?["']([^"']+)["']\)?/
-,"$1"),this._readWhitespace(),t.mustMatch(Tokens.SEMICOLON),this._readWhitespace
-(),e!==!1&&this.fire({type:"namespace",prefix:i,uri:s,line:n,col:r})},_media:function(
-){var e=this._tokenStream,t,n,r;e.mustMatch(Tokens.MEDIA_SYM),t=e.token().startLine
-,n=e.token().startCol,this._readWhitespace(),r=this._media_query_list(),e.mustMatch
-(Tokens.LBRACE),this._readWhitespace(),this.fire({type:"startmedia",media:r,line
-:t,col:n});for(;;)if(e.peek()==Tokens.PAGE_SYM)this._page();else if(e.peek()==Tokens
-.FONT_FACE_SYM)this._font_face();else if(!this._ruleset())break;e.mustMatch(Tokens
-.RBRACE),this._readWhitespace(),this.fire({type:"endmedia",media:r,line:t,col:n}
-)},_media_query_list:function(){var e=this._tokenStream,t=[];this._readWhitespace
-(),(e.peek()==Tokens.IDENT||e.peek()==Tokens.LPAREN)&&t.push(this._media_query()
-);while(e.match(Tokens.COMMA))this._readWhitespace(),t.push(this._media_query())
-;return t},_media_query:function(){var e=this._tokenStream,t=null,n=null,r=null,
-i=[];e.match(Tokens.IDENT)&&(n=e.token().value.toLowerCase(),n!="only"&&n!="not"?
-(e.unget(),n=null):r=e.token()),this._readWhitespace(),e.peek()==Tokens.IDENT?(t=
-this._media_type(),r===null&&(r=e.token())):e.peek()==Tokens.LPAREN&&(r===null&&
-(r=e.LT(1)),i.push(this._media_expression()));if(t===null&&i.length===0)return null
-;this._readWhitespace();while(e.match(Tokens.IDENT))e.token().value.toLowerCase(
-)!="and"&&this._unexpectedToken(e.token()),this._readWhitespace(),i.push(this._media_expression
-());return new MediaQuery(n,t,i,r.startLine,r.startCol)},_media_type:function(){
-return this._media_feature()},_media_expression:function(){var e=this._tokenStream
-,t=null,n,r=null;return e.mustMatch(Tokens.LPAREN),t=this._media_feature(),this.
-_readWhitespace(),e.match(Tokens.COLON)&&(this._readWhitespace(),n=e.LT(1),r=this
-._expression()),e.mustMatch(Tokens.RPAREN),this._readWhitespace(),new MediaFeature
-(t,r?new SyntaxUnit(r,n.startLine,n.startCol):null)},_media_feature:function(){var e=
-this._tokenStream;return e.mustMatch(Tokens.IDENT),SyntaxUnit.fromToken(e.token(
-))},_page:function(){var e=this._tokenStream,t,n,r=null,i=null;e.mustMatch(Tokens
-.PAGE_SYM),t=e.token().startLine,n=e.token().startCol,this._readWhitespace(),e.match
-(Tokens.IDENT)&&(r=e.token().value,r.toLowerCase()==="auto"&&this._unexpectedToken
-(e.token())),e.peek()==Tokens.COLON&&(i=this._pseudo_page()),this._readWhitespace
-(),this.fire({type:"startpage",id:r,pseudo:i,line:t,col:n}),this._readDeclarations
-(!0,!0),this.fire({type:"endpage",id:r,pseudo:i,line:t,col:n})},_margin:function(
-){var e=this._tokenStream,t,n,r=this._margin_sym();return r?(t=e.token().startLine
-,n=e.token().startCol,this.fire({type:"startpagemargin",margin:r,line:t,col:n}),
-this._readDeclarations(!0),this.fire({type:"endpagemargin",margin:r,line:t,col:n
-}),!0):!1},_margin_sym:function(){var e=this._tokenStream;return e.match([Tokens
-.TOPLEFTCORNER_SYM,Tokens.TOPLEFT_SYM,Tokens.TOPCENTER_SYM,Tokens.TOPRIGHT_SYM,Tokens
-.TOPRIGHTCORNER_SYM,Tokens.BOTTOMLEFTCORNER_SYM,Tokens.BOTTOMLEFT_SYM,Tokens.BOTTOMCENTER_SYM
-,Tokens.BOTTOMRIGHT_SYM,Tokens.BOTTOMRIGHTCORNER_SYM,Tokens.LEFTTOP_SYM,Tokens.LEFTMIDDLE_SYM
-,Tokens.LEFTBOTTOM_SYM,Tokens.RIGHTTOP_SYM,Tokens.RIGHTMIDDLE_SYM,Tokens.RIGHTBOTTOM_SYM
-])?SyntaxUnit.fromToken(e.token()):null},_pseudo_page:function(){var e=this._tokenStream
-;return e.mustMatch(Tokens.COLON),e.mustMatch(Tokens.IDENT),e.token().value},_font_face
-:function(){var e=this._tokenStream,t,n;e.mustMatch(Tokens.FONT_FACE_SYM),t=e.token
-().startLine,n=e.token().startCol,this._readWhitespace(),this.fire({type:"startfontface"
-,line:t,col:n}),this._readDeclarations(!0),this.fire({type:"endfontface",line:t,
-col:n})},_viewport:function(){var e=this._tokenStream,t,n;e.mustMatch(Tokens.VIEWPORT_SYM
-),t=e.token().startLine,n=e.token().startCol,this._readWhitespace(),this.fire({type
-:"startviewport",line:t,col:n}),this._readDeclarations(!0),this.fire({type:"endviewport"
-,line:t,col:n})},_operator:function(e){var t=this._tokenStream,n=null;if(t.match
-([Tokens.SLASH,Tokens.COMMA])||e&&t.match([Tokens.PLUS,Tokens.STAR,Tokens.MINUS]
-))n=t.token(),this._readWhitespace();return n?PropertyValuePart.fromToken(n):null
-},_combinator:function(){var e=this._tokenStream,t=null,n;return e.match([Tokens
-.PLUS,Tokens.GREATER,Tokens.TILDE])&&(n=e.token(),t=new Combinator(n.value,n.startLine
-,n.startCol),this._readWhitespace()),t},_unary_operator:function(){var e=this._tokenStream
-;return e.match([Tokens.MINUS,Tokens.PLUS])?e.token().value:null},_property:function(
-){var e=this._tokenStream,t=null,n=null,r,i,s,o;return e.peek()==Tokens.STAR&&this
-.options.starHack&&(e.get(),i=e.token(),n=i.value,s=i.startLine,o=i.startCol),e.
-match(Tokens.IDENT)&&(i=e.token(),r=i.value,r.charAt(0)=="_"&&this.options.underscoreHack&&
-(n="_",r=r.substring(1)),t=new PropertyName(r,n,s||i.startLine,o||i.startCol),this
-._readWhitespace()),t},_ruleset:function(){var e=this._tokenStream,t,n;try{n=this
-._selectors_group()}catch(r){if(r instanceof SyntaxError&&!this.options.strict){
-this.fire({type:"error",error:r,message:r.message,line:r.line,col:r.col}),t=e.advance
-([Tokens.RBRACE]);if(t!=Tokens.RBRACE)throw r;return!0}throw r}return n&&(this.fire
-({type:"startrule",selectors:n,line:n[0].line,col:n[0].col}),this._readDeclarations
-(!0),this.fire({type:"endrule",selectors:n,line:n[0].line,col:n[0].col})),n},_selectors_group
-:function(){var e=this._tokenStream,t=[],n;n=this._selector();if(n!==null){t.push
-(n);while(e.match(Tokens.COMMA))this._readWhitespace(),n=this._selector(),n!==null?
-t.push(n):this._unexpectedToken(e.LT(1))}return t.length?t:null},_selector:function(
-){var e=this._tokenStream,t=[],n=null,r=null,i=null;n=this._simple_selector_sequence
-();if(n===null)return null;t.push(n);do{r=this._combinator();if(r!==null)t.push(
-r),n=this._simple_selector_sequence(),n===null?this._unexpectedToken(e.LT(1)):t.
-push(n);else{if(!this._readWhitespace())break;i=new Combinator(e.token().value,e
-.token().startLine,e.token().startCol),r=this._combinator(),n=this._simple_selector_sequence
-(),n===null?r!==null&&this._unexpectedToken(e.LT(1)):(r!==null?t.push(r):t.push(
-i),t.push(n))}}while(!0);return new Selector(t,t[0].line,t[0].col)},_simple_selector_sequence
-:function(){var e=this._tokenStream,t=null,n=[],r="",i=[function(){return e.match
-(Tokens.HASH)?new SelectorSubPart(e.token().value,"id",e.token().startLine,e.token
-().startCol):null},this._class,this._attrib,this._pseudo,this._negation],s=0,o=i
-.length,u=null,a=!1,f,l;f=e.LT(1).startLine,l=e.LT(1).startCol,t=this._type_selector
-(),t||(t=this._universal()),t!==null&&(r+=t);for(;;){if(e.peek()===Tokens.S)break;
-while(s<o&&u===null)u=i[s++].call(this);if(u===null){if(r==="")return null;break}
-s=0,n.push(u),r+=u.toString(),u=null}return r!==""?new SelectorPart(t,n,r,f,l):null
-},_type_selector:function(){var e=this._tokenStream,t=this._namespace_prefix(),n=
+}},{}],2:[function(e,t,n){"use strict";function s(e,t,n){r.call(this,e,t,n,i.COMBINATOR_TYPE
+),this.type="unknown",/^\s+$/.test(e)?this.type="descendant":e===">"?this.type="child"
+:e==="+"?this.type="adjacent-sibling":e==="~"&&(this.type="sibling")}t.exports=s
+;var r=e("../util/SyntaxUnit"),i=e("./Parser");s.prototype=new r,s.prototype.constructor=
+s},{"../util/SyntaxUnit":26,"./Parser":6}],3:[function(e,t,n){"use strict";function s
+(e,t){this.match=function(t){var n;return t.mark(),n=e(t),n?t.drop():t.restore()
+,n},this.toString=typeof t=="function"?t:function(){return t}}t.exports=s;var r=
+e("../util/StringReader"),i=e("../util/SyntaxError");s.prec={MOD:5,SEQ:4,ANDAND:3
+,OROR:2,ALT:1},s.parse=function(e){var t,n,o,u,a,f,l,c,h;t=new r(e),n=function(e
+){var n=t.readMatch(e);if(n===null)throw new i("Expected "+e,t.getLine(),t.getCol
+());return n},o=function(){var e=[u()];while(t.readMatch(" | ")!==null)e.push(u(
+));return e.length===1?e[0]:s.alt.apply(s,e)},u=function(){var e=[a()];while(t.readMatch
+(" || ")!==null)e.push(a());return e.length===1?e[0]:s.oror.apply(s,e)},a=function(
+){var e=[f()];while(t.readMatch(" && ")!==null)e.push(f());return e.length===1?e
+[0]:s.andand.apply(s,e)},f=function(){var e=[l()];while(t.readMatch(/^ (?![&|\]])/
+)!==null)e.push(l());return e.length===1?e[0]:s.seq.apply(s,e)},l=function(){var e=
+c();if(t.readMatch("?")!==null)return e.question();if(t.readMatch("*")!==null)return e
+.star();if(t.readMatch("+")!==null)return e.plus();if(t.readMatch("#")!==null)return e
+.hash();if(t.readMatch(/^\{\s*/)!==null){var r=n(/^\d+/);n(/^\s*,\s*/);var i=n(/^\d+/
+);return n(/^\s*\}/),e.braces(+r,+i)}return e},c=function(){if(t.readMatch("[ ")!==
+null){var e=o();return n(" ]"),e}return s.fromType(n(/^[^ ?*+#{]+/))},h=o();if(!
+t.eof())throw new i("Expected end of string",t.getLine(),t.getCol());return h},s
+.cast=function(e){return e instanceof s?e:s.parse(e)},s.fromType=function(t){var n=
+e("./ValidationTypes");return new s(function(e){return e.hasNext()&&n.isType(e,t
+)},t)},s.seq=function(){var e=Array.prototype.slice.call(arguments).map(s.cast);
+return e.length===1?e[0]:new s(function(t){var n,r=!0;for(n=0;r&&n<e.length;n++)
+r=e[n].match(t);return r},function(t){var n=s.prec.SEQ,r=e.map(function(e){return e
+.toString(n)}).join(" ");return t>n&&(r="[ "+r+" ]"),r})},s.alt=function(){var e=
+Array.prototype.slice.call(arguments).map(s.cast);return e.length===1?e[0]:new s
+(function(t){var n,r=!1;for(n=0;!r&&n<e.length;n++)r=e[n].match(t);return r},function(
+t){var n=s.prec.ALT,r=e.map(function(e){return e.toString(n)}).join(" | ");return t>
+n&&(r="[ "+r+" ]"),r})},s.many=function(t){var n=Array.prototype.slice.call(arguments
+,1).reduce(function(t,n){if(n.expand){var r=e("./ValidationTypes");t.push.apply(
+t,r.complex[n.expand].options)}else t.push(s.cast(n));return t},[]);t===!0&&(t=n
+.map(function(){return!0}));var r=new s(function(e){var r=[],i=0,s=0,o=function(
+e){return s===0?(i=Math.max(e,i),e===n.length):e===i},u=function(i){for(var s=0;
+s<n.length;s++){if(r[s])continue;e.mark();if(n[s].match(e)){r[s]=!0;if(u(i+(t===!1||
+t[s]?1:0)))return e.drop(),!0;e.restore(),r[s]=!1}else e.drop()}return o(i)};u(0
+)||(s++,u(0));if(t===!1)return i>0;for(var a=0;a<n.length;a++)if(t[a]&&!r[a])return!1
+;return!0},function(e){var r=t===!1?s.prec.OROR:s.prec.ANDAND,i=n.map(function(e
+,n){return t!==!1&&!t[n]?e.toString(s.prec.MOD)+"?":e.toString(r)}).join(t===!1?" || "
+:" && ");return e>r&&(i="[ "+i+" ]"),i});return r.options=n,r},s.andand=function(
+){var e=Array.prototype.slice.call(arguments);return e.unshift(!0),s.many.apply(
+s,e)},s.oror=function(){var e=Array.prototype.slice.call(arguments);return e.unshift
+(!1),s.many.apply(s,e)},s.prototype={constructor:s,match:function(){throw new Error
+("unimplemented")},toString:function(){throw new Error("unimplemented")},func:function(
+){return this.match.bind(this)},then:function(e){return s.seq(this,e)},or:function(
+e){return s.alt(this,e)},andand:function(e){return s.many(!0,this,e)},oror:function(
+e){return s.many(!1,this,e)},star:function(){return this.braces(0,Infinity,"*")}
+,plus:function(){return this.braces(1,Infinity,"+")},question:function(){return this
+.braces(0,1,"?")},hash:function(){return this.braces(1,Infinity,"#",s.cast(","))
+},braces:function(e,t,n,r){var i=this,o=r?r.then(this):this;return n||(n="{"+e+","+
+t+"}"),new s(function(n){var s=!0,u;for(u=0;u<t;u++){u>0&&r?s=o.match(n):s=i.match
+(n);if(!s)break}return u>=e},function(){return i.toString(s.prec.MOD)+n})}}},{"../util/StringReader"
+:24,"../util/SyntaxError":25,"./ValidationTypes":21}],4:[function(e,t,n){"use strict"
+;function s(e,t){r.call(this,"("+e+(t!==null?":"+t:"")+")",e.startLine,e.startCol
+,i.MEDIA_FEATURE_TYPE),this.name=e,this.value=t}t.exports=s;var r=e("../util/SyntaxUnit"
+),i=e("./Parser");s.prototype=new r,s.prototype.constructor=s},{"../util/SyntaxUnit"
+:26,"./Parser":6}],5:[function(e,t,n){"use strict";function s(e,t,n,s,o){r.call(
+this,(e?e+" ":"")+(t?t:"")+(t&&n.length>0?" and ":"")+n.join(" and "),s,o,i.MEDIA_QUERY_TYPE
+),this.modifier=e,this.mediaType=t,this.features=n}t.exports=s;var r=e("../util/SyntaxUnit"
+),i=e("./Parser");s.prototype=new r,s.prototype.constructor=s},{"../util/SyntaxUnit"
+:26,"./Parser":6}],6:[function(e,t,n){"use strict";function y(e){r.call(this),this
+.options=e||{},this._tokenStream=null}t.exports=y;var r=e("../util/EventTarget")
+,i=e("../util/SyntaxError"),s=e("../util/SyntaxUnit"),o=e("./Combinator"),u=e("./MediaFeature"
+),a=e("./MediaQuery"),f=e("./PropertyName"),l=e("./PropertyValue"),c=e("./PropertyValuePart"
+),h=e("./Selector"),p=e("./SelectorPart"),d=e("./SelectorSubPart"),v=e("./TokenStream"
+),m=e("./Tokens"),g=e("./Validation");y.DEFAULT_TYPE=0,y.COMBINATOR_TYPE=1,y.MEDIA_FEATURE_TYPE=2
+,y.MEDIA_QUERY_TYPE=3,y.PROPERTY_NAME_TYPE=4,y.PROPERTY_VALUE_TYPE=5,y.PROPERTY_VALUE_PART_TYPE=6
+,y.SELECTOR_TYPE=7,y.SELECTOR_PART_TYPE=8,y.SELECTOR_SUB_PART_TYPE=9,y.prototype=
+function(){var e=new r,t,n={__proto__:null,constructor:y,DEFAULT_TYPE:0,COMBINATOR_TYPE
+:1,MEDIA_FEATURE_TYPE:2,MEDIA_QUERY_TYPE:3,PROPERTY_NAME_TYPE:4,PROPERTY_VALUE_TYPE
+:5,PROPERTY_VALUE_PART_TYPE:6,SELECTOR_TYPE:7,SELECTOR_PART_TYPE:8,SELECTOR_SUB_PART_TYPE
+:9,_stylesheet:function(){var e=this._tokenStream,t,n,r;this.fire("startstylesheet"
+),this._charset(),this._skipCruft();while(e.peek()===m.IMPORT_SYM)this._import()
+,this._skipCruft();while(e.peek()===m.NAMESPACE_SYM)this._namespace(),this._skipCruft
+();r=e.peek();while(r>m.EOF){try{switch(r){case m.MEDIA_SYM:this._media(),this._skipCruft
+();break;case m.PAGE_SYM:this._page(),this._skipCruft();break;case m.FONT_FACE_SYM
+:this._font_face(),this._skipCruft();break;case m.KEYFRAMES_SYM:this._keyframes(
+),this._skipCruft();break;case m.VIEWPORT_SYM:this._viewport(),this._skipCruft()
+;break;case m.DOCUMENT_SYM:this._document(),this._skipCruft();break;case m.SUPPORTS_SYM
+:this._supports(),this._skipCruft();break;case m.UNKNOWN_SYM:e.get();if(!!this.options
+.strict)throw new i("Unknown @ rule.",e.LT(0).startLine,e.LT(0).startCol);this.fire
+({type:"error",error:null,message:"Unknown @ rule: "+e.LT(0).value+".",line:e.LT
+(0).startLine,col:e.LT(0).startCol}),t=0;while(e.advance([m.LBRACE,m.RBRACE])===
+m.LBRACE)t++;while(t)e.advance([m.RBRACE]),t--;break;case m.S:this._readWhitespace
+();break;default:if(!this._ruleset())switch(r){case m.CHARSET_SYM:throw n=e.LT(1
+),this._charset(!1),new i("@charset not allowed here.",n.startLine,n.startCol);case m
+.IMPORT_SYM:throw n=e.LT(1),this._import(!1),new i("@import not allowed here.",n
+.startLine,n.startCol);case m.NAMESPACE_SYM:throw n=e.LT(1),this._namespace(!1),new
+i("@namespace not allowed here.",n.startLine,n.startCol);default:e.get(),this._unexpectedToken
+(e.token())}}}catch(s){if(!(s instanceof i&&!this.options.strict))throw s;this.fire
+({type:"error",error:s,message:s.message,line:s.line,col:s.col})}r=e.peek()}r!==
+m.EOF&&this._unexpectedToken(e.token()),this.fire("endstylesheet")},_charset:function(
+e){var t=this._tokenStream,n,r,i,s;t.match(m.CHARSET_SYM)&&(i=t.token().startLine
+,s=t.token().startCol,this._readWhitespace(),t.mustMatch(m.STRING),r=t.token(),n=
+r.value,this._readWhitespace(),t.mustMatch(m.SEMICOLON),e!==!1&&this.fire({type:"charset"
+,charset:n,line:i,col:s}))},_import:function(e){var t=this._tokenStream,n,r,i=[]
+;t.mustMatch(m.IMPORT_SYM),r=t.token(),this._readWhitespace(),t.mustMatch([m.STRING
+,m.URI]),n=t.token().value.replace(/^(?:url\()?["']?([^"']+?)["']?\)?$/,"$1"),this
+._readWhitespace(),i=this._media_query_list(),t.mustMatch(m.SEMICOLON),this._readWhitespace
+(),e!==!1&&this.fire({type:"import",uri:n,media:i,line:r.startLine,col:r.startCol
+})},_namespace:function(e){var t=this._tokenStream,n,r,i,s;t.mustMatch(m.NAMESPACE_SYM
+),n=t.token().startLine,r=t.token().startCol,this._readWhitespace(),t.match(m.IDENT
+)&&(i=t.token().value,this._readWhitespace()),t.mustMatch([m.STRING,m.URI]),s=t.
+token().value.replace(/(?:url\()?["']([^"']+)["']\)?/,"$1"),this._readWhitespace
+(),t.mustMatch(m.SEMICOLON),this._readWhitespace(),e!==!1&&this.fire({type:"namespace"
+,prefix:i,uri:s,line:n,col:r})},_supports:function(e){var t=this._tokenStream,n,
+r;if(t.match(m.SUPPORTS_SYM)){n=t.token().startLine,r=t.token().startCol,this._readWhitespace
+(),this._supports_condition(),this._readWhitespace(),t.mustMatch(m.LBRACE),this.
+_readWhitespace(),e!==!1&&this.fire({type:"startsupports",line:n,col:r});for(;;)
+if(!this._ruleset())break;t.mustMatch(m.RBRACE),this._readWhitespace(),this.fire
+({type:"endsupports",line:n,col:r})}},_supports_condition:function(){var e=this.
+_tokenStream,t;if(e.match(m.IDENT))t=e.token().value.toLowerCase(),t==="not"?(e.
+mustMatch(m.S),this._supports_condition_in_parens()):e.unget();else{this._supports_condition_in_parens
+(),this._readWhitespace();while(e.peek()===m.IDENT){t=e.LT(1).value.toLowerCase(
+);if(t==="and"||t==="or")e.mustMatch(m.IDENT),this._readWhitespace(),this._supports_condition_in_parens
+(),this._readWhitespace()}}},_supports_condition_in_parens:function(){var e=this
+._tokenStream,t;e.match(m.LPAREN)?(this._readWhitespace(),e.match(m.IDENT)?(t=e.
+token().value.toLowerCase(),t==="not"?(this._readWhitespace(),this._supports_condition
+(),this._readWhitespace(),e.mustMatch(m.RPAREN)):(e.unget(),this._supports_declaration_condition
+(!1))):(this._supports_condition(),this._readWhitespace(),e.mustMatch(m.RPAREN))
+):this._supports_declaration_condition()},_supports_declaration_condition:function(
+e){var t=this._tokenStream;e!==!1&&t.mustMatch(m.LPAREN),this._readWhitespace(),
+this._declaration(),t.mustMatch(m.RPAREN)},_media:function(){var e=this._tokenStream
+,t,n,r;e.mustMatch(m.MEDIA_SYM),t=e.token().startLine,n=e.token().startCol,this.
+_readWhitespace(),r=this._media_query_list(),e.mustMatch(m.LBRACE),this._readWhitespace
+(),this.fire({type:"startmedia",media:r,line:t,col:n});for(;;)if(e.peek()===m.PAGE_SYM
+)this._page();else if(e.peek()===m.FONT_FACE_SYM)this._font_face();else if(e.peek
+()===m.VIEWPORT_SYM)this._viewport();else if(e.peek()===m.DOCUMENT_SYM)this._document
+();else if(e.peek()===m.SUPPORTS_SYM)this._supports();else if(e.peek()===m.MEDIA_SYM
+)this._media();else if(!this._ruleset())break;e.mustMatch(m.RBRACE),this._readWhitespace
+(),this.fire({type:"endmedia",media:r,line:t,col:n})},_media_query_list:function(
+){var e=this._tokenStream,t=[];this._readWhitespace(),(e.peek()===m.IDENT||e.peek
+()===m.LPAREN)&&t.push(this._media_query());while(e.match(m.COMMA))this._readWhitespace
+(),t.push(this._media_query());return t},_media_query:function(){var e=this._tokenStream
+,t=null,n=null,r=null,i=[];e.match(m.IDENT)&&(n=e.token().value.toLowerCase(),n!=="only"&&
+n!=="not"?(e.unget(),n=null):r=e.token()),this._readWhitespace(),e.peek()===m.IDENT?
+(t=this._media_type(),r===null&&(r=e.token())):e.peek()===m.LPAREN&&(r===null&&(
+r=e.LT(1)),i.push(this._media_expression()));if(t===null&&i.length===0)return null
+;this._readWhitespace();while(e.match(m.IDENT))e.token().value.toLowerCase()!=="and"&&
+this._unexpectedToken(e.token()),this._readWhitespace(),i.push(this._media_expression
+());return new a(n,t,i,r.startLine,r.startCol)},_media_type:function(){return this
+._media_feature()},_media_expression:function(){var e=this._tokenStream,t=null,n
+,r=null;return e.mustMatch(m.LPAREN),t=this._media_feature(),this._readWhitespace
+(),e.match(m.COLON)&&(this._readWhitespace(),n=e.LT(1),r=this._expression()),e.mustMatch
+(m.RPAREN),this._readWhitespace(),new u(t,r?new s(r,n.startLine,n.startCol):null
+)},_media_feature:function(){var e=this._tokenStream;return this._readWhitespace
+(),e.mustMatch(m.IDENT),s.fromToken(e.token())},_page:function(){var e=this._tokenStream
+,t,n,r=null,i=null;e.mustMatch(m.PAGE_SYM),t=e.token().startLine,n=e.token().startCol
+,this._readWhitespace(),e.match(m.IDENT)&&(r=e.token().value,r.toLowerCase()==="auto"&&
+this._unexpectedToken(e.token())),e.peek()===m.COLON&&(i=this._pseudo_page()),this
+._readWhitespace(),this.fire({type:"startpage",id:r,pseudo:i,line:t,col:n}),this
+._readDeclarations(!0,!0),this.fire({type:"endpage",id:r,pseudo:i,line:t,col:n})
+},_margin:function(){var e=this._tokenStream,t,n,r=this._margin_sym();return r?(
+t=e.token().startLine,n=e.token().startCol,this.fire({type:"startpagemargin",margin
+:r,line:t,col:n}),this._readDeclarations(!0),this.fire({type:"endpagemargin",margin
+:r,line:t,col:n}),!0):!1},_margin_sym:function(){var e=this._tokenStream;return e
+.match([m.TOPLEFTCORNER_SYM,m.TOPLEFT_SYM,m.TOPCENTER_SYM,m.TOPRIGHT_SYM,m.TOPRIGHTCORNER_SYM
+,m.BOTTOMLEFTCORNER_SYM,m.BOTTOMLEFT_SYM,m.BOTTOMCENTER_SYM,m.BOTTOMRIGHT_SYM,m.
+BOTTOMRIGHTCORNER_SYM,m.LEFTTOP_SYM,m.LEFTMIDDLE_SYM,m.LEFTBOTTOM_SYM,m.RIGHTTOP_SYM
+,m.RIGHTMIDDLE_SYM,m.RIGHTBOTTOM_SYM])?s.fromToken(e.token()):null},_pseudo_page
+:function(){var e=this._tokenStream;return e.mustMatch(m.COLON),e.mustMatch(m.IDENT
+),e.token().value},_font_face:function(){var e=this._tokenStream,t,n;e.mustMatch
+(m.FONT_FACE_SYM),t=e.token().startLine,n=e.token().startCol,this._readWhitespace
+(),this.fire({type:"startfontface",line:t,col:n}),this._readDeclarations(!0),this
+.fire({type:"endfontface",line:t,col:n})},_viewport:function(){var e=this._tokenStream
+,t,n;e.mustMatch(m.VIEWPORT_SYM),t=e.token().startLine,n=e.token().startCol,this
+._readWhitespace(),this.fire({type:"startviewport",line:t,col:n}),this._readDeclarations
+(!0),this.fire({type:"endviewport",line:t,col:n})},_document:function(){var e=this
+._tokenStream,t,n=[],r="";e.mustMatch(m.DOCUMENT_SYM),t=e.token(),/^@\-([^\-]+)\-/
+.test(t.value)&&(r=RegExp.$1),this._readWhitespace(),n.push(this._document_function
+());while(e.match(m.COMMA))this._readWhitespace(),n.push(this._document_function
+());e.mustMatch(m.LBRACE),this._readWhitespace(),this.fire({type:"startdocument"
+,functions:n,prefix:r,line:t.startLine,col:t.startCol});var i=!0;while(i)switch(
+e.peek()){case m.PAGE_SYM:this._page();break;case m.FONT_FACE_SYM:this._font_face
+();break;case m.VIEWPORT_SYM:this._viewport();break;case m.MEDIA_SYM:this._media
+();break;case m.KEYFRAMES_SYM:this._keyframes();break;case m.DOCUMENT_SYM:this._document
+();break;default:i=Boolean(this._ruleset())}e.mustMatch(m.RBRACE),t=e.token(),this
+._readWhitespace(),this.fire({type:"enddocument",functions:n,prefix:r,line:t.startLine
+,col:t.startCol})},_document_function:function(){var e=this._tokenStream,t;return e
+.match(m.URI)?(t=e.token().value,this._readWhitespace()):t=this._function(),t},_operator
+:function(e){var t=this._tokenStream,n=null;if(t.match([m.SLASH,m.COMMA])||e&&t.
+match([m.PLUS,m.STAR,m.MINUS]))n=t.token(),this._readWhitespace();return n?c.fromToken
+(n):null},_combinator:function(){var e=this._tokenStream,t=null,n;return e.match
+([m.PLUS,m.GREATER,m.TILDE])&&(n=e.token(),t=new o(n.value,n.startLine,n.startCol
+),this._readWhitespace()),t},_unary_operator:function(){var e=this._tokenStream;
+return e.match([m.MINUS,m.PLUS])?e.token().value:null},_property:function(){var e=
+this._tokenStream,t=null,n=null,r,i,s,o;return e.peek()===m.STAR&&this.options.starHack&&
+(e.get(),i=e.token(),n=i.value,s=i.startLine,o=i.startCol),e.match(m.IDENT)&&(i=
+e.token(),r=i.value,r.charAt(0)==="_"&&this.options.underscoreHack&&(n="_",r=r.substring
+(1)),t=new f(r,n,s||i.startLine,o||i.startCol),this._readWhitespace()),t},_ruleset
+:function(){var e=this._tokenStream,t,n;try{n=this._selectors_group()}catch(r){if(
+r instanceof i&&!this.options.strict){this.fire({type:"error",error:r,message:r.
+message,line:r.line,col:r.col}),t=e.advance([m.RBRACE]);if(t!==m.RBRACE)throw r;
+return!0}throw r}return n&&(this.fire({type:"startrule",selectors:n,line:n[0].line
+,col:n[0].col}),this._readDeclarations(!0),this.fire({type:"endrule",selectors:n
+,line:n[0].line,col:n[0].col})),n},_selectors_group:function(){var e=this._tokenStream
+,t=[],n;n=this._selector();if(n!==null){t.push(n);while(e.match(m.COMMA))this._readWhitespace
+(),n=this._selector(),n!==null?t.push(n):this._unexpectedToken(e.LT(1))}return t
+.length?t:null},_selector:function(){var e=this._tokenStream,t=[],n=null,r=null,
+i=null;n=this._simple_selector_sequence();if(n===null)return null;t.push(n);do{r=
+this._combinator();if(r!==null)t.push(r),n=this._simple_selector_sequence(),n===
+null?this._unexpectedToken(e.LT(1)):t.push(n);else{if(!this._readWhitespace())break;
+i=new o(e.token().value,e.token().startLine,e.token().startCol),r=this._combinator
+(),n=this._simple_selector_sequence(),n===null?r!==null&&this._unexpectedToken(e
+.LT(1)):(r!==null?t.push(r):t.push(i),t.push(n))}}while(!0);return new h(t,t[0].
+line,t[0].col)},_simple_selector_sequence:function(){var e=this._tokenStream,t=null
+,n=[],r="",i=[function(){return e.match(m.HASH)?new d(e.token().value,"id",e.token
+().startLine,e.token().startCol):null},this._class,this._attrib,this._pseudo,this
+._negation],s=0,o=i.length,u=null,a,f;a=e.LT(1).startLine,f=e.LT(1).startCol,t=this
+._type_selector(),t||(t=this._universal()),t!==null&&(r+=t);for(;;){if(e.peek()===
+m.S)break;while(s<o&&u===null)u=i[s++].call(this);if(u===null){if(r==="")return null
+;break}s=0,n.push(u),r+=u.toString(),u=null}return r!==""?new p(t,n,r,a,f):null}
+,_type_selector:function(){var e=this._tokenStream,t=this._namespace_prefix(),n=
 this._element_name();return n?(t&&(n.text=t+n.text,n.col-=t.length),n):(t&&(e.unget
 (),t.length>1&&e.unget()),null)},_class:function(){var e=this._tokenStream,t;return e
-.match(Tokens.DOT)?(e.mustMatch(Tokens.IDENT),t=e.token(),new SelectorSubPart("."+
-t.value,"class",t.startLine,t.startCol-1)):null},_element_name:function(){var e=
-this._tokenStream,t;return e.match(Tokens.IDENT)?(t=e.token(),new SelectorSubPart
-(t.value,"elementName",t.startLine,t.startCol)):null},_namespace_prefix:function(
-){var e=this._tokenStream,t="";if(e.LA(1)===Tokens.PIPE||e.LA(2)===Tokens.PIPE)e
-.match([Tokens.IDENT,Tokens.STAR])&&(t+=e.token().value),e.mustMatch(Tokens.PIPE
-),t+="|";return t.length?t:null},_universal:function(){var e=this._tokenStream,t=""
-,n;return n=this._namespace_prefix(),n&&(t+=n),e.match(Tokens.STAR)&&(t+="*"),t.
+.match(m.DOT)?(e.mustMatch(m.IDENT),t=e.token(),new d("."+t.value,"class",t.startLine
+,t.startCol-1)):null},_element_name:function(){var e=this._tokenStream,t;return e
+.match(m.IDENT)?(t=e.token(),new d(t.value,"elementName",t.startLine,t.startCol)
+):null},_namespace_prefix:function(){var e=this._tokenStream,t="";if(e.LA(1)===m
+.PIPE||e.LA(2)===m.PIPE)e.match([m.IDENT,m.STAR])&&(t+=e.token().value),e.mustMatch
+(m.PIPE),t+="|";return t.length?t:null},_universal:function(){var e=this._tokenStream
+,t="",n;return n=this._namespace_prefix(),n&&(t+=n),e.match(m.STAR)&&(t+="*"),t.
 length?t:null},_attrib:function(){var e=this._tokenStream,t=null,n,r;return e.match
-(Tokens.LBRACKET)?(r=e.token(),t=r.value,t+=this._readWhitespace(),n=this._namespace_prefix
-(),n&&(t+=n),e.mustMatch(Tokens.IDENT),t+=e.token().value,t+=this._readWhitespace
-(),e.match([Tokens.PREFIXMATCH,Tokens.SUFFIXMATCH,Tokens.SUBSTRINGMATCH,Tokens.EQUALS
-,Tokens.INCLUDES,Tokens.DASHMATCH])&&(t+=e.token().value,t+=this._readWhitespace
-(),e.mustMatch([Tokens.IDENT,Tokens.STRING]),t+=e.token().value,t+=this._readWhitespace
-()),e.mustMatch(Tokens.RBRACKET),new SelectorSubPart(t+"]","attribute",r.startLine
-,r.startCol)):null},_pseudo:function(){var e=this._tokenStream,t=null,n=":",r,i;
-return e.match(Tokens.COLON)&&(e.match(Tokens.COLON)&&(n+=":"),e.match(Tokens.IDENT
-)?(t=e.token().value,r=e.token().startLine,i=e.token().startCol-n.length):e.peek
-()==Tokens.FUNCTION&&(r=e.LT(1).startLine,i=e.LT(1).startCol-n.length,t=this._functional_pseudo
-()),t&&(t=new SelectorSubPart(n+t,"pseudo",r,i))),t},_functional_pseudo:function(
-){var e=this._tokenStream,t=null;return e.match(Tokens.FUNCTION)&&(t=e.token().value
-,t+=this._readWhitespace(),t+=this._expression(),e.mustMatch(Tokens.RPAREN),t+=")"
-),t},_expression:function(){var e=this._tokenStream,t="";while(e.match([Tokens.PLUS
-,Tokens.MINUS,Tokens.DIMENSION,Tokens.NUMBER,Tokens.STRING,Tokens.IDENT,Tokens.LENGTH
-,Tokens.FREQ,Tokens.ANGLE,Tokens.TIME,Tokens.RESOLUTION,Tokens.SLASH]))t+=e.token
-().value,t+=this._readWhitespace();return t.length?t:null},_negation:function(){
-var e=this._tokenStream,t,n,r="",i,s=null;return e.match(Tokens.NOT)&&(r=e.token
-().value,t=e.token().startLine,n=e.token().startCol,r+=this._readWhitespace(),i=
-this._negation_arg(),r+=i,r+=this._readWhitespace(),e.match(Tokens.RPAREN),r+=e.
-token().value,s=new SelectorSubPart(r,"not",t,n),s.args.push(i)),s},_negation_arg
-:function(){var e=this._tokenStream,t=[this._type_selector,this._universal,function(
-){return e.match(Tokens.HASH)?new SelectorSubPart(e.token().value,"id",e.token()
-.startLine,e.token().startCol):null},this._class,this._attrib,this._pseudo],n=null
-,r=0,i=t.length,s,o,u,a;o=e.LT(1).startLine,u=e.LT(1).startCol;while(r<i&&n===null
-)n=t[r].call(this),r++;return n===null&&this._unexpectedToken(e.LT(1)),n.type=="elementName"?
-a=new SelectorPart(n,[],n.toString(),o,u):a=new SelectorPart(null,[n],n.toString
-(),o,u),a},_declaration:function(){var e=this._tokenStream,t=null,n=null,r=null,
-i=null,s=null,o="";t=this._property();if(t!==null){e.mustMatch(Tokens.COLON),this
-._readWhitespace(),n=this._expr(),(!n||n.length===0)&&this._unexpectedToken(e.LT
-(1)),r=this._prio(),o=t.toString();if(this.options.starHack&&t.hack=="*"||this.options
-.underscoreHack&&t.hack=="_")o=t.text;try{this._validateProperty(o,n)}catch(u){s=
-u}return this.fire({type:"property",property:t,value:n,important:r,line:t.line,col
-:t.col,invalid:s}),!0}return!1},_prio:function(){var e=this._tokenStream,t=e.match
-(Tokens.IMPORTANT_SYM);return this._readWhitespace(),t},_expr:function(e){var t=
-this._tokenStream,n=[],r=null,i=null;r=this._term();if(r!==null){n.push(r);do{i=
-this._operator(e),i&&n.push(i),r=this._term();if(r===null)break;n.push(r)}while(!0
-)}return n.length>0?new PropertyValue(n,n[0].line,n[0].col):null},_term:function(
-){var e=this._tokenStream,t=null,n=null,r,i,s;return t=this._unary_operator(),t!==
-null&&(i=e.token().startLine,s=e.token().startCol),e.peek()==Tokens.IE_FUNCTION&&
-this.options.ieFilters?(n=this._ie_function(),t===null&&(i=e.token().startLine,s=
-e.token().startCol)):e.match([Tokens.NUMBER,Tokens.PERCENTAGE,Tokens.LENGTH,Tokens
-.ANGLE,Tokens.TIME,Tokens.FREQ,Tokens.STRING,Tokens.IDENT,Tokens.URI,Tokens.UNICODE_RANGE
-])?(n=e.token().value,t===null&&(i=e.token().startLine,s=e.token().startCol),this
-._readWhitespace()):(r=this._hexcolor(),r===null?(t===null&&(i=e.LT(1).startLine
-,s=e.LT(1).startCol),n===null&&(e.LA(3)==Tokens.EQUALS&&this.options.ieFilters?n=
-this._ie_function():n=this._function())):(n=r.value,t===null&&(i=r.startLine,s=r
-.startCol))),n!==null?new PropertyValuePart(t!==null?t+n:n,i,s):null},_function:
-function(){var e=this._tokenStream,t=null,n=null,r;if(e.match(Tokens.FUNCTION)){
-t=e.token().value,this._readWhitespace(),n=this._expr(!0),t+=n;if(this.options.ieFilters&&
-e.peek()==Tokens.EQUALS)do{this._readWhitespace()&&(t+=e.token().value),e.LA(0)==
-Tokens.COMMA&&(t+=e.token().value),e.match(Tokens.IDENT),t+=e.token().value,e.match
-(Tokens.EQUALS),t+=e.token().value,r=e.peek();while(r!=Tokens.COMMA&&r!=Tokens.S&&
-r!=Tokens.RPAREN)e.get(),t+=e.token().value,r=e.peek()}while(e.match([Tokens.COMMA
-,Tokens.S]));e.match(Tokens.RPAREN),t+=")",this._readWhitespace()}return t},_ie_function
-:function(){var e=this._tokenStream,t=null,n=null,r;if(e.match([Tokens.IE_FUNCTION
-,Tokens.FUNCTION])){t=e.token().value;do{this._readWhitespace()&&(t+=e.token().value
-),e.LA(0)==Tokens.COMMA&&(t+=e.token().value),e.match(Tokens.IDENT),t+=e.token()
-.value,e.match(Tokens.EQUALS),t+=e.token().value,r=e.peek();while(r!=Tokens.COMMA&&
-r!=Tokens.S&&r!=Tokens.RPAREN)e.get(),t+=e.token().value,r=e.peek()}while(e.match
-([Tokens.COMMA,Tokens.S]));e.match(Tokens.RPAREN),t+=")",this._readWhitespace()}
-return t},_hexcolor:function(){var e=this._tokenStream,t=null,n;if(e.match(Tokens
-.HASH)){t=e.token(),n=t.value;if(!/#[a-f0-9]{3,6}/i.test(n))throw new SyntaxError
-("Expected a hex color but found '"+n+"' at line "+t.startLine+", col "+t.startCol+"."
-,t.startLine,t.startCol);this._readWhitespace()}return t},_keyframes:function(){
-var e=this._tokenStream,t,n,r,i="";e.mustMatch(Tokens.KEYFRAMES_SYM),t=e.token()
-,/^@\-([^\-]+)\-/.test(t.value)&&(i=RegExp.$1),this._readWhitespace(),r=this._keyframe_name
-(),this._readWhitespace(),e.mustMatch(Tokens.LBRACE),this.fire({type:"startkeyframes"
+(m.LBRACKET)?(r=e.token(),t=r.value,t+=this._readWhitespace(),n=this._namespace_prefix
+(),n&&(t+=n),e.mustMatch(m.IDENT),t+=e.token().value,t+=this._readWhitespace(),e
+.match([m.PREFIXMATCH,m.SUFFIXMATCH,m.SUBSTRINGMATCH,m.EQUALS,m.INCLUDES,m.DASHMATCH
+])&&(t+=e.token().value,t+=this._readWhitespace(),e.mustMatch([m.IDENT,m.STRING]
+),t+=e.token().value,t+=this._readWhitespace()),e.mustMatch(m.RBRACKET),new d(t+"]"
+,"attribute",r.startLine,r.startCol)):null},_pseudo:function(){var e=this._tokenStream
+,t=null,n=":",r,s;if(e.match(m.COLON)){e.match(m.COLON)&&(n+=":"),e.match(m.IDENT
+)?(t=e.token().value,r=e.token().startLine,s=e.token().startCol-n.length):e.peek
+()===m.FUNCTION&&(r=e.LT(1).startLine,s=e.LT(1).startCol-n.length,t=this._functional_pseudo
+());if(!t){var o=e.LT(1).startLine,u=e.LT(0).startCol;throw new i("Expected a `FUNCTION` or `IDENT` after colon at line "+
+o+", col "+u+".",o,u)}t=new d(n+t,"pseudo",r,s)}return t},_functional_pseudo:function(
+){var e=this._tokenStream,t=null;return e.match(m.FUNCTION)&&(t=e.token().value,
+t+=this._readWhitespace(),t+=this._expression(),e.mustMatch(m.RPAREN),t+=")"),t}
+,_expression:function(){var e=this._tokenStream,t="";while(e.match([m.PLUS,m.MINUS
+,m.DIMENSION,m.NUMBER,m.STRING,m.IDENT,m.LENGTH,m.FREQ,m.ANGLE,m.TIME,m.RESOLUTION
+,m.SLASH]))t+=e.token().value,t+=this._readWhitespace();return t.length?t:null},
+_negation:function(){var e=this._tokenStream,t,n,r="",i,s=null;return e.match(m.
+NOT)&&(r=e.token().value,t=e.token().startLine,n=e.token().startCol,r+=this._readWhitespace
+(),i=this._negation_arg(),r+=i,r+=this._readWhitespace(),e.match(m.RPAREN),r+=e.
+token().value,s=new d(r,"not",t,n),s.args.push(i)),s},_negation_arg:function(){var e=
+this._tokenStream,t=[this._type_selector,this._universal,function(){return e.match
+(m.HASH)?new d(e.token().value,"id",e.token().startLine,e.token().startCol):null
+},this._class,this._attrib,this._pseudo],n=null,r=0,i=t.length,s,o,u;s=e.LT(1).startLine
+,o=e.LT(1).startCol;while(r<i&&n===null)n=t[r].call(this),r++;return n===null&&this
+._unexpectedToken(e.LT(1)),n.type==="elementName"?u=new p(n,[],n.toString(),s,o)
+:u=new p(null,[n],n.toString(),s,o),u},_declaration:function(){var e=this._tokenStream
+,t=null,n=null,r=null,i=null,s="";t=this._property();if(t!==null){e.mustMatch(m.
+COLON),this._readWhitespace(),n=this._expr(),(!n||n.length===0)&&this._unexpectedToken
+(e.LT(1)),r=this._prio(),s=t.toString();if(this.options.starHack&&t.hack==="*"||
+this.options.underscoreHack&&t.hack==="_")s=t.text;try{this._validateProperty(s,
+n)}catch(o){i=o}return this.fire({type:"property",property:t,value:n,important:r
+,line:t.line,col:t.col,invalid:i}),!0}return!1},_prio:function(){var e=this._tokenStream
+,t=e.match(m.IMPORTANT_SYM);return this._readWhitespace(),t},_expr:function(e){var t=
+[],n=null,r=null;n=this._term(e);if(n!==null){t.push(n);do{r=this._operator(e),r&&
+t.push(r),n=this._term(e);if(n===null)break;t.push(n)}while(!0)}return t.length>0?new
+l(t,t[0].line,t[0].col):null},_term:function(e){var t=this._tokenStream,n=null,r=
+null,i=null,s=null,o,u,a;return n=this._unary_operator(),n!==null&&(u=t.token().
+startLine,a=t.token().startCol),t.peek()===m.IE_FUNCTION&&this.options.ieFilters?
+(r=this._ie_function(),n===null&&(u=t.token().startLine,a=t.token().startCol)):e&&
+t.match([m.LPAREN,m.LBRACE,m.LBRACKET])?(o=t.token(),i=o.endChar,r=o.value+this.
+_expr(e).text,n===null&&(u=t.token().startLine,a=t.token().startCol),t.mustMatch
+(m.type(i)),r+=i,this._readWhitespace()):t.match([m.NUMBER,m.PERCENTAGE,m.LENGTH
+,m.ANGLE,m.TIME,m.FREQ,m.STRING,m.IDENT,m.URI,m.UNICODE_RANGE])?(r=t.token().value
+,n===null&&(u=t.token().startLine,a=t.token().startCol,s=c.fromToken(t.token()))
+,this._readWhitespace()):(o=this._hexcolor(),o===null?(n===null&&(u=t.LT(1).startLine
+,a=t.LT(1).startCol),r===null&&(t.LA(3)===m.EQUALS&&this.options.ieFilters?r=this
+._ie_function():r=this._function())):(r=o.value,n===null&&(u=o.startLine,a=o.startCol
+))),s!==null?s:r!==null?new c(n!==null?n+r:r,u,a):null},_function:function(){var e=
+this._tokenStream,t=null,n=null,r;if(e.match(m.FUNCTION)){t=e.token().value,this
+._readWhitespace(),n=this._expr(!0),t+=n;if(this.options.ieFilters&&e.peek()===m
+.EQUALS)do{this._readWhitespace()&&(t+=e.token().value),e.LA(0)===m.COMMA&&(t+=e
+.token().value),e.match(m.IDENT),t+=e.token().value,e.match(m.EQUALS),t+=e.token
+().value,r=e.peek();while(r!==m.COMMA&&r!==m.S&&r!==m.RPAREN)e.get(),t+=e.token(
+).value,r=e.peek()}while(e.match([m.COMMA,m.S]));e.match(m.RPAREN),t+=")",this._readWhitespace
+()}return t},_ie_function:function(){var e=this._tokenStream,t=null,n;if(e.match
+([m.IE_FUNCTION,m.FUNCTION])){t=e.token().value;do{this._readWhitespace()&&(t+=e
+.token().value),e.LA(0)===m.COMMA&&(t+=e.token().value),e.match(m.IDENT),t+=e.token
+().value,e.match(m.EQUALS),t+=e.token().value,n=e.peek();while(n!==m.COMMA&&n!==
+m.S&&n!==m.RPAREN)e.get(),t+=e.token().value,n=e.peek()}while(e.match([m.COMMA,m
+.S]));e.match(m.RPAREN),t+=")",this._readWhitespace()}return t},_hexcolor:function(
+){var e=this._tokenStream,t=null,n;if(e.match(m.HASH)){t=e.token(),n=t.value;if(!/#[a-f0-9]{3,6}/i
+.test(n))throw new i("Expected a hex color but found '"+n+"' at line "+t.startLine+", col "+
+t.startCol+".",t.startLine,t.startCol);this._readWhitespace()}return t},_keyframes
+:function(){var e=this._tokenStream,t,n,r,i="";e.mustMatch(m.KEYFRAMES_SYM),t=e.
+token(),/^@\-([^\-]+)\-/.test(t.value)&&(i=RegExp.$1),this._readWhitespace(),r=this
+._keyframe_name(),this._readWhitespace(),e.mustMatch(m.LBRACE),this.fire({type:"startkeyframes"
 ,name:r,prefix:i,line:t.startLine,col:t.startCol}),this._readWhitespace(),n=e.peek
-();while(n==Tokens.IDENT||n==Tokens.PERCENTAGE)this._keyframe_rule(),this._readWhitespace
+();while(n===m.IDENT||n===m.PERCENTAGE)this._keyframe_rule(),this._readWhitespace
 (),n=e.peek();this.fire({type:"endkeyframes",name:r,prefix:i,line:t.startLine,col
-:t.startCol}),this._readWhitespace(),e.mustMatch(Tokens.RBRACE)},_keyframe_name:
-function(){var e=this._tokenStream,t;return e.mustMatch([Tokens.IDENT,Tokens.STRING
-]),SyntaxUnit.fromToken(e.token())},_keyframe_rule:function(){var e=this._tokenStream
-,t,n=this._key_list();this.fire({type:"startkeyframerule",keys:n,line:n[0].line,
-col:n[0].col}),this._readDeclarations(!0),this.fire({type:"endkeyframerule",keys
-:n,line:n[0].line,col:n[0].col})},_key_list:function(){var e=this._tokenStream,t
-,n,r=[];r.push(this._key()),this._readWhitespace();while(e.match(Tokens.COMMA))this
-._readWhitespace(),r.push(this._key()),this._readWhitespace();return r},_key:function(
-){var e=this._tokenStream,t;if(e.match(Tokens.PERCENTAGE))return SyntaxUnit.fromToken
-(e.token());if(e.match(Tokens.IDENT)){t=e.token();if(/from|to/i.test(t.value))return SyntaxUnit
-.fromToken(t);e.unget()}this._unexpectedToken(e.LT(1))},_skipCruft:function(){while(
-this._tokenStream.match([Tokens.S,Tokens.CDO,Tokens.CDC]));},_readDeclarations:function(
-e,t){var n=this._tokenStream,r;this._readWhitespace(),e&&n.mustMatch(Tokens.LBRACE
-),this._readWhitespace();try{for(;;){if(!(n.match(Tokens.SEMICOLON)||t&&this._margin
-())){if(!this._declaration())break;if(!n.match(Tokens.SEMICOLON))break}this._readWhitespace
-()}n.mustMatch(Tokens.RBRACE),this._readWhitespace()}catch(i){if(!(i instanceof
-SyntaxError&&!this.options.strict))throw i;this.fire({type:"error",error:i,message
-:i.message,line:i.line,col:i.col}),r=n.advance([Tokens.SEMICOLON,Tokens.RBRACE])
-;if(r==Tokens.SEMICOLON)this._readDeclarations(!1,t);else if(r!=Tokens.RBRACE)throw i
-}},_readWhitespace:function(){var e=this._tokenStream,t="";while(e.match(Tokens.
-S))t+=e.token().value;return t},_unexpectedToken:function(e){throw new SyntaxError
-("Unexpected token '"+e.value+"' at line "+e.startLine+", col "+e.startCol+".",e
-.startLine,e.startCol)},_verifyEnd:function(){this._tokenStream.LA(1)!=Tokens.EOF&&
-this._unexpectedToken(this._tokenStream.LT(1))},_validateProperty:function(e,t){
-Validation.validate(e,t)},parse:function(e){this._tokenStream=new TokenStream(e,
-Tokens),this._stylesheet()},parseStyleSheet:function(e){return this.parse(e)},parseMediaQuery
-:function(e){this._tokenStream=new TokenStream(e,Tokens);var t=this._media_query
-();return this._verifyEnd(),t},parsePropertyValue:function(e){this._tokenStream=new
-TokenStream(e,Tokens),this._readWhitespace();var t=this._expr();return this._readWhitespace
-(),this._verifyEnd(),t},parseRule:function(e){this._tokenStream=new TokenStream(
-e,Tokens),this._readWhitespace();var t=this._ruleset();return this._readWhitespace
-(),this._verifyEnd(),t},parseSelector:function(e){this._tokenStream=new TokenStream
-(e,Tokens),this._readWhitespace();var t=this._selector();return this._readWhitespace
-(),this._verifyEnd(),t},parseStyleAttribute:function(e){e+="}",this._tokenStream=new
-TokenStream(e,Tokens),this._readDeclarations()}};for(t in n)n.hasOwnProperty(t)&&
-(e[t]=n[t]);return e}();var Properties={"alignment-adjust":"auto | baseline | before-edge | text-before-edge | middle | central | after-edge | text-after-edge | ideographic | alphabetic | hanging | mathematical | <percentage> | <length>"
-,"alignment-baseline":"baseline | use-script | before-edge | text-before-edge | after-edge | text-after-edge | central | middle | ideographic | alphabetic | hanging | mathematical"
-,animation:1,"animation-delay":{multi:"<time>",comma:!0},"animation-direction":{
-multi:"normal | alternate",comma:!0},"animation-duration":{multi:"<time>",comma:!0
-},"animation-iteration-count":{multi:"<number> | infinite",comma:!0},"animation-name"
-:{multi:"none | <ident>",comma:!0},"animation-play-state":{multi:"running | paused"
-,comma:!0},"animation-timing-function":1,"-moz-animation-delay":{multi:"<time>",
-comma:!0},"-moz-animation-direction":{multi:"normal | alternate",comma:!0},"-moz-animation-duration"
-:{multi:"<time>",comma:!0},"-moz-animation-iteration-count":{multi:"<number> | infinite"
-,comma:!0},"-moz-animation-name":{multi:"none | <ident>",comma:!0},"-moz-animation-play-state"
-:{multi:"running | paused",comma:!0},"-ms-animation-delay":{multi:"<time>",comma
-:!0},"-ms-animation-direction":{multi:"normal | alternate",comma:!0},"-ms-animation-duration"
-:{multi:"<time>",comma:!0},"-ms-animation-iteration-count":{multi:"<number> | infinite"
-,comma:!0},"-ms-animation-name":{multi:"none | <ident>",comma:!0},"-ms-animation-play-state"
-:{multi:"running | paused",comma:!0},"-webkit-animation-delay":{multi:"<time>",comma
-:!0},"-webkit-animation-direction":{multi:"normal | alternate",comma:!0},"-webkit-animation-duration"
-:{multi:"<time>",comma:!0},"-webkit-animation-iteration-count":{multi:"<number> | infinite"
-,comma:!0},"-webkit-animation-name":{multi:"none | <ident>",comma:!0},"-webkit-animation-play-state"
-:{multi:"running | paused",comma:!0},"-o-animation-delay":{multi:"<time>",comma:!0
-},"-o-animation-direction":{multi:"normal | alternate",comma:!0},"-o-animation-duration"
-:{multi:"<time>",comma:!0},"-o-animation-iteration-count":{multi:"<number> | infinite"
-,comma:!0},"-o-animation-name":{multi:"none | <ident>",comma:!0},"-o-animation-play-state"
-:{multi:"running | paused",comma:!0},appearance:"icon | window | desktop | workspace | document | tooltip | dialog | button | push-button | hyperlink | radio-button | checkbox | menu-item | tab | menu | menubar | pull-down-menu | pop-up-menu | list-menu | radio-group | checkbox-group | outline-tree | range | field | combo-box | signature | password | normal | none | inherit"
-,azimuth:function(e){var t="<angle> | leftwards | rightwards | inherit",n="left-side | far-left | left | center-left | center | center-right | right | far-right | right-side"
-,r=!1,i=!1,s;ValidationTypes.isAny(e,t)||(ValidationTypes.isAny(e,"behind")&&(r=!0
-,i=!0),ValidationTypes.isAny(e,n)&&(i=!0,r||ValidationTypes.isAny(e,"behind")));
-if(e.hasNext())throw s=e.next(),i?new ValidationError("Expected end of value but found '"+
-s+"'.",s.line,s.col):new ValidationError("Expected (<'azimuth'>) but found '"+s+"'."
-,s.line,s.col)},"backface-visibility":"visible | hidden",background:1,"background-attachment"
-:{multi:"<attachment>",comma:!0},"background-clip":{multi:"<box>",comma:!0},"background-color"
-:"<color> | inherit","background-image":{multi:"<bg-image>",comma:!0},"background-origin"
-:{multi:"<box>",comma:!0},"background-position":{multi:"<bg-position>",comma:!0}
-,"background-repeat":{multi:"<repeat-style>"},"background-size":{multi:"<bg-size>"
-,comma:!0},"baseline-shift":"baseline | sub | super | <percentage> | <length>",behavior
-:1,binding:1,bleed:"<length>","bookmark-label":"<content> | <attr> | <string>","bookmark-level"
-:"none | <integer>","bookmark-state":"open | closed","bookmark-target":"none | <uri> | <attr>"
-,border:"<border-width> || <border-style> || <color>","border-bottom":"<border-width> || <border-style> || <color>"
-,"border-bottom-color":"<color> | inherit","border-bottom-left-radius":"<x-one-radius>"
-,"border-bottom-right-radius":"<x-one-radius>","border-bottom-style":"<border-style>"
-,"border-bottom-width":"<border-width>","border-collapse":"collapse | separate | inherit"
-,"border-color":{multi:"<color> | inherit",max:4},"border-image":1,"border-image-outset"
-:{multi:"<length> | <number>",max:4},"border-image-repeat":{multi:"stretch | repeat | round"
-,max:2},"border-image-slice":function(e){var t=!1,n="<number> | <percentage>",r=!1
-,i=0,s=4,o;ValidationTypes.isAny(e,"fill")&&(r=!0,t=!0);while(e.hasNext()&&i<s){
-t=ValidationTypes.isAny(e,n);if(!t)break;i++}r?t=!0:ValidationTypes.isAny(e,"fill"
-);if(e.hasNext())throw o=e.next(),t?new ValidationError("Expected end of value but found '"+
-o+"'.",o.line,o.col):new ValidationError("Expected ([<number> | <percentage>]{1,4} && fill?) but found '"+
-o+"'.",o.line,o.col)},"border-image-source":"<image> | none","border-image-width"
-:{multi:"<length> | <percentage> | <number> | auto",max:4},"border-left":"<border-width> || <border-style> || <color>"
-,"border-left-color":"<color> | inherit","border-left-style":"<border-style>","border-left-width"
-:"<border-width>","border-radius":function(e){var t=!1,n="<length> | <percentage> | inherit"
-,r=!1,i=!1,s=0,o=8,u;while(e.hasNext()&&s<o){t=ValidationTypes.isAny(e,n);if(!t)
-{if(!(e.peek()=="/"&&s>0&&!r))break;r=!0,o=s+5,e.next()}s++}if(e.hasNext())throw u=
-e.next(),t?new ValidationError("Expected end of value but found '"+u+"'.",u.line
-,u.col):new ValidationError("Expected (<'border-radius'>) but found '"+u+"'.",u.
-line,u.col)},"border-right":"<border-width> || <border-style> || <color>","border-right-color"
-:"<color> | inherit","border-right-style":"<border-style>","border-right-width":"<border-width>"
-,"border-spacing":{multi:"<length> | inherit",max:2},"border-style":{multi:"<border-style>"
-,max:4},"border-top":"<border-width> || <border-style> || <color>","border-top-color"
-:"<color> | inherit","border-top-left-radius":"<x-one-radius>","border-top-right-radius"
-:"<x-one-radius>","border-top-style":"<border-style>","border-top-width":"<border-width>"
-,"border-width":{multi:"<border-width>",max:4},bottom:"<margin-width> | inherit"
-,"box-align":"start | end | center | baseline | stretch","box-decoration-break":"slice |clone"
-,"box-direction":"normal | reverse | inherit","box-flex":"<number>","box-flex-group"
-:"<integer>","box-lines":"single | multiple","box-ordinal-group":"<integer>","box-orient"
-:"horizontal | vertical | inline-axis | block-axis | inherit","box-pack":"start | end | center | justify"
-,"box-shadow":function(e){var t=!1,n;if(!ValidationTypes.isAny(e,"none"))Validation
-.multiProperty("<shadow>",e,!0,Infinity);else if(e.hasNext())throw n=e.next(),new
-ValidationError("Expected end of value but found '"+n+"'.",n.line,n.col)},"box-sizing"
-:"content-box | border-box | inherit","break-after":"auto | always | avoid | left | right | page | column | avoid-page | avoid-column"
+:t.startCol}),this._readWhitespace(),e.mustMatch(m.RBRACE),this._readWhitespace(
+)},_keyframe_name:function(){var e=this._tokenStream;return e.mustMatch([m.IDENT
+,m.STRING]),s.fromToken(e.token())},_keyframe_rule:function(){var e=this._key_list
+();this.fire({type:"startkeyframerule",keys:e,line:e[0].line,col:e[0].col}),this
+._readDeclarations(!0),this.fire({type:"endkeyframerule",keys:e,line:e[0].line,col
+:e[0].col})},_key_list:function(){var e=this._tokenStream,t=[];t.push(this._key(
+)),this._readWhitespace();while(e.match(m.COMMA))this._readWhitespace(),t.push(this
+._key()),this._readWhitespace();return t},_key:function(){var e=this._tokenStream
+,t;if(e.match(m.PERCENTAGE))return s.fromToken(e.token());if(e.match(m.IDENT)){t=
+e.token();if(/from|to/i.test(t.value))return s.fromToken(t);e.unget()}this._unexpectedToken
+(e.LT(1))},_skipCruft:function(){while(this._tokenStream.match([m.S,m.CDO,m.CDC]
+));},_readDeclarations:function(e,t){var n=this._tokenStream,r;this._readWhitespace
+(),e&&n.mustMatch(m.LBRACE),this._readWhitespace();try{for(;;){if(!(n.match(m.SEMICOLON
+)||t&&this._margin())){if(!this._declaration())break;if(!n.match(m.SEMICOLON))break}
+this._readWhitespace()}n.mustMatch(m.RBRACE),this._readWhitespace()}catch(s){if(!
+(s instanceof i&&!this.options.strict))throw s;this.fire({type:"error",error:s,message
+:s.message,line:s.line,col:s.col}),r=n.advance([m.SEMICOLON,m.RBRACE]);if(r===m.
+SEMICOLON)this._readDeclarations(!1,t);else if(r!==m.RBRACE)throw s}},_readWhitespace
+:function(){var e=this._tokenStream,t="";while(e.match(m.S))t+=e.token().value;return t
+},_unexpectedToken:function(e){throw new i("Unexpected token '"+e.value+"' at line "+
+e.startLine+", col "+e.startCol+".",e.startLine,e.startCol)},_verifyEnd:function(
+){this._tokenStream.LA(1)!==m.EOF&&this._unexpectedToken(this._tokenStream.LT(1)
+)},_validateProperty:function(e,t){g.validate(e,t)},parse:function(e){this._tokenStream=new
+v(e,m),this._stylesheet()},parseStyleSheet:function(e){return this.parse(e)},parseMediaQuery
+:function(e){this._tokenStream=new v(e,m);var t=this._media_query();return this.
+_verifyEnd(),t},parsePropertyValue:function(e){this._tokenStream=new v(e,m),this
+._readWhitespace();var t=this._expr();return this._readWhitespace(),this._verifyEnd
+(),t},parseRule:function(e){this._tokenStream=new v(e,m),this._readWhitespace();
+var t=this._ruleset();return this._readWhitespace(),this._verifyEnd(),t},parseSelector
+:function(e){this._tokenStream=new v(e,m),this._readWhitespace();var t=this._selector
+();return this._readWhitespace(),this._verifyEnd(),t},parseStyleAttribute:function(
+e){e+="}",this._tokenStream=new v(e,m),this._readDeclarations()}};for(t in n)Object
+.prototype.hasOwnProperty.call(n,t)&&(e[t]=n[t]);return e}()},{"../util/EventTarget"
+:23,"../util/SyntaxError":25,"../util/SyntaxUnit":26,"./Combinator":2,"./MediaFeature"
+:4,"./MediaQuery":5,"./PropertyName":8,"./PropertyValue":9,"./PropertyValuePart"
+:11,"./Selector":13,"./SelectorPart":14,"./SelectorSubPart":15,"./TokenStream":17
+,"./Tokens":18,"./Validation":19}],7:[function(e,t,n){"use strict";var r=t.exports=
+{__proto__:null,"align-items":"flex-start | flex-end | center | baseline | stretch"
+,"align-content":"flex-start | flex-end | center | space-between | space-around | stretch"
+,"align-self":"auto | flex-start | flex-end | center | baseline | stretch",all:"initial | inherit | unset"
+,"-webkit-align-items":"flex-start | flex-end | center | baseline | stretch","-webkit-align-content"
+:"flex-start | flex-end | center | space-between | space-around | stretch","-webkit-align-self"
+:"auto | flex-start | flex-end | center | baseline | stretch","alignment-adjust"
+:"auto | baseline | before-edge | text-before-edge | middle | central | after-edge | text-after-edge | ideographic | alphabetic | hanging | mathematical | <percentage> | <length>"
+,"alignment-baseline":"auto | baseline | use-script | before-edge | text-before-edge | after-edge | text-after-edge | central | middle | ideographic | alphabetic | hanging | mathematical"
+,animation:1,"animation-delay":"<time>#","animation-direction":"<single-animation-direction>#"
+,"animation-duration":"<time>#","animation-fill-mode":"[ none | forwards | backwards | both ]#"
+,"animation-iteration-count":"[ <number> | infinite ]#","animation-name":"[ none | <single-animation-name> ]#"
+,"animation-play-state":"[ running | paused ]#","animation-timing-function":1,"-moz-animation-delay"
+:"<time>#","-moz-animation-direction":"[ normal | alternate ]#","-moz-animation-duration"
+:"<time>#","-moz-animation-iteration-count":"[ <number> | infinite ]#","-moz-animation-name"
+:"[ none | <single-animation-name> ]#","-moz-animation-play-state":"[ running | paused ]#"
+,"-ms-animation-delay":"<time>#","-ms-animation-direction":"[ normal | alternate ]#"
+,"-ms-animation-duration":"<time>#","-ms-animation-iteration-count":"[ <number> | infinite ]#"
+,"-ms-animation-name":"[ none | <single-animation-name> ]#","-ms-animation-play-state"
+:"[ running | paused ]#","-webkit-animation-delay":"<time>#","-webkit-animation-direction"
+:"[ normal | alternate ]#","-webkit-animation-duration":"<time>#","-webkit-animation-fill-mode"
+:"[ none | forwards | backwards | both ]#","-webkit-animation-iteration-count":"[ <number> | infinite ]#"
+,"-webkit-animation-name":"[ none | <single-animation-name> ]#","-webkit-animation-play-state"
+:"[ running | paused ]#","-o-animation-delay":"<time>#","-o-animation-direction"
+:"[ normal | alternate ]#","-o-animation-duration":"<time>#","-o-animation-iteration-count"
+:"[ <number> | infinite ]#","-o-animation-name":"[ none | <single-animation-name> ]#"
+,"-o-animation-play-state":"[ running | paused ]#",appearance:"none | auto","-moz-appearance"
+:"none | button | button-arrow-down | button-arrow-next | button-arrow-previous | button-arrow-up | button-bevel | button-focus | caret | checkbox | checkbox-container | checkbox-label | checkmenuitem | dualbutton | groupbox | listbox | listitem | menuarrow | menubar | menucheckbox | menuimage | menuitem | menuitemtext | menulist | menulist-button | menulist-text | menulist-textfield | menupopup | menuradio | menuseparator | meterbar | meterchunk | progressbar | progressbar-vertical | progresschunk | progresschunk-vertical | radio | radio-container | radio-label | radiomenuitem | range | range-thumb | resizer | resizerpanel | scale-horizontal | scalethumbend | scalethumb-horizontal | scalethumbstart | scalethumbtick | scalethumb-vertical | scale-vertical | scrollbarbutton-down | scrollbarbutton-left | scrollbarbutton-right | scrollbarbutton-up | scrollbarthumb-horizontal | scrollbarthumb-vertical | scrollbartrack-horizontal | scrollbartrack-vertical | searchfield | separator | sheet | spinner | spinner-downbutton | spinner-textfield | spinner-upbutton | splitter | statusbar | statusbarpanel | tab | tabpanel | tabpanels | tab-scroll-arrow-back | tab-scroll-arrow-forward | textfield | textfield-multiline | toolbar | toolbarbutton | toolbarbutton-dropdown | toolbargripper | toolbox | tooltip | treeheader | treeheadercell | treeheadersortarrow | treeitem | treeline | treetwisty | treetwistyopen | treeview | -moz-mac-unified-toolbar | -moz-win-borderless-glass | -moz-win-browsertabbar-toolbox | -moz-win-communicationstext | -moz-win-communications-toolbox | -moz-win-exclude-glass | -moz-win-glass | -moz-win-mediatext | -moz-win-media-toolbox | -moz-window-button-box | -moz-window-button-box-maximized | -moz-window-button-close | -moz-window-button-maximize | -moz-window-button-minimize | -moz-window-button-restore | -moz-window-frame-bottom | -moz-window-frame-left | -moz-window-frame-right | -moz-window-titlebar | -moz-window-titlebar-maximized"
+,"-ms-appearance":"none | icon | window | desktop | workspace | document | tooltip | dialog | button | push-button | hyperlink | radio | radio-button | checkbox | menu-item | tab | menu | menubar | pull-down-menu | pop-up-menu | list-menu | radio-group | checkbox-group | outline-tree | range | field | combo-box | signature | password | normal"
+,"-webkit-appearance":"none | button | button-bevel | caps-lock-indicator | caret | checkbox | default-button | listbox	| listitem | media-fullscreen-button | media-mute-button | media-play-button | media-seek-back-button	| media-seek-forward-button	| media-slider | media-sliderthumb | menulist	| menulist-button	| menulist-text	| menulist-textfield | push-button	| radio	| searchfield	| searchfield-cancel-button	| searchfield-decoration | searchfield-results-button | searchfield-results-decoration | slider-horizontal | slider-vertical | sliderthumb-horizontal | sliderthumb-vertical	| square-button	| textarea	| textfield	| scrollbarbutton-down | scrollbarbutton-left | scrollbarbutton-right | scrollbarbutton-up | scrollbargripper-horizontal | scrollbargripper-vertical | scrollbarthumb-horizontal | scrollbarthumb-vertical | scrollbartrack-horizontal | scrollbartrack-vertical"
+,"-o-appearance":"none | window | desktop | workspace | document | tooltip | dialog | button | push-button | hyperlink | radio | radio-button | checkbox | menu-item | tab | menu | menubar | pull-down-menu | pop-up-menu | list-menu | radio-group | checkbox-group | outline-tree | range | field | combo-box | signature | password | normal"
+,azimuth:"<azimuth>","backface-visibility":"visible | hidden",background:1,"background-attachment"
+:"<attachment>#","background-clip":"<box>#","background-color":"<color>","background-image"
+:"<bg-image>#","background-origin":"<box>#","background-position":"<bg-position>"
+,"background-repeat":"<repeat-style>#","background-size":"<bg-size>#","baseline-shift"
+:"baseline | sub | super | <percentage> | <length>",behavior:1,binding:1,bleed:"<length>"
+,"bookmark-label":"<content> | <attr> | <string>","bookmark-level":"none | <integer>"
+,"bookmark-state":"open | closed","bookmark-target":"none | <uri> | <attr>",border
+:"<border-width> || <border-style> || <color>","border-bottom":"<border-width> || <border-style> || <color>"
+,"border-bottom-color":"<color>","border-bottom-left-radius":"<x-one-radius>","border-bottom-right-radius"
+:"<x-one-radius>","border-bottom-style":"<border-style>","border-bottom-width":"<border-width>"
+,"border-collapse":"collapse | separate","border-color":"<color>{1,4}","border-image"
+:1,"border-image-outset":"[ <length> | <number> ]{1,4}","border-image-repeat":"[ stretch | repeat | round ]{1,2}"
+,"border-image-slice":"<border-image-slice>","border-image-source":"<image> | none"
+,"border-image-width":"[ <length> | <percentage> | <number> | auto ]{1,4}","border-left"
+:"<border-width> || <border-style> || <color>","border-left-color":"<color>","border-left-style"
+:"<border-style>","border-left-width":"<border-width>","border-radius":"<border-radius>"
+,"border-right":"<border-width> || <border-style> || <color>","border-right-color"
+:"<color>","border-right-style":"<border-style>","border-right-width":"<border-width>"
+,"border-spacing":"<length>{1,2}","border-style":"<border-style>{1,4}","border-top"
+:"<border-width> || <border-style> || <color>","border-top-color":"<color>","border-top-left-radius"
+:"<x-one-radius>","border-top-right-radius":"<x-one-radius>","border-top-style":"<border-style>"
+,"border-top-width":"<border-width>","border-width":"<border-width>{1,4}",bottom
+:"<margin-width>","-moz-box-align":"start | end | center | baseline | stretch","-moz-box-decoration-break"
+:"slice | clone","-moz-box-direction":"normal | reverse","-moz-box-flex":"<number>"
+,"-moz-box-flex-group":"<integer>","-moz-box-lines":"single | multiple","-moz-box-ordinal-group"
+:"<integer>","-moz-box-orient":"horizontal | vertical | inline-axis | block-axis"
+,"-moz-box-pack":"start | end | center | justify","-o-box-decoration-break":"slice | clone"
+,"-webkit-box-align":"start | end | center | baseline | stretch","-webkit-box-decoration-break"
+:"slice | clone","-webkit-box-direction":"normal | reverse","-webkit-box-flex":"<number>"
+,"-webkit-box-flex-group":"<integer>","-webkit-box-lines":"single | multiple","-webkit-box-ordinal-group"
+:"<integer>","-webkit-box-orient":"horizontal | vertical | inline-axis | block-axis"
+,"-webkit-box-pack":"start | end | center | justify","box-decoration-break":"slice | clone"
+,"box-shadow":"<box-shadow>","box-sizing":"content-box | border-box","break-after"
+:"auto | always | avoid | left | right | page | column | avoid-page | avoid-column"
 ,"break-before":"auto | always | avoid | left | right | page | column | avoid-page | avoid-column"
-,"break-inside":"auto | avoid | avoid-page | avoid-column","caption-side":"top | bottom | inherit"
-,clear:"none | right | left | both | inherit",clip:1,color:"<color> | inherit","color-profile"
-:1,"column-count":"<integer> | auto","column-fill":"auto | balance","column-gap"
-:"<length> | normal","column-rule":"<border-width> || <border-style> || <color>"
-,"column-rule-color":"<color>","column-rule-style":"<border-style>","column-rule-width"
-:"<border-width>","column-span":"none | all","column-width":"<length> | auto",columns
-:1,content:1,"counter-increment":1,"counter-reset":1,crop:"<shape> | auto",cue:"cue-after | cue-before | inherit"
-,"cue-after":1,"cue-before":1,cursor:1,direction:"ltr | rtl | inherit",display:"inline | block | list-item | inline-block | table | inline-table | table-row-group | table-header-group | table-footer-group | table-row | table-column-group | table-column | table-cell | table-caption | box | inline-box | grid | inline-grid | none | inherit | -moz-box | -moz-inline-block | -moz-inline-box | -moz-inline-grid | -moz-inline-stack | -moz-inline-table | -moz-grid | -moz-grid-group | -moz-grid-line | -moz-groupbox | -moz-deck | -moz-popup | -moz-stack | -moz-marker | -webkit-box | -webkit-inline-box"
-,"dominant-baseline":1,"drop-initial-after-adjust":"central | middle | after-edge | text-after-edge | ideographic | alphabetic | mathematical | <percentage> | <length>"
+,"break-inside":"auto | avoid | avoid-page | avoid-column","caption-side":"top | bottom"
+,clear:"none | right | left | both",clip:"<shape> | auto","-webkit-clip-path":"<clip-source> | <clip-path> | none"
+,"clip-path":"<clip-source> | <clip-path> | none","clip-rule":"nonzero | evenodd"
+,color:"<color>","color-interpolation":"auto | sRGB | linearRGB","color-interpolation-filters"
+:"auto | sRGB | linearRGB","color-profile":1,"color-rendering":"auto | optimizeSpeed | optimizeQuality"
+,"column-count":"<integer> | auto","column-fill":"auto | balance","column-gap":"<length> | normal"
+,"column-rule":"<border-width> || <border-style> || <color>","column-rule-color"
+:"<color>","column-rule-style":"<border-style>","column-rule-width":"<border-width>"
+,"column-span":"none | all","column-width":"<length> | auto",columns:1,content:1
+,"counter-increment":1,"counter-reset":1,crop:"<shape> | auto",cue:"cue-after | cue-before"
+,"cue-after":1,"cue-before":1,cursor:1,direction:"ltr | rtl",display:"inline | block | list-item | inline-block | table | inline-table | table-row-group | table-header-group | table-footer-group | table-row | table-column-group | table-column | table-cell | table-caption | grid | inline-grid | run-in | ruby | ruby-base | ruby-text | ruby-base-container | ruby-text-container | contents | none | -moz-box | -moz-inline-block | -moz-inline-box | -moz-inline-grid | -moz-inline-stack | -moz-inline-table | -moz-grid | -moz-grid-group | -moz-grid-line | -moz-groupbox | -moz-deck | -moz-popup | -moz-stack | -moz-marker | -webkit-box | -webkit-inline-box | -ms-flexbox | -ms-inline-flexbox | flex | -webkit-flex | inline-flex | -webkit-inline-flex"
+,"dominant-baseline":"auto | use-script | no-change | reset-size | ideographic | alphabetic | hanging | mathematical | central | middle | text-after-edge | text-before-edge"
+,"drop-initial-after-adjust":"central | middle | after-edge | text-after-edge | ideographic | alphabetic | mathematical | <percentage> | <length>"
 ,"drop-initial-after-align":"baseline | use-script | before-edge | text-before-edge | after-edge | text-after-edge | central | middle | ideographic | alphabetic | hanging | mathematical"
 ,"drop-initial-before-adjust":"before-edge | text-before-edge | central | middle | hanging | mathematical | <percentage> | <length>"
 ,"drop-initial-before-align":"caps-height | baseline | use-script | before-edge | text-before-edge | after-edge | text-after-edge | central | middle | ideographic | alphabetic | hanging | mathematical"
 ,"drop-initial-size":"auto | line | <length> | <percentage>","drop-initial-value"
-:"initial | <integer>",elevation:"<angle> | below | level | above | higher | lower | inherit"
-,"empty-cells":"show | hide | inherit",filter:1,fit:"fill | hidden | meet | slice"
-,"fit-position":1,"float":"left | right | none | inherit","float-offset":1,font:1
-,"font-family":1,"font-size":"<absolute-size> | <relative-size> | <length> | <percentage> | inherit"
-,"font-size-adjust":"<number> | none | inherit","font-stretch":"normal | ultra-condensed | extra-condensed | condensed | semi-condensed | semi-expanded | expanded | extra-expanded | ultra-expanded | inherit"
-,"font-style":"normal | italic | oblique | inherit","font-variant":"normal | small-caps | inherit"
-,"font-weight":"normal | bold | bolder | lighter | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | inherit"
-,"grid-cell-stacking":"columns | rows | layer","grid-column":1,"grid-columns":1,"grid-column-align"
-:"start | end | center | stretch","grid-column-sizing":1,"grid-column-span":"<integer>"
-,"grid-flow":"none | rows | columns","grid-layer":"<integer>","grid-row":1,"grid-rows"
-:1,"grid-row-align":"start | end | center | stretch","grid-row-span":"<integer>"
-,"grid-row-sizing":1,"hanging-punctuation":1,height:"<margin-width> | inherit","hyphenate-after"
-:"<integer> | auto","hyphenate-before":"<integer> | auto","hyphenate-character":"<string> | auto"
-,"hyphenate-lines":"no-limit | <integer>","hyphenate-resource":1,hyphens:"none | manual | auto"
-,icon:1,"image-orientation":"angle | auto","image-rendering":1,"image-resolution"
-:1,"inline-box-align":"initial | last | <integer>",left:"<margin-width> | inherit"
-,"letter-spacing":"<length> | normal | inherit","line-height":"<number> | <length> | <percentage> | normal | inherit"
-,"line-break":"auto | loose | normal | strict","line-stacking":1,"line-stacking-ruby"
-:"exclude-ruby | include-ruby","line-stacking-shift":"consider-shifts | disregard-shifts"
+:"<integer>",elevation:"<angle> | below | level | above | higher | lower","empty-cells"
+:"show | hide","enable-background":1,fill:"<paint>","fill-opacity":"<opacity-value>"
+,"fill-rule":"nonzero | evenodd",filter:"<filter-function-list> | none",fit:"fill | hidden | meet | slice"
+,"fit-position":1,flex:"<flex>","flex-basis":"<width>","flex-direction":"row | row-reverse | column | column-reverse"
+,"flex-flow":"<flex-direction> || <flex-wrap>","flex-grow":"<number>","flex-shrink"
+:"<number>","flex-wrap":"nowrap | wrap | wrap-reverse","-webkit-flex":"<flex>","-webkit-flex-basis"
+:"<width>","-webkit-flex-direction":"row | row-reverse | column | column-reverse"
+,"-webkit-flex-flow":"<flex-direction> || <flex-wrap>","-webkit-flex-grow":"<number>"
+,"-webkit-flex-shrink":"<number>","-webkit-flex-wrap":"nowrap | wrap | wrap-reverse"
+,"-ms-flex":"<flex>","-ms-flex-align":"start | end | center | stretch | baseline"
+,"-ms-flex-direction":"row | row-reverse | column | column-reverse","-ms-flex-order"
+:"<number>","-ms-flex-pack":"start | end | center | justify","-ms-flex-wrap":"nowrap | wrap | wrap-reverse"
+,"float":"left | right | none","float-offset":1,"flood-color":1,"flood-opacity":"<opacity-value>"
+,font:"<font-shorthand> | caption | icon | menu | message-box | small-caption | status-bar"
+,"font-family":"<font-family>","font-feature-settings":"<feature-tag-value> | normal"
+,"font-kerning":"auto | normal | none","font-size":"<font-size>","font-size-adjust"
+:"<number> | none","font-stretch":"<font-stretch>","font-style":"<font-style>","font-variant"
+:"<font-variant> | normal | none","font-variant-alternates":"<font-variant-alternates> | normal"
+,"font-variant-caps":"<font-variant-caps> | normal","font-variant-east-asian":"<font-variant-east-asian> | normal"
+,"font-variant-ligatures":"<font-variant-ligatures> | normal | none","font-variant-numeric"
+:"<font-variant-numeric> | normal","font-variant-position":"normal | sub | super"
+,"font-weight":"<font-weight>","glyph-orientation-horizontal":"<glyph-angle>","glyph-orientation-vertical"
+:"auto | <glyph-angle>",grid:1,"grid-area":1,"grid-auto-columns":1,"grid-auto-flow"
+:1,"grid-auto-position":1,"grid-auto-rows":1,"grid-cell-stacking":"columns | rows | layer"
+,"grid-column":1,"grid-columns":1,"grid-column-align":"start | end | center | stretch"
+,"grid-column-sizing":1,"grid-column-start":1,"grid-column-end":1,"grid-column-span"
+:"<integer>","grid-flow":"none | rows | columns","grid-layer":"<integer>","grid-row"
+:1,"grid-rows":1,"grid-row-align":"start | end | center | stretch","grid-row-start"
+:1,"grid-row-end":1,"grid-row-span":"<integer>","grid-row-sizing":1,"grid-template"
+:1,"grid-template-areas":1,"grid-template-columns":1,"grid-template-rows":1,"hanging-punctuation"
+:1,height:"<margin-width> | <content-sizing>","hyphenate-after":"<integer> | auto"
+,"hyphenate-before":"<integer> | auto","hyphenate-character":"<string> | auto","hyphenate-lines"
+:"no-limit | <integer>","hyphenate-resource":1,hyphens:"none | manual | auto",icon
+:1,"image-orientation":"angle | auto","image-rendering":"auto | optimizeSpeed | optimizeQuality"
+,"image-resolution":1,"ime-mode":"auto | normal | active | inactive | disabled","inline-box-align"
+:"last | <integer>","justify-content":"flex-start | flex-end | center | space-between | space-around"
+,"-webkit-justify-content":"flex-start | flex-end | center | space-between | space-around"
+,kerning:"auto | <length>",left:"<margin-width>","letter-spacing":"<length> | normal"
+,"line-height":"<line-height>","line-break":"auto | loose | normal | strict","line-stacking"
+:1,"line-stacking-ruby":"exclude-ruby | include-ruby","line-stacking-shift":"consider-shifts | disregard-shifts"
 ,"line-stacking-strategy":"inline-line-height | block-line-height | max-height | grid-height"
-,"list-style":1,"list-style-image":"<uri> | none | inherit","list-style-position"
-:"inside | outside | inherit","list-style-type":"disc | circle | square | decimal | decimal-leading-zero | lower-roman | upper-roman | lower-greek | lower-latin | upper-latin | armenian | georgian | lower-alpha | upper-alpha | none | inherit"
-,margin:{multi:"<margin-width> | inherit",max:4},"margin-bottom":"<margin-width> | inherit"
-,"margin-left":"<margin-width> | inherit","margin-right":"<margin-width> | inherit"
-,"margin-top":"<margin-width> | inherit",mark:1,"mark-after":1,"mark-before":1,marks
+,"list-style":1,"list-style-image":"<uri> | none","list-style-position":"inside | outside"
+,"list-style-type":"disc | circle | square | decimal | decimal-leading-zero | lower-roman | upper-roman | lower-greek | lower-latin | upper-latin | armenian | georgian | lower-alpha | upper-alpha | none"
+,margin:"<margin-width>{1,4}","margin-bottom":"<margin-width>","margin-left":"<margin-width>"
+,"margin-right":"<margin-width>","margin-top":"<margin-width>",mark:1,"mark-after"
+:1,"mark-before":1,marker:1,"marker-end":1,"marker-mid":1,"marker-start":1,marks
 :1,"marquee-direction":1,"marquee-play-count":1,"marquee-speed":1,"marquee-style"
-:1,"max-height":"<length> | <percentage> | none | inherit","max-width":"<length> | <percentage> | none | inherit"
-,"min-height":"<length> | <percentage> | inherit","min-width":"<length> | <percentage> | inherit"
-,"move-to":1,"nav-down":1,"nav-index":1,"nav-left":1,"nav-right":1,"nav-up":1,opacity
-:"<number> | inherit",orphans:"<integer> | inherit",outline:1,"outline-color":"<color> | invert | inherit"
-,"outline-offset":1,"outline-style":"<border-style> | inherit","outline-width":"<border-width> | inherit"
-,overflow:"visible | hidden | scroll | auto | inherit","overflow-style":1,"overflow-x"
-:1,"overflow-y":1,padding:{multi:"<padding-width> | inherit",max:4},"padding-bottom"
-:"<padding-width> | inherit","padding-left":"<padding-width> | inherit","padding-right"
-:"<padding-width> | inherit","padding-top":"<padding-width> | inherit",page:1,"page-break-after"
-:"auto | always | avoid | left | right | inherit","page-break-before":"auto | always | avoid | left | right | inherit"
-,"page-break-inside":"auto | avoid | inherit","page-policy":1,pause:1,"pause-after"
-:1,"pause-before":1,perspective:1,"perspective-origin":1,phonemes:1,pitch:1,"pitch-range"
-:1,"play-during":1,"pointer-events":"auto | none | visiblePainted | visibleFill | visibleStroke | visible | painted | fill | stroke | all | inherit"
-,position:"static | relative | absolute | fixed | inherit","presentation-level":1
-,"punctuation-trim":1,quotes:1,"rendering-intent":1,resize:1,rest:1,"rest-after"
-:1,"rest-before":1,richness:1,right:"<margin-width> | inherit",rotation:1,"rotation-point"
-:1,"ruby-align":1,"ruby-overhang":1,"ruby-position":1,"ruby-span":1,size:1,speak
-:"normal | none | spell-out | inherit","speak-header":"once | always | inherit","speak-numeral"
-:"digits | continuous | inherit","speak-punctuation":"code | none | inherit","speech-rate"
-:1,src:1,stress:1,"string-set":1,"table-layout":"auto | fixed | inherit","tab-size"
-:"<integer> | <length>",target:1,"target-name":1,"target-new":1,"target-position"
-:1,"text-align":"left | right | center | justify | inherit","text-align-last":1,"text-decoration"
-:1,"text-emphasis":1,"text-height":1,"text-indent":"<length> | <percentage> | inherit"
-,"text-justify":"auto | none | inter-word | inter-ideograph | inter-cluster | distribute | kashida"
-,"text-outline":1,"text-overflow":1,"text-rendering":"auto | optimizeSpeed | optimizeLegibility | geometricPrecision | inherit"
-,"text-shadow":1,"text-transform":"capitalize | uppercase | lowercase | none | inherit"
-,"text-wrap":"normal | none | avoid",top:"<margin-width> | inherit",transform:1,"transform-origin"
-:1,"transform-style":1,transition:1,"transition-delay":1,"transition-duration":1
-,"transition-property":1,"transition-timing-function":1,"unicode-bidi":"normal | embed | bidi-override | inherit"
-,"user-modify":"read-only | read-write | write-only | inherit","user-select":"none | text | toggle | element | elements | all | inherit"
+:1,mask:1,"max-height":"<length> | <percentage> | <content-sizing> | none","max-width"
+:"<length> | <percentage> | <content-sizing> | none","min-height":"<length> | <percentage> | <content-sizing> | contain-floats | -moz-contain-floats | -webkit-contain-floats"
+,"min-width":"<length> | <percentage> | <content-sizing> | contain-floats | -moz-contain-floats | -webkit-contain-floats"
+,"move-to":1,"nav-down":1,"nav-index":1,"nav-left":1,"nav-right":1,"nav-up":1,"object-fit"
+:"fill | contain | cover | none | scale-down","object-position":"<position>",opacity
+:"<opacity-value>",order:"<integer>","-webkit-order":"<integer>",orphans:"<integer>"
+,outline:1,"outline-color":"<color> | invert","outline-offset":1,"outline-style"
+:"<border-style>","outline-width":"<border-width>",overflow:"visible | hidden | scroll | auto"
+,"overflow-style":1,"overflow-wrap":"normal | break-word","overflow-x":1,"overflow-y"
+:1,padding:"<padding-width>{1,4}","padding-bottom":"<padding-width>","padding-left"
+:"<padding-width>","padding-right":"<padding-width>","padding-top":"<padding-width>"
+,page:1,"page-break-after":"auto | always | avoid | left | right","page-break-before"
+:"auto | always | avoid | left | right","page-break-inside":"auto | avoid","page-policy"
+:1,pause:1,"pause-after":1,"pause-before":1,perspective:1,"perspective-origin":1
+,phonemes:1,pitch:1,"pitch-range":1,"play-during":1,"pointer-events":"auto | none | visiblePainted | visibleFill | visibleStroke | visible | painted | fill | stroke | all"
+,position:"static | relative | absolute | fixed","presentation-level":1,"punctuation-trim"
+:1,quotes:1,"rendering-intent":1,resize:1,rest:1,"rest-after":1,"rest-before":1,
+richness:1,right:"<margin-width>",rotation:1,"rotation-point":1,"ruby-align":1,"ruby-overhang"
+:1,"ruby-position":1,"ruby-span":1,"shape-rendering":"auto | optimizeSpeed | crispEdges | geometricPrecision"
+,size:1,speak:"normal | none | spell-out","speak-header":"once | always","speak-numeral"
+:"digits | continuous","speak-punctuation":"code | none","speech-rate":1,src:1,"stop-color"
+:1,"stop-opacity":"<opacity-value>",stress:1,"string-set":1,stroke:"<paint>","stroke-dasharray"
+:"none | <dasharray>","stroke-dashoffset":"<percentage> | <length>","stroke-linecap"
+:"butt | round | square","stroke-linejoin":"miter | round | bevel","stroke-miterlimit"
+:"<miterlimit>","stroke-opacity":"<opacity-value>","stroke-width":"<percentage> | <length>"
+,"table-layout":"auto | fixed","tab-size":"<integer> | <length>",target:1,"target-name"
+:1,"target-new":1,"target-position":1,"text-align":"left | right | center | justify | match-parent | start | end"
+,"text-align-last":1,"text-anchor":"start | middle | end","text-decoration":"<text-decoration-line> || <text-decoration-style> || <text-decoration-color>"
+,"text-decoration-color":"<text-decoration-color>","text-decoration-line":"<text-decoration-line>"
+,"text-decoration-style":"<text-decoration-style>","text-emphasis":1,"text-height"
+:1,"text-indent":"<length> | <percentage>","text-justify":"auto | none | inter-word | inter-ideograph | inter-cluster | distribute | kashida"
+,"text-outline":1,"text-overflow":1,"text-rendering":"auto | optimizeSpeed | optimizeLegibility | geometricPrecision"
+,"text-shadow":1,"text-transform":"capitalize | uppercase | lowercase | none","text-wrap"
+:"normal | none | avoid",top:"<margin-width>","-ms-touch-action":"auto | none | pan-x | pan-y | pan-left | pan-right | pan-up | pan-down | manipulation"
+,"touch-action":"auto | none | pan-x | pan-y | pan-left | pan-right | pan-up | pan-down | manipulation"
+,transform:1,"transform-origin":1,"transform-style":1,transition:1,"transition-delay"
+:1,"transition-duration":1,"transition-property":1,"transition-timing-function":1
+,"unicode-bidi":"normal | embed | isolate | bidi-override | isolate-override | plaintext"
+,"user-modify":"read-only | read-write | write-only","user-select":"none | text | toggle | element | elements | all"
 ,"vertical-align":"auto | use-script | baseline | sub | super | top | text-top | central | middle | bottom | text-bottom | <percentage> | <length>"
-,visibility:"visible | hidden | collapse | inherit","voice-balance":1,"voice-duration"
-:1,"voice-family":1,"voice-pitch":1,"voice-pitch-range":1,"voice-rate":1,"voice-stress"
-:1,"voice-volume":1,volume:1,"white-space":"normal | pre | nowrap | pre-wrap | pre-line | inherit | -pre-wrap | -o-pre-wrap | -moz-pre-wrap | -hp-pre-wrap"
-,"white-space-collapse":1,widows:"<integer> | inherit",width:"<length> | <percentage> | auto | inherit"
-,"word-break":"normal | keep-all | break-all","word-spacing":"<length> | normal | inherit"
-,"word-wrap":1,"z-index":"<integer> | auto | inherit",zoom:"<number> | <percentage> | normal"
-};PropertyName.prototype=new SyntaxUnit,PropertyName.prototype.constructor=PropertyName
-,PropertyName.prototype.toString=function(){return(this.hack?this.hack:"")+this.
-text},PropertyValue.prototype=new SyntaxUnit,PropertyValue.prototype.constructor=
-PropertyValue,PropertyValueIterator.prototype.count=function(){return this._parts
-.length},PropertyValueIterator.prototype.isFirst=function(){return this._i===0},
-PropertyValueIterator.prototype.hasNext=function(){return this._i<this._parts.length
-},PropertyValueIterator.prototype.mark=function(){this._marks.push(this._i)},PropertyValueIterator
+,visibility:"visible | hidden | collapse","voice-balance":1,"voice-duration":1,"voice-family"
+:1,"voice-pitch":1,"voice-pitch-range":1,"voice-rate":1,"voice-stress":1,"voice-volume"
+:1,volume:1,"white-space":"normal | pre | nowrap | pre-wrap | pre-line | -pre-wrap | -o-pre-wrap | -moz-pre-wrap | -hp-pre-wrap"
+,"white-space-collapse":1,widows:"<integer>",width:"<length> | <percentage> | <content-sizing> | auto"
+,"will-change":"<will-change>","word-break":"normal | keep-all | break-all","word-spacing"
+:"<length> | normal","word-wrap":"normal | break-word","writing-mode":"horizontal-tb | vertical-rl | vertical-lr | lr-tb | rl-tb | tb-rl | bt-rl | tb-lr | bt-lr | lr-bt | rl-bt | lr | rl | tb"
+,"z-index":"<integer> | auto",zoom:"<number> | <percentage> | normal"}},{}],8:[function(
+e,t,n){"use strict";function s(e,t,n,s){r.call(this,e,n,s,i.PROPERTY_NAME_TYPE),
+this.hack=t}t.exports=s;var r=e("../util/SyntaxUnit"),i=e("./Parser");s.prototype=new
+r,s.prototype.constructor=s,s.prototype.toString=function(){return(this.hack?this
+.hack:"")+this.text}},{"../util/SyntaxUnit":26,"./Parser":6}],9:[function(e,t,n)
+{"use strict";function s(e,t,n){r.call(this,e.join(" "),t,n,i.PROPERTY_VALUE_TYPE
+),this.parts=e}t.exports=s;var r=e("../util/SyntaxUnit"),i=e("./Parser");s.prototype=new
+r,s.prototype.constructor=s},{"../util/SyntaxUnit":26,"./Parser":6}],10:[function(
+e,t,n){"use strict";function r(e){this._i=0,this._parts=e.parts,this._marks=[],this
+.value=e}t.exports=r,r.prototype.count=function(){return this._parts.length},r.prototype
+.isFirst=function(){return this._i===0},r.prototype.hasNext=function(){return this
+._i<this._parts.length},r.prototype.mark=function(){this._marks.push(this._i)},r
 .prototype.peek=function(e){return this.hasNext()?this._parts[this._i+(e||0)]:null
-},PropertyValueIterator.prototype.next=function(){return this.hasNext()?this._parts
-[this._i++]:null},PropertyValueIterator.prototype.previous=function(){return this
-._i>0?this._parts[--this._i]:null},PropertyValueIterator.prototype.restore=function(
-){this._marks.length&&(this._i=this._marks.pop())},PropertyValuePart.prototype=new
-SyntaxUnit,PropertyValuePart.prototype.constructor=PropertyValuePart,PropertyValuePart
-.fromToken=function(e){return new PropertyValuePart(e.value,e.startLine,e.startCol
-)};var Pseudos={":first-letter":1,":first-line":1,":before":1,":after":1};Pseudos
-.ELEMENT=1,Pseudos.CLASS=2,Pseudos.isElement=function(e){return e.indexOf("::")===0||
-Pseudos[e.toLowerCase()]==Pseudos.ELEMENT},Selector.prototype=new SyntaxUnit,Selector
-.prototype.constructor=Selector,SelectorPart.prototype=new SyntaxUnit,SelectorPart
-.prototype.constructor=SelectorPart,SelectorSubPart.prototype=new SyntaxUnit,SelectorSubPart
-.prototype.constructor=SelectorSubPart,Specificity.prototype={constructor:Specificity
-,compare:function(e){var t=["a","b","c","d"],n,r;for(n=0,r=t.length;n<r;n++){if(
-this[t[n]]<e[t[n]])return-1;if(this[t[n]]>e[t[n]])return 1}return 0},valueOf:function(
-){return this.a*1e3+this.b*100+this.c*10+this.d},toString:function(){return this
-.a+","+this.b+","+this.c+","+this.d}},Specificity.calculate=function(e){function u
-(e){var t,n,r,a,f=e.elementName?e.elementName.text:"",l;f&&f.charAt(f.length-1)!="*"&&
-o++;for(t=0,r=e.modifiers.length;t<r;t++){l=e.modifiers[t];switch(l.type){case"class"
-:case"attribute":s++;break;case"id":i++;break;case"pseudo":Pseudos.isElement(l.text
-)?o++:s++;break;case"not":for(n=0,a=l.args.length;n<a;n++)u(l.args[n])}}}var t,n
-,r,i=0,s=0,o=0;for(t=0,n=e.parts.length;t<n;t++)r=e.parts[t],r instanceof SelectorPart&&
-u(r);return new Specificity(0,i,s,o)};var h=/^[0-9a-fA-F]$/,nonascii=/^[\u0080-\uFFFF]$/
-,nl=/\n|\r\n|\r|\f/;TokenStream.prototype=mix(new TokenStreamBase,{_getToken:function(
-e){var t,n=this._reader,r=null,i=n.getLine(),s=n.getCol();t=n.read();while(t){switch(
-t){case"/":n.peek()=="*"?r=this.commentToken(t,i,s):r=this.charToken(t,i,s);break;
-case"|":case"~":case"^":case"$":case"*":n.peek()=="="?r=this.comparisonToken(t,i
-,s):r=this.charToken(t,i,s);break;case'"':case"'":r=this.stringToken(t,i,s);break;
-case"#":isNameChar(n.peek())?r=this.hashToken(t,i,s):r=this.charToken(t,i,s);break;
-case".":isDigit(n.peek())?r=this.numberToken(t,i,s):r=this.charToken(t,i,s);break;
-case"-":n.peek()=="-"?r=this.htmlCommentEndToken(t,i,s):isNameStart(n.peek())?r=
-this.identOrFunctionToken(t,i,s):r=this.charToken(t,i,s);break;case"!":r=this.importantToken
-(t,i,s);break;case"@":r=this.atRuleToken(t,i,s);break;case":":r=this.notToken(t,
-i,s);break;case"<":r=this.htmlCommentStartToken(t,i,s);break;case"U":case"u":if(
-n.peek()=="+"){r=this.unicodeRangeToken(t,i,s);break};default:isDigit(t)?r=this.
-numberToken(t,i,s):isWhitespace(t)?r=this.whitespaceToken(t,i,s):isIdentStart(t)?
-r=this.identOrFunctionToken(t,i,s):r=this.charToken(t,i,s)}break}return!r&&t===null&&
-(r=this.createToken(Tokens.EOF,null,i,s)),r},createToken:function(e,t,n,r,i){var s=
-this._reader;return i=i||{},{value:t,type:e,channel:i.channel,hide:i.hide||!1,startLine
-:n,startCol:r,endLine:s.getLine(),endCol:s.getCol()}},atRuleToken:function(e,t,n
-){var r=e,i=this._reader,s=Tokens.CHAR,o=!1,u,a;i.mark(),u=this.readName(),r=e+u
-,s=Tokens.type(r.toLowerCase());if(s==Tokens.CHAR||s==Tokens.UNKNOWN)r.length>1?
-s=Tokens.UNKNOWN_SYM:(s=Tokens.CHAR,r=e,i.reset());return this.createToken(s,r,t
-,n)},charToken:function(e,t,n){var r=Tokens.type(e);return r==-1&&(r=Tokens.CHAR
-),this.createToken(r,e,t,n)},commentToken:function(e,t,n){var r=this._reader,i=this
-.readComment(e);return this.createToken(Tokens.COMMENT,i,t,n)},comparisonToken:function(
-e,t,n){var r=this._reader,i=e+r.read(),s=Tokens.type(i)||Tokens.CHAR;return this
-.createToken(s,i,t,n)},hashToken:function(e,t,n){var r=this._reader,i=this.readName
-(e);return this.createToken(Tokens.HASH,i,t,n)},htmlCommentStartToken:function(e
-,t,n){var r=this._reader,i=e;return r.mark(),i+=r.readCount(3),i=="<!--"?this.createToken
-(Tokens.CDO,i,t,n):(r.reset(),this.charToken(e,t,n))},htmlCommentEndToken:function(
-e,t,n){var r=this._reader,i=e;return r.mark(),i+=r.readCount(2),i=="-->"?this.createToken
-(Tokens.CDC,i,t,n):(r.reset(),this.charToken(e,t,n))},identOrFunctionToken:function(
-e,t,n){var r=this._reader,i=this.readName(e),s=Tokens.IDENT;return r.peek()=="("?
-(i+=r.read(),i.toLowerCase()=="url("?(s=Tokens.URI,i=this.readURI(i),i.toLowerCase
-()=="url("&&(s=Tokens.FUNCTION)):s=Tokens.FUNCTION):r.peek()==":"&&i.toLowerCase
-()=="progid"&&(i+=r.readTo("("),s=Tokens.IE_FUNCTION),this.createToken(s,i,t,n)}
-,importantToken:function(e,t,n){var r=this._reader,i=e,s=Tokens.CHAR,o,u;r.mark(
-),u=r.read();while(u){if(u=="/"){if(r.peek()!="*")break;o=this.readComment(u);if(
-o==="")break}else{if(!isWhitespace(u)){if(/i/i.test(u)){o=r.readCount(8),/mportant/i
-.test(o)&&(i+=u+o,s=Tokens.IMPORTANT_SYM);break}break}i+=u+this.readWhitespace()
-}u=r.read()}return s==Tokens.CHAR?(r.reset(),this.charToken(e,t,n)):this.createToken
-(s,i,t,n)},notToken:function(e,t,n){var r=this._reader,i=e;return r.mark(),i+=r.
-readCount(4),i.toLowerCase()==":not("?this.createToken(Tokens.NOT,i,t,n):(r.reset
-(),this.charToken(e,t,n))},numberToken:function(e,t,n){var r=this._reader,i=this
-.readNumber(e),s,o=Tokens.NUMBER,u=r.peek();return isIdentStart(u)?(s=this.readName
-(r.read()),i+=s,/^em$|^ex$|^px$|^gd$|^rem$|^vw$|^vh$|^vm$|^ch$|^cm$|^mm$|^in$|^pt$|^pc$/i
-.test(s)?o=Tokens.LENGTH:/^deg|^rad$|^grad$/i.test(s)?o=Tokens.ANGLE:/^ms$|^s$/i
-.test(s)?o=Tokens.TIME:/^hz$|^khz$/i.test(s)?o=Tokens.FREQ:/^dpi$|^dpcm$/i.test(
-s)?o=Tokens.RESOLUTION:o=Tokens.DIMENSION):u=="%"&&(i+=r.read(),o=Tokens.PERCENTAGE
-),this.createToken(o,i,t,n)},stringToken:function(e,t,n){var r=e,i=e,s=this._reader
-,o=e,u=Tokens.STRING,a=s.read();while(a){i+=a;if(a==r&&o!="\\")break;if(isNewLine
-(s.peek())&&a!="\\"){u=Tokens.INVALID;break}o=a,a=s.read()}return a===null&&(u=Tokens
-.INVALID),this.createToken(u,i,t,n)},unicodeRangeToken:function(e,t,n){var r=this
-._reader,i=e,s,o=Tokens.CHAR;return r.peek()=="+"&&(r.mark(),i+=r.read(),i+=this
-.readUnicodeRangePart(!0),i.length==2?r.reset():(o=Tokens.UNICODE_RANGE,i.indexOf
-("?")==-1&&r.peek()=="-"&&(r.mark(),s=r.read(),s+=this.readUnicodeRangePart(!1),
-s.length==1?r.reset():i+=s))),this.createToken(o,i,t,n)},whitespaceToken:function(
-e,t,n){var r=this._reader,i=e+this.readWhitespace();return this.createToken(Tokens
-.S,i,t,n)},readUnicodeRangePart:function(e){var t=this._reader,n="",r=t.peek();while(
-isHexDigit(r)&&n.length<6)t.read(),n+=r,r=t.peek();if(e)while(r=="?"&&n.length<6
-)t.read(),n+=r,r=t.peek();return n},readWhitespace:function(){var e=this._reader
-,t="",n=e.peek();while(isWhitespace(n))e.read(),t+=n,n=e.peek();return t},readNumber
-:function(e){var t=this._reader,n=e,r=e==".",i=t.peek();while(i){if(isDigit(i))n+=
-t.read();else{if(i!=".")break;if(r)break;r=!0,n+=t.read()}i=t.peek()}return n},readString
-:function(){var e=this._reader,t=e.read(),n=t,r=t,i=e.peek();while(i){i=e.read()
-,n+=i;if(i==t&&r!="\\")break;if(isNewLine(e.peek())&&i!="\\"){n="";break}r=i,i=e
-.peek()}return i===null&&(n=""),n},readURI:function(e){var t=this._reader,n=e,r=""
-,i=t.peek();t.mark();while(i&&isWhitespace(i))t.read(),i=t.peek();i=="'"||i=='"'?
-r=this.readString():r=this.readURL(),i=t.peek();while(i&&isWhitespace(i))t.read(
-),i=t.peek();return r===""||i!=")"?(n=e,t.reset()):n+=r+t.read(),n},readURL:function(
-){var e=this._reader,t="",n=e.peek();while(/^[!#$%&\\*-~]$/.test(n))t+=e.read(),
-n=e.peek();return t},readName:function(e){var t=this._reader,n=e||"",r=t.peek();
-for(;;)if(r=="\\")n+=this.readEscape(t.read()),r=t.peek();else{if(!r||!isNameChar
-(r))break;n+=t.read(),r=t.peek()}return n},readEscape:function(e){var t=this._reader
-,n=e||"",r=0,i=t.peek();if(isHexDigit(i))do n+=t.read(),i=t.peek();while(i&&isHexDigit
-(i)&&++r<6);return n.length==3&&/\s/.test(i)||n.length==7||n.length==1?t.read():
-i="",n+i},readComment:function(e){var t=this._reader,n=e||"",r=t.read();if(r=="*"
-){while(r){n+=r;if(n.length>2&&r=="*"&&t.peek()=="/"){n+=t.read();break}r=t.read
-()}return n}return""}});var Tokens=[{name:"CDO"},{name:"CDC"},{name:"S",whitespace
-:!0},{name:"COMMENT",comment:!0,hide:!0,channel:"comment"},{name:"INCLUDES",text
-:"~="},{name:"DASHMATCH",text:"|="},{name:"PREFIXMATCH",text:"^="},{name:"SUFFIXMATCH"
-,text:"$="},{name:"SUBSTRINGMATCH",text:"*="},{name:"STRING"},{name:"IDENT"},{name
-:"HASH"},{name:"IMPORT_SYM",text:"@import"},{name:"PAGE_SYM",text:"@page"},{name
-:"MEDIA_SYM",text:"@media"},{name:"FONT_FACE_SYM",text:"@font-face"},{name:"CHARSET_SYM"
-,text:"@charset"},{name:"NAMESPACE_SYM",text:"@namespace"},{name:"VIEWPORT_SYM",
-text:"@viewport"},{name:"UNKNOWN_SYM"},{name:"KEYFRAMES_SYM",text:["@keyframes","@-webkit-keyframes"
-,"@-moz-keyframes","@-o-keyframes"]},{name:"IMPORTANT_SYM"},{name:"LENGTH"},{name
-:"ANGLE"},{name:"TIME"},{name:"FREQ"},{name:"DIMENSION"},{name:"PERCENTAGE"},{name
-:"NUMBER"},{name:"URI"},{name:"FUNCTION"},{name:"UNICODE_RANGE"},{name:"INVALID"
-},{name:"PLUS",text:"+"},{name:"GREATER",text:">"},{name:"COMMA",text:","},{name
-:"TILDE",text:"~"},{name:"NOT"},{name:"TOPLEFTCORNER_SYM",text:"@top-left-corner"
+},r.prototype.next=function(){return this.hasNext()?this._parts[this._i++]:null}
+,r.prototype.previous=function(){return this._i>0?this._parts[--this._i]:null},r
+.prototype.restore=function(){this._marks.length&&(this._i=this._marks.pop())},r
+.prototype.drop=function(){this._marks.pop()}},{}],11:[function(e,t,n){"use strict"
+;function u(e,t,n,o){var a=o||{};r.call(this,e,t,n,s.PROPERTY_VALUE_PART_TYPE),this
+.type="unknown";var f;if(/^([+\-]?[\d\.]+)([a-z]+)$/i.test(e)){this.type="dimension"
+,this.value=+RegExp.$1,this.units=RegExp.$2;switch(this.units.toLowerCase()){case"em"
+:case"rem":case"ex":case"px":case"cm":case"mm":case"in":case"pt":case"pc":case"ch"
+:case"vh":case"vw":case"vmax":case"vmin":this.type="length";break;case"fr":this.
+type="grid";break;case"deg":case"rad":case"grad":case"turn":this.type="angle";break;
+case"ms":case"s":this.type="time";break;case"hz":case"khz":this.type="frequency"
+;break;case"dpi":case"dpcm":this.type="resolution"}}else/^([+\-]?[\d\.]+)%$/i.test
+(e)?(this.type="percentage",this.value=+RegExp.$1):/^([+\-]?\d+)$/i.test(e)?(this
+.type="integer",this.value=+RegExp.$1):/^([+\-]?[\d\.]+)$/i.test(e)?(this.type="number"
+,this.value=+RegExp.$1):/^#([a-f0-9]{3,6})/i.test(e)?(this.type="color",f=RegExp
+.$1,f.length===3?(this.red=parseInt(f.charAt(0)+f.charAt(0),16),this.green=parseInt
+(f.charAt(1)+f.charAt(1),16),this.blue=parseInt(f.charAt(2)+f.charAt(2),16)):(this
+.red=parseInt(f.substring(0,2),16),this.green=parseInt(f.substring(2,4),16),this
+.blue=parseInt(f.substring(4,6),16))):/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i
+.test(e)?(this.type="color",this.red=+RegExp.$1,this.green=+RegExp.$2,this.blue=+
+RegExp.$3):/^rgb\(\s*(\d+)%\s*,\s*(\d+)%\s*,\s*(\d+)%\s*\)/i.test(e)?(this.type="color"
+,this.red=+RegExp.$1*255/100,this.green=+RegExp.$2*255/100,this.blue=+RegExp.$3*255/100
+):/^rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d\.]+)\s*\)/i.test(e)?(this.
+type="color",this.red=+RegExp.$1,this.green=+RegExp.$2,this.blue=+RegExp.$3,this
+.alpha=+RegExp.$4):/^rgba\(\s*(\d+)%\s*,\s*(\d+)%\s*,\s*(\d+)%\s*,\s*([\d\.]+)\s*\)/i
+.test(e)?(this.type="color",this.red=+RegExp.$1*255/100,this.green=+RegExp.$2*255/100
+,this.blue=+RegExp.$3*255/100,this.alpha=+RegExp.$4):/^hsl\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*\)/i
+.test(e)?(this.type="color",this.hue=+RegExp.$1,this.saturation=+RegExp.$2/100,this
+.lightness=+RegExp.$3/100):/^hsla\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*,\s*([\d\.]+)\s*\)/i
+.test(e)?(this.type="color",this.hue=+RegExp.$1,this.saturation=+RegExp.$2/100,this
+.lightness=+RegExp.$3/100,this.alpha=+RegExp.$4):/^url\(("([^\\"]|\\.)*")\)/i.test
+(e)?(this.type="uri",this.uri=u.parseString(RegExp.$1)):/^([^\(]+)\(/i.test(e)?(
+this.type="function",this.name=RegExp.$1,this.value=e):/^"([^\n\r\f\\"]|\\\r\n|\\[^\r0-9a-f]|\\[0-9a-f]{1,6}(\r\n|[ \n\r\t\f])?)*"/i
+.test(e)?(this.type="string",this.value=u.parseString(e)):/^'([^\n\r\f\\']|\\\r\n|\\[^\r0-9a-f]|\\[0-9a-f]{1,6}(\r\n|[ \n\r\t\f])?)*'/i
+.test(e)?(this.type="string",this.value=u.parseString(e)):i[e.toLowerCase()]?(this
+.type="color",f=i[e.toLowerCase()].substring(1),this.red=parseInt(f.substring(0,2
+),16),this.green=parseInt(f.substring(2,4),16),this.blue=parseInt(f.substring(4,6
+),16)):/^[,\/]$/.test(e)?(this.type="operator",this.value=e):/^-?[a-z_\u00A0-\uFFFF][a-z0-9\-_\u00A0-\uFFFF]*$/i
+.test(e)&&(this.type="identifier",this.value=e);this.wasIdent=Boolean(a.ident)}t
+.exports=u;var r=e("../util/SyntaxUnit"),i=e("./Colors"),s=e("./Parser"),o=e("./Tokens"
+);u.prototype=new r,u.prototype.constructor=u,u.parseString=function(e){e=e.slice
+(1,-1);var t=function(e,t){if(/^(\n|\r\n|\r|\f)$/.test(t))return"";var n=/^[0-9a-f]{1,6}/i
+.exec(t);if(n){var r=parseInt(n[0],16);return String.fromCodePoint?String.fromCodePoint
+(r):String.fromCharCode(r)}return t};return e.replace(/\\(\r\n|[^\r0-9a-f]|[0-9a-f]{1,6}(\r\n|[ \n\r\t\f])?)/ig
+,t)},u.serializeString=function(e){var t=function(e,t){if(t==='"')return"\\"+t;var n=
+String.codePointAt?String.codePointAt(0):String.charCodeAt(0);return"\\"+n.toString
+(16)+" "};return'"'+e.replace(/["\r\n\f]/g,t)+'"'},u.fromToken=function(e){var t=new
+u(e.value,e.startLine,e.startCol,{ident:e.type===o.IDENT});return t}},{"../util/SyntaxUnit"
+:26,"./Colors":1,"./Parser":6,"./Tokens":18}],12:[function(e,t,n){"use strict";var r=
+t.exports={__proto__:null,":first-letter":1,":first-line":1,":before":1,":after"
+:1};r.ELEMENT=1,r.CLASS=2,r.isElement=function(e){return e.indexOf("::")===0||r[
+e.toLowerCase()]===r.ELEMENT}},{}],13:[function(e,t,n){"use strict";function o(e
+,t,n){r.call(this,e.join(" "),t,n,i.SELECTOR_TYPE),this.parts=e,this.specificity=
+s.calculate(this)}t.exports=o;var r=e("../util/SyntaxUnit"),i=e("./Parser"),s=e("./Specificity"
+);o.prototype=new r,o.prototype.constructor=o},{"../util/SyntaxUnit":26,"./Parser"
+:6,"./Specificity":16}],14:[function(e,t,n){"use strict";function s(e,t,n,s,o){r
+.call(this,n,s,o,i.SELECTOR_PART_TYPE),this.elementName=e,this.modifiers=t}t.exports=
+s;var r=e("../util/SyntaxUnit"),i=e("./Parser");s.prototype=new r,s.prototype.constructor=
+s},{"../util/SyntaxUnit":26,"./Parser":6}],15:[function(e,t,n){"use strict";function s
+(e,t,n,s){r.call(this,e,n,s,i.SELECTOR_SUB_PART_TYPE),this.type=t,this.args=[]}t
+.exports=s;var r=e("../util/SyntaxUnit"),i=e("./Parser");s.prototype=new r,s.prototype
+.constructor=s},{"../util/SyntaxUnit":26,"./Parser":6}],16:[function(e,t,n){"use strict"
+;function s(e,t,n,r){this.a=e,this.b=t,this.c=n,this.d=r}t.exports=s;var r=e("./Pseudos"
+),i=e("./SelectorPart");s.prototype={constructor:s,compare:function(e){var t=["a"
+,"b","c","d"],n,r;for(n=0,r=t.length;n<r;n++){if(this[t[n]]<e[t[n]])return-1;if(
+this[t[n]]>e[t[n]])return 1}return 0},valueOf:function(){return this.a*1e3+this.
+b*100+this.c*10+this.d},toString:function(){return this.a+","+this.b+","+this.c+","+
+this.d}},s.calculate=function(e){function l(e){var t,n,i,s,o=e.elementName?e.elementName
+.text:"",h;o&&o.charAt(o.length-1)!=="*"&&f++;for(t=0,i=e.modifiers.length;t<i;t++
+){h=e.modifiers[t];switch(h.type){case"class":case"attribute":a++;break;case"id"
+:u++;break;case"pseudo":r.isElement(h.text)?f++:a++;break;case"not":for(n=0,s=h.
+args.length;n<s;n++)l(h.args[n])}}}var t,n,o,u=0,a=0,f=0;for(t=0,n=e.parts.length
+;t<n;t++)o=e.parts[t],o instanceof i&&l(o);return new s(0,u,a,f)}},{"./Pseudos":12
+,"./SelectorPart":14}],17:[function(e,t,n){"use strict";function l(e){return e!==
+null&&o.test(e)}function c(e){return e!==null&&/\d/.test(e)}function h(e){return e!==
+null&&f.test(e)}function p(e){return e!==null&&a.test(e)}function d(e){return e!==
+null&&/[a-z_\u00A0-\uFFFF\\]/i.test(e)}function v(e){return e!==null&&(d(e)||/[0-9\-\\]/
+.test(e))}function m(e){return e!==null&&(d(e)||/\-\\/.test(e))}function g(e,t){
+for(var n in t)Object.prototype.hasOwnProperty.call(t,n)&&(e[n]=t[n]);return e}function y
+(e){r.call(this,e,s)}t.exports=y;var r=e("../util/TokenStreamBase"),i=e("./PropertyValuePart"
+),s=e("./Tokens"),o=/^[0-9a-fA-F]$/,u=/^[\u00A0-\uFFFF]$/,a=/\n|\r\n|\r|\f/,f=/\u0009|\u000a|\u000c|\u000d|\u0020/
+;y.prototype=g(new r,{_getToken:function(){var e,t=this._reader,n=null,r=t.getLine
+(),i=t.getCol();e=t.read();while(e){switch(e){case"/":t.peek()==="*"?n=this.commentToken
+(e,r,i):n=this.charToken(e,r,i);break;case"|":case"~":case"^":case"$":case"*":t.
+peek()==="="?n=this.comparisonToken(e,r,i):n=this.charToken(e,r,i);break;case'"'
+:case"'":n=this.stringToken(e,r,i);break;case"#":v(t.peek())?n=this.hashToken(e,
+r,i):n=this.charToken(e,r,i);break;case".":c(t.peek())?n=this.numberToken(e,r,i)
+:n=this.charToken(e,r,i);break;case"-":t.peek()==="-"?n=this.htmlCommentEndToken
+(e,r,i):d(t.peek())?n=this.identOrFunctionToken(e,r,i):n=this.charToken(e,r,i);break;
+case"!":n=this.importantToken(e,r,i);break;case"@":n=this.atRuleToken(e,r,i);break;
+case":":n=this.notToken(e,r,i);break;case"<":n=this.htmlCommentStartToken(e,r,i)
+;break;case"\\":/[^\r\n\f]/.test(t.peek())?n=this.identOrFunctionToken(this.readEscape
+(e,!0),r,i):n=this.charToken(e,r,i);break;case"U":case"u":if(t.peek()==="+"){n=this
+.unicodeRangeToken(e,r,i);break};default:c(e)?n=this.numberToken(e,r,i):h(e)?n=this
+.whitespaceToken(e,r,i):m(e)?n=this.identOrFunctionToken(e,r,i):n=this.charToken
+(e,r,i)}break}return!n&&e===null&&(n=this.createToken(s.EOF,null,r,i)),n},createToken
+:function(e,t,n,r,i){var s=this._reader;return i=i||{},{value:t,type:e,channel:i
+.channel,endChar:i.endChar,hide:i.hide||!1,startLine:n,startCol:r,endLine:s.getLine
+(),endCol:s.getCol()}},atRuleToken:function(e,t,n){var r=e,i=this._reader,o=s.CHAR
+,u;i.mark(),u=this.readName(),r=e+u,o=s.type(r.toLowerCase());if(o===s.CHAR||o===
+s.UNKNOWN)r.length>1?o=s.UNKNOWN_SYM:(o=s.CHAR,r=e,i.reset());return this.createToken
+(o,r,t,n)},charToken:function(e,t,n){var r=s.type(e),i={};return r===-1?r=s.CHAR
+:i.endChar=s[r].endChar,this.createToken(r,e,t,n,i)},commentToken:function(e,t,n
+){var r=this.readComment(e);return this.createToken(s.COMMENT,r,t,n)},comparisonToken
+:function(e,t,n){var r=this._reader,i=e+r.read(),o=s.type(i)||s.CHAR;return this
+.createToken(o,i,t,n)},hashToken:function(e,t,n){var r=this.readName(e);return this
+.createToken(s.HASH,r,t,n)},htmlCommentStartToken:function(e,t,n){var r=this._reader
+,i=e;return r.mark(),i+=r.readCount(3),i==="<!--"?this.createToken(s.CDO,i,t,n):
+(r.reset(),this.charToken(e,t,n))},htmlCommentEndToken:function(e,t,n){var r=this
+._reader,i=e;return r.mark(),i+=r.readCount(2),i==="-->"?this.createToken(s.CDC,
+i,t,n):(r.reset(),this.charToken(e,t,n))},identOrFunctionToken:function(e,t,n){var r=
+this._reader,i=this.readName(e),o=s.IDENT,u=["url(","url-prefix(","domain("],a;return r
+.peek()==="("?(i+=r.read(),u.indexOf(i.toLowerCase())>-1?(r.mark(),a=this.readURI
+(i),a===null?(r.reset(),o=s.FUNCTION):(o=s.URI,i=a)):o=s.FUNCTION):r.peek()===":"&&
+i.toLowerCase()==="progid"&&(i+=r.readTo("("),o=s.IE_FUNCTION),this.createToken(
+o,i,t,n)},importantToken:function(e,t,n){var r=this._reader,i=e,o=s.CHAR,u,a;r.mark
+(),a=r.read();while(a){if(a==="/"){if(r.peek()!=="*")break;u=this.readComment(a)
+;if(u==="")break}else{if(!h(a)){if(/i/i.test(a)){u=r.readCount(8),/mportant/i.test
+(u)&&(i+=a+u,o=s.IMPORTANT_SYM);break}break}i+=a+this.readWhitespace()}a=r.read(
+)}return o===s.CHAR?(r.reset(),this.charToken(e,t,n)):this.createToken(o,i,t,n)}
+,notToken:function(e,t,n){var r=this._reader,i=e;return r.mark(),i+=r.readCount(4
+),i.toLowerCase()===":not("?this.createToken(s.NOT,i,t,n):(r.reset(),this.charToken
+(e,t,n))},numberToken:function(e,t,n){var r=this._reader,i=this.readNumber(e),o,
+u=s.NUMBER,a=r.peek();return m(a)?(o=this.readName(r.read()),i+=o,/^em$|^ex$|^px$|^gd$|^rem$|^vw$|^vh$|^vmax$|^vmin$|^ch$|^cm$|^mm$|^in$|^pt$|^pc$/i
+.test(o)?u=s.LENGTH:/^deg|^rad$|^grad$|^turn$/i.test(o)?u=s.ANGLE:/^ms$|^s$/i.test
+(o)?u=s.TIME:/^hz$|^khz$/i.test(o)?u=s.FREQ:/^dpi$|^dpcm$/i.test(o)?u=s.RESOLUTION
+:u=s.DIMENSION):a==="%"&&(i+=r.read(),u=s.PERCENTAGE),this.createToken(u,i,t,n)}
+,stringToken:function(e,t,n){var r=e,i=e,o=this._reader,u=s.STRING,a=o.read(),f;
+while(a){i+=a;if(a==="\\"){a=o.read();if(a===null)break;if(/[^\r\n\f0-9a-f]/i.test
+(a))i+=a;else{for(f=0;l(a)&&f<6;f++)i+=a,a=o.read();a==="\r"&&o.peek()==="\n"&&(
+i+=a,a=o.read());if(!h(a))continue;i+=a}}else{if(a===r)break;if(p(o.peek())){u=s
+.INVALID;break}}a=o.read()}return a===null&&(u=s.INVALID),this.createToken(u,i,t
+,n)},unicodeRangeToken:function(e,t,n){var r=this._reader,i=e,o,u=s.CHAR;return r
+.peek()==="+"&&(r.mark(),i+=r.read(),i+=this.readUnicodeRangePart(!0),i.length===2?
+r.reset():(u=s.UNICODE_RANGE,i.indexOf("?")===-1&&r.peek()==="-"&&(r.mark(),o=r.
+read(),o+=this.readUnicodeRangePart(!1),o.length===1?r.reset():i+=o))),this.createToken
+(u,i,t,n)},whitespaceToken:function(e,t,n){var r=e+this.readWhitespace();return this
+.createToken(s.S,r,t,n)},readUnicodeRangePart:function(e){var t=this._reader,n=""
+,r=t.peek();while(l(r)&&n.length<6)t.read(),n+=r,r=t.peek();if(e)while(r==="?"&&
+n.length<6)t.read(),n+=r,r=t.peek();return n},readWhitespace:function(){var e=this
+._reader,t="",n=e.peek();while(h(n))e.read(),t+=n,n=e.peek();return t},readNumber
+:function(e){var t=this._reader,n=e,r=e===".",i=t.peek();while(i){if(c(i))n+=t.read
+();else{if(i!==".")break;if(r)break;r=!0,n+=t.read()}i=t.peek()}return n},readString
+:function(){var e=this.stringToken(this._reader.read(),0,0);return e.type===s.INVALID?
+null:e.value},readURI:function(e){var t=this._reader,n=e,r="",s=t.peek();while(s&&
+h(s))t.read(),s=t.peek();s==="'"||s==='"'?(r=this.readString(),r!==null&&(r=i.parseString
+(r))):r=this.readUnquotedURL(),s=t.peek();while(s&&h(s))t.read(),s=t.peek();return r===
+null||s!==")"?n=null:n+=i.serializeString(r)+t.read(),n},readUnquotedURL:function(
+e){var t=this._reader,n=e||"",r;for(r=t.peek();r;r=t.peek())if(u.test(r)||/^[\-!#$%&*-\[\]-~]$/
+.test(r))n+=r,t.read();else{if(r!=="\\")break;if(!/^[^\r\n\f]$/.test(t.peek(2)))
+break;n+=this.readEscape(t.read(),!0)}return n},readName:function(e){var t=this.
+_reader,n=e||"",r;for(r=t.peek();r;r=t.peek())if(r==="\\"){if(!/^[^\r\n\f]$/.test
+(t.peek(2)))break;n+=this.readEscape(t.read(),!0)}else{if(!v(r))break;n+=t.read(
+)}return n},readEscape:function(e,t){var n=this._reader,r=e||"",i=0,s=n.peek();if(
+l(s))do r+=n.read(),s=n.peek();while(s&&l(s)&&++i<6);if(r.length===1){if(!/^[^\r\n\f0-9a-f]$/
+.test(s))throw new Error("Bad escape sequence.");n.read();if(t)return s}else s==="\r"?
+(n.read(),n.peek()==="\n"&&(s+=n.read())):/^[ \t\n\f]$/.test(s)?n.read():s="";if(
+t){var o=parseInt(r.slice(e.length),16);return String.fromCodePoint?String.fromCodePoint
+(o):String.fromCharCode(o)}return r+s},readComment:function(e){var t=this._reader
+,n=e||"",r=t.read();if(r==="*"){while(r){n+=r;if(n.length>2&&r==="*"&&t.peek()==="/"
+){n+=t.read();break}r=t.read()}return n}return""}})},{"../util/TokenStreamBase":27
+,"./PropertyValuePart":11,"./Tokens":18}],18:[function(e,t,n){"use strict";var r=
+t.exports=[{name:"CDO"},{name:"CDC"},{name:"S",whitespace:!0},{name:"COMMENT",comment
+:!0,hide:!0,channel:"comment"},{name:"INCLUDES",text:"~="},{name:"DASHMATCH",text
+:"|="},{name:"PREFIXMATCH",text:"^="},{name:"SUFFIXMATCH",text:"$="},{name:"SUBSTRINGMATCH"
+,text:"*="},{name:"STRING"},{name:"IDENT"},{name:"HASH"},{name:"IMPORT_SYM",text
+:"@import"},{name:"PAGE_SYM",text:"@page"},{name:"MEDIA_SYM",text:"@media"},{name
+:"FONT_FACE_SYM",text:"@font-face"},{name:"CHARSET_SYM",text:"@charset"},{name:"NAMESPACE_SYM"
+,text:"@namespace"},{name:"SUPPORTS_SYM",text:"@supports"},{name:"VIEWPORT_SYM",
+text:["@viewport","@-ms-viewport","@-o-viewport"]},{name:"DOCUMENT_SYM",text:["@document"
+,"@-moz-document"]},{name:"UNKNOWN_SYM"},{name:"KEYFRAMES_SYM",text:["@keyframes"
+,"@-webkit-keyframes","@-moz-keyframes","@-o-keyframes"]},{name:"IMPORTANT_SYM"}
+,{name:"LENGTH"},{name:"ANGLE"},{name:"TIME"},{name:"FREQ"},{name:"DIMENSION"},{
+name:"PERCENTAGE"},{name:"NUMBER"},{name:"URI"},{name:"FUNCTION"},{name:"UNICODE_RANGE"
+},{name:"INVALID"},{name:"PLUS",text:"+"},{name:"GREATER",text:">"},{name:"COMMA"
+,text:","},{name:"TILDE",text:"~"},{name:"NOT"},{name:"TOPLEFTCORNER_SYM",text:"@top-left-corner"
 },{name:"TOPLEFT_SYM",text:"@top-left"},{name:"TOPCENTER_SYM",text:"@top-center"
 },{name:"TOPRIGHT_SYM",text:"@top-right"},{name:"TOPRIGHTCORNER_SYM",text:"@top-right-corner"
 },{name:"BOTTOMLEFTCORNER_SYM",text:"@bottom-left-corner"},{name:"BOTTOMLEFT_SYM"
@@ -7424,204 +7522,337 @@ text:"@viewport"},{name:"UNKNOWN_SYM"},{name:"KEYFRAMES_SYM",text:["@keyframes",
 },{name:"RIGHTMIDDLE_SYM",text:"@right-middle"},{name:"RIGHTBOTTOM_SYM",text:"@right-bottom"
 },{name:"RESOLUTION",state:"media"},{name:"IE_FUNCTION"},{name:"CHAR"},{name:"PIPE"
 ,text:"|"},{name:"SLASH",text:"/"},{name:"MINUS",text:"-"},{name:"STAR",text:"*"
-},{name:"LBRACE",text:"{"},{name:"RBRACE",text:"}"},{name:"LBRACKET",text:"["},{
-name:"RBRACKET",text:"]"},{name:"EQUALS",text:"="},{name:"COLON",text:":"},{name
-:"SEMICOLON",text:";"},{name:"LPAREN",text:"("},{name:"RPAREN",text:")"},{name:"DOT"
-,text:"."}];(function(){var e=[],t={};Tokens.UNKNOWN=-1,Tokens.unshift({name:"EOF"
-});for(var n=0,r=Tokens.length;n<r;n++){e.push(Tokens[n].name),Tokens[Tokens[n].
-name]=n;if(Tokens[n].text)if(Tokens[n].text instanceof Array)for(var i=0;i<Tokens
-[n].text.length;i++)t[Tokens[n].text[i]]=n;else t[Tokens[n].text]=n}Tokens.name=
-function(t){return e[t]},Tokens.type=function(e){return t[e]||-1}})();var Validation=
-{validate:function(e,t){var n=e.toString().toLowerCase(),r=t.parts,i=new PropertyValueIterator
-(t),s=Properties[n],o,u,a,f,l,c,h,p,d,v,m;if(!s){if(n.indexOf("-")!==0)throw new
-ValidationError("Unknown property '"+e+"'.",e.line,e.col)}else typeof s!="number"&&
-(typeof s=="string"?s.indexOf("||")>-1?this.groupProperty(s,i):this.singleProperty
-(s,i,1):s.multi?this.multiProperty(s.multi,i,s.comma,s.max||Infinity):typeof s=="function"&&
-s(i))},singleProperty:function(e,t,n,r){var i=!1,s=t.value,o=0,u;while(t.hasNext
-()&&o<n){i=ValidationTypes.isAny(t,e);if(!i)break;o++}if(!i)throw t.hasNext()&&!
-t.isFirst()?(u=t.peek(),new ValidationError("Expected end of value but found '"+
-u+"'.",u.line,u.col)):new ValidationError("Expected ("+e+") but found '"+s+"'.",
-s.line,s.col);if(t.hasNext())throw u=t.next(),new ValidationError("Expected end of value but found '"+
-u+"'.",u.line,u.col)},multiProperty:function(e,t,n,r){var i=!1,s=t.value,o=0,u=!1
-,a;while(t.hasNext()&&!i&&o<r){if(!ValidationTypes.isAny(t,e))break;o++;if(!t.hasNext
-())i=!0;else if(n){if(t.peek()!=",")break;a=t.next()}}if(!i)throw t.hasNext()&&!
-t.isFirst()?(a=t.peek(),new ValidationError("Expected end of value but found '"+
-a+"'.",a.line,a.col)):(a=t.previous(),n&&a==","?new ValidationError("Expected end of value but found '"+
-a+"'.",a.line,a.col):new ValidationError("Expected ("+e+") but found '"+s+"'.",s
-.line,s.col));if(t.hasNext())throw a=t.next(),new ValidationError("Expected end of value but found '"+
-a+"'.",a.line,a.col)},groupProperty:function(e,t,n){var r=!1,i=t.value,s=e.split
-("||").length,o={count:0},u=!1,a,f;while(t.hasNext()&&!r){a=ValidationTypes.isAnyOfGroup
-(t,e);if(!a)break;if(o[a])break;o[a]=1,o.count++,u=!0;if(o.count==s||!t.hasNext(
-))r=!0}if(!r)throw u&&t.hasNext()?(f=t.peek(),new ValidationError("Expected end of value but found '"+
-f+"'.",f.line,f.col)):new ValidationError("Expected ("+e+") but found '"+i+"'.",
-i.line,i.col);if(t.hasNext())throw f=t.next(),new ValidationError("Expected end of value but found '"+
-f+"'.",f.line,f.col)}};ValidationError.prototype=new Error;var ValidationTypes={
-isLiteral:function(e,t){var n=e.text.toString().toLowerCase(),r=t.split(" | "),i
-,s,o=!1;for(i=0,s=r.length;i<s&&!o;i++)n==r[i].toLowerCase()&&(o=!0);return o},isSimple
-:function(e){return!!this.simple[e]},isComplex:function(e){return!!this.complex[
-e]},isAny:function(e,t){var n=t.split(" | "),r,i,s=!1;for(r=0,i=n.length;r<i&&!s&&
-e.hasNext();r++)s=this.isType(e,n[r]);return s},isAnyOfGroup:function(e,t){var n=
-t.split(" || "),r,i,s=!1;for(r=0,i=n.length;r<i&&!s;r++)s=this.isType(e,n[r]);return s?
-n[r-1]:!1},isType:function(e,t){var n=e.peek(),r=!1;return t.charAt(0)!="<"?(r=this
-.isLiteral(n,t),r&&e.next()):this.simple[t]?(r=this.simple[t](n),r&&e.next()):r=
-this.complex[t](e),r},simple:{"<absolute-size>":function(e){return ValidationTypes
-.isLiteral(e,"xx-small | x-small | small | medium | large | x-large | xx-large")
-},"<attachment>":function(e){return ValidationTypes.isLiteral(e,"scroll | fixed | local"
-)},"<attr>":function(e){return e.type=="function"&&e.name=="attr"},"<bg-image>":
-function(e){return this["<image>"](e)||this["<gradient>"](e)||e=="none"},"<gradient>"
-:function(e){return e.type=="function"&&/^(?:\-(?:ms|moz|o|webkit)\-)?(?:repeating\-)?(?:radial\-|linear\-)?gradient/i
-.test(e)},"<box>":function(e){return ValidationTypes.isLiteral(e,"padding-box | border-box | content-box"
-)},"<content>":function(e){return e.type=="function"&&e.name=="content"},"<relative-size>"
-:function(e){return ValidationTypes.isLiteral(e,"smaller | larger")},"<ident>":function(
-e){return e.type=="identifier"},"<length>":function(e){return e.type=="function"&&/^(?:\-(?:ms|moz|o|webkit)\-)?calc/i
-.test(e)?!0:e.type=="length"||e.type=="number"||e.type=="integer"||e=="0"},"<color>"
-:function(e){return e.type=="color"||e=="transparent"},"<number>":function(e){return e
-.type=="number"||this["<integer>"](e)},"<integer>":function(e){return e.type=="integer"
-},"<line>":function(e){return e.type=="integer"},"<angle>":function(e){return e.
-type=="angle"},"<uri>":function(e){return e.type=="uri"},"<image>":function(e){return this
-["<uri>"](e)},"<percentage>":function(e){return e.type=="percentage"||e=="0"},"<border-width>"
-:function(e){return this["<length>"](e)||ValidationTypes.isLiteral(e,"thin | medium | thick"
-)},"<border-style>":function(e){return ValidationTypes.isLiteral(e,"none | hidden | dotted | dashed | solid | double | groove | ridge | inset | outset"
-)},"<margin-width>":function(e){return this["<length>"](e)||this["<percentage>"]
-(e)||ValidationTypes.isLiteral(e,"auto")},"<padding-width>":function(e){return this
-["<length>"](e)||this["<percentage>"](e)},"<shape>":function(e){return e.type=="function"&&
-(e.name=="rect"||e.name=="inset-rect")},"<time>":function(e){return e.type=="time"
-}},complex:{"<bg-position>":function(e){var t=this,n=!1,r="<percentage> | <length>"
-,i="left | right",s="top | bottom",o=0,u=function(){return e.hasNext()&&e.peek()!=","
-};while(e.peek(o)&&e.peek(o)!=",")o++;return o<3?ValidationTypes.isAny(e,i+" | center | "+
-r)?(n=!0,ValidationTypes.isAny(e,s+" | center | "+r)):ValidationTypes.isAny(e,s)&&
-(n=!0,ValidationTypes.isAny(e,i+" | center")):ValidationTypes.isAny(e,i)?ValidationTypes
-.isAny(e,s)?(n=!0,ValidationTypes.isAny(e,r)):ValidationTypes.isAny(e,r)&&(ValidationTypes
-.isAny(e,s)?(n=!0,ValidationTypes.isAny(e,r)):ValidationTypes.isAny(e,"center")&&
-(n=!0)):ValidationTypes.isAny(e,s)?ValidationTypes.isAny(e,i)?(n=!0,ValidationTypes
-.isAny(e,r)):ValidationTypes.isAny(e,r)&&(ValidationTypes.isAny(e,i)?(n=!0,ValidationTypes
-.isAny(e,r)):ValidationTypes.isAny(e,"center")&&(n=!0)):ValidationTypes.isAny(e,"center"
-)&&ValidationTypes.isAny(e,i+" | "+s)&&(n=!0,ValidationTypes.isAny(e,r)),n},"<bg-size>"
-:function(e){var t=this,n=!1,r="<percentage> | <length> | auto",i,s,o;return ValidationTypes
-.isAny(e,"cover | contain")?n=!0:ValidationTypes.isAny(e,r)&&(n=!0,ValidationTypes
-.isAny(e,r)),n},"<repeat-style>":function(e){var t=!1,n="repeat | space | round | no-repeat"
-,r;return e.hasNext()&&(r=e.next(),ValidationTypes.isLiteral(r,"repeat-x | repeat-y"
-)?t=!0:ValidationTypes.isLiteral(r,n)&&(t=!0,e.hasNext()&&ValidationTypes.isLiteral
-(e.peek(),n)&&e.next())),t},"<shadow>":function(e){var t=!1,n=0,r=!1,i=!1,s;if(e
-.hasNext()){ValidationTypes.isAny(e,"inset")&&(r=!0),ValidationTypes.isAny(e,"<color>"
-)&&(i=!0);while(ValidationTypes.isAny(e,"<length>")&&n<4)n++;e.hasNext()&&(i||ValidationTypes
-.isAny(e,"<color>"),r||ValidationTypes.isAny(e,"inset")),t=n>=2&&n<=4}return t},"<x-one-radius>"
-:function(e){var t=!1,n="<length> | <percentage> | inherit";return ValidationTypes
-.isAny(e,n)&&(t=!0,ValidationTypes.isAny(e,n)),t}}};parserlib.css={Colors:Colors
-,Combinator:Combinator,Parser:Parser,PropertyName:PropertyName,PropertyValue:PropertyValue
-,PropertyValuePart:PropertyValuePart,MediaFeature:MediaFeature,MediaQuery:MediaQuery
-,Selector:Selector,SelectorPart:SelectorPart,SelectorSubPart:SelectorSubPart,Specificity
-:Specificity,TokenStream:TokenStream,Tokens:Tokens,ValidationError:ValidationError
-}}(),function(){for(var e in parserlib)exports[e]=parserlib[e]}();var CSSLint=function(
-){function i(e,t){var r,i=e&&e.match(n),s=i&&i[1];return s&&(r={"true":2,"":1,"false"
-:0,2:2,1:1,0:0},s.toLowerCase().split(",").forEach(function(e){var n=e.split(":"
-),i=n[0]||"",s=n[1]||"";t[i.trim()]=r[s.trim()]})),t}var e=[],t=[],n=/\/\*csslint([^\*]*)\*\//
-,r=new parserlib.util.EventTarget;return r.version="0.10.0",r.addRule=function(t
-){e.push(t),e[t.id]=t},r.clearRules=function(){e=[]},r.getRules=function(){return[
-].concat(e).sort(function(e,t){return e.id>t.id?1:0})},r.getRuleset=function(){var t=
-{},n=0,r=e.length;while(n<r)t[e[n++].id]=1;return t},r.addFormatter=function(e){
-t[e.id]=e},r.getFormatter=function(e){return t[e]},r.format=function(e,t,n,r){var i=
+},{name:"LBRACE",endChar:"}",text:"{"},{name:"RBRACE",text:"}"},{name:"LBRACKET"
+,endChar:"]",text:"["},{name:"RBRACKET",text:"]"},{name:"EQUALS",text:"="},{name
+:"COLON",text:":"},{name:"SEMICOLON",text:";"},{name:"LPAREN",endChar:")",text:"("
+},{name:"RPAREN",text:")"},{name:"DOT",text:"."}];(function(){var e=[],t=Object.
+create(null);r.UNKNOWN=-1,r.unshift({name:"EOF"});for(var n=0,i=r.length;n<i;n++
+){e.push(r[n].name),r[r[n].name]=n;if(r[n].text)if(r[n].text instanceof Array)for(
+var s=0;s<r[n].text.length;s++)t[r[n].text[s]]=n;else t[r[n].text]=n}r.name=function(
+t){return e[t]},r.type=function(e){return t[e]||-1}})()},{}],19:[function(e,t,n)
+{"use strict";var r=e("./Matcher"),i=e("./Properties"),s=e("./ValidationTypes"),
+o=e("./ValidationError"),u=e("./PropertyValueIterator"),a=t.exports={validate:function(
+e,t){var n=e.toString().toLowerCase(),r=new u(t),a=i[n],f;if(!a){if(n.indexOf("-"
+)!==0)throw new o("Unknown property '"+e+"'.",e.line,e.col)}else if(typeof a!="number"
+){if(s.isAny(r,"inherit | initial | unset")){if(r.hasNext())throw f=r.next(),new
+o("Expected end of value but found '"+f+"'.",f.line,f.col);return}this.singleProperty
+(a,r)}},singleProperty:function(e,t){var n=!1,i=t.value,u;n=r.parse(e).match(t);
+if(!n)throw t.hasNext()&&!t.isFirst()?(u=t.peek(),new o("Expected end of value but found '"+
+u+"'.",u.line,u.col)):new o("Expected ("+s.describe(e)+") but found '"+i+"'.",i.
+line,i.col);if(t.hasNext())throw u=t.next(),new o("Expected end of value but found '"+
+u+"'.",u.line,u.col)}}},{"./Matcher":3,"./Properties":7,"./PropertyValueIterator"
+:10,"./ValidationError":20,"./ValidationTypes":21}],20:[function(e,t,n){"use strict"
+;function r(e,t,n){this.col=n,this.line=t,this.message=e}t.exports=r,r.prototype=new
+Error},{}],21:[function(e,t,n){"use strict";function s(e,t){Object.keys(t).forEach
+(function(n){e[n]=t[n]})}var r=t.exports,i=e("./Matcher");s(r,{isLiteral:function(
+e,t){var n=e.text.toString().toLowerCase(),r=t.split(" | "),i,s,o=!1;for(i=0,s=r
+.length;i<s&&!o;i++)r[i].charAt(0)==="<"?o=this.simple[r[i]](e):r[i].slice(-2)==="()"?
+o=e.type==="function"&&e.name===r[i].slice(0,-2):n===r[i].toLowerCase()&&(o=!0);
+return o},isSimple:function(e){return Boolean(this.simple[e])},isComplex:function(
+e){return Boolean(this.complex[e])},describe:function(e){return this.complex[e]instanceof
+i?this.complex[e].toString(0):e},isAny:function(e,t){var n=t.split(" | "),r,i,s=!1
+;for(r=0,i=n.length;r<i&&!s&&e.hasNext();r++)s=this.isType(e,n[r]);return s},isAnyOfGroup
+:function(e,t){var n=t.split(" || "),r,i,s=!1;for(r=0,i=n.length;r<i&&!s;r++)s=this
+.isType(e,n[r]);return s?n[r-1]:!1},isType:function(e,t){var n=e.peek(),r=!1;return t
+.charAt(0)!=="<"?(r=this.isLiteral(n,t),r&&e.next()):this.simple[t]?(r=this.simple
+[t](n),r&&e.next()):this.complex[t]instanceof i?r=this.complex[t].match(e):r=this
+.complex[t](e),r},simple:{__proto__:null,"<absolute-size>":"xx-small | x-small | small | medium | large | x-large | xx-large"
+,"<animateable-feature>":"scroll-position | contents | <animateable-feature-name>"
+,"<animateable-feature-name>":function(e){return this["<ident>"](e)&&!/^(unset|initial|inherit|will-change|auto|scroll-position|contents)$/i
+.test(e)},"<angle>":function(e){return e.type==="angle"},"<attachment>":"scroll | fixed | local"
+,"<attr>":"attr()","<basic-shape>":"inset() | circle() | ellipse() | polygon()","<bg-image>"
+:"<image> | <gradient> | none","<border-style>":"none | hidden | dotted | dashed | solid | double | groove | ridge | inset | outset"
+,"<border-width>":"<length> | thin | medium | thick","<box>":"padding-box | border-box | content-box"
+,"<clip-source>":"<uri>","<color>":function(e){return e.type==="color"||String(e
+)==="transparent"||String(e)==="currentColor"},"<color-svg>":function(e){return e
+.type==="color"},"<content>":"content()","<content-sizing>":"fill-available | -moz-available | -webkit-fill-available | max-content | -moz-max-content | -webkit-max-content | min-content | -moz-min-content | -webkit-min-content | fit-content | -moz-fit-content | -webkit-fit-content"
+,"<feature-tag-value>":function(e){return e.type==="function"&&/^[A-Z0-9]{4}$/i.
+test(e)},"<filter-function>":"blur() | brightness() | contrast() | custom() | drop-shadow() | grayscale() | hue-rotate() | invert() | opacity() | saturate() | sepia()"
+,"<flex-basis>":"<width>","<flex-direction>":"row | row-reverse | column | column-reverse"
+,"<flex-grow>":"<number>","<flex-shrink>":"<number>","<flex-wrap>":"nowrap | wrap | wrap-reverse"
+,"<font-size>":"<absolute-size> | <relative-size> | <length> | <percentage>","<font-stretch>"
+:"normal | ultra-condensed | extra-condensed | condensed | semi-condensed | semi-expanded | expanded | extra-expanded | ultra-expanded"
+,"<font-style>":"normal | italic | oblique","<font-variant-caps>":"small-caps | all-small-caps | petite-caps | all-petite-caps | unicase | titling-caps"
+,"<font-variant-css21>":"normal | small-caps","<font-weight>":"normal | bold | bolder | lighter | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900"
+,"<generic-family>":"serif | sans-serif | cursive | fantasy | monospace","<geometry-box>"
+:"<shape-box> | fill-box | stroke-box | view-box","<glyph-angle>":function(e){return e
+.type==="angle"&&e.units==="deg"},"<gradient>":function(e){return e.type==="function"&&/^(?:\-(?:ms|moz|o|webkit)\-)?(?:repeating\-)?(?:radial\-|linear\-)?gradient/i
+.test(e)},"<icccolor>":"cielab() | cielch() | cielchab() | icc-color() | icc-named-color()"
+,"<ident>":function(e){return e.type==="identifier"||e.wasIdent},"<ident-not-generic-family>"
+:function(e){return this["<ident>"](e)&&!this["<generic-family>"](e)},"<image>":"<uri>"
+,"<integer>":function(e){return e.type==="integer"},"<length>":function(e){return e
+.type==="function"&&/^(?:\-(?:ms|moz|o|webkit)\-)?calc/i.test(e)?!0:e.type==="length"||
+e.type==="number"||e.type==="integer"||String(e)==="0"},"<line>":function(e){return e
+.type==="integer"},"<line-height>":"<number> | <length> | <percentage> | normal"
+,"<margin-width>":"<length> | <percentage> | auto","<miterlimit>":function(e){return this
+["<number>"](e)&&e.value>=1},"<nonnegative-length-or-percentage>":function(e){return(
+this["<length>"](e)||this["<percentage>"](e))&&(String(e)==="0"||e.type==="function"||
+e.value>=0)},"<nonnegative-number-or-percentage>":function(e){return(this["<number>"
+](e)||this["<percentage>"](e))&&(String(e)==="0"||e.type==="function"||e.value>=0
+)},"<number>":function(e){return e.type==="number"||this["<integer>"](e)},"<opacity-value>"
+:function(e){return this["<number>"](e)&&e.value>=0&&e.value<=1},"<padding-width>"
+:"<nonnegative-length-or-percentage>","<percentage>":function(e){return e.type==="percentage"||
+String(e)==="0"},"<relative-size>":"smaller | larger","<shape>":"rect() | inset-rect()"
+,"<shape-box>":"<box> | margin-box","<single-animation-direction>":"normal | reverse | alternate | alternate-reverse"
+,"<single-animation-name>":function(e){return this["<ident>"](e)&&/^-?[a-z_][-a-z0-9_]+$/i
+.test(e)&&!/^(none|unset|initial|inherit)$/i.test(e)},"<string>":function(e){return e
+.type==="string"},"<time>":function(e){return e.type==="time"},"<uri>":function(
+e){return e.type==="uri"},"<width>":"<margin-width>"},complex:{__proto__:null,"<azimuth>"
+:"<angle> | [ [ left-side | far-left | left | center-left | center | center-right | right | far-right | right-side ] || behind ] | leftwards | rightwards"
+,"<bg-position>":"<position>#","<bg-size>":"[ <length> | <percentage> | auto ]{1,2} | cover | contain"
+,"<border-image-slice>":i.many([!0],i.cast("<nonnegative-number-or-percentage>")
+,i.cast("<nonnegative-number-or-percentage>"),i.cast("<nonnegative-number-or-percentage>"
+),i.cast("<nonnegative-number-or-percentage>"),"fill"),"<border-radius>":"<nonnegative-length-or-percentage>{1,4} [ / <nonnegative-length-or-percentage>{1,4} ]?"
+,"<box-shadow>":"none | <shadow>#","<clip-path>":"<basic-shape> || <geometry-box>"
+,"<dasharray>":i.cast("<nonnegative-length-or-percentage>").braces(1,Infinity,"#"
+,i.cast(",").question()),"<family-name>":"<string> | <ident-not-generic-family> <ident>*"
+,"<filter-function-list>":"[ <filter-function> | <uri> ]+","<flex>":"none | [ <flex-grow> <flex-shrink>? || <flex-basis> ]"
+,"<font-family>":"[ <generic-family> | <family-name> ]#","<font-shorthand>":"[ <font-style> || <font-variant-css21> || <font-weight> || <font-stretch> ]? <font-size> [ / <line-height> ]? <font-family>"
+,"<font-variant-alternates>":"stylistic() || historical-forms || styleset() || character-variant() || swash() || ornaments() || annotation()"
+,"<font-variant-ligatures>":"[ common-ligatures | no-common-ligatures ] || [ discretionary-ligatures | no-discretionary-ligatures ] || [ historical-ligatures | no-historical-ligatures ] || [ contextual | no-contextual ]"
+,"<font-variant-numeric>":"[ lining-nums | oldstyle-nums ] || [ proportional-nums | tabular-nums ] || [ diagonal-fractions | stacked-fractions ] || ordinal || slashed-zero"
+,"<font-variant-east-asian>":"[ jis78 | jis83 | jis90 | jis04 | simplified | traditional ] || [ full-width | proportional-width ] || ruby"
+,"<paint>":"<paint-basic> | <uri> <paint-basic>?","<paint-basic>":"none | currentColor | <color-svg> <icccolor>?"
+,"<position>":"[ center | [ left | right ] [ <percentage> | <length> ]? ] && [ center | [ top | bottom ] [ <percentage> | <length> ]? ] | [ left | center | right | <percentage> | <length> ] [ top | center | bottom | <percentage> | <length> ] | [ left | center | right | top | bottom | <percentage> | <length> ]"
+,"<repeat-style>":"repeat-x | repeat-y | [ repeat | space | round | no-repeat ]{1,2}"
+,"<shadow>":i.many([!0],i.cast("<length>").braces(2,4),"inset","<color>"),"<text-decoration-color>"
+:"<color>","<text-decoration-line>":"none | [ underline || overline || line-through || blink ]"
+,"<text-decoration-style>":"solid | double | dotted | dashed | wavy","<will-change>"
+:"auto | <animateable-feature>#","<x-one-radius>":"[ <length> | <percentage> ]{1,2}"
+}}),Object.keys(r.simple).forEach(function(e){var t=r.simple[e];typeof t=="string"&&
+(r.simple[e]=function(e){return r.isLiteral(e,t)})}),Object.keys(r.complex).forEach
+(function(e){var t=r.complex[e];typeof t=="string"&&(r.complex[e]=i.parse(t))}),
+r.complex["<font-variant>"]=i.oror({expand:"<font-variant-ligatures>"},{expand:"<font-variant-alternates>"
+},"<font-variant-caps>",{expand:"<font-variant-numeric>"},{expand:"<font-variant-east-asian>"
+})},{"./Matcher":3}],22:[function(e,t,n){"use strict";t.exports={Colors:e("./Colors"
+),Combinator:e("./Combinator"),Parser:e("./Parser"),PropertyName:e("./PropertyName"
+),PropertyValue:e("./PropertyValue"),PropertyValuePart:e("./PropertyValuePart"),
+Matcher:e("./Matcher"),MediaFeature:e("./MediaFeature"),MediaQuery:e("./MediaQuery"
+),Selector:e("./Selector"),SelectorPart:e("./SelectorPart"),SelectorSubPart:e("./SelectorSubPart"
+),Specificity:e("./Specificity"),TokenStream:e("./TokenStream"),Tokens:e("./Tokens"
+),ValidationError:e("./ValidationError")}},{"./Colors":1,"./Combinator":2,"./Matcher"
+:3,"./MediaFeature":4,"./MediaQuery":5,"./Parser":6,"./PropertyName":8,"./PropertyValue"
+:9,"./PropertyValuePart":11,"./Selector":13,"./SelectorPart":14,"./SelectorSubPart"
+:15,"./Specificity":16,"./TokenStream":17,"./Tokens":18,"./ValidationError":20}]
+,23:[function(e,t,n){"use strict";function r(){this._listeners=Object.create(null
+)}t.exports=r,r.prototype={constructor:r,addListener:function(e,t){this._listeners
+[e]||(this._listeners[e]=[]),this._listeners[e].push(t)},fire:function(e){typeof
+e=="string"&&(e={type:e}),typeof e.target!="undefined"&&(e.target=this);if(typeof
+e.type=="undefined")throw new Error("Event object missing 'type' property.");if(
+this._listeners[e.type]){var t=this._listeners[e.type].concat();for(var n=0,r=t.
+length;n<r;n++)t[n].call(this,e)}},removeListener:function(e,t){if(this._listeners
+[e]){var n=this._listeners[e];for(var r=0,i=n.length;r<i;r++)if(n[r]===t){n.splice
+(r,1);break}}}}},{}],24:[function(e,t,n){"use strict";function r(e){this._input=
+e.replace(/(\r\n?|\n)/g,"\n"),this._line=1,this._col=1,this._cursor=0}t.exports=
+r,r.prototype={constructor:r,getCol:function(){return this._col},getLine:function(
+){return this._line},eof:function(){return this._cursor===this._input.length},peek
+:function(e){var t=null;return e=typeof e=="undefined"?1:e,this._cursor<this._input
+.length&&(t=this._input.charAt(this._cursor+e-1)),t},read:function(){var e=null;
+return this._cursor<this._input.length&&(this._input.charAt(this._cursor)==="\n"?
+(this._line++,this._col=1):this._col++,e=this._input.charAt(this._cursor++)),e},
+mark:function(){this._bookmark={cursor:this._cursor,line:this._line,col:this._col
+}},reset:function(){this._bookmark&&(this._cursor=this._bookmark.cursor,this._line=
+this._bookmark.line,this._col=this._bookmark.col,delete this._bookmark)},readTo:
+function(e){var t="",n;while(t.length<e.length||t.lastIndexOf(e)!==t.length-e.length
+){n=this.read();if(!n)throw new Error('Expected "'+e+'" at line '+this._line+", col "+
+this._col+".");t+=n}return t},readWhile:function(e){var t="",n=this.peek();while(
+n!==null&&e(n))t+=this.read(),n=this.peek();return t},readMatch:function(e){var t=
+this._input.substring(this._cursor),n=null;return typeof e=="string"?t.slice(0,e
+.length)===e&&(n=this.readCount(e.length)):e instanceof RegExp&&e.test(t)&&(n=this
+.readCount(RegExp.lastMatch.length)),n},readCount:function(e){var t="";while(e--
+)t+=this.read();return t}}},{}],25:[function(e,t,n){"use strict";function r(e,t,
+n){Error.call(this),this.name=this.constructor.name,this.col=n,this.line=t,this.
+message=e}t.exports=r,r.prototype=Object.create(Error.prototype),r.prototype.constructor=
+r},{}],26:[function(e,t,n){"use strict";function r(e,t,n,r){this.col=n,this.line=
+t,this.text=e,this.type=r}t.exports=r,r.fromToken=function(e){return new r(e.value
+,e.startLine,e.startCol)},r.prototype={constructor:r,valueOf:function(){return this
+.toString()},toString:function(){return this.text}}},{}],27:[function(e,t,n){"use strict"
+;function s(e,t){this._reader=new r(e?e.toString():""),this._token=null,this._tokenData=
+t,this._lt=[],this._ltIndex=0,this._ltIndexCache=[]}t.exports=s;var r=e("./StringReader"
+),i=e("./SyntaxError");s.createTokenData=function(e){var t=[],n=Object.create(null
+),r=e.concat([]),i=0,s=r.length+1;r.UNKNOWN=-1,r.unshift({name:"EOF"});for(;i<s;
+i++)t.push(r[i].name),r[r[i].name]=i,r[i].text&&(n[r[i].text]=i);return r.name=function(
+e){return t[e]},r.type=function(e){return n[e]},r},s.prototype={constructor:s,match
+:function(e,t){e instanceof Array||(e=[e]);var n=this.get(t),r=0,i=e.length;while(
+r<i)if(n===e[r++])return!0;return this.unget(),!1},mustMatch:function(e){var t;e instanceof
+Array||(e=[e]);if(!this.match.apply(this,arguments))throw t=this.LT(1),new i("Expected "+
+this._tokenData[e[0]].name+" at line "+t.startLine+", col "+t.startCol+".",t.startLine
+,t.startCol)},advance:function(e,t){while(this.LA(0)!==0&&!this.match(e,t))this.
+get();return this.LA(0)},get:function(e){var t=this._tokenData,n=0,r,i;if(this._lt
+.length&&this._ltIndex>=0&&this._ltIndex<this._lt.length){n++,this._token=this._lt
+[this._ltIndex++],i=t[this._token.type];while(i.channel!==undefined&&e!==i.channel&&
+this._ltIndex<this._lt.length)this._token=this._lt[this._ltIndex++],i=t[this._token
+.type],n++;if((i.channel===undefined||e===i.channel)&&this._ltIndex<=this._lt.length
+)return this._ltIndexCache.push(n),this._token.type}return r=this._getToken(),r.
+type>-1&&!t[r.type].hide&&(r.channel=t[r.type].channel,this._token=r,this._lt.push
+(r),this._ltIndexCache.push(this._lt.length-this._ltIndex+n),this._lt.length>5&&
+this._lt.shift(),this._ltIndexCache.length>5&&this._ltIndexCache.shift(),this._ltIndex=
+this._lt.length),i=t[r.type],i&&(i.hide||i.channel!==undefined&&e!==i.channel)?this
+.get(e):r.type},LA:function(e){var t=e,n;if(e>0){if(e>5)throw new Error("Too much lookahead."
+);while(t)n=this.get(),t--;while(t<e)this.unget(),t++}else if(e<0){if(!this._lt[
+this._ltIndex+e])throw new Error("Too much lookbehind.");n=this._lt[this._ltIndex+
+e].type}else n=this._token.type;return n},LT:function(e){return this.LA(e),this.
+_lt[this._ltIndex+e-1]},peek:function(){return this.LA(1)},token:function(){return this
+._token},tokenName:function(e){return e<0||e>this._tokenData.length?"UNKNOWN_TOKEN"
+:this._tokenData[e].name},tokenType:function(e){return this._tokenData[e]||-1},unget
+:function(){if(!this._ltIndexCache.length)throw new Error("Too much lookahead.")
+;this._ltIndex-=this._ltIndexCache.pop(),this._token=this._lt[this._ltIndex-1]}}
+},{"./StringReader":24,"./SyntaxError":25}],28:[function(e,t,n){"use strict";t.exports=
+{StringReader:e("./StringReader"),SyntaxError:e("./SyntaxError"),SyntaxUnit:e("./SyntaxUnit"
+),EventTarget:e("./EventTarget"),TokenStreamBase:e("./TokenStreamBase")}},{"./EventTarget"
+:23,"./StringReader":24,"./SyntaxError":25,"./SyntaxUnit":26,"./TokenStreamBase"
+:27}],parserlib:[function(e,t,n){"use strict";t.exports={css:e("./css"),util:e("./util"
+)}},{"./css":22,"./util":28}]},{},[]),e("parserlib")}(),r=function(){"use strict"
+;function i(t,s,o,u,a){function p(t,o){if(t===null)return null;if(o===0)return t
+;var d,v;if(typeof t!="object")return t;if(t instanceof e)d=new e;else if(t instanceof
+n)d=new n;else if(t instanceof r)d=new r(function(e,n){t.then(function(t){e(p(t,
+o-1))},function(e){n(p(e,o-1))})});else if(i.__isArray(t))d=[];else if(i.__isRegExp
+(t))d=new RegExp(t.source,f(t)),t.lastIndex&&(d.lastIndex=t.lastIndex);else if(i
+.__isDate(t))d=new Date(t.getTime());else{if(h&&Buffer.isBuffer(t))return d=new
+Buffer(t.length),t.copy(d),d;t instanceof Error?d=Object.create(t):typeof u=="undefined"?
+(v=Object.getPrototypeOf(t),d=Object.create(v)):(d=Object.create(u),v=u)}if(s){var m=
+l.indexOf(t);if(m!=-1)return c[m];l.push(t),c.push(d)}if(t instanceof e){var g=t
+.keys();for(;;){var y=g.next();if(y.done)break;var b=p(y.value,o-1),w=p(t.get(y.
+value),o-1);d.set(b,w)}}if(t instanceof n){var E=t.keys();for(;;){var y=E.next()
+;if(y.done)break;var S=p(y.value,o-1);d.add(S)}}for(var x in t){var T;v&&(T=Object
+.getOwnPropertyDescriptor(v,x));if(T&&T.set==null)continue;d[x]=p(t[x],o-1)}if(Object
+.getOwnPropertySymbols){var N=Object.getOwnPropertySymbols(t);for(var x=0;x<N.length
+;x++){var C=N[x],k=Object.getOwnPropertyDescriptor(t,C);if(k&&!k.enumerable&&!a)
+continue;d[C]=p(t[C],o-1),k.enumerable||Object.defineProperty(d,C,{enumerable:!1
+})}}if(a){var L=Object.getOwnPropertyNames(t);for(var x=0;x<L.length;x++){var A=
+L[x],k=Object.getOwnPropertyDescriptor(t,A);if(k&&k.enumerable)continue;d[A]=p(t
+[A],o-1),Object.defineProperty(d,A,{enumerable:!1})}}return d}typeof s=="object"&&
+(o=s.depth,u=s.prototype,a=s.includeNonEnumerable,s=s.circular);var l=[],c=[],h=typeof
+Buffer!="undefined";return typeof s=="undefined"&&(s=!0),typeof o=="undefined"&&
+(o=Infinity),p(t,o)}function s(e){return Object.prototype.toString.call(e)}function o
+(e){return typeof e=="object"&&s(e)==="[object Date]"}function u(e){return typeof
+e=="object"&&s(e)==="[object Array]"}function a(e){return typeof e=="object"&&s(
+e)==="[object RegExp]"}function f(e){var t="";return e.global&&(t+="g"),e.ignoreCase&&
+(t+="i"),e.multiline&&(t+="m"),t}var e;try{e=Map}catch(t){e=function(){}}var n;try{
+n=Set}catch(t){n=function(){}}var r;try{r=Promise}catch(t){r=function(){}}return i
+.clonePrototype=function(t){if(t===null)return null;var n=function(){};return n.
+prototype=t,new n},i.__objToStr=s,i.__isDate=o,i.__isArray=u,i.__isRegExp=a,i.__getRegExpFlags=
+f,i}();typeof e=="object"&&e.exports&&(e.exports=r);var i=function(){"use strict"
+;function a(e,t){var n,r=e&&e.match(o),i=r&&r[1];return i&&(n={"true":2,"":1,"false"
+:0,2:2,1:1,0:0},i.toLowerCase().split(",").forEach(function(e){var r=e.split(":"
+),i=r[0]||"",s=r[1]||"";t[i.trim()]=n[s.trim()]})),t}var e=[],t=[],o=/\/\*\s*csslint([^\*]*)\*\//
+,u=new n.util.EventTarget;return u.version="1.0.4",u.addRule=function(t){e.push(
+t),e[t.id]=t},u.clearRules=function(){e=[]},u.getRules=function(){return[].concat
+(e).sort(function(e,t){return e.id>t.id?1:0})},u.getRuleset=function(){var t={},
+n=0,r=e.length;while(n<r)t[e[n++].id]=1;return t},u.addFormatter=function(e){t[e
+.id]=e},u.getFormatter=function(e){return t[e]},u.format=function(e,t,n,r){var i=
 this.getFormatter(n),s=null;return i&&(s=i.startFormat(),s+=i.formatResults(e,t,
-r||{}),s+=i.endFormat()),s},r.hasFormat=function(e){return t.hasOwnProperty(e)},
-r.verify=function(t,r){var s=0,o=e.length,u,a,f,l=new parserlib.css.Parser({starHack
-:!0,ieFilters:!0,underscoreHack:!0,strict:!1});a=t.replace(/\n\r?/g,"$split$").split
-("$split$"),r||(r=this.getRuleset()),n.test(t)&&(r=i(t,r)),u=new Reporter(a,r),r
-.errors=2;for(s in r)r.hasOwnProperty(s)&&r[s]&&e[s]&&e[s].init(l,u);try{l.parse
-(t)}catch(c){u.error("Fatal error, cannot continue: "+c.message,c.line,c.col,{})
-}return f={messages:u.messages,stats:u.stats,ruleset:u.ruleset},f.messages.sort(
-function(e,t){return e.rollup&&!t.rollup?1:!e.rollup&&t.rollup?-1:e.line-t.line}
-),f},r}();return Reporter.prototype={constructor:Reporter,error:function(e,t,n,r
-){this.messages.push({type:"error",line:t,col:n,message:e,evidence:this.lines[t-1
-],rule:r||{}})},warn:function(e,t,n,r){this.report(e,t,n,r)},report:function(e,t
-,n,r){this.messages.push({type:this.ruleset[r.id]==2?"error":"warning",line:t,col
-:n,message:e,evidence:this.lines[t-1],rule:r})},info:function(e,t,n,r){this.messages
-.push({type:"info",line:t,col:n,message:e,evidence:this.lines[t-1],rule:r})},rollupError
-:function(e,t){this.messages.push({type:"error",rollup:!0,message:e,rule:t})},rollupWarn
-:function(e,t){this.messages.push({type:"warning",rollup:!0,message:e,rule:t})},
-stat:function(e,t){this.stats[e]=t}},CSSLint._Reporter=Reporter,CSSLint.Util={mix
-:function(e,t){var n;for(n in t)t.hasOwnProperty(n)&&(e[n]=t[n]);return n},indexOf
-:function(e,t){if(e.indexOf)return e.indexOf(t);for(var n=0,r=e.length;n<r;n++)if(
-e[n]===t)return n;return-1},forEach:function(e,t){if(e.forEach)return e.forEach(
-t);for(var n=0,r=e.length;n<r;n++)t(e[n],n,e)}},CSSLint.addRule({id:"adjoining-classes"
-,name:"Disallow adjoining classes",desc:"Don't use adjoining classes.",browsers:"IE6"
-,init:function(e,t){var n=this;e.addListener("startrule",function(r){var i=r.selectors
-,s,o,u,a,f,l,c;for(f=0;f<i.length;f++){s=i[f];for(l=0;l<s.parts.length;l++){o=s.
-parts[l];if(o.type==e.SELECTOR_PART_TYPE){a=0;for(c=0;c<o.modifiers.length;c++)u=
-o.modifiers[c],u.type=="class"&&a++,a>1&&t.report("Don't use adjoining classes."
-,o.line,o.col,n)}}}})}}),CSSLint.addRule({id:"box-model",name:"Beware of broken box size"
-,desc:"Don't use width or height when using padding or border.",browsers:"All",init
-:function(e,t){function u(){s={},o=!1}function a(){var e,u;if(!o){if(s.height)for(
-e in i)i.hasOwnProperty(e)&&s[e]&&(u=s[e].value,(e!="padding"||u.parts.length!==2||
-u.parts[0].value!==0)&&t.report("Using height with "+e+" can sometimes make elements larger than you expect."
+r||{}),s+=i.endFormat()),s},u.hasFormat=function(e){return t.hasOwnProperty(e)},
+u.verify=function(t,u){var f=0,l,c,h={},p=[],d,v=new n.css.Parser({starHack:!0,ieFilters
+:!0,underscoreHack:!0,strict:!1});c=t.replace(/\n\r?/g,"$split$").split("$split$"
+),i.Util.forEach(c,function(e,t){var n=e&&e.match(/\/\*[ \t]*csslint[ \t]+allow:[ \t]*([^\*]*)\*\//i
+),r=n&&n[1],i={};r&&(r.toLowerCase().split(",").forEach(function(e){i[e.trim()]=!0
+}),Object.keys(i).length>0&&(h[t+1]=i))});var m=null,g=null;i.Util.forEach(c,function(
+e,t){m===null&&e.match(/\/\*[ \t]*csslint[ \t]+ignore:start[ \t]*\*\//i)&&(m=t),
+e.match(/\/\*[ \t]*csslint[ \t]+ignore:end[ \t]*\*\//i)&&(g=t),m!==null&&g!==null&&
+(p.push([m,g]),m=g=null)}),m!==null&&p.push([m,c.length]),u||(u=this.getRuleset(
+)),o.test(t)&&(u=r(u),u=a(t,u)),l=new s(c,u,h,p),u.errors=2;for(f in u)u.hasOwnProperty
+(f)&&u[f]&&e[f]&&e[f].init(v,l);try{v.parse(t)}catch(y){l.error("Fatal error, cannot continue: "+
+y.message,y.line,y.col,{})}return d={messages:l.messages,stats:l.stats,ruleset:l
+.ruleset,allow:l.allow,ignore:l.ignore},d.messages.sort(function(e,t){return e.rollup&&!
+t.rollup?1:!e.rollup&&t.rollup?-1:e.line-t.line}),d},u}();return s.prototype={constructor
+:s,error:function(e,t,n,r){"use strict";this.messages.push({type:"error",line:t,
+col:n,message:e,evidence:this.lines[t-1],rule:r||{}})},warn:function(e,t,n,r){"use strict"
+;this.report(e,t,n,r)},report:function(e,t,n,r){"use strict";if(this.allow.hasOwnProperty
+(t)&&this.allow[t].hasOwnProperty(r.id))return;var s=!1;i.Util.forEach(this.ignore
+,function(e){e[0]<=t&&t<=e[1]&&(s=!0)});if(s)return;this.messages.push({type:this
+.ruleset[r.id]===2?"error":"warning",line:t,col:n,message:e,evidence:this.lines[
+t-1],rule:r})},info:function(e,t,n,r){"use strict";this.messages.push({type:"info"
+,line:t,col:n,message:e,evidence:this.lines[t-1],rule:r})},rollupError:function(
+e,t){"use strict";this.messages.push({type:"error",rollup:!0,message:e,rule:t})}
+,rollupWarn:function(e,t){"use strict";this.messages.push({type:"warning",rollup
+:!0,message:e,rule:t})},stat:function(e,t){"use strict";this.stats[e]=t}},i._Reporter=
+s,i.Util={mix:function(e,t){"use strict";var n;for(n in t)t.hasOwnProperty(n)&&(
+e[n]=t[n]);return n},indexOf:function(e,t){"use strict";if(e.indexOf)return e.indexOf
+(t);for(var n=0,r=e.length;n<r;n++)if(e[n]===t)return n;return-1},forEach:function(
+e,t){"use strict";if(e.forEach)return e.forEach(t);for(var n=0,r=e.length;n<r;n++
+)t(e[n],n,e)}},i.addRule({id:"adjoining-classes",name:"Disallow adjoining classes"
+,desc:"Don't use adjoining classes.",url:"https://github.com/CSSLint/csslint/wiki/Disallow-adjoining-classes"
+,browsers:"IE6",init:function(e,t){"use strict";var n=this;e.addListener("startrule"
+,function(r){var i=r.selectors,s,o,u,a,f,l,c;for(f=0;f<i.length;f++){s=i[f];for(
+l=0;l<s.parts.length;l++){o=s.parts[l];if(o.type===e.SELECTOR_PART_TYPE){a=0;for(
+c=0;c<o.modifiers.length;c++)u=o.modifiers[c],u.type==="class"&&a++,a>1&&t.report
+("Adjoining classes: "+i[f].text,o.line,o.col,n)}}}})}}),i.addRule({id:"box-model"
+,name:"Beware of broken box size",desc:"Don't use width or height when using padding or border."
+,url:"https://github.com/CSSLint/csslint/wiki/Beware-of-box-model-size",browsers
+:"All",init:function(e,t){"use strict";function u(){s={},o=!1}function a(){var e
+,u;if(!o){if(s.height)for(e in i)i.hasOwnProperty(e)&&s[e]&&(u=s[e].value,(e!=="padding"||
+u.parts.length!==2||u.parts[0].value!==0)&&t.report("Using height with "+e+" can sometimes make elements larger than you expect."
 ,s[e].line,s[e].col,n));if(s.width)for(e in r)r.hasOwnProperty(e)&&s[e]&&(u=s[e]
-.value,(e!="padding"||u.parts.length!==2||u.parts[1].value!==0)&&t.report("Using width with "+
+.value,(e!=="padding"||u.parts.length!==2||u.parts[1].value!==0)&&t.report("Using width with "+
 e+" can sometimes make elements larger than you expect.",s[e].line,s[e].col,n))}
 }var n=this,r={border:1,"border-left":1,"border-right":1,padding:1,"padding-left"
 :1,"padding-right":1},i={border:1,"border-bottom":1,"border-top":1,padding:1,"padding-bottom"
 :1,"padding-top":1},s,o=!1;e.addListener("startrule",u),e.addListener("startfontface"
 ,u),e.addListener("startpage",u),e.addListener("startpagemargin",u),e.addListener
-("startkeyframerule",u),e.addListener("property",function(e){var t=e.property.text
-.toLowerCase();i[t]||r[t]?!/^0\S*$/.test(e.value)&&(t!="border"||e.value!="none"
-)&&(s[t]={line:e.property.line,col:e.property.col,value:e.value}):/^(width|height)/i
-.test(t)&&/^(length|percentage)/.test(e.value.parts[0].type)?s[t]=1:t=="box-sizing"&&
-(o=!0)}),e.addListener("endrule",a),e.addListener("endfontface",a),e.addListener
-("endpage",a),e.addListener("endpagemargin",a),e.addListener("endkeyframerule",a
-)}}),CSSLint.addRule({id:"box-sizing",name:"Disallow use of box-sizing",desc:"The box-sizing properties isn't supported in IE6 and IE7."
-,browsers:"IE6, IE7",tags:["Compatibility"],init:function(e,t){var n=this;e.addListener
-("property",function(e){var r=e.property.text.toLowerCase();r=="box-sizing"&&t.report
-("The box-sizing property isn't supported in IE6 and IE7.",e.line,e.col,n)})}}),
-CSSLint.addRule({id:"bulletproof-font-face",name:"Use the bulletproof @font-face syntax"
+("startkeyframerule",u),e.addListener("startviewport",u),e.addListener("property"
+,function(e){var t=e.property.text.toLowerCase();i[t]||r[t]?!/^0\S*$/.test(e.value
+)&&(t!=="border"||e.value.toString()!=="none")&&(s[t]={line:e.property.line,col:
+e.property.col,value:e.value}):/^(width|height)/i.test(t)&&/^(length|percentage)/
+.test(e.value.parts[0].type)?s[t]=1:t==="box-sizing"&&(o=!0)}),e.addListener("endrule"
+,a),e.addListener("endfontface",a),e.addListener("endpage",a),e.addListener("endpagemargin"
+,a),e.addListener("endkeyframerule",a),e.addListener("endviewport",a)}}),i.addRule
+({id:"box-sizing",name:"Disallow use of box-sizing",desc:"The box-sizing properties isn't supported in IE6 and IE7."
+,url:"https://github.com/CSSLint/csslint/wiki/Disallow-box-sizing",browsers:"IE6, IE7"
+,tags:["Compatibility"],init:function(e,t){"use strict";var n=this;e.addListener
+("property",function(e){var r=e.property.text.toLowerCase();r==="box-sizing"&&t.
+report("The box-sizing property isn't supported in IE6 and IE7.",e.line,e.col,n)
+})}}),i.addRule({id:"bulletproof-font-face",name:"Use the bulletproof @font-face syntax"
 ,desc:"Use the bulletproof @font-face syntax to avoid 404's in old IE (http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax)."
-,browsers:"All",init:function(e,t){var n=this,r=0,i=!1,s=!0,o=!1,u,a;e.addListener
-("startfontface",function(e){i=!0}),e.addListener("property",function(e){if(!i)return;
-var t=e.property.toString().toLowerCase(),n=e.value.toString();u=e.line,a=e.col;
-if(t==="src"){var r=/^\s?url\(['"].+\.eot\?.*['"]\)\s*format\(['"]embedded-opentype['"]\).*$/i
-;!n.match(r)&&s?(o=!0,s=!1):n.match(r)&&!s&&(o=!1)}}),e.addListener("endfontface"
-,function(e){i=!1,o&&t.report("@font-face declaration doesn't follow the fontspring bulletproof syntax."
-,u,a,n)})}}),CSSLint.addRule({id:"compatible-vendor-prefixes",name:"Require compatible vendor prefixes"
+,url:"https://github.com/CSSLint/csslint/wiki/Bulletproof-font-face",browsers:"All"
+,init:function(e,t){"use strict";var n=this,r=!1,i=!0,s=!1,o,u;e.addListener("startfontface"
+,function(){r=!0}),e.addListener("property",function(e){if(!r)return;var t=e.property
+.toString().toLowerCase(),n=e.value.toString();o=e.line,u=e.col;if(t==="src"){var a=/^\s?url\(['"].+\.eot\?.*['"]\)\s*format\(['"]embedded-opentype['"]\).*$/i
+;!n.match(a)&&i?(s=!0,i=!1):n.match(a)&&!i&&(s=!1)}}),e.addListener("endfontface"
+,function(){r=!1,s&&t.report("@font-face declaration doesn't follow the fontspring bulletproof syntax."
+,o,u,n)})}}),i.addRule({id:"compatible-vendor-prefixes",name:"Require compatible vendor prefixes"
 ,desc:"Include all compatible vendor prefixes to reach a wider range of users.",
-browsers:"All",init:function(e,t){var n=this,r,i,s,o,u,a,f,l=!1,c=Array.prototype
-.push,h=[];r={animation:"webkit moz","animation-delay":"webkit moz","animation-direction"
-:"webkit moz","animation-duration":"webkit moz","animation-fill-mode":"webkit moz"
-,"animation-iteration-count":"webkit moz","animation-name":"webkit moz","animation-play-state"
-:"webkit moz","animation-timing-function":"webkit moz",appearance:"webkit moz","border-end"
-:"webkit moz","border-end-color":"webkit moz","border-end-style":"webkit moz","border-end-width"
-:"webkit moz","border-image":"webkit moz o","border-radius":"webkit","border-start"
-:"webkit moz","border-start-color":"webkit moz","border-start-style":"webkit moz"
-,"border-start-width":"webkit moz","box-align":"webkit moz ms","box-direction":"webkit moz ms"
-,"box-flex":"webkit moz ms","box-lines":"webkit ms","box-ordinal-group":"webkit moz ms"
-,"box-orient":"webkit moz ms","box-pack":"webkit moz ms","box-sizing":"webkit moz"
-,"box-shadow":"webkit moz","column-count":"webkit moz ms","column-gap":"webkit moz ms"
-,"column-rule":"webkit moz ms","column-rule-color":"webkit moz ms","column-rule-style"
-:"webkit moz ms","column-rule-width":"webkit moz ms","column-width":"webkit moz ms"
-,hyphens:"epub moz","line-break":"webkit ms","margin-end":"webkit moz","margin-start"
-:"webkit moz","marquee-speed":"webkit wap","marquee-style":"webkit wap","padding-end"
-:"webkit moz","padding-start":"webkit moz","tab-size":"moz o","text-size-adjust"
-:"webkit ms",transform:"webkit moz ms o","transform-origin":"webkit moz ms o",transition
-:"webkit moz o","transition-delay":"webkit moz o","transition-duration":"webkit moz o"
-,"transition-property":"webkit moz o","transition-timing-function":"webkit moz o"
-,"user-modify":"webkit moz","user-select":"webkit moz ms","word-break":"epub ms"
-,"writing-mode":"epub ms"};for(s in r)if(r.hasOwnProperty(s)){o=[],u=r[s].split(" "
-);for(a=0,f=u.length;a<f;a++)o.push("-"+u[a]+"-"+s);r[s]=o,c.apply(h,o)}e.addListener
-("startrule",function(){i=[]}),e.addListener("startkeyframes",function(e){l=e.prefix||!0
-}),e.addListener("endkeyframes",function(e){l=!1}),e.addListener("property",function(
-e){var t=e.property;CSSLint.Util.indexOf(h,t.text)>-1&&(!l||typeof l!="string"||
-t.text.indexOf("-"+l+"-")!==0)&&i.push(t)}),e.addListener("endrule",function(e){
-if(!i.length)return;var s={},o,u,a,f,l,c,h,p,d,v;for(o=0,u=i.length;o<u;o++){a=i
-[o];for(f in r)r.hasOwnProperty(f)&&(l=r[f],CSSLint.Util.indexOf(l,a.text)>-1&&(
-s[f]||(s[f]={full:l.slice(0),actual:[],actualNodes:[]}),CSSLint.Util.indexOf(s[f
-].actual,a.text)===-1&&(s[f].actual.push(a.text),s[f].actualNodes.push(a))))}for(
-f in s)if(s.hasOwnProperty(f)){c=s[f],h=c.full,p=c.actual;if(h.length>p.length)for(
-o=0,u=h.length;o<u;o++)d=h[o],CSSLint.Util.indexOf(p,d)===-1&&(v=p.length===1?p[0
-]:p.length==2?p.join(" and "):p.join(", "),t.report("The property "+d+" is compatible with "+
-v+" and should be included as well.",c.actualNodes[0].line,c.actualNodes[0].col,
-n))}})}}),CSSLint.addRule({id:"display-property-grouping",name:"Require properties appropriate for display"
-,desc:"Certain properties shouldn't be used with certain display property values."
-,browsers:"All",init:function(e,t){function s(e,s,o){i[e]&&(typeof r[e]!="string"||
-i[e].value.toLowerCase()!=r[e])&&t.report(o||e+" can't be used with display: "+s+"."
-,i[e].line,i[e].col,n)}function o(){i={}}function u(){var e=i.display?i.display.
-value:null;if(e)switch(e){case"inline":s("height",e),s("width",e),s("margin",e),
-s("margin-top",e),s("margin-bottom",e),s("float",e,"display:inline has no effect on floated elements (but may be used to fix the IE6 double-margin bug)."
+url:"https://github.com/CSSLint/csslint/wiki/Require-compatible-vendor-prefixes"
+,browsers:"All",init:function(e,t){"use strict";var n=this,r,s,o,u,a,f,l,c=!1,h=
+Array.prototype.push,p=[];r={animation:"webkit","animation-delay":"webkit","animation-direction"
+:"webkit","animation-duration":"webkit","animation-fill-mode":"webkit","animation-iteration-count"
+:"webkit","animation-name":"webkit","animation-play-state":"webkit","animation-timing-function"
+:"webkit",appearance:"webkit moz","border-end":"webkit moz","border-end-color":"webkit moz"
+,"border-end-style":"webkit moz","border-end-width":"webkit moz","border-image":"webkit moz o"
+,"border-radius":"webkit","border-start":"webkit moz","border-start-color":"webkit moz"
+,"border-start-style":"webkit moz","border-start-width":"webkit moz","box-align"
+:"webkit moz ms","box-direction":"webkit moz ms","box-flex":"webkit moz ms","box-lines"
+:"webkit ms","box-ordinal-group":"webkit moz ms","box-orient":"webkit moz ms","box-pack"
+:"webkit moz ms","box-sizing":"","box-shadow":"","column-count":"webkit moz ms","column-gap"
+:"webkit moz ms","column-rule":"webkit moz ms","column-rule-color":"webkit moz ms"
+,"column-rule-style":"webkit moz ms","column-rule-width":"webkit moz ms","column-width"
+:"webkit moz ms",hyphens:"epub moz","line-break":"webkit ms","margin-end":"webkit moz"
+,"margin-start":"webkit moz","marquee-speed":"webkit wap","marquee-style":"webkit wap"
+,"padding-end":"webkit moz","padding-start":"webkit moz","tab-size":"moz o","text-size-adjust"
+:"webkit ms",transform:"webkit ms","transform-origin":"webkit ms",transition:"","transition-delay"
+:"","transition-duration":"","transition-property":"","transition-timing-function"
+:"","user-modify":"webkit moz","user-select":"webkit moz ms","word-break":"epub ms"
+,"writing-mode":"epub ms"};for(o in r)if(r.hasOwnProperty(o)){u=[],a=r[o].split(" "
+);for(f=0,l=a.length;f<l;f++)u.push("-"+a[f]+"-"+o);r[o]=u,h.apply(p,u)}e.addListener
+("startrule",function(){s=[]}),e.addListener("startkeyframes",function(e){c=e.prefix||!0
+}),e.addListener("endkeyframes",function(){c=!1}),e.addListener("property",function(
+e){var t=e.property;i.Util.indexOf(p,t.text)>-1&&(!c||typeof c!="string"||t.text
+.indexOf("-"+c+"-")!==0)&&s.push(t)}),e.addListener("endrule",function(){if(!s.length
+)return;var e={},o,u,a,f,l,c,h,p,d,v;for(o=0,u=s.length;o<u;o++){a=s[o];for(f in
+r)r.hasOwnProperty(f)&&(l=r[f],i.Util.indexOf(l,a.text)>-1&&(e[f]||(e[f]={full:l
+.slice(0),actual:[],actualNodes:[]}),i.Util.indexOf(e[f].actual,a.text)===-1&&(e
+[f].actual.push(a.text),e[f].actualNodes.push(a))))}for(f in e)if(e.hasOwnProperty
+(f)){c=e[f],h=c.full,p=c.actual;if(h.length>p.length)for(o=0,u=h.length;o<u;o++)
+d=h[o],i.Util.indexOf(p,d)===-1&&(v=p.length===1?p[0]:p.length===2?p.join(" and "
+):p.join(", "),t.report("The property "+d+" is compatible with "+v+" and should be included as well."
+,c.actualNodes[0].line,c.actualNodes[0].col,n))}})}}),i.addRule({id:"display-property-grouping"
+,name:"Require properties appropriate for display",desc:"Certain properties shouldn't be used with certain display property values."
+,url:"https://github.com/CSSLint/csslint/wiki/Require-properties-appropriate-for-display"
+,browsers:"All",init:function(e,t){"use strict";function s(e,s,o){i[e]&&(typeof
+r[e]!="string"||i[e].value.toLowerCase()!==r[e])&&t.report(o||e+" can't be used with display: "+
+s+".",i[e].line,i[e].col,n)}function o(){i={}}function u(){var e=i.display?i.display
+.value:null;if(e)switch(e){case"inline":s("height",e),s("width",e),s("margin",e)
+,s("margin-top",e),s("margin-bottom",e),s("float",e,"display:inline has no effect on floated elements (but may be used to fix the IE6 double-margin bug)."
 );break;case"block":s("vertical-align",e);break;case"inline-block":s("float",e);
 break;default:e.indexOf("table-")===0&&(s("margin",e),s("margin-left",e),s("margin-right"
 ,e),s("margin-top",e),s("margin-bottom",e),s("float",e))}}var n=this,r={display:1
@@ -7629,181 +7860,222 @@ break;default:e.indexOf("table-")===0&&(s("margin",e),s("margin-left",e),s("marg
 :1,"margin-top":1,padding:1,"padding-left":1,"padding-right":1,"padding-bottom":1
 ,"padding-top":1,"vertical-align":1},i;e.addListener("startrule",o),e.addListener
 ("startfontface",o),e.addListener("startkeyframerule",o),e.addListener("startpagemargin"
-,o),e.addListener("startpage",o),e.addListener("property",function(e){var t=e.property
-.text.toLowerCase();r[t]&&(i[t]={value:e.value.text,line:e.property.line,col:e.property
-.col})}),e.addListener("endrule",u),e.addListener("endfontface",u),e.addListener
-("endkeyframerule",u),e.addListener("endpagemargin",u),e.addListener("endpage",u
-)}}),CSSLint.addRule({id:"duplicate-background-images",name:"Disallow duplicate background images"
-,desc:"Every background-image should be unique. Use a common class for e.g. sprites."
-,browsers:"All",init:function(e,t){var n=this,r={};e.addListener("property",function(
-e){var i=e.property.text,s=e.value,o,u;if(i.match(/background/i))for(o=0,u=s.parts
-.length;o<u;o++)s.parts[o].type=="uri"&&(typeof r[s.parts[o].uri]=="undefined"?r
-[s.parts[o].uri]=e:t.report("Background image '"+s.parts[o].uri+"' was used multiple times, first declared at line "+
+,o),e.addListener("startpage",o),e.addListener("startviewport",o),e.addListener("property"
+,function(e){var t=e.property.text.toLowerCase();r[t]&&(i[t]={value:e.value.text
+,line:e.property.line,col:e.property.col})}),e.addListener("endrule",u),e.addListener
+("endfontface",u),e.addListener("endkeyframerule",u),e.addListener("endpagemargin"
+,u),e.addListener("endpage",u),e.addListener("endviewport",u)}}),i.addRule({id:"duplicate-background-images"
+,name:"Disallow duplicate background images",desc:"Every background-image should be unique. Use a common class for e.g. sprites."
+,url:"https://github.com/CSSLint/csslint/wiki/Disallow-duplicate-background-images"
+,browsers:"All",init:function(e,t){"use strict";var n=this,r={};e.addListener("property"
+,function(e){var i=e.property.text,s=e.value,o,u;if(i.match(/background/i))for(o=0
+,u=s.parts.length;o<u;o++)s.parts[o].type==="uri"&&(typeof r[s.parts[o].uri]=="undefined"?
+r[s.parts[o].uri]=e:t.report("Background image '"+s.parts[o].uri+"' was used multiple times, first declared at line "+
 r[s.parts[o].uri].line+", col "+r[s.parts[o].uri].col+".",e.line,e.col,n))})}}),
-CSSLint.addRule({id:"duplicate-properties",name:"Disallow duplicate properties",
-desc:"Duplicate properties must appear one after the other.",browsers:"All",init
-:function(e,t){function s(e){r={}}var n=this,r,i;e.addListener("startrule",s),e.
-addListener("startfontface",s),e.addListener("startpage",s),e.addListener("startpagemargin"
-,s),e.addListener("startkeyframerule",s),e.addListener("property",function(e){var s=
-e.property,o=s.text.toLowerCase();r[o]&&(i!=o||r[o]==e.value.text)&&t.report("Duplicate property '"+
-e.property+"' found.",e.line,e.col,n),r[o]=e.value.text,i=o})}}),CSSLint.addRule
-({id:"empty-rules",name:"Disallow empty rules",desc:"Rules without any properties specified should be removed."
-,browsers:"All",init:function(e,t){var n=this,r=0;e.addListener("startrule",function(
+i.addRule({id:"duplicate-properties",name:"Disallow duplicate properties",desc:"Duplicate properties must appear one after the other."
+,url:"https://github.com/CSSLint/csslint/wiki/Disallow-duplicate-properties",browsers
+:"All",init:function(e,t){"use strict";function s(){r={}}var n=this,r,i;e.addListener
+("startrule",s),e.addListener("startfontface",s),e.addListener("startpage",s),e.
+addListener("startpagemargin",s),e.addListener("startkeyframerule",s),e.addListener
+("startviewport",s),e.addListener("property",function(e){var s=e.property,o=s.text
+.toLowerCase();r[o]&&(i!==o||r[o]===e.value.text)&&t.report("Duplicate property '"+
+e.property+"' found.",e.line,e.col,n),r[o]=e.value.text,i=o})}}),i.addRule({id:"empty-rules"
+,name:"Disallow empty rules",desc:"Rules without any properties specified should be removed."
+,url:"https://github.com/CSSLint/csslint/wiki/Disallow-empty-rules",browsers:"All"
+,init:function(e,t){"use strict";var n=this,r=0;e.addListener("startrule",function(
 ){r=0}),e.addListener("property",function(){r++}),e.addListener("endrule",function(
 e){var i=e.selectors;r===0&&t.report("Rule is empty.",i[0].line,i[0].col,n)})}})
-,CSSLint.addRule({id:"errors",name:"Parsing Errors",desc:"This rule looks for recoverable syntax errors."
-,browsers:"All",init:function(e,t){var n=this;e.addListener("error",function(e){
-t.error(e.message,e.line,e.col,n)})}}),CSSLint.addRule({id:"fallback-colors",name
-:"Require fallback colors",desc:"For older browsers that don't support RGBA, HSL, or HSLA, provide a fallback color."
-,browsers:"IE6,IE7,IE8",init:function(e,t){function o(e){s={},r=null}var n=this,
-r,i={color:1,background:1,"border-color":1,"border-top-color":1,"border-right-color"
-:1,"border-bottom-color":1,"border-left-color":1,border:1,"border-top":1,"border-right"
-:1,"border-bottom":1,"border-left":1,"background-color":1},s;e.addListener("startrule"
-,o),e.addListener("startfontface",o),e.addListener("startpage",o),e.addListener("startpagemargin"
-,o),e.addListener("startkeyframerule",o),e.addListener("property",function(e){var s=
-e.property,o=s.text.toLowerCase(),u=e.value.parts,a=0,f="",l=u.length;if(i[o])while(
-a<l)u[a].type=="color"&&("alpha"in u[a]||"hue"in u[a]?(/([^\)]+)\(/.test(u[a])&&
-(f=RegExp.$1.toUpperCase()),(!r||r.property.text.toLowerCase()!=o||r.colorType!="compat"
-)&&t.report("Fallback "+o+" (hex or RGB) should precede "+f+" "+o+".",e.line,e.col
-,n)):e.colorType="compat"),a++;r=e})}}),CSSLint.addRule({id:"floats",name:"Disallow too many floats"
-,desc:"This rule tests if the float property is used too many times",browsers:"All"
-,init:function(e,t){var n=this,r=0;e.addListener("property",function(e){e.property
-.text.toLowerCase()=="float"&&e.value.text.toLowerCase()!="none"&&r++}),e.addListener
-("endstylesheet",function(){t.stat("floats",r),r>=10&&t.rollupWarn("Too many floats ("+
-r+"), you're probably using them for layout. Consider using a grid system instead."
-,n)})}}),CSSLint.addRule({id:"font-faces",name:"Don't use too many web fonts",desc
-:"Too many different web fonts in the same stylesheet.",browsers:"All",init:function(
-e,t){var n=this,r=0;e.addListener("startfontface",function(){r++}),e.addListener
-("endstylesheet",function(){r>5&&t.rollupWarn("Too many @font-face declarations ("+
-r+").",n)})}}),CSSLint.addRule({id:"font-sizes",name:"Disallow too many font sizes"
-,desc:"Checks the number of font-size declarations.",browsers:"All",init:function(
-e,t){var n=this,r=0;e.addListener("property",function(e){e.property=="font-size"&&
-r++}),e.addListener("endstylesheet",function(){t.stat("font-sizes",r),r>=10&&t.rollupWarn
-("Too many font-size declarations ("+r+"), abstraction needed.",n)})}}),CSSLint.
-addRule({id:"gradients",name:"Require all gradient definitions",desc:"When using a vendor-prefixed gradient, make sure to use them all."
-,browsers:"All",init:function(e,t){var n=this,r;e.addListener("startrule",function(
-){r={moz:0,webkit:0,oldWebkit:0,o:0}}),e.addListener("property",function(e){/\-(moz|o|webkit)(?:\-(?:linear|radial))\-gradient/i
-.test(e.value)?r[RegExp.$1]=1:/\-webkit\-gradient/i.test(e.value)&&(r.oldWebkit=1
-)}),e.addListener("endrule",function(e){var i=[];r.moz||i.push("Firefox 3.6+"),r
-.webkit||i.push("Webkit (Safari 5+, Chrome)"),r.oldWebkit||i.push("Old Webkit (Safari 4+, Chrome)"
-),r.o||i.push("Opera 11.1+"),i.length&&i.length<4&&t.report("Missing vendor-prefixed CSS gradients for "+
-i.join(", ")+".",e.selectors[0].line,e.selectors[0].col,n)})}}),CSSLint.addRule(
-{id:"ids",name:"Disallow IDs in selectors",desc:"Selectors should not contain IDs."
-,browsers:"All",init:function(e,t){var n=this;e.addListener("startrule",function(
-r){var i=r.selectors,s,o,u,a,f,l,c;for(f=0;f<i.length;f++){s=i[f],a=0;for(l=0;l<
-s.parts.length;l++){o=s.parts[l];if(o.type==e.SELECTOR_PART_TYPE)for(c=0;c<o.modifiers
-.length;c++)u=o.modifiers[c],u.type=="id"&&a++}a==1?t.report("Don't use IDs in selectors."
+,i.addRule({id:"errors",name:"Parsing Errors",desc:"This rule looks for recoverable syntax errors."
+,browsers:"All",init:function(e,t){"use strict";var n=this;e.addListener("error"
+,function(e){t.error(e.message,e.line,e.col,n)})}}),i.addRule({id:"fallback-colors"
+,name:"Require fallback colors",desc:"For older browsers that don't support RGBA, HSL, or HSLA, provide a fallback color."
+,url:"https://github.com/CSSLint/csslint/wiki/Require-fallback-colors",browsers:"IE6,IE7,IE8"
+,init:function(e,t){"use strict";function s(){r=null}var n=this,r,i={color:1,background
+:1,"border-color":1,"border-top-color":1,"border-right-color":1,"border-bottom-color"
+:1,"border-left-color":1,border:1,"border-top":1,"border-right":1,"border-bottom"
+:1,"border-left":1,"background-color":1};e.addListener("startrule",s),e.addListener
+("startfontface",s),e.addListener("startpage",s),e.addListener("startpagemargin"
+,s),e.addListener("startkeyframerule",s),e.addListener("startviewport",s),e.addListener
+("property",function(e){var s=e.property,o=s.text.toLowerCase(),u=e.value.parts,
+a=0,f="",l=u.length;if(i[o])while(a<l)u[a].type==="color"&&("alpha"in u[a]||"hue"in
+u[a]?(/([^\)]+)\(/.test(u[a])&&(f=RegExp.$1.toUpperCase()),(!r||r.property.text.
+toLowerCase()!==o||r.colorType!=="compat")&&t.report("Fallback "+o+" (hex or RGB) should precede "+
+f+" "+o+".",e.line,e.col,n)):e.colorType="compat"),a++;r=e})}}),i.addRule({id:"floats"
+,name:"Disallow too many floats",desc:"This rule tests if the float property is used too many times"
+,url:"https://github.com/CSSLint/csslint/wiki/Disallow-too-many-floats",browsers
+:"All",init:function(e,t){"use strict";var n=this,r=0;e.addListener("property",function(
+e){e.property.text.toLowerCase()==="float"&&e.value.text.toLowerCase()!=="none"&&
+r++}),e.addListener("endstylesheet",function(){t.stat("floats",r),r>=10&&t.rollupWarn
+("Too many floats ("+r+"), you're probably using them for layout. Consider using a grid system instead."
+,n)})}}),i.addRule({id:"font-faces",name:"Don't use too many web fonts",desc:"Too many different web fonts in the same stylesheet."
+,url:"https://github.com/CSSLint/csslint/wiki/Don%27t-use-too-many-web-fonts",browsers
+:"All",init:function(e,t){"use strict";var n=this,r=0;e.addListener("startfontface"
+,function(){r++}),e.addListener("endstylesheet",function(){r>5&&t.rollupWarn("Too many @font-face declarations ("+
+r+").",n)})}}),i.addRule({id:"font-sizes",name:"Disallow too many font sizes",desc
+:"Checks the number of font-size declarations.",url:"https://github.com/CSSLint/csslint/wiki/Don%27t-use-too-many-font-size-declarations"
+,browsers:"All",init:function(e,t){"use strict";var n=this,r=0;e.addListener("property"
+,function(e){e.property.toString()==="font-size"&&r++}),e.addListener("endstylesheet"
+,function(){t.stat("font-sizes",r),r>=10&&t.rollupWarn("Too many font-size declarations ("+
+r+"), abstraction needed.",n)})}}),i.addRule({id:"gradients",name:"Require all gradient definitions"
+,desc:"When using a vendor-prefixed gradient, make sure to use them all.",url:"https://github.com/CSSLint/csslint/wiki/Require-all-gradient-definitions"
+,browsers:"All",init:function(e,t){"use strict";var n=this,r;e.addListener("startrule"
+,function(){r={moz:0,webkit:0,oldWebkit:0,o:0}}),e.addListener("property",function(
+e){/\-(moz|o|webkit)(?:\-(?:linear|radial))\-gradient/i.test(e.value)?r[RegExp.$1
+]=1:/\-webkit\-gradient/i.test(e.value)&&(r.oldWebkit=1)}),e.addListener("endrule"
+,function(e){var i=[];r.moz||i.push("Firefox 3.6+"),r.webkit||i.push("Webkit (Safari 5+, Chrome)"
+),r.oldWebkit||i.push("Old Webkit (Safari 4+, Chrome)"),r.o||i.push("Opera 11.1+"
+),i.length&&i.length<4&&t.report("Missing vendor-prefixed CSS gradients for "+i.
+join(", ")+".",e.selectors[0].line,e.selectors[0].col,n)})}}),i.addRule({id:"ids"
+,name:"Disallow IDs in selectors",desc:"Selectors should not contain IDs.",url:"https://github.com/CSSLint/csslint/wiki/Disallow-IDs-in-selectors"
+,browsers:"All",init:function(e,t){"use strict";var n=this;e.addListener("startrule"
+,function(r){var i=r.selectors,s,o,u,a,f,l,c;for(f=0;f<i.length;f++){s=i[f],a=0;
+for(l=0;l<s.parts.length;l++){o=s.parts[l];if(o.type===e.SELECTOR_PART_TYPE)for(
+c=0;c<o.modifiers.length;c++)u=o.modifiers[c],u.type==="id"&&a++}a===1?t.report("Don't use IDs in selectors."
 ,s.line,s.col,n):a>1&&t.report(a+" IDs in the selector, really?",s.line,s.col,n)
-}})}}),CSSLint.addRule({id:"import",name:"Disallow @import",desc:"Don't use @import, use <link> instead."
-,browsers:"All",init:function(e,t){var n=this;e.addListener("import",function(e)
-{t.report("@import prevents parallel downloads, use <link> instead.",e.line,e.col
-,n)})}}),CSSLint.addRule({id:"important",name:"Disallow !important",desc:"Be careful when using !important declaration"
-,browsers:"All",init:function(e,t){var n=this,r=0;e.addListener("property",function(
+}})}}),i.addRule({id:"import-ie-limit",name:"@import limit on IE6-IE9",desc:"IE6-9 supports up to 31 @import per stylesheet"
+,browsers:"IE6, IE7, IE8, IE9",init:function(e,t){"use strict";function s(){i=0}
+var n=this,r=31,i=0;e.addListener("startpage",s),e.addListener("import",function(
+){i++}),e.addListener("endstylesheet",function(){i>r&&t.rollupError("Too many @import rules ("+
+i+"). IE6-9 supports up to 31 import per stylesheet.",n)})}}),i.addRule({id:"import"
+,name:"Disallow @import",desc:"Don't use @import, use <link> instead.",url:"https://github.com/CSSLint/csslint/wiki/Disallow-%40import"
+,browsers:"All",init:function(e,t){"use strict";var n=this;e.addListener("import"
+,function(e){t.report("@import prevents parallel downloads, use <link> instead."
+,e.line,e.col,n)})}}),i.addRule({id:"important",name:"Disallow !important",desc:"Be careful when using !important declaration"
+,url:"https://github.com/CSSLint/csslint/wiki/Disallow-%21important",browsers:"All"
+,init:function(e,t){"use strict";var n=this,r=0;e.addListener("property",function(
 e){e.important===!0&&(r++,t.report("Use of !important",e.line,e.col,n))}),e.addListener
 ("endstylesheet",function(){t.stat("important",r),r>=10&&t.rollupWarn("Too many !important declarations ("+
-r+"), try to use less than 10 to avoid specificity issues.",n)})}}),CSSLint.addRule
-({id:"known-properties",name:"Require use of known properties",desc:"Properties should be known (listed in CSS3 specification) or be a vendor-prefixed property."
-,browsers:"All",init:function(e,t){var n=this;e.addListener("property",function(
-e){var r=e.property.text.toLowerCase();e.invalid&&t.report(e.invalid.message,e.line
-,e.col,n)})}}),CSSLint.addRule({id:"outline-none",name:"Disallow outline: none",
-desc:"Use of outline: none or outline: 0 should be limited to :focus rules.",browsers
-:"All",tags:["Accessibility"],init:function(e,t){function i(e){e.selectors?r={line
-:e.line,col:e.col,selectors:e.selectors,propCount:0,outline:!1}:r=null}function s
-(e){r&&r.outline&&(r.selectors.toString().toLowerCase().indexOf(":focus")==-1?t.
-report("Outlines should only be modified using :focus.",r.line,r.col,n):r.propCount==1&&
+r+"), try to use less than 10 to avoid specificity issues.",n)})}}),i.addRule({id
+:"known-properties",name:"Require use of known properties",desc:"Properties should be known (listed in CSS3 specification) or be a vendor-prefixed property."
+,url:"https://github.com/CSSLint/csslint/wiki/Require-use-of-known-properties",browsers
+:"All",init:function(e,t){"use strict";var n=this;e.addListener("property",function(
+e){e.invalid&&t.report(e.invalid.message,e.line,e.col,n)})}}),i.addRule({id:"order-alphabetical"
+,name:"Alphabetical order",desc:"Assure properties are in alphabetical order",browsers
+:"All",init:function(e,t){"use strict";var n=this,r,i=function(){r=[]},s=function(
+e){var i=r.join(","),s=r.sort().join(",");i!==s&&t.report("Rule doesn't have all its properties in alphabetical order."
+,e.line,e.col,n)};e.addListener("startrule",i),e.addListener("startfontface",i),
+e.addListener("startpage",i),e.addListener("startpagemargin",i),e.addListener("startkeyframerule"
+,i),e.addListener("startviewport",i),e.addListener("property",function(e){var t=
+e.property.text,n=t.toLowerCase().replace(/^-.*?-/,"");r.push(n)}),e.addListener
+("endrule",s),e.addListener("endfontface",s),e.addListener("endpage",s),e.addListener
+("endpagemargin",s),e.addListener("endkeyframerule",s),e.addListener("endviewport"
+,s)}}),i.addRule({id:"outline-none",name:"Disallow outline: none",desc:"Use of outline: none or outline: 0 should be limited to :focus rules."
+,url:"https://github.com/CSSLint/csslint/wiki/Disallow-outline%3Anone",browsers:"All"
+,tags:["Accessibility"],init:function(e,t){"use strict";function i(e){e.selectors?
+r={line:e.line,col:e.col,selectors:e.selectors,propCount:0,outline:!1}:r=null}function s
+(){r&&r.outline&&(r.selectors.toString().toLowerCase().indexOf(":focus")===-1?t.
+report("Outlines should only be modified using :focus.",r.line,r.col,n):r.propCount===1&&
 t.report("Outlines shouldn't be hidden unless other visual changes are made.",r.
 line,r.col,n))}var n=this,r;e.addListener("startrule",i),e.addListener("startfontface"
 ,i),e.addListener("startpage",i),e.addListener("startpagemargin",i),e.addListener
-("startkeyframerule",i),e.addListener("property",function(e){var t=e.property.text
-.toLowerCase(),n=e.value;r&&(r.propCount++,t=="outline"&&(n=="none"||n=="0")&&(r
-.outline=!0))}),e.addListener("endrule",s),e.addListener("endfontface",s),e.addListener
-("endpage",s),e.addListener("endpagemargin",s),e.addListener("endkeyframerule",s
-)}}),CSSLint.addRule({id:"overqualified-elements",name:"Disallow overqualified elements"
-,desc:"Don't use classes or IDs with elements (a.foo or a#foo).",browsers:"All",
-init:function(e,t){var n=this,r={};e.addListener("startrule",function(i){var s=i
-.selectors,o,u,a,f,l,c;for(f=0;f<s.length;f++){o=s[f];for(l=0;l<o.parts.length;l++
-){u=o.parts[l];if(u.type==e.SELECTOR_PART_TYPE)for(c=0;c<u.modifiers.length;c++)
-a=u.modifiers[c],u.elementName&&a.type=="id"?t.report("Element ("+u+") is overqualified, just use "+
-a+" without element name.",u.line,u.col,n):a.type=="class"&&(r[a]||(r[a]=[]),r[a
-].push({modifier:a,part:u}))}}}),e.addListener("endstylesheet",function(){var e;
-for(e in r)r.hasOwnProperty(e)&&r[e].length==1&&r[e][0].part.elementName&&t.report
-("Element ("+r[e][0].part+") is overqualified, just use "+r[e][0].modifier+" without element name."
-,r[e][0].part.line,r[e][0].part.col,n)})}}),CSSLint.addRule({id:"qualified-headings"
-,name:"Disallow qualified headings",desc:"Headings should not be qualified (namespaced)."
-,browsers:"All",init:function(e,t){var n=this;e.addListener("startrule",function(
+("startkeyframerule",i),e.addListener("startviewport",i),e.addListener("property"
+,function(e){var t=e.property.text.toLowerCase(),n=e.value;r&&(r.propCount++,t==="outline"&&
+(n.toString()==="none"||n.toString()==="0")&&(r.outline=!0))}),e.addListener("endrule"
+,s),e.addListener("endfontface",s),e.addListener("endpage",s),e.addListener("endpagemargin"
+,s),e.addListener("endkeyframerule",s),e.addListener("endviewport",s)}}),i.addRule
+({id:"overqualified-elements",name:"Disallow overqualified elements",desc:"Don't use classes or IDs with elements (a.foo or a#foo)."
+,url:"https://github.com/CSSLint/csslint/wiki/Disallow-overqualified-elements",browsers
+:"All",init:function(e,t){"use strict";var n=this,r={};e.addListener("startrule"
+,function(i){var s=i.selectors,o,u,a,f,l,c;for(f=0;f<s.length;f++){o=s[f];for(l=0
+;l<o.parts.length;l++){u=o.parts[l];if(u.type===e.SELECTOR_PART_TYPE)for(c=0;c<u
+.modifiers.length;c++)a=u.modifiers[c],u.elementName&&a.type==="id"?t.report("Element ("+
+u+") is overqualified, just use "+a+" without element name.",u.line,u.col,n):a.type==="class"&&
+(r[a]||(r[a]=[]),r[a].push({modifier:a,part:u}))}}}),e.addListener("endstylesheet"
+,function(){var e;for(e in r)r.hasOwnProperty(e)&&r[e].length===1&&r[e][0].part.
+elementName&&t.report("Element ("+r[e][0].part+") is overqualified, just use "+r
+[e][0].modifier+" without element name.",r[e][0].part.line,r[e][0].part.col,n)})
+}}),i.addRule({id:"qualified-headings",name:"Disallow qualified headings",desc:"Headings should not be qualified (namespaced)."
+,url:"https://github.com/CSSLint/csslint/wiki/Disallow-qualified-headings",browsers
+:"All",init:function(e,t){"use strict";var n=this;e.addListener("startrule",function(
 r){var i=r.selectors,s,o,u,a;for(u=0;u<i.length;u++){s=i[u];for(a=0;a<s.parts.length
-;a++)o=s.parts[a],o.type==e.SELECTOR_PART_TYPE&&o.elementName&&/h[1-6]/.test(o.elementName
-.toString())&&a>0&&t.report("Heading ("+o.elementName+") should not be qualified."
-,o.line,o.col,n)}})}}),CSSLint.addRule({id:"regex-selectors",name:"Disallow selectors that look like regexs"
+;a++)o=s.parts[a],o.type===e.SELECTOR_PART_TYPE&&o.elementName&&/h[1-6]/.test(o.
+elementName.toString())&&a>0&&t.report("Heading ("+o.elementName+") should not be qualified."
+,o.line,o.col,n)}})}}),i.addRule({id:"regex-selectors",name:"Disallow selectors that look like regexs"
 ,desc:"Selectors that look like regular expressions are slow and should be avoided."
-,browsers:"All",init:function(e,t){var n=this;e.addListener("startrule",function(
-r){var i=r.selectors,s,o,u,a,f,l;for(a=0;a<i.length;a++){s=i[a];for(f=0;f<s.parts
-.length;f++){o=s.parts[f];if(o.type==e.SELECTOR_PART_TYPE)for(l=0;l<o.modifiers.
-length;l++)u=o.modifiers[l],u.type=="attribute"&&/([\~\|\^\$\*]=)/.test(u)&&t.report
-("Attribute selectors with "+RegExp.$1+" are slow!",u.line,u.col,n)}}})}}),CSSLint
-.addRule({id:"rules-count",name:"Rules Count",desc:"Track how many rules there are."
-,browsers:"All",init:function(e,t){var n=this,r=0;e.addListener("startrule",function(
-){r++}),e.addListener("endstylesheet",function(){t.stat("rule-count",r)})}}),CSSLint
-.addRule({id:"selector-max-approaching",name:"Warn when approaching the 4095 selector limit for IE"
+,url:"https://github.com/CSSLint/csslint/wiki/Disallow-selectors-that-look-like-regular-expressions"
+,browsers:"All",init:function(e,t){"use strict";var n=this;e.addListener("startrule"
+,function(r){var i=r.selectors,s,o,u,a,f,l;for(a=0;a<i.length;a++){s=i[a];for(f=0
+;f<s.parts.length;f++){o=s.parts[f];if(o.type===e.SELECTOR_PART_TYPE)for(l=0;l<o
+.modifiers.length;l++)u=o.modifiers[l],u.type==="attribute"&&/([~\|\^\$\*]=)/.test
+(u)&&t.report("Attribute selectors with "+RegExp.$1+" are slow!",u.line,u.col,n)
+}}})}}),i.addRule({id:"rules-count",name:"Rules Count",desc:"Track how many rules there are."
+,browsers:"All",init:function(e,t){"use strict";var n=0;e.addListener("startrule"
+,function(){n++}),e.addListener("endstylesheet",function(){t.stat("rule-count",n
+)})}}),i.addRule({id:"selector-max-approaching",name:"Warn when approaching the 4095 selector limit for IE"
 ,desc:"Will warn when selector count is >= 3800 selectors.",browsers:"IE",init:function(
-e,t){var n=this,r=0;e.addListener("startrule",function(e){r+=e.selectors.length}
-),e.addListener("endstylesheet",function(){r>=3800&&t.report("You have "+r+" selectors. Internet Explorer supports a maximum of 4095 selectors per stylesheet. Consider refactoring."
-,0,0,n)})}}),CSSLint.addRule({id:"selector-max",name:"Error when past the 4095 selector limit for IE"
+e,t){"use strict";var n=this,r=0;e.addListener("startrule",function(e){r+=e.selectors
+.length}),e.addListener("endstylesheet",function(){r>=3800&&t.report("You have "+
+r+" selectors. Internet Explorer supports a maximum of 4095 selectors per stylesheet. Consider refactoring."
+,0,0,n)})}}),i.addRule({id:"selector-max",name:"Error when past the 4095 selector limit for IE"
 ,desc:"Will error when selector count is > 4095.",browsers:"IE",init:function(e,
-t){var n=this,r=0;e.addListener("startrule",function(e){r+=e.selectors.length}),
-e.addListener("endstylesheet",function(){r>4095&&t.report("You have "+r+" selectors. Internet Explorer supports a maximum of 4095 selectors per stylesheet. Consider refactoring."
-,0,0,n)})}}),CSSLint.addRule({id:"shorthand",name:"Require shorthand properties"
-,desc:"Use shorthand properties where possible.",browsers:"All",init:function(e,
-t){function f(e){u={}}function l(e){var r,i,s,o;for(r in a)if(a.hasOwnProperty(r
-)){o=0;for(i=0,s=a[r].length;i<s;i++)o+=u[a[r][i]]?1:0;o==a[r].length&&t.report("The properties "+
-a[r].join(", ")+" can be replaced by "+r+".",e.line,e.col,n)}}var n=this,r,i,s,o=
-{},u,a={margin:["margin-top","margin-bottom","margin-left","margin-right"],padding
-:["padding-top","padding-bottom","padding-left","padding-right"]};for(r in a)if(
-a.hasOwnProperty(r))for(i=0,s=a[r].length;i<s;i++)o[a[r][i]]=r;e.addListener("startrule"
-,f),e.addListener("startfontface",f),e.addListener("property",function(e){var t=
-e.property.toString().toLowerCase(),n=e.value.parts[0].value;o[t]&&(u[t]=1)}),e.
-addListener("endrule",l),e.addListener("endfontface",l)}}),CSSLint.addRule({id:"star-property-hack"
+t){"use strict";var n=this,r=0;e.addListener("startrule",function(e){r+=e.selectors
+.length}),e.addListener("endstylesheet",function(){r>4095&&t.report("You have "+
+r+" selectors. Internet Explorer supports a maximum of 4095 selectors per stylesheet. Consider refactoring."
+,0,0,n)})}}),i.addRule({id:"selector-newline",name:"Disallow new-line characters in selectors"
+,desc:"New-line characters in selectors are usually a forgotten comma and not a descendant combinator."
+,browsers:"All",init:function(e,t){"use strict";function r(e){var r,i,s,o,u,a,f,
+l,c,h,p,d=e.selectors;for(r=0,i=d.length;r<i;r++){s=d[r];for(o=0,a=s.parts.length
+;o<a;o++)for(u=o+1;u<a;u++)f=s.parts[o],l=s.parts[u],c=f.type,h=f.line,p=l.line,
+c==="descendant"&&p>h&&t.report("newline character found in selector (forgot a comma?)"
+,h,d[r].parts[0].col,n)}}var n=this;e.addListener("startrule",r)}}),i.addRule({id
+:"shorthand",name:"Require shorthand properties",desc:"Use shorthand properties where possible."
+,url:"https://github.com/CSSLint/csslint/wiki/Require-shorthand-properties",browsers
+:"All",init:function(e,t){"use strict";function f(){u={}}function l(e){var r,i,s
+,o;for(r in a)if(a.hasOwnProperty(r)){o=0;for(i=0,s=a[r].length;i<s;i++)o+=u[a[r
+][i]]?1:0;o===a[r].length&&t.report("The properties "+a[r].join(", ")+" can be replaced by "+
+r+".",e.line,e.col,n)}}var n=this,r,i,s,o={},u,a={margin:["margin-top","margin-bottom"
+,"margin-left","margin-right"],padding:["padding-top","padding-bottom","padding-left"
+,"padding-right"]};for(r in a)if(a.hasOwnProperty(r))for(i=0,s=a[r].length;i<s;i++
+)o[a[r][i]]=r;e.addListener("startrule",f),e.addListener("startfontface",f),e.addListener
+("property",function(e){var t=e.property.toString().toLowerCase();o[t]&&(u[t]=1)
+}),e.addListener("endrule",l),e.addListener("endfontface",l)}}),i.addRule({id:"star-property-hack"
 ,name:"Disallow properties with a star prefix",desc:"Checks for the star property hack (targets IE6/7)"
-,browsers:"All",init:function(e,t){var n=this;e.addListener("property",function(
-e){var r=e.property;r.hack=="*"&&t.report("Property with star prefix found.",e.property
-.line,e.property.col,n)})}}),CSSLint.addRule({id:"text-indent",name:"Disallow negative text-indent"
-,desc:"Checks for text indent less than -99px",browsers:"All",init:function(e,t)
-{function s(e){r=!1,i="inherit"}function o(e){r&&i!="ltr"&&t.report("Negative text-indent doesn't work well with RTL. If you use text-indent for image replacement explicitly set direction for that item to ltr."
+,url:"https://github.com/CSSLint/csslint/wiki/Disallow-star-hack",browsers:"All"
+,init:function(e,t){"use strict";var n=this;e.addListener("property",function(e)
+{var r=e.property;r.hack==="*"&&t.report("Property with star prefix found.",e.property
+.line,e.property.col,n)})}}),i.addRule({id:"text-indent",name:"Disallow negative text-indent"
+,desc:"Checks for text indent less than -99px",url:"https://github.com/CSSLint/csslint/wiki/Disallow-negative-text-indent"
+,browsers:"All",init:function(e,t){"use strict";function s(){r=!1,i="inherit"}function o
+(){r&&i!=="ltr"&&t.report("Negative text-indent doesn't work well with RTL. If you use text-indent for image replacement explicitly set direction for that item to ltr."
 ,r.line,r.col,n)}var n=this,r,i;e.addListener("startrule",s),e.addListener("startfontface"
 ,s),e.addListener("property",function(e){var t=e.property.toString().toLowerCase
-(),n=e.value;t=="text-indent"&&n.parts[0].value<-99?r=e.property:t=="direction"&&
-n=="ltr"&&(i="ltr")}),e.addListener("endrule",o),e.addListener("endfontface",o)}
-}),CSSLint.addRule({id:"underscore-property-hack",name:"Disallow properties with an underscore prefix"
-,desc:"Checks for the underscore property hack (targets IE6)",browsers:"All",init
-:function(e,t){var n=this;e.addListener("property",function(e){var r=e.property;
-r.hack=="_"&&t.report("Property with underscore prefix found.",e.property.line,e
-.property.col,n)})}}),CSSLint.addRule({id:"unique-headings",name:"Headings should only be defined once"
-,desc:"Headings should be defined only once.",browsers:"All",init:function(e,t){
-var n=this,r={h1:0,h2:0,h3:0,h4:0,h5:0,h6:0};e.addListener("startrule",function(
-e){var i=e.selectors,s,o,u,a,f;for(a=0;a<i.length;a++){s=i[a],o=s.parts[s.parts.
-length-1];if(o.elementName&&/(h[1-6])/i.test(o.elementName.toString())){for(f=0;
-f<o.modifiers.length;f++)if(o.modifiers[f].type=="pseudo"){u=!0;break}u||(r[RegExp
-.$1]++,r[RegExp.$1]>1&&t.report("Heading ("+o.elementName+") has already been defined."
-,o.line,o.col,n))}}}),e.addListener("endstylesheet",function(e){var i,s=[];for(i in
-r)r.hasOwnProperty(i)&&r[i]>1&&s.push(r[i]+" "+i+"s");s.length&&t.rollupWarn("You have "+
-s.join(", ")+" defined in this stylesheet.",n)})}}),CSSLint.addRule({id:"universal-selector"
-,name:"Disallow universal selector",desc:"The universal selector (*) is known to be slow."
-,browsers:"All",init:function(e,t){var n=this;e.addListener("startrule",function(
-e){var r=e.selectors,i,s,o,u,a,f;for(u=0;u<r.length;u++)i=r[u],s=i.parts[i.parts
-.length-1],s.elementName=="*"&&t.report(n.desc,s.line,s.col,n)})}}),CSSLint.addRule
-({id:"unqualified-attributes",name:"Disallow unqualified attribute selectors",desc
-:"Unqualified attribute selectors are known to be slow.",browsers:"All",init:function(
-e,t){var n=this;e.addListener("startrule",function(r){var i=r.selectors,s,o,u,a,
-f,l;for(a=0;a<i.length;a++){s=i[a],o=s.parts[s.parts.length-1];if(o.type==e.SELECTOR_PART_TYPE
-)for(l=0;l<o.modifiers.length;l++)u=o.modifiers[l],u.type=="attribute"&&(!o.elementName||
-o.elementName=="*")&&t.report(n.desc,o.line,o.col,n)}})}}),CSSLint.addRule({id:"vendor-prefix"
+(),n=e.value;t==="text-indent"&&n.parts[0].value<-99?r=e.property:t==="direction"&&
+n.toString()==="ltr"&&(i="ltr")}),e.addListener("endrule",o),e.addListener("endfontface"
+,o)}}),i.addRule({id:"underscore-property-hack",name:"Disallow properties with an underscore prefix"
+,desc:"Checks for the underscore property hack (targets IE6)",url:"https://github.com/CSSLint/csslint/wiki/Disallow-underscore-hack"
+,browsers:"All",init:function(e,t){"use strict";var n=this;e.addListener("property"
+,function(e){var r=e.property;r.hack==="_"&&t.report("Property with underscore prefix found."
+,e.property.line,e.property.col,n)})}}),i.addRule({id:"unique-headings",name:"Headings should only be defined once"
+,desc:"Headings should be defined only once.",url:"https://github.com/CSSLint/csslint/wiki/Headings-should-only-be-defined-once"
+,browsers:"All",init:function(e,t){"use strict";var n=this,r={h1:0,h2:0,h3:0,h4:0
+,h5:0,h6:0};e.addListener("startrule",function(e){var i=e.selectors,s,o,u,a,f;for(
+a=0;a<i.length;a++){s=i[a],o=s.parts[s.parts.length-1];if(o.elementName&&/(h[1-6])/i
+.test(o.elementName.toString())){for(f=0;f<o.modifiers.length;f++)if(o.modifiers
+[f].type==="pseudo"){u=!0;break}u||(r[RegExp.$1]++,r[RegExp.$1]>1&&t.report("Heading ("+
+o.elementName+") has already been defined.",o.line,o.col,n))}}}),e.addListener("endstylesheet"
+,function(){var e,i=[];for(e in r)r.hasOwnProperty(e)&&r[e]>1&&i.push(r[e]+" "+e+"s"
+);i.length&&t.rollupWarn("You have "+i.join(", ")+" defined in this stylesheet."
+,n)})}}),i.addRule({id:"universal-selector",name:"Disallow universal selector",desc
+:"The universal selector (*) is known to be slow.",url:"https://github.com/CSSLint/csslint/wiki/Disallow-universal-selector"
+,browsers:"All",init:function(e,t){"use strict";var n=this;e.addListener("startrule"
+,function(e){var r=e.selectors,i,s,o;for(o=0;o<r.length;o++)i=r[o],s=i.parts[i.parts
+.length-1],s.elementName==="*"&&t.report(n.desc,s.line,s.col,n)})}}),i.addRule({
+id:"unqualified-attributes",name:"Disallow unqualified attribute selectors",desc
+:"Unqualified attribute selectors are known to be slow.",url:"https://github.com/CSSLint/csslint/wiki/Disallow-unqualified-attribute-selectors"
+,browsers:"All",init:function(e,t){"use strict";var n=this;e.addListener("startrule"
+,function(r){var i=r.selectors,s=!1,o,u,a,f,l;for(f=0;f<i.length;f++){o=i[f],u=o
+.parts[o.parts.length-1];if(u.type===e.SELECTOR_PART_TYPE){for(l=0;l<u.modifiers
+.length;l++){a=u.modifiers[l];if(a.type==="class"||a.type==="id"){s=!0;break}}if(!
+s)for(l=0;l<u.modifiers.length;l++)a=u.modifiers[l],a.type==="attribute"&&(!u.elementName||
+u.elementName==="*")&&t.report(n.desc,u.line,u.col,n)}}})}}),i.addRule({id:"vendor-prefix"
 ,name:"Require standard property with vendor prefix",desc:"When using a vendor-prefixed property, make sure to include the standard one."
-,browsers:"All",init:function(e,t){function o(){r={},i=1}function u(e){var i,o,u
-,a,f,l,c=[];for(i in r)s[i]&&c.push({actual:i,needed:s[i]});for(o=0,u=c.length;o<
-u;o++)f=c[o].needed,l=c[o].actual,r[f]?r[f][0].pos<r[l][0].pos&&t.report("Standard property '"+
-f+"' should come after vendor-prefixed property '"+l+"'.",r[l][0].name.line,r[l]
-[0].name.col,n):t.report("Missing standard property '"+f+"' to go along with '"+
-l+"'.",r[l][0].name.line,r[l][0].name.col,n)}var n=this,r,i,s={"-webkit-border-radius"
+,url:"https://github.com/CSSLint/csslint/wiki/Require-standard-property-with-vendor-prefix"
+,browsers:"All",init:function(e,t){"use strict";function o(){r={},i=1}function u
+(){var e,i,o,u,a,f=[];for(e in r)s[e]&&f.push({actual:e,needed:s[e]});for(i=0,o=
+f.length;i<o;i++)u=f[i].needed,a=f[i].actual,r[u]?r[u][0].pos<r[a][0].pos&&t.report
+("Standard property '"+u+"' should come after vendor-prefixed property '"+a+"'."
+,r[a][0].name.line,r[a][0].name.col,n):t.report("Missing standard property '"+u+"' to go along with '"+
+a+"'.",r[a][0].name.line,r[a][0].name.col,n)}var n=this,r,i,s={"-webkit-border-radius"
 :"border-radius","-webkit-border-top-left-radius":"border-top-left-radius","-webkit-border-top-right-radius"
 :"border-top-right-radius","-webkit-border-bottom-left-radius":"border-bottom-left-radius"
 ,"-webkit-border-bottom-right-radius":"border-bottom-right-radius","-o-border-radius"
@@ -7824,69 +8096,77 @@ l+"'.",r[l][0].name.line,r[l][0].name.col,n)}var n=this,r,i,s={"-webkit-border-r
 :"transform","-o-transform":"transform","-ms-transform":"transform","-moz-transform-origin"
 :"transform-origin","-webkit-transform-origin":"transform-origin","-o-transform-origin"
 :"transform-origin","-ms-transform-origin":"transform-origin","-moz-box-sizing":"box-sizing"
-,"-webkit-box-sizing":"box-sizing","-moz-user-select":"user-select","-khtml-user-select"
-:"user-select","-webkit-user-select":"user-select"};e.addListener("startrule",o)
-,e.addListener("startfontface",o),e.addListener("startpage",o),e.addListener("startpagemargin"
-,o),e.addListener("startkeyframerule",o),e.addListener("property",function(e){var t=
-e.property.text.toLowerCase();r[t]||(r[t]=[]),r[t].push({name:e.property,value:e
-.value,pos:i++})}),e.addListener("endrule",u),e.addListener("endfontface",u),e.addListener
-("endpage",u),e.addListener("endpagemargin",u),e.addListener("endkeyframerule",u
-)}}),CSSLint.addRule({id:"zero-units",name:"Disallow units for 0 values",desc:"You don't need to specify units when a value is 0."
-,browsers:"All",init:function(e,t){var n=this;e.addListener("property",function(
-e){var r=e.value.parts,i=0,s=r.length;while(i<s)(r[i].units||r[i].type=="percentage"
-)&&r[i].value===0&&r[i].type!="time"&&t.report("Values of 0 shouldn't have units specified."
-,r[i].line,r[i].col,n),i++})}}),function(){var e=function(e){return!e||e.constructor!==
-String?"":e.replace(/[\"&><]/g,function(e){switch(e){case'"':return"&quot;";case"&"
-:return"&amp;";case"<":return"&lt;";case">":return"&gt;"}})};CSSLint.addFormatter
+,"-webkit-box-sizing":"box-sizing"};e.addListener("startrule",o),e.addListener("startfontface"
+,o),e.addListener("startpage",o),e.addListener("startpagemargin",o),e.addListener
+("startkeyframerule",o),e.addListener("startviewport",o),e.addListener("property"
+,function(e){var t=e.property.text.toLowerCase();r[t]||(r[t]=[]),r[t].push({name
+:e.property,value:e.value,pos:i++})}),e.addListener("endrule",u),e.addListener("endfontface"
+,u),e.addListener("endpage",u),e.addListener("endpagemargin",u),e.addListener("endkeyframerule"
+,u),e.addListener("endviewport",u)}}),i.addRule({id:"zero-units",name:"Disallow units for 0 values"
+,desc:"You don't need to specify units when a value is 0.",url:"https://github.com/CSSLint/csslint/wiki/Disallow-units-for-zero-values"
+,browsers:"All",init:function(e,t){"use strict";var n=this;e.addListener("property"
+,function(e){var r=e.value.parts,i=0,s=r.length;while(i<s)(r[i].units||r[i].type==="percentage"
+)&&r[i].value===0&&r[i].type!=="time"&&t.report("Values of 0 shouldn't have units specified."
+,r[i].line,r[i].col,n),i++})}}),function(){"use strict";var e=function(e){return!
+e||e.constructor!==String?"":e.replace(/["&><]/g,function(e){switch(e){case'"':return"&quot;"
+;case"&":return"&amp;";case"<":return"&lt;";case">":return"&gt;"}})};i.addFormatter
 ({id:"checkstyle-xml",name:"Checkstyle XML format",startFormat:function(){return'<?xml version="1.0" encoding="utf-8"?><checkstyle>'
 },endFormat:function(){return"</checkstyle>"},readError:function(t,n){return'<file name="'+
 e(t)+'"><error line="0" column="0" severty="error" message="'+e(n)+'"></error></file>'
-},formatResults:function(t,n,r){var i=t.messages,s=[],o=function(e){return!!e&&"name"in
-e?"net.csslint."+e.name.replace(/\s/g,""):""};return i.length>0&&(s.push('<file name="'+
-n+'">'),CSSLint.Util.forEach(i,function(t,n){t.rollup||s.push('<error line="'+t.
-line+'" column="'+t.col+'" severity="'+t.type+'"'+' message="'+e(t.message)+'" source="'+
-o(t.rule)+'"/>')}),s.push("</file>")),s.join("")}})}(),CSSLint.addFormatter({id:"compact"
-,name:"Compact, 'porcelain' format",startFormat:function(){return""},endFormat:function(
-){return""},formatResults:function(e,t,n){var r=e.messages,i="";n=n||{};var s=function(
-e){return e.charAt(0).toUpperCase()+e.slice(1)};return r.length===0?n.quiet?"":t+": Lint Free!"
-:(CSSLint.Util.forEach(r,function(e,n){e.rollup?i+=t+": "+s(e.type)+" - "+e.message+"\n"
-:i+=t+": "+"line "+e.line+", col "+e.col+", "+s(e.type)+" - "+e.message+"\n"}),i
-)}}),CSSLint.addFormatter({id:"csslint-xml",name:"CSSLint XML format",startFormat
-:function(){return'<?xml version="1.0" encoding="utf-8"?><csslint>'},endFormat:function(
-){return"</csslint>"},formatResults:function(e,t,n){var r=e.messages,i=[],s=function(
-e){return!e||e.constructor!==String?"":e.replace(/\"/g,"'").replace(/&/g,"&amp;"
-).replace(/</g,"&lt;").replace(/>/g,"&gt;")};return r.length>0&&(i.push('<file name="'+
-t+'">'),CSSLint.Util.forEach(r,function(e,t){e.rollup?i.push('<issue severity="'+
-e.type+'" reason="'+s(e.message)+'" evidence="'+s(e.evidence)+'"/>'):i.push('<issue line="'+
-e.line+'" char="'+e.col+'" severity="'+e.type+'"'+' reason="'+s(e.message)+'" evidence="'+
-s(e.evidence)+'"/>')}),i.push("</file>")),i.join("")}}),CSSLint.addFormatter({id
-:"junit-xml",name:"JUNIT XML format",startFormat:function(){return'<?xml version="1.0" encoding="utf-8"?><testsuites>'
-},endFormat:function(){return"</testsuites>"},formatResults:function(e,t,n){var r=
-e.messages,i=[],s={error:0,failure:0},o=function(e){return!!e&&"name"in e?"net.csslint."+
-e.name.replace(/\s/g,""):""},u=function(e){return!e||e.constructor!==String?"":e
-.replace(/\"/g,"'").replace(/</g,"&lt;").replace(/>/g,"&gt;")};return r.length>0&&
-(r.forEach(function(e,t){var n=e.type==="warning"?"error":e.type;e.rollup||(i.push
-('<testcase time="0" name="'+o(e.rule)+'">'),i.push("<"+n+' message="'+u(e.message
-)+'"><![CDATA['+e.line+":"+e.col+":"+u(e.evidence)+"]]></"+n+">"),i.push("</testcase>"
-),s[n]+=1)}),i.unshift('<testsuite time="0" tests="'+r.length+'" skipped="0" errors="'+
-s.error+'" failures="'+s.failure+'" package="net.csslint" name="'+t+'">'),i.push
-("</testsuite>")),i.join("")}}),CSSLint.addFormatter({id:"lint-xml",name:"Lint XML format"
-,startFormat:function(){return'<?xml version="1.0" encoding="utf-8"?><lint>'},endFormat
-:function(){return"</lint>"},formatResults:function(e,t,n){var r=e.messages,i=[]
-,s=function(e){return!e||e.constructor!==String?"":e.replace(/\"/g,"'").replace(/&/g
-,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")};return r.length>0&&(i.push('<file name="'+
-t+'">'),CSSLint.Util.forEach(r,function(e,t){e.rollup?i.push('<issue severity="'+
-e.type+'" reason="'+s(e.message)+'" evidence="'+s(e.evidence)+'"/>'):i.push('<issue line="'+
-e.line+'" char="'+e.col+'" severity="'+e.type+'"'+' reason="'+s(e.message)+'" evidence="'+
-s(e.evidence)+'"/>')}),i.push("</file>")),i.join("")}}),CSSLint.addFormatter({id
-:"text",name:"Plain Text",startFormat:function(){return""},endFormat:function(){
-return""},formatResults:function(e,t,n){var r=e.messages,i="";n=n||{};if(r.length===0
-)return n.quiet?"":"\n\ncsslint: No errors in "+t+".";i="\n\ncsslint: There are "+
-r.length+" problems in "+t+".";var s=t.lastIndexOf("/"),o=t;return s===-1&&(s=t.
-lastIndexOf("\\")),s>-1&&(o=t.substring(s+1)),CSSLint.Util.forEach(r,function(e,
-t){i=i+"\n\n"+o,e.rollup?(i+="\n"+(t+1)+": "+e.type,i+="\n"+e.message):(i+="\n"+
-(t+1)+": "+e.type+" at line "+e.line+", col "+e.col,i+="\n"+e.message,i+="\n"+e.
-evidence)}),i}}),CSSLint}()
+},formatResults:function(t,n){var r=t.messages,s=[],o=function(e){return!!e&&"name"in
+e?"net.csslint."+e.name.replace(/\s/g,""):""};return r.length>0&&(s.push('<file name="'+
+n+'">'),i.Util.forEach(r,function(t){t.rollup||s.push('<error line="'+t.line+'" column="'+
+t.col+'" severity="'+t.type+'"'+' message="'+e(t.message)+'" source="'+o(t.rule)+'"/>'
+)}),s.push("</file>")),s.join("")}})}(),i.addFormatter({id:"compact",name:"Compact, 'porcelain' format"
+,startFormat:function(){"use strict";return""},endFormat:function(){"use strict"
+;return""},formatResults:function(e,t,n){"use strict";var r=e.messages,s="";n=n||
+{};var o=function(e){return e.charAt(0).toUpperCase()+e.slice(1)};return r.length===0?
+n.quiet?"":t+": Lint Free!":(i.Util.forEach(r,function(e){e.rollup?s+=t+": "+o(e
+.type)+" - "+e.message+" ("+e.rule.id+")\n":s+=t+": line "+e.line+", col "+e.col+", "+
+o(e.type)+" - "+e.message+" ("+e.rule.id+")\n"}),s)}}),i.addFormatter({id:"csslint-xml"
+,name:"CSSLint XML format",startFormat:function(){"use strict";return'<?xml version="1.0" encoding="utf-8"?><csslint>'
+},endFormat:function(){"use strict";return"</csslint>"},formatResults:function(e
+,t){"use strict";var n=e.messages,r=[],s=function(e){return!e||e.constructor!==String?""
+:e.replace(/"/g,"'").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"
+)};return n.length>0&&(r.push('<file name="'+t+'">'),i.Util.forEach(n,function(e
+){e.rollup?r.push('<issue severity="'+e.type+'" reason="'+s(e.message)+'" evidence="'+
+s(e.evidence)+'"/>'):r.push('<issue line="'+e.line+'" char="'+e.col+'" severity="'+
+e.type+'"'+' reason="'+s(e.message)+'" evidence="'+s(e.evidence)+'"/>')}),r.push
+("</file>")),r.join("")}}),i.addFormatter({id:"json",name:"JSON",startFormat:function(
+){"use strict";return this.json=[],""},endFormat:function(){"use strict";var e=""
+;return this.json.length>0&&(this.json.length===1?e=JSON.stringify(this.json[0])
+:e=JSON.stringify(this.json)),e},formatResults:function(e,t,n){"use strict";return(
+e.messages.length>0||!n.quiet)&&this.json.push({filename:t,messages:e.messages,stats
+:e.stats}),""}}),i.addFormatter({id:"junit-xml",name:"JUNIT XML format",startFormat
+:function(){"use strict";return'<?xml version="1.0" encoding="utf-8"?><testsuites>'
+},endFormat:function(){"use strict";return"</testsuites>"},formatResults:function(
+e,t){"use strict";var n=e.messages,r=[],i={error:0,failure:0},s=function(e){return!!
+e&&"name"in e?"net.csslint."+e.name.replace(/\s/g,""):""},o=function(e){return!e||
+e.constructor!==String?"":e.replace(/"/g,"'").replace(/</g,"&lt;").replace(/>/g,"&gt;"
+)};return n.length>0&&(n.forEach(function(e){var t=e.type==="warning"?"error":e.
+type;e.rollup||(r.push('<testcase time="0" name="'+s(e.rule)+'">'),r.push("<"+t+' message="'+
+o(e.message)+'"><![CDATA['+e.line+":"+e.col+":"+o(e.evidence)+"]]></"+t+">"),r.push
+("</testcase>"),i[t]+=1)}),r.unshift('<testsuite time="0" tests="'+n.length+'" skipped="0" errors="'+
+i.error+'" failures="'+i.failure+'" package="net.csslint" name="'+t+'">'),r.push
+("</testsuite>")),r.join("")}}),i.addFormatter({id:"lint-xml",name:"Lint XML format"
+,startFormat:function(){"use strict";return'<?xml version="1.0" encoding="utf-8"?><lint>'
+},endFormat:function(){"use strict";return"</lint>"},formatResults:function(e,t)
+{"use strict";var n=e.messages,r=[],s=function(e){return!e||e.constructor!==String?""
+:e.replace(/"/g,"'").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"
+)};return n.length>0&&(r.push('<file name="'+t+'">'),i.Util.forEach(n,function(e
+){if(e.rollup)r.push('<issue severity="'+e.type+'" reason="'+s(e.message)+'" evidence="'+
+s(e.evidence)+'"/>');else{var t="";e.rule&&e.rule.id&&(t='rule="'+s(e.rule.id)+'" '
+),r.push("<issue "+t+'line="'+e.line+'" char="'+e.col+'" severity="'+e.type+'"'+' reason="'+
+s(e.message)+'" evidence="'+s(e.evidence)+'"/>')}}),r.push("</file>")),r.join(""
+)}}),i.addFormatter({id:"text",name:"Plain Text",startFormat:function(){"use strict"
+;return""},endFormat:function(){"use strict";return""},formatResults:function(e,
+t,n){"use strict";var r=e.messages,s="";n=n||{};if(r.length===0)return n.quiet?""
+:"\n\ncsslint: No errors in "+t+".";s="\n\ncsslint: There ",r.length===1?s+="is 1 problem"
+:s+="are "+r.length+" problems",s+=" in "+t+".";var o=t.lastIndexOf("/"),u=t;return o===-1&&
+(o=t.lastIndexOf("\\")),o>-1&&(u=t.substring(o+1)),i.Util.forEach(r,function(e,t
+){s=s+"\n\n"+u,e.rollup?(s+="\n"+(t+1)+": "+e.type,s+="\n"+e.message):(s+="\n"+(
+t+1)+": "+e.type+" at line "+e.line+", col "+e.col,s+="\n"+e.message,s+="\n"+e.evidence
+)}),s}}),i}()
 
 
 
@@ -12798,14 +13078,6 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
                 );
             // csslint script
             if (file.slice(-4) === '.css') {
-                scriptParsed = scriptParsed.replace(new RegExp([
-                    // handle flexbox
-                    ' display: flex;',
-                    ' flex: .+?;',
-                    ' flex-.+?: .+?;'
-                ].join('|'), 'g'), function () {
-                    return ' background: url(' + Math.random() + ');';
-                });
                 local.CSSLint.errors = local.CSSLint.verify(scriptParsed).messages
                     .filter(function (error) {
                         return !ignoreDict[error.rule.id];
@@ -14303,22 +14575,46 @@ local.assetsDict['/assets.index.template.html'] = '\
     box-sizing: false,\n\
     universal-selector: false\n\
 */\n\
-* {\n\
+*,\n\
+*:after,\n\
+*:before {\n\
     box-sizing: border-box;\n\
 }\n\
 body {\n\
     background: #dde;\n\
     font-family: Arial, Helvetica, sans-serif;\n\
-    margin: 20px;\n\
+    margin: 0 40px;\n\
 }\n\
-body > * {\n\
-    margin-bottom: 10px;\n\
+body > a,\n\
+body > button,\n\
+body > div,\n\
+body > input,\n\
+body > pre,\n\
+body > select,\n\
+body > span,\n\
+body > textarea {\n\
+    margin-bottom: 20px;\n\
 }\n\
 body > button {\n\
     width: 20rem;\n\
 }\n\
 button {\n\
     cursor: pointer;\n\
+}\n\
+@keyframes uiAnimateShake {\n\
+    100% {\n\
+        transform: translateX(0);\n\
+    }\n\
+    0%, 20%, 60% {\n\
+        transform: translateX(10px);\n\
+    }\n\
+    40%, 80% {\n\
+        transform: translateX(-10px);\n\
+    }\n\
+}\n\
+.uiAnimateShake {\n\
+    animation-duration: 500ms;\n\
+    animation-name: uiAnimateShake;\n\
 }\n\
 .uiAnimateSlide {\n\
     overflow-y: hidden;\n\
@@ -14330,13 +14626,13 @@ button {\n\
 }\n\
 .uiAnimateSpin {\n\
     animation: uiAnimateSpin 2s linear infinite;\n\
-    border: 0.5rem solid #999;\n\
+    border: 6px solid #999;\n\
     border-radius: 50%;\n\
-    border-top: 0.5rem solid #7d7;\n\
+    border-top: 8px solid #7d7;\n\
     display: inline-block;\n\
-    height: 2rem;\n\
+    height: 25px;\n\
     vertical-align: middle;\n\
-    width: 2rem;\n\
+    width: 25px;\n\
 }\n\
 .utility2FooterDiv {\n\
     text-align: center;\n\
@@ -14363,7 +14659,7 @@ textarea[readonly] {\n\
 </style>\n\
 </head>\n\
 <body>\n\
-<div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%;"></div>\n\
+<div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%; z-index: 1;"></div>\n\
 <script>\n\
 /*jslint\n\
     bitwise: true,\n\
@@ -14859,7 +15155,7 @@ the greatest app in the world!\n\
 # 1. download standalone app\n\
 curl -O https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app/assets.app.js\n\
 # 2. run standalone app\n\
-node ./assets.app.js\n\
+PORT=8081 node ./assets.app.js\n\
 # 3. open a browser to http://127.0.0.1:8081 and play with the web-demo\n\
 # 4. edit file assets.app.js to suit your needs\n\
 ```\n\
@@ -15031,7 +15327,7 @@ local.assetsDict['/assets.readmeCustomOrg.npmdoc.template.md'] = '\
 \n\
 ```json\n\
 \n\
-{{packageJson jsonStringify4 markdownCodeSafe}}\n\
+{{packageJson jsonStringify4 markdownSafe}}\n\
 ```\n\
 \n\
 \n\
@@ -15086,7 +15382,7 @@ local.assetsDict['/assets.readmeCustomOrg.npmtest.template.md'] = '\
 \n\
 ```json\n\
 \n\
-{{packageJson jsonStringify4 markdownCodeSafe}}\n\
+{{packageJson jsonStringify4 markdownSafe}}\n\
 ```\n\
 \n\
 \n\
@@ -15219,7 +15515,7 @@ local.assetsDict['/assets.testReport.template.html'] = '\
     <span>test date</span>- {{date}}<br>\n\
     <span>commit info</span>-\n\
         {{#if env.CI_COMMIT_INFO}}\n\
-        {{env.CI_COMMIT_INFO htmlSafe}}<br>\n\
+        {{env.CI_COMMIT_INFO}}<br>\n\
         {{#unless env.CI_COMMIT_INFO}}\n\
         undefined<br>\n\
         {{/if env.CI_COMMIT_INFO}}\n\
@@ -15244,7 +15540,7 @@ local.assetsDict['/assets.testReport.template.html'] = '\
 {{#each testPlatformList}}\n\
 <div class="platform">\n\
 <h4>\n\
-    {{testPlatformNumber}}. {{name htmlSafe}}<br>\n\
+    {{testPlatformNumber}}. {{name}}<br>\n\
     {{#if screenshot}}\n\
     <a href="{{screenshot encodeURIComponent}}">\n\
         <img src="{{screenshot encodeURIComponent}}">\n\
@@ -15276,7 +15572,7 @@ local.assetsDict['/assets.testReport.template.html'] = '\
 </table>\n\
 <pre class="{{preClass}}">\n\
 {{#each errorStackList}}\n\
-{{errorStack htmlSafe}}\n\
+{{errorStack}}\n\
 {{/each errorStackList}}\n\
 </pre>\n\
 </div>\n\
@@ -16203,10 +16499,9 @@ local.assetsDict['/favicon.ico'] = '';
                 local.ajaxProgressState = 0;
                 // reset ajaxProgress
                 setTimeout(function () {
-                    // coverage-hack - ignore else-statement
-                    local.nop(!local.ajaxProgressState && (function () {
+                    if (!local.ajaxProgressState) {
                         ajaxProgressDiv1.style.width = '0%';
-                    }()));
+                    }
                 }, 500);
             }, local.ajaxProgressCounter > 0
                 ? local.timeoutDefault
@@ -16258,6 +16553,7 @@ local.assetsDict['/favicon.ico'] = '';
          * this function will convert the Uint8Array-bff to base64-encoded-text
          */
             var ii, mod3, text, uint24, uint6ToB64;
+            bff = bff || [];
             text = '';
             uint24 = 0;
             uint6ToB64 = function (uint6) {
@@ -16293,6 +16589,7 @@ local.assetsDict['/favicon.ico'] = '';
          */
             var bff, ii;
             bff = [];
+            text = text || '';
             for (ii = 0; ii < text.length; ii += 2) {
                 bff.push(parseInt(text[ii] + text[ii + 1], 16));
             }
@@ -16312,6 +16609,7 @@ local.assetsDict['/favicon.ico'] = '';
          * https://gist.github.com/wang-bin/7332335
          * this function will convert the base64-encoded text to Uint8Array
          */
+            text = text || '';
             var de = new Uint8Array(text.length); //3/4
             var u = 0, q = '', x = '', c;
             var map64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -16699,7 +16997,7 @@ function TranslateElementInit() {\n\
                     options.browserTestScript = local.browserTestElectron
                         .toString()
                         .replace((/<\//g), '<\\/')
-                        // coverage-hack - un-instrument
+                        // coverage-hack - un-instrument function
                         .replace((/\b__cov_.*?\+\+/g), '0');
                     options.fileElectronHtml = options.npm_config_dir_tmp + '/electron.' +
                         Date.now().toString(16) + Math.random().toString(16) + '.html';
@@ -16975,6 +17273,7 @@ function TranslateElementInit() {\n\
                         });
                         // deduplicate '/'
                         Object.keys(data.hrefDict).forEach(function (key) {
+                            // optimization - hasOwnProperty
                             if (data.hrefDict.hasOwnProperty(key + '/') ||
                                     (/\.(?:css|js)$/).test(key)) {
                                 data.hrefDict[key] = undefined;
@@ -17485,24 +17784,6 @@ return Utf8ArrayToStr(bff);
                     match0.replace(match1, local.jsonStringifyOrdered(options.packageJson, null, 4))
                 );
             });
-            // init assets.swgg.swagger.json
-            if (local.fs.existsSync('assets.swgg.swagger.json')) {
-                // save assets.swgg.swagger.json
-                local.fs.writeFileSync('assets.swgg.swagger.json', local.jsonStringifyOrdered(
-                    // normalize assets.swgg.swagger.json
-                    local.objectSetOverride(local.swgg.normalizeSwaggerJson(JSON.parse(
-                        // read assets.swgg.swagger.json
-                        local.fs.readFileSync('assets.swgg.swagger.json', 'utf8')
-                    )), { info: {
-                        description: options.packageJson.description,
-                        title: options.packageJson.name,
-                        version: options.packageJson.version,
-                        'x-swgg-homepage': options.packageJson.homepage
-                    } }, 2),
-                    null,
-                    4
-                ) + '\n');
-            }
             // search-and-replace - customize dataTo
             [
                 // customize name and description
@@ -17613,6 +17894,33 @@ return Utf8ArrayToStr(bff);
                 .replace((/(\S)\n{3}(\S)/g), '$1\n\n$2');
             // save README.md
             local.fs.writeFileSync('README.md', options.dataTo);
+            // customize assets.swgg.swagger.json
+            if (local.fs.existsSync('assets.swgg.swagger.json')) {
+                // normalize assets.swgg.swagger.json
+                options.swaggerJson = local.swgg.normalizeSwaggerJson(JSON.parse(
+                    // read assets.swgg.swagger.json
+                    local.fs.readFileSync('assets.swgg.swagger.json', 'utf8')
+                ));
+                local.objectSetOverride(options.swaggerJson, { info: {
+                    description: options.packageJson.description,
+                    title: options.packageJson.name,
+                    version: options.packageJson.version,
+                    'x-swgg-downloadStandaloneApp': ((/\bhttps:\/\/.*?\/assets\.app\.js/).exec(
+                        options.dataTo.replace(new RegExp(
+                            'https:\/\/kaizhu256.github.io' +
+                                '\/node-utility2\/build..beta..travis-ci.org\/app\/assets.app.js',
+                            'g'
+                        ), '')
+                    ) || {})[0],
+                    'x-swgg-homepage': options.packageJson.homepage
+                } }, 2);
+                // save assets.swgg.swagger.json
+                local.fs.writeFileSync('assets.swgg.swagger.json', local.jsonStringifyOrdered(
+                    options.swaggerJson,
+                    null,
+                    4
+                ) + '\n');
+            }
             onError();
         };
 
@@ -18041,7 +18349,7 @@ return Utf8ArrayToStr(bff);
             return self;
         };
 
-        local.domFragmentRender = function (template, dict) {
+        local.domElementRender = function (template, dict) {
         /*
          * this function will return a dom-fragment rendered from the givent template and dict
          */
@@ -18844,10 +19152,6 @@ return Utf8ArrayToStr(bff);
          * this function will normalize the value by type
          */
             switch (type) {
-            case 'dict':
-                return typeof value === 'object' && value && !Array.isArray(value)
-                    ? value
-                    : valueDefault || {};
             case 'list':
                 return Array.isArray(value)
                     ? value
@@ -19473,14 +19777,9 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                             local.tryCatchOnError(function () {
                                 // validate no error occurred
                                 local.assert(!error, error);
-                                // coverage-hack - ignore else-statement
-                                local.nop(local.swgg &&
-                                    local.swgg.validateBySwaggerJson &&
-                                    (function () {
-                                        local.swgg.validateBySwaggerJson({
-                                            swaggerJson: JSON.parse(data)
-                                        });
-                                    }()));
+                                local.swgg.validateBySwaggerJson({
+                                    swaggerJson: JSON.parse(data)
+                                });
                             }, console.error);
                         });
                         break;
@@ -19537,18 +19836,13 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 local.assetsDict['/assets.example.template.js'],
                 {}
             );
-            // coverage-hack - ignore else-statement
-            local.nop(!local.env.npm_package_buildCustomOrg && (function () {
-                local.fs.readFileSync('README.md', 'utf8').replace(
-                    (/```\w*?(\n[\W\s]*?example\.js[\n\"][\S\s]+?)\n```/),
-                    function (match0, match1, ii, text) {
-                        // jslint-hack
-                        local.nop(match0);
-                        // preserve lineno
-                        script = text.slice(0, ii).replace((/.+/g), '') + match1;
-                    }
-                );
-            }()));
+            local.tryCatchOnError(function () {
+                tmp = !local.env.npm_package_buildCustomOrg &&
+                    (/```\w*?(\n[\W\s]*?example\.js[\n\"][\S\s]+?)\n```/).exec(
+                        local.fs.readFileSync('README.md', 'utf8')
+                    );
+                script = tmp.input.slice(0, tmp.index).replace((/.+/g), '') + tmp[1];
+            }, local.nop);
             script = script
                 // alias require($npm_package_name) to utility2_moduleExports;
                 .replace(
@@ -19905,8 +20199,7 @@ instruction\n\
          */
             local.objectSetOverride(local, options, 10);
             // init swgg
-            // coverage-hack - ignore else-statement
-            local.nop(local.swgg && local.swgg.apiUpdate(local.swgg.swaggerJson || {}));
+            local.swgg.apiUpdate(local.swgg.swaggerJson);
         };
 
         local.streamListCleanup = function (streamList) {
@@ -20069,12 +20362,13 @@ instruction\n\
             options.onNext();
         };
 
-        local.templateRender = function (template, dict) {
+        local.templateRender = function (template, dict, options) {
         /*
          * this function will render the template with the given dict
          */
-            var argList, getValue, match, renderPartial, rgx, value;
+            var argList, getValue, match, renderPartial, rgx, tryCatch, value;
             dict = dict || {};
+            options = options || {};
             getValue = function (key) {
                 argList = key.split(' ');
                 value = dict;
@@ -20091,7 +20385,7 @@ instruction\n\
                     return Array.isArray(value)
                         ? value.map(function (dict) {
                             // recurse with partial
-                            return local.templateRender(partial, dict);
+                            return local.templateRender(partial, dict, options);
                         }).join('')
                         : '';
                 case 'if':
@@ -20101,15 +20395,26 @@ instruction\n\
                         // handle 'unless' case
                         : partial.slice(1).join('{{#unless ' + key + '}}');
                     // recurse with partial
-                    return local.templateRender(partial, dict);
+                    return local.templateRender(partial, dict, options);
                 case 'unless':
                     return getValue(key)
                         ? ''
                         // recurse with partial
-                        : local.templateRender(partial, dict);
+                        : local.templateRender(partial, dict, options);
                 default:
                     // recurse with partial
-                    return match0[0] + local.templateRender(match0.slice(1), dict);
+                    return match0[0] + local.templateRender(match0.slice(1), dict, options);
+                }
+            };
+            tryCatch = function (fnc, message) {
+            /*
+             * this function will prepend the message to errorCaught
+             */
+                try {
+                    return fnc();
+                } catch (errorCaught) {
+                    errorCaught.message = message + errorCaught.message;
+                    throw errorCaught;
                 }
             };
             // render partials
@@ -20126,44 +20431,57 @@ instruction\n\
             }
             // search for keys in the template
             return template.replace((/\{\{[^}]+?\}\}/g), function (match0) {
-                getValue(match0.slice(2, -2));
-                if (value === undefined) {
-                    return match0;
-                }
-                argList.slice(1).forEach(function (arg) {
-                    switch (arg) {
-                    case 'alphanumeric':
-                        value = value.replace((/\W/g), '_');
-                        break;
-                    case 'br':
-                        value = value.replace((/\n/g), '<br>');
-                        break;
-                    case 'decodeURIComponent':
-                        value = decodeURIComponent(value);
-                        break;
-                    case 'encodeURIComponent':
-                        value = encodeURIComponent(value);
-                        break;
-                    case 'htmlSafe':
+                var htmlBr, notHtmlSafe;
+                notHtmlSafe = options.notHtmlSafe;
+                return tryCatch(function () {
+                    getValue(match0.slice(2, -2));
+                    if (value === undefined) {
+                        return match0;
+                    }
+                    argList.slice(1).forEach(function (arg) {
+                        switch (arg) {
+                        case 'alphanumeric':
+                            value = value.replace((/\W/g), '_');
+                            break;
+                        case 'decodeURIComponent':
+                            value = decodeURIComponent(value);
+                            break;
+                        case 'encodeURIComponent':
+                            value = encodeURIComponent(value);
+                            break;
+                        case 'htmlBr':
+                            htmlBr = true;
+                            break;
+                        case 'jsonStringify':
+                            value = JSON.stringify(value);
+                            break;
+                        case 'jsonStringify4':
+                            value = JSON.stringify(value, null, 4);
+                            break;
+                        case 'markdownSafe':
+                            value = value.replace((/`/g), '\'');
+                            break;
+                        case 'notHtmlSafe':
+                            notHtmlSafe = true;
+                            break;
+                        // default to String.prototype[arg]()
+                        default:
+                            value = value[arg]();
+                            break;
+                        }
+                    });
+                    value = String(value);
+                    // default to htmlSafe
+                    if (!notHtmlSafe) {
                         value = value.replace((/["&'<>]/g), function (match0) {
                             return '&#x' + match0.charCodeAt(0).toString(16) + ';';
                         });
-                        break;
-                    case 'jsonStringify':
-                        value = JSON.stringify(value);
-                        break;
-                    case 'jsonStringify4':
-                        value = JSON.stringify(value, null, 4);
-                        break;
-                    case 'markdownCodeSafe':
-                        value = value.replace((/`/g), '\'');
-                        break;
-                    default:
-                        value = value[arg]();
-                        break;
                     }
-                });
-                return String(value);
+                    if (htmlBr) {
+                        value = value.replace((/\n/g), '<br>');
+                    }
+                    return value;
+                }, 'templateRender could not render expression ' + JSON.stringify(match0) + '\n');
             });
         };
 
@@ -20852,13 +21170,13 @@ instruction\n\
             local.assert(typeof onError === 'function', typeof onError);
             try {
                 // reset errorCaught
-                local._debugTryCatchErrorCaught = null;
+                local._debugTryCatchError = null;
                 result = fnc();
-                local._debugTryCatchErrorCaught = null;
+                local._debugTryCatchError = null;
                 return result;
             } catch (errorCaught) {
                 // debug errorCaught
-                local._debugTryCatchErrorCaught = errorCaught;
+                local._debugTryCatchError = errorCaught;
                 return onError(errorCaught);
             }
         };
@@ -21109,6 +21427,12 @@ instruction\n\
             '`abcdefghijklmnopqrstuvwxyz{|}~\x7f';
         local.stringUriComponentCharset = '!%\'()*-.' +
             '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~';
+        // mock swgg
+        local.swgg = local.swgg || {
+            apiUpdate: local.nop,
+            normalizeSwaggerJson: local.nop,
+            validateBySwaggerJson: local.nop
+        };
         local.taskOnTaskDict = {};
         local.testReport = { testPlatformList: [{
             name: local.modeJs === 'browser'
@@ -21625,6 +21949,54 @@ local.assetsDict['/assets.swgg.swagger.petstore.json'] = JSON.stringify(
 
 
 
+local.swaggerErrorTypeDict = {
+    arrayMaxItems: '{{type2}} {{prefix2}} = {{data2}} must have <= {{schema.maxItems}} items',
+    arrayMinItems: '{{type2}} {{prefix2}} = {{data2}} must have >= {{schema.minItems}} items',
+    arrayUniqueItems: '{{type2}} {{prefix2}} = {{data2}} must have unique items (has duplicate item {{tmp jsonStringify}})',
+    itemEnum: '{{type2}} {{prefix2}} = {{data2}} can only have items from the list {{schema.enum jsonStringify}}',
+    itemAnyOf: '{{tmp}} (from schama.anyOf {{schema2}})',
+    itemNot: '{{type2}} {{prefix2}} = {{data2}} must not validate against schama.not {{schema2}}',
+    itemOneOf: '{{type2}} {{prefix2}} = {{data2}} did not validate against exactly one schema (validated {{tmp}}) in schema.oneOf {{schema2}}',
+    itemType: 'value {{prefix2}} = {{data2}} is not a valid {{type2}}',
+    numberMultipleOf: '{{type2}} {{prefix2}} = {{data2}} must be a multiple of {{schema.multipleOf}}',
+    numberExclusiveMaximum: '{{type2}} {{prefix2}} = {{data2}} must be < {{schema.maximum}}',
+    numberExclusiveMinimum: '{{type2}} {{prefix2}} = {{data2}} must be > {{schema.minimum}}',
+    numberMaximum: '{{type2}} {{prefix2}} = {{data2}} must be <= {{schema.maximum}}',
+    numberMinimum: '{{type2}} {{prefix2}} = {{data2}} must be >= {{schema.minimum}}',
+    objectAdditionalProperties: '{{type2}} {{prefix2}} = {{data2}} cannot have additional property {{key jsonStringify}}',
+    objectDependencies: '{{type2}} {{prefix2}} = {{data2}} with item {{key jsonStringify}} must have dependency {{key2 jsonStringify}}',
+    objectMaxProperties: '{{type2}} {{prefix2}} = {{data2}} must have <= {{schema.maxProperties}} properties',
+    objectMinProperties: '{{type2}} {{prefix2}} = {{data2}} must have >= {{schema.minProperties}} properties',
+    objectRequired: '{{type2}} {{prefix2}} = {{data2}} must have property {{key jsonStringify}}',
+    schemaDeferenceCircular: 'cannot dereference circular-reference schema {{schema2}}',
+    schemaDeference: 'cannot dereference schema {{schema2}}',
+    // https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation/semantic-validators/validators
+    semanticInvalidInFormdata: 'Parameter "in: formdata" is invalid, did you mean "in: formData" ( camelCase )?',
+    semanticMinimumMoreThanMaximum: 'Minimum cannot be more than maximum',
+    semanticMinPropertiesMoreThanMaxProperties: 'minProperties cannot be more than maxProperties',
+    semanticMinLengthMoreThanMaxLength: 'minLength cannot be more than maxLength',
+    semanticRequired: 'Schema properties specified as "required" must be defined',
+    semanticRequiredArrayItems: 'schema {{schema2}} with "array" type requires an "items" property',
+    semanticRequiredConsumesFormData: 'Operations with Parameters of "in: formData" must include "application/x-www-form-urlencoded" or "multipart/form-data" in their "consumes" property',
+    semanticRequiredConsumesMultipartFormData: 'Operations with Parameters of "type: file" must include "multipart/form-data" in their "consumes" property',
+    semanticRequiredInFormData: 'Parameters with "type: file" must have "in: formData"',
+    semanticRequiredReadOnly: 'Read only properties cannot marked as required by a schema.',
+    semanticRequiredTypeString: '${path} must have required string "type" param',
+    semanticTypeString: '"type" should be a string',
+    semanticUniqueInBodyFormDataParameter: 'Parameters cannot have both a "in: body" and "in: formData", as "formData" _will_ be the body',
+    semanticUniqueInBodyFormDataOperation: 'Operations cannot have both a "body" parameter and "formData" parameter',
+    semanticUniqueInBodyOperation: 'Operations must have no more than one body parameter',
+    semanticUniqueParameterName: 'Operation parameters must have unique "name" + "in" properties',
+    semanticUniqueOperationId: 'operationId {{prefix2}}["operationId"] = {{data2}} is not unique',
+    semanticUnusedDefinition: 'Definition was declared but never used in document',
+    semanticUnusedNameInPath: 'Path parameter ${parameterDefinition.name} was defined but never used',
+    stringMaxLength: 'string {{prefix2}} = {{data2}} must have <= {{schema.maxLength}} characters',
+    stringMinLength: 'string {{prefix2}} = {{data2}} must have >= {{schema.minLength}} characters',
+    stringPattern: 'string {{prefix2}} = {{data2}} must match regexp pattern {{schema.pattern jsonStringify}}',
+};
+
+
+
 local.templateApiDict = {
     "crudCountManyByQuery": {
         "_method": "GET",
@@ -21772,12 +22144,16 @@ local.templateApiDict = {
                 "type": "string"
             },
             {
-                "default": "{}",
                 "description": "projection-fields param",
                 "format": "json",
                 "in": "query",
                 "name": "_queryFields",
-                "type": "string"
+                "type": "string",
+                "x-swgg-collectionFormat": "json",
+                "x-swgg-items": {
+                    "type": "string"
+                },
+                "x-swgg-type": "array"
             },
             {
                 "default": 20,
@@ -21795,12 +22171,17 @@ local.templateApiDict = {
                 "type": "integer"
             },
             {
-                "default": "[{\"fieldName\":\"_timeUpdated\",\"isDescending\":true}]",
+                "default": [{"fieldName":"_timeUpdated","isDescending":true}],
                 "description": "cursor-sort param",
                 "format": "json",
                 "in": "query",
                 "name": "_querySort",
-                "type": "string"
+                "type": "string",
+                "x-swgg-collectionFormat": "json",
+                "x-swgg-items": {
+                    "type": "object"
+                },
+                "x-swgg-type": "array"
             }
         ],
         "responses": {
@@ -22208,71 +22589,66 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
 
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/main.handlebars
 local.templateUiMain = '\
-<div class="eventDelegateKeyup eventDelegateSubmit form header onEventUiReload tr">\n\
-    <a class="td1" href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
+<!-- <div class="swggUiContainer"> -->\n\
+<div class="eventDelegateKeyup eventDelegateSubmit onEventUiReload thead">\n\
+    <a class="td td1" href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
     <input\n\
-        class="flex1 td2"\n\
+        class="td td2"\n\
         placeholder="http://petstore.swagger.io/v2/swagger.json"\n\
         type="text"\n\
         value="{{urlSwaggerJson}}"\n\
     >\n\
     <input\n\
-        class="td3"\n\
+        class="td td3"\n\
         id="swggApiKeyInput1"\n\
         placeholder="api-key"\n\
         type="text"\n\
         value="{{apiKeyValue}}"\n\
     >\n\
-    <button class="eventDelegateClick onEventUiReload td4">Explore</button>\n\
+    <button class="eventDelegateClick onEventUiReload td td4">explore</button>\n\
     <button\n\
-        class="eventDelegateClick onEventUiReload td5"\n\
+        class="eventDelegateClick onEventUiReload td td5"\n\
         id="swggApiKeyClearButton1"\n\
-    >Clear api-keys</button>\n\
+    >clear api-keys</button>\n\
 </div>\n\
 <div class="info reset">\n\
     {{#if info}}\n\
     {{#if info.x-swgg-homepage}}\n\
-    <a class="fontWeightBold"\n\
-        href="{{info.x-swgg-homepage}}"\n\
-        target="_blank"\n\
-    >\n\
-        {{info.title htmlSafe}} ({{info.version htmlSafe}})\n\
-    </a>\n\
+    <a href="{{info.x-swgg-homepage}}" target="_blank"\n\
+    ><h2>{{info.title}} ({{info.version}})</h2></a>\n\
     {{#unless info.x-swgg-homepage}}\n\
-    <div class="fontWeightBold">{{info.title htmlSafe}} ({{info.version htmlSafe}})</div>\n\
+    <h2>{{info.title}} ({{info.version}})</h2>\n\
     {{/if info.x-swgg-homepage}}\n\
-    {{#if info.description}}\n\
-    <div>{{info.description htmlSafe}}</div>\n\
-    {{/if info.description}}\n\
-    {{#if info.x-swgg-urlApp}}\n\
-    <h4><a download href="{{info.x-swgg-urlApp}}">download standalone app</a></h4>\n\
-    {{/if info.x-swgg-urlApp}}\n\
+    {{#if info.description}}<div>{{info.description htmlBr}}</div>{{/if info.description}}\n\
+    {{#if info.x-swgg-downloadStandaloneApp}}\n\
+    <h4><a download href="{{info.x-swgg-downloadStandaloneApp}}">download standalone app</a></h4>\n\
+    {{/if info.x-swgg-downloadStandaloneApp}}\n\
     <ul>\n\
         {{#if externalDocs}}\n\
         <li>\n\
             {{#if externalDocs.description}}\n\
-            <p>{{externalDocs.description htmlSafe}}</p>\n\
+            <p>{{externalDocs.description htmlBr}}</p>\n\
             {{/if externalDocs.description}}\n\
+            {{#if externalDocs.url}}\n\
             <a href="{{externalDocs.url}}" target="_blank">{{externalDocs.url}}</a>\n\
+            {{/if externalDocs.url}}\n\
         </li>\n\
         {{/if externalDocs}}\n\
         {{#if info.termsOfService}}\n\
-        <li><a target="_blank" href="{{info.termsOfService}}">Terms of service</a></li>\n\
+        <li><a target="_blank" href="{{info.termsOfService}}">terms of service</a></li>\n\
         {{/if info.termsOfService}}\n\
         {{#if info.contact.name}}\n\
-        <li>Created by {{info.contact.name htmlSafe}}</li>\n\
+        <li>created by {{info.contact.name}}</li>\n\
         {{/if info.contact.name}}\n\
         {{#if info.contact.url}}\n\
-        <li>\n\
-            See more at <a href="{{info.contact.url}}">{{info.contact.url}}</a>\n\
-        </li>\n\
+        <li>see more at <a href="{{info.contact.url}}">{{info.contact.url}}</a></li>\n\
         {{/if info.contact.url}}\n\
         {{#if info.contact.email}}\n\
         <li>\n\
             <a\n\
                 target="_parent"\n\
-                href="mailto:{{info.contact.email}}?subject={{info.title htmlSafe}}"\n\
-            >Contact the developer</a>\n\
+                href="mailto:{{info.contact.email}}?subject={{info.title}}"\n\
+            >contact the developer</a>\n\
         </li>\n\
         {{/if info.contact.email}}\n\
         {{#if info.license}}\n\
@@ -22282,15 +22658,16 @@ local.templateUiMain = '\
     {{/if info}}\n\
 </div>\n\
 {{#if urlSwaggerJson}}\n\
-<pre class="code" id="swggAjaxProgressPre1">\n\
+<h4 class="label">javascript code</h4>\n\
+<pre id="swggAjaxProgressPre1">\n\
 /*\n\
  * initialize swgg-client\n\
- * 1. download currently-loaded apis as file swagger.json:\n\
- *     $ curl -L "{{urlSwaggerJson htmlSafe}}" > swagger.json\n\
+ * 1. download currently-loaded apis to file swagger.json:\n\
+ *     $ curl -L "{{urlSwaggerJson}}" > swagger.json\n\
  * 2. npm install swgg\n\
  *     $ npm install swgg\n\
  * 3. run code below to initialize swgg-client\n\
- * 4. (optional) edit swagger.json to suit your needs\n\
+ * 4. (optional) edit file swagger.json to suit your needs\n\
  */\n\
 var swgg;\n\
 swgg = require("swgg");\n\
@@ -22299,169 +22676,143 @@ console.log("printing currently loaded apis ...");\n\
 console.log(JSON.stringify(Object.keys(swgg.apiDict).sort(), null, 4));\n\
 console.log("initialized swgg-client");\n\
 </pre>\n\
-<div class="color777 reset">\n\
-    [ <span>base url</span>: {{basePath}} ]\n\
-</div>\n\
+<div class="reset styleColor777">[ <span>base url</span>: {{basePath}} ]</div>\n\
 {{/if urlSwaggerJson}}\n\
 <div id="swggAjaxProgressDiv1" style="text-align: center;">\n\
     <span>{{ajaxProgressText}}</span>\n\
     <span class="uiAnimateSpin"></span>\n\
 </div>\n\
+<div class="reset resourceList"></div>\n\
+<div class="utility2FooterDiv">\n\
+    [ this document was created with\n\
+    <a href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
+    ]\n\
+</div>\n\
+<!-- </div> -->\n\
 ';
 
 
 
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/operation.handlebars
 local.templateUiOperation = '\
-<div\n\
-    class="eventDelegateClick eventDelegateSubmit operation {{_method}}"\n\
-    data-_method-path="{{_methodPath}}"\n\
-    id="{{id}}"\n\
+<div class="operation" data-_method-path="{{_methodPath}}" id="{{id}}">\n\
+<div class="onEventOperationDisplayShow onEventInputValidate thead" tabindex="0">\n\
+    <span class="td td1"></span>\n\
+    <span class="method{{_method}} td td2">{{_method}}</span>\n\
+    <span\n\
+        class="td td3"\n\
+        {{#if deprecated}}style="text-decoration: line-through;"{{/if deprecated}}\n\
+    >{{_path}}</span>\n\
+    <span class="styleColor777 styleTextOverflowEllipsis td td4">{{summary}}</span>\n\
+</div>\n\
+<form accept-charset="UTF-8"\n\
+    class="content uiAnimateSlide"\n\
+    style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
 >\n\
-    <div\n\
-        class="cursorPointer eventDelegateClick onEventOperationDisplayShow header tr"\n\
-        tabindex="0"\n\
-    >\n\
-        <span class="td1">{{_ii}}</span>\n\
-        <span class="td2">{{_method}}</span>\n\
-        <span\n\
-            class="flex1 td3 {{#if deprecated}}deprecated{{/if deprecated}}"\n\
-        >{{_path}}</span>\n\
-        <span class="color777 flex1 td4">{{summary htmlSafe}}</span>\n\
+    {{#if deprecated}}<h4 class="label">(warning: deprecated)</h4><br>{{/if deprecated}}\n\
+    <h4 class="label">description</h4>\n\
+    <div class="styleColor777 tr">{{description htmlBr}}</div>\n\
+    {{#if parameters.length}}\n\
+    <h4 class="label">parameters</h4>\n\
+    <div class="schemaP styleBorderBottom1px styleColor777 tr">\n\
+        <span class="td td1">name and description</span>\n\
+        <span class="td td2">data type</span>\n\
+        <span class="td td3">value</span>\n\
+        <span class="td td4">schema</span>\n\
     </div>\n\
-    <form accept-charset="UTF-8"\n\
-        class="content uiAnimateSlide"\n\
-        style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
-    >\n\
-        {{#if deprecated}}\n\
-        <h4 class="label">Warning: Deprecated</h4>\n\
-        {{/if deprecated}}\n\
-        <h4 class="label">Description</h4>\n\
-        <div class="tr">{{description htmlSafe br}}</div>\n\
-        {{#if parameters.length}}\n\
-        <h4 class="label">Parameters</h4>\n\
-        <div class="borderBottom schemaP tr">\n\
-            <span class="color777 td1">Name and Description</span>\n\
-            <span class="color777 td2">Data Type</span>\n\
-            <span class="color777 td3">Value</span>\n\
-            <span class="color777 td4">Schema</span>\n\
-        </div>\n\
-        {{#each parameters}}\n\
-        <div class="borderBottom schemaP tr" id="{{id}}" name="{{name}}">{{innerHTML}}</div>\n\
-        {{/each parameters}}\n\
-        {{/if parameters.length}}\n\
-        <h4 class="label">Response Messages</h4>\n\
-        <div class="responseList tr">\n\
-            <span class="color777 td1">HTTP Status Code</span>\n\
-            <span class="color777 td2">Reason</span>\n\
-        </div>\n\
-        {{#each responseList}}\n\
-        <div class="borderBottom responseList tr">\n\
-            <span class="td1">{{key}}</span>\n\
-            {{#if value.description}}\n\
-            <span class="td2">{{value.description htmlSafe}}</span>\n\
-            {{/if value.description}}\n\
-        </div>\n\
-        {{/each responseList}}\n\
-        <button class="onEventOperationAjax">Try it out!</button>\n\
-        <div class="responseAjax"></div>\n\
-    </form>\n\
+    {{#each parameters}}\n\
+    {{innerHTML notHtmlSafe}}\n\
+    {{/each parameters}}\n\
+    {{/if parameters.length}}\n\
+    <h4 class="label">response messages</h4>\n\
+    <div class="schemaResponse styleColor777 styleBorderBottom1px tr">\n\
+        <span class="td td1">http status code</span>\n\
+        <span class="td td2">reason</span>\n\
+    </div>\n\
+    {{#each responseList}}\n\
+    <div class="schemaResponse tr">\n\
+        <span class="td td1">{{key}}</span>\n\
+        <span class="td td2">{{value.description}}</span>\n\
+    </div>\n\
+    {{/each responseList}}\n\
+    <button class="onEventOperationAjax">try it out</button>\n\
+    <h4 class="label">javascript code</h4>\n\
+    <pre class="requestJavascript"></pre>\n\
+    <h4 class="label">curl request</h4>\n\
+    <pre class="requestCurl"></pre>\n\
+    <h4 class="label">response status code</h4>\n\
+    <pre class="responseStatusCode"></pre>\n\
+    <h4 class="label">response headers</h4>\n\
+    <pre class="responseHeaders"></pre>\n\
+    <h4 class="label">response body</h4>\n\
+    <pre class="responseBody" tabindex="0"></pre>\n\
+    <div class="responseMedia"></div>\n\
+</form>\n\
 </div>\n\
 ';
 
 
 
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/param.handlebars
-local.templateUiParam = '\
-<span class="td1 {{#if required}}fontWeightBold{{/if required}}">\n\
+local.templateUiParameter = '\
+<div class="schemaP tr" id="{{id}}" data-name="{{name}}">\n\
+<span class="td td1">\n\
     {{name}}\n\
+    {{#if required}}<br><span style="font-weight: bold;">(required)</span>{{/if required}}\n\
     {{#if description}}\n\
-    <br><span class="color777">{{description htmlSafe br}}</span>\n\
+    <br>\n\
+    <span class="styleColor777">{{description htmlBr}}</span>\n\
     {{/if description}}\n\
 </span>\n\
-<span class="td2">{{type2}}{{#if format2}}<br>({{format2}}){{/if format2}}</span>\n\
-<span class="td3">\n\
+<span class="td td2">{{type2}}{{#if format2}}<br>({{format2}}){{/if format2}}</span>\n\
+<span class="td td3">\n\
     {{#if isTextarea}}\n\
-    <textarea\n\
-        class="input"\n\
-        data-value-encoded="{{valueEncoded encodeURIComponent}}"\n\
-        placeholder="{{placeholder htmlSafe}}"></textarea>\n\
+    <div class="multilinePlaceholderContainer">\n\
+        <pre class="multilinePlaceholderPre">{{placeholder}}</pre>\n\
+        <textarea\n\
+            class="input multilinePlaceholderTextarea onEventInputTextareaChange"\n\
+            data-value-text="{{valueText encodeURIComponent notHtmlSafe}}"\n\
+        ></textarea>\n\
+    </div>\n\
     {{/if isTextarea}}\n\
-    {{#if isFile}}\n\
-    <input class="input" type="file">\n\
-    {{/if isFile}}\n\
-    {{#if isSelect}}\n\
+    {{#if isFile}}<input class="input" type="file">{{/if isFile}}\n\
+    {{#if enum2}}\n\
     <select class="input" {{#if isSelectMultiple}}multiple{{/if isSelectMultiple}}>\n\
         {{#each selectOptionList}}\n\
         <option\n\
-            data-value-decoded="{{valueDecoded jsonStringify encodeURIComponent}}"\n\
+            data-value-select-option=\n\
+                "{{valueSelectOption jsonStringify encodeURIComponent notHtmlSafe}}"\n\
             id="{{id}}"\n\
             {{selected}}\n\
-        >{{valueEncoded htmlSafe}}</option>\n\
+        >{{placeholder}}</option>\n\
         {{/each selectOptionList}}\n\
     </select>\n\
-    {{/if isSelect}}\n\
+    {{/if enum2}}\n\
     {{#if isInputText}}\n\
     <input\n\
         class="input"\n\
-        data-value-encoded="{{valueEncoded encodeURIComponent}}"\n\
-        placeholder="{{placeholder htmlSafe}}"\n\
+        data-value-text="{{valueText encodeURIComponent notHtmlSafe}}"\n\
+        placeholder="{{placeholder}}"\n\
         type="text"\n\
     >\n\
     {{/if isInputText}}\n\
+    <div class="styleColorError"></div>\n\
 </span>\n\
-<span class="td4">{{#if schemaText}}<pre>{{schemaText}}</pre>{{/if schemaText}}</span>\n\
-';
-
-
-
-// https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/resource.handlebars
-local.templateUiResource = '\
-<div\n\
-    class="borderBottom resource eventDelegateClick"\n\
-    data-name="{{name}}"\n\
-    id="{{id}}"\n\
->\n\
-    <div class="cursorPointer fontWeightBold header tr">\n\
-        <span class="color777 flex1 onEventResourceDisplayAction td1"\n\
-            tabindex="0"\n\
-        >{{name}} :\n\
-        {{description htmlSafe br}}</span>\n\
-        <span\n\
-            class="color777 onEventResourceDisplayAction td2"\n\
-            tabindex="0"\n\
-        >Expand / Collapse Operations</span>\n\
-        <span\n\
-            class="color777 onEventDatatableReload td3"\n\
-            data-resource-name="{{name}}"\n\
-            tabindex="0"\n\
-        >Datatable</span>\n\
-    </div>\n\
-    <div class="operationList uiAnimateSlide"\n\
-        style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
-    ></div>\n\
+<span class="td td4">\n\
+    {{#if schemaText}}<pre>{{schemaText}}</pre>{{/if schemaText}}\n\
+</span>\n\
 </div>\n\
 ';
 
 
 
-local.templateUiResponseAjax = '\
-{{#if error}}\n\
-<h4 class="label"></h4>\n\
-<pre class="code error uiAnimateShake">\n\
-ERROR\n\
-\n\
-{{error.message htmlSafe}}\n\
-</pre>\n\
-{{/if error}}\n\
-<h4 class="label"></h4>\n\
-<pre class="code">\n\
+local.templateUiRequestJavascript = '\
 /*\n\
  * reproduce api-call {{options.api._methodPath jsonStringify}}\n\
  * 1. initialize swgg-client from previous step\n\
  * 2. run code below to reproduce api-call\n\
  */\n\
-swgg.apiDict[{{options.api._methodPath jsonStringify htmlSafe}}].ajax({{optionsJson htmlSafe}}, \
+swgg.apiDict[{{options.api._methodPath jsonStringify}}].ajax({{optionsJson}}, \
 function (error, data) {\n\
     if (error) {\n\
         console.error(error);\n\
@@ -22470,15 +22821,41 @@ function (error, data) {\n\
     console.log(data.responseJson || data.responseText);\n\
 }\
 );\n\
-</pre>\n\
-<h4 class="label">Curl Request</h4>\n\
-<pre>{{curl htmlSafe}}</pre>\n\
-<h4 class="label">Response Code</h4>\n\
-<pre>{{statusCode}}</pre>\n\
-<h4 class="label">Response Headers</h4>\n\
-<pre>{{responseHeaders htmlSafe}}</pre>\n\
-<h4 class="label">Response Body</h4>\n\
-{{responseBody}}\n\
+';
+
+
+
+// https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/resource.handlebars
+local.templateUiResource = '\
+<div\n\
+    class="styleBorderBottom1px resource\n\
+        eventDelegateChange eventDelegateClick eventDelegateKeyup eventDelegateSubmit\n\
+    "\n\
+    data-name="{{name}}"\n\
+    id="{{id}}"\n\
+>\n\
+<h3 class="thead">\n\
+    <span\n\
+        class="onEventResourceDisplayAction styleTextOverflowEllipsis td td1"\n\
+        tabindex="0"\n\
+    >{{name}} : {{description}}</span>\n\
+    <span\n\
+        class="onEventResourceDisplayAction td td2"\n\
+        tabindex="0"\n\
+    >expand / collapse operations</span>\n\
+    <span\n\
+        class="onEventDatatableReload td td3"\n\
+        data-resource-name="{{name}}"\n\
+        tabindex="0"\n\
+    >datatable</span>\n\
+</h3>\n\
+<div\n\
+    class="operationList uiAnimateSlide"\n\
+    style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
+>\n\
+    <div class="resourceDescription">{{description htmlBr}}</div>\n\
+</div>\n\
+</div>\n\
 ';
 
 
@@ -22506,84 +22883,51 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 </style>\n\
 <style>\n\
 /*csslint\n\
-    adjoining-classes: false,\n\
-    universal-selector: false\n\
 */\n\
-/* animate */\n\
-@keyframes uiAnimateShake {\n\
-    100% {\n\
-        transform: translateX(0);\n\
-    }\n\
-    0%, 20%, 60% {\n\
-        transform: translateX(1rem);\n\
-    }\n\
-    40%, 80% {\n\
-        transform: translateX(-1rem);\n\
-    }\n\
-}\n\
-.uiAnimateShake {\n\
-    animation-duration: 500ms;\n\
-    animation-name: uiAnimateShake;\n\
-}\n\
-\n\
-\n\
-\n\
-/* general */\n\
+/* jslint-ignore-begin */\n\
 .swggUiContainer,\n\
 .swggUiContainer * {\n\
     margin: 0;\n\
     margin-bottom: 10px;\n\
+    max-width: 100%;\n\
     padding: 0;\n\
 }\n\
+.swggUiContainer .operation > .thead:focus,\n\
+.swggUiContainer pre,\n\
+.swggUiContainer .resource > .thead > .td:focus {\n\
+    outline: none;\n\
+}\n\
+/* jslint-ignore-end */\n\
+\n\
+\n\
+\n\
+/* general */\n\
 .swggUiContainer {\n\
-    font-family: Arial, Helvetica, sans-serif;\n\
     margin-left: auto;\n\
     margin-right: auto;\n\
-    max-width: 1024px;\n\
+    max-width: 1200px;\n\
 }\n\
-.swggUiContainer a,\n\
-.swggUiContainer input,\n\
-.swggUiContainer span {\n\
-    min-height: 1.5rem;\n\
+.swggUiContainer button,\n\
+.swggUiContainer .operation > .thead,\n\
+.swggUiContainer .resource > .thead {\n\
+    cursor: pointer;\n\
 }\n\
 .swggUiContainer button {\n\
     padding: 10px;\n\
 }\n\
-.swggUiContainer .color777 {\n\
-    color: #777;\n\
-}\n\
-.swggUiContainer button,\n\
-.swggUiContainer .cursorPointer,\n\
-.swggUiContainer .cursorPointer input {\n\
-    cursor: pointer;\n\
-}\n\
-.swggUiContainer .code,\n\
-.swggUiContainer .operation > .content .code {\n\
-    background: #ddd;\n\
-    color: #555;\n\
-    max-height: 50rem;\n\
-}\n\
-.swggUiContainer .deprecated {\n\
-    text-decoration: line-through;\n\
-}\n\
-.swggUiContainer .flex1 {\n\
-    flex: 1;\n\
-}\n\
-.swggUiContainer .fontWeightBold {\n\
-    font-weight: bold;\n\
-}\n\
-.swggUiContainer .operation .header,\n\
-.swggUiContainer option,\n\
-.swggUiContainer .tr > * {\n\
-    margin-bottom: 0;\n\
+.swggUiContainer input,\n\
+.swggUiContainer pre,\n\
+.swggUiContainer textarea {\n\
+    min-height: 1.5rem;\n\
 }\n\
 .swggUiContainer input {\n\
-    height: 1.5rem;\n\
-    padding-left: 0.25rem;\n\
-    padding-right: 0.25rem;\n\
+    padding-left: 5px;\n\
+    padding-right: 5px;\n\
 }\n\
-.swggUiContainer select[multiple] {\n\
-    height: 10rem;\n\
+.swggUiContainer .responseStatusCode,\n\
+.swggUiContainer .responseHeaders,\n\
+.swggUiContainer .responseBody {\n\
+    background: #373;\n\
 }\n\
 .swggUiContainer pre,\n\
 .swggUiContainer textarea {\n\
@@ -22591,183 +22935,256 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     font-family: Menlo, Monaco, Consolas, Courier New, monospace;\n\
     font-size: small;\n\
     line-height: 1.25rem;\n\
-    max-height: 20rem;\n\
-    min-height: 1.75rem;\n\
-    overflow: auto;\n\
-    padding: 0.25rem;\n\
-    white-space: pre;\n\
+    max-height: 25rem;\n\
+    padding: 5px;\n\
+    white-space: nowrap;\n\
 }\n\
-.swggUiContainer .tr {\n\
-    display: flex;\n\
+.swggUiContainer pre {\n\
+    background: #ddd;\n\
+    overflow-wrap: break-word;\n\
+    white-space: pre-wrap;\n\
 }\n\
-.swggUiContainer .tr > * {\n\
-    margin-left: 1rem;\n\
-    overflow: auto;\n\
-    padding-top: 0.1rem;\n\
+.swggUiContainer .schemaP pre,\n\
+.swggUiContainer .schemaP .multilinePlaceholderContainer,\n\
+.swggUiContainer .schemaP select[multiple],\n\
+.swggUiContainer .schemaP textarea {\n\
+    height: 10rem;\n\
+}\n\
+.swggUiContainer .td {\n\
     word-wrap: break-word;\n\
 }\n\
-.swggUiContainer .tr > *:first-child {\n\
-    margin-left: 0;\n\
-}\n\
-.swggUiContainer .tr > * > * {\n\
+.swggUiContainer .td div,\n\
+.swggUiContainer .td input,\n\
+.swggUiContainer .td pre,\n\
+.swggUiContainer .td select,\n\
+.swggUiContainer .td textarea {\n\
     width: 100%;\n\
 }\n\
-\n\
-\n\
-\n\
-/* border */\n\
-.swggUiContainer .borderBottom {\n\
-    border-bottom: 1px solid #777;\n\
-}\n\
-.swggUiContainer .resource:first-child {\n\
-    border-top: 1px solid #777;\n\
-    padding-top: 10px;\n\
-}\n\
-/* border-error*/\n\
-.swggUiContainer .error,\n\
-.swggUiContainer .operation > .content .error {\n\
-    border: 5px solid #b00;\n\
+.swggUiContainer .thead,\n\
+.swggUiContainer .tr {\n\
+    display: flex;\n\
 }\n\
 \n\
 \n\
 \n\
 /* section */\n\
-.swggUiContainer > .header {\n\
-    background: #8c0;\n\
+.swggUiContainer .methodDELETE {\n\
+    background: #b07;\n\
+}\n\
+.swggUiContainer .methodGET {\n\
+    background: #373;\n\
+}\n\
+.swggUiContainer .methodHEAD {\n\
+    background: #7b7;\n\
+}\n\
+.swggUiContainer .methodOPTIONS {\n\
+    background: #777;\n\
+}\n\
+.swggUiContainer .methodPATCH {\n\
+    background: #99f;\n\
+}\n\
+.swggUiContainer .methodPOST {\n\
+    background: #33d;\n\
+}\n\
+.swggUiContainer .methodPUT {\n\
+    background: #77e;\n\
+}\n\
+.swggUiContainer .multilinePlaceholderContainer {\n\
+    min-height: 10rem;\n\
+    position: relative;\n\
+}\n\
+.swggUiContainer .multilinePlaceholderPre {\n\
+    background: #fff;\n\
+    position: absolute;\n\
+    white-space: pre;\n\
+}\n\
+.swggUiContainer .multilinePlaceholderTextarea {\n\
+    position: absolute;\n\
+}\n\
+.swggUiContainer .operation {\n\
+    background: #dfd;\n\
+}\n\
+.swggUiContainer .operation > .content {\n\
+    padding: 20px;\n\
+}\n\
+.swggUiContainer .operation > .thead:hover {\n\
+    background: #7d7;\n\
+}\n\
+.swggUiContainer .operation > .thead > .td {\n\
+    padding: 10px 0;\n\
+}\n\
+.swggUiContainer .operation > .thead > .td1 {\n\
+    text-align: center;\n\
+    width: 2rem;\n\
+}\n\
+.swggUiContainer .operation > .thead > .td2 {\n\
+    text-align: center;\n\
+    width: 5rem;\n\
+}\n\
+.swggUiContainer .resource > .thead > .td2 {\n\
+    border-left: 1px solid #777;\n\
+    border-right: 1px solid #777;\n\
+    padding-left: 20px;\n\
+    padding-right: 20px;\n\
+}\n\
+.swggUiContainer .resource:first-child {\n\
+    border-top: 1px solid #777;\n\
+    padding-top: 10px;\n\
+}\n\
+.swggUiContainer .resourceDescription {\n\
+    background: #373;\n\
+    padding: 10px 20px;\n\
+}\n\
+.swggUiContainer > .thead {\n\
+    background: #7b5;\n\
     padding: 10px;\n\
 }\n\
-.swggUiContainer > .header > * {\n\
-    font-size: small;\n\
-    height: 2rem;\n\
+.swggUiContainer > .thead > .td {\n\
+    font-size: smaller;\n\
 }\n\
+.swggUiContainer > .thead > .td1 {\n\
+    background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAqRJREFUeNrEVz1s00AUfnGXii5maMXoEUEHVwIpEkPNgkBdMnQoU5ytiKHJwpp2Q2JIO8DCUDOxIJFIVOoWZyJSh3pp1Q2PVVlcCVBH3ufeVZZ9Zye1Ay86nXV+ue/9fO/lheg/Se02X1rvksmbnTiKvuxQMBNgBnN4a/LCbmnUAP6JV58NCUsBC8CuAJxGPF47OgNqBaA93tolUhnx6jC4NxGwyOEwlccyAs+3kwdzKq0HDn2vEBTi8J2XpyMaywNDE157BhXUE3zJhlq8GKq+Zd2zaWHepPA8oN9XkfLmRdOiJV4XUUg/IyWncLjCYY/SHndV2u7zHr3bPKZtdxgboJOnthvrfGj/oMf3G0r7JVmNlLfKklmrt2MvvcNO7LFOhoFHfuAJI5o6ta10jpt5CQLgwXhXG2YIwvu+34qf78ybOjWTnWwkgR36d7JqJOrW0hHmNrKg9xhiS4+1jFmrxymh03B0w+6kURIAu3yHtOD5oaUNojMnGgbcctNvwdAnyxvxRR+/vaJnjzbpzcZX+nN1SdGv85i9eH8w3qPO+mdm/y4dnQ1iI8Fq6Nf4cxL6GWSjiFDSs0VRnxC5g0xSB2cgHpaseTxfqOv5uoHkNQ6Ha/N1Yz9mNMppEkEkYKj79q6uCq4bCHcSX3fJ0Vk/k9siASjCm1N6gZH6Ec9IXt2WkFES2K/ixoIyktJPAu/ptOA1SgO5zqtr6KASJPF0nMV8dgMsRhRPOcMwqQAOoi0VAIMLAEWJ6YYC1c8ibj1GP51RqwzYwZVMHQuvOzMCBUtb2tGHx5NAdLKqp5AX7Ng4d+Zi8AGDI9z1ijx9yaCH04y3GCP2S+QcvaGl+pcxyUBvinFlawoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=) no-repeat left center;\n\
+    font-size: x-large;\n\
+    padding-left: 40px;\n\
+    padding-top: 7px;\n\
+    text-decoration: none;\n\
+}\n\
+.swggUiContainer > .thead > .td4,\n\
+.swggUiContainer > .thead > .td5 {\n\
+    background: #373;\n\
+    border: 0;\n\
+}\n\
+\n\
+\n\
+\n\
+/* important style */\n\
+/* border */\n\
+.swggUiContainer .styleBorderError {\n\
+    border: 5px solid #b00;\n\
+}\n\
+.swggUiContainer .styleBorderBottom1px {\n\
+    border-bottom: 1px solid #777;\n\
+}\n\
+/* color */\n\
+.swggUiContainer .resource > .thead > .td:hover {\n\
+    color: #000;\n\
+}\n\
+.swggUiContainer a,\n\
+.swggUiContainer .label,\n\
+.swggUiContainer .resource > .thead > .td {\n\
+    color: #373;\n\
+}\n\
+.swggUiContainer .styleColor777 {\n\
+    color: #777;\n\
+}\n\
+.swggUiContainer .multilinePlaceholderPre {\n\
+    color: #999;\n\
+}\n\
+.swggUiContainer .styleColorError {\n\
+    color: #b00;\n\
+}\n\
+.swggUiContainer .operation > .thead > .td2,\n\
+.swggUiContainer .resourceDescription,\n\
+.swggUiContainer .responseStatusCode,\n\
+.swggUiContainer .responseHeaders,\n\
+.swggUiContainer .responseBody,\n\
+.swggUiContainer > .thead > .td1,\n\
+.swggUiContainer > .thead > .td4,\n\
+.swggUiContainer > .thead > .td5 {\n\
+    color: #fff;\n\
+}\n\
+/* flex */\n\
+.swggUiContainer .operation > .thead > .td3 {\n\
+    flex: 1;\n\
+}\n\
+.swggUiContainer .operation > .thead > .td4 {\n\
+    flex: 1;\n\
+}\n\
+.swggUiContainer .resource > .thead > .td1 {\n\
+    flex: 1;\n\
+}\n\
+.swggUiContainer .schemaP > .td1 {\n\
+    flex: 2;\n\
+}\n\
+.swggUiContainer .schemaP > .td2 {\n\
+    flex: 1;\n\
+}\n\
+.swggUiContainer .schemaP > .td3 {\n\
+    flex: 4;\n\
+}\n\
+.swggUiContainer .schemaP > .td4 {\n\
+    flex: 3;\n\
+}\n\
+.swggUiContainer .schemaResponse > .td1 {\n\
+    flex: 1;\n\
+}\n\
+.swggUiContainer .schemaResponse > .td2 {\n\
+    flex: 4;\n\
+}\n\
+.swggUiContainer > .thead > .td2 {\n\
+    flex: 4;\n\
+}\n\
+.swggUiContainer > .thead > .td3 {\n\
+    flex: 1;\n\
+}\n\
+/* margin */\n\
+.swggUiContainer audio,\n\
+.swggUiContainer img,\n\
+.swggUiContainer .operation .thead,\n\
+.swggUiContainer option,\n\
+.swggUiContainer .responseBody,\n\
+.swggUiContainer .responseMedia,\n\
+.swggUiContainer .td,\n\
+.swggUiContainer video {\n\
+    margin-bottom: 0;\n\
+}\n\
+.swggUiContainer .label {\n\
+    margin-bottom: 1px;\n\
+}\n\
+.swggUiContainer .onEventOperationAjax,\n\
+.swggUiContainer .schemaP {\n\
+    margin-bottom: 20px;\n\
+}\n\
+.swggUiContainer .td:first-child {\n\
+    margin-left: 0;\n\
+}\n\
+.swggUiContainer > .info > ul,\n\
+.swggUiContainer .operation > .thead > .td1,\n\
+.swggUiContainer .td {\n\
+    margin-left: 20px;\n\
+}\n\
+/* @media */\n\
 @media screen and (max-width: 640px){\n\
-    .swggUiContainer > .header {\n\
+    .swggUiContainer .operation {\n\
+        font-size: small;\n\
+    }\n\
+    .swggUiContainer .resource > .thead > .td {\n\
+        flex: 1;\n\
+    }\n\
+    .swggUiContainer > .thead {\n\
         display: block;\n\
         padding: 0;\n\
     }\n\
-    .swggUiContainer > .header > * {\n\
+    .swggUiContainer > .thead > .td {\n\
         display: block;\n\
         margin: 0;\n\
         width: 100%;\n\
     }\n\
 }\n\
-.swggUiContainer > .header > .td1 {\n\
-    background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAqRJREFUeNrEVz1s00AUfnGXii5maMXoEUEHVwIpEkPNgkBdMnQoU5ytiKHJwpp2Q2JIO8DCUDOxIJFIVOoWZyJSh3pp1Q2PVVlcCVBH3ufeVZZ9Zye1Ay86nXV+ue/9fO/lheg/Se02X1rvksmbnTiKvuxQMBNgBnN4a/LCbmnUAP6JV58NCUsBC8CuAJxGPF47OgNqBaA93tolUhnx6jC4NxGwyOEwlccyAs+3kwdzKq0HDn2vEBTi8J2XpyMaywNDE157BhXUE3zJhlq8GKq+Zd2zaWHepPA8oN9XkfLmRdOiJV4XUUg/IyWncLjCYY/SHndV2u7zHr3bPKZtdxgboJOnthvrfGj/oMf3G0r7JVmNlLfKklmrt2MvvcNO7LFOhoFHfuAJI5o6ta10jpt5CQLgwXhXG2YIwvu+34qf78ybOjWTnWwkgR36d7JqJOrW0hHmNrKg9xhiS4+1jFmrxymh03B0w+6kURIAu3yHtOD5oaUNojMnGgbcctNvwdAnyxvxRR+/vaJnjzbpzcZX+nN1SdGv85i9eH8w3qPO+mdm/y4dnQ1iI8Fq6Nf4cxL6GWSjiFDSs0VRnxC5g0xSB2cgHpaseTxfqOv5uoHkNQ6Ha/N1Yz9mNMppEkEkYKj79q6uCq4bCHcSX3fJ0Vk/k9siASjCm1N6gZH6Ec9IXt2WkFES2K/ixoIyktJPAu/ptOA1SgO5zqtr6KASJPF0nMV8dgMsRhRPOcMwqQAOoi0VAIMLAEWJ6YYC1c8ibj1GP51RqwzYwZVMHQuvOzMCBUtb2tGHx5NAdLKqp5AX7Ng4d+Zi8AGDI9z1ijx9yaCH04y3GCP2S+QcvaGl+pcxyUBvinFlawoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=) no-repeat left center;\n\
-    color: white;\n\
-    font-size: x-large;\n\
-    padding-left: 2.5rem;\n\
-    text-decoration: none;\n\
+/* overflow */\n\
+.swggUiContainer pre,\n\
+.swggUiContainer textarea,\n\
+.swggUiContainer .td {\n\
+    overflow: auto;\n\
 }\n\
-.swggUiContainer > .header > .td3 {\n\
-    flex: 0.25;\n\
+.swggUiContainer .schemaP > .td3 {\n\
+    overflow: visible;\n\
 }\n\
-.swggUiContainer > .header > .td4,\n\
-.swggUiContainer > .header > .td5 {\n\
-    border: 0;\n\
-    color: #fff;\n\
-    padding: 6px 8px;\n\
-    background: #580;\n\
-}\n\
-.swggUiContainer > .info a {\n\
-    color: #370;\n\
-}\n\
-.swggUiContainer > .info > .fontWeightBold {\n\
-    font-size: x-large;\n\
-}\n\
-.swggUiContainer > .info > ul {\n\
-    margin-left: 2rem;\n\
-}\n\
-.swggUiContainer .operation {\n\
-    background: #dfd;\n\
-    font-size: smaller;\n\
-}\n\
-.swggUiContainer .operation > .content {\n\
-    padding: 1rem;\n\
-}\n\
-.swggUiContainer .operation > .content .label {\n\
-    color: #0b0;\n\
-}\n\
-.swggUiContainer .operation > .content pre {\n\
-    background: #ffd;\n\
-}\n\
-.swggUiContainer .operation > .content .tr {\n\
-    margin-left: 10px;\n\
-}\n\
-.swggUiContainer .operation > .header:focus,\n\
-.swggUiContainer .operation > .header:hover {\n\
-    background: #bfb;\n\
-    outline: none;\n\
-}\n\
-.swggUiContainer .operation > .header > span {\n\
-    padding-top: 5px;\n\
-}\n\
-.swggUiContainer .operation > .header > .td1 {\n\
-    margin-left: 1rem;\n\
-    width: 1rem;\n\
-}\n\
-.swggUiContainer .operation > .header > .td2 {\n\
-    background: #777;\n\
-    color: white;\n\
-    text-align: center;\n\
-    width: 5rem;\n\
-}\n\
-.swggUiContainer .operation .responseList > .td1 {\n\
-    flex: 1;\n\
-}\n\
-.swggUiContainer .operation .responseList > .td2 {\n\
-    flex: 4;\n\
-}\n\
-.swggUiContainer .operation .schemaP pre,\n\
-.swggUiContainer .operation .schemaP textarea {\n\
-    height: 10rem;\n\
-}\n\
-.swggUiContainer .operation .schemaP > .td1 {\n\
-    flex: 2;\n\
-}\n\
-.swggUiContainer .operation .schemaP > .td2 {\n\
-    flex: 1;\n\
-}\n\
-.swggUiContainer .operation .schemaP > .td3 {\n\
-    flex: 4;\n\
-}\n\
-.swggUiContainer .operation .schemaP > .td4 {\n\
-    flex: 3;\n\
-}\n\
-.swggUiContainer .resource > .header > span:focus,\n\
-.swggUiContainer .resource > .header > span:hover {\n\
-    color: black;\n\
-    outline: none;\n\
-}\n\
-.swggUiContainer .resource > .header > .td1 {\n\
-    font-size: large;\n\
-}\n\
-.swggUiContainer .resource > .header > .td2 {\n\
-    border-left: 1px solid;\n\
-    border-right: 1px solid;\n\
-    padding-left: 1rem;\n\
-    padding-right: 1rem;\n\
-}\n\
-\n\
-\n\
-\n\
-/* method */\n\
-.swggUiContainer .operation.DELETE > .header > .td2 {\n\
-    background: #b00;\n\
-}\n\
-.swggUiContainer .operation.GET > .header > .td2 {\n\
-    background: #093;\n\
-}\n\
-.swggUiContainer .operation.HEAD > .header > .td2 {\n\
-    background: #f30;\n\
-}\n\
-.swggUiContainer .operation.PATCH > .header > .td2 {\n\
-    background: #b0b;\n\
-}\n\
-.swggUiContainer .operation.POST > .header > .td2 {\n\
-    background: #07b;\n\
-}\n\
-.swggUiContainer .operation.PUT > .header > .td2 {\n\
-    background: #70b;\n\
+/* text-overflow */\n\
+.swggUiContainer .styleTextOverflowEllipsis {\n\
+    overflow: hidden;\n\
+    text-overflow: ellipsis;\n\
+    white-space: nowrap;\n\
 }\n\
 </style>\n\
 ')
@@ -22781,11 +23198,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     urlSwaggerJson: ''
 }) + '\
 </div>\n\
-<div class="utility2FooterDiv">\n\
-    [ this document was created with\n\
-    <a href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
-    ]\n\
-</div>\n\
 <script>\n\
 /*jslint\n\
     bitwise: true,\n\
@@ -22798,7 +23210,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     stupid: true\n\
 */\n\
 "use strict";\n\
-document.querySelector(".swggUiContainer > .header > .td2").value =\n\
+document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
     ((/\\bmodeSwaggerJsonUrl=([^&]+)/g).exec(location.search) || {})[1] ||\n\
         "assets.swgg.swagger.json";\n\
 </script>\n\
@@ -22832,27 +23244,19 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         /*
          * this function will send a swagger-api ajax-request with the operation self
          */
-            var errorValidate, isMultipartFormData, tmp;
+            var isMultipartFormData, tmp;
             options.operation = self;
             isMultipartFormData = (self.consumes && self.consumes[0]) === 'multipart/form-data';
             local.objectSetDefault(options, { data: '', paramDict: {}, url: '' });
             // try to validate paramDict
-            local.tryCatchOnError(function () {
-                local.validateBySwaggerParameters({
-                    // normalize paramDict
-                    data: local.normalizeSwaggerParamDict(options).paramDict,
-                    dataReadonlyRemove: options.paramDict,
-                    prefix: ['operation', self._methodPath],
-                    parameters: self.parameters,
-                    swaggerJson: local.swaggerJson
-                });
-            }, function (error) {
-                errorValidate = error;
-            });
-            if (errorValidate) {
-                onError(errorValidate);
-                return;
-            }
+            options.error = local.validateBySwaggerParameters({
+                // normalize paramDict
+                data: local.normalizeSwaggerParamDict(options).paramDict,
+                dataReadonlyRemove: options.paramDict,
+                prefix: ['operation', self._methodPath],
+                parameters: self.parameters,
+                swaggerJson: local.swaggerJson
+            })[0];
             // init options-defaults
             local.objectSetDefault(options, {
                 inForm: isMultipartFormData
@@ -22875,7 +23279,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     return;
                 }
                 // serialize array
-                if (schemaP.type === 'array' && schemaP.in !== 'body') {
+                if (Array.isArray(tmp) && schemaP.in !== 'body') {
                     switch (schemaP.collectionFormat || schemaP['x-swgg-collectionFormat']) {
                     case 'json':
                         tmp = JSON.stringify(tmp);
@@ -22885,7 +23289,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                             options[schemaP.in === 'formData'
                                 ? 'inForm'
                                 : 'inQuery'] += '&' + encodeURIComponent(schemaP.name) + '=' +
-                                encodeURIComponent(schemaP.items.type === 'string'
+                                encodeURIComponent(local.schemaPItemsType(schemaP) === 'string'
                                     ? value
                                     : JSON.stringify(value));
                         });
@@ -22903,9 +23307,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     default:
                         tmp = tmp.join(',');
                     }
-                } else if (!(schemaP.type === 'string' ||
-                        (schemaP.schema && schemaP.schema.type === 'string') ||
-                        tmp instanceof local.Blob)) {
+                } else if (typeof tmp !== 'string' && !(tmp instanceof local.Blob)) {
                     tmp = JSON.stringify(tmp);
                 }
                 switch (schemaP.in) {
@@ -22961,6 +23363,10 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             if (!(options.headers['Content-Type'] || options.headers['content-type'])) {
                 options.headers['content-type'] = 'application/json; charset=UTF-8';
             }
+            if (options.error || options.modeValidate) {
+                onError(options.error);
+                return;
+            }
             // send ajax-request
             return local.ajax(options, function (error, xhr) {
                 // try to init responseJson
@@ -22980,6 +23386,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
          * this function will update the swagger-api dict of api-calls
          */
             var tmp;
+            options = options || {};
             // fetch swagger.json file
             if (options.modeAjax) {
                 local.ajax(options, function (error, xhr) {
@@ -22987,7 +23394,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     local.tryCatchOnError(function () {
                         tmp = JSON.parse(xhr.responseText);
                     }, local.nop);
-                    error = error || local.utility2._debugTryCatchErrorCaught;
+                    error = error || local.utility2._debugTryCatchError;
                     // reset state
                     local.apiDict = local.swaggerJson = null;
                     // apiUpdate swagger.json object
@@ -23218,22 +23625,22 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 });
                 // init _methodPath
                 self._methodPath = self._method + ' ' + self._path.replace((/\{.*?\}/g), '{}');
-                self.parameters.forEach(function (schemaP, ii) {
+                self.parameters.forEach(function (schemaP) {
                     // init _idName.format and _idName.type
                     if (self._schemaName && schemaP.name === self._idName) {
                         schemaP.format = options.definitions[self._schemaName]
                             .properties[self._idBackend].format;
-                        schemaP.type = options.definitions[self._schemaName]
-                            .properties[self._idBackend].type;
+                        schemaP.type = local.schemaPType(options.definitions[self._schemaName]
+                            .properties[self._idBackend]);
                     }
                     local.tryCatchOnError(function () {
                         // dereference schemaP.$ref
-                        local.objectSetDefault(self.parameters[ii], local.jsonCopy(
+                        local.objectSetDefault(schemaP, local.jsonCopy(
                             options.parameters[
                                 (schemaP.$ref || schemaP['x-swgg-$ref']).split('#/parameters/')[1]
                             ]
                         ));
-                        delete self.parameters[ii].$ref;
+                        delete schemaP.$ref;
                     }, local.nop);
                 });
                 switch (self._crudType[0]) {
@@ -23307,85 +23714,98 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         /*
          * this function will create a random dbField from options.schemaP
          */
-            var ii, max, min, schemaP, tmp, type;
+            var depth, ii, max, min, schemaP, value;
+            depth = Number.isFinite(options.depth)
+                ? options.depth
+                : 3;
             schemaP = options.schemaP;
+            schemaP = schemaP.schema || schemaP;
             if (schemaP.readOnly) {
                 return;
             }
             if (schemaP.enum) {
-                tmp = options.modeNotRandom
+                value = options.modeNotRandom
                     ? schemaP.enum[0]
                     : local.listGetElementRandom(schemaP.enum);
-                return schemaP.type === 'array'
-                    ? [tmp]
-                    : tmp;
+                return local.schemaPType(schemaP) === 'array'
+                    ? [value]
+                    : value;
             }
-            type = schemaP.type || (schemaP.schema && schemaP.schema.type);
-            switch (type) {
+            // init default-value
+            value = null;
+            switch (local.schemaPType(schemaP)) {
+            case 'boolean':
+                value = options.modeNotRandom
+                    ? false
+                    : Math.random() > 0.5
+                    ? false
+                    : true;
+                break;
             // 5.1. Validation keywords for numeric instances (number and integer)
             case 'integer':
             case 'number':
                 max = schemaP.maximum;
                 min = schemaP.minimum;
                 if (options.modeNotRandom) {
-                    tmp = !(0 < min || max < 0)
+                    value = !(0 < min || max < 0)
                         ? 0
                         : min || max;
                 } else {
-                    if (!(isFinite(max) && isFinite(min))) {
-                        if (!isFinite(max) && !isFinite(min)) {
+                    if (!(Number.isFinite(max) && Number.isFinite(min))) {
+                        if (!Number.isFinite(max) && !Number.isFinite(min)) {
                             max = 1000;
                             min = 0;
-                        } else if (isFinite(max)) {
+                        } else if (Number.isFinite(max)) {
                             min = max - 1000;
                         } else {
                             max = min + 1000;
                         }
                     }
-                    tmp = min + (max - min) * Math.max(Math.random(), 0.00000000001);
-                    if (type === 'integer') {
-                        tmp = Math.round(tmp);
+                    // exclusiveMaximum and exclusiveMinimum for float
+                    value = min + (max - min) * Math.max(Math.random(), min * 0.000000000000001);
+                    if (local.schemaPType(schemaP) === 'integer') {
+                        value = Math.round(value);
                     }
                 }
                 max = schemaP.maximum;
                 min = schemaP.minimum;
-                // exclusiveMaximum
-                if (schemaP.exclusiveMaximum && tmp === max) {
-                    tmp -= 1;
+                // exclusiveMaximum for integer
+                if (schemaP.exclusiveMaximum && value === max) {
+                    value -= 1;
                 }
-                // exclusiveMinimum
-                if (schemaP.exclusiveMaximum && tmp === min) {
-                    tmp += 1;
+                // exclusiveMinimum for integer
+                if (schemaP.exclusiveMaximum && value === min) {
+                    value += 1;
                 }
                 // multipleOf
                 if (schemaP.multipleOf > 0) {
-                    tmp = schemaP.multipleOf * Math.floor(tmp / schemaP.multipleOf);
-                    if (tmp < min || (schemaP.exclusiveMinimum && tmp <= min)) {
-                        tmp += schemaP.multipleOf;
+                    value = schemaP.multipleOf * Math.floor(value / schemaP.multipleOf);
+                    if (value < min || (schemaP.exclusiveMinimum && value <= min)) {
+                        value += schemaP.multipleOf;
                     }
                 }
                 break;
             // 5.2. Validation keywords for strings
             case 'string':
-                tmp = options.modeNotRandom
+                value = options.modeNotRandom
                     ? 'abcd1234'
                     : ((1 + Math.random()) * 0x10000000000000).toString(36).slice(1);
                 switch (schemaP.format) {
                 case 'byte':
-                    tmp = local.base64FromString(tmp);
+                    value = local.base64FromString(value);
                     break;
                 case 'date':
                 case 'date-time':
-                    tmp = new Date().toISOString();
+                    value = new Date().toISOString();
                     break;
                 case 'email':
-                    tmp = tmp + '@random.com';
+                    value = value + '@example.com';
                     break;
                 case 'json':
-                    tmp = JSON.stringify({ random: tmp });
+                    value = JSON.stringify({ foo: value });
                     break;
                 case 'phone':
-                    tmp = options.modeNotRandom
+                    value = options.modeNotRandom
                         ? '+123 (1234) 1234-1234'
                         : '+' + Math.random().toString().slice(-3) +
                             ' (' + Math.random().toString().slice(-4) + ') ' +
@@ -23393,51 +23813,57 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                             Math.random().toString().slice(-4);
                     break;
                 }
-                while (tmp.length < schemaP.minLength) {
-                    tmp += tmp;
+                while (value.length < schemaP.minLength) {
+                    value += value;
                 }
-                tmp = tmp.slice(0, schemaP.maxLength || Infinity);
+                value = value.slice(0, schemaP.maxLength || Infinity);
                 break;
             // 5.3. Validation keywords for arrays
             case 'array':
-                tmp = [];
-                for (ii = 0; ii < schemaP.minItems; ii += 1) {
-                    tmp.push(null);
+                if (depth <= 0) {
+                    break;
+                }
+                value = [];
+                for (ii = 0; ii < Math.min(
+                        // 5.3.2. maxItems
+                        schemaP.maxItems || 2,
+                        // 5.3.3. minItems
+                        schemaP.minItems || 2,
+                        // 5.3.4. uniqueItems
+                        schemaP.uniqueItems
+                            ? 2
+                            : 1
+                    ); ii += 1) {
+                    // recurse dbFieldRandomCreate
+                    value.push(local.dbFieldRandomCreate({
+                        depth: depth - 1,
+                        modeNotRandom: options.modeNotRandom,
+                        schemaP: local.schemaPItems(schemaP)
+                    }));
                 }
                 break;
             // 5.4. Validation keywords for objects
-            case 'object':
-                tmp = {};
-                for (ii = 0; ii < schemaP.minProperties; ii += 1) {
-                    tmp['property' + ii] = null;
+            default:
+                if (depth <= 0) {
+                    break;
                 }
-                break;
-            case 'boolean':
-                tmp = options.modeNotRandom
-                    ? false
-                    : Math.random() <= 0.5
-                    ? false
-                    : true;
+                // recurse dbRowRandomCreate
+                value = local.dbRowRandomCreate({
+                    depth: depth - 1,
+                    modeNotRandom: options.modeNotRandom,
+                    schema: schemaP
+                });
                 break;
             }
-            return tmp;
+            return value;
         };
 
         local.dbRowListRandomCreate = function (options) {
         /*
          * this function will create a dbRowList of options.length random dbRow's
          */
-            local.objectSetDefault(options, { dbRowList: [], properties: [] });
-            Object.keys(options.properties).forEach(function (key) {
-                options.properties[key] = local.validateBySwaggerSchema({
-                    // dereference property
-                    modeDereference: true,
-                    prefix: ['dbRow', key],
-                    schema: options.properties[key],
-                    swaggerJson: local.swaggerJson
-                });
-            });
-            for (options.ii = 0; options.ii < options.length; options.ii += 1) {
+            var ii;
+            for (ii = 0; ii < options.length; ii += 1) {
                 options.dbRowList.push(local.dbRowRandomCreate(options));
             }
             return options.dbRowList;
@@ -23447,46 +23873,57 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         /*
          * this function will create a random dbRow from options.properties
          */
-            var dbRow, tmp;
+            var ii, dbRow, properties;
             dbRow = {};
-            Object.keys(options.properties).forEach(function (key) {
-                // try to validate data
-                local.tryCatchOnError(function () {
-                    options.properties[key] = local.validateBySwaggerSchema({
+            options = local.objectSetDefault(options, { override: local.nop });
+            properties = local.validateBySwaggerSchema({
+                // dereference property
+                modeDereference: true,
+                prefix: ['dbRow'],
+                schema: options.schema,
+                swaggerJson: local.swaggerJson
+            });
+            properties = local.jsonCopy((properties && properties.properties) || {});
+            for (ii = Object.keys(properties).length;
+                    ii < (options.schema && options.schema.minProperties);
+                    ii += 1) {
+                properties['property' + ii] = { type: 'string' };
+            }
+            Object.keys(properties).forEach(function (key) {
+                dbRow[key] = local.dbFieldRandomCreate({
+                    depth: options.depth,
+                    modeNotRandom: options.modeNotRandom,
+                    schemaP: local.validateBySwaggerSchema({
                         // dereference property
                         modeDereference: true,
                         prefix: ['dbRow', key],
-                        schema: options.properties[key],
+                        schema: properties[key],
                         swaggerJson: local.swaggerJson
-                    });
-                    tmp = local.dbFieldRandomCreate({
-                        modeNotRandom: options.modeNotRandom,
-                        schemaP: options.properties[key]
-                    });
-                    local.validateBySwaggerSchema({
-                        data: tmp,
-                        prefix: ['dbRow', 'properties', key],
-                        schema: options.properties[key],
-                        swaggerJson: local.swaggerJson
-                    });
-                    dbRow[key] = tmp;
-                }, console.error);
+                    })
+                });
             });
-            return local.jsonCopy(local.objectSetOverride(dbRow, options.override(options)));
+            dbRow = local.jsonCopy(local.objectSetOverride(dbRow, options.override(options)));
+            // try to validate data
+            local.tryCatchOnError(function () {
+                local.validateBySwaggerSchema({
+                    data: dbRow,
+                    prefix: ['dbRow'],
+                    schema: options.schema,
+                    swaggerJson: local.swaggerJson
+                });
+            }, console.error);
+            return dbRow;
         };
 
         local.idDomElementCreate = function (seed) {
         /*
-         * this function will create a unique dom-element id from the seed,
+         * this function will create a deterministic and unique dom-element id from the seed,
          * that is both dom-selector and url friendly
          */
-            var id, ii;
-            id = encodeURIComponent(seed).replace((/\W/g), '_');
-            for (ii = 2; local.idDomElementDict[id]; ii += 1) {
-                id = encodeURIComponent(seed + '_' + ii).replace((/\W/g), '_');
-            }
-            local.idDomElementDict[id] = true;
-            return id;
+            local.idDomElementDict[seed] = (local.idDomElementDict[seed] || 0) + 1;
+            return encodeURIComponent(
+                seed + '_' + local.idDomElementDict[seed]
+            ).replace((/\W/g), '_');
         };
 
         local.idNameInit = function (options) {
@@ -23706,6 +24143,8 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                             })
                             .map(function (key) {
                                 tmp = local.jsonCopy(request.swgg.paramDict);
+                                tmp.id = tmp.id ||
+                                    ((1 + Math.random()) * 0x10000000000000).toString(36).slice(1);
                                 local.objectSetOverride(tmp, {
                                     fileBlob:
                                         local.base64FromBuffer(request.swgg.bodyParsed[key]),
@@ -23956,17 +24395,16 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         /*
          * this function will run the middleware that will validate the swagger-request
          */
-            var crud, modeNext, onNext, tmp;
+            var crud, options, tmp;
             // jslint-hack - nop
             local.nop(response);
-            modeNext = 0;
-            onNext = function () {
-                modeNext += 1;
-                switch (modeNext) {
+            options = {};
+            local.onNext(options, function (error) {
+                switch (options.modeNext) {
                 case 1:
                     if (!request.swgg.operation) {
-                        modeNext = Infinity;
-                        onNext();
+                        options.modeNext = Infinity;
+                        options.onNext();
                         return;
                     }
                     // init paramDict
@@ -24008,15 +24446,14 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                             break;
                         }
                         // parse array-multi
-                        if (request.swgg.paramDict[schemaP.name] &&
-                                schemaP.type === 'array' &&
+                        tmp = request.swgg.paramDict[schemaP.name];
+                        if (tmp &&
+                                local.schemaPType(schemaP) === 'array' &&
                                 schemaP.collectionFormat === 'multi') {
-                            tmp = '';
-                            request.swgg.paramDict[schemaP.name].forEach(function (value) {
-                                tmp += '&' + encodeURIComponent(schemaP.name) + '=' +
-                                    encodeURIComponent(value);
-                            });
-                            request.swgg.paramDict[schemaP.name] = tmp.slice(1);
+                            request.swgg.paramDict[schemaP.name] =
+                                encodeURIComponent(schemaP.name) + '=' + (Array.isArray(tmp)
+                                ? tmp
+                                : [tmp]).join('&' + encodeURIComponent(schemaP.name) + '=');
                         }
                         // init default param
                         if (local.isNullOrUndefined(request.swgg.paramDict[schemaP.name]) &&
@@ -24029,13 +24466,13 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     // normalize paramDict
                     local.normalizeSwaggerParamDict(request.swgg);
                     // validate paramDict
-                    local.validateBySwaggerParameters({
+                    error = local.validateBySwaggerParameters({
                         data: request.swgg.paramDict,
                         prefix: ['operation', request.swgg.methodPath],
                         parameters: request.swgg.operation.parameters,
                         swaggerJson: local.swaggerJson
-                    });
-                    onNext();
+                    })[0];
+                    options.onNext(error);
                     break;
                 case 2:
                     // init crud
@@ -24057,7 +24494,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     request.swgg.operation.parameters.forEach(function (schemaP) {
                         // JSON.parse json-string
                         if (schemaP.format === 'json' &&
-                                schemaP.type === 'string' &&
+                                local.schemaPType(schemaP) === 'string' &&
                                 crud.data[schemaP.name]) {
                             crud.data[schemaP.name] = JSON.parse(crud.data[schemaP.name]);
                         }
@@ -24082,7 +24519,8 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                         crud[element.key] = crud.data['_' + element.key] || JSON.parse(
                             local.templateRender(
                                 request.swgg.operation['_' + element.key] || 'null',
-                                request.swgg.paramDict
+                                request.swgg.paramDict,
+                                { notHtmlSafe: true }
                             )
                         ) || element.value;
                     });
@@ -24105,15 +24543,16 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     nextMiddleware();
                     break;
                 default:
-                    nextMiddleware();
+                    nextMiddleware(error);
                 }
-            };
-            onNext();
+            });
+            options.modeNext = 0;
+            options.onNext();
         };
 
         local.normalizeSwaggerJson = function (options) {
         /*
-         * this function will normalize swaggerJson and filter $SWGG_TAGS0_FILTER
+         * this function will normalize swaggerJson and filter $npm_package_swggTags0
          */
             var tmp;
             local.objectSetDefault(options, { paths: {}, tags: [] });
@@ -24131,25 +24570,30 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     }
                 });
             });
-            // filter $SWGG_TAGS0_FILTER
-            // example usage:
-            // $ SWGG_TAGS0_FILTER=google-maps shBuildApp
-            // filter $SWGG_TAGS0_FILTER - definitions and parameters
+            if (!local.env.npm_package_swggTags0) {
+                return options;
+            }
+            // override options with x-swgg-tags0-override
+            local.objectSetOverride(options, options['x-swgg-tags0-override'] &&
+                options['x-swgg-tags0-override'][local.env.npm_package_swggTags0], 10);
+            // filter $npm_package_swggTags0 - definitions and parameters
             ['definitions', 'parameters'].forEach(function (schema) {
                 schema = options[schema] || {};
                 Object.keys(schema).forEach(function (key) {
-                    if (local.env.SWGG_TAGS0_FILTER && schema[key]['x-swgg-tags0'] &&
-                            schema[key]['x-swgg-tags0'] !== local.env.SWGG_TAGS0_FILTER) {
+                    if (schema[key]['x-swgg-tags0'] &&
+                            schema[key]['x-swgg-tags0'] !== 'all' &&
+                            schema[key]['x-swgg-tags0'] !== local.env.npm_package_swggTags0) {
                         delete schema[key];
                     }
                 });
             });
-            // filter $SWGG_TAGS0_FILTER - paths
+            // filter $npm_package_swggTags0 - paths
             Object.keys(options.paths).forEach(function (path) {
                 Object.keys(options.paths[path]).forEach(function (method) {
                     tmp = options.paths[path][method];
-                    if (local.env.SWGG_TAGS0_FILTER && tmp['x-swgg-tags0'] &&
-                            tmp['x-swgg-tags0'] !== local.env.SWGG_TAGS0_FILTER) {
+                    if (tmp['x-swgg-tags0'] &&
+                            tmp['x-swgg-tags0'] !== 'all' &&
+                            tmp['x-swgg-tags0'] !== local.env.npm_package_swggTags0) {
                         delete options.paths[path][method];
                         return;
                     }
@@ -24158,10 +24602,11 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     delete options.paths[path];
                 }
             });
-            // filter $SWGG_TAGS0_FILTER - tags
+            // filter $npm_package_swggTags0 - tags
             options.tags = options.tags.filter(function (tag) {
-                return !local.env.SWGG_TAGS0_FILTER ||
-                    (tag['x-swgg-tags0'] && tag['x-swgg-tags0'] === local.env.SWGG_TAGS0_FILTER);
+                return !tag['x-swgg-tags0'] ||
+                    tmp['x-swgg-tags0'] === 'all' ||
+                    tag['x-swgg-tags0'] === local.env.npm_package_swggTags0;
             });
             return options;
         };
@@ -24186,7 +24631,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     });
                 }
                 // parse array
-                if (schemaP.type === 'array' && schemaP.in !== 'body') {
+                if (local.schemaPType(schemaP) === 'array' && schemaP.in !== 'body') {
                     if (typeof tmp === 'string') {
                         switch (schemaP.collectionFormat || schemaP['x-swgg-collectionFormat']) {
                         case 'json':
@@ -24197,6 +24642,9 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                             return;
                         case 'multi':
                             tmp = local.urlParse('?' + tmp, true).query[schemaP.name];
+                            if (!Array.isArray(tmp)) {
+                                tmp = [tmp];
+                            }
                             break;
                         case 'pipes':
                             tmp = tmp.split('|');
@@ -24211,7 +24659,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                         default:
                             tmp = tmp.split(',');
                         }
-                        if (schemaP.items && schemaP.items.type !== 'string') {
+                        if (local.schemaPItemsType(schemaP) !== 'string') {
                             // try to JSON.parse the string
                             local.tryCatchOnError(function () {
                                 tmp = tmp.map(function (element) {
@@ -24221,8 +24669,8 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                         }
                     }
                 // JSON.parse paramDict
-                } else if (schemaP.type !== 'file' &&
-                        schemaP.type !== 'string' &&
+                } else if (local.schemaPType(schemaP) !== 'file' &&
+                        local.schemaPType(schemaP) !== 'string' &&
                         (typeof tmp === 'string' || tmp instanceof local.global.Uint8Array)) {
                     // try to JSON.parse the string
                     local.tryCatchOnError(function () {
@@ -24255,6 +24703,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     }
                     // normalize error-list to contain non-null objects
                     if (ii === 0) {
+                        data = data.errorList || data;
                         // normalize error-list to be non-empty
                         if (!data.length) {
                             data.push(null);
@@ -24264,11 +24713,12 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                                 element = { message: String(element) };
                             }
                             // normalize error-object to plain json-object
-                            error = local.jsonCopy(element);
-                            error.message = element.message;
-                            error.stack = element.stack;
-                            error.statusCode = Number(error.statusCode) || 500;
-                            return error;
+                            return {
+                                message: element.message,
+                                name: element.name,
+                                stack: element.stack,
+                                statusCode: Number(element.statusCode) || 500
+                            };
                         });
                         error = local.jsonCopy(data[0]);
                         error.errors = data;
@@ -24296,6 +24746,27 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             };
         };
 
+        local.schemaPItemsType = function (schemaP) {
+        /*
+         * this function will return schemaP.items.type
+         */
+            return local.schemaPType(local.schemaPItems(schemaP) || {});
+        };
+
+        local.schemaPItems = function (schemaP) {
+        /*
+         * this function will return schemaP.items
+         */
+            return schemaP['x-swgg-items'] || schemaP.items;
+        };
+
+        local.schemaPType = function (schemaP) {
+        /*
+         * this function will return schemaP.type
+         */
+            return schemaP['x-swgg-type'] || schemaP.type;
+        };
+
         local.serverRespondJsonapi = function (request, response, error, data, meta) {
         /*
          * http://jsonapi.org/format/#errors
@@ -24320,6 +24791,45 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             })(error, data, meta);
         };
 
+        local.throwSwaggerError = function (options) {
+        /*
+         * this function will throw a swaggerError with the given options.errorType
+         */
+            var error;
+            if (!options) {
+                return;
+            }
+            options.data2 = options.data === undefined
+                ? 'undefined'
+                : JSON.stringify(options.data);
+            options.prefix2 = options.prefix[0] + options.prefix.slice(1).map(function (element) {
+                return '[' + JSON.stringify(element) + ']';
+            }).join('');
+            options.schema2 = JSON.stringify(options.schema) || 'undefined';
+            options.type2 = (options.schema && local.schemaPType(options.schema)) || 'object';
+            if (options.schema && options.schema.format) {
+                options.type2 += ' (' + options.schema.format + ')';
+            }
+            Object.keys(options).forEach(function (key) {
+                if (typeof options[key] === 'string' && options[key].length > 100) {
+                    options[key] = options[key].slice(0, 100) + '...' + options[key].slice(-1);
+                }
+            });
+            error = new Error('error.' + options.errorType + ' - ' + local.templateRender(
+                local.swaggerErrorTypeDict[options.errorType],
+                options,
+                { notHtmlSafe: true }
+            ));
+            error.messageShort = 'value ' + local.templateRender(
+                local.swaggerErrorTypeDict[options.errorType].replace((/.*?\{\{data2\}\} /), ''),
+                options,
+                { notHtmlSafe: true }
+            );
+            error.options = options;
+            error.statusCode = 400;
+            throw error;
+        };
+
         local.uiAnimateShake = function (element) {
         /*
          * this function will shake the dom-element
@@ -24331,11 +24841,24 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         };
 
         local.uiEventDelegate = function (event) {
+            event.target2 = event.target;
+            // filter non-input keyup-event
+            if (event.type === 'keyup' &&
+                    !event.target2.closest('input, option, select, textarea')) {
+                return;
+            }
+            // delegate event in .operation
+            event.targetOperation = event.target2.closest('.operation');
             Object.keys(local.uiEventListenerDict).sort().some(function (key) {
-                if (!(event.currentTarget.matches(key) || event.target.matches(key))) {
+                switch (key) {
+                case '.onEventOperationDisplayShow':
+                    event.target2 = event.target2.closest(key) || event.target2;
+                    break;
+                }
+                if (!(event.currentTarget.matches(key) || event.target2.matches(key))) {
                     return;
                 }
-                switch (event.target.tagName) {
+                switch (event.target2.tagName) {
                 case 'BUTTON':
                 case 'FORM':
                     event.preventDefault();
@@ -24345,28 +24868,37 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 local.uiEventListenerDict[key](event);
                 return true;
             });
-        };
-
-        local.uiEventInit = function (element) {
-        /*
-         * this function will init event-handling for the dom-element
-         */
-            ['Click', 'Keyup', 'Submit'].forEach(function (eventType) {
-                Array.from(
-                    element.querySelectorAll('.eventDelegate' + eventType)
-                ).forEach(function (element) {
-                    element.addEventListener(eventType.toLowerCase(), local.uiEventDelegate);
-                });
-            });
+            if (event.targetOperation && !local.timerTimeoutOnEventInputValidate) {
+                local.timerTimeoutOnEventInputValidate = setTimeout(function () {
+                    local.timerTimeoutOnEventInputValidate = null;
+                    // validate input
+                    local.uiEventListenerDict['.onEventInputValidate'](event);
+                }, 25);
+            }
         };
 
         local.uiEventListenerDict = {};
 
-        local.uiEventListenerDict['.onEventOperationAjax'] = function (event) {
+        local.uiEventListenerDict['.onEventInputTextareaChange'] = function (event) {
         /*
-         * this function will submit the operation to the backend
+         * this function will show/hide the textarea's multiline placeholder
          */
-            var options, jsonParse, tmp;
+            var isTransparent, value;
+            isTransparent = event.target2.style.background === 'transparent';
+            value = event.target2.value;
+            if (value && isTransparent) {
+                event.target2.style.background = '';
+            }
+            if (!value && !isTransparent) {
+                event.target2.style.background = 'transparent';
+            }
+        };
+
+        local.uiEventListenerDict['.onEventInputValidate'] = function (options, onError) {
+        /*
+         * this function will validate the parameters
+         */
+            var errorDict, jsonParse, tmp;
             jsonParse = function (text) {
             /*
              * this function will try to JSON.parse(text)
@@ -24377,150 +24909,198 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     return text;
                 });
             };
-            options = {};
+            options.api = local.apiDict[options.targetOperation.dataset._methodPath];
+            options.headers = {};
+            options.modeNoDefault = true;
+            options.modeValidate = !options.modeAjax;
+            options.paramDict = {};
+            options.url = '';
+            options.api.parameters.forEach(function (schemaP) {
+                tmp = options.targetOperation.querySelector(
+                    '.schemaP[data-name=' + JSON.stringify(schemaP.name) + '] .input'
+                );
+                switch (tmp.tagName) {
+                case 'INPUT':
+                    // parse file
+                    if (local.schemaPType(tmp) === 'file') {
+                        tmp = tmp.files && tmp.files[0];
+                        break;
+                    }
+                    tmp = tmp.value;
+                    if (!tmp) {
+                        return;
+                    }
+                    // parse string
+                    if (local.schemaPType(schemaP) !== 'string') {
+                        tmp = jsonParse(tmp);
+                    }
+                    break;
+                case 'SELECT':
+                    tmp = Array.from(tmp.options)
+                        .filter(function (element) {
+                            return element.selected;
+                        })
+                        .map(function (element) {
+                            return jsonParse(decodeURIComponent(
+                                element.dataset.valueSelectOption
+                            ));
+                        });
+                    if (!tmp.length || tmp[0] === '$swggUndefined') {
+                        return;
+                    }
+                    if (local.schemaPType(schemaP) !== 'array') {
+                        tmp = tmp[0];
+                    }
+                    break;
+                case 'TEXTAREA':
+                    tmp = tmp.value;
+                    if (!tmp) {
+                        return;
+                    }
+                    if (schemaP.schema &&
+                            local.schemaPType(schemaP.schema) === 'string' &&
+                            typeof tmp === 'string') {
+                        break;
+                    }
+                    // parse schema
+                    if (schemaP.in === 'body') {
+                        tmp = jsonParse(tmp);
+                        break;
+                    }
+                    // parse array
+                    tmp = tmp.split('\n').map(function (element) {
+                        return local.schemaPItemsType(schemaP) === 'string'
+                            ? element
+                            : jsonParse(element);
+                    });
+                    break;
+                }
+                options.paramDict[schemaP.name] = tmp;
+            });
+            options.api.ajax(options, onError || local.nop);
+            // init errorDict
+            errorDict = {};
+            ((options.error && options.error.errorList) || []).forEach(function (error) {
+                errorDict[error.options.prefix.filter(function (element) {
+                    return typeof element === 'string';
+                }).slice(-1)[0]] = error;
+            });
+            Array.from(options.targetOperation.querySelectorAll(
+                '.schemaP[data-name]'
+            )).forEach(function (element) {
+                tmp = errorDict[element.dataset.name];
+                // remove previous error
+                if (!tmp) {
+                    element.querySelector('.input').classList.remove('styleBorderError');
+                    element.querySelector('.styleColorError').textContent = '';
+                    return;
+                }
+                // shake invalid-input
+                if (!element.querySelector('.input').classList.contains('styleBorderError')) {
+                    element.querySelector('.input').classList.add('styleBorderError');
+                    local.uiAnimateShake(element.querySelector('.td3'));
+                }
+                element.querySelector('.styleColorError').textContent = tmp.messageShort;
+            });
+            // init requestCurl
+            tmp = options.data;
+            local.tryCatchOnError(function () {
+                tmp = JSON.stringify(JSON.parse(options.data), null, 4);
+            }, local.nop);
+            tmp = 'curl \\\n' + '--request ' + options.api._method + ' \\\n' +
+                Object.keys(options.headers).map(function (key) {
+                    return "--header '" + key + ': ' + options.headers[key] + "' \\\n";
+                }).join('') + '--data-binary ' + (typeof tmp === 'string'
+                    ? "'" + tmp.replace(/'/g, "'\"'\"'") + "'"
+                    : '<blob>') + ' \\\n"' + options.url.replace((/&/g), '&\\\n') + '"';
+            options.targetOperation.querySelector('.requestCurl').textContent = tmp;
+            // init requestJavascript
+            options.targetOperation.querySelector('.requestJavascript').textContent =
+                local.templateRender(local.templateUiRequestJavascript, {
+                    options: options,
+                    optionsJson: JSON.stringify({
+                        paramDict: options.paramDict
+                    }, null, 4)
+                }, { notHtmlSafe: true });
+        };
+
+        local.uiEventListenerDict['.onEventOperationAjax'] = function (options) {
+        /*
+         * this function will submit the operation to the backend
+         */
+            // ensure options is stateless
+            options = { targetOperation: options.targetOperation };
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
-                    options.api = local.apiDict[event.currentTarget.dataset._methodPath];
-                    options.domOperationContent = event.target.closest('.operation > .content');
-                    options.headers = {};
-                    options.modeNoDefault = true;
-                    options.paramDict = {};
-                    options.url = 'error';
-                    options.api.parameters.forEach(function (schemaP) {
-                        tmp = options.domOperationContent.querySelector(
-                            '.schemaP[name=' + schemaP.name + '] > .td3'
-                        ).children[0];
-                        switch (tmp.tagName) {
-                        case 'INPUT':
-                            // parse file
-                            if (tmp.type === 'file') {
-                                tmp = tmp.files && tmp.files[0];
-                                break;
-                            }
-                            tmp = tmp.value;
-                            if (!tmp) {
-                                return;
-                            }
-                            // parse string
-                            if (schemaP.type !== 'string') {
-                                tmp = jsonParse(tmp);
-                            }
-                            break;
-                        case 'SELECT':
-                            tmp = Array.from(tmp.options)
-                                .filter(function (element) {
-                                    return element.selected;
-                                })
-                                .map(function (element) {
-                                    return jsonParse(decodeURIComponent(
-                                        element.dataset.valueDecoded
-                                    ));
-                                });
-                            if (!tmp.length || tmp[0] === '$swggUndefined') {
-                                return;
-                            }
-                            if (schemaP.type !== 'array') {
-                                tmp = tmp[0];
-                            }
-                            break;
-                        case 'TEXTAREA':
-                            tmp = tmp.value;
-                            if (!tmp) {
-                                return;
-                            }
-                            if (schemaP.schema &&
-                                    schemaP.schema.type === 'string' &&
-                                    typeof tmp === 'string') {
-                                break;
-                            }
-                            // parse schema
-                            if (schemaP.in === 'body') {
-                                tmp = jsonParse(tmp);
-                                break;
-                            }
-                            // parse array
-                            tmp = tmp.split('\n').map(function (element) {
-                                return schemaP.items.type === 'string'
-                                    ? element
-                                    : jsonParse(element);
-                            });
-                            break;
-                        }
-                        options.paramDict[schemaP.name] = tmp;
+                    // init ajax
+                    options.modeAjax = true;
+                    // validate input
+                    local.uiEventListenerDict['.onEventInputValidate'](options, options.onNext);
+                    if (options.error) {
+                        return;
+                    }
+                    // reset response output
+                    Array.from(options.targetOperation.querySelectorAll(
+                        '.responseBody, .responseHeaders, .responseStatusCode'
+                    )).forEach(function (element) {
+                        element.classList.remove('styleBorderError');
+                        element.textContent = 'loading ...';
                     });
-                    options.api.ajax(options, options.onNext);
+                    options.targetOperation.querySelector('.responseMedia').innerHTML = '';
+                    // scrollTo response
+                    options.targetOperation.querySelector('.responseBody').focus();
                     break;
                 default:
+                    if (options.error) {
+                        return;
+                    }
                     data = local.objectSetDefault(data, {
+                        contentType: 'undefined',
                         error: error,
                         options: options,
-                        statusCode: 'error'
+                        statusCode: ''
                     });
-                    // remove previous error
-                    Array.from(
-                        options.domOperationContent.querySelectorAll('.schemaP .input')
-                    ).forEach(function (element) {
-                        element.classList.remove('error');
-                    });
-                    // shake invalid-input
-                    if (error && error.options && error.schema) {
-                        Array.from(options.domOperationContent.querySelectorAll(
-                            '.schemaP[name=' + error.schema.name + '] .input'
-                        )).forEach(function (element) {
-                            element.classList.add('error');
-                            local.uiAnimateShake(element.closest('span'));
-                        });
-                    }
-                    // init optionsJson
-                    data.optionsJson = JSON.stringify({
-                        paramDict: options.paramDict
-                    }, null, 4);
-                    // init curl
-                    local.tryCatchOnError(function () {
-                        options.data = JSON.stringify(JSON.parse(options.data), null, 4);
-                    }, local.nop);
-                    data.curl = 'curl \\\n' + '--request ' + options.api._method + ' \\\n' +
-                        Object.keys(options.headers).map(function (key) {
-                            return "--header '" + key + ': ' + options.headers[key] + "' \\\n";
-                        }).join('') + '--data-binary ' + (typeof options.data === 'string'
-                            ? "'" + options.data.replace(/'/g, "'\"'\"'") + "'"
-                            : '<blob>') + ' \\\n"' + options.url + '"';
+                    // init responseStatusCode
+                    options.targetOperation.querySelector('.responseStatusCode').textContent =
+                        data.statusCode;
                     // init responseHeaders
-                    data.responseHeaders = data.getAllResponseHeaders
-                        ? data.getAllResponseHeaders().trim()
-                        : 'error';
+                    options.targetOperation.querySelector('.responseHeaders').textContent =
+                        data.getAllResponseHeaders().trim();
                     // init responseBody
-                    ('\r\n' + (data.getAllResponseHeaders
-                        ? data.getAllResponseHeaders()
-                        : ''))
-                        .replace((/\r\ncontent-type:(.*?)\r\n/gi), function (match0, match1) {
-                            match0 = match1;
-                            data.contentType = match0.trim();
-                        });
-                    switch (data.contentType && data.contentType.split('/')[0]) {
+                    options.targetOperation.querySelector('.responseHeaders').textContent.replace((
+                        /^content-type:(.*?)$/im
+                    ), function (match0, match1) {
+                        match0 = match1;
+                        data.contentType = match0.trim();
+                    });
+                    data.mediaType = data.contentType.split('/')[0].replace('image', 'img');
+                    switch (data.mediaType) {
                     case 'audio':
+                    case 'img':
                     case 'video':
-                        data.responseBody = '<' + data.contentType.split('/')[0] +
-                            ' controls><source src="data:' + data.contentType + ';base64,' +
-                            local.base64FromBuffer(data.response) +
-                            '" type="' + data.contentType + '"></' +
-                            data.contentType.split('/')[0] + '>';
-                        break;
-                    case 'image':
-                        data.responseBody = '<img src="data:' + data.contentType + ';base64,' +
-                            local.base64FromBuffer(data.response) + '">';
+                        options.targetOperation.querySelector('.responseBody').textContent =
+                            data.contentType;
+                        options.targetOperation.querySelector('.responseMedia').innerHTML =
+                            '<' + data.mediaType + ' controls src="data:' + data.contentType +
+                            ';base64,' + local.base64FromBuffer(data.response) + '"></' +
+                            data.mediaType + '>';
                         break;
                     default:
-                        data.responseBody = '<pre>' + local.stringHtmlSafe(
+                        options.targetOperation.querySelector('.responseBody').textContent =
                             data.responseJson
-                                ? JSON.stringify(data.responseJson, null, 4)
-                                : String(data.responseText || '')
-                        ) + '</pre>';
+                            ? JSON.stringify(data.responseJson, null, 4)
+                            : data.responseText;
                     }
-                    // templateRender response
-                    options.domOperationContent.querySelector('.responseAjax').innerHTML =
-                        local.templateRender(local.templateUiResponseAjax, data);
+                    // init error
+                    if (!(data.statusCode < 400)) {
+                        Array.from(options.targetOperation.querySelectorAll(
+                            '.responseBody, .responseHeaders, .responseStatusCode'
+                        )).forEach(function (element) {
+                            element.classList.add('styleBorderError');
+                            local.uiAnimateShake(element);
+                        });
+                    }
                     break;
                 }
             });
@@ -24528,23 +25108,32 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             options.onNext();
         };
 
-        local.uiEventListenerDict['.onEventOperationDisplayShow'] = function (event) {
+        local.uiEventListenerDict['.onEventOperationDisplayShow'] = function (event, onError) {
         /*
          * this function will toggle the display of the operation
          */
             var element;
-            location.hash = '!' + event.target.closest('.operation').id;
-            element = event.target.closest('.operation');
+            element = event.target2;
+            element = element.querySelector('.operation') || element.closest('.operation');
+            location.hash = '!' + element.id;
             element.closest('.resource').classList.remove('expanded');
+            // show parent resource
+            local.uiAnimateSlideDown(element.closest('.resource').querySelector('.operationList'));
             // show the operation, but hide all other operations
             local.uiAnimateSlideAccordian(
                 element.querySelector('.operation > .content'),
-                Array.from(
-                    element.closest('.operationList').querySelectorAll('.operation > .content')
-                ),
+                Array.from(element.closest('.operationList').querySelectorAll(
+                    '.operation > .content'
+                )),
                 function () {
+                    // scrollTo operation
                     element.querySelector('[tabIndex]').blur();
                     element.querySelector('[tabIndex]').focus();
+                    // validate input
+                    local.uiEventListenerDict['.onEventInputValidate']({
+                        targetOperation: element
+                    });
+                    local.setTimeoutOnError(onError, null, element);
                 }
             );
         };
@@ -24554,36 +25143,46 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
          * this function will toggle the display of the resource
          */
             location.hash = '!' + event.currentTarget.id;
-            event.target.className.split(' ').some(function (className) {
+            event.target2.className.split(' ').some(function (className) {
                 switch (className) {
-                // show the resource, but hide all other resources
                 case 'td1':
-                case 'td2':
+                    // show the resource, but hide all other resources
                     local.uiAnimateSlideAccordian(
                         event.currentTarget.querySelector('.operationList'),
                         Array.from(document.querySelectorAll('.swggUiContainer .operationList'))
                     );
-                    break;
-                }
-                switch (className) {
-                case 'td1':
+                    // show at least one operation in the resource
+                    local.uiEventListenerDict['.onEventOperationDisplayShow']({
+                        target2: event.currentTarget.querySelector(
+                            '.operation .uiAnimateSlide[style*="max-height: 100%"]'
+                        ) || event.currentTarget.querySelector('.operation')
+                    });
                     return true;
                 case 'td2':
+                    // show the resource, but hide all other resources
+                    local.uiAnimateSlideAccordian(
+                        event.currentTarget.querySelector('.operationList'),
+                        Array.from(document.querySelectorAll('.swggUiContainer .operationList'))
+                    );
                     // collapse all operations in the resource
                     if (event.currentTarget.classList.contains('expanded')) {
                         event.currentTarget.classList.remove('expanded');
-                        Array.from(
-                            event.currentTarget.querySelectorAll('.operation > .content')
-                        ).forEach(function (element) {
+                        Array.from(event.currentTarget.querySelectorAll(
+                            '.operation > .content'
+                        )).forEach(function (element) {
                             local.uiAnimateSlideUp(element);
                         });
                     // expand all operations in the resource
                     } else {
                         event.currentTarget.classList.add('expanded');
-                        Array.from(
-                            event.currentTarget.querySelectorAll('.operation > .content')
-                        ).forEach(function (element) {
+                        Array.from(event.currentTarget.querySelectorAll(
+                            '.operation > .content'
+                        )).forEach(function (element) {
                             local.uiAnimateSlideDown(element);
+                            // validate input
+                            local.uiEventListenerDict['.onEventInputValidate']({
+                                targetOperation: element.closest('.operation')
+                            });
                         });
                     }
                     return true;
@@ -24597,7 +25196,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
          */
             event = event || {};
             // clear all apiKeyValue's from localStorage
-            if (event.target && event.target.id === 'swggApiKeyClearButton1') {
+            if (event.target2 && event.target2.id === 'swggApiKeyClearButton1') {
                 local.apiKeyValue = '';
                 Object.keys(localStorage).forEach(function (key) {
                     if (key.indexOf('utility2_swgg_apiKeyKey_') === 0) {
@@ -24607,7 +25206,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             // restore apiKeyValue
             } else if (event.swggInit) {
                 local.apiKeyKey = 'utility2_swgg_apiKeyKey_' + encodeURIComponent(local.urlParse(
-                    document.querySelector('.swggUiContainer > .header > .td2').value
+                    document.querySelector('.swggUiContainer > .thead > .td2').value
                         .replace((/^\//), '')
                 ).href);
                 local.apiKeyValue = localStorage.getItem(local.apiKeyKey) || '';
@@ -24623,23 +25222,23 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 return;
             }
             // reset ui
-            Array.from(
-                document.querySelectorAll('.swggUiContainer > .reset')
-            ).forEach(function (element) {
+            Array.from(document.querySelectorAll(
+                '.swggUiContainer > .reset'
+            )).forEach(function (element) {
                 element.remove();
             });
             // normalize swaggerJsonUrl
-            document.querySelector('.swggUiContainer > .header > .td2').value = local.urlParse(
-                document.querySelector('.swggUiContainer > .header > .td2').value
+            document.querySelector('.swggUiContainer > .thead > .td2').value = local.urlParse(
+                document.querySelector('.swggUiContainer > .thead > .td2').value
                     .replace((/^\//), '')
             ).href;
             document.querySelector('#swggAjaxProgressDiv1 span').innerHTML = 'loading swagger.json';
             // fetch swagger.json file
             local.apiUpdate({
                 modeAjax: true,
-                url: document.querySelector('.swggUiContainer > .header > .td2').value
+                url: document.querySelector('.swggUiContainer > .thead > .td2').value
             }, function (error) {
-                local.uiRender(null, onError);
+                local.uiRenderAll(null, onError);
                 local.tryCatchOnError(function () {
                     local.validateBySwaggerJson({ swaggerJson: local.swaggerJson });
                 }, local.uiNotify);
@@ -24656,176 +25255,14 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             if (!error) {
                 return element;
             }
-            element.classList.add('error');
+            // highlight and shake input
+            element.classList.add('styleBorderError');
             local.uiAnimateShake(element);
-            element.textContent = error.stack + '\n' + element.textContent;
+            element.textContent = error.message + '\n' + element.textContent;
             return element;
         };
 
-        local.uiParamRender = function (schemaP) {
-        /*
-         * this function will render schemaP
-         */
-            schemaP.placeholder = !local.isNullOrUndefined(schemaP.default)
-                ? schemaP.default
-                : local.dbFieldRandomCreate({
-                    modeNotRandom: true,
-                    schemaP: schemaP
-                });
-            if (schemaP.type !== 'string') {
-                schemaP.placeholder = JSON.stringify(schemaP.placeholder);
-            }
-            schemaP.placeholder = String(schemaP.placeholder || '');
-            schemaP.enum2 = schemaP.enum || (schemaP.items && schemaP.items.enum);
-            // init input - file
-            if (schemaP.type === 'file') {
-                schemaP.isFile = true;
-            // init input - textarea
-            } else if (schemaP.in === 'body') {
-                schemaP.isTextarea = true;
-            // init input - select
-            } else if (schemaP.enum2 || schemaP.type === 'boolean') {
-                // init enumDefault
-                schemaP.enumDefault = [];
-                if (schemaP.required && schemaP.default !== undefined) {
-                    schemaP.enumDefault = schemaP.type === 'array'
-                        ? schemaP.default
-                        : [schemaP.default];
-                }
-                schemaP.isSelect = true;
-                schemaP.isSelectMultiple = schemaP.type === 'array';
-                schemaP.selectOptionList = (schemaP.type === 'boolean'
-                    ? [false, true]
-                    : schemaP.enum2).map(function (element) {
-                    // init hasDefault
-                    schemaP.hasDefault = schemaP.hasDefault ||
-                        schemaP.enumDefault.indexOf(element) >= 0;
-                    return {
-                        id: local.idDomElementCreate('swgg_id_' + schemaP.name),
-                        selected: schemaP.enumDefault.indexOf(element) >= 0
-                            ? 'selected'
-                            : '',
-                        type: (schemaP.items && schemaP.items.type) || schemaP.type,
-                        valueDecoded: element,
-                        valueEncoded: typeof element === 'string'
-                            ? element
-                            : JSON.stringify(element)
-                    };
-                });
-                // init 'undefined' value
-                if (!schemaP.required && !schemaP.hasDefault) {
-                    schemaP.selectOptionList.unshift({
-                        id: local.idDomElementCreate('swgg_id_' + schemaP.name),
-                        selected: 'selected',
-                        type: schemaP.type,
-                        valueDecoded: '$swggUndefined',
-                        valueEncoded: '<none>'
-                    });
-                }
-                // select at least one value
-                if (!schemaP.isSelectMultiple) {
-                    schemaP.selectOptionList.some(function (element, ii) {
-                        if (ii === 0 || element.selected) {
-                            element.selected = 'selected';
-                            if (ii !== 0) {
-                                schemaP.selectOptionList[0].selected = '';
-                                return true;
-                            }
-                        }
-                    });
-                }
-            // init input - textarea
-            } else if (schemaP.type === 'array') {
-                schemaP.isTextarea = true;
-                schemaP.placeholder = String(Array.isArray(schemaP.default)
-                    ? schemaP.default.join('\n')
-                    : 'provide multiple values in new lines' + (schemaP.required
-                        ? ' (at least one required)'
-                        : ''));
-            // init input - text
-            } else {
-                schemaP.isInputText = true;
-            }
-            // init format2 / type2
-            [schemaP, schemaP.schema || {}].some(function (element) {
-                local.objectSetDefault(schemaP, {
-                    format2: element.format,
-                    type2: element.type
-                });
-                return schemaP.type2;
-            });
-            schemaP.type2 = schemaP.type2 || 'object';
-            // init schema2
-            [
-                schemaP,
-                schemaP.items,
-                schemaP.schema,
-                schemaP.schema && schemaP.schema.items
-            ].some(function (element) {
-                schemaP.schema2 = (local.validateBySwaggerSchema({
-                    // dereference schemaP
-                    modeDereference: true,
-                    prefix: ['parameters', schemaP.name],
-                    schema: element,
-                    swaggerJson: local.swaggerJson
-                }) || {}).properties;
-                return schemaP.schema2;
-            });
-            if (schemaP.schema2) {
-                schemaP.schemaText = JSON.stringify(schemaP.type2 === 'array'
-                    ? [schemaP.schema2]
-                    : schemaP.schema2, null, 4);
-            }
-            // init valueEncoded
-            if (schemaP.required || schemaP.in === 'body' || schemaP['x-swgg-apiKey']) {
-                schemaP.valueEncoded = schemaP['x-swgg-apiKey']
-                    ? local.apiKeyValue
-                    : schemaP.default;
-                if (schemaP.valueEncoded === undefined &&
-                        local.isNullOrUndefined(schemaP.default)) {
-                    schemaP.valueEncoded = local.dbFieldRandomCreate({
-                        modeNotRandom: true,
-                        schemaP: schemaP
-                    });
-                }
-                // init valueEncoded for array
-                if (schemaP.valueEncoded && schemaP.type2 === 'array' && schemaP.in !== 'body') {
-                    schemaP.valueEncoded = schemaP.valueEncoded.map(function (element) {
-                        return typeof element === 'string'
-                            ? element
-                            : JSON.stringify(element);
-                    }).join('\n');
-                }
-            }
-            // init valueEncoded for schema
-            if (schemaP.in === 'body' && schemaP.schema2) {
-                schemaP.valueEncoded = local.dbRowRandomCreate({
-                    modeNotRandom: true,
-                    override: function () {
-                        var override = {};
-                        // preserve default value
-                        Object.keys(schemaP.schema2).forEach(function (key) {
-                            if (schemaP.schema2[key].default !== undefined) {
-                                override[key] = schemaP.schema2[key].default;
-                            }
-                        });
-                        return override;
-                    },
-                    properties: schemaP.schema2
-                });
-                if (schemaP.type2 === 'array') {
-                    schemaP.valueEncoded = [schemaP.valueEncoded];
-                }
-                schemaP.valueEncoded = JSON.stringify(schemaP.valueEncoded, null, 4);
-            }
-            if (typeof schemaP.valueEncoded !== 'string') {
-                schemaP.valueEncoded = JSON.stringify(schemaP.valueEncoded) || '';
-            }
-            // templateRender schemaP
-            schemaP.innerHTML = local.templateRender(local.templateUiParam, schemaP);
-        };
-
-        local.uiRender = function (options, onError) {
+        local.uiRenderAll = function (options, onError) {
         /*
          * this function will render swagger-ui
          */
@@ -24837,14 +25274,14 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 options.ajaxProgressText = 'rendering swagger.json';
                 // init apiKeyValue
                 options.apiKeyValue = local.apiKeyValue;
-                // init title
+                // templateRender title
                 document.querySelector('head > title').textContent = local.templateRender(
                     local.templateUiTitle,
                     options
                 ).trim();
                 // init urlSwaggerJson
                 options.urlSwaggerJson = document.querySelector(
-                    '.swggUiContainer > .header > .td2'
+                    '.swggUiContainer > .thead > .td2'
                 ).value;
                 // templateRender main
                 document.querySelector('.swggUiContainer').innerHTML = local.templateRender(
@@ -24852,7 +25289,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     options
                 );
                 setTimeout(function () {
-                    local.uiRender(options, onError);
+                    local.uiRenderAll(options, onError);
                 }, 100);
                 return;
             }
@@ -24873,18 +25310,18 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     // init resource
                     resource = options.resourceDict[tag] = local.objectSetDefault(
                         options.resourceDict[tag] || options.tagDict[tag],
-                        { description: 'no description', name: tag, operationListInnerHtml: '' }
+                        { description: 'no description', name: tag }
                     );
                     resource.id = resource.id || local.idDomElementCreate('swgg_id_' + tag);
                 });
             });
             // init uiFragment
-            options.uiFragment = local.domFragmentRender('<div class="reset resourceList"></div>');
+            options.uiFragment = document.createDocumentFragment();
             // init resourceDict
             Object.keys(options.resourceDict).sort().forEach(function (key) {
                 // templateRender resource
-                options.uiFragment.querySelector('.resourceList').appendChild(
-                    local.domFragmentRender(local.templateUiResource, options.resourceDict[key])
+                options.uiFragment.appendChild(
+                    local.domElementRender(local.templateUiResource, options.resourceDict[key])
                 );
             });
             Object.keys(options.operationDict).sort(function (aa, bb) {
@@ -24899,60 +25336,196 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 operation = options.operationDict[operation];
                 operation.id = local.idDomElementCreate('swgg_id_' + operation.operationId);
                 operation.tags.forEach(function (tag) {
+                    // create new operation for each tag
                     operation = local.jsonCopy(operation);
                     resource = options.resourceDict[tag];
                     local.objectSetDefault(operation, {
                         description: 'no description',
                         responseList: Object.keys(operation.responses).sort().map(function (key) {
-                            return { key: key, value: operation.responses[key] };
+                            return {
+                                key: key,
+                                value: local.objectSetDefault(operation.responses[key], {
+                                    description: 'no description'
+                                })
+                            };
                         }),
-                        summary: 'no summary'
+                        summary: operation.description || 'no summary'
                     });
-                    operation.parameters.forEach(function (schemaP) {
-                        // init schemaP.id
-                        schemaP.id = local.idDomElementCreate('swgg_id_' + schemaP.name);
-                        local.uiParamRender(schemaP);
-                    });
+                    operation.parameters.forEach(local.uiRenderSchemaP);
                     // templateRender operation
                     options.uiFragment.querySelector('#' + resource.id + ' .operationList')
-                        .appendChild(local.domFragmentRender(local.templateUiOperation, operation));
+                        .appendChild(local.domElementRender(local.templateUiOperation, operation));
                 });
             });
-            Array.from(
-                options.uiFragment.querySelectorAll('.operation > .header > .td1')
-            ).forEach(function (element, ii) {
-                element.innerHTML = ii + 1;
+            // emulate <ol></ol> for operations
+            Array.from(options.uiFragment.querySelectorAll(
+                '.operationList'
+            )).forEach(function (element) {
+                Array.from(element.querySelectorAll(
+                    '.operation > .thead > .td1'
+                )).forEach(function (element, ii) {
+                    element.textContent = ii + 1 + '.';
+                });
             });
             // append uiFragment to swggUiContainer
             document.querySelector('#swggAjaxProgressDiv1').style.display = 'none';
-            document.querySelector('.swggUiContainer').appendChild(options.uiFragment);
-            // render valueEncoded
-            Array.from(
-                document.querySelectorAll('.swggUiContainer [data-value-encoded]')
-            ).forEach(function (element) {
-                element.value = decodeURIComponent(element.dataset.valueEncoded);
+            document.querySelector('.swggUiContainer .resourceList').appendChild(
+                options.uiFragment
+            );
+            Array.from(document.querySelectorAll(
+                '.swggUiContainer [data-value-text]'
+            )).forEach(function (element) {
+                // render valueText
+                element.value = decodeURIComponent(element.dataset.valueText);
+                delete element.dataset.valueText;
+                // init textarea's multiline placeholder
+                if (element.tagName === 'TEXTAREA') {
+                    local.uiEventListenerDict['.onEventInputTextareaChange']({ target2: element });
+                }
             });
             // init event-handling
-            local.uiEventInit(document);
+            ['Click', 'Keyup', 'Submit'].forEach(function (eventType) {
+                Array.from(document.querySelectorAll(
+                    '.swggUiContainer .eventDelegate' + eventType
+                )).forEach(function (element) {
+                    element.addEventListener(eventType.toLowerCase(), local.uiEventDelegate);
+                });
+            });
             // scrollTo location.hash
-            local.tryCatchOnError(function () {
-                var element, parent;
-                local.tryCatchOnError(function () {
-                    element = document.querySelector('#' + location.hash.slice(2));
-                }, local.nop);
-                element = element || document.querySelector(
-                    '.swggUiContainer .operation, .swggUiContainer .operation'
-                );
-                parent = element.querySelector('.uiAnimateSlide');
-                while (parent) {
-                    local.uiAnimateSlideDown(parent);
-                    parent = parent.parentElement;
-                }
-                setTimeout(function () {
-                    element.querySelector('[tabIndex]').focus();
-                }, 250);
-            }, local.nop);
+            local.uiEventListenerDict['.onEventOperationDisplayShow']({
+                target2: document.querySelector('#' + (location.hash.slice(2) || 'undefined')) ||
+                    document.querySelector('.swggUiContainer .operation')
+            });
             local.setTimeoutOnError(onError);
+        };
+
+        local.uiRenderSchemaP = function (schemaP) {
+        /*
+         * this function will render schemaP
+         */
+            // init schemaP.id
+            schemaP.id = local.idDomElementCreate('swgg_id_' + schemaP.name);
+            // init enum
+            schemaP.enum2 = schemaP.enum ||
+                (local.schemaPItems(schemaP) || {}).enum ||
+                (local.schemaPType(schemaP) === 'boolean' && [false, true]);
+            // init input - file
+            if (local.schemaPType(schemaP) === 'file') {
+                schemaP.isFile = true;
+            // init input - textarea
+            } else if (schemaP.in === 'body') {
+                schemaP.isTextarea = true;
+            // init input - select
+            } else if (schemaP.enum2) {
+                // init enumDefault
+                schemaP.enumDefault = [];
+                if (schemaP.required && schemaP.default !== undefined) {
+                    schemaP.enumDefault = local.schemaPType(schemaP) === 'array'
+                        ? schemaP.default
+                        : [schemaP.default];
+                }
+                schemaP.isSelectMultiple = local.schemaPType(schemaP) === 'array';
+                schemaP.selectOptionList = schemaP.enum2.map(function (element) {
+                    // init hasDefault
+                    schemaP.hasDefault = schemaP.hasDefault ||
+                        schemaP.enumDefault.indexOf(element) >= 0;
+                    return {
+                        id: local.idDomElementCreate('swgg_id_' + schemaP.name),
+                        selected: schemaP.enumDefault.indexOf(element) >= 0
+                            ? 'selected'
+                            : '',
+                        type: local.schemaPItemsType(schemaP) || local.schemaPType(schemaP),
+                        placeholder: typeof element === 'string'
+                            ? element
+                            : JSON.stringify(element),
+                        valueSelectOption: element
+                    };
+                });
+                // init 'undefined' value
+                if (!schemaP.required && !schemaP.hasDefault) {
+                    schemaP.selectOptionList.unshift({
+                        id: local.idDomElementCreate('swgg_id_' + schemaP.name),
+                        selected: 'selected',
+                        type: local.schemaPType(schemaP),
+                        placeholder: '<none>',
+                        valueSelectOption: '$swggUndefined'
+                    });
+                }
+                // select at least one value
+                schemaP.selectOptionList.some(function (element, ii) {
+                    if (ii === 0 || element.selected) {
+                        element.selected = 'selected';
+                        if (ii !== 0) {
+                            schemaP.selectOptionList[0].selected = '';
+                            return true;
+                        }
+                    }
+                });
+            // init input - textarea
+            } else if (local.schemaPType(schemaP) === 'array') {
+                schemaP.isTextarea = true;
+            // init input - text
+            } else {
+                schemaP.isInputText = true;
+            }
+            // init format2 / type2
+            [schemaP, schemaP.schema || {}].some(function (element) {
+                local.objectSetDefault(schemaP, {
+                    format2: local.schemaPItemsType(element) || element.format,
+                    type2: local.schemaPType(element)
+                });
+                return schemaP.type2;
+            });
+            schemaP.type2 = schemaP.type2 || 'object';
+            // init schema2
+            [
+                schemaP,
+                local.schemaPItems(schemaP),
+                schemaP.schema,
+                schemaP.schema && local.schemaPItems(schemaP.schema)
+            ].some(function (element) {
+                schemaP.schema2 = (local.validateBySwaggerSchema({
+                    // dereference schemaP
+                    modeDereference: true,
+                    prefix: ['parameters', schemaP.name],
+                    schema: element,
+                    swaggerJson: local.swaggerJson
+                }) || {});
+                return schemaP.schema2.properties;
+            });
+            if (schemaP.schema2.properties) {
+                schemaP.schemaText = JSON.stringify(schemaP.type2 === 'array'
+                    ? [schemaP.schema2.properties]
+                    : schemaP.schema2.properties, null, 4);
+            }
+            // init placeholder
+            schemaP.placeholder = !local.isNullOrUndefined(schemaP.default)
+                ? schemaP.default
+                : local.dbFieldRandomCreate({
+                    modeNotRandom: true,
+                    schemaP: schemaP
+                });
+            if (typeof schemaP.placeholder !== 'string') {
+                if (schemaP.in === 'body') {
+                    schemaP.placeholder = JSON.stringify(schemaP.placeholder, null, 4);
+                } else if (Array.isArray(schemaP.placeholder)) {
+                    schemaP.placeholder = schemaP.placeholder.map(function (element) {
+                        return typeof element === 'string'
+                            ? element
+                            : JSON.stringify(element);
+                    }).join('\n');
+                } else {
+                    schemaP.placeholder = JSON.stringify(schemaP.placeholder);
+                }
+            }
+            // init valueText
+            schemaP.valueText = schemaP['x-swgg-apiKey']
+                ? local.apiKeyValue
+                : schemaP.required
+                ? schemaP.placeholder
+                : '';
+            // templateRender schemaP
+            schemaP.innerHTML = local.templateRender(local.templateUiParameter, schemaP);
         };
 
         local.userLoginByPassword = function (options, onError) {
@@ -24987,7 +25560,8 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         /*
          * this function will validate the entire swagger json object
          */
-            var swaggerJson, tmp;
+            var operation, operationIdDict, prefix, swaggerJson, test, tmp;
+            operationIdDict = {};
             swaggerJson = options.swaggerJson || {};
             local.validateBySwaggerSchema(local.objectSetDefault(options, {
                 data: swaggerJson,
@@ -25026,17 +25600,26 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             // validate swaggerJson.paths[key][key].parameters[ii].default
             Object.keys(swaggerJson.paths).forEach(function (path) {
                 Object.keys(swaggerJson.paths[path]).forEach(function (method) {
-                    (swaggerJson.paths[path][method].parameters || []).forEach(function (schemaP) {
+                    prefix = ['swaggerJson', 'paths', path, method];
+                    operation = local.validateBySwaggerSchema({
+                        // dereference operation
+                        modeDereference: true,
+                        prefix: prefix,
+                        schema: swaggerJson.paths[path][method],
+                        swaggerJson: swaggerJson
+                    });
+                    // validate semanticUniqueOperationId
+                    test = !operationIdDict[operation.operationId];
+                    local.throwSwaggerError(!test && {
+                        data: operation.operationId,
+                        errorType: 'semanticUniqueOperationId',
+                        prefix: prefix
+                    });
+                    operationIdDict[operation.operationId] = true;
+                    (operation.parameters || []).forEach(function (schemaP) {
                         local.validateBySwaggerSchema({
                             modeDefault: true,
-                            prefix: [
-                                'swaggerJson',
-                                'paths',
-                                path,
-                                method,
-                                'parameters',
-                                schemaP.name
-                            ],
+                            prefix: prefix.concat(['parameters', schemaP.name]),
                             schema: schemaP,
                             swaggerJson: swaggerJson
                         });
@@ -25049,19 +25632,27 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
         /*
          * this function will validate options.data against options.parameters
          */
+            var errorList;
+            errorList = [];
             options.parameters.forEach(function (schemaP) {
-                local.validateBySwaggerSchema({
-                    data: options.data[schemaP.name],
-                    dataReadonlyRemove: [
-                        options.dataReadonlyRemove || {},
-                        schemaP.name,
-                        (options.dataReadonlyRemove || {})[schemaP.name]
-                    ],
-                    prefix: options.prefix.concat(schemaP.name),
-                    schema: schemaP,
-                    swaggerJson: local.swaggerJson
+                local.tryCatchOnError(function () {
+                    local.validateBySwaggerSchema({
+                        data: options.data[schemaP.name],
+                        dataReadonlyRemove: [
+                            options.dataReadonlyRemove || {},
+                            schemaP.name,
+                            (options.dataReadonlyRemove || {})[schemaP.name]
+                        ],
+                        prefix: options.prefix.concat([schemaP.name]),
+                        schema: schemaP,
+                        swaggerJson: local.swaggerJson
+                    });
+                }, function (errorCaught) {
+                    errorList.push(errorCaught);
+                    errorCaught.errorList = errorList;
                 });
             });
+            return errorList;
         };
 
         local.validateBySwaggerSchema = function (options) {
@@ -25075,38 +25666,22 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 dataReadonlyRemove2,
                 ii,
                 oneOf,
-                prefix,
                 schema,
                 test,
-                throwError,
                 tmp;
             if (!options.schema) {
                 return;
             }
-            throwError = function (message) {
-            /*
-             * this function will throw an error with the given message
-             */
-                if (!message) {
-                    return;
-                }
-                message = new Error(message);
-                message.options = options;
-                message.schema = schema;
-                message.statusCode = 400;
-                throw message;
-            };
             data = options.data;
             options.dataReadonlyRemove = options.dataReadonlyRemove || [{}, '', null];
             dataReadonlyRemove2 = options.dataReadonlyRemove[2] || {};
-            prefix = Array.isArray(options.prefix)
-                ? options.prefix[0] + options.prefix.slice(1).map(function (element) {
-                    return '[' + JSON.stringify(element) + ']';
-                }).join('')
-                : options.prefix;
             schema = options.schema;
             circularList = [];
             while (true) {
+                // dereference schema.schema
+                while (schema.schema) {
+                    schema = schema.schema;
+                }
                 // dereference schema.oneOf
                 oneOf = (data && schema.oneOf) || [];
                 for (ii = 0; ii < oneOf.length; ii += 1) {
@@ -25135,15 +25710,16 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 }
                 // dereference schema.$ref
                 $ref = schema && schema.$ref;
-                if ($ref === '#/x-test/aa') {
-                    local.nop();
-                }
                 if (!$ref) {
                     break;
                 }
                 test = circularList.indexOf($ref) < 0;
-                throwError(!test && prefix +
-                    ' cannot dereference circular-reference schema.$ref = ' + JSON.stringify($ref));
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'schemaDeferenceCircular',
+                    prefix: options.prefix,
+                    schema: schema
+                });
                 circularList.push($ref);
                 tmp = $ref.split('/').slice(-2);
                 schema = $ref.indexOf('http://json-schema.org/draft-04/schema#/') === 0
@@ -25151,8 +25727,12 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     : options.swaggerJson[tmp[0]];
                 schema = schema && schema[tmp[1]];
                 test = schema;
-                throwError(!test && prefix + ' cannot dereference schema.$ref =' +
-                    JSON.stringify($ref));
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'schemaDeference',
+                    prefix: options.prefix,
+                    schema: options.schema
+                });
             }
             if (options.modeDereference) {
                 return schema;
@@ -25161,45 +25741,38 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             if (options.modeDefault) {
                 data = schema.default;
             }
-            // swagger-validate items-required-for-array-objects
-            // https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation
-            // /semantic-validators/validators/items-required-for-array-objects.js
+            // validate semanticRequired
             test = options.modeDefault ||
                 !local.isNullOrUndefined(data) ||
                 schema.required !== true ||
                 schema['x-swgg-notRequired'];
-            throwError(!test && prefix +
-                " - Schema properties specified as 'required' must be defined");
+            local.throwSwaggerError(!test && {
+                data: data,
+                errorType: 'semanticRequired',
+                prefix: options.prefix,
+                schema: schema
+            });
             if (local.isNullOrUndefined(data)) {
                 return;
             }
-            // swagger-validate items-required-for-array-objects
-            // https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation
-            // /semantic-validators/validators/items-required-for-array-objects.js
-            test = !options.modeSchema || data.type !== 'array' ||
-                (typeof data.items === 'object' && data.items);
-            throwError(!test && prefix +
-                " - Schema objects with 'array' type require an 'items' property");
+            // validate semanticRequiredArrayItems
+            test = !options.modeSchema || local.schemaPType(data) !== 'array' ||
+                (typeof local.schemaPItems(data) === 'object' && local.schemaPItems(data));
+            local.throwSwaggerError(!test && {
+                data: data,
+                errorType: 'semanticRequiredArrayItems',
+                prefix: options.prefix,
+                schema: schema
+            });
             // remove readOnly property
             if (schema.readOnly) {
                 delete options.dataReadonlyRemove[0][options.dataReadonlyRemove[1]];
             }
-            // validate schemaP.schema
-            // recurse - schema.schema
-            local.validateBySwaggerSchema({
-                data: data,
-                dataReadonlyRemove: options.dataReadonlyRemove,
-                modeSchema: options.modeSchema,
-                prefix: prefix,
-                schema: schema.schema,
-                swaggerJson: options.swaggerJson
-            });
             // optimization - validate schema.type first
             // 5.5.2. type
             // https://swagger.io/docs/specification/data-models/data-types/
             // https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#data-types
-            test = local.isNullOrUndefined(schema.type);
-            switch (schema.type) {
+            switch (local.schemaPType(schema)) {
             case 'array':
                 test = Array.isArray(data);
                 break;
@@ -25210,7 +25783,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 test = !options.modeSchema;
                 break;
             case 'integer':
-                test = typeof data === 'number' && isFinite(data) && Math.floor(data) === data;
+                test = Number.isFinite(data) && Math.floor(data) === data;
                 switch (schema.format) {
                 case 'int32':
                     break;
@@ -25219,16 +25792,13 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 }
                 break;
             case 'number':
-                test = typeof data === 'number' && isFinite(data);
+                test = Number.isFinite(data);
                 switch (schema.format) {
                 case 'double':
                     break;
                 case 'float':
                     break;
                 }
-                break;
-            case 'object':
-                test = typeof data === 'object';
                 break;
             case 'string':
                 test = typeof data === 'string' ||
@@ -25257,11 +25827,17 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     break;
                 }
                 break;
+            default:
+                test = options.modeSchema || typeof data === 'object';
+                break;
             }
-            throwError(!test && prefix + ' (' + (typeof data) +
-                ') is not a valid ' + schema.type + (schema.format
-                ? ' (' + schema.format + ')'
-                : ''));
+            local.throwSwaggerError(!test && {
+                data: data,
+                errorType: 'itemType',
+                prefix: options.prefix,
+                schema: schema,
+                typeof: typeof data
+            });
             tmp = typeof data;
             if (tmp === 'object' && Array.isArray(data)) {
                 tmp = 'array';
@@ -25271,35 +25847,63 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
             case 'number':
                 // 5.1.1. multipleOf
                 test = typeof schema.multipleOf !== 'number' || data % schema.multipleOf === 0;
-                throwError(!test && prefix + ' = ' + data + ' must be a multiple of ' +
-                    schema.multipleOf);
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'numberMultipleOf',
+                    prefix: options.prefix,
+                    schema: schema
+                });
                 // 5.1.2. maximum and exclusiveMaximum
                 test = typeof schema.maximum !== 'number' || (schema.exclusiveMaximum
                     ? data < schema.maximum
                     : data <= schema.maximum);
-                throwError(!test && prefix + ' = ' + data + ' must be ' + (schema.exclusiveMaximum
-                    ? '< '
-                    : '<= ') + schema.maximum);
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: schema.exclusiveMaximum
+                        ? 'numberExclusiveMaximum'
+                        : 'numberMaximum',
+                    prefix: options.prefix,
+                    schema: schema
+                });
                 // 5.1.3. minimum and exclusiveMinimum
                 test = typeof schema.minimum !== 'number' || (schema.exclusiveMinimum
                     ? data > schema.minimum
                     : data >= schema.minimum);
-                throwError(!test && prefix + ' = ' + data + ' must be ' + (schema.exclusiveMinimum
-                    ? '> '
-                    : '>= ') + schema.minimum);
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: schema.exclusiveMinimum
+                        ? 'numberExclusiveMinimum'
+                        : 'numberMinimum',
+                    prefix: options.prefix,
+                    schema: schema
+                });
                 break;
             // 5.2. Validation keywords for strings
             case 'string':
                 // 5.2.1. maxLength
                 test = typeof schema.maxLength !== 'number' || data.length <= schema.maxLength;
-                throwError(!test && prefix + ' must have <= ' + schema.maxLength + ' characters');
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'stringMaxLength',
+                    prefix: options.prefix,
+                    schema: schema
+                });
                 // 5.2.2. minLength
                 test = typeof schema.minLength !== 'number' || data.length >= schema.minLength;
-                throwError(!test && prefix + ' must have >= ' + schema.minLength + ' characters');
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'stringMinLength',
+                    prefix: options.prefix,
+                    schema: schema
+                });
                 // 5.2.3. pattern
                 test = !schema.pattern || new RegExp(schema.pattern).test(data);
-                throwError(!test && prefix + ' must match regex pattern ' +
-                    JSON.stringify(schema.pattern));
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'stringPattern',
+                    prefix: options.prefix,
+                    schema: schema
+                });
                 break;
             // 5.3. Validation keywords for arrays
             case 'array':
@@ -25311,40 +25915,70 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                         data: element,
                         dataReadonlyRemove: [dataReadonlyRemove2, ii, dataReadonlyRemove2[ii]],
                         modeSchema: options.modeSchema,
-                        prefix: prefix + '[' + ii + ']',
-                        schema: schema.items || schema.additionalItems,
+                        prefix: options.prefix.concat([ii]),
+                        schema: local.schemaPItems(schema) || schema.additionalItems,
                         swaggerJson: options.swaggerJson
                     });
                 });
                 // 5.3.2. maxItems
                 test = typeof schema.maxItems !== 'number' || data.length <= schema.maxItems;
-                throwError(!test && prefix + ' must have <= ' + schema.maxItems + ' items');
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'arrayMaxItems',
+                    prefix: options.prefix,
+                    schema: schema
+                });
                 // 5.3.3. minItems
                 test = typeof schema.minItems !== 'number' || data.length >= schema.minItems;
-                throwError(!test && prefix + ' must have >= ' + schema.minItems + ' items');
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'arrayMinItems',
+                    prefix: options.prefix,
+                    schema: schema
+                });
                 // 5.3.4. uniqueItems
                 test = !schema.uniqueItems || data.every(function (element) {
                     tmp = element;
                     return data.indexOf(element) === data.lastIndexOf(element);
                 });
-                throwError(!test && prefix + ' must have unique items (contains duplicate item ' +
-                    JSON.stringify(tmp) + ')');
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'arrayUniqueItems',
+                    prefix: options.prefix,
+                    schema: schema,
+                    tmp: tmp
+                });
                 break;
             // 5.4. Validation keywords for objects
             case 'object':
                 // 5.4.1. maxProperties
                 test = typeof schema.maxProperties !== 'number' ||
                     Object.keys(data).length <= schema.maxProperties;
-                throwError(!test && prefix + ' must have <= ' + schema.maxProperties + ' items');
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'objectMaxProperties',
+                    prefix: options.prefix,
+                    schema: schema
+                });
                 // 5.4.2. minProperties
                 test = typeof schema.minProperties !== 'number' ||
                     Object.keys(data).length >= schema.minProperties;
-                throwError(!test && prefix + ' must have >= ' + schema.minProperties + ' items');
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'objectMinProperties',
+                    prefix: options.prefix,
+                    schema: schema
+                });
                 // 5.4.3. required
                 local.normalizeValue('list', schema.required).forEach(function (key) {
                     test = !local.isNullOrUndefined(data[key]);
-                    throwError(!test && prefix + '[' + JSON.stringify(key) +
-                        "] - Schema properties specified as 'required' must be defined");
+                    local.throwSwaggerError(!test && {
+                        data: data,
+                        errorType: 'objectRequired',
+                        key: key,
+                        prefix: options.prefix,
+                        schema: schema
+                    });
                 });
                 // 5.4.4. additionalProperties, properties and patternProperties
                 Object.keys(data).forEach(function (key) {
@@ -25360,7 +25994,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                                 dataReadonlyRemove2[key]
                             ],
                             modeSchema: options.modeSchema,
-                            prefix: prefix + '[' + JSON.stringify(key) + ']',
+                            prefix: options.prefix.concat([key]),
                             schema: schema.properties[key],
                             swaggerJson: options.swaggerJson
                         });
@@ -25372,7 +26006,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                             local.validateBySwaggerSchema({
                                 data: data[key],
                                 modeSchema: options.modeSchema,
-                                prefix: prefix + '[' + JSON.stringify(key) + ']',
+                                prefix: options.prefix.concat([key]),
                                 schema: schema.patternProperties[rgx],
                                 swaggerJson: options.swaggerJson
                             });
@@ -25401,13 +26035,18 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
  * Validation of the instance succeeds if, after these two steps, set "s" is empty.
  */
                     test = tmp || schema.additionalProperties !== false;
-                    throwError(!test && prefix + ' cannot have additional property ' +
-                        JSON.stringify(key));
+                    local.throwSwaggerError(!test && {
+                        data: data,
+                        errorType: 'objectAdditionalProperties',
+                        key: key,
+                        prefix: options.prefix,
+                        schema: schema
+                    });
                     // recurse - schema.additionalProperties
                     local.validateBySwaggerSchema({
                         data: data[key],
                         modeSchema: options.modeSchema,
-                        prefix: prefix + '[' + JSON.stringify(key) + ']',
+                        prefix: options.prefix.concat([key]),
                         schema: schema.additionalProperties,
                         swaggerJson: options.swaggerJson
                     });
@@ -25422,29 +26061,40 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     local.validateBySwaggerSchema({
                         data: data[key],
                         modeSchema: options.modeSchema,
-                        prefix: prefix + '[' + JSON.stringify(key) + ']',
+                        prefix: options.prefix.concat([key]),
                         schema: schema.dependencies[key],
                         swaggerJson: options.swaggerJson
                     });
                     // 5.4.5.2.2. Property dependencies
                     local.normalizeValue('list', schema.dependencies[key]).every(function (key2) {
                         test = !local.isNullOrUndefined(data[key2]);
-                        throwError(!test && prefix + '[' + JSON.stringify(key) +
-                            '] is missing dependency ' + prefix + '[' + JSON.stringify(key2) + ']');
+                        local.throwSwaggerError(!test && {
+                            data: data,
+                            errorType: 'objectDependencies',
+                            key: key,
+                            key2: key2,
+                            prefix: options.prefix,
+                            schema: schema
+                        });
                     });
                 });
                 break;
             }
             // 5.5. Validation keywords for any instance type
             // 5.5.1. enum
-            tmp = schema.enum || (!options.modeSchema && schema.items && schema.items.enum);
+            tmp = schema.enum || (!options.modeSchema && (local.schemaPItems(schema) || {}).enum);
             test = !tmp || (Array.isArray(data)
                 ? data
                 : [data]).every(function (element) {
                 return tmp.indexOf(element) >= 0;
             });
-            throwError(!test && prefix + ' can only have items from the list ' +
-                JSON.stringify(tmp));
+            local.throwSwaggerError(!test && {
+                data: data,
+                errorType: 'itemEnum',
+                prefix: options.prefix,
+                schema: schema,
+                tmp: tmp
+            });
             // 5.5.2. type
             local.nop();
             // 5.5.3. allOf
@@ -25452,7 +26102,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 // recurse - schema.allOf
                 local.validateBySwaggerSchema({
                     data: data,
-                    prefix: prefix,
+                    prefix: options.prefix,
                     modeSchema: options.modeSchema,
                     schema: element,
                     swaggerJson: options.swaggerJson
@@ -25466,17 +26116,22 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     local.validateBySwaggerSchema({
                         data: data,
                         modeSchema: options.modeSchema,
-                        prefix: prefix,
+                        prefix: options.prefix,
                         schema: element,
                         swaggerJson: options.swaggerJson
                     });
                     return true;
                 }, local.nop);
-                tmp = tmp || local.utility2._debugTryCatchErrorCaught;
+                tmp = tmp || local.utility2._debugTryCatchError;
                 return !tmp;
             });
-            throwError(!test && tmp.message + ' (from schema.anyOf ' +
-                JSON.stringify(schema.anyOf) + ')');
+            local.throwSwaggerError(!test && {
+                data: data,
+                errorType: 'itemOneOf',
+                prefix: options.prefix,
+                schema: schema,
+                tmp: tmp
+            });
             // 5.5.5. oneOf
             tmp = !schema.oneOf
                 ? 1
@@ -25487,7 +26142,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                     local.validateBySwaggerSchema({
                         data: data,
                         modeSchema: options.modeSchema,
-                        prefix: prefix,
+                        prefix: options.prefix,
                         schema: element,
                         swaggerJson: options.swaggerJson
                     });
@@ -25496,23 +26151,31 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 return tmp > 1;
             });
             test = tmp === 1;
-            throwError(!test && prefix +
-                ' did not validate against exactly one schema (validated ' + tmp +
-                ') in schema.oneOf = ' + JSON.stringify(schema.oneOf));
+            local.throwSwaggerError(!test && {
+                data: data,
+                errorType: 'itemOneOf',
+                prefix: options.prefix,
+                schema: schema,
+                tmp: tmp
+            });
             // 5.5.6. not
             test = !schema.not || !local.tryCatchOnError(function () {
                 // recurse - schema.not
                 local.validateBySwaggerSchema({
                     data: data,
                     modeSchema: options.modeSchema,
-                    prefix: prefix,
+                    prefix: options.prefix,
                     schema: schema.not,
                     swaggerJson: options.swaggerJson
                 });
                 return true;
             }, local.nop);
-            throwError(!test && prefix + ' must not validate against schama.not = ' +
-                JSON.stringify(schema.not));
+            local.throwSwaggerError(!test && {
+                data: data,
+                errorType: 'itemNot',
+                prefix: options.prefix,
+                schema: schema
+            });
             // 5.5.7. definitions
             local.nop();
             // validate data.$ref
@@ -25520,7 +26183,7 @@ document.querySelector(".swggUiContainer > .header > .td2").value =\n\
                 local.validateBySwaggerSchema({
                     modeDereference: true,
                     modeSchema: options.modeSchema,
-                    prefix: prefix,
+                    prefix: options.prefix,
                     schema: data,
                     swaggerJson: options.swaggerJson
                 });

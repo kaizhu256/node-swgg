@@ -1022,6 +1022,7 @@
         /*
          * this function will test validateBySwaggerJson's default handling-behavior
          */
+            var error;
             // test default handling-behavior
             local.validateBySwaggerJson({ swaggerJson: {
                 info: { title: '', version: '' },
@@ -1032,51 +1033,72 @@
             // 5.4. Validation keywords for objects
             // 5.5. Validation keywords for any instance type
             [null, undefined, {}, {
-                // swagger-validate items-required-for-array-objects
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                type: 'array'
-            }, {
-                // test circularList-error handling-behavior
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { responses: { 200: { $ref: '#/x-test/aa' } } } } },
-                'x-test': { aa: { $ref: '#/x-test/aa' } },
-                swagger: '2.0'
-            }, {
-                // test $ref-error handling-behavior
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { responses: { 200: { $ref: 'undefined' } } } } },
-                swagger: '2.0'
-            }, {
                 // 5.4.4. additionalProperties, properties and patternProperties
                 aa: true,
                 info: { title: '', version: '' },
                 paths: { '/aa': { get: { responses: { 200: { description: '' } } } } },
-                swagger: '2.0'
+                swagger: '2.0',
+                'x-errorType': 'objectAdditionalProperties'
             }, {
                 // 5.4.5. dependencies
                 exclusiveMaximum: true,
                 info: { title: '', version: '' },
                 paths: { '/aa': { get: { responses: { 200: { description: '' } } } } },
-                swagger: '2.0'
+                swagger: '2.0',
+                'x-errorType': 'objectDependencies'
             }, {
                 // 5.5.5. oneOf
                 info: { title: '', version: '' },
                 paths: { '/aa': { get: { responses: { 200: { description: '' } } } } },
                 securityDefinitions: { aa: true },
-                swagger: '2.0'
+                swagger: '2.0',
+                'x-errorType': 'itemOneOf'
             }, {
                 // 5.5.6. not
                 info: { title: '', version: '' },
                 paths: { '/aa': { get: { responses: { 'x-': true } } } },
-                swagger: '2.0'
+                swagger: '2.0',
+                'x-errorType': 'itemNot'
+            }, {
+                // validate schemaDeference
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { responses: { 200: { $ref: 'undefined' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'schemaDeference'
+            }, {
+                // validate schemaDeferenceCircular
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { responses: { 200: { $ref: '#/x-test/aa' } } } } },
+                'x-test': { aa: { $ref: '#/x-test/aa' } },
+                swagger: '2.0',
+                'x-errorType': 'schemaDeferenceCircular'
+            }, {
+                // validate semanticRequiredArrayItems
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                type: 'array',
+                'x-errorType': 'semanticRequiredArrayItems'
+            }, {
+                // validate semanticUniqueOperationId
+                info: { title: '', version: '' },
+                paths: {
+                    '/aa': { get: { operationId: 'aa', responses: { 200: { description: '' } } } },
+                    '/bb': { get: { operationId: 'aa', responses: { 200: { description: '' } } } }
+                },
+                swagger: '2.0',
+                'x-errorType': 'semanticUniqueOperationId'
             }].forEach(function (element) {
                 local.tryCatchOnError(function () {
                     local.validateBySwaggerJson({ swaggerJson: element });
                 }, local.nop);
+                error = local.utility2._debugTryCatchError;
                 // validate error occurred
-                local.assert(local.utility2._debugTryCatchErrorCaught, element);
+                local.assert(error, element);
+                // validate x-errorType
+                if (element && element['x-errorType']) {
+                    local.assertJsonEqual(element['x-errorType'], error.options.errorType);
+                }
             });
             onError(null, options);
         };
@@ -1089,11 +1111,15 @@
             onParallel = local.onParallel(onError);
             onParallel.counter += 1;
             Object.keys(local.apiDict).forEach(function (key) {
-                if (key.indexOf('x-test.parameters') < 0) {
+                if (key.indexOf('operationId.x-test.parameters') < 0) {
                     return;
                 }
                 onParallel.counter += 1;
-                local.apiDict[key].ajax({}, function (error, data) {
+                local.apiDict[key].ajax({
+                    paramDict: key === 'operationId.x-test.parametersStringInBodyRequired'
+                        ? { body: 'aa' }
+                        : undefined
+                }, function (error, data) {
                     // validate no error occurred
                     local.assert(!error, error);
                     // validate data
@@ -1115,36 +1141,39 @@
             [
                 // 5.1. Validation keywords for numeric instances (number and integer)
                 // 5.1.1. multipleOf
-                { typeInteger1: 1 },
+                { typeInteger1: 1, 'x-errorType': 'numberMultipleOf' },
                 // 5.1.2. maximum and exclusiveMaximum - maximum
-                { typeInteger1: 10 },
+                { typeInteger1: 10, 'x-errorType': 'numberMaximum' },
                 // 5.1.2. maximum and exclusiveMaximum - exclusiveMaximum
-                { typeInteger2: 10 },
+                { typeInteger2: 10, 'x-errorType': 'numberExclusiveMaximum' },
                 // 5.1.3. minimum and exclusiveMinimum - minimum
-                { typeInteger1: -10 },
+                { typeInteger1: -10, 'x-errorType': 'numberMinimum' },
                 // 5.1.3. minimum and exclusiveMinimum - exclusiveMinimum
-                { typeInteger2: -10 },
+                { typeInteger2: -10, 'x-errorType': 'numberExclusiveMinimum' },
                 // 5.2. Validation keywords for strings
                 // 5.2.1. maxLength
-                { typeString1: '01234567890123456789' },
+                { typeString1: '01234567890123456789', 'x-errorType': 'stringMaxLength' },
                 // 5.2.2. minLength
-                { typeString1: '' },
+                { typeString1: '', 'x-errorType': 'stringMinLength' },
                 // 5.2.3. pattern
-                { typeString1: '0123456789012345~' },
+                { typeString1: '0123456789012345~', 'x-errorType': 'stringPattern' },
                 // 5.3. Validation keywords for arrays
                 // 5.3.2. maxItems
-                { typeArrayItemsNumber2: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+                {
+                    typeArrayItemsNumber2: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                    'x-errorType': 'arrayMaxItems'
+                },
                 // 5.3.2. minItems
-                { typeArrayItemsNumber2: [] },
+                { typeArrayItemsNumber2: [], 'x-errorType': 'arrayMinItems' },
                 // 5.3.4. uniqueItems
-                { typeArrayItemsNumber2: [0, 0] },
+                { typeArrayItemsNumber2: [0, 0], 'x-errorType': 'arrayUniqueItems' },
                 // 5.5. Validation keywords for any instance type
                 // 5.5.1. enum
-                { typeNumberEnum: 0 },
-                // 5.5.2. type - type
-                { typeString0: true },
+                { typeNumberEnum: 0, 'x-errorType': 'itemEnum' },
+                // 5.5.2. type - string
+                { typeString0: true, 'x-errorType': 'itemType' },
                 // 5.5.2. type - byte
-                { typeStringFormatByte: '~' }
+                { typeStringFormatByte: '~', 'x-errorType': 'itemType' }
                 // 5.5.3. allOf
                 // 5.5.4. anyOf
                 // 5.5.5. oneOf
@@ -1152,7 +1181,7 @@
                 // 5.5.6. not
                 // testCase_validateBySwaggerJson_default
                 // 5.5.7. definitions
-            ].forEach(function (paramDict) {
+            ].forEach(function (paramDict, ii) {
                 onParallel.counter += 1;
                 local.apiDict['operationId.x-test.parametersDefault'].ajax({
                     paramDict: local.jsonCopy(paramDict)
@@ -1161,6 +1190,10 @@
                     local.assert(error, JSON.stringify(paramDict));
                     // validate statusCode
                     local.assertJsonEqual(error.statusCode, 400);
+                    // validate x-errorType
+                    local.assertJsonEqual(paramDict['x-errorType'], error.options.errorType);
+                    // debug error.message
+                    console.error(ii, error.message);
                     onParallel(null, options);
                 });
             });
@@ -1170,19 +1203,20 @@
                 { body: {
                     typeBooleanRequired: true,
                     typeObjectMisc: { aa: 1, bb: 2, cc: 3, dd: 4, de: 5, ff: 6 }
-                } },
+
+                }, 'x-errorType': 'objectMaxProperties' },
                 // 5.4.2. minProperties
                 { body: {
                     typeBooleanRequired: true,
                     typeObjectMisc: {}
-                } },
+                }, 'x-errorType': 'objectMinProperties' },
                 // 5.4.3. required
-                { body: {} }
+                { body: {}, 'x-errorType': 'objectRequired' }
                 // 5.4.4. additionalProperties, properties and patternProperties
                 // testCase_validateBySwaggerJson_default
                 // 5.4.5. dependencies
                 // testCase_validateBySwaggerJson_default
-            ].forEach(function (paramDict) {
+            ].forEach(function (paramDict, ii) {
                 onParallel.counter += 1;
                 local.apiDict['operationId.x-test.parametersObjectInBody'].ajax({
                     paramDict: local.jsonCopy(paramDict)
@@ -1191,6 +1225,10 @@
                     local.assert(error, JSON.stringify(paramDict));
                     // validate statusCode
                     local.assertJsonEqual(error.statusCode, 400);
+                    // validate x-errorType
+                    local.assertJsonEqual(paramDict['x-errorType'], error.options.errorType);
+                    // debug error.message
+                    console.error(ii, error.message);
                     onParallel(null, options);
                 });
             });
@@ -1228,59 +1266,81 @@
             // test null-case handling-behavior
             options.data = local.uiNotify();
             // validate no error occurred
-            local.assert(!options.data.classList.contains('error'), options.data.classList);
+            local.assert(
+                !options.data.classList.contains('styleBorderError'),
+                options.data.classList
+            );
             // test error handling-behavior
             options.data = local.uiNotify(local.errorDefault);
             // validate error occurred
-            local.assert(options.data.classList.contains('error'), options.data.classList);
+            local.assert(
+                options.data.classList.contains('styleBorderError'),
+                options.data.classList
+            );
             onError(null, options);
         };
 
-        local.testCase_ui_default = function (options, onError) {
+        local.testCase_ui_apiKey = function (options, onError) {
         /*
-         * this function will test ui's default handling-behavior
+         * this function will test ui's apiKey handling-behavior
+         */
+            localStorage.setItem('utility2_swgg_apiKeyKey_', '');
+            local.uiEventListenerDict['.onEventUiReload']({
+                swggInit: true,
+                target2: { id: 'swggApiKeyInput1' },
+                type: 'keyup'
+            });
+            onError(null, options);
+        };
+
+        local.testCase_ui_click = function (options, onError) {
+        /*
+         * this function will test ui's click handling-behavior
          */
             var onParallel;
             onParallel = local.onParallel(function (error) {
                 setTimeout(function () {
                     // reset location.hash
-                    document.querySelector('#swgg_id_pet .td1').click();
+                    document.querySelector('#swgg_id_pet_1 .td1').click();
                     onError(error);
                 }, 1000);
             });
             onParallel.counter += 1;
-            // init localStorage
-            localStorage.setItem('testCase_ui_default', '');
-            localStorage.setItem('utility2_swgg_apiKeyKey_', '');
+            options = {};
             // test click handling-behavior
-            options = Object.keys(local.uiEventListenerDict).sort();
-            options.forEach(function (selector) {
-                Array.from(
-                    document.querySelectorAll(selector)
-                ).forEach(function (element, ii, list) {
-                    [null, null].forEach(function () {
-                        onParallel.counter += 1;
-                        setTimeout(function () {
+            Object.keys(local.uiEventListenerDict).sort().forEach(function (selector) {
+                Array.from(document.querySelectorAll(selector)).forEach(function (
+                    element,
+                    ii,
+                    list
+                ) {
+                    onParallel.counter += 1;
+                    setTimeout(function () {
+                        element.click();
+                        // test duplicate-click handling-behavior
+                        if (ii < 10) {
                             element.click();
-                            onParallel();
-                        }, ii * 1000 / list.length);
-                    });
+                        }
+                        onParallel();
+                    }, ii * 1000 / list.length);
                 });
             });
             // test empty-input handling-behavior
-            document.querySelector('#swgg_id_typeString0 .input').value = '';
+            options.element = document.querySelector('#swgg_id_typeNumber0_1 .input');
+            options.element.value = '';
+            options.element.closest('.operation').querySelector('.onEventOperationAjax').click();
             // test onEventOperationAjax's error handling-behavior
-            document.querySelector('#swgg_id_typeNumber0 .input').value = 'syntax error';
-            document.querySelector('#swgg_id_x_test_parametersDefault .onEventOperationAjax')
-                .click();
-            // test onEventUiReload's key handling-behavior
-            onParallel.counter += 1;
-            local.uiEventListenerDict['.onEventUiReload']({
-                swggInit: true,
-                target: { id: 'swggApiKeyInput1' },
-                type: 'keyup'
-            });
-            onParallel();
+            options.element.value = 'syntax error';
+            options.element.closest('.operation').querySelector('.onEventOperationAjax').click();
+            // test onEventInputTextareaChange's empty-value handling-behavior
+            options.element = document.querySelector('.schemaP textarea');
+            options.element.value = '';
+            local.uiEventListenerDict['.onEventInputTextareaChange']({ target2: options.element });
+            options.element.closest('.operation').querySelector('.onEventOperationAjax').click();
+            // test onEventInputTextareaChange's non-empty-value handling-behavior
+            options.element.value = '{}';
+            local.uiEventListenerDict['.onEventInputTextareaChange']({ target2: options.element });
+            options.element.closest('.operation').querySelector('.onEventOperationAjax').click();
             onParallel(null, options);
         };
 
@@ -1294,9 +1354,28 @@
                 'testCase_ui_fileMedia_videoNull'
             ];
             options.forEach(function (id) {
-                document.querySelector('#swgg_id_file_fileGetOneById_id_id .input').value = id;
-                document.querySelector('#swgg_id_file_fileGetOneById_id_id .onEventOperationAjax')
-                    .click();
+                document.querySelector('#swgg_id_file_fileGetOneById_id_id_1 .input').value = id;
+                document.querySelector(
+                    '#swgg_id_file_fileGetOneById_id_id_1 .onEventOperationAjax'
+                ).click();
+            });
+            onError(null, options);
+        };
+
+        local.testCase_ui_keyup = function (options, onError) {
+        /*
+         * this function will test ui's keyup handling-behavior
+         */
+            Object.keys(local.uiEventListenerDict).concat(['input']).sort().forEach(function (
+                selector
+            ) {
+                local.uiEventDelegate({
+                    currentTarget: document.querySelector('.resource'),
+                    preventDefault: local.nop,
+                    stopPropagation: local.nop,
+                    target: document.querySelector(selector),
+                    type: 'keyup'
+                });
             });
             onError(null, options);
         };
@@ -1307,12 +1386,14 @@
 
     // run shared js-env code - init-after
     (function () {
+        // test apiUpdate's null-case handling-behavior
+        local.apiUpdate();
         // test apiUpdate's root-basePath handling-behavior
         local.apiUpdate({ basePath: '/' });
         local.assertJsonEqual(local.swaggerJsonBasePath, '');
-        // test apiUpdate's $SWGG_TAGS0_FILTER handling-behavior
+        // test apiUpdate's $npm_package_swggTags0 handling-behavior
         local.testMock([
-            [local.env, { SWGG_TAGS0_FILTER: 'x-test-tags0-filter' }]
+            [local.env, { npm_package_swggTags0: 'x-test-tags0-filter' }]
         ], function (onError) {
             local.apiUpdate({
                 definitions: { Aa: {}, Bb: { 'x-swgg-tags0': 'undefined' } },
@@ -1321,7 +1402,8 @@
                     '/x-test/tags0Filter': { get: { tags: ['x-test'] } },
                     '/x-test/tags0FilterUndefined': { get: { 'x-swgg-tags0': 'undefined' } }
                 },
-                tags: [{}, { 'x-swgg-tags0': 'undefined' }]
+                tags: [{ 'x-swgg-tags0': 'undefined' }],
+                'x-swgg-tags0-override': {}
             });
             onError();
         }, local.onErrorThrow);
@@ -1365,6 +1447,15 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
                     "maxProperties": 5,
                     "minProperties": 1,
                     "type": "object"
+                },
+                "typeArrayCircularReference": {
+                    "items": {
+                        "$ref": "#/definitions/TestMisc"
+                    },
+                    "type": "array"
+                },
+                "typeObjectCircularReference": {
+                    "$ref": "#/definitions/TestMisc"
                 }
             },
             "required": [
@@ -1385,7 +1476,7 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
         }
     },
     "info": {
-        "x-swgg-urlApp": "http://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js"
+        "x-swgg-downloadStandaloneApp": "http://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js"
     },
     "parameters": {
         "typeArrayItemsBoolean1": {
@@ -1412,14 +1503,6 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
             },
             "name": "typeArrayItemsInteger1",
             "required": true,
-            "type": "array"
-        },
-        "typeArrayItemsNumber0": {
-            "in": "query",
-            "items": {
-                "type": "number"
-            },
-            "name": "typeArrayItemsNumber0",
             "type": "array"
         },
         "typeArrayItemsNumber1": {
@@ -1451,34 +1534,6 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
             "type": "array",
             "uniqueItems": true
         },
-        "typeArrayItemsNumberCollectionFormatCsv": {
-            "collectionFormat": "csv",
-            "default": [
-                0.5,
-                1.5
-            ],
-            "in": "query",
-            "items": {
-                "type": "number"
-            },
-            "name": "typeArrayItemsNumberCollectionFormatCsv",
-            "required": true,
-            "type": "array"
-        },
-        "typeArrayItemsNumberCollectionFormatJson": {
-            "default": [
-                0.5,
-                1.5
-            ],
-            "in": "query",
-            "items": {
-                "type": "number"
-            },
-            "name": "typeArrayItemsNumberCollectionFormatJson",
-            "required": true,
-            "type": "array",
-            "x-swgg-collectionFormat": "json"
-        },
         "typeArrayItemsNumberCollectionFormatMultiInFormData": {
             "collectionFormat": "multi",
             "default": [
@@ -1493,63 +1548,12 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
             "required": true,
             "type": "array"
         },
-        "typeArrayItemsNumberCollectionFormatPipes": {
-            "collectionFormat": "pipes",
-            "default": [
-                0.5,
-                1.5
-            ],
+        "typeArrayItemsString0": {
             "in": "query",
             "items": {
-                "type": "number"
+                "type": "string"
             },
-            "name": "typeArrayItemsNumberCollectionFormatPipes",
-            "required": true,
-            "type": "array"
-        },
-        "typeArrayItemsNumberCollectionFormatSsv": {
-            "collectionFormat": "ssv",
-            "default": [
-                0.5,
-                1.5
-            ],
-            "in": "query",
-            "items": {
-                "type": "number"
-            },
-            "name": "typeArrayItemsNumberCollectionFormatSsv",
-            "required": true,
-            "type": "array"
-        },
-        "typeArrayItemsNumberCollectionFormatTsv": {
-            "collectionFormat": "tsv",
-            "default": [
-                0.5,
-                1.5
-            ],
-            "in": "query",
-            "items": {
-                "type": "number"
-            },
-            "name": "typeArrayItemsNumberCollectionFormatTsv",
-            "required": true,
-            "type": "array"
-        },
-        "typeArrayItemsNumberEnum": {
-            "default": [
-                0.5,
-                1.5
-            ],
-            "enum": [
-                0.5,
-                1.5
-            ],
-            "in": "query",
-            "items": {
-                "type": "number"
-            },
-            "name": "typeArrayItemsNumberEnum",
-            "required": true,
+            "name": "typeArrayItemsString0",
             "type": "array"
         },
         "typeArrayItemsString1": {
@@ -1565,8 +1569,8 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
             "required": true,
             "type": "array"
         },
-        "typeArrayItemsStringCollectionFormatMulti": {
-            "collectionFormat": "multi",
+        "typeArrayItemsStringCollectionFormatCsv": {
+            "collectionFormat": "csv",
             "default": [
                 "aa",
                 "bb"
@@ -1575,7 +1579,94 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
             "items": {
                 "type": "string"
             },
-            "name": "typeArrayItemsStringCollectionFormatMulti",
+            "name": "typeArrayItemsStringCollectionFormatCsv",
+            "required": true,
+            "type": "array"
+        },
+        "typeArrayItemsStringCollectionFormatJson": {
+            "default": [
+                "aa",
+                "bb"
+            ],
+            "in": "query",
+            "items": {
+                "type": "string"
+            },
+            "name": "typeArrayItemsStringCollectionFormatJson",
+            "required": true,
+            "type": "array",
+            "x-swgg-collectionFormat": "json"
+        },
+        "typeArrayItemsStringCollectionFormatMultiInFormData": {
+            "collectionFormat": "multi",
+            "default": [
+                "aa",
+                "bb"
+            ],
+            "in": "formData",
+            "items": {
+                "type": "string"
+            },
+            "name": "typeArrayItemsStringCollectionFormatMultiInFormData",
+            "required": true,
+            "type": "array"
+        },
+        "typeArrayItemsStringCollectionFormatPipes": {
+            "collectionFormat": "pipes",
+            "default": [
+                "aa",
+                "bb"
+            ],
+            "in": "query",
+            "items": {
+                "type": "string"
+            },
+            "name": "typeArrayItemsStringCollectionFormatPipes",
+            "required": true,
+            "type": "array"
+        },
+        "typeArrayItemsStringCollectionFormatSsv": {
+            "collectionFormat": "ssv",
+            "default": [
+                "aa",
+                "bb"
+            ],
+            "in": "query",
+            "items": {
+                "type": "string"
+            },
+            "name": "typeArrayItemsStringCollectionFormatSsv",
+            "required": true,
+            "type": "array"
+        },
+        "typeArrayItemsStringCollectionFormatTsv": {
+            "collectionFormat": "tsv",
+            "default": [
+                "aa",
+                "bb"
+            ],
+            "in": "query",
+            "items": {
+                "type": "string"
+            },
+            "name": "typeArrayItemsStringCollectionFormatTsv",
+            "required": true,
+            "type": "array"
+        },
+        "typeArrayItemsStringEnum": {
+            "default": [
+                "aa",
+                "bb"
+            ],
+            "enum": [
+                "aa",
+                "bb"
+            ],
+            "in": "query",
+            "items": {
+                "type": "string"
+            },
+            "name": "typeArrayItemsStringEnum",
             "required": true,
             "type": "array"
         },
@@ -1685,7 +1776,8 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
         },
         "typeStringFormatBinary": {
             "default": [
-                0
+                0,
+                1
             ],
             "format": "binary",
             "in": "query",
@@ -1704,6 +1796,13 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
             "format": "date",
             "in": "query",
             "name": "typeStringFormatDate",
+            "type": "string"
+        },
+        "typeStringFormatDateTime": {
+            "default": "1970-01-01T00:00:00.000Z",
+            "format": "date-time",
+            "in": "query",
+            "name": "typeStringFormatDateTime",
             "type": "string"
         },
         "typeStringFormatEmail": {
@@ -1811,9 +1910,6 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
         },
         "/x-test/parametersStringInBody": {
             "post": {
-                "consumes": [
-                    "application/x-www-form-urlencoded"
-                ],
                 "operationId": "x-test.parametersStringInBody",
                 "parameters": [
                     {
@@ -1825,6 +1921,25 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
                     }
                 ],
                 "summary": "test parameters' string-in-body handling-behavior",
+                "tags": [
+                    "x-test"
+                ]
+            }
+        },
+        "/x-test/parametersStringInBodyRequired": {
+            "post": {
+                "operationId": "x-test.parametersStringInBodyRequired",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "summary": "test parameters' string-in-body-required handling-behavior",
                 "tags": [
                     "x-test"
                 ]
@@ -1960,6 +2075,7 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
             case 'x-test.parametersDefault':
             case 'x-test.parametersObjectInBody':
             case 'x-test.parametersStringInBody':
+            case 'x-test.parametersStringInBodyRequired':
                 // test redundant onErrorJsonapi handling-behavior
                 local.serverRespondJsonapi(request, response, null, request.swgg.paramDict);
                 break;
@@ -1969,6 +2085,8 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
             }
         });
         // init db
+        // test dbRowRandomCreate's null-case handling-behavior
+        local.dbRowRandomCreate();
         local.dbSeedTestList = [{
             // test dbRowListRandomCreate's default handling-behavior
             dbRowList: local.dbRowListRandomCreate({
@@ -1992,7 +2110,7 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
                         id: 'testCase_dbRowListRandomCreate_' + (options.ii + 100)
                     };
                 },
-                properties: local.swaggerJson.definitions.TestCrud.properties
+                schema: { properties: local.swaggerJson.definitions.TestCrud.properties }
             }),
             idIndexCreateList: [{
                 name: 'id'
