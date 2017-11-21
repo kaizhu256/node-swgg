@@ -58,10 +58,8 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
-- allow function dbRowListRandomCreate to recurse objects and stop with modeSubdoc flag
-- update ui to show required attribute only in 'name and desscription' section
+- add hmacSha256 support for wechat-pay
 - add validators from https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation/semantic-validators/validators/items-required-for-array-objects.js
-- add xml support for wechat
 - add property parameters.x-swgg-persist to persist to localStorage
 - revamp datatable with card-expansion ui
 - datatable - allow optional sub-level input for swagger-models
@@ -72,22 +70,15 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2017.11.15
-- npm publish 2017.11.15
-- add env tags filter \$npm_package_swggTags0
-- add function assertSwaggerValidate
+#### changelog for v2017.11.20
+- npm publish 2017.11.20
+- add param operation['x-swgg-consumes0'], operation['x-swgg-notRequired'], and operation['x-swgg-required']
+- add operation['x-swgg-consumes0'] = 'application/xml' support for wechat-pay
 - allow function dbRowListRandomCreate to recurse objects and stop with modeSubdoc flag
-- function templateRender - default to htmlSafe and override with flag notHtmlSafe
-- ui - add cross-browser multiline placeholder support for textarea
-- ui - add dynamic input validation
-- ui - include resource description from header in operationList
-- ui - merge template templateUiResponseAjax into templateUiOperation
-- ui - select pre-text when clicked
-- ui - truncate resource long-descriptions
-- ui - remove eventListeners in operation-div (and rely on resource-ui eventListeners)
-- rename function uiRender -> uiRenderAll
-- rename property x-swgg-urlApp -> x-swgg-downloadStandaloneApp
-- update function normalizeSwaggerJson to override swaggerJson with x-swgg-tags0-override
+- disable submit-button on input-validation-error
+- fix in.body parameter not showing validation-error-message
+- update ui to show required attribute only in 'name and desscription' section
+- use textarea for string (json)
 - none
 
 #### this package requires
@@ -980,7 +971,7 @@ utility2-comment -->\n\
         "start": "PORT=${PORT:-8080} utility2 start test.js",
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2017.11.15"
+    "version": "2017.11.20"
 }
 ```
 

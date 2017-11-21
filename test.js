@@ -1110,16 +1110,20 @@
             var onParallel;
             onParallel = local.onParallel(onError);
             onParallel.counter += 1;
+            options = {};
             Object.keys(local.apiDict).forEach(function (key) {
                 if (key.indexOf('operationId.x-test.parameters') < 0) {
                     return;
                 }
+                // test null-case handling-behavior
                 onParallel.counter += 1;
-                local.apiDict[key].ajax({
-                    paramDict: key === 'operationId.x-test.parametersStringInBodyRequired'
-                        ? { body: 'aa' }
-                        : undefined
-                }, function (error, data) {
+                local.apiDict[key].ajax({}, function (error, data) {
+                    // validate no error occurred
+                    local.assert(!error, data);
+                    onParallel(null, options);
+                });
+                onParallel.counter += 1;
+                local.apiDict[key].ajax({ modeDefault: true }, function (error, data) {
                     // validate no error occurred
                     local.assert(!error, error);
                     // validate data
@@ -1200,18 +1204,18 @@
             [
                 // 5.4. Validation keywords for objects
                 // 5.4.1. maxProperties
-                { body: {
+                { typeObjectInBody: {
                     typeBooleanRequired: true,
                     typeObjectMisc: { aa: 1, bb: 2, cc: 3, dd: 4, de: 5, ff: 6 }
 
                 }, 'x-errorType': 'objectMaxProperties' },
                 // 5.4.2. minProperties
-                { body: {
+                { typeObjectInBody: {
                     typeBooleanRequired: true,
                     typeObjectMisc: {}
                 }, 'x-errorType': 'objectMinProperties' },
                 // 5.4.3. required
-                { body: {}, 'x-errorType': 'objectRequired' }
+                { typeObjectInBody: {}, 'x-errorType': 'objectRequired' }
                 // 5.4.4. additionalProperties, properties and patternProperties
                 // testCase_validateBySwaggerJson_default
                 // 5.4.5. dependencies
@@ -1267,14 +1271,14 @@
             options.data = local.uiNotify();
             // validate no error occurred
             local.assert(
-                !options.data.classList.contains('styleBorderError'),
+                !options.data.classList.contains('hasError'),
                 options.data.classList
             );
             // test error handling-behavior
             options.data = local.uiNotify(local.errorDefault);
             // validate error occurred
             local.assert(
-                options.data.classList.contains('styleBorderError'),
+                options.data.classList.contains('hasError'),
                 options.data.classList
             );
             onError(null, options);
@@ -1440,22 +1444,22 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
         },
         "TestMisc": {
             "properties": {
-                "typeBooleanRequired": {
-                    "$ref": "#/parameters/typeBooleanRequired"
-                },
-                "typeObjectMisc": {
-                    "maxProperties": 5,
-                    "minProperties": 1,
-                    "type": "object"
-                },
                 "typeArrayCircularReference": {
                     "items": {
                         "$ref": "#/definitions/TestMisc"
                     },
                     "type": "array"
                 },
+                "typeBooleanRequired": {
+                    "$ref": "#/parameters/typeBooleanRequired"
+                },
                 "typeObjectCircularReference": {
                     "$ref": "#/definitions/TestMisc"
+                },
+                "typeObjectMisc": {
+                    "maxProperties": 5,
+                    "minProperties": 1,
+                    "type": "object"
                 }
             },
             "required": [
@@ -1886,7 +1890,49 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
                 "summary": "test parameters' default handling-behavior",
                 "tags": [
                     "x-test"
+                ],
+                "x-swgg-required": [
+                    "typeBooleanRequired"
                 ]
+            }
+        },
+        "/x-test/parametersDefaultInFormDataXml": {
+            "post": {
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "operationId": "x-test.parametersDefaultInFormDataXml",
+                "parameters": [
+                    {
+                        "default": false,
+                        "in": "formData",
+                        "name": "typeBoolean0",
+                        "type": "boolean"
+                    },
+                    {
+                        "default": 0,
+                        "in": "formData",
+                        "name": "typeInteger0",
+                        "type": "integer"
+                    },
+                    {
+                        "default": 0,
+                        "in": "formData",
+                        "name": "typeNumber0",
+                        "type": "number"
+                    },
+                    {
+                        "default": "aa",
+                        "in": "formData",
+                        "name": "typeString0",
+                        "type": "string"
+                    }
+                ],
+                "summary": "test parameters' string-in-body-required handling-behavior",
+                "tags": [
+                    "x-test"
+                ],
+                "x-swgg-consumes0": "application/xml"
             }
         },
         "/x-test/parametersObjectInBody": {
@@ -1896,13 +1942,13 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
                     {
                         "description": "TestMisc object",
                         "in": "body",
-                        "name": "body",
+                        "name": "typeObjectInBody",
                         "schema": {
                             "$ref": "#/definitions/TestMisc"
                         }
                     }
                 ],
-                "summary": "test parameters' array-in-body handling-behavior",
+                "summary": "test parameters' object-in-body handling-behavior",
                 "tags": [
                     "x-test"
                 ]
@@ -1914,7 +1960,7 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
                 "parameters": [
                     {
                         "in": "body",
-                        "name": "body",
+                        "name": "typeStringInBody",
                         "schema": {
                             "type": "string"
                         }
@@ -1932,7 +1978,7 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
                 "parameters": [
                     {
                         "in": "body",
-                        "name": "body",
+                        "name": "typeStringInBodyRequired",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -2073,6 +2119,7 @@ local.assetsDict['/assets.swgg.swagger.test.json'] =
                 );
                 break;
             case 'x-test.parametersDefault':
+            case 'x-test.parametersDefaultInFormDataXml':
             case 'x-test.parametersObjectInBody':
             case 'x-test.parametersStringInBody':
             case 'x-test.parametersStringInBodyRequired':
