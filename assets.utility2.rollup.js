@@ -2862,6 +2862,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             });
             // upsert dbRow
             self.crudSetManyById(options.dbRowList);
+            // restore dbTable from persistent-storage
             self.isLoaded = self.isLoaded || options.isLoaded;
             if (!self.isLoaded) {
                 local.storageGetItem('dbTable.' + self.name + '.json', function (error, data) {
@@ -4088,11 +4089,10 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 file = file
                     .replace((/\bhtml\b/g), 'x-istanbul-html')
                     .replace((/<style>[\S\s]+?<\/style>/), function (match0) {
-                        return match0
-                            .replace((/\S.*?\{/g), function (match0) {
-                                return 'x-istanbul-html ' + match0
-                                    .replace((/,/g), ', x-istanbul-html ');
-                            });
+                        return match0.replace((/\S.*?\{/g), function (match0) {
+                            return 'x-istanbul-html ' +
+                                match0.replace((/,/g), ', x-istanbul-html ');
+                        });
                     })
                     .replace('position: fixed;', 'position: static;')
                     .replace('margin-top: 170px;', 'margin-top: 10px;');
@@ -4202,8 +4202,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             local.coverageReportHtml = '';
             local.coverageReportHtml += '<div class="coverageReportDiv">\n' +
                 '<h1>coverage-report</h1>\n' +
-                '<div ' +
-                'style="background: #fff; border: 1px solid #000; margin 0; padding: 0;">\n';
+                '<div style="background: #fff; border: 1px solid #000; margin 0; padding: 0;">\n';
             local.writerData = '';
             options.sourceStore = {};
             options.writer = local.writer;
@@ -4231,10 +4230,11 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                         // edit coverage badge percent
                         .replace((/100.0/g), options.pct)
                         // edit coverage badge color
-                        .replace((/0d0/g), ('0' + Math.round((100 - options.pct) * 2.21)
-                            .toString(16)).slice(-2) +
-                            ('0' + Math.round(options.pct * 2.21).toString(16)).slice(-2) +
-                            '00')
+                        .replace(
+                            (/0d0/g),
+                            ('0' + Math.round((100 - options.pct) * 2.21).toString(16)).slice(-2) +
+                                ('0' + Math.round(options.pct * 2.21).toString(16)).slice(-2) + '00'
+                        )
                 );
             }
             console.log('created coverage file ' + options.dir + '/index.html');
@@ -6521,11 +6521,11 @@ local.templateCoverageBadgeSvg =
             // add coverage hook to require
             local._istanbul_moduleExtensionsJs = local._istanbul_module._extensions['.js'];
             local._istanbul_module._extensions['.js'] = function (module, file) {
-                if (typeof file === 'string' &&
-                        (file.indexOf(process.env.npm_config_mode_coverage_dir) === 0 || (
-                            file.indexOf(process.cwd()) === 0 &&
-                            file.indexOf(process.cwd() + '/node_modules/') !== 0
-                        ))) {
+                if (typeof file === 'string' && (
+                        file.indexOf(process.env.npm_config_mode_coverage_dir) === 0 ||
+                        (file.indexOf(process.cwd()) === 0 &&
+                            file.indexOf(process.cwd() + '/node_modules/') !== 0)
+                    )) {
                     module._compile(local.instrumentInPackage(
                         local.fs.readFileSync(file, 'utf8'),
                         file
@@ -14575,7 +14575,6 @@ local.assetsDict['/assets.index.template.html'] = '\
 <title>{{env.npm_package_name}} (v{{env.npm_package_version}})</title>\n\
 <style>\n\
 /*csslint\n\
-    box-model: false,\n\
     box-sizing: false,\n\
     universal-selector: false\n\
 */\n\
@@ -14628,16 +14627,6 @@ button {\n\
     0% { transform: rotate(0deg); }\n\
     100% { transform: rotate(360deg); }\n\
 }\n\
-.uiAnimateSpin {\n\
-    animation: uiAnimateSpin 2s linear infinite;\n\
-    border: 6px solid #999;\n\
-    border-radius: 50%;\n\
-    border-top: 8px solid #7d7;\n\
-    display: inline-block;\n\
-    height: 25px;\n\
-    vertical-align: middle;\n\
-    width: 25px;\n\
-}\n\
 .utility2FooterDiv {\n\
     text-align: center;\n\
 }\n\
@@ -14664,6 +14653,7 @@ textarea[readonly] {\n\
 </head>\n\
 <body>\n\
 <div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%; z-index: 1;"></div>\n\
+<div class="uiAnimateSpin" style="animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: none; height: 25px; vertical-align: middle; width: 25px;"></div>\n\
 <script>\n\
 /*jslint\n\
     bitwise: true,\n\
@@ -15088,7 +15078,7 @@ local.assetsDict['/assets.readme.template.md'] = '\
 the greatest app in the world!\n\
 \n\
 # live web demo\n\
-- [https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app/](https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app)\n\
+- [https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app](https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app)\n\
 \n\
 [![screenshot](https://kaizhu256.github.io/node-jslint-lite/build/screenshot.deployGithub.browser.%252Fnode-jslint-lite%252Fbuild%252Fapp.png)](https://kaizhu256.github.io/node-jslint-lite/build..beta..travis-ci.org/app)\n\
 \n\
@@ -17848,10 +17838,8 @@ return Utf8ArrayToStr(bff);
             });
             options.customize();
             // customize shDeployCustom
-            if (options.dataFrom.indexOf(' shDeployCustom\n') >= 0) {
+            if (options.dataFrom.indexOf('    shDeployCustom\n') >= 0) {
                 [
-                    // customize test-server
-                    (/\n\| git-branch : \|[\S\s]*?\n\| test-report : \|/),
                     // customize quickstart
                     (/\n#### changelog [\S\s]*\n# quickstart example.js\n/),
                     options.dataFrom.indexOf('"assets.index.default.template.html"') < 0 &&
@@ -17863,9 +17851,26 @@ return Utf8ArrayToStr(bff);
                 });
                 // customize screenshot
                 options.dataTo = options.dataTo.replace(new RegExp('^1\\. .*?screenshot\\.' +
-                    '(?:deployGithub|deployHeroku|npmTest|testExampleJs|testExampleSh)' +
+                    '(?:npmTest|testExampleJs|testExampleSh)' +
                     '.*?\\.png[\\S\\s]*?\\n\\n', 'gm'), '');
             }
+            // customize shDeployGithub and shDeployHeroku
+            [
+                'Github',
+                'Heroku'
+            ].forEach(function (element) {
+                if (options.dataFrom.indexOf('    shDeploy' + element + '\n') < 0) {
+                    // customize test-server
+                    options.dataTo = options.dataTo.replace(
+                        new RegExp('\\n\\| test-server-' + element.toLowerCase() + ' : \\|.*?\\n'),
+                        '\n'
+                    );
+                    // customize screenshot
+                    options.dataTo = options.dataTo.replace(new RegExp('^1\\. .*?screenshot\\.' +
+                        'deploy' + element +
+                        '.*?\\.png[\\S\\s]*?\\n\\n', 'gm'), '');
+                }
+            });
             // customize assets.index.template.html
             if (local.assetsDict['/assets.index.template.html']
                     .indexOf('"assets.index.default.template.html"') < 0) {
@@ -22049,7 +22054,7 @@ local.templateApiDict =
         "_path": "/{{_tags0}}/crudCountManyByQuery",
         "parameters": [
             {
-                "default": "{}",
+                "default": "{\"id\":{\"$exists\":true}}",
                 "description": "query param",
                 "format": "json",
                 "in": "query",
@@ -22181,7 +22186,7 @@ local.templateApiDict =
         "_path": "/{{_tags0}}/crudGetManyByQuery",
         "parameters": [
             {
-                "default": "{\"_id\":{\"$exists\":true}}",
+                "default": "{\"id\":{\"$exists\":true}}",
                 "description": "query param",
                 "format": "json",
                 "in": "query",
@@ -22190,6 +22195,7 @@ local.templateApiDict =
                 "type": "string"
             },
             {
+                "default": null,
                 "description": "projection-fields param",
                 "format": "json",
                 "in": "query",
@@ -22218,6 +22224,9 @@ local.templateApiDict =
             },
             {
                 "default": [
+                    {
+                        "fieldName": "id"
+                    },
                     {
                         "fieldName": "_timeUpdated",
                         "isDescending": true
@@ -22273,7 +22282,7 @@ local.templateApiDict =
         "_path": "/{{_tags0}}/crudGetOneByQuery",
         "parameters": [
             {
-                "default": "{}",
+                "default": "{\"id\":{\"$exists\":true}}",
                 "description": "query param",
                 "format": "json",
                 "in": "query",
@@ -22731,7 +22740,7 @@ console.log("initialized swgg-client");\n\
 {{/if urlSwaggerJson}}\n\
 <div id="swggAjaxProgressDiv1" style="text-align: center;">\n\
     <span>{{ajaxProgressText}}</span>\n\
-    <span class="uiAnimateSpin"></span>\n\
+    <div class="uiAnimateSpin" style="animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: inline-block; height: 25px; vertical-align: middle; width: 25px;"></div>\n\
 </div>\n\
 <div class="reset resourceList"></div>\n\
 <div class="utility2FooterDiv">\n\
@@ -22892,13 +22901,9 @@ local.templateUiResource = '\
     >{{name}} : {{description}}</span>\n\
     <span\n\
         class="onEventResourceDisplayAction td td2"\n\
+        style="border-left: 1px solid #000; margin: 0; padding-left: 20px;"\n\
         tabindex="0"\n\
     >expand / collapse operations</span>\n\
-    <span\n\
-        class="onEventDatatableReload td td3"\n\
-        data-resource-name="{{name}}"\n\
-        tabindex="0"\n\
-    >datatable</span>\n\
 </h3>\n\
 <div\n\
     class="operationList uiAnimateSlide"\n\
@@ -23091,10 +23096,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .resource:first-child {\n\
     border-top: 1px solid #777;\n\
 }\n\
-.swggUiContainer .resource > .thead > .td2 {\n\
-    border-left: 1px solid #777;\n\
-    border-right: 1px solid #777;\n\
-}\n\
 .swggUiContainer .styleBorderBottom1px {\n\
     border-bottom: 1px solid #777;\n\
 }\n\
@@ -23208,9 +23209,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer .resource:first-child {\n\
     padding-top: 10px;\n\
-}\n\
-.swggUiContainer .resource > .thead > .td2 {\n\
-    padding: 0 20px;\n\
 }\n\
 .swggUiContainer .resourceDescription {\n\
     padding: 10px 20px;\n\
@@ -24652,7 +24650,12 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                         value: 0
                     }, {
                         key: 'querySort',
-                        value: [{ fieldName: '_timeUpdated', isDescending: true }]
+                        value: [{
+                            fieldName: 'id'
+                        }, {
+                            fieldName: '_timeUpdated',
+                            isDescending: true
+                        }]
                     }, {
                         key: 'queryWhere',
                         value: {}
@@ -25133,9 +25136,10 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                     : '';
             });
             // shake submit-button on error
-            tmp = options.targetOperation.querySelector('.onEventOperationAjax');
-            tmp.disabled = !!options.error;
-            local.uiAnimateShakeIfError(options.error, tmp);
+            local.uiAnimateShakeIfError(
+                options.error,
+                options.targetOperation.querySelector('.onEventOperationAjax')
+            );
             // init requestCurl
             tmp = options.data;
             local.tryCatchOnError(function () {
@@ -25653,6 +25657,8 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
             // init valueText
             schemaP.valueText = schemaP['x-swgg-apiKey']
                 ? local.apiKeyValue
+                : schemaP.default === null
+                ? ''
                 : schemaP.required || schemaP.isTextarea
                 ? schemaP.placeholder
                 : '';

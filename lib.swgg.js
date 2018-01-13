@@ -162,7 +162,7 @@ local.templateApiDict =
         "_path": "/{{_tags0}}/crudCountManyByQuery",
         "parameters": [
             {
-                "default": "{}",
+                "default": "{\"id\":{\"$exists\":true}}",
                 "description": "query param",
                 "format": "json",
                 "in": "query",
@@ -294,7 +294,7 @@ local.templateApiDict =
         "_path": "/{{_tags0}}/crudGetManyByQuery",
         "parameters": [
             {
-                "default": "{\"_id\":{\"$exists\":true}}",
+                "default": "{\"id\":{\"$exists\":true}}",
                 "description": "query param",
                 "format": "json",
                 "in": "query",
@@ -303,6 +303,7 @@ local.templateApiDict =
                 "type": "string"
             },
             {
+                "default": null,
                 "description": "projection-fields param",
                 "format": "json",
                 "in": "query",
@@ -331,6 +332,9 @@ local.templateApiDict =
             },
             {
                 "default": [
+                    {
+                        "fieldName": "id"
+                    },
                     {
                         "fieldName": "_timeUpdated",
                         "isDescending": true
@@ -386,7 +390,7 @@ local.templateApiDict =
         "_path": "/{{_tags0}}/crudGetOneByQuery",
         "parameters": [
             {
-                "default": "{}",
+                "default": "{\"id\":{\"$exists\":true}}",
                 "description": "query param",
                 "format": "json",
                 "in": "query",
@@ -844,7 +848,7 @@ console.log("initialized swgg-client");\n\
 {{/if urlSwaggerJson}}\n\
 <div id="swggAjaxProgressDiv1" style="text-align: center;">\n\
     <span>{{ajaxProgressText}}</span>\n\
-    <span class="uiAnimateSpin"></span>\n\
+    <div class="uiAnimateSpin" style="animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: inline-block; height: 25px; vertical-align: middle; width: 25px;"></div>\n\
 </div>\n\
 <div class="reset resourceList"></div>\n\
 <div class="utility2FooterDiv">\n\
@@ -1005,13 +1009,9 @@ local.templateUiResource = '\
     >{{name}} : {{description}}</span>\n\
     <span\n\
         class="onEventResourceDisplayAction td td2"\n\
+        style="border-left: 1px solid #000; margin: 0; padding-left: 20px;"\n\
         tabindex="0"\n\
     >expand / collapse operations</span>\n\
-    <span\n\
-        class="onEventDatatableReload td td3"\n\
-        data-resource-name="{{name}}"\n\
-        tabindex="0"\n\
-    >datatable</span>\n\
 </h3>\n\
 <div\n\
     class="operationList uiAnimateSlide"\n\
@@ -1204,10 +1204,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .resource:first-child {\n\
     border-top: 1px solid #777;\n\
 }\n\
-.swggUiContainer .resource > .thead > .td2 {\n\
-    border-left: 1px solid #777;\n\
-    border-right: 1px solid #777;\n\
-}\n\
 .swggUiContainer .styleBorderBottom1px {\n\
     border-bottom: 1px solid #777;\n\
 }\n\
@@ -1321,9 +1317,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer .resource:first-child {\n\
     padding-top: 10px;\n\
-}\n\
-.swggUiContainer .resource > .thead > .td2 {\n\
-    padding: 0 20px;\n\
 }\n\
 .swggUiContainer .resourceDescription {\n\
     padding: 10px 20px;\n\
@@ -2765,7 +2758,12 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                         value: 0
                     }, {
                         key: 'querySort',
-                        value: [{ fieldName: '_timeUpdated', isDescending: true }]
+                        value: [{
+                            fieldName: 'id'
+                        }, {
+                            fieldName: '_timeUpdated',
+                            isDescending: true
+                        }]
                     }, {
                         key: 'queryWhere',
                         value: {}
@@ -3246,9 +3244,10 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                     : '';
             });
             // shake submit-button on error
-            tmp = options.targetOperation.querySelector('.onEventOperationAjax');
-            tmp.disabled = !!options.error;
-            local.uiAnimateShakeIfError(options.error, tmp);
+            local.uiAnimateShakeIfError(
+                options.error,
+                options.targetOperation.querySelector('.onEventOperationAjax')
+            );
             // init requestCurl
             tmp = options.data;
             local.tryCatchOnError(function () {
@@ -3766,6 +3765,8 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
             // init valueText
             schemaP.valueText = schemaP['x-swgg-apiKey']
                 ? local.apiKeyValue
+                : schemaP.default === null
+                ? ''
                 : schemaP.required || schemaP.isTextarea
                 ? schemaP.placeholder
                 : '';

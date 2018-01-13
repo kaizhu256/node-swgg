@@ -70,15 +70,10 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2017.11.20
-- npm publish 2017.11.20
-- add param operation['x-swgg-consumes0'], operation['x-swgg-notRequired'], and operation['x-swgg-required']
-- add operation['x-swgg-consumes0'] = 'application/xml' support for wechat-pay
-- allow function dbRowListRandomCreate to recurse objects and stop with modeSubdoc flag
-- disable submit-button on input-validation-error
-- fix in.body parameter not showing validation-error-message
-- update ui to show required attribute only in 'name and desscription' section
-- use textarea for string (json)
+#### changelog for v2018.1.12
+- npm publish 2018.1.12
+- do not auto-fill input if default value is null
+- remove unused datatable link
 - none
 
 #### this package requires
@@ -943,6 +938,7 @@ utility2-comment -->\n\
     "engines": {
         "node": ">=4.0"
     },
+    "githubRepoAlias": "swgg-io/node-swgg",
     "homepage": "https://github.com/kaizhu256/node-swgg",
     "keywords": [
         "openapi",
@@ -971,7 +967,7 @@ utility2-comment -->\n\
         "start": "PORT=${PORT:-8080} utility2 start test.js",
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2017.11.20"
+    "version": "2018.1.12"
 }
 ```
 
