@@ -58,6 +58,8 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
+- add function operationIdFromPathnameAndMethod
+- add function swaggerFromCurl
 - add hmacSha256 support for wechat-pay
 - add validators from https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation/semantic-validators/validators/items-required-for-array-objects.js
 - add property parameters.x-swgg-persist to persist to localStorage
@@ -70,10 +72,18 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2018.1.12
-- npm publish 2018.1.12
-- do not auto-fill input if default value is null
-- remove unused datatable link
+#### changelog for v2018.2.1
+- npm publish 2018.2.1
+- add validation semanticUniquePath in function swaggerValidateJson
+- merge js-env for tests
+- add swaggerJson property x-swgg-descriptionLineList
+- add file assets.swgg.swagger.petstore.json
+- add function swaggerValidateFile
+- ignore env var \$npm_package_swggAll and \$npm_package_swggTags0 if package-name has -all suffix
+- dereference body-sub-schema.\$ref in ui-documentation
+- fix failed semanticRequired validation-error in ui
+- update function dbFieldRandomCreate to use schemaP.default if available, in modeNotRandom
+- update function normalizeSwaggerJson to override tag.description with x-swgg-tags0-override
 - none
 
 #### this package requires
@@ -521,6 +531,7 @@ utility2-comment -->\n\
                 }
             }
         });
+    // run resetValidateKeySorted js-env code
         // init db
         local.dbSeedList = [{
             dbRowList: [{
@@ -695,8 +706,7 @@ utility2-comment -->\n\
                 // show tests
                 if (document.querySelector('#testReportDiv1').style.maxHeight === '0px') {
                     local.uiAnimateSlideDown(document.querySelector('#testReportDiv1'));
-                    document.querySelector('#testRunButton1').textContent =
-                        'hide internal test';
+                    document.querySelector('#testRunButton1').textContent = 'hide internal test';
                     local.modeTest = true;
                     local.testRunDefault(local);
                 // hide tests
@@ -960,14 +970,17 @@ utility2-comment -->\n\
         "url": "https://github.com/kaizhu256/node-swgg.git"
     },
     "scripts": {
+        "apidocRawCreate": "[ ! -f npm_scripts.sh ] || ./npm_scripts.sh shNpmScriptApidocRawCreate",
+        "apidocRawFetch": "[ ! -f npm_scripts.sh ] || ./npm_scripts.sh shNpmScriptApidocRawFetch",
         "build-ci": "utility2 shReadmeTest build_ci.sh",
         "env": "env",
         "heroku-postbuild": "npm uninstall utility2 2>/dev/null; npm install kaizhu256/node-utility2#alpha && utility2 shDeployHeroku",
-        "postinstall": "[ ! -f npm_scripts.sh ] || ./npm_scripts.sh postinstall",
+        "nameAliasPublish": "",
+        "postinstall": "[ ! -f npm_scripts.sh ] || ./npm_scripts.sh shNpmScriptPostinstall",
         "start": "PORT=${PORT:-8080} utility2 start test.js",
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2018.1.12"
+    "version": "2018.2.1"
 }
 ```
 
@@ -986,6 +999,7 @@ utility2-comment -->\n\
 # this shell script will run the build for this package
 
 shBuildCiAfter() {(set -e
+    # shDeployCustom
     shDeployGithub
     shDeployHeroku
     shReadmeTest example.sh
