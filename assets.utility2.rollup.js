@@ -319,23 +319,30 @@
         local.stringHtmlSafe = function (text) {
         /*
          * this function will make the text html-safe
+         * https://stackoverflow.com/questions/7381974/which-characters-need-to-be-escaped-on-html
          */
-            // new RegExp('[' + '"&\'<>'.split('').sort().join('') + ']', 'g')
-            return text.replace((/["&'<>]/g), function (match0) {
-                return '&#x' + match0.charCodeAt(0).toString(16) + ';';
-            });
+            return text
+                .replace((/"/g), '&quot;')
+                .replace((/&/g), '&amp;')
+                .replace((/'/g), '&apos;')
+                .replace((/</g), '&lt;')
+                .replace((/>/g), '&gt;')
+                .replace((/&amp;(amp;|apos;|gt;|lt;|quot;)/ig), '&$1');
         };
 
         local.templateRender = function (template, dict, options) {
         /*
          * this function will render the template with the given dict
          */
-            var argList, getValue, match, renderPartial, rgx, tryCatch, value;
+            var argList, getValue, match, renderPartial, rgx, tryCatch, skip, value;
             dict = dict || {};
             options = options || {};
             getValue = function (key) {
                 argList = key.split(' ');
                 value = dict;
+                if (argList[0] === '#this/') {
+                    return;
+                }
                 // iteratively lookup nested values in the dict
                 argList[0].split('.').forEach(function (key) {
                     value = value && value[key];
@@ -345,13 +352,19 @@
             renderPartial = function (match0, helper, key, partial) {
                 switch (helper) {
                 case 'each':
+                case 'eachTrimRightComma':
                     value = getValue(key);
-                    return Array.isArray(value)
+                    value = Array.isArray(value)
                         ? value.map(function (dict) {
                             // recurse with partial
                             return local.templateRender(partial, dict, options);
                         }).join('')
                         : '';
+                    // remove trailing-comma from last element
+                    if (helper === 'eachTrimRightComma') {
+                        value = value.trimRight().replace((/,$/), '');
+                    }
+                    return value;
                 case 'if':
                     partial = partial.split('{{#unless ' + key + '}}');
                     partial = getValue(key)
@@ -402,7 +415,7 @@
                     if (value === undefined) {
                         return match0;
                     }
-                    argList.slice(1).forEach(function (arg) {
+                    argList.slice(1).forEach(function (arg, ii, list) {
                         switch (arg) {
                         case 'alphanumeric':
                             value = value.replace((/\W/g), '_');
@@ -428,8 +441,17 @@
                         case 'notHtmlSafe':
                             notHtmlSafe = true;
                             break;
+                        case 'truncate':
+                            skip = ii + 1;
+                            if (value.length > list[skip]) {
+                                value = value.slice(0, list[skip] - 3).trimRight() + '...';
+                            }
+                            break;
                         // default to String.prototype[arg]()
                         default:
+                            if (ii === skip) {
+                                break;
+                            }
                             value = value[arg]();
                             break;
                         }
@@ -437,12 +459,17 @@
                     value = String(value);
                     // default to htmlSafe
                     if (!notHtmlSafe) {
-                        value = value.replace((/["&'<>]/g), function (match0) {
-                            return '&#x' + match0.charCodeAt(0).toString(16) + ';';
-                        });
+                        value = value
+                            .replace((/"/g), '&quot;')
+                            .replace((/&/g), '&amp;')
+                            .replace((/'/g), '&apos;')
+                            .replace((/</g), '&lt;')
+                            .replace((/>/g), '&gt;')
+                            .replace((/&amp;(amp;|apos;|gt;|lt;|quot;)/ig), '&$1');
                     }
                     if (markdownToHtml && typeof local.marked === 'function') {
-                        value = local.marked(value);
+                        value = local.marked(value)
+                            .replace((/&amp;(amp;|apos;|gt;|lt;|quot;)/ig), '&$1');
                     }
                     return value;
                 }, 'templateRender could not render expression ' + JSON.stringify(match0) + '\n');
@@ -566,7 +593,7 @@ local.templateApidocHtml = '\
         </a>\n\
     </h2>\n\
     <ul>\n\
-    <li>description and source-code<pre class="apidocCodePre">{{source}}</pre></li>\n\
+    <li>description and source-code<pre class="apidocCodePre">{{source truncate 4096}}</pre></li>\n\
     <li>example usage<pre class="apidocCodePre">{{example}}</pre></li>\n\
     </ul>\n\
     {{/if source}}\n\
@@ -616,11 +643,7 @@ local.templateApidocHtml = '\
                     return element;
                 }
                 // init source
-                element.source = trimLeft(toString(module[key])) || 'n/a';
-                if (element.source.length > 4096) {
-                    element.source = element.source.slice(0, 4096).trimRight() + ' ...';
-                }
-                element.source = local.stringHtmlSafe(element.source)
+                element.source = local.stringHtmlSafe(trimLeft(toString(module[key])) || 'n/a')
                     .replace((/\([\S\s]*?\)/), function (match0) {
                         // init signature
                         element.signature = match0
@@ -663,6 +686,7 @@ local.templateApidocHtml = '\
                     console.error('apidocCreate - readExample ' + file);
                     result = '';
                     result = ('\n\n\n\n\n\n\n\n' +
+                        // bug-workaround - truncate example to manageable size
                         local.fs.readFileSync(file, 'utf8').slice(0, 262144) +
                         '\n\n\n\n\n\n\n\n').replace((/\r\n*/g), '\n');
                 }, console.error);
@@ -749,8 +773,7 @@ local.templateApidocHtml = '\
             // init exampleList
             [1, 2, 3, 4].forEach(function (depth) {
                 options.exampleList = options.exampleList.concat(
-                    // http://stackoverflow.com
-                    // /questions/4509624/how-to-limit-depth-for-recursive-file-list
+                    // http://stackoverflow.com/questions/4509624/how-to-limit-depth-for-recursive-file-list
                     // find . -maxdepth 1 -mindepth 1 -name "*.js" -type f
                     local.child_process.execSync('find "' + options.dir +
                         '" -maxdepth ' + depth + ' -mindepth ' + depth +
@@ -854,8 +877,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 options.moduleExtraDict[options.env.npm_package_name] || {};
             [1, 2, 3, 4].forEach(function (depth) {
                 options.libFileList = options.libFileList.concat(
-                    // http://stackoverflow.com
-                    // /questions/4509624/how-to-limit-depth-for-recursive-file-list
+                    // http://stackoverflow.com/questions/4509624/how-to-limit-depth-for-recursive-file-list
                     // find . -maxdepth 1 -mindepth 1 -name "*.js" -type f
                     local.child_process.execSync('find "' + options.dir +
                         '" -maxdepth ' + depth + ' -mindepth ' + depth +
@@ -1210,6 +1232,8 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
              * print help
              */
                 var element, result, lengthList, sortDict;
+                console.log(require(__dirname + '/package.json').name + ' v' +
+                    require(__dirname + '/package.json').version);
                 sortDict = {};
                 result = [['[command]', '[args]', '[description]', -1]];
                 lengthList = [result[0][0].length, result[0][1].length];
@@ -1273,6 +1297,15 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                     local.cliDict._interactive;
                 local.cliDict['-i'] = local.cliDict['-i'] || local.cliDict._interactive;
             }
+            local.cliDict._version = local.cliDict._version || function () {
+            /*
+             * [none]
+             * print version
+             */
+                console.log(require(__dirname + '/package.json').version);
+            };
+            local.cliDict['--version'] = local.cliDict['--version'] || local.cliDict._version;
+            local.cliDict['-v'] = local.cliDict['-v'] || local.cliDict._version;
             // run fnc()
             fnc = fnc || function () {
                 if (local.cliDict[process.argv[2]]) {
@@ -1342,6 +1375,13 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 return JSON.stringify(jsonObj);
             };
             circularList = [];
+            // try to derefernce all properties in jsonObj
+            (function () {
+                try {
+                    jsonObj = JSON.parse(JSON.stringify(jsonObj));
+                } catch (ignore) {
+                }
+            }());
             return JSON.stringify(typeof jsonObj === 'object' && jsonObj
                 // recurse
                 ? JSON.parse(stringify(jsonObj))
@@ -6631,6 +6671,7 @@ local.templateCoverageBadgeSvg =
 /* script-begin /assets.utility2.lib.jslint.js */
 ///usr/bin/env node
 /* istanbul instrument in package jslint */
+/* jslint-utility2 */
 /*jslint
     bitwise: true,
     browser: true,
@@ -6727,6 +6768,8 @@ local.templateCoverageBadgeSvg =
              * print help
              */
                 var element, result, lengthList, sortDict;
+                console.log(require(__dirname + '/package.json').name + ' v' +
+                    require(__dirname + '/package.json').version);
                 sortDict = {};
                 result = [['[command]', '[args]', '[description]', -1]];
                 lengthList = [result[0][0].length, result[0][1].length];
@@ -6767,7 +6810,7 @@ local.templateCoverageBadgeSvg =
                         }
                     });
                     element = element.slice(0, 3).join('---- ');
-                    if (ii === 0) {
+                    if (!ii) {
                         element = element.replace((/-/g), ' ');
                     }
                     console.log(element);
@@ -6790,6 +6833,15 @@ local.templateCoverageBadgeSvg =
                     local.cliDict._interactive;
                 local.cliDict['-i'] = local.cliDict['-i'] || local.cliDict._interactive;
             }
+            local.cliDict._version = local.cliDict._version || function () {
+            /*
+             * [none]
+             * print version
+             */
+                console.log(require(__dirname + '/package.json').version);
+            };
+            local.cliDict['--version'] = local.cliDict['--version'] || local.cliDict._version;
+            local.cliDict['-v'] = local.cliDict['-v'] || local.cliDict._version;
             // run fnc()
             fnc = fnc || function () {
                 if (local.cliDict[process.argv[2]]) {
@@ -7232,7 +7284,7 @@ e){e+="}",this._tokenStream=new v(e,m),this._readDeclarations()}};for(t in n)Obj
 ,"-o-animation-play-state":"[ running | paused ]#",appearance:"none | auto","-moz-appearance"
 :"none | button | button-arrow-down | button-arrow-next | button-arrow-previous | button-arrow-up | button-bevel | button-focus | caret | checkbox | checkbox-container | checkbox-label | checkmenuitem | dualbutton | groupbox | listbox | listitem | menuarrow | menubar | menucheckbox | menuimage | menuitem | menuitemtext | menulist | menulist-button | menulist-text | menulist-textfield | menupopup | menuradio | menuseparator | meterbar | meterchunk | progressbar | progressbar-vertical | progresschunk | progresschunk-vertical | radio | radio-container | radio-label | radiomenuitem | range | range-thumb | resizer | resizerpanel | scale-horizontal | scalethumbend | scalethumb-horizontal | scalethumbstart | scalethumbtick | scalethumb-vertical | scale-vertical | scrollbarbutton-down | scrollbarbutton-left | scrollbarbutton-right | scrollbarbutton-up | scrollbarthumb-horizontal | scrollbarthumb-vertical | scrollbartrack-horizontal | scrollbartrack-vertical | searchfield | separator | sheet | spinner | spinner-downbutton | spinner-textfield | spinner-upbutton | splitter | statusbar | statusbarpanel | tab | tabpanel | tabpanels | tab-scroll-arrow-back | tab-scroll-arrow-forward | textfield | textfield-multiline | toolbar | toolbarbutton | toolbarbutton-dropdown | toolbargripper | toolbox | tooltip | treeheader | treeheadercell | treeheadersortarrow | treeitem | treeline | treetwisty | treetwistyopen | treeview | -moz-mac-unified-toolbar | -moz-win-borderless-glass | -moz-win-browsertabbar-toolbox | -moz-win-communicationstext | -moz-win-communications-toolbox | -moz-win-exclude-glass | -moz-win-glass | -moz-win-mediatext | -moz-win-media-toolbox | -moz-window-button-box | -moz-window-button-box-maximized | -moz-window-button-close | -moz-window-button-maximize | -moz-window-button-minimize | -moz-window-button-restore | -moz-window-frame-bottom | -moz-window-frame-left | -moz-window-frame-right | -moz-window-titlebar | -moz-window-titlebar-maximized"
 ,"-ms-appearance":"none | icon | window | desktop | workspace | document | tooltip | dialog | button | push-button | hyperlink | radio | radio-button | checkbox | menu-item | tab | menu | menubar | pull-down-menu | pop-up-menu | list-menu | radio-group | checkbox-group | outline-tree | range | field | combo-box | signature | password | normal"
-,"-webkit-appearance":"none | button | button-bevel | caps-lock-indicator | caret | checkbox | default-button | listbox	| listitem | media-fullscreen-button | media-mute-button | media-play-button | media-seek-back-button	| media-seek-forward-button	| media-slider | media-sliderthumb | menulist	| menulist-button	| menulist-text	| menulist-textfield | push-button	| radio	| searchfield	| searchfield-cancel-button	| searchfield-decoration | searchfield-results-button | searchfield-results-decoration | slider-horizontal | slider-vertical | sliderthumb-horizontal | sliderthumb-vertical	| square-button	| textarea	| textfield	| scrollbarbutton-down | scrollbarbutton-left | scrollbarbutton-right | scrollbarbutton-up | scrollbargripper-horizontal | scrollbargripper-vertical | scrollbarthumb-horizontal | scrollbarthumb-vertical | scrollbartrack-horizontal | scrollbartrack-vertical"
+,"-webkit-appearance":"none | button | button-bevel | caps-lock-indicator | caret | checkbox | default-button | listbox\t| listitem | media-fullscreen-button | media-mute-button | media-play-button | media-seek-back-button\t| media-seek-forward-button\t| media-slider | media-sliderthumb | menulist\t| menulist-button\t| menulist-text\t| menulist-textfield | push-button\t| radio\t| searchfield\t| searchfield-cancel-button\t| searchfield-decoration | searchfield-results-button | searchfield-results-decoration | slider-horizontal | slider-vertical | sliderthumb-horizontal | sliderthumb-vertical\t| square-button\t| textarea\t| textfield\t| scrollbarbutton-down | scrollbarbutton-left | scrollbarbutton-right | scrollbarbutton-up | scrollbargripper-horizontal | scrollbargripper-vertical | scrollbarthumb-horizontal | scrollbarthumb-vertical | scrollbartrack-horizontal | scrollbartrack-vertical"
 ,"-o-appearance":"none | window | desktop | workspace | document | tooltip | dialog | button | push-button | hyperlink | radio | radio-button | checkbox | menu-item | tab | menu | menubar | pull-down-menu | pop-up-menu | list-menu | radio-group | checkbox-group | outline-tree | range | field | combo-box | signature | password | normal"
 ,azimuth:"<azimuth>","backface-visibility":"visible | hidden",background:1,"background-attachment"
 :"<attachment>#","background-clip":"<box>#","background-color":"<color>","background-image"
@@ -13079,138 +13131,271 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
 
     // run shared js-env code - function
     (function () {
+        local.csslintUtility2 = function (script) {
+        /*
+         * this function will csslint the script with utiity2-specific rules
+         */
+            var current1, current2, ii, jj, message, previous1, previous2;
+            // ignore comments
+            script = script.replace((/^ *?\/\*[\S\s]*?\*\/ *?$/gm), function (match0) {
+                if (match0 === '/* validateLineSortedReset */') {
+                    return match0;
+                }
+                // preserve lineno
+                return match0.replace((/^.*?$/gm), '');
+            });
+            ii = 0;
+            current1 = '';
+            current2 = '';
+            previous1 = '';
+            previous2 = '';
+            script.replace((/^.*?$/gm), function (line) {
+                current1 = line;
+                ii += 1;
+                jj = 0;
+                message = '';
+                if (!current1) {
+                    return;
+                }
+                // validate double-whitespace
+                if ((/\S {2}/).test(current1)) {
+                    jj = jj || ((/\S {2}/).exec(current1).index + 2);
+                    message = message || 'double whitespace';
+                }
+                // ignore indent
+                if (!message && current1[0] === ' ') {
+                    return;
+                }
+                // validate multi-line-statement
+                if ((/[,;\{\}]./).test(current1)) {
+                    jj = jj || ((/[,;\{\}]./).exec(current1).index + 1);
+                    message = message || 'multi-line statement';
+                }
+                // validateLineSortedReset
+                if (current1 === '/* validateLineSortedReset */') {
+                    current1 = '';
+                    current2 = '';
+                    previous1 = '';
+                    previous2 = '';
+                    return;
+                }
+                // validate previous1 < current1
+                current1 = current1
+                    .replace((/,$/gm), '   ,')
+                    .replace((/ \{$/gm), '   {')
+                    .replace((/(^[\w*@]| \w)/gm), ' $1');
+                if (!(previous1 < current1)) {
+                    jj = jj || 1;
+                    message = message ||
+                        ('lines not sorted\n' + previous1 + '\n' + current1);
+                }
+                previous1 = current1;
+                // validate previous2 < current2
+                current2 += current1 + '\n';
+                if (current1 === '}') {
+                    current2 = current2.slice(0, -3);
+                    if (!(previous2 < current2)) {
+                        jj = jj || 1;
+                        message = message ||
+                            ('lines not sorted\n' + previous2 + '\n' + current2).trim();
+                    }
+                    previous1 = '';
+                    previous2 = current2;
+                    current2 = '';
+                }
+                if (!message) {
+                    return;
+                }
+                local.errorList.push({
+                    col: jj,
+                    line: ii,
+                    message: message,
+                    value: line
+                });
+            });
+        };
+
         local.jslintAndPrint = function (script, file) {
         /*
          * this function will jslint / csslint the script and print any errors to stderr
          */
-            var ignoreDict, lineno, scriptParsed;
+            var ii, jj, lintType, message, scriptParsed;
             // cleanup errors
-            local.errorCounter = 0;
+            local.errorList = [];
             local.errorText = '';
             // do nothing for empty script
-            if (!script.length) {
+            if (!(script && script.length)) {
                 return script;
             }
-            // init ignoreDict
-            ignoreDict = {};
-            // init lineno
-            lineno = 0;
+            scriptParsed = script;
+            if ((/^\/\* jslint-utility2 \*\/$|^# jslint-utility2$/m).test(scriptParsed)) {
+                ii = 0;
+                scriptParsed.replace((/^.*?$/gm), function (line) {
+                    ii += 1;
+                    jj = 0;
+                    message = '';
+                    // validate indent
+                    if (!(/^ * \*/).test(line) && ((/^ */).exec(line)[0].length % 4 !== 0)) {
+                        jj = jj || 1;
+                        message = message || 'non 4-space indent';
+                    }
+                    // validate trailing-whitespace
+                    if ((/ $| \\n\\$/).test(line)) {
+                        jj = jj || line.length;
+                        message = message || 'trailing whitespace';
+                    }
+                    // validate tab
+                    if (line.indexOf('\t') >= 0) {
+                        jj = jj || (line.indexOf('\t') + 1);
+                        message = message || 'tab detected';
+                    }
+                    if (message) {
+                        local.errorList.push({
+                            col: jj,
+                            line: ii,
+                            message: message,
+                            value: JSON.stringify(line)
+                        });
+                    }
+                });
+            }
             // parse script
             scriptParsed = script
-                // indent text-block
-                // /* jslint-indent-begin */ ... /* jslint-indent-end */
-                .replace(
-/* jslint-indent-begin 20 */
-(function () {
-    /*jslint maxlen: 256*/
-    return (/^ *?\/\* jslint-indent-begin (\d+?) \*\/$[\S\s]+?^ *?\/\* jslint-indent-end \*\/$/gm);
-}()),
-/* jslint-indent-end */
-                    function (match0, match1) {
-                        return match0.replace(
-                            (/(^ *\S)/gm),
-                            new Array(Number(match1) + 1).join(' ') + '$1'
-                        );
-                    }
-                )
+                // ignore shebang
+                .replace((/^#!.*/), '')
+                // ignore long-url-comment
+                .replace((/^ *?(?:\* |\/\/ )https?:\/\/.*?$/gm), '')
                 // ignore text-block
-                // /* jslint-ignore-begin */ ... /* jslint-ignore-end */
                 .replace(
 /* jslint-ignore-begin */
 (/^ *?\/\* jslint-ignore-begin \*\/$[\S\s]+?^ *?\/\* jslint-ignore-end \*\/$/gm),
 /* jslint-ignore-end */
                     function (match0) {
-                        return match0.replace((/.*/g), '');
+                        return match0.replace((/^.*?$/gm), '');
                     }
                 )
                 // ignore next-line
-                // /* jslint-ignore-next-line */
                 .replace(
 /* jslint-ignore-next-line */
 (/^ *?\/\* jslint-ignore-next-line \*\/\n.*/gm),
                     function (match0) {
-                        return match0.replace((/.*/g), '');
+                        return match0.replace((/^.*?$/gm), '');
                     }
                 );
+            switch (file.replace((/^.*\./), '.')) {
             // csslint script
-            if (file.slice(-4) === '.css') {
-                local.CSSLint.errors = local.CSSLint.verify(scriptParsed).messages
-                    .filter(function (error) {
-                        return !ignoreDict[error.rule.id];
+            case '.css':
+                lintType = 'csslint';
+                local.CSSLint.errors = local.CSSLint.verify(scriptParsed).messages;
+                local.CSSLint.errors.forEach(function (error) {
+                    local.errorList.push(error && {
+                        col: error.col,
+                        line: error.line,
+                        message: error.type + ' - ' + error.rule.id + ' - ' + error.message +
+                            '\n    ' + error.rule.desc,
+                        value: error.evidence
                     });
-                // if error occurred, then print colorized error messages
-                if (!local.CSSLint.errors.length) {
-                    return script;
+                });
+                break;
+            // shlint script
+            case '.sh':
+                lintType = 'shlint';
+                break;
+            // jslint script
+            default:
+                // jslint es6-script
+                if ((/^\/\*jslint\b[\s\w,:]*?\bes6: true\b/m)
+                        .test(scriptParsed.slice(0, 0x1000))) {
+                    local.jslintEs6.errors = local.jslintEs6(scriptParsed).warnings;
+                    local.jslintEs6.errors.forEach(function (error) {
+                        local.errorList.push(error && {
+                            col: error.column + 1,
+                            line: error.line + 1,
+                            message: error.message,
+                            value: error.a
+                        });
+                    });
+                    break;
                 }
-                local.errorText = '\u001b[1m' + file + '\u001b[22m\n';
-                local.CSSLint.errors
-                    .filter(function (error) {
-                        return error;
-                    })
-                    .forEach(function (error) {
-                        local.errorCounter += 1;
-                        lineno += 1;
-                        local.errorText +=
-                            (' #' + String(lineno) + ' ').slice(-4) +
-                            '\u001b[33m' + error.type + ' - ' + error.rule.id +
-                            ' - ' + error.message + '\n    ' + error.rule.desc +
-                            '\u001b[39m\n    ' + String(error.evidence).trim() +
-                            '\u001b[90m \/\/ line ' + error.line +
-                            ', col ' + error.col + '\u001b[39m\n';
+                // jslint es5 script
+                local.JSLINT(scriptParsed);
+                local.JSLINT.errors.forEach(function (error) {
+                    local.errorList.push(error && {
+                        col: error.character,
+                        line: error.line,
+                        message: error.reason,
+                        value: error.evidence
                     });
-            // jslint es6-script
-            } else if ((/^\/\*jslint\b[\s\w,:]*?\bes6: true\b/m)
-                    .test(scriptParsed.slice(0, 0x1000))) {
-                // comment shebang
-                scriptParsed = scriptParsed.replace((/^#!/), '//');
-                local.jslintEs6.errors = local.jslintEs6(scriptParsed).warnings;
-                if (!local.jslintEs6.errors.length) {
-                    return script;
-                }
-                // if error occurred, then print colorized error messages
-                local.errorText = '\u001b[1m' + file + '\u001b[22m\n';
-                local.jslintEs6.errors
-                    .filter(function (error) {
-                        return error;
-                    })
-                    .forEach(function (error) {
-                        local.errorCounter += 1;
-                        lineno += 1;
-                        local.errorText +=
-                            (' #' + String(lineno) + ' ').slice(-4) +
-                            '\u001b[33m' + error.message +
-                            '\u001b[39m\n    ' + String(error.a).trim() +
-                            '\u001b[90m \/\/ Line ' + (error.line + 1) +
-                            ', Pos ' + (error.column + 1) + '\u001b[39m\n';
-                    });
-            // jslint es5 script
-            } else {
-                // comment shebang
-                scriptParsed = scriptParsed.replace((/^#!/), '//');
-                if (local.JSLINT(scriptParsed)) {
-                    return script;
-                }
-                // if error occurred, then print colorized error messages
-                local.errorText = '\u001b[1m' + file + '\u001b[22m\n';
-                local.JSLINT.errors
-                    .filter(function (error) {
-                        return error;
-                    })
-                    .forEach(function (error) {
-                        local.errorCounter += 1;
-                        lineno += 1;
-                        local.errorText +=
-                            (' #' + String(lineno) + ' ').slice(-4) +
-                            '\u001b[33m' + error.reason +
-                            '\u001b[39m\n    ' + String(error.evidence).trim() +
-                            '\u001b[90m \/\/ Line ' + error.line +
-                            ', Pos ' + error.character + '\u001b[39m\n';
-                    });
+                });
             }
+            // jslint the script with utiity2-specific rules
+            local.errorList = local.errorList.filter(function (error) {
+                return error && error.message;
+            });
+            if (!local.errorList.length &&
+                    (/^\/\* jslint-utility2 \*\/$|^# jslint-utility2$/m).test(script)) {
+                switch (file.replace((/^.*\./), '.')) {
+                case '.css':
+                    local.csslintUtility2(script);
+                    break;
+                case '.sh':
+                    local.shlintUtility2(script);
+                    break;
+                default:
+                    local.jslintUtility2(script);
+                }
+            }
+            // if error occurred, then print colorized error messages
+            local.errorList = local.errorList.filter(function (error) {
+                return error && error.message;
+            });
+            if (!local.errorList.length) {
+                return script;
+            }
+            local.errorText = '\u001b[1m' + (lintType || 'jslint') + ' ' +  file + '\u001b[22m\n';
+            local.errorList.forEach(function (error, ii) {
+                local.errorText += (' #' + String(ii + 1) + ' ').slice(-4) +
+                    '\u001b[33m' + error.message +
+                    '\u001b[39m\n    ' + String(error.value).trim() +
+                    '\u001b[90m \/\/ line ' + (error.line) +
+                    ', col ' + (error.col) + '\u001b[39m\n';
+            });
             local.errorText = local.errorText.trim();
             // print error to stderr
             console.error(local.errorText);
             return script;
+        };
+
+        local.jslintUtility2 = function (script) {
+        /*
+         * this function will jslint the script with utiity2-specific rules
+         */
+            return script;
+        };
+
+        local.shlintUtility2 = function (script) {
+        /*
+         * this function will shlint the script with utiity2-specific rules
+         */
+            var ii, previous;
+            ii = 0;
+            previous = '';
+            script.replace((/^.*?$/gm), function (line) {
+                ii += 1;
+                if (!(/^sh\w+?\(\) \{/).test(line)) {
+                    return;
+                }
+                // validate previous < line
+                if (!(previous < line)) {
+                    local.errorList.push({
+                        col: 0,
+                        line: ii,
+                        message: 'lines not sorted\n' + previous + '\n' + line,
+                        value: line
+                    });
+                }
+                previous = line;
+            });
         };
     }());
     switch (local.modeJs) {
@@ -13240,7 +13425,7 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
                 }
             });
             // if error occurred, then exit with non-zero code
-            process.exit(local.errorCounter);
+            process.exit(!!local.errorList.length);
         };
         local.cliRun();
         break;
@@ -13298,167 +13483,199 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
 /* jslint-ignore-begin */
 (function () { var exports, module; exports = module = {};
 // init lib marked
-// 2013-08-25T00:10:18Z
-// https://github.com/chjj/marked/blob/v0.2.10/lib/marked.js
-// utility2-uglifyjs https://raw.githubusercontent.com/chjj/marked/v0.2.10/lib/marked.js
-(function(){function t(t){this.tokens=[],this.tokens.links={},this.options=t||f.
+// 2017-01-19T23:03:37Z
+// https://github.com/chjj/marked/blob/v0.3.7/lib/marked.js
+// utility2-uglifyjs https://raw.githubusercontent.com/chjj/marked/v0.3.7/lib/marked.js
+(function(){function t(t){this.tokens=[],this.tokens.links={},this.options=t||c.
 defaults,this.rules=e.normal,this.options.gfm&&(this.options.tables?this.rules=e
-.tables:this.rules=e.gfm)}function r(e,t){this.options=t||f.defaults,this.links=
-e,this.rules=n.normal;if(!this.links)throw new Error("Tokens array requires a `links` property."
+.tables:this.rules=e.gfm)}function r(e,t){this.options=t||c.defaults,this.links=
+e,this.rules=n.normal,this.renderer=this.options.renderer||new i,this.renderer.options=
+this.options;if(!this.links)throw new Error("Tokens array requires a `links` property."
 );this.options.gfm?this.options.breaks?this.rules=n.breaks:this.rules=n.gfm:this
-.options.pedantic&&(this.rules=n.pedantic)}function i(e){this.tokens=[],this.token=
-null,this.options=e||f.defaults}function s(e,t){return e.replace(t?/&/g:/&(?!#?\w+;)/g
-,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace
-(/'/g,"&#39;")}function o(e,t){return e=e.source,t=t||"",function n(r,i){return r?
-(i=i.source||i,i=i.replace(/(^|[^\[])\^/g,"$1"),e=e.replace(r,i),n):new RegExp(e
-,t)}}function u(){}function a(e){var t=1,n,r;for(;t<arguments.length;t++){n=arguments
-[t];for(r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e}function f
-(e,n,r){if(r||typeof n=="function"){r||(r=n,n=null),n=a({},f.defaults,n||{});var o=
-n.highlight,u,l,c=0;try{u=t.lex(e,n)}catch(h){return r(h)}l=u.length;var p=function(
-){var e,t;try{e=i.parse(u,n)}catch(s){t=s}return n.highlight=o,t?r(t):r(null,e)}
-;if(!o||o.length<3)return p();delete n.highlight;if(!l)return p();for(;c<u.length
-;c++)(function(e){return e.type!=="code"?--l||p():o(e.text,e.lang,function(t,n){
-if(n==null||n===e.text)return--l||p();e.text=n,e.escaped=!0,--l||p()})})(u[c]);return}
-try{return n&&(n=a({},f.defaults,n)),i.parse(t.lex(e,n),n)}catch(h){h.message+="\nPlease report this to https://github.com/chjj/marked."
-;if((n||f.defaults).silent)return"<p>An error occured:</p><pre>"+s(h.message+"",!0
-)+"</pre>";throw h}}var e={newline:/^\n+/,code:/^( {4}[^\n]+\n*)+/,fences:u,hr:/^( *[-*_]){3,} *(?:\n+|$)/
-,heading:/^ *(#{1,6}) *([^\n]+?) *#* *(?:\n+|$)/,nptable:u,lheading:/^([^\n]+)\n *(=|-){2,} *(?:\n+|$)/
-,blockquote:/^( *>[^\n]+(\n[^\n]+)*\n*)+/,list:/^( *)(bull) [\s\S]+?(?:hr|\n{2,}(?! )(?!\1bull )\n*|\s*$)/
-,html:/^ *(?:comment|closed|closing) *(?:\n{2,}|\s*$)/,def:/^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/
-,table:u,paragraph:/^((?:[^\n]+\n?(?!hr|heading|lheading|blockquote|tag|def))+)\n*/
-,text:/^[^\n]+/};e.bullet=/(?:[*+-]|\d+\.)/,e.item=/^( *)(bull) [^\n]*(?:\n(?!\1bull )[^\n]*)*/
-,e.item=o(e.item,"gm")(/bull/g,e.bullet)(),e.list=o(e.list)(/bull/g,e.bullet)("hr"
-,/\n+(?=(?: *[-*_]){3,} *(?:\n+|$))/)(),e._tag="(?!(?:a|em|strong|small|s|cite|q|dfn|abbr|data|time|code|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo|span|br|wbr|ins|del|img)\\b)\\w+(?!:/|@)\\b"
-,e.html=o(e.html)("comment",/<!--[\s\S]*?-->/)("closed",/<(tag)[\s\S]+?<\/\1>/)("closing"
-,/<tag(?:"[^"]*"|'[^']*'|[^'">])*?>/)(/tag/g,e._tag)(),e.paragraph=o(e.paragraph
+.options.pedantic&&(this.rules=n.pedantic)}function i(e){this.options=e||{}}function s
+(e){this.tokens=[],this.token=null,this.options=e||c.defaults,this.options.renderer=
+this.options.renderer||new i,this.renderer=this.options.renderer,this.renderer.options=
+this.options}function o(e,t){return e.replace(t?/&/g:/&(?!#?\w+;)/g,"&amp;").replace
+(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+function u(e){return e.replace(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/g,function(
+e,t){return t=t.toLowerCase(),t==="colon"?":":t.charAt(0)==="#"?t.charAt(1)==="x"?
+String.fromCharCode(parseInt(t.substring(2),16)):String.fromCharCode(+t.substring
+(1)):""})}function a(e,t){return e=e.source,t=t||"",function n(r,i){return r?(i=
+i.source||i,i=i.replace(/(^|[^\[])\^/g,"$1"),e=e.replace(r,i),n):new RegExp(e,t)
+}}function f(){}function l(e){var t=1,n,r;for(;t<arguments.length;t++){n=arguments
+[t];for(r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e}function c
+(e,n,r){if(r||typeof n=="function"){r||(r=n,n=null),n=l({},c.defaults,n||{});var i=
+n.highlight,u,a,f=0;try{u=t.lex(e,n)}catch(h){return r(h)}a=u.length;var p=function(
+e){if(e)return n.highlight=i,r(e);var t;try{t=s.parse(u,n)}catch(o){e=o}return n
+.highlight=i,e?r(e):r(null,t)};if(!i||i.length<3)return p();delete n.highlight;if(!
+a)return p();for(;f<u.length;f++)(function(e){return e.type!=="code"?--a||p():i(
+e.text,e.lang,function(t,n){if(t)return p(t);if(n==null||n===e.text)return--a||p
+();e.text=n,e.escaped=!0,--a||p()})})(u[f]);return}try{return n&&(n=l({},c.defaults
+,n)),s.parse(t.lex(e,n),n)}catch(h){h.message+="\nPlease report this to https://github.com/chjj/marked."
+;if((n||c.defaults).silent)return"<p>An error occured:</p><pre>"+o(h.message+"",!0
+)+"</pre>";throw h}}var e={newline:/^\n+/,code:/^( {4}[^\n]+\n*)+/,fences:f,hr:/^( *[-*_]){3,} *(?:\n+|$)/
+,heading:/^ *(#{1,6}) *([^\n]+?) *#* *(?:\n+|$)/,nptable:f,lheading:/^([^\n]+)\n *(=|-){2,} *(?:\n+|$)/
+,blockquote:/^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/,list:/^( *)(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/
+,html:/^ *(?:comment *(?:\n|\s*$)|closed *(?:\n{2,}|\s*$)|closing *(?:\n{2,}|\s*$))/
+,def:/^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,table:f
+,paragraph:/^((?:[^\n]+\n?(?!hr|heading|lheading|blockquote|tag|def))+)\n*/,text
+:/^[^\n]+/};e.bullet=/(?:[*+-]|\d+\.)/,e.item=/^( *)(bull) [^\n]*(?:\n(?!\1bull )[^\n]*)*/
+,e.item=a(e.item,"gm")(/bull/g,e.bullet)(),e.list=a(e.list)(/bull/g,e.bullet)("hr"
+,"\\n+(?=\\1?(?:[-*_] *){3,}(?:\\n+|$))")("def","\\n+(?="+e.def.source+")")(),e.
+blockquote=a(e.blockquote)("def",e.def)(),e._tag="(?!(?:a|em|strong|small|s|cite|q|dfn|abbr|data|time|code|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo|span|br|wbr|ins|del|img)\\b)\\w+(?!:/|[^\\w\\s@]*@)\\b"
+,e.html=a(e.html)("comment",/<!--[\s\S]*?-->/)("closed",/<(tag)[\s\S]+?<\/\1>/)("closing"
+,/<tag(?:"[^"]*"|'[^']*'|[^'">])*?>/)(/tag/g,e._tag)(),e.paragraph=a(e.paragraph
 )("hr",e.hr)("heading",e.heading)("lheading",e.lheading)("blockquote",e.blockquote
-)("tag","<"+e._tag)("def",e.def)(),e.normal=a({},e),e.gfm=a({},e.normal,{fences:/^ *(`{3,}|~{3,}) *(\S+)? *\n([\s\S]+?)\s*\1 *(?:\n+|$)/
-,paragraph:/^/}),e.gfm.paragraph=o(e.paragraph)("(?!","(?!"+e.gfm.fences.source.
-replace("\\1","\\2")+"|"+e.list.source.replace("\\1","\\3")+"|")(),e.tables=a({}
-,e.gfm,{nptable:/^ *(\S.*\|.*)\n *([-:]+ *\|[-| :]*)\n((?:.*\|.*(?:\n|$))*)\n*/,
-table:/^ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/}),t.rules=e,t.
-lex=function(e,n){var r=new t(n);return r.lex(e)},t.prototype.lex=function(e){return e=
+)("tag","<"+e._tag)("def",e.def)(),e.normal=l({},e),e.gfm=l({},e.normal,{fences:/^ *(`{3,}|~{3,})[ \.]*(\S+)? *\n([\s\S]*?)\s*\1 *(?:\n+|$)/
+,paragraph:/^/,heading:/^ *(#{1,6}) +([^\n]+?) *#* *(?:\n+|$)/}),e.gfm.paragraph=
+a(e.paragraph)("(?!","(?!"+e.gfm.fences.source.replace("\\1","\\2")+"|"+e.list.source
+.replace("\\1","\\3")+"|")(),e.tables=l({},e.gfm,{nptable:/^ *(\S.*\|.*)\n *([-:]+ *\|[-| :]*)\n((?:.*\|.*(?:\n|$))*)\n*/
+,table:/^ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/}),t.rules=e,t
+.lex=function(e,n){var r=new t(n);return r.lex(e)},t.prototype.lex=function(e){return e=
 e.replace(/\r\n|\r/g,"\n").replace(/\t/g,"    ").replace(/\u00a0/g," ").replace(/\u2424/g
-,"\n"),this.token(e,!0)},t.prototype.token=function(t,n){var t=t.replace(/^ +$/gm
-,""),r,i,s,o,u,a,f,l,c;while(t){if(s=this.rules.newline.exec(t))t=t.substring(s[0
-].length),s[0].length>1&&this.tokens.push({type:"space"});if(s=this.rules.code.exec
-(t)){t=t.substring(s[0].length),s=s[0].replace(/^ {4}/gm,""),this.tokens.push({type
-:"code",text:this.options.pedantic?s:s.replace(/\n+$/,"")});continue}if(s=this.rules
-.fences.exec(t)){t=t.substring(s[0].length),this.tokens.push({type:"code",lang:s
-[2],text:s[3]});continue}if(s=this.rules.heading.exec(t)){t=t.substring(s[0].length
-),this.tokens.push({type:"heading",depth:s[1].length,text:s[2]});continue}if(n&&
-(s=this.rules.nptable.exec(t))){t=t.substring(s[0].length),a={type:"table",header
-:s[1].replace(/^ *| *\| *$/g,"").split(/ *\| */),align:s[2].replace(/^ *|\| *$/g
-,"").split(/ *\| */),cells:s[3].replace(/\n$/,"").split("\n")};for(l=0;l<a.align
-.length;l++)/^ *-+: *$/.test(a.align[l])?a.align[l]="right":/^ *:-+: *$/.test(a.
-align[l])?a.align[l]="center":/^ *:-+ *$/.test(a.align[l])?a.align[l]="left":a.align
-[l]=null;for(l=0;l<a.cells.length;l++)a.cells[l]=a.cells[l].split(/ *\| */);this
-.tokens.push(a);continue}if(s=this.rules.lheading.exec(t)){t=t.substring(s[0].length
-),this.tokens.push({type:"heading",depth:s[2]==="="?1:2,text:s[1]});continue}if(
-s=this.rules.hr.exec(t)){t=t.substring(s[0].length),this.tokens.push({type:"hr"}
-);continue}if(s=this.rules.blockquote.exec(t)){t=t.substring(s[0].length),this.tokens
-.push({type:"blockquote_start"}),s=s[0].replace(/^ *> ?/gm,""),this.token(s,n),this
-.tokens.push({type:"blockquote_end"});continue}if(s=this.rules.list.exec(t)){t=t
-.substring(s[0].length),o=s[2],this.tokens.push({type:"list_start",ordered:o.length>1
-}),s=s[0].match(this.rules.item),r=!1,c=s.length,l=0;for(;l<c;l++)a=s[l],f=a.length
-,a=a.replace(/^ *([*+-]|\d+\.) +/,""),~a.indexOf("\n ")&&(f-=a.length,a=this.options
-.pedantic?a.replace(/^ {1,4}/gm,""):a.replace(new RegExp("^ {1,"+f+"}","gm"),"")
-),this.options.smartLists&&l!==c-1&&(u=e.bullet.exec(s[l+1])[0],o!==u&&!(o.length>1&&
-u.length>1)&&(t=s.slice(l+1).join("\n")+t,l=c-1)),i=r||/\n\n(?!\s*$)/.test(a),l!==
-c-1&&(r=a.charAt(a.length-1)==="\n",i||(i=r)),this.tokens.push({type:i?"loose_item_start"
-:"list_item_start"}),this.token(a,!1),this.tokens.push({type:"list_item_end"});this
-.tokens.push({type:"list_end"});continue}if(s=this.rules.html.exec(t)){t=t.substring
-(s[0].length),this.tokens.push({type:this.options.sanitize?"paragraph":"html",pre
-:s[1]==="pre"||s[1]==="script"||s[1]==="style",text:s[0]});continue}if(n&&(s=this
-.rules.def.exec(t))){t=t.substring(s[0].length),this.tokens.links[s[1].toLowerCase
-()]={href:s[2],title:s[3]};continue}if(n&&(s=this.rules.table.exec(t))){t=t.substring
-(s[0].length),a={type:"table",header:s[1].replace(/^ *| *\| *$/g,"").split(/ *\| */
-),align:s[2].replace(/^ *|\| *$/g,"").split(/ *\| */),cells:s[3].replace(/(?: *\| *)?\n$/
-,"").split("\n")};for(l=0;l<a.align.length;l++)/^ *-+: *$/.test(a.align[l])?a.align
-[l]="right":/^ *:-+: *$/.test(a.align[l])?a.align[l]="center":/^ *:-+ *$/.test(a
-.align[l])?a.align[l]="left":a.align[l]=null;for(l=0;l<a.cells.length;l++)a.cells
-[l]=a.cells[l].replace(/^ *\| *| *\| *$/g,"").split(/ *\| */);this.tokens.push(a
-);continue}if(n&&(s=this.rules.paragraph.exec(t))){t=t.substring(s[0].length),this
-.tokens.push({type:"paragraph",text:s[1].charAt(s[1].length-1)==="\n"?s[1].slice
-(0,-1):s[1]});continue}if(s=this.rules.text.exec(t)){t=t.substring(s[0].length),
-this.tokens.push({type:"text",text:s[0]});continue}if(t)throw new Error("Infinite loop on byte: "+
-t.charCodeAt(0))}return this.tokens};var n={escape:/^\\([\\`*{}\[\]()#+\-.!_>])/
-,autolink:/^<([^ >]+(@|:\/)[^ >]+)>/,url:u,tag:/^<!--[\s\S]*?-->|^<\/?\w+(?:"[^"]*"|'[^']*'|[^'">])*?>/
-,link:/^!?\[(inside)\]\(href\)/,reflink:/^!?\[(inside)\]\s*\[([^\]]*)\]/,nolink:/^!?\[((?:\[[^\]]*\]|[^\[\]])*)\]/
-,strong:/^__([\s\S]+?)__(?!_)|^\*\*([\s\S]+?)\*\*(?!\*)/,em:/^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/
-,code:/^(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/,br:/^ {2,}\n(?!\s*$)/,del:u,text:/^[\s\S]+?(?=[\\<!\[_*`]| {2,}\n|$)/
+,"\n"),this.token(e,!0)},t.prototype.token=function(t,n,r){var t=t.replace(/^ +$/gm
+,""),i,s,o,u,a,f,l,c,h;while(t){if(o=this.rules.newline.exec(t))t=t.substring(o[0
+].length),o[0].length>1&&this.tokens.push({type:"space"});if(o=this.rules.code.exec
+(t)){t=t.substring(o[0].length),o=o[0].replace(/^ {4}/gm,""),this.tokens.push({type
+:"code",text:this.options.pedantic?o:o.replace(/\n+$/,"")});continue}if(o=this.rules
+.fences.exec(t)){t=t.substring(o[0].length),this.tokens.push({type:"code",lang:o
+[2],text:o[3]||""});continue}if(o=this.rules.heading.exec(t)){t=t.substring(o[0]
+.length),this.tokens.push({type:"heading",depth:o[1].length,text:o[2]});continue}
+if(n&&(o=this.rules.nptable.exec(t))){t=t.substring(o[0].length),f={type:"table"
+,header:o[1].replace(/^ *| *\| *$/g,"").split(/ *\| */),align:o[2].replace(/^ *|\| *$/g
+,"").split(/ *\| */),cells:o[3].replace(/\n$/,"").split("\n")};for(c=0;c<f.align
+.length;c++)/^ *-+: *$/.test(f.align[c])?f.align[c]="right":/^ *:-+: *$/.test(f.
+align[c])?f.align[c]="center":/^ *:-+ *$/.test(f.align[c])?f.align[c]="left":f.align
+[c]=null;for(c=0;c<f.cells.length;c++)f.cells[c]=f.cells[c].split(/ *\| */);this
+.tokens.push(f);continue}if(o=this.rules.lheading.exec(t)){t=t.substring(o[0].length
+),this.tokens.push({type:"heading",depth:o[2]==="="?1:2,text:o[1]});continue}if(
+o=this.rules.hr.exec(t)){t=t.substring(o[0].length),this.tokens.push({type:"hr"}
+);continue}if(o=this.rules.blockquote.exec(t)){t=t.substring(o[0].length),this.tokens
+.push({type:"blockquote_start"}),o=o[0].replace(/^ *> ?/gm,""),this.token(o,n,!0
+),this.tokens.push({type:"blockquote_end"});continue}if(o=this.rules.list.exec(t
+)){t=t.substring(o[0].length),u=o[2],this.tokens.push({type:"list_start",ordered
+:u.length>1}),o=o[0].match(this.rules.item),i=!1,h=o.length,c=0;for(;c<h;c++)f=o
+[c],l=f.length,f=f.replace(/^ *([*+-]|\d+\.) +/,""),~f.indexOf("\n ")&&(l-=f.length
+,f=this.options.pedantic?f.replace(/^ {1,4}/gm,""):f.replace(new RegExp("^ {1,"+
+l+"}","gm"),"")),this.options.smartLists&&c!==h-1&&(a=e.bullet.exec(o[c+1])[0],u!==
+a&&!(u.length>1&&a.length>1)&&(t=o.slice(c+1).join("\n")+t,c=h-1)),s=i||/\n\n(?!\s*$)/
+.test(f),c!==h-1&&(i=f.charAt(f.length-1)==="\n",s||(s=i)),this.tokens.push({type
+:s?"loose_item_start":"list_item_start"}),this.token(f,!1,r),this.tokens.push({type
+:"list_item_end"});this.tokens.push({type:"list_end"});continue}if(o=this.rules.
+html.exec(t)){t=t.substring(o[0].length),this.tokens.push({type:this.options.sanitize?"paragraph"
+:"html",pre:!this.options.sanitizer&&(o[1]==="pre"||o[1]==="script"||o[1]==="style"
+),text:o[0]});continue}if(!r&&n&&(o=this.rules.def.exec(t))){t=t.substring(o[0].
+length),this.tokens.links[o[1].toLowerCase()]={href:o[2],title:o[3]};continue}if(
+n&&(o=this.rules.table.exec(t))){t=t.substring(o[0].length),f={type:"table",header
+:o[1].replace(/^ *| *\| *$/g,"").split(/ *\| */),align:o[2].replace(/^ *|\| *$/g
+,"").split(/ *\| */),cells:o[3].replace(/(?: *\| *)?\n$/,"").split("\n")};for(c=0
+;c<f.align.length;c++)/^ *-+: *$/.test(f.align[c])?f.align[c]="right":/^ *:-+: *$/
+.test(f.align[c])?f.align[c]="center":/^ *:-+ *$/.test(f.align[c])?f.align[c]="left"
+:f.align[c]=null;for(c=0;c<f.cells.length;c++)f.cells[c]=f.cells[c].replace(/^ *\| *| *\| *$/g
+,"").split(/ *\| */);this.tokens.push(f);continue}if(n&&(o=this.rules.paragraph.
+exec(t))){t=t.substring(o[0].length),this.tokens.push({type:"paragraph",text:o[1
+].charAt(o[1].length-1)==="\n"?o[1].slice(0,-1):o[1]});continue}if(o=this.rules.
+text.exec(t)){t=t.substring(o[0].length),this.tokens.push({type:"text",text:o[0]
+});continue}if(t)throw new Error("Infinite loop on byte: "+t.charCodeAt(0))}return this
+.tokens};var n={escape:/^\\([\\`*{}\[\]()#+\-.!_>])/,autolink:/^<([^ >]+(@|:\/)[^ >]+)>/
+,url:f,tag:/^<!--[\s\S]*?-->|^<\/?\w+(?:"[^"]*"|'[^']*'|[^'">])*?>/,link:/^!?\[(inside)\]\(href\)/
+,reflink:/^!?\[(inside)\]\s*\[([^\]]*)\]/,nolink:/^!?\[((?:\[[^\]]*\]|[^\[\]])*)\]/
+,strong:/^__([\s\S]+?)__(?!_)|^\*\*([\s\S]+?)\*\*(?!\*)/,em:/^\b_((?:[^_]|__)+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/
+,code:/^(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/,br:/^ {2,}\n(?!\s*$)/,del:f,text:/^[\s\S]+?(?=[\\<!\[_*`]| {2,}\n|$)/
 };n._inside=/(?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*/,n._href=/\s*<?([\s\S]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*/
-,n.link=o(n.link)("inside",n._inside)("href",n._href)(),n.reflink=o(n.reflink)("inside"
-,n._inside)(),n.normal=a({},n),n.pedantic=a({},n.normal,{strong:/^__(?=\S)([\s\S]*?\S)__(?!_)|^\*\*(?=\S)([\s\S]*?\S)\*\*(?!\*)/
-,em:/^_(?=\S)([\s\S]*?\S)_(?!_)|^\*(?=\S)([\s\S]*?\S)\*(?!\*)/}),n.gfm=a({},n.normal
-,{escape:o(n.escape)("])","~|])")(),url:/^(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/,del
-:/^~~(?=\S)([\s\S]*?\S)~~/,text:o(n.text)("]|","~]|")("|","|https?://|")()}),n.breaks=
-a({},n.gfm,{br:o(n.br)("{2,}","*")(),text:o(n.gfm.text)("{2,}","*")()}),r.rules=
+,n.link=a(n.link)("inside",n._inside)("href",n._href)(),n.reflink=a(n.reflink)("inside"
+,n._inside)(),n.normal=l({},n),n.pedantic=l({},n.normal,{strong:/^__(?=\S)([\s\S]*?\S)__(?!_)|^\*\*(?=\S)([\s\S]*?\S)\*\*(?!\*)/
+,em:/^_(?=\S)([\s\S]*?\S)_(?!_)|^\*(?=\S)([\s\S]*?\S)\*(?!\*)/}),n.gfm=l({},n.normal
+,{escape:a(n.escape)("])","~|])")(),url:/^(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/,del
+:/^~~(?=\S)([\s\S]*?\S)~~/,text:a(n.text)("]|","~]|")("|","|https?://|")()}),n.breaks=
+l({},n.gfm,{br:a(n.br)("{2,}","*")(),text:a(n.gfm.text)("{2,}","*")()}),r.rules=
 n,r.output=function(e,t,n){var i=new r(t,n);return i.output(e)},r.prototype.output=
-function(e){var t="",n,r,i,o;while(e){if(o=this.rules.escape.exec(e)){e=e.substring
-(o[0].length),t+=o[1];continue}if(o=this.rules.autolink.exec(e)){e=e.substring(o
-[0].length),o[2]==="@"?(r=o[1].charAt(6)===":"?this.mangle(o[1].substring(7)):this
-.mangle(o[1]),i=this.mangle("mailto:")+r):(r=s(o[1]),i=r),t+='<a href="'+i+'">'+
-r+"</a>";continue}if(o=this.rules.url.exec(e)){e=e.substring(o[0].length),r=s(o[1
-]),i=r,t+='<a href="'+i+'">'+r+"</a>";continue}if(o=this.rules.tag.exec(e)){e=e.
-substring(o[0].length),t+=this.options.sanitize?s(o[0]):o[0];continue}if(o=this.
-rules.link.exec(e)){e=e.substring(o[0].length),t+=this.outputLink(o,{href:o[2],title
-:o[3]});continue}if((o=this.rules.reflink.exec(e))||(o=this.rules.nolink.exec(e)
-)){e=e.substring(o[0].length),n=(o[2]||o[1]).replace(/\s+/g," "),n=this.links[n.
-toLowerCase()];if(!n||!n.href){t+=o[0].charAt(0),e=o[0].substring(1)+e;continue}
-t+=this.outputLink(o,n);continue}if(o=this.rules.strong.exec(e)){e=e.substring(o
-[0].length),t+="<strong>"+this.output(o[2]||o[1])+"</strong>";continue}if(o=this
-.rules.em.exec(e)){e=e.substring(o[0].length),t+="<em>"+this.output(o[2]||o[1])+"</em>"
-;continue}if(o=this.rules.code.exec(e)){e=e.substring(o[0].length),t+="<code>"+s
-(o[2],!0)+"</code>";continue}if(o=this.rules.br.exec(e)){e=e.substring(o[0].length
-),t+="<br>";continue}if(o=this.rules.del.exec(e)){e=e.substring(o[0].length),t+="<del>"+
-this.output(o[1])+"</del>";continue}if(o=this.rules.text.exec(e)){e=e.substring(
-o[0].length),t+=s(this.smartypants(o[0]));continue}if(e)throw new Error("Infinite loop on byte: "+
-e.charCodeAt(0))}return t},r.prototype.outputLink=function(e,t){return e[0].charAt
-(0)!=="!"?'<a href="'+s(t.href)+'"'+(t.title?' title="'+s(t.title)+'"':"")+">"+this
-.output(e[1])+"</a>":'<img src="'+s(t.href)+'" alt="'+s(e[1])+'"'+(t.title?' title="'+
-s(t.title)+'"':"")+">"},r.prototype.smartypants=function(e){return this.options.
-smartypants?e.replace(/--/g,"\u2014").replace(/(^|[-\u2014/(\[{"\s])'/g,"$1\u2018"
-).replace(/'/g,"\u2019").replace(/(^|[-\u2014/(\[{\u2018\s])"/g,"$1\u201c").replace
-(/"/g,"\u201d").replace(/\.{3}/g,"\u2026"):e},r.prototype.mangle=function(e){var t=""
-,n=e.length,r=0,i;for(;r<n;r++)i=e.charCodeAt(r),Math.random()>.5&&(i="x"+i.toString
-(16)),t+="&#"+i+";";return t},i.parse=function(e,t){var n=new i(t);return n.parse
-(e)},i.prototype.parse=function(e){this.inline=new r(e.links,this.options),this.
-tokens=e.reverse();var t="";while(this.next())t+=this.tok();return t},i.prototype
-.next=function(){return this.token=this.tokens.pop()},i.prototype.peek=function(
-){return this.tokens[this.tokens.length-1]||0},i.prototype.parseText=function(){
+function(e){var t="",n,r,i,s;while(e){if(s=this.rules.escape.exec(e)){e=e.substring
+(s[0].length),t+=s[1];continue}if(s=this.rules.autolink.exec(e)){e=e.substring(s
+[0].length),s[2]==="@"?(r=s[1].charAt(6)===":"?this.mangle(s[1].substring(7)):this
+.mangle(s[1]),i=this.mangle("mailto:")+r):(r=o(s[1]),i=r),t+=this.renderer.link(
+i,null,r);continue}if(!this.inLink&&(s=this.rules.url.exec(e))){e=e.substring(s[0
+].length),r=o(s[1]),i=r,t+=this.renderer.link(i,null,r);continue}if(s=this.rules
+.tag.exec(e)){!this.inLink&&/^<a /i.test(s[0])?this.inLink=!0:this.inLink&&/^<\/a>/i
+.test(s[0])&&(this.inLink=!1),e=e.substring(s[0].length),t+=this.options.sanitize?
+this.options.sanitizer?this.options.sanitizer(s[0]):o(s[0]):s[0];continue}if(s=this
+.rules.link.exec(e)){e=e.substring(s[0].length),this.inLink=!0,t+=this.outputLink
+(s,{href:s[2],title:s[3]}),this.inLink=!1;continue}if((s=this.rules.reflink.exec
+(e))||(s=this.rules.nolink.exec(e))){e=e.substring(s[0].length),n=(s[2]||s[1]).replace
+(/\s+/g," "),n=this.links[n.toLowerCase()];if(!n||!n.href){t+=s[0].charAt(0),e=s
+[0].substring(1)+e;continue}this.inLink=!0,t+=this.outputLink(s,n),this.inLink=!1
+;continue}if(s=this.rules.strong.exec(e)){e=e.substring(s[0].length),t+=this.renderer
+.strong(this.output(s[2]||s[1]));continue}if(s=this.rules.em.exec(e)){e=e.substring
+(s[0].length),t+=this.renderer.em(this.output(s[2]||s[1]));continue}if(s=this.rules
+.code.exec(e)){e=e.substring(s[0].length),t+=this.renderer.codespan(o(s[2],!0));
+continue}if(s=this.rules.br.exec(e)){e=e.substring(s[0].length),t+=this.renderer
+.br();continue}if(s=this.rules.del.exec(e)){e=e.substring(s[0].length),t+=this.renderer
+.del(this.output(s[1]));continue}if(s=this.rules.text.exec(e)){e=e.substring(s[0
+].length),t+=this.renderer.text(o(this.smartypants(s[0])));continue}if(e)throw new
+Error("Infinite loop on byte: "+e.charCodeAt(0))}return t},r.prototype.outputLink=
+function(e,t){var n=o(t.href),r=t.title?o(t.title):null;return e[0].charAt(0)!=="!"?
+this.renderer.link(n,r,this.output(e[1])):this.renderer.image(n,r,o(e[1]))},r.prototype
+.smartypants=function(e){return this.options.smartypants?e.replace(/---/g,"\u2014"
+).replace(/--/g,"\u2013").replace(/(^|[-\u2014/(\[{"\s])'/g,"$1\u2018").replace(/'/g
+,"\u2019").replace(/(^|[-\u2014/(\[{\u2018\s])"/g,"$1\u201c").replace(/"/g,"\u201d"
+).replace(/\.{3}/g,"\u2026"):e},r.prototype.mangle=function(e){if(!this.options.
+mangle)return e;var t="",n=e.length,r=0,i;for(;r<n;r++)i=e.charCodeAt(r),Math.random
+()>.5&&(i="x"+i.toString(16)),t+="&#"+i+";";return t},i.prototype.code=function(
+e,t,n){if(this.options.highlight){var r=this.options.highlight(e,t);r!=null&&r!==
+e&&(n=!0,e=r)}return t?'<pre><code class="'+this.options.langPrefix+o(t,!0)+'">'+
+(n?e:o(e,!0))+"\n</code></pre>\n":"<pre><code>"+(n?e:o(e,!0))+"\n</code></pre>"}
+,i.prototype.blockquote=function(e){return"<blockquote>\n"+e+"</blockquote>\n"},
+i.prototype.html=function(e){return e},i.prototype.heading=function(e,t,n){return"<h"+
+t+' id="'+this.options.headerPrefix+n.toLowerCase().replace(/[^\w]+/g,"-")+'">'+
+e+"</h"+t+">\n"},i.prototype.hr=function(){return this.options.xhtml?"<hr/>\n":"<hr>\n"
+},i.prototype.list=function(e,t){var n=t?"ol":"ul";return"<"+n+">\n"+e+"</"+n+">\n"
+},i.prototype.listitem=function(e){return"<li>"+e+"</li>\n"},i.prototype.paragraph=
+function(e){return"<p>"+e+"</p>\n"},i.prototype.table=function(e,t){return"<table>\n<thead>\n"+
+e+"</thead>\n"+"<tbody>\n"+t+"</tbody>\n"+"</table>\n"},i.prototype.tablerow=function(
+e){return"<tr>\n"+e+"</tr>\n"},i.prototype.tablecell=function(e,t){var n=t.header?"th"
+:"td",r=t.align?"<"+n+' style="text-align:'+t.align+'">':"<"+n+">";return r+e+"</"+
+n+">\n"},i.prototype.strong=function(e){return"<strong>"+e+"</strong>"},i.prototype
+.em=function(e){return"<em>"+e+"</em>"},i.prototype.codespan=function(e){return"<code>"+
+e+"</code>"},i.prototype.br=function(){return this.options.xhtml?"<br/>":"<br>"}
+,i.prototype.del=function(e){return"<del>"+e+"</del>"},i.prototype.link=function(
+e,t,n){if(this.options.sanitize){try{var r=decodeURIComponent(u(e)).replace(/[^\w:]/g
+,"").toLowerCase()}catch(i){return""}if(r.indexOf("javascript:")===0||r.indexOf("vbscript:"
+)===0||r.indexOf("data:")===0)return""}var s='<a href="'+e+'"';return t&&(s+=' title="'+
+t+'"'),s+=">"+n+"</a>",s},i.prototype.image=function(e,t,n){var r='<img src="'+e+'" alt="'+
+n+'"';return t&&(r+=' title="'+t+'"'),r+=this.options.xhtml?"/>":">",r},i.prototype
+.text=function(e){return e},s.parse=function(e,t,n){var r=new s(t,n);return r.parse
+(e)},s.prototype.parse=function(e){this.inline=new r(e.links,this.options,this.renderer
+),this.tokens=e.reverse();var t="";while(this.next())t+=this.tok();return t},s.prototype
+.next=function(){return this.token=this.tokens.pop()},s.prototype.peek=function(
+){return this.tokens[this.tokens.length-1]||0},s.prototype.parseText=function(){
 var e=this.token.text;while(this.peek().type==="text")e+="\n"+this.next().text;return this
-.inline.output(e)},i.prototype.tok=function(){switch(this.token.type){case"space"
-:return"";case"hr":return"<hr>\n";case"heading":return"<h"+this.token.depth+' id="'+
-this.token.text.toLowerCase().replace(/[^\w]+/g,"-")+'">'+this.inline.output(this
-.token.text)+"</h"+this.token.depth+">\n";case"code":if(this.options.highlight){
-var e=this.options.highlight(this.token.text,this.token.lang);e!=null&&e!==this.
-token.text&&(this.token.escaped=!0,this.token.text=e)}return this.token.escaped||
-(this.token.text=s(this.token.text,!0)),"<pre><code"+(this.token.lang?' class="'+
-this.options.langPrefix+this.token.lang+'"':"")+">"+this.token.text+"</code></pre>\n"
-;case"table":var t="",n,r,i,o,u;t+="<thead>\n<tr>\n";for(r=0;r<this.token.header
-.length;r++)n=this.inline.output(this.token.header[r]),t+="<th",this.token.align
-[r]&&(t+=' style="text-align:'+this.token.align[r]+'"'),t+=">"+n+"</th>\n";t+="</tr>\n</thead>\n"
-,t+="<tbody>\n";for(r=0;r<this.token.cells.length;r++){i=this.token.cells[r],t+="<tr>\n"
-;for(u=0;u<i.length;u++)o=this.inline.output(i[u]),t+="<td",this.token.align[u]&&
-(t+=' style="text-align:'+this.token.align[u]+'"'),t+=">"+o+"</td>\n";t+="</tr>\n"
-}return t+="</tbody>\n","<table>\n"+t+"</table>\n";case"blockquote_start":var t=""
-;while(this.next().type!=="blockquote_end")t+=this.tok();return"<blockquote>\n"+
-t+"</blockquote>\n";case"list_start":var a=this.token.ordered?"ol":"ul",t="";while(
-this.next().type!=="list_end")t+=this.tok();return"<"+a+">\n"+t+"</"+a+">\n";case"list_item_start"
+.inline.output(e)},s.prototype.tok=function(){switch(this.token.type){case"space"
+:return"";case"hr":return this.renderer.hr();case"heading":return this.renderer.
+heading(this.inline.output(this.token.text),this.token.depth,this.token.text);case"code"
+:return this.renderer.code(this.token.text,this.token.lang,this.token.escaped);case"table"
+:var e="",t="",n,r,i,s,o;i="";for(n=0;n<this.token.header.length;n++)s={header:!0
+,align:this.token.align[n]},i+=this.renderer.tablecell(this.inline.output(this.token
+.header[n]),{header:!0,align:this.token.align[n]});e+=this.renderer.tablerow(i);
+for(n=0;n<this.token.cells.length;n++){r=this.token.cells[n],i="";for(o=0;o<r.length
+;o++)i+=this.renderer.tablecell(this.inline.output(r[o]),{header:!1,align:this.token
+.align[o]});t+=this.renderer.tablerow(i)}return this.renderer.table(e,t);case"blockquote_start"
+:var t="";while(this.next().type!=="blockquote_end")t+=this.tok();return this.renderer
+.blockquote(t);case"list_start":var t="",u=this.token.ordered;while(this.next().
+type!=="list_end")t+=this.tok();return this.renderer.list(t,u);case"list_item_start"
 :var t="";while(this.next().type!=="list_item_end")t+=this.token.type==="text"?this
-.parseText():this.tok();return"<li>"+t+"</li>\n";case"loose_item_start":var t=""
-;while(this.next().type!=="list_item_end")t+=this.tok();return"<li>"+t+"</li>\n"
-;case"html":return!this.token.pre&&!this.options.pedantic?this.inline.output(this
-.token.text):this.token.text;case"paragraph":return"<p>"+this.inline.output(this
-.token.text)+"</p>\n";case"text":return"<p>"+this.parseText()+"</p>\n"}},u.exec=
-u,f.options=f.setOptions=function(e){return a(f.defaults,e),f},f.defaults={gfm:!0
-,tables:!0,breaks:!1,pedantic:!1,sanitize:!1,smartLists:!1,silent:!1,highlight:null
-,langPrefix:"lang-",smartypants:!1},f.Parser=i,f.parser=i.parse,f.Lexer=t,f.lexer=
-t.lex,f.InlineLexer=r,f.inlineLexer=r.output,f.parse=f,typeof exports=="object"?
-module.exports=f:typeof define=="function"&&define.amd?define(function(){return f
-}):this.marked=f}).call(function(){return this||(typeof window!="undefined"?window
-:global)}())
+.parseText():this.tok();return this.renderer.listitem(t);case"loose_item_start":
+var t="";while(this.next().type!=="list_item_end")t+=this.tok();return this.renderer
+.listitem(t);case"html":var a=!this.token.pre&&!this.options.pedantic?this.inline
+.output(this.token.text):this.token.text;return this.renderer.html(a);case"paragraph"
+:return this.renderer.paragraph(this.inline.output(this.token.text));case"text":
+return this.renderer.paragraph(this.parseText())}},f.exec=f,c.options=c.setOptions=
+function(e){return l(c.defaults,e),c},c.defaults={gfm:!0,tables:!0,breaks:!1,pedantic
+:!1,sanitize:!1,sanitizer:null,mangle:!0,smartLists:!1,silent:!1,highlight:null,
+langPrefix:"lang-",smartypants:!1,headerPrefix:"",renderer:new i,xhtml:!1},c.Parser=
+s,c.parser=s.parse,c.Renderer=i,c.Lexer=t,c.lexer=t.lex,c.InlineLexer=r,c.inlineLexer=
+r.output,c.parse=c,typeof module!="undefined"&&typeof exports=="object"?module.exports=
+c:typeof define=="function"&&define.amd?define(function(){return c}):this.marked=
+c}).call(function(){return this||(typeof window!="undefined"?window:global)}())
 local.marked = module.exports; }());
 /* jslint-ignore-end */
     if (local.modeJs === 'browser') {
@@ -14735,6 +14952,7 @@ split_lines=split_lines,exports.MAP=MAP,exports.ast_squeeze_more=require("./sque
 /* script-begin /assets.utility2.js */
 ///usr/bin/env node
 /* istanbul instrument in package utility2 */
+/* jslint-utility2 */
 /*jslint
     bitwise: true,
     browser: true,
@@ -14813,6 +15031,7 @@ split_lines=split_lines,exports.MAP=MAP,exports.ast_squeeze_more=require("./sque
 
     // run shared js-env code - function-before
     (function () {
+        local._consoleError = console.error;
         // init global.debug_inline
         local.global['debug_inline'.replace('_i', 'I')] = local.global[
             'debug_inline'.replace('_i', 'I')
@@ -14822,9 +15041,9 @@ split_lines=split_lines,exports.MAP=MAP,exports.ast_squeeze_more=require("./sque
          */
             // debug arguments
             local['_debug_inlineArguments'.replace('_i', 'I')] = arguments;
-            console.error('\n\n\ndebug_inline'.replace('_i', 'I'));
-            console.error.apply(console, arguments);
-            console.error();
+            local._consoleError('\n\n\ndebug_inline'.replace('_i', 'I'));
+            local._consoleError.apply(console, arguments);
+            local._consoleError();
             // return arg for inspection
             return arg;
         };
@@ -14848,29 +15067,39 @@ split_lines=split_lines,exports.MAP=MAP,exports.ast_squeeze_more=require("./sque
             local[key] = local[key] || {};
         });
         // init assets and templates
-        local.assetsDict = {};
+        local.assetsDict = local.assetsDict || {};
 
 
 
 /* jslint-ignore-begin */
-local.assetsDict['/assets.index.default.template.html'] =
-local.assetsDict['/assets.index.template.html'] = '\
-<!doctype html>\n\
-<html lang="en">\n\
-<head>\n\
-<meta charset="UTF-8">\n\
-<meta name="viewport" content="width=device-width, initial-scale=1">\n\
-<!-- "assets.index.default.template.html" -->\n\
-<title>{{env.npm_package_name}} (v{{env.npm_package_version}})</title>\n\
-<style>\n\
+local.assetsDict['/assets.utility2.css'] = '\
+/* jslint-utility2 */\n\
 /*csslint\n\
-    box-sizing: false,\n\
-    universal-selector: false\n\
 */\n\
+/* jslint-ignore-begin */\n\
 *,\n\
 *:after,\n\
 *:before {\n\
     box-sizing: border-box;\n\
+}\n\
+/* jslint-ignore-end */\n\
+@keyframes uiAnimateShake {\n\
+    0%, 50% {\n\
+        transform: translateX(10px);\n\
+    }\n\
+    25%, 75% {\n\
+        transform: translateX(-10px);\n\
+    }\n\
+    100% {\n\
+        transform: translateX(0);\n\
+    }\n\
+}\n\
+@keyframes uiAnimateSpin {\n\
+    0% { transform: rotate(0deg); }\n\
+    100% { transform: rotate(360deg); }\n\
+}\n\
+a {\n\
+    overflow-wrap: break-word;\n\
 }\n\
 body {\n\
     background: #dde;\n\
@@ -14893,20 +15122,20 @@ body > button {\n\
 button {\n\
     cursor: pointer;\n\
 }\n\
+code,\n\
+pre,\n\
+textarea {\n\
+    font-family: Menlo, Consolas, Courier New, monospace;\n\
+    font-size: small;\n\
+}\n\
 pre {\n\
     overflow-wrap: break-word;\n\
     white-space: pre-wrap;\n\
 }\n\
-@keyframes uiAnimateShake {\n\
-    100% {\n\
-        transform: translateX(0);\n\
-    }\n\
-    0%, 20%, 60% {\n\
-        transform: translateX(10px);\n\
-    }\n\
-    40%, 80% {\n\
-        transform: translateX(-10px);\n\
-    }\n\
+.textOverflowEllipsis {\n\
+    overflow: hidden;\n\
+    text-overflow: ellipsis;\n\
+    white-space: nowrap;\n\
 }\n\
 .uiAnimateShake {\n\
     animation-duration: 500ms;\n\
@@ -14915,10 +15144,6 @@ pre {\n\
 .uiAnimateSlide {\n\
     overflow-y: hidden;\n\
     transition: max-height ease-in 250ms, min-height ease-in 250ms, padding-bottom ease-in 250ms, padding-top ease-in 250ms;\n\
-}\n\
-@keyframes uiAnimateSpin {\n\
-    0% { transform: rotate(0deg); }\n\
-    100% { transform: rotate(360deg); }\n\
 }\n\
 .utility2FooterDiv {\n\
     text-align: center;\n\
@@ -14930,12 +15155,28 @@ pre {\n\
     padding: 0;\n\
     width: 0;\n\
 }\n\
+';
+
+
+
+/* validateLineSortedReset */
+local.assetsDict['/assets.index.default.template.html'] =
+local.assetsDict['/assets.index.template.html'] = '\
+<!doctype html>\n\
+<html lang="en">\n\
+<head>\n\
+<meta charset="UTF-8">\n\
+<meta name="viewport" content="width=device-width, initial-scale=1">\n\
+<!-- "assets.index.default.template.html" -->\n\
+<title>{{env.npm_package_name}} (v{{env.npm_package_version}})</title>\n\
+<style>\n\
+' + local.assetsDict['/assets.utility2.css'] + '\
 </style>\n\
 <style>\n\
+/* jslint-utility2 */\n\
 /*csslint\n\
 */\n\
 textarea {\n\
-    font-family: monospace;\n\
     height: 10rem;\n\
     width: 100%;\n\
 }\n\
@@ -14948,6 +15189,7 @@ textarea[readonly] {\n\
 <div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%; z-index: 1;"></div>\n\
 <div class="uiAnimateSpin" style="animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: none; height: 25px; vertical-align: middle; width: 25px;"></div>\n\
 <script>\n\
+/* jslint-utility2 */\n\
 /*jslint\n\
     bitwise: true,\n\
     browser: true,\n\
@@ -15008,7 +15250,7 @@ utility2-comment -->\n\
 </h1>\n\
 <h3>{{env.npm_package_description}}</h3>\n\
 <!-- utility2-comment\n\
-<h4><a download href="assets.app.js">download standalone app</a></h4>\n\
+<h4><a download href="assets.app.js">[download standalone app]</a></h4>\n\
 <button class="onclick onreset" id="testRunButton1">run internal test</button><br>\n\
 <div class="uiAnimateSlide" id="testReportDiv1" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>\n\
 utility2-comment -->\n\
@@ -15070,6 +15312,7 @@ instruction\n\
 \n\
 \n\
 /* istanbul instrument in package jslint */\n\
+/* jslint-utility2 */\n\
 /*jslint\n\
     bitwise: true,\n\
     browser: true,\n\
@@ -15242,8 +15485,6 @@ local.assetsDict['/assets.index.template.html'].replace((/\n/g), '\\n\\\n') + '\
             local.assetsDict[\'/assets.example.html\'] =\n\
             local.assetsDict[\'/assets.index.template.html\']\n\
             .replace((/\\{\\{env\\.(\\w+?)\\}\\}/g), function (match0, match1) {\n\
-                // jslint-hack\n\
-                String(match0);\n\
                 switch (match1) {\n\
                 case \'npm_package_description\':\n\
                     return \'the greatest app in the world!\';\n\
@@ -15303,6 +15544,7 @@ local.assetsDict['/assets.index.template.html'].replace((/\n/g), '\\n\\\n') + '\
 
 local.assetsDict['/assets.lib.template.js'] = '\
 /* istanbul instrument in package jslint */\n\
+/* jslint-utility2 */\n\
 /*jslint\n\
     bitwise: true,\n\
     browser: true,\n\
@@ -15691,6 +15933,7 @@ local.assetsDict['/assets.readmeCustomOrg.npmtest.template.md'] = '\
 
 local.assetsDict['/assets.test.template.js'] = '\
 /* istanbul instrument in package jslint */\n\
+/* jslint-utility2 */\n\
 /*jslint\n\
     bitwise: true,\n\
     browser: true,\n\
@@ -15743,22 +15986,44 @@ local.assetsDict['/assets.test.template.js'] = '\
 local.assetsDict['/assets.testReport.template.html'] = '\
 <div class="testReportDiv">\n\
 <style>\n\
+' + local.assetsDict['/assets.utility2.css'] + '\
+</style>\n\
+<style>\n\
+/* jslint-utility2 */\n\
 /*csslint\n\
 */\n\
 .testReportDiv {\n\
     font-family: Arial, Helvetica, sans-serif;\n\
-}\n\
-.testReportDiv .displayNone {\n\
-    display: none;\n\
-}\n\
-.testReportDiv .footer {\n\
-    text-align: center;\n\
 }\n\
 .testReportDiv img {\n\
     border: 1px solid black;\n\
     margin: 5px 0 5px 0;\n\
     max-height: 256px;\n\
     max-width: 512px;\n\
+}\n\
+.testReportDiv pre {\n\
+    background: #fdd;\n\
+    border-top: 1px solid black;\n\
+    margin-bottom: 0;\n\
+    padding: 10px;\n\
+}\n\
+.testReportDiv span {\n\
+    display: inline-block;\n\
+    width: 120px;\n\
+}\n\
+.testReportDiv table {\n\
+    border-top: 1px solid black;\n\
+    text-align: left;\n\
+    width: 100%;\n\
+}\n\
+.testReportDiv table > tbody > tr:nth-child(odd) {\n\
+    background: #bfb;\n\
+}\n\
+.testReportDiv .displayNone {\n\
+    display: none;\n\
+}\n\
+.testReportDiv .footer {\n\
+    text-align: center;\n\
 }\n\
 .testReportDiv .platform {\n\
     background: #fff;\n\
@@ -15767,27 +16032,7 @@ local.assetsDict['/assets.testReport.template.html'] = '\
     padding: 0 10px 10px 10px;\n\
     text-align: left;\n\
 }\n\
-.testReportDiv pre {\n\
-    background: #fdd;\n\
-    border-top: 1px solid black;\n\
-    margin-bottom: 0;\n\
-    overflow-wrap: break-word;\n\
-    padding: 10px;\n\
-    white-space: pre-wrap;\n\
-}\n\
-.testReportDiv span {\n\
-    display: inline-block;\n\
-    width: 120px;\n\
-}\n\
 .testReportDiv .summary {\n\
-    background: #bfb;\n\
-}\n\
-.testReportDiv table {\n\
-    border-top: 1px solid black;\n\
-    text-align: left;\n\
-    width: 100%;\n\
-}\n\
-.testReportDiv table > tbody > tr:nth-child(odd) {\n\
     background: #bfb;\n\
 }\n\
 .testReportDiv .testFailed {\n\
@@ -16047,7 +16292,7 @@ local.assetsDict['/favicon.ico'] = '';
          */
             var boundary, result;
             // handle null-case
-            if (this.entryList.length === 0) {
+            if (!this.entryList.length) {
                 onError(null, local.bufferCreate());
                 return;
             }
@@ -16466,9 +16711,7 @@ local.assetsDict['/favicon.ico'] = '';
              * but it is presumed that the file descriptor or handle has already been bound
              * to a port or domain socket
              */
-                // jslint-hack
-                local.nop(port);
-                onError();
+                onError(null, port);
             } };
         };
 
@@ -16569,7 +16812,8 @@ local.assetsDict['/favicon.ico'] = '';
         /*
          * this function will test webpage's default handling-behavior
          */
-            if (local.modeJs !== 'node') {
+            if (local.modeJs === 'browser') {
+                local.validateDocumentStyle();
                 onError(null, options);
                 return;
             }
@@ -17233,9 +17477,8 @@ function TranslateElementInit() {\n\
                         options.fileScreenshotBase + '.html',
                         'utf8'
                     ).replace((/ data-scrape="([\S\s]*?)"/), function (match0, match1) {
-                        // jslint-hack
-                        local.nop(match0);
-                        data = JSON.parse(match1
+                        match0 = match1;
+                        data = JSON.parse(match0
                             .replace((/&quot;/g), '"')
                             .replace((/&amp;/g), '&'));
                     });
@@ -17375,7 +17618,7 @@ function TranslateElementInit() {\n\
                     options.browserWindow.loadURL('file://' + options.fileElectronHtml, {
                         userAgent: options.modeBrowserTest === 'scrape' &&
                             'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 ' +
-                            '(KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'
+                            '(KHTML, like Gecko) Chrome/64.0.1234.123 Safari/537.36'
                     });
                     break;
                 // node.electron - after html
@@ -17813,7 +18056,7 @@ return Utf8ArrayToStr(bff);
          * this function will build the app
          */
             options = local.objectSetDefault(options, { assetsList: [] });
-            // validate fileKeySorted
+            // validateLineSorted
             local._debugAssertError = null;
             options.data = [
                 'README.md',
@@ -17825,7 +18068,9 @@ return Utf8ArrayToStr(bff);
                     // filter `
                     .replace((/^`.*?\n/gm), '')
                     // filter skip
-                    .replace((/^( {4}\/\/ run .*?\bjs-env code)\b/gm), '`$1')
+                    .replace((
+                        /^( {4}\/\/ run .*?\bjs-env code\b|\/\* validateLineSortedReset \*\/)/gm
+                    ), '`$1')
                     .replace((/^(\/\/ init lib)\b/gm), '`$1')
                     // filter local
                     .replace((/^ *?local\.(?:modeJs|global|local|tmp)\b.*?\n/gm), '')
@@ -17840,12 +18085,14 @@ return Utf8ArrayToStr(bff);
                     .replace((/^[^`].*?\n/gm), '')
                     .replace((/^`/gm), '');
             }).join('\n').trim();
-            local.fs.writeFileSync('tmp/validateFileKeySorted.js', options.data);
+            // debug validateLineSorted
+            local.fs.writeFileSync('tmp/validateLineSorted.js', options.data);
             options.keyLocal = options.keySh = '';
             options.data.split('\n').forEach(function (line) {
                 line = line.trim();
                 switch (line.slice(0, 2)) {
                 case '':
+                case '/*':
                 case '//':
                     // reset key
                     options.keyLocal = options.keySh = '';
@@ -17861,7 +18108,7 @@ return Utf8ArrayToStr(bff);
                     // validate key < line
                     local.assert(
                         options.keySh <= line,
-                        [options.file, options.keySh, line],
+                        'buildApp.sortError\n' + options.file + '\n' + options.keySh + '\n' + line,
                         console.error
                     );
                     // update key
@@ -17871,7 +18118,8 @@ return Utf8ArrayToStr(bff);
                     // validate key < line
                     local.assert(
                         options.keyLocal <= line,
-                        [options.file, options.keyLocal, line],
+                        'buildApp.sortError\n' + options.file + '\n' + options.keyLocal + '\n' +
+                            line,
                         console.error
                     );
                     // update key
@@ -18073,20 +18321,6 @@ return Utf8ArrayToStr(bff);
                     });
                 });
             });
-            /* istanbul ignore next */
-            if (!local.env.npm_config_mode_coverage) {
-                // normalize function-before
-                options.dataTo = options.dataTo.replace(new RegExp('\\n {4}\\/\\/ ' +
-                    'run shared js-env code - function-before\\n' +
-                    '[\\S\\s]+?\\n {4}\\}\\(\\)\\);\\n'), function (match0) {
-                    return match0.replace(new RegExp('^ {8}local\\.(\\w+) = ' +
-                        'function \\([\\S\\s]+?\\n {8}\\};$', 'gm'), function (match0, match1) {
-                        return typeof local[match1] === 'function'
-                            ? '        local.' + match1 + ' = ' + local[match1].toString() + ';'
-                            : match0;
-                    });
-                });
-            }
             // customize local
             if (local.fs.existsSync('./assets.utility2.rollup.js') &&
                     local.env.npm_package_nameLib !== 'swgg') {
@@ -18101,6 +18335,35 @@ return Utf8ArrayToStr(bff);
                 'lib.' + local.env.npm_package_nameLib + '.js',
                 options.dataTo
             );
+            // normalize function-before
+            /* istanbul ignore next */
+            [
+                'lib.' + local.env.npm_package_nameLib + '.js',
+                'lib.' + local.env.npm_package_nameLib + '.sh',
+                'npm_scripts.sh'
+            ].forEach(function (file) {
+                if (local.env.npm_config_mode_coverage) {
+                    return;
+                }
+                options.dataFunctionBefore = (local.tryCatchReadFile(
+                    file,
+                    'utf8'
+                )).replace(file.slice(-3) === '.js'
+                    ? new RegExp('\\n {4}\\/\\/ run shared js-env code - function-before\\n' +
+                        '[\\S\\s]+?\\n {4}\\}\\(\\)\\);\\n')
+                    : (/^[\S\s]*?$/), function (match0) {
+                        return match0.replace((
+                            /^ {8}local\.(\w+) = function \([\S\s]+?\n {8}\};$/gm
+                        ), function (match0, match1) {
+                            return typeof local[match1] === 'function'
+                                ? '        local.' + match1 + ' = ' + local[match1].toString() + ';'
+                                : match0;
+                        });
+                    });
+                if (options.dataFunctionBefore) {
+                    local.fs.writeFileSync(file, options.dataFunctionBefore);
+                }
+            });
             onError();
         };
 
@@ -18195,6 +18458,10 @@ return Utf8ArrayToStr(bff);
                     });
                 });
             });
+            // customize version
+            options.dataTo = options.dataTo.replace((
+                /^(#### changelog for v|- npm publish v)\d{4}\.\d{1,2}\.\d{1,2}.*?$/gm
+            ), '$1' + options.packageJson.version);
             // customize swaggerdoc
             if (!local.assetsDict['/assets.swgg.swagger.json'] ||
                     (/\bswggUiContainer\b/).test(local.assetsDict['/index.html']) ||
@@ -18270,12 +18537,11 @@ return Utf8ArrayToStr(bff);
             // customize toc
             options.toc = '\n# table of contents\n';
             options.dataTo.replace(/\n\n\n\n# (.*)/g, function (match0, match1) {
-                // jslint-hack
-                local.nop(match0);
-                if (match1 === 'table of contents') {
+                match0 = match1;
+                if (match0 === 'table of contents') {
                     return;
                 }
-                options.toc += '1. [' + match1 + '](#' + match1.toLowerCase()
+                options.toc += '1. [' + match0 + '](#' + match0.toLowerCase()
                     .replace(/[^ \-0-9A-Z_a-z]/g, '').replace(/ /g, '-') + ')\n';
             });
             options.dataTo = options.dataTo.replace('\n# table of contents\n', options.toc);
@@ -18293,18 +18559,14 @@ return Utf8ArrayToStr(bff);
                     local.fs.readFileSync('assets.swgg.swagger.json', 'utf8')
                 ));
                 local.objectSetOverride(options.swaggerJson, { info: {
-                    description: options.packageJson.description,
                     title: options.packageJson.name,
                     version: options.packageJson.version,
-                    'x-swgg-downloadStandaloneApp': ((/\bhttps:\/\/.*?\/assets\.app\.js/).exec(
-                        options.dataTo.replace(new RegExp(
-                            'https:\/\/kaizhu256.github.io' +
-                                '\/node-utility2\/build..beta..travis-ci.org\/app\/assets.app.js',
-                            'g'
-                        ), '')
-                    ) || {})[0],
+                    'x-swgg-description': options.packageJson.description,
                     'x-swgg-homepage': options.packageJson.homepage
                 } }, 2);
+                options.dataTo.replace((/\bhttps:\/\/.*?\/assets\.app\.js/), function (match0) {
+                    options.swaggerJson['x-swgg-downloadStandaloneApp'] = match0;
+                });
                 // save assets.swgg.swagger.json
                 local.fs.writeFileSync('assets.swgg.swagger.json', local.jsonStringifyOrdered(
                     options.swaggerJson,
@@ -18427,6 +18689,8 @@ return Utf8ArrayToStr(bff);
              * print help
              */
                 var element, result, lengthList, sortDict;
+                console.log(require(__dirname + '/package.json').name + ' v' +
+                    require(__dirname + '/package.json').version);
                 sortDict = {};
                 result = [['[command]', '[args]', '[description]', -1]];
                 lengthList = [result[0][0].length, result[0][1].length];
@@ -18467,7 +18731,7 @@ return Utf8ArrayToStr(bff);
                         }
                     });
                     element = element.slice(0, 3).join('---- ');
-                    if (ii === 0) {
+                    if (!ii) {
                         element = element.replace((/-/g), ' ');
                     }
                     console.log(element);
@@ -18490,6 +18754,15 @@ return Utf8ArrayToStr(bff);
                     local.cliDict._interactive;
                 local.cliDict['-i'] = local.cliDict['-i'] || local.cliDict._interactive;
             }
+            local.cliDict._version = local.cliDict._version || function () {
+            /*
+             * [none]
+             * print version
+             */
+                console.log(require(__dirname + '/package.json').version);
+            };
+            local.cliDict['--version'] = local.cliDict['--version'] || local.cliDict._version;
+            local.cliDict['-v'] = local.cliDict['-v'] || local.cliDict._version;
             // run fnc()
             fnc = fnc || function () {
                 if (local.cliDict[process.argv[2]]) {
@@ -18508,9 +18781,8 @@ return Utf8ArrayToStr(bff);
             var result;
             result = {};
             document.cookie.replace((/(\w+)=([^;]*)/g), function (match0, match1, match2) {
-                // jslint-hack
-                local.nop(match0);
-                result[match1] = match2;
+                match0 = match1;
+                result[match0] = match2;
             });
             return result;
         };
@@ -18527,9 +18799,8 @@ return Utf8ArrayToStr(bff);
          * this function will remove all cookies
          */
             document.cookie.replace((/(\w+)=/g), function (match0, match1) {
-                // jslint-hack
-                local.nop(match0);
-                document.cookie = match1 + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                match0 = match1;
+                document.cookie = match0 + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
             });
         };
 
@@ -18557,7 +18828,6 @@ return Utf8ArrayToStr(bff);
             location.pathname.replace(
                 (/\/build\.\.(alpha|beta|master)\.\.travis-ci\.org\//),
                 function (match0, match1) {
-                    // jslint-hack
                     match0 = match1;
                     backendHost = backendHost.replace('-alpha.', '-' + match0 + '.');
                 }
@@ -18571,9 +18841,9 @@ return Utf8ArrayToStr(bff);
          */
             return local.modeJs === 'browser' &&
                 local.env.npm_package_nameLib &&
-                xhr.url.match(/^https{0,1}:\/\//) &&
+                (/^https?:\/\//).test(xhr.url) &&
                 xhr.url.indexOf(xhr.location.protocol + '//' + xhr.location.host) !== 0 &&
-                xhr.location.host.match(/\.github\.io$/) &&
+                (/\.github\.io$/).test(xhr.location.host) &&
                 xhr.corsForwardProxyHost !== 'disabled' &&
                 (xhr.corsForwardProxyHost || 'https://h1-proxy1.herokuapp.com');
         };
@@ -18737,51 +19007,6 @@ return Utf8ArrayToStr(bff);
             options.modeNext = 0;
             options.onNext();
             return self;
-        };
-
-        local.debugDocumentStyle = function () {
-        /*
-         * this function will validate the document's style
-         */
-            var tmp;
-            tmp = [];
-            Array.from(document.querySelectorAll('style')).forEach(function (element) {
-                element.innerHTML.split('\n').forEach(function (element) {
-                    try {
-                        element = element.trim().slice(0, -1).trim();
-                        tmp.push([document.querySelectorAll(element).length, element]);
-                    } catch (ignore) {
-                    }
-                });
-            });
-            tmp
-                .map(function (element) {
-                    return ('000000' + element[0]).slice(-6) + ' ' + element[1];
-                })
-                .sort()
-                .map(function (element, ii) {
-                    return ii + '. ' + element;
-                })
-                .reverse()
-                .forEach(function (element) {
-                    console.error(element);
-                });
-            Array.from(document.querySelectorAll('style')).forEach(function (element) {
-                element.innerHTML.split((/\n\/\*.*?\n/g)).forEach(function (element) {
-                    tmp = '';
-                    element.replace((/(^[\w#.].*?[,{]\n)+/gm), function (match0) {
-                        match0.trim().split('\n').forEach(function (element, ii, list) {
-                            element = element.replace((/[^\w\-]+/gm), ' ').trim();
-                            if (ii === 0) {
-                                local.assert(element >= tmp, [tmp, element, match0]);
-                                tmp = element;
-                                return;
-                            }
-                            local.assert(element >= list[ii - 1], [list[ii - 1], element, match0]);
-                        });
-                    });
-                });
-            });
         };
 
         local.domElementRender = function (template, dict) {
@@ -18974,45 +19199,21 @@ return Utf8ArrayToStr(bff);
 
         local.jslintAndPrintConditional = function (script, file, mode) {
         /*
-         * this function will jslint / csslint the script and print any errors to stderr,
-         * conditionally
+         * this function will jslint / csslint the script and print any errors to stderr
+         * conditionally, depending on macros
          */
-            // cleanup errors
-            local.jslint.errorCounter = 0;
-            local.jslint.errorText = '';
             // optimization - ignore uglified/rollup files
             if (!script || script.length >= 0x100000) {
                 return script;
             }
-            switch (((/\.\w+$/).exec(file) || {})[0]) {
+            switch (file.replace((/^.*\./), '.')) {
             case '.css':
                 if (script.indexOf('/*csslint') >= 0 || mode === 'force') {
                     local.jslintAndPrint(script, file);
                 }
                 break;
-            case '.html':
-                // csslint <style> tag
-                script.replace(
-                    (/<style>([\S\s]+?)<\/style>/g),
-                    function (match0, match1, ii, text) {
-                        // jslint-hack
-                        local.nop(match0);
-                        // preserve lineno
-                        match1 = text.slice(0, ii).replace((/.+/g), '') + match1;
-                        local.jslintAndPrintConditional(match1, file + '.css', mode);
-                    }
-                );
-                // jslint <script> tag
-                script.replace(
-                    (/<script>([\S\s]+?)<\/script>/g),
-                    function (match0, match1, ii, text) {
-                        // jslint-hack
-                        local.nop(match0);
-                        // preserve lineno
-                        match1 = text.slice(0, ii).replace((/.+/g), '') + match1;
-                        local.jslintAndPrintConditional(match1, file + '.js', mode);
-                    }
-                );
+            case '.sh':
+                local.jslintAndPrint(script, file);
                 break;
             case '.js':
                 if ((script.indexOf('/*jslint') >= 0 && !local.global.__coverage__) ||
@@ -19021,6 +19222,40 @@ return Utf8ArrayToStr(bff);
                 }
                 break;
             }
+            // csslint <style>...</style>
+            script.replace(
+                (/^<style>(?:\\n\\)?\n([\S\s]+?)\n<\\?\/style>(?:\\n\\)?$/gm),
+                function (match0, match1, ii, text) {
+                    match0 = match1;
+                    local.jslintAndPrint(
+                        // preserve lineno
+                        text.slice(0, ii).replace((/.+/g), '') + '\n' + match0
+                            // filter \\n\\
+                            .replace((/\\n\\$/gm), '')
+                            // filter ' + ... + '\\
+                            .replace((/^' \+ .*? \+ '\\$/gm), ''),
+                        file + '.css',
+                        mode
+                    );
+                }
+            );
+            // jslint <script>...</script>
+            script.replace(
+                (/^(?:\/\/ )?<script>(?:\\n\\)?\n([\S\s]+?)\n(?:\/\/ )?<\\?\/script>(?:\\n\\)?$/gm),
+                function (match0, match1, ii, text) {
+                    match0 = match1;
+                    local.jslintAndPrint(
+                        // preserve lineno
+                        text.slice(0, ii).replace((/.+/g), '') + '\n' + match0
+                            // filter \\n\\
+                            .replace((/\\n\\$/gm), '')
+                            // filter ' + ... + '\\
+                            .replace((/^' \+ .*? \+ '\\$/gm), ''),
+                        file + '.js',
+                        mode
+                    );
+                }
+            );
             return script;
         };
 
@@ -19082,6 +19317,13 @@ return Utf8ArrayToStr(bff);
                 return JSON.stringify(jsonObj);
             };
             circularList = [];
+            // try to derefernce all properties in jsonObj
+            (function () {
+                try {
+                    jsonObj = JSON.parse(JSON.stringify(jsonObj));
+                } catch (ignore) {
+                }
+            }());
             return JSON.stringify(typeof jsonObj === 'object' && jsonObj
                 // recurse
                 ? JSON.parse(stringify(jsonObj))
@@ -19365,7 +19607,7 @@ return Utf8ArrayToStr(bff);
                 }
                 // init response-header content-type
                 request.urlParsed.contentType = local.contentTypeDict[
-                    ((/\.[^\.]*$/).exec(request.urlParsed.pathname) || {})[0]
+                    ((/\.[^\.]*?$/).exec(request.urlParsed.pathname) || {})[0]
                 ];
                 local.serverRespondHeadSet(request, response, null, {
                     'Content-Type': request.urlParsed.contentType
@@ -19465,7 +19707,7 @@ return Utf8ArrayToStr(bff);
             request.urlParsed = local.urlParse(request.url);
             // init response-header content-type
             request.urlParsed.contentType = local.contentTypeDict[
-                ((/\.[^\.]*$/).exec(request.urlParsed.pathname) || {})[0]
+                ((/\.[^\.]*?$/).exec(request.urlParsed.pathname) || {})[0]
             ];
             local.serverRespondHeadSet(request, response, null, {
                 'Content-Type': request.urlParsed.contentType
@@ -19604,8 +19846,7 @@ return Utf8ArrayToStr(bff);
         local.numberToRomanNumerals = function (num) {
         /*
          * this function will convert num to a roman-numeral
-         * https://stackoverflow.com
-         * /questions/9083037/convert-a-number-into-a-roman-numeral-in-javascript
+         * https://stackoverflow.com/questions/9083037/convert-a-number-into-a-roman-numeral-in-javascript
          */
             var digits, ii, key, roman;
             digits = String(+num).split('');
@@ -20203,7 +20444,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             local.testMock(mockList, function (onError) {
                 local.tryCatchOnError(function () {
                     exports = require(file);
-                }, console.error);
+                }, local.onErrorDefault);
                 onError();
             }, local.onErrorThrow);
             return exports;
@@ -20226,44 +20467,37 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             // start repl-debugger
             local.replStart();
             // debug dir
-            [__dirname, process.cwd()].forEach(function (dir) {
-                local.fs.readdirSync(dir).forEach(function (file) {
-                    file = dir + '/' + file;
-                    // if the file is modified, then restart the process
-                    local.onFileModifiedRestart(file);
-                    switch (local.path.basename(file)) {
-                    // swagger-validate assets.swgg.swagger.json
-                    case 'assets.swgg.swagger.json':
-                        local.fs.readFile(file, 'utf8', function (error, data) {
-                            local.tryCatchOnError(function () {
-                                // validate no error occurred
-                                local.assert(!error, error);
-                                local.swgg.swaggerValidateJson(JSON.parse(data));
-                            }, console.error);
-                        });
-                        break;
+            local.fs.readdirSync(process.cwd()).forEach(function (file) {
+                file = process.cwd() + '/' + file;
+                // if the file is modified, then restart the process
+                local.onFileModifiedRestart(file);
+                switch (local.path.basename(file)) {
+                // swagger-validate assets.swgg.swagger.json
+                case 'assets.swgg.swagger.json':
+                    local.fs.readFile(file, 'utf8', function (error, data) {
+                        local.tryCatchOnError(function () {
+                            // validate no error occurred
+                            local.assert(!error, error);
+                            local.swgg.swaggerValidateJson(JSON.parse(data));
+                        }, local.onErrorDefault);
+                    });
+                    break;
+                }
+                switch (local.path.extname(file)) {
+                case '.css':
+                case '.html':
+                case '.js':
+                case '.json':
+                case '.sh':
+                    if ((/\brollup\b/).test(file)) {
+                        return;
                     }
-                    switch (local.path.extname(file)) {
-                    case '.css':
-                    case '.html':
-                    case '.js':
-                    case '.json':
-                        if ((/\brollup\b/).test(file)) {
-                            return;
-                        }
-                        // jslint file
-                        local.fs.readFile(file, 'utf8', function (error, data) {
-                            local.jslintAndPrintConditional(!error && data, file);
-                        });
-                        break;
-                    case '.sh':
-                        // jslint file
-                        local.fs.readFile(file, 'utf8', function (error, data) {
-                            local.jslintAndPrintConditional(!error && data, file + '.html');
-                        });
-                        break;
-                    }
-                });
+                    // jslint file
+                    local.fs.readFile(file, 'utf8', function (error, data) {
+                        local.jslintAndPrintConditional(!error && data, file);
+                    });
+                    break;
+                }
             });
             if (local.global.utility2_rollup || local.env.npm_config_mode_start) {
                 // init assets
@@ -20349,7 +20583,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             ['index', 'index.default'].forEach(function (element) {
                 local.assetsDict['/' + element + '.html'] =
                     local.assetsDict['/' + element + '.html'] ||
-                    local.jslintAndPrintConditional(local.templateRender(
+                    local.templateRender(
                         // uncomment utility2-comment
                         local.assetsDict['/assets.' + element + '.template.html'].replace(
                             (/<!-- utility2-comment\b([\S\s]+?)\butility2-comment -->/g),
@@ -20361,7 +20595,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                                 local.env.NODE_ENV === 'rollup' ||
                                 local.env.NODE_ENV === 'production'
                         }
-                    ), '/' + element + '.html');
+                    );
             });
             local.assetsDict['/'] = local.assetsDict['/index.html'];
             // init assets.app.js
@@ -20404,7 +20638,7 @@ instruction\n\
                     script = local.assetsDict['/assets.utility2.rollup.content.js']
                         .split('/* utility2.rollup.js content */');
                     script.splice(1, 0, 'local.assetsDict["' + tmp + '"] = ' +
-                        JSON.stringify(local.assetsDict[tmp]));
+                            JSON.stringify(local.assetsDict[tmp]).replace((/\\n/g), '\\n\\\n'));
                     script = script.join('');
                     script += '\n';
                     script += local.assetsDict[tmp];
@@ -20434,16 +20668,13 @@ instruction\n\
                     '\n/* script-end ' + key + ' */\n';
             }).join('\n\n\n');
             local.objectSetDefault(module.exports, local);
-            // jslint assetsDict
-            Object.keys(local.assetsDict).sort().forEach(function (key) {
-                setTimeout(function () {
-                    local.jslintAndPrintConditional(local.assetsDict[key], key);
-                });
-            });
             return module.exports;
         };
 
         local.serverLog = function (options) {
+        /*
+         * this function will log server operations
+         */
             console.error('serverLog - ' + JSON.stringify(options));
         };
 
@@ -20720,11 +20951,46 @@ instruction\n\
         local.stringHtmlSafe = function (text) {
         /*
          * this function will make the text html-safe
+         * https://stackoverflow.com/questions/7381974/which-characters-need-to-be-escaped-on-html
          */
-            // new RegExp('[' + '"&\'<>'.split('').sort().join('') + ']', 'g')
-            return text.replace((/["&'<>]/g), function (match0) {
-                return '&#x' + match0.charCodeAt(0).toString(16) + ';';
-            });
+            return text
+                .replace((/"/g), '&quot;')
+                .replace((/&/g), '&amp;')
+                .replace((/'/g), '&apos;')
+                .replace((/</g), '&lt;')
+                .replace((/>/g), '&gt;')
+                .replace((/&amp;(amp;|apos;|gt;|lt;|quot;)/ig), '&$1');
+        };
+
+        local.stringRegexpEscape = function (text) {
+        /*
+         * this function will make the text html-safe
+         * https://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
+         */
+            return text.replace(/[\-\/\\\^$*+?.()|\[\]{}]/g, '\\$&');
+        };
+
+        local.stringTruncate = function (text, maxLength) {
+        /*
+         * this function will truncate the text to the given maxLength
+         */
+            return text.length > maxLength
+                ? text.slice(0, maxLength - 3).trimRight() + '...'
+                : text;
+        };
+
+        local.stringUniqueKey = function (text) {
+        /*
+         * this function will return a string-key that is unique in the given text
+         */
+            var key;
+            // seed the key with the least frequent letters in the english-language
+            // https://en.wikipedia.org/wiki/Letter_frequency
+            key = 'zqxj';
+            do {
+                key += ((1 + Math.random()) * 0x10000000000000).toString(36).slice(1);
+            } while (text.indexOf(key) >= 0);
+            return key;
         };
 
         local.taskCreate = function (options, onTask, onError) {
@@ -20838,12 +21104,15 @@ instruction\n\
         /*
          * this function will render the template with the given dict
          */
-            var argList, getValue, match, renderPartial, rgx, tryCatch, value;
+            var argList, getValue, match, renderPartial, rgx, tryCatch, skip, value;
             dict = dict || {};
             options = options || {};
             getValue = function (key) {
                 argList = key.split(' ');
                 value = dict;
+                if (argList[0] === '#this/') {
+                    return;
+                }
                 // iteratively lookup nested values in the dict
                 argList[0].split('.').forEach(function (key) {
                     value = value && value[key];
@@ -20853,13 +21122,19 @@ instruction\n\
             renderPartial = function (match0, helper, key, partial) {
                 switch (helper) {
                 case 'each':
+                case 'eachTrimRightComma':
                     value = getValue(key);
-                    return Array.isArray(value)
+                    value = Array.isArray(value)
                         ? value.map(function (dict) {
                             // recurse with partial
                             return local.templateRender(partial, dict, options);
                         }).join('')
                         : '';
+                    // remove trailing-comma from last element
+                    if (helper === 'eachTrimRightComma') {
+                        value = value.trimRight().replace((/,$/), '');
+                    }
+                    return value;
                 case 'if':
                     partial = partial.split('{{#unless ' + key + '}}');
                     partial = getValue(key)
@@ -20910,7 +21185,7 @@ instruction\n\
                     if (value === undefined) {
                         return match0;
                     }
-                    argList.slice(1).forEach(function (arg) {
+                    argList.slice(1).forEach(function (arg, ii, list) {
                         switch (arg) {
                         case 'alphanumeric':
                             value = value.replace((/\W/g), '_');
@@ -20936,8 +21211,17 @@ instruction\n\
                         case 'notHtmlSafe':
                             notHtmlSafe = true;
                             break;
+                        case 'truncate':
+                            skip = ii + 1;
+                            if (value.length > list[skip]) {
+                                value = value.slice(0, list[skip] - 3).trimRight() + '...';
+                            }
+                            break;
                         // default to String.prototype[arg]()
                         default:
+                            if (ii === skip) {
+                                break;
+                            }
                             value = value[arg]();
                             break;
                         }
@@ -20945,12 +21229,17 @@ instruction\n\
                     value = String(value);
                     // default to htmlSafe
                     if (!notHtmlSafe) {
-                        value = value.replace((/["&'<>]/g), function (match0) {
-                            return '&#x' + match0.charCodeAt(0).toString(16) + ';';
-                        });
+                        value = value
+                            .replace((/"/g), '&quot;')
+                            .replace((/&/g), '&amp;')
+                            .replace((/'/g), '&apos;')
+                            .replace((/</g), '&lt;')
+                            .replace((/>/g), '&gt;')
+                            .replace((/&amp;(amp;|apos;|gt;|lt;|quot;)/ig), '&$1');
                     }
                     if (markdownToHtml && typeof local.marked === 'function') {
-                        value = local.marked(value);
+                        value = local.marked(value)
+                            .replace((/&amp;(amp;|apos;|gt;|lt;|quot;)/ig), '&$1');
                     }
                     return value;
                 }, 'templateRender could not render expression ' + JSON.stringify(match0) + '\n');
@@ -21257,7 +21546,7 @@ instruction\n\
                     : -1;
             });
             // stop testReport timer
-            if (testReport.testsPending === 0) {
+            if (!testReport.testsPending) {
                 local.timeElapsedPoll(testReport);
             }
             // 2. return testReport1 in html-format
@@ -21404,7 +21693,7 @@ instruction\n\
             timerInterval = setInterval(function () {
                 // update testReportDiv1 in browser
                 testReportDiv1.innerHTML = local.testReportMerge(testReport, {});
-                if (testReport.testsPending === 0) {
+                if (!testReport.testsPending) {
                     // cleanup timerInterval
                     clearInterval(timerInterval);
                 }
@@ -21658,12 +21947,11 @@ instruction\n\
          * this function will try to read the file or return an empty string
          */
             var data;
-            data = '';
             try {
                 data = local.fs.readFileSync(file, options);
             } catch (ignore) {
             }
-            return data;
+            return data || '';
         };
 
         local.uiAnimateShake = function (element, onError) {
@@ -21867,6 +22155,25 @@ instruction\n\
             }
             return id;
         };
+
+        local.validateDocumentStyle = function () {
+        /*
+         * this function will validate the document's style
+         */
+            var tmp;
+            tmp = [];
+            Array.from(document.querySelectorAll('style')).map(function (element, ii) {
+                element.innerHTML.replace((/^([^\n @].*?)[,\{:].*?$/gm), function (match0, match1) {
+                    ii = document.querySelectorAll(match1).length;
+                    if (!(ii > 1)) {
+                        tmp.push(ii + ' ' + match0);
+                    }
+                });
+            });
+            tmp.sort().forEach(function (element, ii) {
+                console.error('validateDocumentStyleUnmatched ' + ii + '. ' + element);
+            });
+        };
     }());
 
 
@@ -21918,23 +22225,28 @@ instruction\n\
         local.istanbulInstrumentInPackage = local.istanbul.instrumentInPackage || local.echo;
         local.istanbulInstrumentSync = local.istanbul.instrumentSync || local.echo;
         local.jslintAndPrint = local.jslint.jslintAndPrint || local.echo;
-        local.regexpEmailValidate = new RegExp(
+        local.regexpCharsetEncodeUri = (/\w!#\$%&'\(\)\*\+,\-\.\/:;=\?@~/);
+        local.regexpCharsetEncodeUriComponent = (/\w!%'\(\)\*\-\.~/);
+        // https://github.com/chjj/marked/blob/v0.3.7/lib/marked.js#L499
+        local.regexpMatchUrl = (/\bhttps?:\/\/[^\s<]+[^<.,:;"')\]\s]/);
+        // https://www.w3.org/TR/html5/sec-forms.html#email-state-typeemail
+        local.regexpValidateEmail = new RegExp(
             '^[a-zA-Z0-9.!#$%&\'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}' +
                 '[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$'
         );
         // https://en.wikipedia.org/wiki/E.164
-        local.regexpPhoneValidate =
-            (/^(?:\+\d{1,3}[ \-]{0,1}){0,1}(?:\(\d{1,4}\)[ \-]{0,1}){0,1}\d[\d \-]{7,17}$/);
-        local.regexpUriComponentCharset = (/[\w\!\%\'\(\)\*\-\.\~]/);
-        local.regexpUuidValidate =
+        local.regexpValidatePhone = (/^(?:\+\d{1,3}[ \-]?)?(?:\(\d{1,4}\)[ \-]?)?\d[\d \-]{7,17}$/);
+        local.regexpValidateUuid =
             (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
-        local.stringAsciiCharset =
+        local.stringCharsetAscii =
             '\x00\x01\x02\x03\x04\x05\x06\x07\b\t\n\x0b\f\r\x0e\x0f' +
             '\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f' +
             ' !"#$%&\'()*+,-./0123456789:;<=>?' +
             '@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_' +
             '`abcdefghijklmnopqrstuvwxyz{|}~\x7f';
-        local.stringUriComponentCharset = '!%\'()*-.' +
+        local.stringCharsetEncodeUri = '!#$%&\'()*+,-./' +
+            '0123456789:;=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~';
+        local.stringCharsetEncodeUriComponent = '!%\'()*-.' +
             '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~';
         // mock swgg
         local.swgg = local.swgg || {
@@ -22061,8 +22373,8 @@ instruction\n\
                     local.ajax({
                         url: 'https://www.npmjs.com/browse/star?offset=' + options2.element
                     }, function (error, xhr) {
-                        // jslint-hack
-                        local.nop(error);
+                        // validate no error occurred
+                        local.assert(!error, error);
                         console.error('utility2.customOrgStarFilterNotBuilt - fetched ' + xhr.url);
                         (xhr.responseText || '').toLowerCase().replace((
                             /href=\"\/package\/(.+?)\"/g
@@ -22142,13 +22454,14 @@ instruction\n\
                 retryLimit: process.argv[5]
             }, function (options, onParallel) {
                 onParallel.counter += 1;
-                local.child_process.spawn('. ' + local.__dirname + '/lib.utility2.sh; ' +
-                    options.element, { shell: true, stdio: ['ignore', 1, 2] })
-                    .on('exit', function (exitCode) {
-                        console.error('onParallelListExec - [' + (onParallel.ii + 1) +
-                            ' of ' + options.list.length + '] exitCode ' + exitCode);
-                        onParallel(exitCode && new Error(exitCode), options);
-                    });
+                local.child_process.spawn(
+                    '. ' + local.__dirname + '/lib.utility2.sh; ' + options.element,
+                    { shell: true, stdio: ['ignore', 1, 2] }
+                ).on('exit', function (exitCode) {
+                    console.error('onParallelListExec - [' + (onParallel.ii + 1) +
+                        ' of ' + options.list.length + '] exitCode ' + exitCode);
+                    onParallel(exitCode && new Error(exitCode), options);
+                });
             }, local.exit);
         };
         local.cliDict['utility2.start'] = function () {
@@ -22182,7 +22495,7 @@ instruction\n\
                 return require(local.env.npm_config_dir_build + '/test-report.json');
             }, local.onErrorDefault)).testsFailed);
         };
-        switch (process.argv2) {
+        switch (process.argv[2]) {
         case 'utility2.browserTest':
             break;
         }
@@ -22203,7 +22516,15 @@ instruction\n\
                 }
             }
         }
-    // run resetValidateKeySorted js-env code
+        break;
+    }
+    switch (local.modeJs) {
+
+
+
+    // run node js-env code - init-after-rollup
+    /* istanbul ignore next */
+    case 'node':
         // override assets
         [
             'assets.index.css',
@@ -22230,6 +22551,8 @@ instruction\n\
         }
         // init assets
         [
+            '/assets.utility2.example.js',
+            '/assets.utility2.html',
             'lib.apidoc.js',
             'lib.db.js',
             'lib.github_crud.js',
@@ -22239,21 +22562,50 @@ instruction\n\
             'lib.sjcl.js',
             'lib.swgg.js',
             'lib.uglifyjs.js',
-            'lib.utility2.js'
+            'lib.utility2.js',
+            'test.js'
         ].forEach(function (key) {
             switch (key) {
-            case 'lib.apidoc.js':
-            case 'lib.db.js':
-            case 'lib.github_crud.js':
-            case 'lib.istanbul.js':
-            case 'lib.jslint.js':
-            case 'lib.marked.js':
-            case 'lib.sjcl.js':
-            case 'lib.uglifyjs.js':
-                local.assetsDict['/assets.utility2.' + key] = local.tryCatchReadFile(
-                    __dirname + '/' + key,
-                    'utf8'
-                ).replace((/^#!/), '//');
+            case '/assets.utility2.example.js':
+                local.assetsDict[key] = '';
+                local.tryCatchOnError(function () {
+                    local.fs.readFileSync(
+                        __dirname + '/README.md',
+                        'utf8'
+                    ).replace((/```javascript([\S\s]*?)```/), function (match0, match1) {
+                        match0 = match1;
+                        local.assetsDict[key] = match0.trim() + '\n';
+                    });
+                }, local.nop);
+                break;
+            case '/assets.utility2.html':
+                local.assetsDict[key] = '';
+                local.tryCatchOnError(function () {
+                    local.fs.readFileSync(
+                        __dirname + '/README.md',
+                        'utf8'
+                    ).replace((/<!doctype html>[\S\s]*?<\/html>\\n\\\n/), function (match0) {
+                        local.assetsDict[key] = local.templateRender(match0
+                            .replace((/\\n\\$/gm), '')
+                            .replace(
+                                '<script src="assets.app.js"></script>\n',
+                                '<script src="assets.utility2.rollup.js"></script>\n' +
+                                    '<script src="assets.utility2.example.js"></script>\n' +
+                                    '<script src="assets.utiilty2.test.js"></script>\n'
+                            )
+                            .replace('assets.example.js', 'assets.utility2.example.js')
+                            .replace('assets.test.js', 'assets.utility2.test.js')
+                            .replace((/npm_package_/g), '')
+                            // uncomment utility2-comment
+                            .replace(
+                                (/<!-- utility2-comment\b([\S\s]+?)\butility2-comment -->/g),
+                                '$1'
+                            ), {
+                                env: require(__dirname + '/package.json'),
+                                isRollup: true
+                            });
+                    });
+                }, local.nop);
                 break;
             case 'lib.swgg.js':
             case 'lib.utility2.js':
@@ -22263,6 +22615,11 @@ instruction\n\
                     'utf8'
                 ).replace((/^#!/), '//');
                 break;
+            default:
+                local.assetsDict['/assets.utility2.' + key] = local.tryCatchReadFile(
+                    __dirname + '/' + key,
+                    'utf8'
+                ).replace((/^#!/), '//');
             }
         });
         local.assetsDict['/assets.utility2.rollup.js'] = [
@@ -22278,33 +22635,36 @@ instruction\n\
             'lib.uglifyjs.js',
             'lib.utility2.js',
             'lib.swgg.js',
+            '/assets.utility2.example.js',
+            '/assets.utility2.html',
             '/assets.utility2.rollup.end.js'
         ].map(function (key) {
             var script;
             switch (key) {
-            case 'header':
-                return '/* this rollup was created with utility2 ' +
-                    '(https://github.com/kaizhu256/node-utility2) */\n';
+            case '/assets.utility2.example.js':
+            case '/assets.utility2.html':
+                script = local.assetsDict['/assets.utility2.rollup.content.js']
+                    .split('/* utility2.rollup.js content */');
+                script.splice(1, 0, 'local.assetsDict["' + key + '"] = ' +
+                    JSON.stringify(local.assetsDict[key]).replace((/\\n/g), '\\n\\\n'));
+                script = script.join('');
+                script += '\n';
+                break;
             case '/assets.utility2.rollup.begin.js':
             case '/assets.utility2.rollup.end.js':
                 script = local.assetsDict[key];
                 break;
-            case 'lib.apidoc.js':
-            case 'lib.db.js':
-            case 'lib.github_crud.js':
-            case 'lib.istanbul.js':
-            case 'lib.jslint.js':
-            case 'lib.marked.js':
-            case 'lib.sjcl.js':
-            case 'lib.uglifyjs.js':
-                key = '/assets.utility2.' + key;
-                script = local.assetsDict[key];
-                break;
+            case 'header':
+                return '/* this rollup was created with utility2 ' +
+                    '(https://github.com/kaizhu256/node-utility2) */\n';
             case 'lib.swgg.js':
             case 'lib.utility2.js':
                 key = '/assets.' + key.replace('lib.', '');
                 script = local.assetsDict[key];
                 break;
+            default:
+                key = '/assets.utility2.' + key;
+                script = local.assetsDict[key];
             }
             return '/* script-begin ' + key + ' */\n' +
                 script.trim() +
@@ -22329,6 +22689,7 @@ instruction\n\
 
 /* script-begin /assets.swgg.js */
 /* istanbul instrument in package swgg */
+/* jslint-utility2 */
 /*jslint
     bitwise: true,
     browser: true,
@@ -22413,7 +22774,7 @@ instruction\n\
             }()));
         local.utility2.objectSetDefault(local, local.utility2);
         local.utility2.swgg = local;
-    // run resetValidateKeySorted js-env code
+/* validateLineSortedReset */
         // init assets and templates
 /* jslint-ignore-begin */
 // https://github.com/json-schema-org/json-schema-org.github.io/blob/eb4805e94c3e27932352344767d19cc4c3c3381c/draft-04/schema
@@ -23117,6 +23478,11 @@ local.templateUiMain = '\
         id="swggApiKeyClearButton1"\n\
     >clear api-keys</button>\n\
 </div>\n\
+<div\n\
+    class="errorMessage"\n\
+    id="swggUiReloadErrorDiv1"\n\
+    style="background: none; border: 0;"\n\
+></div>\n\
 <div class="info reset">\n\
     {{#if info}}\n\
     {{#if info.x-swgg-homepage}}\n\
@@ -23125,23 +23491,27 @@ local.templateUiMain = '\
     {{#unless info.x-swgg-homepage}}\n\
     <h2>{{info.title}} ({{info.version}})</h2>\n\
     {{/if info.x-swgg-homepage}}\n\
+    {{#if info.x-swgg-description}}\n\
+    <div class="markdown">{{info.x-swgg-description markdownToHtml}}</div>\n\
+    {{/if info.x-swgg-description}}\n\
     {{#if info.description}}\n\
-    <div>{{info.description markdownToHtml}}</div>\n\
+    <div class="markdown resourceDescription">{{info.description markdownToHtml}}</div>\n\
     {{/if info.description}}\n\
-    {{#if info.x-swgg-downloadStandaloneApp}}\n\
-    <h4><a download href="{{info.x-swgg-downloadStandaloneApp}}">download standalone app</a></h4>\n\
-    {{/if info.x-swgg-downloadStandaloneApp}}\n\
+    {{#if x-swgg-downloadStandaloneApp}}\n\
+    <h3><a download href="{{x-swgg-downloadStandaloneApp}}">[download standalone app]</a></h3>\n\
+    {{/if x-swgg-downloadStandaloneApp}}\n\
     <ul>\n\
-        {{#if externalDocs}}\n\
+        {{#if externalDocs.url}}\n\
         <li>\n\
-            {{#if externalDocs.description}}\n\
-            <p>{{externalDocs.description markdownToHtml}}</p>\n\
-            {{/if externalDocs.description}}\n\
-            {{#if externalDocs.url}}\n\
-            <a href="{{externalDocs.url}}" target="_blank">{{externalDocs.url}}</a>\n\
-            {{/if externalDocs.url}}\n\
+            <a href="{{externalDocs.url}}" target="_blank">\n\
+                {{#if externalDocs.description}}\n\
+                {{externalDocs.description}}\n\
+                {{#unless externalDocs.description}}\n\
+                external url\n\
+                {{/if externalDocs.description}}\n\
+            </a>\n\
         </li>\n\
-        {{/if externalDocs}}\n\
+        {{/if externalDocs.url}}\n\
         {{#if info.termsOfService}}\n\
         <li><a target="_blank" href="{{info.termsOfService}}">terms of service</a></li>\n\
         {{/if info.termsOfService}}\n\
@@ -23166,25 +23536,27 @@ local.templateUiMain = '\
     {{/if info}}\n\
 </div>\n\
 {{#if urlSwaggerJson}}\n\
-<h4 class="label">javascript code</h4>\n\
+<h4 class="label">nodejs initialization</h4>\n\
 <pre id="swggAjaxProgressPre1">\n\
 /*\n\
- * initialize swgg-client\n\
+ * initialize nodejs swgg-client\n\
  * 1. download currently-loaded apis to file swagger.json:\n\
- *     $ curl -L "{{urlSwaggerJson}}" > swagger.json\n\
+ *     $ curl -L -o swagger.json "{{urlSwaggerJson}}"\n\
  * 2. npm install swgg\n\
  *     $ npm install swgg\n\
- * 3. run code below to initialize swgg-client\n\
+ * 3. run code below to initialize nodejs swgg-client\n\
  * 4. (optional) edit file swagger.json to suit your needs\n\
  */\n\
 var swgg;\n\
 swgg = require("swgg");\n\
 swgg.apiUpdate(require("./swagger.json"));\n\
 console.log("printing currently loaded apis ...");\n\
-console.log(JSON.stringify(Object.keys(swgg.apiDict).sort(), null, 4));\n\
-console.log("initialized swgg-client");\n\
+Object.keys(swgg.apiDict).sort().forEach(function (key) {\n\
+    console.log("swgg.apiDict[" + JSON.stringify(key) + "].ajax");\n\
+});\n\
+console.log("initialized nodejs swgg-client");\n\
 </pre>\n\
-<div class="reset styleColor777">[ <span>base url</span>: {{basePath}} ]</div>\n\
+<div class="color777 reset">[ <span>base url</span>: {{basePath}} ]</div>\n\
 {{/if urlSwaggerJson}}\n\
 <div id="swggAjaxProgressDiv1" style="text-align: center;">\n\
     <span>{{ajaxProgressText}}</span>\n\
@@ -23211,18 +23583,22 @@ local.templateUiOperation = '\
         class="td td3"\n\
         {{#if deprecated}}style="text-decoration: line-through;"{{/if deprecated}}\n\
     >{{_path}}</span>\n\
-    <span class="styleColor777 td td4">{{summary}}</span>\n\
+    <span class="color777 td td4 textOverflowEllipsis">{{summary}}</span>\n\
 </div>\n\
 <form accept-charset="UTF-8"\n\
     class="content uiAnimateSlide"\n\
     style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
 >\n\
-    {{#if deprecated}}<h4 class="label">(warning: deprecated)</h4><br>{{/if deprecated}}\n\
+    {{#if deprecated}}\n\
+    <h4 class="errorMessage label">(warning: deprecated)</h4><br>\n\
+    {{/if deprecated}}\n\
     <h4 class="label">description</h4>\n\
-    <div class="description styleColor777">{{description markdownToHtml}}</div>\n\
+    <div class="markdown operationDescription">\n\
+    {{description markdownToHtml}}\n\
+    </div>\n\
     {{#if parameters.length}}\n\
     <h4 class="label">parameters</h4>\n\
-    <div class="schemaP styleBorderBottom1px styleColor777 tr">\n\
+    <div class="color777 schemaP styleBorderBottom1px tr">\n\
         <span class="td td1">name and description</span>\n\
         <span class="td td2">data type</span>\n\
         <span class="td td3">value</span>\n\
@@ -23233,18 +23609,18 @@ local.templateUiOperation = '\
     {{/each parameters}}\n\
     {{/if parameters.length}}\n\
     <h4 class="label">response messages</h4>\n\
-    <div class="schemaResponse styleBorderBottom1px styleColor777 tr">\n\
+    <div class="color777 schemaResponse styleBorderBottom1px tr">\n\
         <span class="td td1">http status code</span>\n\
         <span class="td td2">reason</span>\n\
     </div>\n\
     {{#each responseList}}\n\
     <div class="schemaResponse tr">\n\
         <span class="td td1">{{key}}</span>\n\
-        <span class="td td2">{{value.description markdownToHtml}}</span>\n\
+        <span class="markdown td td2">{{value.description markdownToHtml}}</span>\n\
     </div>\n\
     {{/each responseList}}\n\
     <button class="onEventOperationAjax">try it out!</button>\n\
-    <h4 class="label">javascript code</h4>\n\
+    <h4 class="label">nodejs request</h4>\n\
     <pre class="requestJavascript"></pre>\n\
     <h4 class="label">curl request</h4>\n\
     <pre class="requestCurl"></pre>\n\
@@ -23269,7 +23645,7 @@ local.templateUiParameter = '\
     {{#if required}}<br><span style="font-weight: bold;">(required)</span>{{/if required}}\n\
     {{#if description}}\n\
     <br>\n\
-    <span class="styleColor777">{{description markdownToHtml}}</span>\n\
+    <span class="color777 markdown">{{description markdownToHtml}}</span>\n\
     {{/if description}}\n\
 </span>\n\
 <span class="td td2">{{type2}}{{#if format2}}<br>({{format2}}){{/if format2}}</span>\n\
@@ -23317,7 +23693,7 @@ local.templateUiParameter = '\
 local.templateUiRequestJavascript = '\
 /*\n\
  * reproduce api-call {{options.api._methodPath jsonStringify}}\n\
- * 1. initialize swgg-client from previous step\n\
+ * 1. initialize nodejs swgg-client from previous step\n\
  * 2. run code below to reproduce api-call\n\
  */\n\
 swgg.apiDict[{{options.api._methodPath jsonStringify}}].ajax({{optionsJson}}, \
@@ -23343,9 +23719,9 @@ local.templateUiResource = '\
     id="{{id}}"\n\
 >\n\
 <h3 class="thead">\n\
-    <span class="onEventResourceDisplayAction td td1" tabindex="0">\n\
+    <span class="onEventResourceDisplayAction td td1 textOverflowEllipsis" tabindex="0">\n\
         <div class="onEventResourceDisplayAction resourceIi">{{ii}}.</div>{{name}}:\n\
-        <span class="onEventResourceDisplayAction resourceSummary">{{description}}</span>\n\
+        <span class="onEventResourceDisplayAction resourceSummary">{{summary}}</span>\n\
     </span>\n\
     <span\n\
         class="onEventResourceDisplayAction td td2"\n\
@@ -23357,7 +23733,7 @@ local.templateUiResource = '\
     class="operationList uiAnimateSlide"\n\
     style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
 >\n\
-    <div class="resourceDescription">{{description markdownToHtml}}</div>\n\
+    <div class="markdown resourceDescription">{{description markdownToHtml}}</div>\n\
 </div>\n\
 </div>\n\
 ';
@@ -23378,7 +23754,7 @@ swgg\n\
 
 
 
-    // run resetValidateKeySorted js-env code
+/* validateLineSortedReset */
 local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.template.html']
     .replace('assets.index.default.template.html', '')
     .replace((/<title>.*?<\/title>/), '<title>swgg</title>')
@@ -23387,6 +23763,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 \n\
 </style>\n\
 <style>\n\
+/* jslint-utility2 */\n\
 /*csslint\n\
 */\n\
 /* jslint-ignore-begin */\n\
@@ -23399,15 +23776,13 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     max-width: 100%;\n\
     padding: 0;\n\
 }\n\
-.swggUiContainer .operation > .thead:focus,\n\
 .swggUiContainer pre,\n\
+.swggUiContainer .operation > .thead:focus,\n\
 .swggUiContainer .resource > .thead > .td:focus {\n\
     outline: none;\n\
 }\n\
 /* jslint-ignore-end */\n\
-\n\
-\n\
-\n\
+/* validateLineSortedReset */\n\
 /* general */\n\
 .swggUiContainer {\n\
     max-width: 1200px;\n\
@@ -23417,14 +23792,33 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .resource > .thead {\n\
     cursor: pointer;\n\
 }\n\
-.swggUiContainer button {\n\
-    font-size: medium;\n\
+.swggUiContainer button,\n\
+.swggUiContainer .operation > .thead > .td3 {\n\
+    font-weight: bold;\n\
+    text-decoration: underline;\n\
+}\n\
+.swggUiContainer code,\n\
+.swggUiContainer pre,\n\
+.swggUiContainer textarea {\n\
+    line-height: 1.25rem;\n\
+    max-height: 50rem;\n\
+    overflow: auto;\n\
 }\n\
 .swggUiContainer input,\n\
 .swggUiContainer pre,\n\
 .swggUiContainer textarea {\n\
     min-height: 1.5rem;\n\
 }\n\
+.swggUiContainer pre {\n\
+    white-space: pre;\n\
+}\n\
+.swggUiContainer textarea {\n\
+    white-space: nowrap;\n\
+}\n\
+.swggUiContainer .markdown pre {\n\
+    max-height: none;\n\
+}\n\
+\n\
 .swggUiContainer .multilinePlaceholderContainer {\n\
     min-height: 10rem;\n\
     position: relative;\n\
@@ -23444,19 +23838,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     text-align: center;\n\
     width: 5rem;\n\
 }\n\
-.swggUiContainer pre,\n\
-.swggUiContainer textarea {\n\
-    font-family: Menlo, Monaco, Consolas, Courier New, monospace;\n\
-    font-size: small;\n\
-    line-height: 1.25rem;\n\
-    max-height: 50rem;\n\
-    overflow: auto;\n\
-    white-space: nowrap;\n\
-}\n\
-.swggUiContainer pre {\n\
-    overflow-wrap: break-word;\n\
-    white-space: pre-wrap;\n\
-}\n\
 .swggUiContainer .resourceIi {\n\
     min-width: 3rem;\n\
 }\n\
@@ -23468,10 +23849,10 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .responseStatusCode {\n\
     font-weight: bold;\n\
 }\n\
-.swggUiContainer .schemaP .multilinePlaceholderContainer,\n\
 .swggUiContainer .schemaP pre,\n\
 .swggUiContainer .schemaP select[multiple],\n\
-.swggUiContainer .schemaP textarea {\n\
+.swggUiContainer .schemaP textarea,\n\
+.swggUiContainer .schemaP .multilinePlaceholderContainer {\n\
     height: 10rem;\n\
 }\n\
 .swggUiContainer .schemaP > .td3 {\n\
@@ -23479,7 +23860,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer .td {\n\
     overflow: auto;\n\
-    word-wrap: break-word;\n\
+    overflow-wrap: break-word;\n\
 }\n\
 .swggUiContainer .td input,\n\
 .swggUiContainer .td pre,\n\
@@ -23489,19 +23870,15 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer > .thead > .td1 {\n\
     font-size: x-large;\n\
-    text-decoration: none;\n\
 }\n\
-\n\
-\n\
-\n\
-/* important style */\n\
+/* validateLineSortedReset */\n\
 /* background */\n\
-.swggUiContainer button,\n\
-.swggUiContainer .resourceDescription {\n\
-    background: #373;\n\
+.swggUiContainer button {\n\
+    background: #ddf;\n\
 }\n\
-.swggUiContainer .description,\n\
-.swggUiContainer pre {\n\
+.swggUiContainer code,\n\
+.swggUiContainer pre,\n\
+.swggUiContainer .operationDescription {\n\
     background: #ddd;\n\
 }\n\
 .swggUiContainer .methodDELETE {\n\
@@ -23531,18 +23908,26 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .operation {\n\
     background: #dfd;\n\
 }\n\
+.swggUiContainer .resourceDescription {\n\
+    background: #9d9;\n\
+}\n\
 .swggUiContainer > .thead {\n\
     background: #7b5;\n\
 }\n\
 .swggUiContainer > .thead > .td1 {\n\
     background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAqRJREFUeNrEVz1s00AUfnGXii5maMXoEUEHVwIpEkPNgkBdMnQoU5ytiKHJwpp2Q2JIO8DCUDOxIJFIVOoWZyJSh3pp1Q2PVVlcCVBH3ufeVZZ9Zye1Ay86nXV+ue/9fO/lheg/Se02X1rvksmbnTiKvuxQMBNgBnN4a/LCbmnUAP6JV58NCUsBC8CuAJxGPF47OgNqBaA93tolUhnx6jC4NxGwyOEwlccyAs+3kwdzKq0HDn2vEBTi8J2XpyMaywNDE157BhXUE3zJhlq8GKq+Zd2zaWHepPA8oN9XkfLmRdOiJV4XUUg/IyWncLjCYY/SHndV2u7zHr3bPKZtdxgboJOnthvrfGj/oMf3G0r7JVmNlLfKklmrt2MvvcNO7LFOhoFHfuAJI5o6ta10jpt5CQLgwXhXG2YIwvu+34qf78ybOjWTnWwkgR36d7JqJOrW0hHmNrKg9xhiS4+1jFmrxymh03B0w+6kURIAu3yHtOD5oaUNojMnGgbcctNvwdAnyxvxRR+/vaJnjzbpzcZX+nN1SdGv85i9eH8w3qPO+mdm/y4dnQ1iI8Fq6Nf4cxL6GWSjiFDSs0VRnxC5g0xSB2cgHpaseTxfqOv5uoHkNQ6Ha/N1Yz9mNMppEkEkYKj79q6uCq4bCHcSX3fJ0Vk/k9siASjCm1N6gZH6Ec9IXt2WkFES2K/ixoIyktJPAu/ptOA1SgO5zqtr6KASJPF0nMV8dgMsRhRPOcMwqQAOoi0VAIMLAEWJ6YYC1c8ibj1GP51RqwzYwZVMHQuvOzMCBUtb2tGHx5NAdLKqp5AX7Ng4d+Zi8AGDI9z1ijx9yaCH04y3GCP2S+QcvaGl+pcxyUBvinFlawoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=) no-repeat left center;\n\
 }\n\
+/* validateLineSortedReset */\n\
 /* border */\n\
+.swggUiContainer button {\n\
+    border: 1px solid #35b;\n\
+    border-radius: 5px;\n\
+}\n\
 .swggUiContainer input,\n\
 .swggUiContainer pre,\n\
 .swggUiContainer select,\n\
 .swggUiContainer textarea {\n\
-    border: 1px solid #bbb;\n\
+    border: 1px solid #999;\n\
 }\n\
 .swggUiContainer .resource:first-child {\n\
     border-top: 1px solid #777;\n\
@@ -23550,46 +23935,41 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .styleBorderBottom1px {\n\
     border-bottom: 1px solid #777;\n\
 }\n\
+/* validateLineSortedReset */\n\
 /* color */\n\
 .swggUiContainer a,\n\
-.swggUiContainer .label,\n\
-.swggUiContainer .resource > .thead > .td {\n\
-    color: #373;\n\
-}\n\
 .swggUiContainer button,\n\
-.swggUiContainer .operation > .thead > .td2,\n\
-.swggUiContainer .resourceDescription,\n\
-.swggUiContainer > .thead > .td1,\n\
-.swggUiContainer > .thead > .td4,\n\
-.swggUiContainer > .thead > .td5 {\n\
-    color: #fff;\n\
+.swggUiContainer .operation > .thead,\n\
+.swggUiContainer .resource > .thead {\n\
+    color: #35b;\n\
 }\n\
-.swggUiContainer .errorMessage {\n\
-    color: #b00;\n\
+.swggUiContainer code {\n\
+    color: #333;\n\
+}\n\
+.swggUiContainer .color777 {\n\
+    color: #777;\n\
+}\n\
+.swggUiContainer .label {\n\
+    color: #373;\n\
 }\n\
 .swggUiContainer .multilinePlaceholderPre {\n\
     color: #999;\n\
 }\n\
-.swggUiContainer .resourceDescription a {\n\
-    color: #7d7;\n\
+.swggUiContainer .operation > .thead > .td2,\n\
+.swggUiContainer > .thead > .td1 {\n\
+    color: #eee;\n\
 }\n\
-.swggUiContainer .resourceDescription code {\n\
-    color: #ddf;\n\
-}\n\
-.swggUiContainer .resourceDescription strong {\n\
-    color: #fbb;\n\
-}\n\
-.swggUiContainer .styleColor777 {\n\
-    color: #777;\n\
-}\n\
+/* validateLineSortedReset */\n\
 /* display */\n\
 .swggUiContainer .onEventResourceDisplayAction {\n\
     display: inline-block;\n\
+    text-decoration: underline;\n\
 }\n\
 .swggUiContainer .thead,\n\
 .swggUiContainer .tr {\n\
     display: flex;\n\
 }\n\
+/* validateLineSortedReset */\n\
 /* flex */\n\
 .swggUiContainer .operation > .thead > .td3 {\n\
     flex: 1;\n\
@@ -23624,20 +24004,27 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer > .thead > .td3 {\n\
     flex: 1;\n\
 }\n\
+/* validateLineSortedReset */\n\
 /* margin */\n\
 .swggUiContainer {\n\
     margin: 0 auto;\n\
 }\n\
 .swggUiContainer audio,\n\
 .swggUiContainer img,\n\
-.swggUiContainer .operation .thead,\n\
 .swggUiContainer option,\n\
+.swggUiContainer video,\n\
+.swggUiContainer .operation .thead,\n\
 .swggUiContainer .responseBody,\n\
 .swggUiContainer .responseMedia,\n\
 .swggUiContainer .td,\n\
-.swggUiContainer .td .onEventResourceDisplayAction,\n\
-.swggUiContainer video {\n\
+.swggUiContainer .td .onEventResourceDisplayAction {\n\
     margin-bottom: 0;\n\
+}\n\
+.swggUiContainer ol,\n\
+.swggUiContainer ul,\n\
+.swggUiContainer .operation > .thead > .td1,\n\
+.swggUiContainer .td {\n\
+    margin-left: 20px;\n\
 }\n\
 .swggUiContainer .label {\n\
     margin-bottom: 1px;\n\
@@ -23647,13 +24034,8 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     margin-bottom: 20px;\n\
 }\n\
 .swggUiContainer .operation button {\n\
-    margin-bottom: 50px;\n\
+    margin-bottom: 40px;\n\
     margin-top: 40px;\n\
-}\n\
-.swggUiContainer .operation > .thead > .td1,\n\
-.swggUiContainer .td,\n\
-.swggUiContainer ul {\n\
-    margin-left: 20px;\n\
 }\n\
 .swggUiContainer .operation > .thead > .td4 {\n\
     margin-right: 20px;\n\
@@ -23661,16 +24043,21 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .td:first-child {\n\
     margin-left: 0;\n\
 }\n\
+/* validateLineSortedReset */\n\
 /* padding */\n\
 .swggUiContainer button,\n\
 .swggUiContainer > .thead {\n\
     padding: 10px;\n\
 }\n\
-.swggUiContainer .description {\n\
-    padding: 10px 10px 1px 10px;\n\
+.swggUiContainer code {\n\
+    padding: 2px;\n\
 }\n\
 .swggUiContainer input {\n\
     padding: 0 5px;\n\
+}\n\
+.swggUiContainer pre,\n\
+.swggUiContainer textarea {\n\
+    padding: 5px;\n\
 }\n\
 .swggUiContainer .operation > .content {\n\
     padding: 20px;\n\
@@ -23678,9 +24065,8 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .operation > .thead > .td {\n\
     padding: 10px 0;\n\
 }\n\
-.swggUiContainer pre,\n\
-.swggUiContainer textarea {\n\
-    padding: 5px;\n\
+.swggUiContainer .operationDescription {\n\
+    padding: 15px 10px 1px 10px;\n\
 }\n\
 .swggUiContainer .resource:first-child {\n\
     padding-top: 10px;\n\
@@ -23692,24 +24078,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     padding-left: 40px;\n\
     padding-top: 5px;\n\
 }\n\
-\n\
-\n\
-\n\
-/* hover */\n\
-.swggUiContainer a:hover,\n\
-.swggUiContainer > .thead > .td1:hover {\n\
-    color: #33d;\n\
-}\n\
-.swggUiContainer button:hover {\n\
-    background: #33d;\n\
-}\n\
-.swggUiContainer .operation > .thead:hover,\n\
-.swggUiContainer .resource > .thead > .td:hover {\n\
-    background: #bbf;\n\
-}\n\
-\n\
-\n\
-\n\
+/* validateLineSortedReset */\n\
 /* @media */\n\
 @media screen and (max-width: 640px) {\n\
     .swggUiContainer .operation {\n\
@@ -23728,30 +24097,30 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
         width: 100%;\n\
     }\n\
 }\n\
-\n\
-\n\
-\n\
-/* textOverflowElipsis */\n\
-.swggUiContainer .operation > .thead > .td4,\n\
-.swggUiContainer .resource > .thead > .td1 {\n\
-    overflow: hidden;\n\
-    text-overflow: ellipsis;\n\
-    white-space: nowrap;\n\
+/* validateLineSortedReset */\n\
+/* hover */\n\
+.swggUiContainer a:hover,\n\
+.swggUiContainer > .thead > .td1:hover {\n\
+    color: #037;\n\
 }\n\
-\n\
-\n\
-\n\
-/* .hasError */\n\
-.swggUiContainer button.hasError {\n\
-    background: #b00;\n\
+.swggUiContainer button:hover,\n\
+.swggUiContainer .operation > .thead:hover,\n\
+.swggUiContainer .resource > .thead > .td:hover {\n\
+    background: #bbf;\n\
+}\n\
+/* validateLineSortedReset */\n\
+/* error */\n\
+.swggUiContainer button.hasError,\n\
+.swggUiContainer pre.hasError,\n\
+.swggUiContainer textarea.hasError {\n\
+    background: #fbb;\n\
 }\n\
 .swggUiContainer input.hasError,\n\
 .swggUiContainer select.hasError {\n\
-    border: 5px solid #b00;\n\
+    border: 5px solid #c00;\n\
 }\n\
-.swggUiContainer pre.hasError,\n\
-.swggUiContainer textarea.hasError {\n\
-    background: #fdd;\n\
+.swggUiContainer .errorMessage {\n\
+    color: #c00;\n\
 }\n\
 </style>\n\
 ')
@@ -23782,7 +24151,11 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
         "assets.swgg.swagger.json";\n\
 </script>\n\
 <script src="assets.utility2.rollup.js"></script>\n\
-<script>window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });</script>\n\
+<script>\n\
+/*jslint browser: true*/\n\
+window.local = window.local || window.swgg;\n\
+window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
+</script>\n\
 </body>\n\
 </html>\n\
 ');
@@ -23932,12 +24305,14 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                     'Bearer ' + options.jwtEncrypted;
             }
             // init url
-            options.url = (((local.normalizeValue('list', self.schemes ||
-                local.swaggerJson.schemes)[0] ||
-                local.urlParse('').protocol.slice(0, -1)) + '://' +
-                (self['x-swgg-host'] || local.swaggerJson.host || local.urlParse('').host) +
-                local.swaggerJsonBasePath) + options.inPath + '?' + options.inQuery.slice(1))
-                .replace((/\?$/), '');
+            options.url = '';
+            options.url += (self['x-swgg-schemes'] || local.swaggerJson.schemes || [])[0] ||
+                local.urlParse('').protocol.slice(0, -1);
+            options.url += '://';
+            options.url += self['x-swgg-host'] || local.swaggerJson.host || local.urlParse('').host;
+            options.url += local.swaggerJsonBasePath;
+            options.url += options.inPath + '?' + options.inQuery.slice(1);
+            options.url = options.url.replace((/\?$/), '');
             if (options.error || options.modeValidate) {
                 onError(options.error);
                 return;
@@ -23956,44 +24331,23 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
             });
         };
 
-        local.apiUpdate = function (swaggerJson, onError) {
+        local.apiUpdate = function (swaggerJson) {
         /*
          * this function will update the swagger-api dict of api-calls
          */
             var tmp;
             swaggerJson = swaggerJson || {};
-            // fetch swagger.json file
-            if (swaggerJson.modeAjax) {
-                local.ajax(swaggerJson, function (error, xhr) {
-                    // JSON.parse swagger.json string
-                    local.tryCatchOnError(function () {
-                        tmp = JSON.parse(xhr.responseText);
-                    }, local.nop);
-                    error = error || local.utility2._debugTryCatchError;
-                    // reset state
-                    local.apiDict = local.swaggerJson = null;
-                    // apiUpdate swagger.json object
-                    local.apiUpdate(!error && tmp, function (error2, data) {
-                        onError(error || error2, data);
-                    });
-                });
-                return;
-            }
-            local.tryCatchOnError(function () {
-                swaggerJson = JSON.parse(
-                    swaggerJson.utility2.assetsDict['/assets.swgg.swagger.json']
-                );
-            }, local.nop);
             // normalize swaggerJson
             swaggerJson = local.normalizeSwaggerJson(swaggerJson, {
                 objectSetDescription: function (dict) {
-                    if (!(typeof dict === 'object' && dict)) {
-                        return;
+                    if (typeof dict === 'object' && dict && !dict.$ref) {
+                        if (Array.isArray(dict['x-swgg-descriptionLineList'])) {
+                            dict.description = dict['x-swgg-descriptionLineList'].join('\n');
+                        }
+                        if (!(dict === swaggerJson.externalDocs || dict === swaggerJson.info)) {
+                            dict.description = dict.description || 'no description';
+                        }
                     }
-                    if (Array.isArray(dict['x-swgg-descriptionLineList'])) {
-                        dict.description = dict['x-swgg-descriptionLineList'].join('\n');
-                    }
-                    dict.description = dict.description || 'no description';
                 }
             });
             // init apiDict
@@ -24098,7 +24452,6 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                     }
                 },
                 "info": {
-                    "description": "web-demo of swagger-ui server",
                     "title": "swgg api",
                     "version": "0.0.1"
                 },
@@ -24144,7 +24497,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                         swaggerJson: local.swaggerJson
                     })), 2);
                 });
-                delete tmp.allOf;
+                tmp.allOf = undefined;
             });
             // init apiDict from paths
             Object.keys(swaggerJson.paths).forEach(function (path) {
@@ -24299,7 +24652,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                 tmp = local.jsonCopy(self);
                 Object.keys(tmp).forEach(function (key) {
                     if (key[0] === '_') {
-                        delete tmp[key];
+                        tmp[key] = undefined;
                     }
                 });
                 // update paths
@@ -24320,7 +24673,6 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
             local.assetsDict['/assets.swgg.swagger.server.json'] = JSON.stringify(
                 local.swaggerJson
             );
-            local.setTimeoutOnError(onError, 0, null, swaggerJson);
         };
 
         local.dbFieldRandomCreate = function (options) {
@@ -24469,6 +24821,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                 value = local.dbRowRandomCreate({
                     depth: depth - 1,
                     modeNotRandom: options.modeNotRandom,
+                    prefix: ['schema<' + JSON.stringify(schemaP) + '>'],
                     schema: schemaP
                 });
                 break;
@@ -24493,11 +24846,11 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
          */
             var ii, dbRow, properties;
             dbRow = {};
-            options = local.objectSetDefault(options, { override: local.nop });
+            options = local.objectSetDefault(options, { override: local.nop, prefix: ['dbRow'] });
             properties = local.validateBySwaggerSchema({
                 // dereference property
                 modeDereference: true,
-                prefix: ['dbRow'],
+                prefix: options.prefix,
                 schema: options.schema,
                 swaggerJson: local.swaggerJson
             });
@@ -24514,7 +24867,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                     schemaP: local.validateBySwaggerSchema({
                         // dereference property
                         modeDereference: true,
-                        prefix: ['dbRow', key],
+                        prefix: options.prefix.concat([key]),
                         schema: properties[key],
                         swaggerJson: local.swaggerJson
                     })
@@ -24525,11 +24878,11 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
             local.tryCatchOnError(function () {
                 local.validateBySwaggerSchema({
                     data: dbRow,
-                    prefix: ['dbRow'],
+                    prefix: options.prefix,
                     schema: options.schema,
                     swaggerJson: local.swaggerJson
                 });
-            }, console.error);
+            }, local.onErrorDefault);
             return dbRow;
         };
 
@@ -24692,15 +25045,15 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                         break;
                     case 'crudSetOneById':
                         // replace idName with idBackend in body
-                        delete crud.body.id;
-                        delete crud.body[crud.idName];
+                        crud.body.id = undefined;
+                        crud.body[crud.idName] = undefined;
                         crud.body[crud.idBackend] = crud.data[crud.idName];
                         crud.dbTable.crudSetOneById(crud.body, options.onNext);
                         break;
                     case 'crudUpdateOneById':
                         // replace idName with idBackend in body
-                        delete crud.body.id;
-                        delete crud.body[crud.idName];
+                        crud.body.id = undefined;
+                        crud.body[crud.idName] = undefined;
                         crud.body[crud.idBackend] = crud.data[crud.idName];
                         crud.dbTable.crudUpdateOneById(crud.body, options.onNext);
                         break;
@@ -24823,7 +25176,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                         break;
                     case 'fileUploadManyByForm':
                         options.onNext(null, data.map(function (element) {
-                            delete element.fileBlob;
+                            element.fileBlob = undefined;
                             return element;
                         }));
                         break;
@@ -25193,7 +25546,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
         /*
          * this function will normalize swaggerJson and filter $npm_package_swggTags0
          */
-            var tmp;
+            var pathDict, tmp;
             options = local.objectSetDefault(options, {
                 objectSetDescription: function (dict) {
                     if (dict &&
@@ -25204,27 +25557,46 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                 }
             });
             local.objectSetDefault(swaggerJson, { paths: {}, tags: [] });
+            // fix error - semanticUniquePath
+            pathDict = {};
+            Object.keys(swaggerJson.paths).forEach(function (path) {
+                tmp = path.replace((/\{.*?\}/g), '{}');
+                pathDict[tmp] = pathDict[tmp] || {};
+                pathDict[tmp][path] = true;
+            });
+            Object.keys(pathDict).forEach(function (key) {
+                Object.keys(pathDict[key]).sort().forEach(function (path, ii) {
+                    if (ii && swaggerJson['x-swgg-fixErrorSemanticUniquePath']) {
+                        swaggerJson.paths[path + '#' + ii] = swaggerJson.paths[path];
+                        delete swaggerJson.paths[path];
+                    }
+                });
+            });
             // auto-create operationId from path
             Object.keys(swaggerJson.paths).forEach(function (path) {
                 Object.keys(swaggerJson.paths[path]).forEach(function (method) {
                     tmp = swaggerJson.paths[path][method];
-                    // auto-create operationId
+                    // auto-create operationId from path
                     if (swaggerJson['x-swgg-operationIdFromPath'] ||
                             tmp['x-swgg-operationIdFromPath'] ||
                             !tmp.operationId) {
-                        tmp.operationId = encodeURIComponent(path + ' ' + method.toUpperCase())
-                            .replace((/[^\w\-.]/g), '_');
+                        tmp.operationId = local.operationIdFromAjax({ method: method, url: path });
                     }
+                    // normalize parameter.required
+                    (tmp.parameters || []).forEach(function (schemaP) {
+                        if (schemaP.required === false) {
+                            delete schemaP.required;
+                        }
+                    });
                 });
             });
             // override tag.description with x-swgg-tags0-override
             if (swaggerJson['x-swgg-tags0-override']) {
                 swaggerJson.tags.forEach(function (tag) {
-                    tmp = local.objectSetDefault(swaggerJson['x-swgg-tags0-override'][tag.name] &&
-                        swaggerJson['x-swgg-tags0-override'][tag.name].externalDocs, {
-                            description: tag.description,
-                            'x-swgg-descriptionLineList': tag['x-swgg-descriptionLineList']
-                        });
+                    tmp = local.objectSetDefault(swaggerJson['x-swgg-tags0-override'][tag.name], {
+                        description: tag.description,
+                        'x-swgg-descriptionLineList': tag['x-swgg-descriptionLineList']
+                    });
                     tag.description = tmp.description;
                     tag['x-swgg-descriptionLineList'] = tmp['x-swgg-descriptionLineList'];
                     // objectSetDescription
@@ -25232,7 +25604,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                     options.objectSetDescription(tag);
                 });
             }
-            // objectSetDescription
+            // apply options.objectSetDescription
             [swaggerJson.externalDocs, swaggerJson.info].forEach(options.objectSetDescription);
             [
                 swaggerJson.definitions,
@@ -25253,10 +25625,12 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
             });
             Object.keys(swaggerJson.paths).forEach(function (path) {
                 Object.keys(swaggerJson.paths[path]).forEach(function (method) {
-                    options.objectSetDescription(swaggerJson.paths[path][method]);
-                    Object.keys(
-                        swaggerJson.paths[path][method].responses || {}
-                    ).forEach(options.objectSetDescription);
+                    tmp = swaggerJson.paths[path][method];
+                    options.objectSetDescription(tmp);
+                    (tmp.parameters || []).forEach(options.objectSetDescription);
+                    Object.keys(tmp.responses || {}).forEach(function (key) {
+                        options.objectSetDescription(tmp.responses[key]);
+                    });
                 });
             });
             if (!local.env.npm_package_swggTags0 ||
@@ -25392,7 +25766,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                         data = [data];
                     }
                     // normalize error-list to contain non-null objects
-                    if (ii === 0) {
+                    if (!ii) {
                         data = data.errorList || data;
                         // normalize error-list to be non-empty
                         if (!data.length) {
@@ -25423,7 +25797,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                     }
                     data.meta = local.jsonCopy(meta || {});
                     data.meta.isJsonapiResponse = true;
-                    if (ii === 0) {
+                    if (!ii) {
                         data.meta.errorsLength = (data.errors && data.errors.length) | 0;
                     } else {
                         data.meta.dataLength = (data.data && data.data.length) | 0;
@@ -25434,6 +25808,18 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                 });
                 onError(data[0], data[1]);
             };
+        };
+
+        local.operationIdFromAjax = function (options) {
+        /*
+         * this function will create a sortable operationId
+         * from the given ajax-options
+         */
+            var urlParsed;
+            urlParsed = local.urlParseWithBraket(options.url);
+            return encodeURIComponent(
+                urlParsed.pathname + urlParsed.hash + ' ' + options.method.toUpperCase()
+            ).replace((/[^\w\-.]/g), '_');
         };
 
         local.schemaPItems = function (schemaP) {
@@ -25479,6 +25865,247 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                     response.statusCode;
                 response.end(JSON.stringify(data));
             })(error, data, meta);
+        };
+
+        local.swaggerJsonFromAjax = function (swaggerJson, options) {
+        /*
+         * this function will update swaggerJson
+         * with definitions and paths created from the given ajax-options
+         */
+            var data, isArray, operation, type, upsertSchemaP, urlParsed;
+            upsertSchemaP = function (schemaP) {
+                if (!operation.parameters.some(function (element) {
+                        if (element.in === schemaP.in && element.name === schemaP.name) {
+                            ['default', 'items', 'schema'].forEach(function (key) {
+                                if (!local.isNullOrUndefined(schemaP[key])) {
+                                    element[key] = schemaP[key];
+                                }
+                            });
+                            return true;
+                        }
+                    })) {
+                    operation.parameters.push(schemaP);
+                }
+            };
+            // init swaggerJson
+            swaggerJson = local.objectSetDefault(swaggerJson, {
+                basePath: '/',
+                definitions: {},
+                info: { title: '', version: '' },
+                paths: {},
+                swagger: '2.0'
+            });
+            // init options
+            options = local.objectSetDefault(options, { headers: {}, method: 'GET' });
+            // init urlParsed
+            urlParsed = local.urlParseWithBraket(options.url);
+            // init operation
+            operation = {
+                operationId: options.operationId || local.operationIdFromAjax(options),
+                parameters: [],
+                responses: { default: { description: 'default response' } },
+                tags: options.tags || ['undefined'],
+                'x-swgg-tags0': options['x-swgg-tags0']
+            };
+            if ((/^(?:http|https):\/\//).test(options.url)) {
+                operation['x-swgg-host'] = urlParsed.host;
+                operation['x-swgg-schemes'] = [urlParsed.protocol.slice(0, -1)];
+            }
+            local.objectSetDefault(swaggerJson, local.objectLiteralize({ paths: {
+                '$[]': [urlParsed.pathname + urlParsed.hash, {
+                    '$[]': [options.method.toLowerCase(), operation]
+                }]
+            } }), 4);
+            // init param in header
+            Object.keys(options.headers).forEach(function (key) {
+                upsertSchemaP({
+                    default: options.headers[key],
+                    in: 'header',
+                    name: key,
+                    type: 'string'
+                });
+            });
+            // init param in path
+            urlParsed.pathname.replace((/\{[^}]+?\}/g), function (match0) {
+                match0 = match0.slice(1, -1);
+                upsertSchemaP({
+                    default: match0,
+                    in: 'path',
+                    name: match0,
+                    required: true,
+                    type: 'string'
+                });
+            });
+            // init param in query
+            Object.keys(urlParsed.query).forEach(function (key) {
+                upsertSchemaP({
+                    default: urlParsed.query[key],
+                    in: 'query',
+                    name: key,
+                    type: 'string'
+                });
+            });
+            data = options.data;
+            if (!data) {
+                return swaggerJson;
+            }
+            // init param in body - text-data
+            upsertSchemaP({
+                in: 'body',
+                name: 'body',
+                schema: { type: 'string' }
+            });
+            local.tryCatchOnError(function () {
+                data = JSON.parse(data);
+            }, local.nop);
+            if (typeof data !== 'object') {
+                return swaggerJson;
+            }
+            // init param in body - json-data
+            isArray = Array.isArray(data);
+            type = local.swaggerJsonFromPostBody(swaggerJson, {
+                data: isArray
+                    ? data[0]
+                    : data,
+                depth: 2,
+                key: 'body',
+                prefix: operation.operationId,
+                'x-swgg-tags0': options['x-swgg-tags0']
+            });
+            upsertSchemaP({
+                in: 'body',
+                name: 'body',
+                schema: isArray
+                    ? { items: type, type: 'array' }
+                    : type
+            });
+            return swaggerJson;
+        };
+
+        local.swaggerJsonFromCurl = function (swaggerJson, text) {
+        /*
+         * this function will update swaggerJson
+         * with definitions and paths created from the given curl-command-text
+         */
+            var arg, argList, doubleBackslash, quote, options;
+            arg = '';
+            argList = [];
+            doubleBackslash = local.stringUniqueKey(text);
+            // parse doubleBackslash
+            text = text.replace((/\\\\/g), doubleBackslash);
+            // parse line-continuation
+            text = text.replace((/\\\n/g), '');
+            // parse quotes
+            text.replace((/(\s*?)(\S+)/g), function (match0, line, word) {
+                line = match0;
+                word.replace((/^(["']?).*?(?:\\")?(["']?)$/), function (quote1, match1, quote2) {
+                    quote1 = match1;
+                    if (quote) {
+                        arg += line;
+                    } else {
+                        arg = word;
+                        quote = quote1;
+                    }
+                    if (!quote || quote === quote2) {
+                        switch (quote) {
+                        // parse escapes in double-quotes
+                        // https://www.gnu.org/software/bash/manual/html_node/Double-Quotes.html
+                        case '"':
+                            arg = arg.replace((/\\([$`"\n])/g), '$1');
+                            arg = arg.slice(1, -1);
+                            break;
+                        // parse escapes in single-quotes
+                        case "'":
+                            arg = arg.replace((/'"'"'/g), "'");
+                            arg = arg.slice(1, -1);
+                            break;
+                        }
+                        argList.push(arg);
+                        arg = '';
+                        quote = '';
+                    }
+                });
+            });
+            // un-parse doubleBackslash
+            argList = argList.map(function (arg) {
+                return arg.replace(new RegExp(doubleBackslash, 'g'), '\\\\');
+            });
+            argList.push('curl');
+            argList.forEach(function (arg, ii) {
+                switch (argList[ii - 1]) {
+                case '--data':
+                case '--data-ascii':
+                case '--data-binary':
+                case '--data-raw':
+                case '-d':
+                    options.data = arg;
+                    return;
+                case '--request':
+                case '-X':
+                    options.method = arg;
+                    return;
+                case '--header':
+                case '-H':
+                    arg = arg.split(':');
+                    arg[1] = arg.slice(1).join(':').trim();
+                    options.headers[arg[0].toLowerCase()] = arg[1];
+                    return;
+                }
+                if (arg === 'curl') {
+                    if (options) {
+                        options.url = options.url || argList[ii - 1];
+                        swaggerJson = local.swaggerJsonFromAjax(swaggerJson, options);
+                    }
+                    options = { headers: {}, method: 'GET' };
+                }
+                if ((/^(?:http|https):\/\//).test(arg)) {
+                    options.url = arg;
+                }
+            });
+            return swaggerJson;
+        };
+
+        local.swaggerJsonFromPostBody = function (swaggerJson, options) {
+        /*
+         * this function will update swaggerJson
+         * with definitions created from the post-body-data
+         */
+            var definition, isArray, prefix, schemaP, type, value;
+            prefix = options.prefix + '.' + encodeURIComponent(options.key);
+            definition = swaggerJson.definitions[prefix] = {
+                properties: {},
+                'x-swgg-tags0': options['x-swgg-tags0']
+            };
+            Object.keys(options.data).forEach(function (key) {
+                value = options.data[key];
+                isArray = Array.isArray(value);
+                if (isArray) {
+                    value = value[0];
+                }
+                type = local.isNullOrUndefined(value)
+                    ? 'string'
+                    : typeof value;
+                schemaP = definition.properties[key] = isArray
+                    ? { default: options.data[key], items: { type: type }, type: 'array' }
+                    : { default: value, type: type };
+                if (!(type === 'object' && options.depth > 1)) {
+                    return;
+                }
+                // recurse
+                type = local.swaggerJsonFromPostBody(swaggerJson, {
+                    data: value,
+                    depth: options.depth - 1,
+                    key: key,
+                    prefix: prefix,
+                    'x-swgg-tags0': options['x-swgg-tags0']
+                });
+                if (isArray) {
+                    schemaP.items = type;
+                } else {
+                    definition.properties[key] = type;
+                }
+            });
+            return { $ref: '#/definitions/' + prefix };
         };
 
         local.swaggerValidateFile = function (options, onError) {
@@ -25592,7 +26219,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                     local.throwSwaggerError(!test && {
                         data: operation.operationId,
                         errorType: 'semanticUniqueOperationId',
-                        prefix: prefix
+                        prefix: prefix.concat(['operationId'])
                     });
                     operationIdDict[operation.operationId] = true;
                     (operation.parameters || []).forEach(function (schemaP) {
@@ -25611,7 +26238,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
         /*
          * this function will throw a swaggerError with the given options.errorType
          */
-            var error, tmp;
+            var error;
             if (!options) {
                 return;
             }
@@ -25622,16 +26249,14 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                     return '[' + JSON.stringify(element) + ']';
                 }).join('');
             });
-            tmp = JSON.stringify(options.data);
-            options.prefix0 += ' = ' + (typeof tmp === 'string' && tmp.length > 100
-                ? tmp.slice(0, 100) + '...' + tmp.slice(-1)
-                : tmp);
-            switch (options.errorType) {
-            case 'semanticUniqueOperationId':
-                options.prefix0 += '["operationId"]';
-                break;
-            }
-            options.schema2 = JSON.stringify(options.schema) || 'undefined';
+            options.prefix0 += ' = ' + local.stringTruncate(
+                JSON.stringify(options.data) || 'undefined',
+                100
+            );
+            options.schema2 = local.stringTruncate(
+                JSON.stringify(options.schema) || 'undefined',
+                500
+            );
             options.type2 = (options.schema && local.schemaPType(options.schema)) || 'object';
             if (options.schema && options.schema.format) {
                 options.type2 += ' (' + options.schema.format + ')';
@@ -25707,7 +26332,8 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
 
         local.uiEventListenerDict['.onEventInputValidate'] = function (options, onError) {
         /*
-         * this function will validate the parameters
+         * this function will validate the input parameters
+         * against the schemas in options.parameters
          */
             var errorDict, jsonParse, tmp;
             jsonParse = function (text) {
@@ -25863,9 +26489,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                     options.targetOperation.querySelector('.responseStatusCode').focus();
                     break;
                 default:
-                    if (error) {
-                        console.error(error);
-                    }
+                    local.onErrorDefault(error);
                     if (options.error) {
                         return;
                     }
@@ -26000,106 +26624,107 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
             });
         };
 
-        local.uiEventListenerDict['.onEventUiReload'] = function (event, onError) {
+        local.uiEventListenerDict['.onEventUiReload'] = function (options, onError) {
         /*
          * this function will reload the ui
          */
-            event = event || {};
-            // clear all apiKeyValue's from localStorage
-            if (event.target2 && event.target2.id === 'swggApiKeyClearButton1') {
-                local.apiKeyValue = '';
-                Object.keys(localStorage).forEach(function (key) {
-                    if (key.indexOf('utility2_swgg_apiKeyKey_') === 0) {
-                        localStorage.removeItem(key);
+            var resource, swaggerJson;
+            options = swaggerJson = options || {};
+            local.onNext(options, function (error, data) {
+                switch (options.modeNext) {
+                case 1:
+                    options.inputUrl = document.querySelector('.swggUiContainer > .thead > .td2');
+                    // clear all apiKeyValue's from localStorage
+                    if (options.target2 && options.target2.id === 'swggApiKeyClearButton1') {
+                        local.apiKeyValue = '';
+                        Object.keys(localStorage).forEach(function (key) {
+                            if (key.indexOf('utility2_swgg_apiKeyKey_') === 0) {
+                                localStorage.removeItem(key);
+                            }
+                        });
+                    // restore apiKeyValue
+                    } else if (options.swggInit) {
+                        local.apiKeyKey = 'utility2_swgg_apiKeyKey_' +
+                            encodeURIComponent(local.urlParse(
+                                options.inputUrl.value.replace((/^\//), '')
+                            ).href);
+                        local.apiKeyValue = localStorage.getItem(local.apiKeyKey) || '';
+                    // save apiKeyValue
+                    } else {
+                        local.apiKeyValue = document.querySelector('#swggApiKeyInput1').value;
+                        local.localStorageSetItemOrClear(local.apiKeyKey, local.apiKeyValue);
                     }
-                });
-            // restore apiKeyValue
-            } else if (event.swggInit) {
-                local.apiKeyKey = 'utility2_swgg_apiKeyKey_' + encodeURIComponent(local.urlParse(
-                    document.querySelector('.swggUiContainer > .thead > .td2').value
-                        .replace((/^\//), '')
-                ).href);
-                local.apiKeyValue = localStorage.getItem(local.apiKeyKey) || '';
-            // save apiKeyValue
-            } else {
-                local.apiKeyValue = document.querySelector('#swggApiKeyInput1').value;
-                local.localStorageSetItemOrClear(local.apiKeyKey, local.apiKeyValue);
-            }
-            // if keyup-event is not return-key, then return
-            if ((event.type === 'keyup' && event.code !== 'Enter') ||
-                    // do not reload ui during test
-                    local.global.utility2_modeTestRun >= 2) {
-                return;
-            }
-            // reset ui
-            Array.from(document.querySelectorAll(
-                '.swggUiContainer > .reset'
-            )).forEach(function (element) {
-                element.remove();
+                    // if keyup-event is not return-key, then return
+                    if ((options.type === 'keyup' && options.code !== 'Enter') ||
+                            // do not reload ui during test
+                            local.global.utility2_modeTestRun >= 2) {
+                        return;
+                    }
+                    // reset ui
+                    document.querySelector('#swggUiReloadErrorDiv1').textContent = '';
+                    Array.from(document.querySelectorAll(
+                        '.swggUiContainer > .reset'
+                    )).forEach(function (element) {
+                        element.remove();
+                    });
+                    // normalize swaggerJsonUrl
+                    options.inputUrl.value = local.urlParse(
+                        options.inputUrl.value.replace((/^\//), '')
+                    ).href;
+                    document.querySelector('#swggAjaxProgressDiv1 span').innerHTML =
+                        'loading swagger.json';
+                    options.onNext();
+                    break;
+                case 2:
+                    // fetch swagger.json file
+                    local.ajax({ url: options.inputUrl.value }, options.onNext);
+                    break;
+                case 3:
+                    // JSON.parse swagger.json string
+                    local.tryCatchOnError(function () {
+                        options.onNext(null, JSON.parse(data.responseText));
+                    }, options.onNext);
+                    break;
+                case 4:
+                    // reset state
+                    local.apiDict = local.swaggerJson = null;
+                    // apiUpdate swagger.json object
+                    local.apiUpdate(data);
+                    swaggerJson = local.uiState = local.jsonCopy(local.swaggerJson);
+                    // init ajaxProgressText
+                    swaggerJson.ajaxProgressText = 'rendering swagger.json';
+                    // init apiKeyValue
+                    swaggerJson.apiKeyValue = local.apiKeyValue;
+                    // templateRender title
+                    document.querySelector('head > title').textContent = local.templateRender(
+                        local.templateUiTitle,
+                        swaggerJson
+                    ).trim();
+                    // init urlSwaggerJson
+                    swaggerJson.urlSwaggerJson = options.inputUrl.value;
+                    // templateRender main
+                    document.querySelector('.swggUiContainer').innerHTML = local.templateRender(
+                        local.templateUiMain,
+                        swaggerJson
+                    );
+                    setTimeout(function () {
+                        // recurse - render .resourceList
+                        local.uiEventListenerDict['.onEventUiReload'](swaggerJson, options.onNext);
+                    }, 100);
+                    break;
+                default:
+                    local.onErrorDefault(error);
+                    // debug error
+                    local._debugOnEventUiReload = error || local._debugOnEventUiReload;
+                    document.querySelector('#swggUiReloadErrorDiv1').textContent =
+                        (error || { message: '' }).message;
+                    local.setTimeoutOnError(onError, 0, error);
+                }
             });
-            // normalize swaggerJsonUrl
-            document.querySelector('.swggUiContainer > .thead > .td2').value = local.urlParse(
-                document.querySelector('.swggUiContainer > .thead > .td2').value
-                    .replace((/^\//), '')
-            ).href;
-            document.querySelector('#swggAjaxProgressDiv1 span').innerHTML = 'loading swagger.json';
-            // fetch swagger.json file
-            local.apiUpdate({
-                modeAjax: true,
-                url: document.querySelector('.swggUiContainer > .thead > .td2').value
-            }, function (error) {
-                local.uiRenderAll(null, onError);
-                local.tryCatchOnError(function () {
-                    local.swaggerValidateJson(local.swaggerJson);
-                }, local.uiNotify);
-                local.uiNotify(error);
-            });
-        };
-
-        local.uiNotify = function (error) {
-        /*
-         * this function will notify with the given error
-         */
-            var element;
-            element = document.querySelector('#swggAjaxProgressPre1');
-            if (!error) {
-                return element;
-            }
-            element.textContent = error.message + '\n' + element.textContent;
-            // shake input on error
-            local.uiAnimateShakeIfError(error, element);
-            return element;
-        };
-
-        local.uiRenderAll = function (swaggerJson, onError) {
-        /*
-         * this function will render swagger-ui
-         */
-            var resource;
             // optimization - render .swggUiContainer first
-            if (!(swaggerJson && swaggerJson.swagger)) {
-                swaggerJson = local.uiState = local.jsonCopy(local.swaggerJson);
-                // init ajaxProgressText
-                swaggerJson.ajaxProgressText = 'rendering swagger.json';
-                // init apiKeyValue
-                swaggerJson.apiKeyValue = local.apiKeyValue;
-                // templateRender title
-                document.querySelector('head > title').textContent = local.templateRender(
-                    local.templateUiTitle,
-                    swaggerJson
-                ).trim();
-                // init urlSwaggerJson
-                swaggerJson.urlSwaggerJson = document.querySelector(
-                    '.swggUiContainer > .thead > .td2'
-                ).value;
-                // templateRender main
-                document.querySelector('.swggUiContainer').innerHTML = local.templateRender(
-                    local.templateUiMain,
-                    swaggerJson
-                );
-                setTimeout(function () {
-                    local.uiRenderAll(swaggerJson, onError);
-                }, 100);
+            if (!swaggerJson.swagger) {
+                options.modeNext = 0;
+                options.onNext();
                 return;
             }
             // optimization - render .resourceList in separate event-loop
@@ -26124,11 +26749,12 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                     resource = swaggerJson.resourceDict[tag] = local.objectSetDefault(
                         swaggerJson.resourceDict[tag] || swaggerJson.tagDict[tag],
                         {
-                            description: 'no description',
                             name: tag
                         }
                     );
                     resource.id = resource.id || local.idDomElementCreate('swgg_id_' + tag);
+                    resource.summary = resource.summary || String(resource.description)
+                        .replace((/\bhttps?:\/\/[^\s<]+[^<.,:;"')\]\s]/g), '');
                 });
             });
             // init uiFragment
@@ -26164,6 +26790,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                             };
                         }),
                         summary: operation.description
+                            .replace((/\bhttps?:\/\/[^\s<]+[^<.,:;"')\]\s]/g), '')
                     });
                     operation.parameters.forEach(local.uiRenderSchemaP);
                     // templateRender operation
@@ -26348,6 +26975,17 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
             schemaP.innerHTML = local.templateRender(local.templateUiParameter, schemaP);
         };
 
+        local.urlParseWithBraket = function (url) {
+        /*
+         * this function will urlParse the url with curly-brackets preserved
+         */
+            var tmp;
+            tmp = local.stringUniqueKey(url);
+            return JSON.parse(JSON.stringify(
+                local.urlParse(url.replace((/\{/g), tmp + 1).replace((/\}/g), tmp + 2))
+            ).replace(new RegExp(tmp + 1, 'g'), '{').replace(new RegExp(tmp + 2, 'g'), '}'));
+        };
+
         local.userLoginByPassword = function (options, onError) {
         /*
          * this function will send a login-by-password request
@@ -26378,7 +27016,8 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
 
         local.validateBySwaggerParameters = function (options) {
         /*
-         * this function will validate options.data against options.parameters
+         * this function will validate the items in options.paramDict
+         * against the schemaP's in options.parameters
          */
             var errorList;
             errorList = [];
@@ -26405,7 +27044,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
 
         local.validateBySwaggerSchema = function (options) {
         /*
-         * this function will validate data against schema
+         * this function will validate options.data against the swagger options.schema
          * http://json-schema.org/draft-04/json-schema-validation.html#rfc.section.5
          */
             var $ref,
@@ -26543,7 +27182,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                 test = !options.modeSchema;
                 break;
             case 'integer':
-                test = Number.isFinite(data) && Math.floor(data) === data;
+                test = Number.isInteger(data);
                 switch (schema.format) {
                 case 'int32':
                     break;
@@ -26574,7 +27213,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                     test = JSON.stringify(new Date(data)) !== 'null';
                     break;
                 case 'email':
-                    test = local.regexpEmailValidate.test(data);
+                    test = local.regexpValidateEmail.test(data);
                     break;
                 case 'json':
                     test = local.tryCatchOnError(function () {
@@ -26583,7 +27222,7 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
                     }, local.nop);
                     break;
                 case 'phone':
-                    test = local.regexpPhoneValidate.test(data);
+                    test = local.regexpValidatePhone.test(data);
                     break;
                 }
                 break;
@@ -26967,6 +27606,1185 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
     }
 }());
 /* script-end /assets.swgg.js */
+
+
+
+/* script-begin /assets.utility2.example.js */
+(function () {
+    "use strict";
+    var local;
+    local = (typeof window === "object" && window && window.utility2_rollup) ||
+        global.utility2_rollup;
+    local.local = local;
+/* jslint-ignore-begin */
+local.assetsDict["/assets.utility2.example.js"] = "/*\n\
+example.js\n\
+\n\
+this script will demo automated browser-tests with coverage (via electron and istanbul)\n\
+\n\
+instruction\n\
+    1. save this script as example.js\n\
+    2. run the shell command:\n\
+        $ npm install utility2 electron-lite && \\\n\
+            PATH=\"$(pwd)/node_modules/.bin:$PATH\" \\\n\
+            PORT=8081 \\\n\
+            npm_config_mode_coverage=utility2 \\\n\
+            node_modules/.bin/utility2 test example.js\n\
+    3. view test-report in ./tmp/build/test-report.html\n\
+    4. view coverage in ./tmp/build/coverage.html/index.html\n\
+*/\n\
+\n\
+\n\
+\n\
+/* istanbul instrument in package utility2 */\n\
+/* jslint-utility2 */\n\
+/*jslint\n\
+    bitwise: true,\n\
+    browser: true,\n\
+    maxerr: 8,\n\
+    maxlen: 100,\n\
+    node: true,\n\
+    nomen: true,\n\
+    regexp: true,\n\
+    stupid: true\n\
+*/\n\
+(function () {\n\
+    'use strict';\n\
+    var local;\n\
+\n\
+\n\
+\n\
+    // run shared js-env code - init-before\n\
+    (function () {\n\
+        // init local\n\
+        local = {};\n\
+        // init modeJs\n\
+        local.modeJs = (function () {\n\
+            try {\n\
+                return typeof navigator.userAgent === 'string' &&\n\
+                    typeof document.querySelector('body') === 'object' &&\n\
+                    typeof XMLHttpRequest.prototype.open === 'function' &&\n\
+                    'browser';\n\
+            } catch (errorCaughtBrowser) {\n\
+                return module.exports &&\n\
+                    typeof process.versions.node === 'string' &&\n\
+                    typeof require('http').createServer === 'function' &&\n\
+                    'node';\n\
+            }\n\
+        }());\n\
+        // init global\n\
+        local.global = local.modeJs === 'browser'\n\
+            ? window\n\
+            : global;\n\
+        // init utility2_rollup\n\
+        local = local.global.utility2_rollup || (local.modeJs === 'browser'\n\
+            ? local.global.utility2_utility2\n\
+            : require('utility2'));\n\
+        // init exports\n\
+        local.global.local = local;\n\
+        // run test-server\n\
+        local.testRunServer(local);\n\
+        // init assets\n\
+        local.assetsDict['/assets.hello'] = 'hello\\n\
+';\n\
+        local.assetsDict['/assets.index.template.html'] = '';\n\
+    }());\n\
+    switch (local.modeJs) {\n\
+\n\
+\n\
+\n\
+    // run browser js-env code - function\n\
+    case 'browser':\n\
+        local.testCase_ajax_200 = function (options, onError) {\n\
+        /*\n\
+         * this function will test ajax's \"200 ok\" handling-behavior\n\
+         */\n\
+            options = {};\n\
+            // test ajax-path 'assets.hello'\n\
+            local.ajax({ url: 'assets.hello' }, function (error, xhr) {\n\
+                local.tryCatchOnError(function () {\n\
+                    // validate no error occurred\n\
+                    local.assert(!error, error);\n\
+                    // validate data\n\
+                    options.data = xhr.responseText;\n\
+                    local.assert(options.data === 'hello\\n\
+', options.data);\n\
+                    onError();\n\
+                }, onError);\n\
+            });\n\
+        };\n\
+        local.testCase_ajax_404 = function (options, onError) {\n\
+        /*\n\
+         * this function will test ajax's \"404 not found\" handling-behavior\n\
+         */\n\
+            options = {};\n\
+            // test ajax-path '/undefined'\n\
+            local.ajax({ url: '/undefined' }, function (error) {\n\
+                local.tryCatchOnError(function () {\n\
+                    // validate error occurred\n\
+                    local.assert(error, error);\n\
+                    options.statusCode = error.statusCode;\n\
+                    // validate 404 http statusCode\n\
+                    local.assert(options.statusCode === 404, options.statusCode);\n\
+                    onError();\n\
+                }, onError);\n\
+            });\n\
+        };\n\
+        break;\n\
+\n\
+\n\
+\n\
+    // run node js-env code - function\n\
+    case 'node':\n\
+        local.testCase_webpage_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test webpage's default handling-behavior\n\
+         */\n\
+            options = { modeCoverageMerge: true, url: local.serverLocalHost + '?modeTest=1' };\n\
+            local.browserTest(options, onError);\n\
+        };\n\
+        break;\n\
+    }\n\
+    switch (local.modeJs) {\n\
+\n\
+\n\
+\n\
+    // run browser js-env code - init-test\n\
+    /* istanbul ignore next */\n\
+    case 'browser':\n\
+        local.testRunBrowser = function (event) {\n\
+            if (!event || (event &&\n\
+                    event.currentTarget &&\n\
+                    event.currentTarget.className &&\n\
+                    event.currentTarget.className.includes &&\n\
+                    event.currentTarget.className.includes('onreset'))) {\n\
+                // reset output\n\
+                Array.from(\n\
+                    document.querySelectorAll('body > .resettable')\n\
+                ).forEach(function (element) {\n\
+                    switch (element.tagName) {\n\
+                    case 'INPUT':\n\
+                    case 'TEXTAREA':\n\
+                        element.value = '';\n\
+                        break;\n\
+                    default:\n\
+                        element.textContent = '';\n\
+                    }\n\
+                });\n\
+            }\n\
+            switch (event && event.currentTarget && event.currentTarget.id) {\n\
+            case 'testRunButton1':\n\
+                // show tests\n\
+                if (document.querySelector('#testReportDiv1').style.maxHeight === '0px') {\n\
+                    local.uiAnimateSlideDown(document.querySelector('#testReportDiv1'));\n\
+                    document.querySelector('#testRunButton1').textContent = 'hide internal test';\n\
+                    local.modeTest = true;\n\
+                    local.testRunDefault(local);\n\
+                // hide tests\n\
+                } else {\n\
+                    local.uiAnimateSlideUp(document.querySelector('#testReportDiv1'));\n\
+                    document.querySelector('#testRunButton1').textContent = 'run internal test';\n\
+                }\n\
+                break;\n\
+            // custom-case\n\
+            case 'testRunButton2':\n\
+                // run tests\n\
+                local.modeTest = true;\n\
+                local.testRunDefault(local);\n\
+                break;\n\
+            default:\n\
+                if (location.href.indexOf(\"modeTest=\") >= 0) {\n\
+                    return;\n\
+                }\n\
+                // try to JSON.stringify #inputTextareaEval1\n\
+                try {\n\
+                    document.querySelector('#outputPreJsonStringify1').textContent = '';\n\
+                    document.querySelector('#outputPreJsonStringify1').textContent =\n\
+                        local.jsonStringifyOrdered(\n\
+                            JSON.parse(document.querySelector('#inputTextareaEval1').value),\n\
+                            null,\n\
+                            4\n\
+                        );\n\
+                } catch (ignore) {\n\
+                }\n\
+                // jslint #inputTextareaEval1\n\
+                local.jslint.errorText = '';\n\
+                if (document.querySelector('#inputTextareaEval1').value\n\
+                        .indexOf('/*jslint') >= 0) {\n\
+                    local.jslint.jslintAndPrint(\n\
+                        document.querySelector('#inputTextareaEval1').value,\n\
+                        'inputTextareaEval1.js'\n\
+                    );\n\
+                }\n\
+                document.querySelector('#outputPreJslint1').textContent =\n\
+                    local.jslint.errorText\n\
+                    .replace((/\\u001b\\[\\d+m/g), '')\n\
+                    .trim();\n\
+                // try to cleanup __coverage__\n\
+                try {\n\
+                    delete local.global.__coverage__['/inputTextareaEval1.js'];\n\
+                } catch (ignore) {\n\
+                }\n\
+                // try to cover and eval input-code\n\
+                try {\n\
+                    /*jslint evil: true*/\n\
+                    document.querySelector('#outputTextarea1').value =\n\
+                        local.istanbul.instrumentSync(\n\
+                            document.querySelector('#inputTextareaEval1').value,\n\
+                            '/inputTextareaEval1.js'\n\
+                        );\n\
+                    eval(document.querySelector('#outputTextarea1').value);\n\
+                    document.querySelector('#coverageReportDiv1').innerHTML =\n\
+                        local.istanbul.coverageReportCreate({\n\
+                            coverage: window.__coverage__\n\
+                        });\n\
+                } catch (errorCaught) {\n\
+                    console.error(errorCaught);\n\
+                }\n\
+            }\n\
+            if (document.querySelector('#inputTextareaEval1') && (!event || (event &&\n\
+                    event.currentTarget &&\n\
+                    event.currentTarget.className &&\n\
+                    event.currentTarget.className.includes &&\n\
+                    event.currentTarget.className.includes('oneval')))) {\n\
+                // try to eval input-code\n\
+                try {\n\
+                    /*jslint evil: true*/\n\
+                    eval(document.querySelector('#inputTextareaEval1').value);\n\
+                } catch (errorCaught) {\n\
+                    console.error(errorCaught);\n\
+                }\n\
+            }\n\
+        };\n\
+        // log stderr and stdout to #outputTextareaStdout1\n\
+        ['error', 'log'].forEach(function (key) {\n\
+            console[key + '_original'] = console[key];\n\
+            console[key] = function () {\n\
+                var element;\n\
+                console[key + '_original'].apply(console, arguments);\n\
+                element = document.querySelector('#outputTextareaStdout1');\n\
+                if (!element) {\n\
+                    return;\n\
+                }\n\
+                // append text to #outputTextareaStdout1\n\
+                element.value += Array.from(arguments).map(function (arg) {\n\
+                    return typeof arg === 'string'\n\
+                        ? arg\n\
+                        : JSON.stringify(arg, null, 4);\n\
+                }).join(' ') + '\\n\
+';\n\
+                // scroll textarea to bottom\n\
+                element.scrollTop = element.scrollHeight;\n\
+            };\n\
+        });\n\
+        // init event-handling\n\
+        ['change', 'click', 'keyup'].forEach(function (event) {\n\
+            Array.from(document.querySelectorAll('.on' + event)).forEach(function (element) {\n\
+                element.addEventListener(event, local.testRunBrowser);\n\
+            });\n\
+        });\n\
+        // run tests\n\
+        local.testRunBrowser();\n\
+        break;\n\
+\n\
+\n\
+\n\
+    // run node js-env code - init-test\n\
+    /* istanbul ignore next */\n\
+    case 'node':\n\
+        // init exports\n\
+        module.exports = local;\n\
+        // require builtins\n\
+        Object.keys(process.binding('natives')).forEach(function (key) {\n\
+            if (!local[key] && !(/\\/|^_|^sys$/).test(key)) {\n\
+                local[key] = require(key);\n\
+            }\n\
+        });\n\
+        // init assets\n\
+        local.assetsDict = local.assetsDict || {};\n\
+        /* jslint-ignore-begin */\n\
+        local.assetsDict['/assets.index.template.html'] = '\\\n\
+<!doctype html>\\n\
+\\\n\
+<html lang=\"en\">\\n\
+\\\n\
+<head>\\n\
+\\\n\
+<meta charset=\"UTF-8\">\\n\
+\\\n\
+<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\\n\
+\\\n\
+<!-- \"assets.index.default.template.html\" -->\\n\
+\\\n\
+<title>{{env.npm_package_name}} (v{{env.npm_package_version}})</title>\\n\
+\\\n\
+<style>\\n\
+\\\n\
+/* jslint-utility2 */\\n\
+\\\n\
+/*csslint\\n\
+\\\n\
+*/\\n\
+\\\n\
+/* jslint-ignore-begin */\\n\
+\\\n\
+*,\\n\
+\\\n\
+*:after,\\n\
+\\\n\
+*:before {\\n\
+\\\n\
+    box-sizing: border-box;\\n\
+\\\n\
+}\\n\
+\\\n\
+/* jslint-ignore-end */\\n\
+\\\n\
+@keyframes uiAnimateShake {\\n\
+\\\n\
+    0%, 50% {\\n\
+\\\n\
+        transform: translateX(10px);\\n\
+\\\n\
+    }\\n\
+\\\n\
+    25%, 75% {\\n\
+\\\n\
+        transform: translateX(-10px);\\n\
+\\\n\
+    }\\n\
+\\\n\
+    100% {\\n\
+\\\n\
+        transform: translateX(0);\\n\
+\\\n\
+    }\\n\
+\\\n\
+}\\n\
+\\\n\
+@keyframes uiAnimateSpin {\\n\
+\\\n\
+    0% { transform: rotate(0deg); }\\n\
+\\\n\
+    100% { transform: rotate(360deg); }\\n\
+\\\n\
+}\\n\
+\\\n\
+a {\\n\
+\\\n\
+    overflow-wrap: break-word;\\n\
+\\\n\
+}\\n\
+\\\n\
+body {\\n\
+\\\n\
+    background: #dde;\\n\
+\\\n\
+    font-family: Arial, Helvetica, sans-serif;\\n\
+\\\n\
+    margin: 0 40px;\\n\
+\\\n\
+}\\n\
+\\\n\
+body > a,\\n\
+\\\n\
+body > button,\\n\
+\\\n\
+body > div,\\n\
+\\\n\
+body > input,\\n\
+\\\n\
+body > pre,\\n\
+\\\n\
+body > select,\\n\
+\\\n\
+body > span,\\n\
+\\\n\
+body > textarea {\\n\
+\\\n\
+    margin-bottom: 20px;\\n\
+\\\n\
+}\\n\
+\\\n\
+body > button {\\n\
+\\\n\
+    width: 20rem;\\n\
+\\\n\
+}\\n\
+\\\n\
+button {\\n\
+\\\n\
+    cursor: pointer;\\n\
+\\\n\
+}\\n\
+\\\n\
+code,\\n\
+\\\n\
+pre,\\n\
+\\\n\
+textarea {\\n\
+\\\n\
+    font-family: Menlo, Consolas, Courier New, monospace;\\n\
+\\\n\
+    font-size: small;\\n\
+\\\n\
+}\\n\
+\\\n\
+pre {\\n\
+\\\n\
+    overflow-wrap: break-word;\\n\
+\\\n\
+    white-space: pre-wrap;\\n\
+\\\n\
+}\\n\
+\\\n\
+.textOverflowEllipsis {\\n\
+\\\n\
+    overflow: hidden;\\n\
+\\\n\
+    text-overflow: ellipsis;\\n\
+\\\n\
+    white-space: nowrap;\\n\
+\\\n\
+}\\n\
+\\\n\
+.uiAnimateShake {\\n\
+\\\n\
+    animation-duration: 500ms;\\n\
+\\\n\
+    animation-name: uiAnimateShake;\\n\
+\\\n\
+}\\n\
+\\\n\
+.uiAnimateSlide {\\n\
+\\\n\
+    overflow-y: hidden;\\n\
+\\\n\
+    transition: max-height ease-in 250ms, min-height ease-in 250ms, padding-bottom ease-in 250ms, padding-top ease-in 250ms;\\n\
+\\\n\
+}\\n\
+\\\n\
+.utility2FooterDiv {\\n\
+\\\n\
+    text-align: center;\\n\
+\\\n\
+}\\n\
+\\\n\
+.zeroPixel {\\n\
+\\\n\
+    border: 0;\\n\
+\\\n\
+    height: 0;\\n\
+\\\n\
+    margin: 0;\\n\
+\\\n\
+    padding: 0;\\n\
+\\\n\
+    width: 0;\\n\
+\\\n\
+}\\n\
+\\\n\
+</style>\\n\
+\\\n\
+<style>\\n\
+\\\n\
+/*csslint\\n\
+\\\n\
+    ids: false,\\n\
+\\\n\
+*/\\n\
+\\\n\
+textarea {\\n\
+\\\n\
+    height: 10rem;\\n\
+\\\n\
+    width: 100%;\\n\
+\\\n\
+}\\n\
+\\\n\
+textarea[readonly] {\\n\
+\\\n\
+    background: #ddd;\\n\
+\\\n\
+}\\n\
+\\\n\
+#outputPreJslint1 {\\n\
+\\\n\
+    color: #d00;\\n\
+\\\n\
+}\\n\
+\\\n\
+</style>\\n\
+\\\n\
+</head>\\n\
+\\\n\
+<body>\\n\
+\\\n\
+<div id=\"ajaxProgressDiv1\" style=\"background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%; z-index: 1;\"></div>\\n\
+\\\n\
+<div class=\"uiAnimateSpin\" style=\"animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: none; height: 25px; vertical-align: middle; width: 25px;\"></div>\\n\
+\\\n\
+<script>\\n\
+\\\n\
+/* jslint-utility2 */\\n\
+\\\n\
+/*jslint\\n\
+\\\n\
+    bitwise: true,\\n\
+\\\n\
+    browser: true,\\n\
+\\\n\
+    maxerr: 8,\\n\
+\\\n\
+    maxlen: 100,\\n\
+\\\n\
+    node: true,\\n\
+\\\n\
+    nomen: true,\\n\
+\\\n\
+    regexp: true,\\n\
+\\\n\
+    stupid: true\\n\
+\\\n\
+*/\\n\
+\\\n\
+(function () {\\n\
+\\\n\
+    \"use strict\";\\n\
+\\\n\
+    var ajaxProgressDiv1,\\n\
+\\\n\
+        ajaxProgressState,\\n\
+\\\n\
+        ajaxProgressUpdate,\\n\
+\\\n\
+        timerIntervalAjaxProgressUpdate;\\n\
+\\\n\
+    ajaxProgressDiv1 = document.querySelector(\"#ajaxProgressDiv1\");\\n\
+\\\n\
+    setTimeout(function () {\\n\
+\\\n\
+        ajaxProgressDiv1.style.width = \"25%\";\\n\
+\\\n\
+    });\\n\
+\\\n\
+    ajaxProgressState = 0;\\n\
+\\\n\
+    ajaxProgressUpdate = (window.local &&\\n\
+\\\n\
+        window.local.ajaxProgressUpdate) || function () {\\n\
+\\\n\
+        ajaxProgressDiv1.style.width = \"100%\";\\n\
+\\\n\
+        setTimeout(function () {\\n\
+\\\n\
+            ajaxProgressDiv1.style.background = \"transparent\";\\n\
+\\\n\
+            setTimeout(function () {\\n\
+\\\n\
+                ajaxProgressDiv1.style.width = \"0%\";\\n\
+\\\n\
+            }, 500);\\n\
+\\\n\
+        }, 1500);\\n\
+\\\n\
+    };\\n\
+\\\n\
+    timerIntervalAjaxProgressUpdate = setInterval(function () {\\n\
+\\\n\
+        ajaxProgressState += 1;\\n\
+\\\n\
+        ajaxProgressDiv1.style.width = Math.max(\\n\
+\\\n\
+            100 - 75 * Math.exp(-0.125 * ajaxProgressState),\\n\
+\\\n\
+            Number(ajaxProgressDiv1.style.width.slice(0, -1)) || 0\\n\
+\\\n\
+        ) + \"%\";\\n\
+\\\n\
+    }, 1000);\\n\
+\\\n\
+    window.addEventListener(\"load\", function () {\\n\
+\\\n\
+        clearInterval(timerIntervalAjaxProgressUpdate);\\n\
+\\\n\
+        ajaxProgressUpdate();\\n\
+\\\n\
+    });\\n\
+\\\n\
+}());\\n\
+\\\n\
+</script>\\n\
+\\\n\
+<h1>\\n\
+\\\n\
+<!-- utility2-comment\\n\
+\\\n\
+    <a\\n\
+\\\n\
+        {{#if env.npm_package_homepage}}\\n\
+\\\n\
+        href=\"{{env.npm_package_homepage}}\"\\n\
+\\\n\
+        {{/if env.npm_package_homepage}}\\n\
+\\\n\
+        target=\"_blank\"\\n\
+\\\n\
+    >\\n\
+\\\n\
+utility2-comment -->\\n\
+\\\n\
+        {{env.npm_package_name}} (v{{env.npm_package_version}})\\n\
+\\\n\
+<!-- utility2-comment\\n\
+\\\n\
+    </a>\\n\
+\\\n\
+utility2-comment -->\\n\
+\\\n\
+</h1>\\n\
+\\\n\
+<h3>{{env.npm_package_description}}</h3>\\n\
+\\\n\
+<!-- utility2-comment\\n\
+\\\n\
+<h4><a download href=\"assets.app.js\">[download standalone app]</a></h4>\\n\
+\\\n\
+<button class=\"onclick onreset\" id=\"testRunButton2\">run internal test</button><br>\\n\
+\\\n\
+utility2-comment -->\\n\
+\\\n\
+\\n\
+\\\n\
+\\n\
+\\\n\
+\\n\
+\\\n\
+<label>edit or paste script below to cover and test</label>\\n\
+\\\n\
+<textarea class=\"oneval onkeyup onreset\" id=\"inputTextareaEval1\">\\n\
+\\\n\
+// remove comment below to disable jslint\\n\
+\\\n\
+/*jslint\\n\
+\\\n\
+    browser: true,\\n\
+\\\n\
+    es6: true\\n\
+\\\n\
+*/\\n\
+\\\n\
+/*global window*/\\n\
+\\\n\
+(function () {\\n\
+\\\n\
+    \"use strict\";\\n\
+\\\n\
+    var testCaseDict;\\n\
+\\\n\
+    testCaseDict = {};\\n\
+\\\n\
+    testCaseDict.modeTest = true;\\n\
+\\\n\
+\\n\
+\\\n\
+    // comment this testCase to disable the failed assertion demo\\n\
+\\\n\
+    testCaseDict.testCase_failed_assertion_demo = function (\\n\
+\\\n\
+        options,\\n\
+\\\n\
+        onError\\n\
+\\\n\
+    ) {\\n\
+\\\n\
+    /*\\n\
+\\\n\
+     * this function will demo a failed assertion test\\n\
+\\\n\
+     */\\n\
+\\\n\
+        // jslint-hack\\n\
+\\\n\
+        window.utility2.nop(options);\\n\
+\\\n\
+        window.utility2.assert(false, \"this is a failed assertion demo\");\\n\
+\\\n\
+        onError();\\n\
+\\\n\
+    };\\n\
+\\\n\
+\\n\
+\\\n\
+    testCaseDict.testCase_passed_ajax_demo = function (options, onError) {\\n\
+\\\n\
+    /*\\n\
+\\\n\
+     * this function will demo a passed ajax test\\n\
+\\\n\
+     */\\n\
+\\\n\
+        var data;\\n\
+\\\n\
+        options = {url: \"/\"};\\n\
+\\\n\
+        // test ajax request for main-page \"/\"\\n\
+\\\n\
+        window.utility2.ajax(options, function (error, xhr) {\\n\
+\\\n\
+            try {\\n\
+\\\n\
+                // validate no error occurred\\n\
+\\\n\
+                window.utility2.assert(!error, error);\\n\
+\\\n\
+                // validate \"200 ok\" status\\n\
+\\\n\
+                window.utility2.assert(xhr.statusCode === 200, xhr.statusCode);\\n\
+\\\n\
+                // validate non-empty data\\n\
+\\\n\
+                data = xhr.responseText;\\n\
+\\\n\
+                window.utility2.assert(data && data.length > 0, data);\\n\
+\\\n\
+                onError();\\n\
+\\\n\
+            } catch (errorCaught) {\\n\
+\\\n\
+                onError(errorCaught);\\n\
+\\\n\
+            }\\n\
+\\\n\
+        });\\n\
+\\\n\
+    };\\n\
+\\\n\
+\\n\
+\\\n\
+    window.utility2.testRunDefault(testCaseDict);\\n\
+\\\n\
+}());\\n\
+\\\n\
+</textarea>\\n\
+\\\n\
+<pre id=\"outputPreJsonStringify1\"></pre>\\n\
+\\\n\
+<pre id=\"outputPreJslint1\"></pre>\\n\
+\\\n\
+<label>instrumented-code</label>\\n\
+\\\n\
+<textarea class=\"resettable\" id=\"outputTextarea1\" readonly></textarea>\\n\
+\\\n\
+<label>stderr and stdout</label>\\n\
+\\\n\
+<textarea class=\"resettable\" id=\"outputTextareaStdout1\" readonly></textarea>\\n\
+\\\n\
+<div class=\"resettable\" id=\"testReportDiv1\"></div>\\n\
+\\\n\
+<div class=\"resettable\" id=\"coverageReportDiv1\"></div>\\n\
+\\\n\
+<!-- utility2-comment\\n\
+\\\n\
+{{#if isRollup}}\\n\
+\\\n\
+<script src=\"assets.app.js\"></script>\\n\
+\\\n\
+{{#unless isRollup}}\\n\
+\\\n\
+utility2-comment -->\\n\
+\\\n\
+<script src=\"assets.utility2.lib.istanbul.js\"></script>\\n\
+\\\n\
+<script src=\"assets.utility2.lib.jslint.js\"></script>\\n\
+\\\n\
+<script src=\"assets.utility2.lib.db.js\"></script>\\n\
+\\\n\
+<script src=\"assets.utility2.lib.marked.js\"></script>\\n\
+\\\n\
+<script src=\"assets.utility2.lib.sjcl.js\"></script>\\n\
+\\\n\
+<script src=\"assets.utility2.lib.uglifyjs.js\"></script>\\n\
+\\\n\
+<script src=\"assets.utility2.js\"></script>\\n\
+\\\n\
+<script>window.utility2.onResetBefore.counter += 1;</script>\\n\
+\\\n\
+<script src=\"jsonp.utility2.stateInit?callback=window.utility2.stateInit\"></script>\\n\
+\\\n\
+<script src=\"assets.example.js\"></script>\\n\
+\\\n\
+<script src=\"assets.test.js\"></script>\\n\
+\\\n\
+<script>window.utility2.onResetBefore();</script>\\n\
+\\\n\
+<!-- utility2-comment\\n\
+\\\n\
+{{/if isRollup}}\\n\
+\\\n\
+utility2-comment -->\\n\
+\\\n\
+<div class=\"utility2FooterDiv\">\\n\
+\\\n\
+    [ this app was created with\\n\
+\\\n\
+    <a href=\"https://github.com/kaizhu256/node-utility2\" target=\"_blank\">utility2</a>\\n\
+\\\n\
+    ]\\n\
+\\\n\
+</div>\\n\
+\\\n\
+</body>\\n\
+\\\n\
+</html>\\n\
+\\\n\
+';\n\
+        /* jslint-ignore-end */\n\
+        [\n\
+            'assets.index.css',\n\
+            'assets.index.template.html',\n\
+            'assets.swgg.swagger.json',\n\
+            'assets.swgg.swagger.server.json'\n\
+        ].forEach(function (file) {\n\
+            file = '/' + file;\n\
+            local.assetsDict[file] = local.assetsDict[file] || '';\n\
+            if (local.fs.existsSync(local.__dirname + file)) {\n\
+                local.assetsDict[file] = local.fs.readFileSync(\n\
+                    local.__dirname + file,\n\
+                    'utf8'\n\
+                );\n\
+            }\n\
+        });\n\
+        local.assetsDict['/'] =\n\
+            local.assetsDict['/assets.example.html'] =\n\
+            local.assetsDict['/assets.index.template.html']\n\
+            .replace((/\\{\\{env\\.(\\w+?)\\}\\}/g), function (match0, match1) {\n\
+                switch (match1) {\n\
+                case 'npm_package_description':\n\
+                    return 'the greatest app in the world!';\n\
+                case 'npm_package_name':\n\
+                    return 'utility2';\n\
+                case 'npm_package_nameLib':\n\
+                    return 'utility2';\n\
+                case 'npm_package_version':\n\
+                    return '0.0.1';\n\
+                default:\n\
+                    return match0;\n\
+                }\n\
+            });\n\
+        // init cli\n\
+        if (module !== require.main || local.global.utility2_rollup) {\n\
+            break;\n\
+        }\n\
+        local.assetsDict['/assets.example.js'] =\n\
+            local.assetsDict['/assets.example.js'] ||\n\
+            local.fs.readFileSync(__filename, 'utf8');\n\
+        // bug-workaround - long $npm_package_buildCustomOrg\n\
+        /* jslint-ignore-begin */\n\
+        local.assetsDict['/assets.utility2.js'] =\n\
+            local.assetsDict['/assets.utility2.js'] ||\n\
+            local.fs.readFileSync(\n\
+                local.__dirname + '/lib.utility2.js',\n\
+                'utf8'\n\
+            ).replace((/^#!/), '//');\n\
+        /* jslint-ignore-end */\n\
+        local.assetsDict['/favicon.ico'] = local.assetsDict['/favicon.ico'] || '';\n\
+        // if $npm_config_timeout_exit exists,\n\
+        // then exit this process after $npm_config_timeout_exit ms\n\
+        if (Number(process.env.npm_config_timeout_exit)) {\n\
+            setTimeout(process.exit, Number(process.env.npm_config_timeout_exit));\n\
+        }\n\
+        // start server\n\
+        if (local.global.utility2_serverHttp1) {\n\
+            break;\n\
+        }\n\
+        process.env.PORT = process.env.PORT || '8081';\n\
+        console.error('server starting on port ' + process.env.PORT);\n\
+        local.http.createServer(function (request, response) {\n\
+            request.urlParsed = local.url.parse(request.url);\n\
+            if (local.assetsDict[request.urlParsed.pathname] !== undefined) {\n\
+                response.end(local.assetsDict[request.urlParsed.pathname]);\n\
+                return;\n\
+            }\n\
+            response.statusCode = 404;\n\
+            response.end();\n\
+        }).listen(process.env.PORT);\n\
+        break;\n\
+    }\n\
+}());\n\
+"
+/* jslint-ignore-end */
+}());
+/* script-end /assets.utility2.example.js */
+
+
+
+/* script-begin /assets.utility2.html */
+(function () {
+    "use strict";
+    var local;
+    local = (typeof window === "object" && window && window.utility2_rollup) ||
+        global.utility2_rollup;
+    local.local = local;
+/* jslint-ignore-begin */
+local.assetsDict["/assets.utility2.html"] = "<!doctype html>\n\
+<html lang=\"en\">\n\
+<head>\n\
+<meta charset=\"UTF-8\">\n\
+<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\
+<!-- \"assets.index.default.template.html\" -->\n\
+<title>utility2 (v2018.2.3-alpha)</title>\n\
+<style>\n\
+/* jslint-utility2 */\n\
+/*csslint\n\
+*/\n\
+/* jslint-ignore-begin */\n\
+*,\n\
+*:after,\n\
+*:before {\n\
+    box-sizing: border-box;\n\
+}\n\
+/* jslint-ignore-end */\n\
+@keyframes uiAnimateShake {\n\
+    0%, 50% {\n\
+        transform: translateX(10px);\n\
+    }\n\
+    25%, 75% {\n\
+        transform: translateX(-10px);\n\
+    }\n\
+    100% {\n\
+        transform: translateX(0);\n\
+    }\n\
+}\n\
+@keyframes uiAnimateSpin {\n\
+    0% { transform: rotate(0deg); }\n\
+    100% { transform: rotate(360deg); }\n\
+}\n\
+a {\n\
+    overflow-wrap: break-word;\n\
+}\n\
+body {\n\
+    background: #dde;\n\
+    font-family: Arial, Helvetica, sans-serif;\n\
+    margin: 0 40px;\n\
+}\n\
+body > a,\n\
+body > button,\n\
+body > div,\n\
+body > input,\n\
+body > pre,\n\
+body > select,\n\
+body > span,\n\
+body > textarea {\n\
+    margin-bottom: 20px;\n\
+}\n\
+body > button {\n\
+    width: 20rem;\n\
+}\n\
+button {\n\
+    cursor: pointer;\n\
+}\n\
+code,\n\
+pre,\n\
+textarea {\n\
+    font-family: Menlo, Consolas, Courier New, monospace;\n\
+    font-size: small;\n\
+}\n\
+pre {\n\
+    overflow-wrap: break-word;\n\
+    white-space: pre-wrap;\n\
+}\n\
+.textOverflowEllipsis {\n\
+    overflow: hidden;\n\
+    text-overflow: ellipsis;\n\
+    white-space: nowrap;\n\
+}\n\
+.uiAnimateShake {\n\
+    animation-duration: 500ms;\n\
+    animation-name: uiAnimateShake;\n\
+}\n\
+.uiAnimateSlide {\n\
+    overflow-y: hidden;\n\
+    transition: max-height ease-in 250ms, min-height ease-in 250ms, padding-bottom ease-in 250ms, padding-top ease-in 250ms;\n\
+}\n\
+.utility2FooterDiv {\n\
+    text-align: center;\n\
+}\n\
+.zeroPixel {\n\
+    border: 0;\n\
+    height: 0;\n\
+    margin: 0;\n\
+    padding: 0;\n\
+    width: 0;\n\
+}\n\
+</style>\n\
+<style>\n\
+/*csslint\n\
+    ids: false,\n\
+*/\n\
+textarea {\n\
+    height: 10rem;\n\
+    width: 100%;\n\
+}\n\
+textarea[readonly] {\n\
+    background: #ddd;\n\
+}\n\
+#outputPreJslint1 {\n\
+    color: #d00;\n\
+}\n\
+</style>\n\
+</head>\n\
+<body>\n\
+<div id=\"ajaxProgressDiv1\" style=\"background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%; z-index: 1;\"></div>\n\
+<div class=\"uiAnimateSpin\" style=\"animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: none; height: 25px; vertical-align: middle; width: 25px;\"></div>\n\
+<script>\n\
+/* jslint-utility2 */\n\
+/*jslint\n\
+    bitwise: true,\n\
+    browser: true,\n\
+    maxerr: 8,\n\
+    maxlen: 100,\n\
+    node: true,\n\
+    nomen: true,\n\
+    regexp: true,\n\
+    stupid: true\n\
+*/\n\
+(function () {\n\
+    \"use strict\";\n\
+    var ajaxProgressDiv1,\n\
+        ajaxProgressState,\n\
+        ajaxProgressUpdate,\n\
+        timerIntervalAjaxProgressUpdate;\n\
+    ajaxProgressDiv1 = document.querySelector(\"#ajaxProgressDiv1\");\n\
+    setTimeout(function () {\n\
+        ajaxProgressDiv1.style.width = \"25%\";\n\
+    });\n\
+    ajaxProgressState = 0;\n\
+    ajaxProgressUpdate = (window.local &&\n\
+        window.local.ajaxProgressUpdate) || function () {\n\
+        ajaxProgressDiv1.style.width = \"100%\";\n\
+        setTimeout(function () {\n\
+            ajaxProgressDiv1.style.background = \"transparent\";\n\
+            setTimeout(function () {\n\
+                ajaxProgressDiv1.style.width = \"0%\";\n\
+            }, 500);\n\
+        }, 1500);\n\
+    };\n\
+    timerIntervalAjaxProgressUpdate = setInterval(function () {\n\
+        ajaxProgressState += 1;\n\
+        ajaxProgressDiv1.style.width = Math.max(\n\
+            100 - 75 * Math.exp(-0.125 * ajaxProgressState),\n\
+            Number(ajaxProgressDiv1.style.width.slice(0, -1)) || 0\n\
+        ) + \"%\";\n\
+    }, 1000);\n\
+    window.addEventListener(\"load\", function () {\n\
+        clearInterval(timerIntervalAjaxProgressUpdate);\n\
+        ajaxProgressUpdate();\n\
+    });\n\
+}());\n\
+</script>\n\
+<h1>\n\
+\n\
+    <a\n\
+        \n\
+        href=\"https://github.com/kaizhu256/node-utility2\"\n\
+        \n\
+        target=\"_blank\"\n\
+    >\n\
+\n\
+        utility2 (v2018.2.3-alpha)\n\
+\n\
+    </a>\n\
+\n\
+</h1>\n\
+<h3>the zero-dependency, swiss-army-knife utility for building, testing, and deploying webapps</h3>\n\
+\n\
+<h4><a download href=\"assets.app.js\">[download standalone app]</a></h4>\n\
+<button class=\"onclick onreset\" id=\"testRunButton2\">run internal test</button><br>\n\
+\n\
+\n\
+\n\
+\n\
+<label>edit or paste script below to cover and test</label>\n\
+<textarea class=\"oneval onkeyup onreset\" id=\"inputTextareaEval1\">\n\
+// remove comment below to disable jslint\n\
+/*jslint\n\
+    browser: true,\n\
+    es6: true\n\
+*/\n\
+/*global window*/\n\
+(function () {\n\
+    \"use strict\";\n\
+    var testCaseDict;\n\
+    testCaseDict = {};\n\
+    testCaseDict.modeTest = true;\n\
+\n\
+    // comment this testCase to disable the failed assertion demo\n\
+    testCaseDict.testCase_failed_assertion_demo = function (\n\
+        options,\n\
+        onError\n\
+    ) {\n\
+    /*\n\
+     * this function will demo a failed assertion test\n\
+     */\n\
+        // jslint-hack\n\
+        window.utility2.nop(options);\n\
+        window.utility2.assert(false, \"this is a failed assertion demo\");\n\
+        onError();\n\
+    };\n\
+\n\
+    testCaseDict.testCase_passed_ajax_demo = function (options, onError) {\n\
+    /*\n\
+     * this function will demo a passed ajax test\n\
+     */\n\
+        var data;\n\
+        options = {url: \"/\"};\n\
+        // test ajax request for main-page \"/\"\n\
+        window.utility2.ajax(options, function (error, xhr) {\n\
+            try {\n\
+                // validate no error occurred\n\
+                window.utility2.assert(!error, error);\n\
+                // validate \"200 ok\" status\n\
+                window.utility2.assert(xhr.statusCode === 200, xhr.statusCode);\n\
+                // validate non-empty data\n\
+                data = xhr.responseText;\n\
+                window.utility2.assert(data && data.length > 0, data);\n\
+                onError();\n\
+            } catch (errorCaught) {\n\
+                onError(errorCaught);\n\
+            }\n\
+        });\n\
+    };\n\
+\n\
+    window.utility2.testRunDefault(testCaseDict);\n\
+}());\n\
+</textarea>\n\
+<pre id=\"outputPreJsonStringify1\"></pre>\n\
+<pre id=\"outputPreJslint1\"></pre>\n\
+<label>instrumented-code</label>\n\
+<textarea class=\"resettable\" id=\"outputTextarea1\" readonly></textarea>\n\
+<label>stderr and stdout</label>\n\
+<textarea class=\"resettable\" id=\"outputTextareaStdout1\" readonly></textarea>\n\
+<div class=\"resettable\" id=\"testReportDiv1\"></div>\n\
+<div class=\"resettable\" id=\"coverageReportDiv1\"></div>\n\
+\n\
+\n\
+<script src=\"assets.utility2.rollup.js\"></script>\n\
+<script src=\"assets.utility2.example.js\"></script>\n\
+<script src=\"assets.utiilty2.test.js\"></script>\n\
+\n\
+\n\
+<div class=\"utility2FooterDiv\">\n\
+    [ this app was created with\n\
+    <a href=\"https://github.com/kaizhu256/node-utility2\" target=\"_blank\">utility2</a>\n\
+    ]\n\
+</div>\n\
+</body>\n\
+</html>\n\
+"
+/* jslint-ignore-end */
+}());
+/* script-end /assets.utility2.html */
 
 
 

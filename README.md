@@ -58,8 +58,8 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
-- add function operationIdFromPathnameAndMethod
-- add function swaggerFromCurl
+- css - merge .resourceDescripton into .resource > .thead
+- allow parsing of default path-argument, e.g. /aa/{bb=1}/{cc=2}
 - add hmacSha256 support for wechat-pay
 - add validators from https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation/semantic-validators/validators/items-required-for-array-objects.js
 - add property parameters.x-swgg-persist to persist to localStorage
@@ -72,18 +72,16 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2018.2.1
-- npm publish 2018.2.1
-- add validation semanticUniquePath in function swaggerValidateJson
-- merge js-env for tests
-- add swaggerJson property x-swgg-descriptionLineList
-- add file assets.swgg.swagger.petstore.json
-- add function swaggerValidateFile
-- ignore env var \$npm_package_swggAll and \$npm_package_swggTags0 if package-name has -all suffix
-- dereference body-sub-schema.\$ref in ui-documentation
-- fix failed semanticRequired validation-error in ui
-- update function dbFieldRandomCreate to use schemaP.default if available, in modeNotRandom
-- update function normalizeSwaggerJson to override tag.description with x-swgg-tags0-override
+#### changelog for v2018.2.24
+- npm publish v2018.2.24
+- assets.utility2.rollup.js - add function shlintUtility2 and macro # jslint-utility2
+- merge function uiRenderAll into onEventUiReload
+- add ui-element swggAjaxErrorPre1, and uppdate function uiNotify to post errors there
+- fix bug in function normalizeSwaggerJson where options.objectSetDescription is not applied to operation.parameters or operation.responses
+- update function normalizeSwaggerJson with option x-swgg-fixErrorSemanticUniquePath
+- add function operationIdFromAjax
+- add function swaggerJsonFromAjax, swaggerJsonFromCurl, swaggerJsonFromPostBody
+- add function urlParseWithBraket
 - none
 
 #### this package requires
@@ -143,6 +141,7 @@ instruction
 
 
 /* istanbul instrument in package swgg */
+/* jslint-utility2 */
 /*jslint
     bitwise: true,
     browser: true,
@@ -301,7 +300,7 @@ instruction
     </a>\n\
 </h1>\n\
 <h3>{{env.npm_package_description}}</h3>\n\
-<h4><a download href="assets.app.js">download standalone app</a></h4>\n\
+<h4><a download href="assets.app.js">[download standalone app]</a></h4>\n\
 <button class="onclick onreset" id="testRunButton1">run internal test</button><br>\n\
 <div class="uiAnimateSlide" id="testReportDiv1" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>\n\
 \n\
@@ -531,7 +530,7 @@ utility2-comment -->\n\
                 }
             }
         });
-    // run resetValidateKeySorted js-env code
+/* validateLineSortedReset */
         // init db
         local.dbSeedList = [{
             dbRowList: [{
@@ -832,8 +831,6 @@ utility2-comment -->\n\
             local.assetsDict['/assets.example.html'] =
             local.assetsDict['/assets.index.template.html']
             .replace((/\{\{env\.(\w+?)\}\}/g), function (match0, match1) {
-                // jslint-hack
-                String(match0);
                 switch (match1) {
                 case 'npm_package_description':
                     return 'the greatest app in the world!';
@@ -980,7 +977,7 @@ utility2-comment -->\n\
         "start": "PORT=${PORT:-8080} utility2 start test.js",
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2018.2.1"
+    "version": "2018.2.24"
 }
 ```
 

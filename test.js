@@ -1,4 +1,5 @@
 /* istanbul instrument in package swgg */
+/* jslint-utility2 */
 /*jslint
     bitwise: true,
     browser: true,
@@ -925,6 +926,247 @@
             options.onNext();
         };
 
+        local.testCase_swaggerJsonFromCurl_default = function (options, onError) {
+        /*
+         * this function will test swaggerJsonFromCurl's default handling-behavior
+         */
+            options = {};
+            options.swaggerJson = local.swaggerJsonFromCurl(
+/* jslint-ignore-begin */
+                null,
+'\
+# test no-data handling-behavior\n\
+curl https://example.com\n\
+# test json-object-data handling-behavior\n\
+curl --data {} https://example.com/json\n\
+# test text-data handling-behavior\n\
+curl --data undefined https://example.com/text\n\
+# test json-array-data handling-behavior\n\
+curl \\\n\
+--data \'[{\n\
+    "listEmpty": [],\n\
+    "listObject": [{ "aa": "bb" }],\n\
+    "object": { "aa": { "bb": { "cc": "dd" } } },\n\
+    "quote": "\\\\\\"api\'"\'"\'s\\""\n\
+}]\' \\\n\
+--header \'Content-Type: application/json\' \\\n\
+--request POST \\\n\
+"https://example.com/{aa}/{bb}?aa=bb"\n\
+# test no-url handling-behavior\n\
+curl /undefined\n\
+'
+            );
+            local.swaggerValidateJson(options.swaggerJson);
+            local.assertJsonEqual(
+                options.swaggerJson,
+{
+    "basePath": "/",
+    "definitions": {
+        "_2F_7Baa_7D_2F_7Bbb_7D_20POST.body": {
+            "properties": {
+                "listEmpty": {
+                    "default": [],
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "listObject": {
+                    "default": [
+                        {
+                            "aa": "bb"
+                        }
+                    ],
+                    "items": {
+                        "$ref": "#/definitions/_2F_7Baa_7D_2F_7Bbb_7D_20POST.body.listObject"
+                    },
+                    "type": "array"
+                },
+                "object": {
+                    "$ref": "#/definitions/_2F_7Baa_7D_2F_7Bbb_7D_20POST.body.object"
+                },
+                "quote": {
+                    "default": "\\\"api's\"",
+                    "type": "string"
+                }
+            }
+        },
+        "_2F_7Baa_7D_2F_7Bbb_7D_20POST.body.listObject": {
+            "properties": {
+                "aa": {
+                    "default": "bb",
+                    "type": "string"
+                }
+            }
+        },
+        "_2F_7Baa_7D_2F_7Bbb_7D_20POST.body.object": {
+            "properties": {
+                "aa": {
+                    "default": {
+                        "bb": {
+                            "cc": "dd"
+                        }
+                    },
+                    "type": "object"
+                }
+            }
+        },
+        "_2Fjson_20GET.body": {
+            "properties": {}
+        }
+    },
+    "info": {
+        "title": "",
+        "version": ""
+    },
+    "paths": {
+        "/": {
+            "get": {
+                "operationId": "_2F_20GET",
+                "parameters": [],
+                "responses": {
+                    "default": {
+                        "description": "default response"
+                    }
+                },
+                "tags": [
+                    "undefined"
+                ],
+                "x-swgg-host": "example.com",
+                "x-swgg-schemes": [
+                    "https"
+                ]
+            }
+        },
+        "/json": {
+            "get": {
+                "operationId": "_2Fjson_20GET",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "schema": {
+                            "$ref": "#/definitions/_2Fjson_20GET.body"
+                        }
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "default response"
+                    }
+                },
+                "tags": [
+                    "undefined"
+                ],
+                "x-swgg-host": "example.com",
+                "x-swgg-schemes": [
+                    "https"
+                ]
+            }
+        },
+        "/text": {
+            "get": {
+                "operationId": "_2Ftext_20GET",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "default response"
+                    }
+                },
+                "tags": [
+                    "undefined"
+                ],
+                "x-swgg-host": "example.com",
+                "x-swgg-schemes": [
+                    "https"
+                ]
+            }
+        },
+        "/undefined": {
+            "get": {
+                "operationId": "_2Fundefined_20GET",
+                "parameters": [],
+                "responses": {
+                    "default": {
+                        "description": "default response"
+                    }
+                },
+                "tags": [
+                    "undefined"
+                ]
+            }
+        },
+        "/{aa}/{bb}": {
+            "post": {
+                "operationId": "_2F_7Baa_7D_2F_7Bbb_7D_20POST",
+                "parameters": [
+                    {
+                        "default": "application/json",
+                        "in": "header",
+                        "name": "content-type",
+                        "type": "string"
+                    },
+                    {
+                        "default": "aa",
+                        "in": "path",
+                        "name": "aa",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "default": "bb",
+                        "in": "path",
+                        "name": "bb",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "default": "bb",
+                        "in": "query",
+                        "name": "aa",
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "schema": {
+                            "items": {
+                                "$ref": "#/definitions/_2F_7Baa_7D_2F_7Bbb_7D_20POST.body"
+                            },
+                            "type": "array"
+                        }
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "default response"
+                    }
+                },
+                "tags": [
+                    "undefined"
+                ],
+                "x-swgg-host": "example.com",
+                "x-swgg-schemes": [
+                    "https"
+                ]
+            }
+        }
+    },
+    "swagger": "2.0"
+}
+/* jslint-ignore-end */
+            );
+            onError(null, options);
+        };
+
         local.testCase_swaggerValidateFile_default = function (options, onError) {
         /*
          * this function will test swaggerValidateFile's default handling-behavior
@@ -1049,32 +1291,6 @@
                 }
                 console.error('swaggerValidateJson - ' + ii + ' - ' + error.message);
             });
-            onError(null, options);
-        };
-
-        local.testCase_uiNotify_default = function (options, onError) {
-        /*
-         * this function will test uiNotify's default handling-behavior
-         */
-            if (local.modeJs !== 'browser') {
-                onError(null, options);
-                return;
-            }
-            options = {};
-            // test null-case handling-behavior
-            options.data = local.uiNotify();
-            // validate no error occurred
-            local.assert(
-                !options.data.classList.contains('hasError'),
-                options.data.classList
-            );
-            // test error handling-behavior
-            options.data = local.uiNotify(local.errorDefault);
-            // validate error occurred
-            local.assert(
-                options.data.classList.contains('hasError'),
-                options.data.classList
-            );
             onError(null, options);
         };
 
@@ -1519,6 +1735,9 @@
                     "maxProperties": 5,
                     "minProperties": 1,
                     "type": "object"
+                },
+                "typeStringCharsetAscii": {
+                    "$ref": "#/parameters/typeStringCharsetAscii"
                 }
             },
             "required": [
@@ -1537,9 +1756,6 @@
                 }
             }
         }
-    },
-    "info": {
-        "x-swgg-downloadStandaloneApp": "http://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js"
     },
     "parameters": {
         "typeArrayItemsBoolean1": {
@@ -1835,6 +2051,14 @@
             "type": "string",
             "x-swgg-apiKey": true
         },
+        "typeStringCharsetAscii": {
+            "default": "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\t\n\u000b\f\r\u000e\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~",
+            "description": "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\t\n\u000b\f\r\u000e\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~",
+            "in": "query",
+            "name": "typeStringCharsetAscii",
+            "required": true,
+            "type": "string"
+        },
         "typeStringFormatBinary": {
             "default": [
                 0,
@@ -1902,10 +2126,52 @@
         }
     },
     "paths": {
+        "/x-test-markdown/description": {
+            "get": {
+                "operationId": "x-test-markdown.description",
+                "tags": [
+                    "x-test-markdown"
+                ]
+            }
+        },
         "/x-test/errorUndefinedApi": {
             "get": {
                 "operationId": "x-test.errorUndefinedApi",
                 "summary": "test undefined-api handling-behavior",
+                "tags": [
+                    "x-test"
+                ]
+            }
+        },
+        "/x-test/fixErrorSemanticUniquePath/{aa}": {
+            "get": {
+                "operationId": "x-test.fixErrorSemanticUniquePathAa",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "aa",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "summary": "test fix-error-semanticUniquePath's handling-behavior",
+                "tags": [
+                    "x-test"
+                ]
+            }
+        },
+        "/x-test/fixErrorSemanticUniquePath/{bb}": {
+            "get": {
+                "operationId": "x-test.fixErrorSemanticUniquePathBb",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "bb",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "summary": "test fix-error-semanticUniquePath's handling-behavior",
                 "tags": [
                     "x-test"
                 ]
@@ -2049,6 +2315,9 @@
     "tags": [
         {
             "name": "x-test"
+        },
+        {
+            "name": "x-test-markdown"
         }
     ],
     "x-swgg-apiDict": {
@@ -2131,14 +2400,14 @@
             "_schemaName": "TestCrud"
         }
     },
+    "x-swgg-downloadStandaloneApp": "http://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js",
+    "x-swgg-fixErrorSemanticUniquePath": true,
     "x-swgg-tags0-override": {
         "x-test": {
-            "externalDocs": {
-                "description": "internal test-api",
-                "x-swgg-descriptionLineList": [
-                    "internal test-api"
-                ]
-            }
+            "description": "internal test-api",
+            "x-swgg-descriptionLineList": [
+                "internal test-api"
+            ]
         }
     }
 }
@@ -2161,6 +2430,11 @@
                 .TestCrud
                 .properties[key] = { $ref: '#/parameters/' + key };
         });
+        local.assetsDict['/assets.swgg.swagger.test.json'].paths[
+            '/x-test-markdown/description'
+        ].get.description =
+            local.assetsDict['/assets.swgg.swagger.test.json'].tags[1].description =
+            local.tryCatchReadFile('README.md', 'utf8');
         local.assetsDict['/assets.swgg.swagger.test.json'] = JSON.stringify(
             local.assetsDict['/assets.swgg.swagger.test.json']
         );
@@ -2256,10 +2530,11 @@
             name: 'File'
         }];
         // run validation test
-        local.tryCatchOnError(function () {
-            local.testCase_swaggerValidateJson_default(null, local.onErrorDefault);
-            local.testCase_validateBySwaggerParameters_default(null, local.onErrorDefault);
-            local.testCase_validateBySwaggerParameters_error(null, local.onErrorDefault);
-        }, console.error);
+        // local.tryCatchOnError(function () {
+            // local.testCase_swaggerJsonFromCurl_default(null, local.onErrorDefault);
+            // local.testCase_swaggerValidateJson_default(null, local.onErrorDefault);
+            // local.testCase_validateBySwaggerParameters_default(null, local.onErrorDefault);
+            // local.testCase_validateBySwaggerParameters_error(null, local.onErrorDefault);
+        // }, local.onErrorDefault);
     }());
 }());
