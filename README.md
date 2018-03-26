@@ -8,7 +8,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 
 
-[![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swgg.svg)](https://travis-ci.org/kaizhu256/node-swgg) [![coverage](https://kaizhu256.github.io/node-swgg/build/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build/coverage.html/index.html) [![snyk.io vulnerabilities](https://snyk.io/test/github/kaizhu256/node-swgg/badge.svg)](https://snyk.io/test/github/kaizhu256/node-swgg)
+[![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-swgg.svg)](https://travis-ci.org/kaizhu256/node-swgg) [![coverage](https://kaizhu256.github.io/node-swgg/build/coverage.badge.svg)](https://kaizhu256.github.io/node-swgg/build/coverage.html/index.html)
 
 [![NPM](https://nodei.co/npm/swgg.png?downloads=true)](https://www.npmjs.com/package/swgg)
 
@@ -58,30 +58,23 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
+- add swagger.json editor
 - css - merge .resourceDescripton into .resource > .thead
 - allow parsing of default path-argument, e.g. /aa/{bb=1}/{cc=2}
 - add hmacSha256 support for wechat-pay
 - add validators from https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation/semantic-validators/validators/items-required-for-array-objects.js
 - add property parameters.x-swgg-persist to persist to localStorage
 - revamp datatable with card-expansion ui
-- datatable - allow optional sub-level input for swagger-models
 - add authorization-header hook
 - add middlewareAcl
-- datatable - add sort-by-field
 - add api userPasswordChange
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2018.2.24
-- npm publish v2018.2.24
-- assets.utility2.rollup.js - add function shlintUtility2 and macro # jslint-utility2
-- merge function uiRenderAll into onEventUiReload
-- add ui-element swggAjaxErrorPre1, and uppdate function uiNotify to post errors there
-- fix bug in function normalizeSwaggerJson where options.objectSetDescription is not applied to operation.parameters or operation.responses
-- update function normalizeSwaggerJson with option x-swgg-fixErrorSemanticUniquePath
-- add function operationIdFromAjax
-- add function swaggerJsonFromAjax, swaggerJsonFromCurl, swaggerJsonFromPostBody
-- add function urlParseWithBraket
+#### changelog for v2018.3.25
+- npm publish v2018.3.25
+- fix transparency bug in firefox for textarea
+- revamp css
 - none
 
 #### this package requires
@@ -300,16 +293,16 @@ instruction
     </a>\n\
 </h1>\n\
 <h3>{{env.npm_package_description}}</h3>\n\
-<h4><a download href="assets.app.js">[download standalone app]</a></h4>\n\
-<button class="onclick onreset" id="testRunButton1">run internal test</button><br>\n\
+<a class="button" download href="assets.app.js">download standalone app</a><br>\n\
+<button class="button onclick onreset" id="testRunButton1">run internal test</button><br>\n\
 <div class="uiAnimateSlide" id="testReportDiv1" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>\n\
 \n\
 \n\
 \n\
-<button class="onclick" id="dbResetButton1">reset database</button><br>\n\
-<button class="onclick" id="dbExportButton1">export database -&gt; file</button><br>\n\
+<button class="button onclick" id="dbResetButton1">reset database</button><br>\n\
+<button class="button onclick" id="dbExportButton1">export database -&gt; file</button><br>\n\
 <a download="db.persistence.json" href="" id="dbExportA1"></a>\n\
-<button class="onclick" id="dbImportButton1">import database &lt;- file</button><br>\n\
+<button class="button onclick" id="dbImportButton1">import database &lt;- file</button><br>\n\
 <input class="onchange zeroPixel" type="file" id="dbImportInput1">\n\
 ')
             .replace('assets.swgg.swagger.json', 'assets.swgg.swagger.server.json')
@@ -806,7 +799,7 @@ utility2-comment -->\n\
         module.exports = local;
         // require builtins
         Object.keys(process.binding('natives')).forEach(function (key) {
-            if (!local[key] && !(/\/|^_|^sys$/).test(key)) {
+            if (!local[key] && !(/\/|^_|^assert|^sys$/).test(key)) {
                 local[key] = require(key);
             }
         });
@@ -827,6 +820,7 @@ utility2-comment -->\n\
                 );
             }
         });
+/* validateLineSortedReset */
         local.assetsDict['/'] =
             local.assetsDict['/assets.example.html'] =
             local.assetsDict['/assets.index.template.html']
@@ -972,12 +966,11 @@ utility2-comment -->\n\
         "build-ci": "utility2 shReadmeTest build_ci.sh",
         "env": "env",
         "heroku-postbuild": "npm uninstall utility2 2>/dev/null; npm install kaizhu256/node-utility2#alpha && utility2 shDeployHeroku",
-        "nameAliasPublish": "",
         "postinstall": "[ ! -f npm_scripts.sh ] || ./npm_scripts.sh shNpmScriptPostinstall",
         "start": "PORT=${PORT:-8080} utility2 start test.js",
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2018.2.24"
+    "version": "2018.3.25"
 }
 ```
 

@@ -45,6 +45,7 @@
 /* script-begin /assets.utility2.lib.apidoc.js */
 ///usr/bin/env node
 /* istanbul instrument in package apidoc */
+/* jslint-utility2 */
 /*jslint
     bitwise: true,
     browser: true,
@@ -773,8 +774,8 @@ local.templateApidocHtml = '\
             // init exampleList
             [1, 2, 3, 4].forEach(function (depth) {
                 options.exampleList = options.exampleList.concat(
-                    // http://stackoverflow.com/questions/4509624/how-to-limit-depth-for-recursive-file-list
                     // find . -maxdepth 1 -mindepth 1 -name "*.js" -type f
+                    // http://stackoverflow.com/questions/4509624/how-to-limit-depth-for-recursive-file-list
                     local.child_process.execSync('find "' + options.dir +
                         '" -maxdepth ' + depth + ' -mindepth ' + depth +
                         ' -type f | sed -e "s|' + options.dir +
@@ -877,8 +878,8 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 options.moduleExtraDict[options.env.npm_package_name] || {};
             [1, 2, 3, 4].forEach(function (depth) {
                 options.libFileList = options.libFileList.concat(
-                    // http://stackoverflow.com/questions/4509624/how-to-limit-depth-for-recursive-file-list
                     // find . -maxdepth 1 -mindepth 1 -name "*.js" -type f
+                    // http://stackoverflow.com/questions/4509624/how-to-limit-depth-for-recursive-file-list
                     local.child_process.execSync('find "' + options.dir +
                         '" -maxdepth ' + depth + ' -mindepth ' + depth +
                         ' -name "*.js" -type f | sed -e "s|' + options.dir +
@@ -1112,6 +1113,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
 
 
 /* istanbul instrument in package db */
+/* jslint-utility2 */
 /*jslint
     bitwise: true,
     browser: true,
@@ -3152,6 +3154,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
 /* script-begin /assets.utility2.lib.github_crud.js */
 ///usr/bin/env node
 /* istanbul instrument in package github_crud */
+/* jslint-utility2 */
 /*jslint
     bitwise: true,
     browser: true,
@@ -3205,7 +3208,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
         } else {
             // require builtins
             Object.keys(process.binding('natives')).forEach(function (key) {
-                if (!local[key] && !(/\/|^_|^sys$/).test(key)) {
+                if (!local[key] && !(/\/|^_|^assert|^sys$/).test(key)) {
                     local[key] = require(key);
                 }
             });
@@ -3272,6 +3275,8 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
              * print help
              */
                 var element, result, lengthList, sortDict;
+                console.log(require(__dirname + '/package.json').name + ' v' +
+                    require(__dirname + '/package.json').version);
                 sortDict = {};
                 result = [['[command]', '[args]', '[description]', -1]];
                 lengthList = [result[0][0].length, result[0][1].length];
@@ -3312,7 +3317,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                         }
                     });
                     element = element.slice(0, 3).join('---- ');
-                    if (ii === 0) {
+                    if (!ii) {
                         element = element.replace((/-/g), ' ');
                     }
                     console.log(element);
@@ -3335,6 +3340,15 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                     local.cliDict._interactive;
                 local.cliDict['-i'] = local.cliDict['-i'] || local.cliDict._interactive;
             }
+            local.cliDict._version = local.cliDict._version || function () {
+            /*
+             * [none]
+             * print version
+             */
+                console.log(require(__dirname + '/package.json').version);
+            };
+            local.cliDict['--version'] = local.cliDict['--version'] || local.cliDict._version;
+            local.cliDict['-v'] = local.cliDict['-v'] || local.cliDict._version;
             // run fnc()
             fnc = fnc || function () {
                 if (local.cliDict[process.argv[2]]) {
@@ -3400,11 +3414,10 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             urlParsed = require('url').parse(options.url);
             urlParsed.headers = options.headers;
             urlParsed.method = options.method;
-            // debug request
+            // debug request-time
             timeStart = Date.now();
-            request = require(
-                urlParsed.protocol.slice(0, -1)
-            ).request(urlParsed, function (_response) {
+            request = options.request || require(urlParsed.protocol.slice(0, -1)).request;
+            request = request(urlParsed, function (_response) {
                 response = _response;
                 if (response.statusCode < 200 || response.statusCode > 299) {
                     onError2(new Error(response.statusCode));
@@ -3420,8 +3433,8 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                         onError2();
                     })
                     .on('error', onError2);
-            }).on('error', onError2);
-            request.end(options.data);
+            });
+            request.on('error', onError2).end(options.data);
         };
 
         local.nop = function () {
@@ -3582,12 +3595,16 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
          * this function will delete the github file
          * https://developer.github.com/v3/repos/contents/#delete-a-file
          */
-            options = { message: options.message, url: options.url };
+            options = { message: options.message, request: options.request, url: options.url };
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     // get sha
-                    local.contentRequest({ method: 'GET', url: options.url }, options.onNext);
+                    local.contentRequest({
+                        method: 'GET',
+                        request: options.request,
+                        url: options.url
+                    }, options.onNext);
                     break;
                 case 2:
                     // delete file with sha
@@ -3595,6 +3612,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                         local.contentRequest({
                             message: options.message,
                             method: 'DELETE',
+                            request: options.request,
                             sha: data.sha,
                             url: options.url
                         }, options.onNext);
@@ -3606,6 +3624,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                         // recurse
                         local.contentDelete({
                             message: options.message,
+                            request: options.request,
                             url: data.element.url
                         }, onParallel);
                     }, options.onNext);
@@ -3623,14 +3642,18 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
          * this function will get the github file
          * https://developer.github.com/v3/repos/contents/#get-contents
          */
-            options = { url: options.url };
+            options = { request: options.request, url: options.url };
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
-                    local.contentRequest({ method: 'GET', url: options.url }, options.onNext);
+                    local.contentRequest({
+                        method: 'GET',
+                        request: options.request,
+                        url: options.url
+                    }, options.onNext);
                     break;
                 case 2:
-                    options.onNext(null, new Buffer(data.content, 'base64'));
+                    options.onNext(null, new Buffer(data.content || '', 'base64'));
                     break;
                 default:
                     onError(error, !error && data);
@@ -3649,13 +3672,18 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 content: options.content,
                 message: options.message,
                 modeErrorIgnore: true,
+                request: options.request,
                 url: options.url
             };
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     // get sha
-                    local.contentRequest({ method: 'GET', url: options.url }, options.onNext);
+                    local.contentRequest({
+                        method: 'GET',
+                        request: options.request,
+                        url: options.url
+                    }, options.onNext);
                     break;
                 case 2:
                     // put file with sha
@@ -3663,6 +3691,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                         content: options.content,
                         message: options.message,
                         method: 'PUT',
+                        request: options.request,
                         sha: data.sha,
                         url: options.url
                     }, options.onNext);
@@ -3680,7 +3709,12 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
          * this function will put options.file into the github file
          * https://developer.github.com/v3/repos/contents/#update-a-file
          */
-            options = { file: options.file, message: options.message, url: options.url };
+            options = {
+                file: options.file,
+                message: options.message,
+                request: options.request,
+                url: options.url
+            };
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
@@ -3688,6 +3722,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                     if ((/^(?:http|https):\/\//).test(options.file)) {
                         local.httpRequest({
                             method: 'GET',
+                            request: options.request,
                             url: options.file
                         }, function (error, response) {
                             options.onNext(error, response && response.data);
@@ -3695,15 +3730,13 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                         return;
                     }
                     // get file
-                    local.fs.readFile(
-                        local.path.resolve(process.cwd(), options.file),
-                        options.onNext
-                    );
+                    local.fs.readFile(options.file, options.onNext);
                     break;
                 case 2:
                     local.contentPut({
                         content: data,
                         message: options.message,
+                        request: options.request,
                         // resolve file in url
                         url: (/\/$/).test(options.url)
                             ? options.url + local.path.basename(options.file)
@@ -3734,6 +3767,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 },
                 message: options.message,
                 method: options.method,
+                request: options.request,
                 responseJson: {},
                 sha: options.sha,
                 url: options.url
@@ -3804,13 +3838,18 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             options = {
                 message: options.message,
                 modeErrorIgnore: true,
+                request: options.request,
                 url: options.url
             };
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
                     // get sha
-                    local.contentRequest({ method: 'GET', url: options.url }, options.onNext);
+                    local.contentRequest({
+                        method: 'GET',
+                        request: options.request,
+                        url: options.url
+                    }, options.onNext);
                     break;
                 case 2:
                     // put file with sha
@@ -3818,6 +3857,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                         content: new Buffer(data.content || '', 'base64'),
                         message: options.message,
                         method: 'PUT',
+                        request: options.request,
                         sha: data.sha,
                         url: options.url
                     }, options.onNext);
@@ -3840,6 +3880,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 local.contentTouch({
                     message: options.message,
                     modeErrorIgnore: true,
+                    request: options.request,
                     url: data.element
                 }, onParallel);
             }, onError);
@@ -3938,6 +3979,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
 /* script-begin /assets.utility2.lib.istanbul.js */
 ///usr/bin/env node
 /* istanbul instrument in package istanbul */
+/* jslint-utility2 */
 /*jslint
     bitwise: true,
     browser: true,
@@ -3991,7 +4033,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
         } else {
             // require builtins
             Object.keys(process.binding('natives')).forEach(function (key) {
-                if (!local[key] && !(/\/|^_|^sys$/).test(key)) {
+                if (!local[key] && !(/\/|^_|^assert|^sys$/).test(key)) {
                     local[key] = require(key);
                 }
             });
@@ -4040,6 +4082,8 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
              * print help
              */
                 var element, result, lengthList, sortDict;
+                console.log(require(__dirname + '/package.json').name + ' v' +
+                    require(__dirname + '/package.json').version);
                 sortDict = {};
                 result = [['[command]', '[args]', '[description]', -1]];
                 lengthList = [result[0][0].length, result[0][1].length];
@@ -4080,7 +4124,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                         }
                     });
                     element = element.slice(0, 3).join('---- ');
-                    if (ii === 0) {
+                    if (!ii) {
                         element = element.replace((/-/g), ' ');
                     }
                     console.log(element);
@@ -4103,6 +4147,15 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                     local.cliDict._interactive;
                 local.cliDict['-i'] = local.cliDict['-i'] || local.cliDict._interactive;
             }
+            local.cliDict._version = local.cliDict._version || function () {
+            /*
+             * [none]
+             * print version
+             */
+                console.log(require(__dirname + '/package.json').version);
+            };
+            local.cliDict['--version'] = local.cliDict['--version'] || local.cliDict._version;
+            local.cliDict['-v'] = local.cliDict['-v'] || local.cliDict._version;
             // run fnc()
             fnc = fnc || function () {
                 if (local.cliDict[process.argv[2]]) {
@@ -4173,15 +4226,8 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             file = local[file.slice(-8)];
             if (local.modeJs === 'browser') {
                 file = file
-                    .replace((/\bhtml\b/g), 'x-istanbul-html')
-                    .replace((/<style>[\S\s]+?<\/style>/), function (match0) {
-                        return match0.replace((/\S.*?\{/g), function (match0) {
-                            return 'x-istanbul-html ' +
-                                match0.replace((/,/g), ', x-istanbul-html ');
-                        });
-                    })
-                    .replace('position: fixed;', 'position: static;')
-                    .replace('margin-top: 170px;', 'margin-top: 10px;');
+                    .replace('<!doctype html>\n', '')
+                    .replace((/(<\/?)(?:body|html)/g), '$1div');
             }
             if (local.modeJs === 'node' && process.env.npm_package_homepage) {
                 file = file
@@ -4189,7 +4235,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                     .replace('{{env.npm_package_name}}', process.env.npm_package_name)
                     .replace('{{env.npm_package_version}}', process.env.npm_package_version);
             } else {
-                file = file.replace((/<h1 [\S\s]*<\/h1>/), '<h1>&nbsp;</h1>');
+                file = file.replace((/<h1 [\S\s]*<\/h1>/), '');
             }
             return file;
         };
@@ -4473,7 +4519,7 @@ value:parseFloat(e),lineNumber:c,lineStart:h,start:n,end:l}}function it(){var e=
 ),r=l,++l;while(l<E){i=a[l++];if(i===n){n="";break}if(i==="\\"){i=a[l++];if(!i||!
 P(i.charCodeAt(0)))switch(i){case"u":case"x":if(a[l]==="{")++l,e+=$();else{s=V(i
 );if(!s)throw Lt();e+=s}break;case"n":e+="\n";break;case"r":e+="\r";break;case"t"
-:e+="	";break;case"b":e+="\b";break;case"f":e+="\f";break;case"v":e+="";break;case"8"
+:e+="\t";break;case"b":e+="\b";break;case"f":e+="\f";break;case"v":e+="";break;case"8"
 :case"9":e+=i,At();break;default:M(i)?(o=_(i),u=o.octal||u,e+=String.fromCharCode
 (o.code)):e+=i}else++c,i==="\r"&&a[l]==="\n"&&++l,h=l}else{if(P(i.charCodeAt(0))
 )break;e+=i}}return n!==""&&(l=r,Lt()),{type:t.StringLiteral,value:e,octal:u,lineNumber
@@ -4481,7 +4527,7 @@ P(i.charCodeAt(0)))switch(i){case"u":case"x":if(a[l]==="{")++l,e+=$();else{s=V(i
 l,u=a[l]==="`",i=2,++l;while(l<E){n=a[l++];if(n==="`"){i=1,f=!0,s=!0;break}if(n==="$"
 ){if(a[l]==="{"){x.curlyStack.push("${"),++l,s=!0;break}e+=n}else if(n==="\\"){n=
 a[l++];if(!P(n.charCodeAt(0)))switch(n){case"n":e+="\n";break;case"r":e+="\r";break;
-case"t":e+="	";break;case"u":case"x":a[l]==="{"?(++l,e+=$()):(p=l,d=V(n),d?e+=d:
+case"t":e+="\t";break;case"u":case"x":a[l]==="{"?(++l,e+=$()):(p=l,d=V(n),d?e+=d:
 (l=p,e+=n));break;case"b":e+="\b";break;case"f":e+="\f";break;case"v":e+="";break;
 default:n==="0"?(A(a.charCodeAt(l))&&Nt(o.TemplateOctalLiteral),e+="\0"):M(n)?Nt
 (o.TemplateOctalLiteral):e+=n}else++c,n==="\r"&&a[l]==="\n"&&++l,h=l}else P(n.charCodeAt
@@ -6096,217 +6142,265 @@ local['foot.txt'] = '\
 // https://github.com/gotwarlost/istanbul/blob/v0.2.16/lib/report/templates/head.txt
 local['head.txt'] = '\
 <!doctype html>\n\
-<html lang="en">\n\
+<html lang="en" class="x-istanbul">\n\
 <head>\n\
     <title>Code coverage report for {{entity}}</title>\n\
     <meta charset="utf-8">\n\
-    <style>\n\
-        body, html {\n\
-            margin:0; padding: 0;\n\
-        }\n\
-        body {\n\
-            font-family: Arial, Helvetica;\n\
-            font-size: 10pt;\n\
-        }\n\
-        div.header, div.footer {\n\
-            background: #eee;\n\
-            padding: 1em;\n\
-        }\n\
-        div.header {\n\
-            height: 160px;\n\
-            padding: 0 1em 0 1em;\n\
-            z-index: 100;\n\
-            position: fixed;\n\
-            top: 0;\n\
-            border-bottom: 1px solid #666;\n\
-            width: 100%;\n\
-        }\n\
-        div.footer {\n\
-            border-top: 1px solid #666;\n\
-        }\n\
-        div.body {\n\
-            margin-top: 170px;\n\
-        }\n\
-        div.meta {\n\
-            font-size: 90%;\n\
-            text-align: center;\n\
-        }\n\
-        h1, h2, h3 {\n\
-            font-weight: normal;\n\
-        }\n\
-        h1 {\n\
-            font-size: 12pt;\n\
-        }\n\
-        h2 {\n\
-            font-size: 10pt;\n\
-        }\n\
-        pre {\n\
-            font-family: Menlo, Monaco, Consolas, Courier New, monospace;\n\
-            margin: 0;\n\
-            padding: 0;\n\
-            font-size: 14px;\n\
-            tab-size: 2;\n\
-        }\n\
-\n\
-        div.path { font-size: 110%; }\n\
-        div.path a:link, div.path a:visited { color: #000; }\n\
-        table.coverage { border-collapse: collapse; margin:0; padding: 0 }\n\
-\n\
-        table.coverage td {\n\
-            margin: 0;\n\
-            padding: 0;\n\
-            color: #111;\n\
-            vertical-align: top;\n\
-        }\n\
-        table.coverage td.line-count {\n\
-            width: 50px;\n\
-            text-align: right;\n\
-            padding-right: 5px;\n\
-        }\n\
-        table.coverage td.line-coverage {\n\
-            color: #777 !important;\n\
-            text-align: right;\n\
-            border-left: 1px solid #666;\n\
-            border-right: 1px solid #666;\n\
-        }\n\
-\n\
-        table.coverage td.text {\n\
-        }\n\
-\n\
-        table.coverage td span.cline-any {\n\
-            display: inline-block;\n\
-            padding: 0 5px;\n\
-            width: 40px;\n\
-        }\n\
-        table.coverage td span.cline-neutral {\n\
-            background: #eee;\n\
-        }\n\
-        table.coverage td span.cline-yes {\n\
-            background: #b5d592;\n\
-            color: #999;\n\
-        }\n\
-        table.coverage td span.cline-no {\n\
-            background: #fc8c84;\n\
-        }\n\
-\n\
-        .cstat-yes { color: #111; }\n\
-        .cstat-no { background: #fc8c84; color: #111; }\n\
-        .fstat-no { background: #ffc520; color: #111 !important; }\n\
-        .cbranch-no { background:  yellow !important; color: #111; }\n\
-\n\
-        .cstat-skip { background: #ddd; color: #111; }\n\
-        .fstat-skip { background: #ddd; color: #111 !important; }\n\
-        .cbranch-skip { background: #ddd !important; color: #111; }\n\
-\n\
-        .missing-if-branch {\n\
-            display: inline-block;\n\
-            margin-right: 10px;\n\
-            position: relative;\n\
-            padding: 0 4px;\n\
-            background: black;\n\
-            color: yellow;\n\
-        }\n\
-\n\
-        .skip-if-branch {\n\
-            display: none;\n\
-            margin-right: 10px;\n\
-            position: relative;\n\
-            padding: 0 4px;\n\
-            background: #ccc;\n\
-            color: white;\n\
-        }\n\
-\n\
-        .missing-if-branch .typ, .skip-if-branch .typ {\n\
-            color: inherit !important;\n\
-        }\n\
-\n\
-        .entity, .metric { font-weight: bold; }\n\
-        .metric { display: inline-block; border: 1px solid #333; padding: 0.3em; background: white; }\n\
-        .metric small { font-size: 80%; font-weight: normal; color: #666; }\n\
-\n\
-        div.coverage-summary table { border-collapse: collapse; margin: 3em; font-size: 110%; }\n\
-        div.coverage-summary td, div.coverage-summary table  th { margin: 0; padding: 0.25em 1em; border-top: 1px solid #666; border-bottom: 1px solid #666; }\n\
-        div.coverage-summary th { text-align: left; border: 1px solid #666; background: #eee; font-weight: normal; }\n\
-        div.coverage-summary th.file { border-right: none !important; }\n\
-        div.coverage-summary th.pic { border-left: none !important; text-align: right; }\n\
-        div.coverage-summary th.pct { border-right: none !important; }\n\
-        div.coverage-summary th.abs { border-left: none !important; text-align: right; }\n\
-        div.coverage-summary td.pct { text-align: right; border-left: 1px solid #666; }\n\
-        div.coverage-summary td.abs { text-align: right; font-size: 90%; color: #444; border-right: 1px solid #666; }\n\
-        div.coverage-summary td.file { text-align: right; border-left: 1px solid #666; white-space: nowrap;  }\n\
-        div.coverage-summary td.pic { min-width: 120px !important;  }\n\
-        div.coverage-summary a:link { color: #000; }\n\
-        div.coverage-summary a:visited { color: #333; }\n\
-        div.coverage-summary tfoot td { border-top: 1px solid #666; }\n\
-\n\
-        div.coverage-summary .yui3-datatable-sort-indicator, div.coverage-summary .dummy-sort-indicator {\n\
-            height: 10px;\n\
-            width: 7px;\n\
-            display: inline-block;\n\
-            margin-left: 0.5em;\n\
-        }\n\
-        div.coverage-summary .yui3-datatable-sort-indicator {\n\
-            background: no-repeat scroll 0 0 transparent;\n\
-        }\n\
-        div.coverage-summary .yui3-datatable-sorted .yui3-datatable-sort-indicator {\n\
-            background-position: 0 -20px;\n\
-        }\n\
-        div.coverage-summary .yui3-datatable-sorted-desc .yui3-datatable-sort-indicator {\n\
-            background-position: 0 -10px;\n\
-        }\n\
-\n\
-        .high { background: #b5d592 !important; }\n\
-        .medium { background: #ffe87c !important; }\n\
-        .low { background: #fc8c84 !important; }\n\
-\n\
-        span.cover-fill, span.cover-empty {\n\
-            display:inline-block;\n\
-            border:1px solid #444;\n\
-            background: white;\n\
-            height: 12px;\n\
-        }\n\
-        span.cover-fill {\n\
-            background: #ccc;\n\
-            border-right: 1px solid #444;\n\
-        }\n\
-        span.cover-empty {\n\
-            background: white;\n\
-            border-left: none;\n\
-        }\n\
-        span.cover-full {\n\
-            border-right: none !important;\n\
-        }\n\
-        pre.prettyprint {\n\
-            border: none !important;\n\
-            padding: 0 !important;\n\
-            margin: 0 !important;\n\
-        }\n\
-        .com { color: #999 !important; }\n\
-        .ignore-none { color: #999; font-weight: normal; }\n\
-\n\
-    </style>\n\
+<style>\n\
+/* jslint-utility2 */\n\
+/*csslint\n\
+    box-model: false,\n\
+    important: false,\n\
+    qualified-headings: false,\n\
+*/\n\
+/* jslint-ignore-begin */\n\
+*,\n\
+*:after,\n\
+*:before {\n\
+    box-sizing: border-box;\n\
+}\n\
+/* jslint-ignore-end */\n\
+.x-istanbul {\n\
+    font-family: Helvetica Neue, Helvetica,Arial;\n\
+    font-size: 10pt;\n\
+    margin: 0;\n\
+    padding: 0;\n\
+}\n\
+.x-istanbul h1 {\n\
+    font-size: large;\n\
+}\n\
+.x-istanbul pre {\n\
+    font-family: Consolas, Menlo, Monaco, monospace;\n\
+    font-size: 14px;\n\
+    margin: 0;\n\
+    padding: 0;\n\
+    tab-size: 2;\n\
+}\n\
+.x-istanbul .cbranch-no {\n\
+    background: yellow !important;\n\
+    color: #111;\n\
+}\n\
+.x-istanbul .cbranch-skip {\n\
+    background: #ddd !important;\n\
+    color: #111;\n\
+}\n\
+.x-istanbul .com {\n\
+    color: #999 !important;\n\
+}\n\
+.x-istanbul .cover-empty,\n\
+.x-istanbul .cover-fill {\n\
+    background: white;\n\
+    border: 1px solid #444;\n\
+    display: inline-block;\n\
+    height: 12px;\n\
+}\n\
+.x-istanbul .cover-empty {\n\
+    background: white;\n\
+    border-left: none;\n\
+}\n\
+.x-istanbul .cover-fill {\n\
+    background: #ccc;\n\
+    border-right: 1px solid #444;\n\
+}\n\
+.x-istanbul .cover-full {\n\
+    border-right: none !important;\n\
+}\n\
+.x-istanbul .coverage {\n\
+    border-collapse: collapse;\n\
+    margin: 0;\n\
+    padding: 0\n\
+}\n\
+.x-istanbul .coverage td {\n\
+    color: #111;\n\
+    margin: 0;\n\
+    padding: 0;\n\
+    vertical-align: top;\n\
+}\n\
+.x-istanbul .coverage td .cline-any {\n\
+    display: inline-block;\n\
+    padding: 0 5px;\n\
+    width: 40px;\n\
+}\n\
+.x-istanbul .coverage td .cline-neutral {\n\
+    background: #eee;\n\
+}\n\
+.x-istanbul .coverage td .cline-no {\n\
+    background: #fc8c84;\n\
+}\n\
+.x-istanbul .coverage td .cline-yes {\n\
+    background: #b5d592;\n\
+    color: #999;\n\
+}\n\
+.x-istanbul .coverage .line-count {\n\
+    padding-right: 5px;\n\
+    text-align: right;\n\
+    width: 50px;\n\
+}\n\
+.x-istanbul .coverage .line-coverage {\n\
+    border-left: 1px solid #666;\n\
+    border-right: 1px solid #666;\n\
+    color: #777 !important;\n\
+    text-align: right;\n\
+}\n\
+.x-istanbul .coverage-summary {\n\
+    padding: 20px;\n\
+}\n\
+.x-istanbul .coverage-summary table {\n\
+    border-collapse: collapse;\n\
+    margin: auto;\n\
+    table-layout: fixed;\n\
+    text-align: left;\n\
+    width: 100%\n\
+}\n\
+.x-istanbul .coverage-summary td {\n\
+    border: 1px solid #666;\n\
+    margin: 0;\n\
+    padding: 5px;\n\
+    white-space: nowrap;\n\
+}\n\
+.x-istanbul .coverage-summary th {\n\
+    margin: 0;\n\
+    padding: 0 0 2px 0;\n\
+}\n\
+.x-istanbul .cstat-no {\n\
+    background: #fc8c84;\n\
+    color: #111;\n\
+}\n\
+.x-istanbul .cstat-skip {\n\
+    background: #ddd;\n\
+    color: #111;\n\
+}\n\
+.x-istanbul .cstat-yes {\n\
+    color: #111;\n\
+}\n\
+.x-istanbul .entity,\n\
+.x-istanbul .metric {\n\
+    font-weight: bold;\n\
+}\n\
+.x-istanbul .footer,\n\
+.x-istanbul .header {\n\
+    background: #eee;\n\
+    padding: 20px;\n\
+}\n\
+.x-istanbul .footer {\n\
+    border-top: 1px solid #666;\n\
+}\n\
+.x-istanbul .fstat-no {\n\
+    background: #ffc520;\n\
+    color: #111 !important;\n\
+}\n\
+.x-istanbul .fstat-skip {\n\
+    background: #ddd;\n\
+    color: #111 !important;\n\
+}\n\
+.x-istanbul .header {\n\
+    border-bottom: 1px solid #666;\n\
+    top: 0;\n\
+    width: 100%;\n\
+}\n\
+.x-istanbul .high {\n\
+    background: #b5d592 !important;\n\
+}\n\
+.x-istanbul .ignore-none {\n\
+    color: #999;\n\
+    font-weight: normal;\n\
+}\n\
+.x-istanbul .low {\n\
+    background: #fc8c84 !important;\n\
+}\n\
+.x-istanbul .medium {\n\
+    background: #ffe87c !important;\n\
+}\n\
+.x-istanbul .meta {\n\
+    text-align: center;\n\
+}\n\
+.x-istanbul .metric {\n\
+    background: white;\n\
+    border: 1px solid #333;\n\
+    display: inline-block;\n\
+    padding: .3em;\n\
+}\n\
+.x-istanbul .missing-if-branch {\n\
+    background: black;\n\
+    color: yellow;\n\
+    display: inline-block;\n\
+    margin-right: 10px;\n\
+    padding: 0 4px;\n\
+    position: relative;\n\
+}\n\
+.x-istanbul .missing-if-branch .typ,\n\
+.x-istanbul .skip-if-branch .typ {\n\
+    color: inherit !important;\n\
+}\n\
+.x-istanbul .prettyprint {\n\
+    border: none !important;\n\
+    margin: 0 !important;\n\
+    padding: 0 !important;\n\
+}\n\
+.x-istanbul .skip-if-branch {\n\
+    background: #ccc;\n\
+    color: white;\n\
+    display: none;\n\
+    margin-right: 10px;\n\
+    padding: 0 4px;\n\
+    position: relative;\n\
+}\n\
+/* validateLineSortedReset */\n\
+.x-istanbul a {\n\
+    color: #00d;\n\
+    text-decoration: underline;\n\
+}\n\
+.x-istanbul pre {\n\
+    overflow: visible;\n\
+    white-space: pre\n\
+}\n\
+.x-istanbul .file div {\n\
+    margin-bottom: 2px;\n\
+    overflow-wrap: break-word;\n\
+    white-space: normal;\n\
+    width: 100%;\n\
+}\n\
+.x-istanbul .tableHeader {\n\
+    border-collapse: collapse;\n\
+    margin: 0 auto 10px auto;\n\
+    table-layout: fixed;\n\
+    text-align: left;\n\
+    width: 100%;\n\
+}\n\
+.x-istanbul .tableHeader td {\n\
+    background: #eee;\n\
+    border: 1px solid #666;\n\
+    padding: 5px;\n\
+}\n\
+.x-istanbul .tableHeader th {\n\
+    padding: 0 0 2px 0;\n\
+}\n\
+</style>\n\
 </head>\n\
-<body>\n\
+<body class="x-istanbul">\n\
 <div class="header {{reportClass}}">\n\
     <h1 style="font-weight: bold;">\n\
         <a href="{{env.npm_package_homepage}}">{{env.npm_package_name}} (v{{env.npm_package_version}})</a>\n\
     </h1>\n\
     <h1>Code coverage report for <span class="entity">{{entity}}</span></h1>\n\
-    <h2>\n\
-        {{#with metrics.statements}}\n\
-        Statements: <span class="metric">{{pct}}% <small>({{covered}} / {{total}})</small></span> &nbsp;&nbsp;&nbsp;&nbsp;\n\
-        {{/with}}\n\
-        {{#with metrics.branches}}\n\
-        Branches: <span class="metric">{{pct}}% <small>({{covered}} / {{total}})</small></span> &nbsp;&nbsp;&nbsp;&nbsp;\n\
-        {{/with}}\n\
-        {{#with metrics.functions}}\n\
-        Functions: <span class="metric">{{pct}}% <small>({{covered}} / {{total}})</small></span> &nbsp;&nbsp;&nbsp;&nbsp;\n\
-        {{/with}}\n\
-        {{#with metrics.lines}}\n\
-        Lines: <span class="metric">{{pct}}% <small>({{covered}} / {{total}})</small></span> &nbsp;&nbsp;&nbsp;&nbsp;\n\
-        {{/with}}\n\
-        Ignored: <span class="metric">{{#show_ignores metrics}}{{/show_ignores}}</span> &nbsp;&nbsp;&nbsp;&nbsp;\n\
-    </h2>\n\
+    <table class="tableHeader">\n\
+    <thead>\n\
+    <tr>\n\
+        <th>Ignored</th>\n\
+        <th>Statements</th>\n\
+        <th>Branches</th>\n\
+        <th>Functions</th>\n\
+        <th>Lines</th>\n\
+    </tr>\n\
+    </thead>\n\
+    <tbody>\n\
+        <td>{{#show_ignores metrics}}{{/show_ignores}}</td>\n\
+        <td>{{#with metrics.statements}}{{pct}}%<br>({{covered}} / {{total}}){{/with}}</td>\n\
+        <td>{{#with metrics.branches}}{{pct}}%<br>({{covered}} / {{total}}){{/with}}</td>\n\
+        <td>{{#with metrics.functions}}{{pct}}%<br>({{covered}} / {{total}}){{/with}}</td>\n\
+        <td>{{#with metrics.lines}}{{pct}}%<br>({{covered}} / {{total}}){{/with}}</td>\n\
+    </tbody>\n\
+    </table>\n\
     {{{pathHtml}}}\n\
 </div>\n\
 <div class="body">\n\
@@ -6442,36 +6536,25 @@ templateFor("foot"),pathTemplate=handlebars.compile('<div class="path">{{{html}}
 ,'<td class="text"><pre class="prettyprint lang-js">{{#show_code structured}}{{/show_code}}</pre></td>'
 ,"</tr>\n"].join("")),summaryTableHeader=['<div class="coverage-summary">',"<table>"
 ,"<thead>","<tr>",'   <th data-col="file" data-fmt="html" data-html="true" class="file">File</th>'
-,'   <th data-col="pic" data-type="number" data-fmt="html" data-html="true" class="pic"></th>'
 ,'   <th data-col="statements" data-type="number" data-fmt="pct" class="pct">Statements</th>'
-,'   <th data-col="statements_raw" data-type="number" data-fmt="html" class="abs"></th>'
 ,'   <th data-col="branches" data-type="number" data-fmt="pct" class="pct">Branches</th>'
-,'   <th data-col="branches_raw" data-type="number" data-fmt="html" class="abs"></th>'
 ,'   <th data-col="functions" data-type="number" data-fmt="pct" class="pct">Functions</th>'
-,'   <th data-col="functions_raw" data-type="number" data-fmt="html" class="abs"></th>'
 ,'   <th data-col="lines" data-type="number" data-fmt="pct" class="pct">Lines</th>'
-,'   <th data-col="lines_raw" data-type="number" data-fmt="html" class="abs"></th>'
 ,"</tr>","</thead>","<tbody>"].join("\n"),summaryLineTemplate=handlebars.compile
-(["<tr>",'<td class="file {{reportClasses.statements}}" data-value="{{file}}"><a href="{{output}}">{{file}}</a></td>'
-,'<td data-value="{{metrics.statements.pct}}" class="pic {{reportClasses.statements}}">{{#show_picture}}{{metrics.statements.pct}}{{/show_picture}}</td>'
-,'<td data-value="{{metrics.statements.pct}}" class="pct {{reportClasses.statements}}">{{metrics.statements.pct}}%</td>'
-,'<td data-value="{{metrics.statements.total}}" class="abs {{reportClasses.statements}}">({{metrics.statements.covered}}&nbsp;/&nbsp;{{metrics.statements.total}})</td>'
-,'<td data-value="{{metrics.branches.pct}}" class="pct {{reportClasses.branches}}">{{metrics.branches.pct}}%</td>'
-,'<td data-value="{{metrics.branches.total}}" class="abs {{reportClasses.branches}}">({{metrics.branches.covered}}&nbsp;/&nbsp;{{metrics.branches.total}})</td>'
-,'<td data-value="{{metrics.functions.pct}}" class="pct {{reportClasses.functions}}">{{metrics.functions.pct}}%</td>'
-,'<td data-value="{{metrics.functions.total}}" class="abs {{reportClasses.functions}}">({{metrics.functions.covered}}&nbsp;/&nbsp;{{metrics.functions.total}})</td>'
-,'<td data-value="{{metrics.lines.pct}}" class="pct {{reportClasses.lines}}">{{metrics.lines.pct}}%</td>'
-,'<td data-value="{{metrics.lines.total}}" class="abs {{reportClasses.lines}}">({{metrics.lines.covered}}&nbsp;/&nbsp;{{metrics.lines.total}})</td>'
-,"</tr>\n"].join("\n	")),summaryTableFooter=["</tbody>","</table>","</div>"].join
+(["<tr>",'<td class="file {{reportClasses.statements}}" data-value="{{file}}"><a href="{{output}}"><div>{{file}}</div>{{#show_picture}}{{metrics.statements.pct}}{{/show_picture}}</a></td>'
+,'<td data-value="{{metrics.statements.pct}}" class="pct {{reportClasses.statements}}">{{metrics.statements.pct}}%<br>({{metrics.statements.covered}} / {{metrics.statements.total}})</td>'
+,'<td data-value="{{metrics.branches.pct}}" class="pct {{reportClasses.branches}}">{{metrics.branches.pct}}%<br>({{metrics.branches.covered}} / {{metrics.branches.total}})</td>'
+,'<td data-value="{{metrics.functions.pct}}" class="pct {{reportClasses.functions}}">{{metrics.functions.pct}}%<br>({{metrics.functions.covered}} / {{metrics.functions.total}})</td>'
+,'<td data-value="{{metrics.lines.pct}}" class="pct {{reportClasses.lines}}">{{metrics.lines.pct}}%<br>({{metrics.lines.covered}} / {{metrics.lines.total}})</td>'
+,"</tr>\n"].join("\n\t")),summaryTableFooter=["</tbody>","</table>","</div>"].join
 ("\n"),lt="",gt="",RE_LT=/</g,RE_GT=/>/g,RE_AMP=/&/g,RE_lt=/\u0001/g,RE_gt=/\u0002/g
 ;handlebars.registerHelper("show_picture",function(e){var t=Number(e.fn(this)),n
 ,r="";return isFinite(t)?(t===100&&(r=" cover-full"),t=Math.floor(t),n=100-t,'<span class="cover-fill'+
 r+'" style="width: '+t+'px;"></span>'+'<span class="cover-empty" style="width:'+
 n+'px;"></span>'):""}),handlebars.registerHelper("show_ignores",function(e){var t=
 e.statements.skipped,n=e.functions.skipped,r=e.branches.skipped,i;return t===0&&
-n===0&&r===0?'<span class="ignore-none">none</span>':(i=[],t>0&&i.push(t===1?"1 statement"
-:t+" statements"),n>0&&i.push(n===1?"1 function":n+" functions"),r>0&&i.push(r===1?"1 branch"
-:r+" branches"),i.join(", "))}),handlebars.registerHelper("show_lines",function(
+n===0&&r===0?'<span class="ignore-none">none</span>':(i=[],r>0&&i.push("branches: "+r),t>0&&i.push(
+"statements: "+t),n>0&&i.push("functions: "+n),i.join("<br>"))}),handlebars.registerHelper("show_lines",function(
 e){var t=Number(e.fn(this)),n,r=[];for(n=0;n<t;n+=1)r[n]=n+1;return r.join("\n")
 }),handlebars.registerHelper("show_line_execution_counts",function(e,t){var n=e.
 l,r=Number(t.fn(this)),i,s,o=[],u,a="";for(i=0;i<r;i+=1)s=i+1,a="&nbsp;",u="neutral"
@@ -6725,7 +6808,7 @@ local.templateCoverageBadgeSvg =
         } else {
             // require builtins
             Object.keys(process.binding('natives')).forEach(function (key) {
-                if (!local[key] && !(/\/|^_|^sys$/).test(key)) {
+                if (!local[key] && !(/\/|^_|^assert|^sys$/).test(key)) {
                     local[key] = require(key);
                 }
             });
@@ -13157,10 +13240,15 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
                 if (!current1) {
                     return;
                 }
+                // validate whitespace-before-comma
+                if ((/ ,/).test(current1)) {
+                    jj = jj || ((/ ,/).exec(current1).index + 2);
+                    message = message || 'whitespace-before-comma';
+                }
                 // validate double-whitespace
                 if ((/\S {2}/).test(current1)) {
                     jj = jj || ((/\S {2}/).exec(current1).index + 2);
-                    message = message || 'double whitespace';
+                    message = message || 'double-whitespace';
                 }
                 // ignore indent
                 if (!message && current1[0] === ' ') {
@@ -13169,7 +13257,7 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
                 // validate multi-line-statement
                 if ((/[,;\{\}]./).test(current1)) {
                     jj = jj || ((/[,;\{\}]./).exec(current1).index + 1);
-                    message = message || 'multi-line statement';
+                    message = message || 'multi-line-statement';
                 }
                 // validateLineSortedReset
                 if (current1 === '/* validateLineSortedReset */') {
@@ -13182,12 +13270,12 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
                 // validate previous1 < current1
                 current1 = current1
                     .replace((/,$/gm), '   ,')
-                    .replace((/ \{$/gm), '   {')
+                    .replace((/( \{$|:)/gm), '  $1')
                     .replace((/(^[\w*@]| \w)/gm), ' $1');
                 if (!(previous1 < current1)) {
                     jj = jj || 1;
                     message = message ||
-                        ('lines not sorted\n' + previous1 + '\n' + current1);
+                        ('lines not sorted\n' + previous1 + '\n' + current1).trim();
                 }
                 previous1 = current1;
                 // validate previous2 < current2
@@ -13234,7 +13322,7 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
                     ii += 1;
                     jj = 0;
                     message = '';
-                    // validate indent
+                    // validate 4-space indent
                     if (!(/^ * \*/).test(line) && ((/^ */).exec(line)[0].length % 4 !== 0)) {
                         jj = jj || 1;
                         message = message || 'non 4-space indent';
@@ -13370,7 +13458,46 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
         /*
          * this function will jslint the script with utiity2-specific rules
          */
-            return script;
+            var ii, current, previous, tmp;
+            ii = 0;
+            previous = '';
+            script.replace((/^.*?$/gm), function (line) {
+                current = line.trim();
+                ii += 1;
+                // validate className sorted
+                tmp = (/class="([^"]+?)"/g).exec(current);
+                tmp = JSON.stringify(
+                    (tmp && tmp[1].match(/\w\S*?\{\{[^}]*?\}\}|\w\S*|\{\{[^}]*?\}\}/g)) || []
+                );
+                if (JSON.stringify(JSON.parse(tmp).sort()) !== tmp) {
+                    local.errorList.push({
+                        col: 0,
+                        line: ii,
+                        message: 'tag.classList not sorted - ' + tmp,
+                        value: line
+                    });
+                }
+                // validate line-sorted
+                if (line === '/* validateLineSortedReset */' ||
+                        (/^ {4}\/\/ run .*?\bjs\\?-env code\b|^\/\/ init lib|\\n\\$/m).test(line)) {
+                    previous = '';
+                    return;
+                }
+                if (!(/^(?: {4}| {8})local\.\S*? =(?: |$)/m).test(line) ||
+                        (/^local\.(?:modeJs|global|local|tmp)\b/).test(current)) {
+                    return;
+                }
+                // validate previous < current
+                if (!(previous < current)) {
+                    local.errorList.push({
+                        col: 0,
+                        line: ii,
+                        message: 'lines not sorted\n' + previous + '\n' + current,
+                        value: line
+                    });
+                }
+                previous = current;
+            });
         };
 
         local.shlintUtility2 = function (script) {
@@ -13436,6 +13563,7 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
 
 
 /* script-begin /assets.utility2.lib.marked.js */
+/* jslint-utility2 */
 /*jslint
     bitwise: true,
     browser: true,
@@ -13689,6 +13817,7 @@ local.marked = module.exports; }());
 
 
 /* script-begin /assets.utility2.lib.sjcl.js */
+/* jslint-utility2 */
 /*jslint
     bitwise: true,
     browser: true,
@@ -14129,6 +14258,7 @@ s=0;s<i;s++)n[r+s]=e[t+s]|0},sjcl.misc.scrypt.blockxor=function(e,t,n,r,i){var s
 /* script-begin /assets.utility2.lib.uglifyjs.js */
 ///usr/bin/env node
 /* istanbul instrument in package uglifyjs */
+/* jslint-utility2 */
 /*jslint
     bitwise: true,
     browser: true,
@@ -14348,7 +14478,7 @@ nlb:t.newline_before};if(!r){i.comments_before=t.comments_before,t.comments_befo
 o==0&&!e?!0:!1:s=="+"?n:(n=!1,s=="."?!i&&!r&&!t?i=!0:!1:is_alphanumeric_char(s))
 :t?!1:t=n=!0});e&&(s=e+s);var o=parse_js_number(s);if(!isNaN(o))return u("num",o
 );l("Invalid syntax: "+s)}function h(e){var t=r(!0,e);switch(t){case"n":return"\n"
-;case"r":return"\r";case"t":return"	";case"b":return"\b";case"v":return"";case"f"
+;case"r":return"\r";case"t":return"\t";case"b":return"\b";case"v":return"";case"f"
 :return"\f";case"0":return"\0";case"x":return String.fromCharCode(p(2));case"u":
 return String.fromCharCode(p(4));case"\n":return"";default:return t}}function p(
 e){var t=0;for(;e>0;--e){var n=parseInt(r(!0),16);isNaN(n)&&l("Invalid hex-character pattern in string"
@@ -14490,7 +14620,7 @@ array_to_hash(["return","new","delete","throw","else","case"]),KEYWORDS_ATOM=arr
 ,OPERATORS=array_to_hash(["in","instanceof","typeof","new","void","delete","++","--"
 ,"+","-","!","~","&","|","^","*","/","%",">>","<<",">>>","<",">","<=",">=","==","==="
 ,"!=","!==","?","=","+=","-=","/=","*=","%=",">>=","<<=",">>>=","|=","^=","&=","&&"
-,"||"]),WHITESPACE_CHARS=array_to_hash(characters(" \u00a0\n\r	\f\u200b\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\ufeff"
+,"||"]),WHITESPACE_CHARS=array_to_hash(characters(" \u00a0\n\r\t\f\u200b\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\ufeff"
 )),PUNC_BEFORE_EXPRESSION=array_to_hash(characters("[{(,.;:")),PUNC_CHARS=array_to_hash
 (characters("[]{}(),;:")),REGEXP_MODIFIERS=array_to_hash(characters("gmsiy")),UNICODE=
 {letter:new RegExp("[\\u0041-\\u005A\\u0061-\\u007A\\u00AA\\u00B5\\u00BA\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02C1\\u02C6-\\u02D1\\u02E0-\\u02E4\\u02EC\\u02EE\\u0370-\\u0374\\u0376\\u0377\\u037A-\\u037D\\u0386\\u0388-\\u038A\\u038C\\u038E-\\u03A1\\u03A3-\\u03F5\\u03F7-\\u0481\\u048A-\\u0527\\u0531-\\u0556\\u0559\\u0561-\\u0587\\u05D0-\\u05EA\\u05F0-\\u05F2\\u0620-\\u064A\\u066E\\u066F\\u0671-\\u06D3\\u06D5\\u06E5\\u06E6\\u06EE\\u06EF\\u06FA-\\u06FC\\u06FF\\u0710\\u0712-\\u072F\\u074D-\\u07A5\\u07B1\\u07CA-\\u07EA\\u07F4\\u07F5\\u07FA\\u0800-\\u0815\\u081A\\u0824\\u0828\\u0840-\\u0858\\u08A0\\u08A2-\\u08AC\\u0904-\\u0939\\u093D\\u0950\\u0958-\\u0961\\u0971-\\u0977\\u0979-\\u097F\\u0985-\\u098C\\u098F\\u0990\\u0993-\\u09A8\\u09AA-\\u09B0\\u09B2\\u09B6-\\u09B9\\u09BD\\u09CE\\u09DC\\u09DD\\u09DF-\\u09E1\\u09F0\\u09F1\\u0A05-\\u0A0A\\u0A0F\\u0A10\\u0A13-\\u0A28\\u0A2A-\\u0A30\\u0A32\\u0A33\\u0A35\\u0A36\\u0A38\\u0A39\\u0A59-\\u0A5C\\u0A5E\\u0A72-\\u0A74\\u0A85-\\u0A8D\\u0A8F-\\u0A91\\u0A93-\\u0AA8\\u0AAA-\\u0AB0\\u0AB2\\u0AB3\\u0AB5-\\u0AB9\\u0ABD\\u0AD0\\u0AE0\\u0AE1\\u0B05-\\u0B0C\\u0B0F\\u0B10\\u0B13-\\u0B28\\u0B2A-\\u0B30\\u0B32\\u0B33\\u0B35-\\u0B39\\u0B3D\\u0B5C\\u0B5D\\u0B5F-\\u0B61\\u0B71\\u0B83\\u0B85-\\u0B8A\\u0B8E-\\u0B90\\u0B92-\\u0B95\\u0B99\\u0B9A\\u0B9C\\u0B9E\\u0B9F\\u0BA3\\u0BA4\\u0BA8-\\u0BAA\\u0BAE-\\u0BB9\\u0BD0\\u0C05-\\u0C0C\\u0C0E-\\u0C10\\u0C12-\\u0C28\\u0C2A-\\u0C33\\u0C35-\\u0C39\\u0C3D\\u0C58\\u0C59\\u0C60\\u0C61\\u0C85-\\u0C8C\\u0C8E-\\u0C90\\u0C92-\\u0CA8\\u0CAA-\\u0CB3\\u0CB5-\\u0CB9\\u0CBD\\u0CDE\\u0CE0\\u0CE1\\u0CF1\\u0CF2\\u0D05-\\u0D0C\\u0D0E-\\u0D10\\u0D12-\\u0D3A\\u0D3D\\u0D4E\\u0D60\\u0D61\\u0D7A-\\u0D7F\\u0D85-\\u0D96\\u0D9A-\\u0DB1\\u0DB3-\\u0DBB\\u0DBD\\u0DC0-\\u0DC6\\u0E01-\\u0E30\\u0E32\\u0E33\\u0E40-\\u0E46\\u0E81\\u0E82\\u0E84\\u0E87\\u0E88\\u0E8A\\u0E8D\\u0E94-\\u0E97\\u0E99-\\u0E9F\\u0EA1-\\u0EA3\\u0EA5\\u0EA7\\u0EAA\\u0EAB\\u0EAD-\\u0EB0\\u0EB2\\u0EB3\\u0EBD\\u0EC0-\\u0EC4\\u0EC6\\u0EDC-\\u0EDF\\u0F00\\u0F40-\\u0F47\\u0F49-\\u0F6C\\u0F88-\\u0F8C\\u1000-\\u102A\\u103F\\u1050-\\u1055\\u105A-\\u105D\\u1061\\u1065\\u1066\\u106E-\\u1070\\u1075-\\u1081\\u108E\\u10A0-\\u10C5\\u10C7\\u10CD\\u10D0-\\u10FA\\u10FC-\\u1248\\u124A-\\u124D\\u1250-\\u1256\\u1258\\u125A-\\u125D\\u1260-\\u1288\\u128A-\\u128D\\u1290-\\u12B0\\u12B2-\\u12B5\\u12B8-\\u12BE\\u12C0\\u12C2-\\u12C5\\u12C8-\\u12D6\\u12D8-\\u1310\\u1312-\\u1315\\u1318-\\u135A\\u1380-\\u138F\\u13A0-\\u13F4\\u1401-\\u166C\\u166F-\\u167F\\u1681-\\u169A\\u16A0-\\u16EA\\u16EE-\\u16F0\\u1700-\\u170C\\u170E-\\u1711\\u1720-\\u1731\\u1740-\\u1751\\u1760-\\u176C\\u176E-\\u1770\\u1780-\\u17B3\\u17D7\\u17DC\\u1820-\\u1877\\u1880-\\u18A8\\u18AA\\u18B0-\\u18F5\\u1900-\\u191C\\u1950-\\u196D\\u1970-\\u1974\\u1980-\\u19AB\\u19C1-\\u19C7\\u1A00-\\u1A16\\u1A20-\\u1A54\\u1AA7\\u1B05-\\u1B33\\u1B45-\\u1B4B\\u1B83-\\u1BA0\\u1BAE\\u1BAF\\u1BBA-\\u1BE5\\u1C00-\\u1C23\\u1C4D-\\u1C4F\\u1C5A-\\u1C7D\\u1CE9-\\u1CEC\\u1CEE-\\u1CF1\\u1CF5\\u1CF6\\u1D00-\\u1DBF\\u1E00-\\u1F15\\u1F18-\\u1F1D\\u1F20-\\u1F45\\u1F48-\\u1F4D\\u1F50-\\u1F57\\u1F59\\u1F5B\\u1F5D\\u1F5F-\\u1F7D\\u1F80-\\u1FB4\\u1FB6-\\u1FBC\\u1FBE\\u1FC2-\\u1FC4\\u1FC6-\\u1FCC\\u1FD0-\\u1FD3\\u1FD6-\\u1FDB\\u1FE0-\\u1FEC\\u1FF2-\\u1FF4\\u1FF6-\\u1FFC\\u2071\\u207F\\u2090-\\u209C\\u2102\\u2107\\u210A-\\u2113\\u2115\\u2119-\\u211D\\u2124\\u2126\\u2128\\u212A-\\u212D\\u212F-\\u2139\\u213C-\\u213F\\u2145-\\u2149\\u214E\\u2160-\\u2188\\u2C00-\\u2C2E\\u2C30-\\u2C5E\\u2C60-\\u2CE4\\u2CEB-\\u2CEE\\u2CF2\\u2CF3\\u2D00-\\u2D25\\u2D27\\u2D2D\\u2D30-\\u2D67\\u2D6F\\u2D80-\\u2D96\\u2DA0-\\u2DA6\\u2DA8-\\u2DAE\\u2DB0-\\u2DB6\\u2DB8-\\u2DBE\\u2DC0-\\u2DC6\\u2DC8-\\u2DCE\\u2DD0-\\u2DD6\\u2DD8-\\u2DDE\\u2E2F\\u3005-\\u3007\\u3021-\\u3029\\u3031-\\u3035\\u3038-\\u303C\\u3041-\\u3096\\u309D-\\u309F\\u30A1-\\u30FA\\u30FC-\\u30FF\\u3105-\\u312D\\u3131-\\u318E\\u31A0-\\u31BA\\u31F0-\\u31FF\\u3400-\\u4DB5\\u4E00-\\u9FCC\\uA000-\\uA48C\\uA4D0-\\uA4FD\\uA500-\\uA60C\\uA610-\\uA61F\\uA62A\\uA62B\\uA640-\\uA66E\\uA67F-\\uA697\\uA6A0-\\uA6EF\\uA717-\\uA71F\\uA722-\\uA788\\uA78B-\\uA78E\\uA790-\\uA793\\uA7A0-\\uA7AA\\uA7F8-\\uA801\\uA803-\\uA805\\uA807-\\uA80A\\uA80C-\\uA822\\uA840-\\uA873\\uA882-\\uA8B3\\uA8F2-\\uA8F7\\uA8FB\\uA90A-\\uA925\\uA930-\\uA946\\uA960-\\uA97C\\uA984-\\uA9B2\\uA9CF\\uAA00-\\uAA28\\uAA40-\\uAA42\\uAA44-\\uAA4B\\uAA60-\\uAA76\\uAA7A\\uAA80-\\uAAAF\\uAAB1\\uAAB5\\uAAB6\\uAAB9-\\uAABD\\uAAC0\\uAAC2\\uAADB-\\uAADD\\uAAE0-\\uAAEA\\uAAF2-\\uAAF4\\uAB01-\\uAB06\\uAB09-\\uAB0E\\uAB11-\\uAB16\\uAB20-\\uAB26\\uAB28-\\uAB2E\\uABC0-\\uABE2\\uAC00-\\uD7A3\\uD7B0-\\uD7C6\\uD7CB-\\uD7FB\\uF900-\\uFA6D\\uFA70-\\uFAD9\\uFB00-\\uFB06\\uFB13-\\uFB17\\uFB1D\\uFB1F-\\uFB28\\uFB2A-\\uFB36\\uFB38-\\uFB3C\\uFB3E\\uFB40\\uFB41\\uFB43\\uFB44\\uFB46-\\uFBB1\\uFBD3-\\uFD3D\\uFD50-\\uFD8F\\uFD92-\\uFDC7\\uFDF0-\\uFDFB\\uFE70-\\uFE74\\uFE76-\\uFEFC\\uFF21-\\uFF3A\\uFF41-\\uFF5A\\uFF66-\\uFFBE\\uFFC2-\\uFFC7\\uFFCA-\\uFFCF\\uFFD2-\\uFFD7\\uFFDA-\\uFFDC]"
@@ -15006,7 +15136,7 @@ split_lines=split_lines,exports.MAP=MAP,exports.ast_squeeze_more=require("./sque
         } else {
             // require builtins
             Object.keys(process.binding('natives')).forEach(function (key) {
-                if (!local[key] && !(/\/|^_|^sys$/).test(key)) {
+                if (!local[key] && !(/\/|^_|^assert|^sys$/).test(key)) {
                     local[key] = require(key);
                 }
             });
@@ -15073,6 +15203,7 @@ split_lines=split_lines,exports.MAP=MAP,exports.ast_squeeze_more=require("./sque
 
 /* jslint-ignore-begin */
 local.assetsDict['/assets.utility2.css'] = '\
+<style>\n\
 /* jslint-utility2 */\n\
 /*csslint\n\
 */\n\
@@ -15095,47 +15226,65 @@ local.assetsDict['/assets.utility2.css'] = '\
     }\n\
 }\n\
 @keyframes uiAnimateSpin {\n\
-    0% { transform: rotate(0deg); }\n\
-    100% { transform: rotate(360deg); }\n\
+    0% {\n\
+        transform: rotate(0deg);\n\
+    }\n\
+    100% {\n\
+        transform: rotate(360deg);\n\
+    }\n\
 }\n\
 a {\n\
     overflow-wrap: break-word;\n\
 }\n\
-body {\n\
-    background: #dde;\n\
-    font-family: Arial, Helvetica, sans-serif;\n\
-    margin: 0 40px;\n\
-}\n\
-body > a,\n\
-body > button,\n\
 body > div,\n\
-body > input,\n\
 body > pre,\n\
-body > select,\n\
-body > span,\n\
-body > textarea {\n\
+body > textarea,\n\
+body > .button {\n\
     margin-bottom: 20px;\n\
 }\n\
-body > button {\n\
-    width: 20rem;\n\
+body > textarea {\n\
+    height: 10rem;\n\
+    width: 100%;\n\
 }\n\
-button {\n\
-    cursor: pointer;\n\
+body > textarea[readonly] {\n\
+    background: #ddd;\n\
+}\n\
+body > .button {\n\
+    width: 20rem;\n\
 }\n\
 code,\n\
 pre,\n\
 textarea {\n\
-    font-family: Menlo, Consolas, Courier New, monospace;\n\
+    font-family: Consolas, Menlo, monospace;\n\
     font-size: small;\n\
 }\n\
 pre {\n\
     overflow-wrap: break-word;\n\
     white-space: pre-wrap;\n\
 }\n\
-.textOverflowEllipsis {\n\
-    overflow: hidden;\n\
-    text-overflow: ellipsis;\n\
-    white-space: nowrap;\n\
+textarea {\n\
+    overflow: auto;\n\
+    white-space: pre;\n\
+}\n\
+.button {\n\
+    background-color: #fff;\n\
+    border: 1px solid;\n\
+    border-bottom-color: rgb(186, 186, 186);\n\
+    border-left-color: rgb(209, 209, 209);\n\
+    border-radius: 4px;\n\
+    border-right-color: rgb(209, 209, 209);\n\
+    border-top-color: rgb(216, 216, 216);\n\
+    color: #00d;\n\
+    cursor: pointer;\n\
+    display: inline-block;\n\
+    font-family: Arial, Helvetica, sans-serif;\n\
+    font-size: 12px;\n\
+    font-style: normal;\n\
+    font-weight: normal;\n\
+    margin: 0;\n\
+    padding: 2px 7px 3px 7px;\n\
+    text-align: center;\n\
+    text-decoration: underline;\n\
 }\n\
 .uiAnimateShake {\n\
     animation-duration: 500ms;\n\
@@ -15155,7 +15304,8 @@ pre {\n\
     padding: 0;\n\
     width: 0;\n\
 }\n\
-';
+</style>\n\
+'.replace((/<\/?style>\n/g), '');
 
 
 
@@ -15172,22 +15322,12 @@ local.assetsDict['/assets.index.template.html'] = '\
 <style>\n\
 ' + local.assetsDict['/assets.utility2.css'] + '\
 </style>\n\
-<style>\n\
-/* jslint-utility2 */\n\
-/*csslint\n\
-*/\n\
-textarea {\n\
-    height: 10rem;\n\
-    width: 100%;\n\
-}\n\
-textarea[readonly] {\n\
-    background: #ddd;\n\
-}\n\
-</style>\n\
 </head>\n\
-<body>\n\
+<body style="background: #ddf; font-family: Arial, Helvetica, sans-serif; margin: 0 40px;">\n\
 <div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%; z-index: 1;"></div>\n\
 <div class="uiAnimateSpin" style="animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: none; height: 25px; vertical-align: middle; width: 25px;"></div>\n\
+<code style="display: none;"></code><div class="button uiAnimateShake uiAnimateSlide utility2FooterDiv zeroPixel" style="display: none;"></div><pre style="display: none;"></pre><textarea readonly style="display: none;"></textarea>\n\
+<code style="display: none;"></code><div class="button uiAnimateShake uiAnimateSlide utility2FooterDiv zeroPixel" style="display: none;"></div><pre style="display: none;"></pre><textarea readonly style="display: none;"></textarea>\n\
 <script>\n\
 /* jslint-utility2 */\n\
 /*jslint\n\
@@ -15250,8 +15390,8 @@ utility2-comment -->\n\
 </h1>\n\
 <h3>{{env.npm_package_description}}</h3>\n\
 <!-- utility2-comment\n\
-<h4><a download href="assets.app.js">[download standalone app]</a></h4>\n\
-<button class="onclick onreset" id="testRunButton1">run internal test</button><br>\n\
+<a class="button" download href="assets.app.js">download standalone app</a><br>\n\
+<button class="button onclick onreset" id="testRunButton1">run internal test</button><br>\n\
 <div class="uiAnimateSlide" id="testReportDiv1" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>\n\
 utility2-comment -->\n\
 \n\
@@ -15456,7 +15596,7 @@ instruction\n\
         module.exports = local;\n\
         // require builtins\n\
         Object.keys(process.binding(\'natives\')).forEach(function (key) {\n\
-            if (!local[key] && !(/\\/|^_|^sys$/).test(key)) {\n\
+            if (!local[key] && !(/\\/|^_|^assert|^sys$/).test(key)) {\n\
                 local[key] = require(key);\n\
             }\n\
         });\n\
@@ -15481,6 +15621,7 @@ local.assetsDict['/assets.index.template.html'].replace((/\n/g), '\\n\\\n') + '\
                 );\n\
             }\n\
         });\n\
+/* validateLineSortedReset */\n\
         local.assetsDict[\'/\'] =\n\
             local.assetsDict[\'/assets.example.html\'] =\n\
             local.assetsDict[\'/assets.index.template.html\']\n\
@@ -15598,7 +15739,7 @@ local.assetsDict['/assets.lib.template.js'] = '\
         } else {\n\
             // require builtins\n\
             Object.keys(process.binding(\'natives\')).forEach(function (key) {\n\
-                if (!local[key] && !(/\\/|^_|^sys$/).test(key)) {\n\
+                if (!local[key] && !(/\\/|^_|^assert|^sys$/).test(key)) {\n\
                     local[key] = require(key);\n\
                 }\n\
             });\n\
@@ -15624,7 +15765,7 @@ the greatest app in the world!\n\
 \n\
 \n\
 \n\
-[![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-jslint-lite.svg)](https://travis-ci.org/kaizhu256/node-jslint-lite) [![coverage](https://kaizhu256.github.io/node-jslint-lite/build/coverage.badge.svg)](https://kaizhu256.github.io/node-jslint-lite/build/coverage.html/index.html) [![snyk.io vulnerabilities](https://snyk.io/test/github/kaizhu256/node-jslint-lite/badge.svg)](https://snyk.io/test/github/kaizhu256/node-jslint-lite)\n\
+[![travis-ci.org build-status](https://api.travis-ci.org/kaizhu256/node-jslint-lite.svg)](https://travis-ci.org/kaizhu256/node-jslint-lite) [![coverage](https://kaizhu256.github.io/node-jslint-lite/build/coverage.badge.svg)](https://kaizhu256.github.io/node-jslint-lite/build/coverage.html/index.html)\n\
 \n\
 [![NPM](https://nodei.co/npm/jslint-lite.png?downloads=true)](https://www.npmjs.com/package/jslint-lite)\n\
 \n\
@@ -15773,6 +15914,7 @@ PORT=8081 node ./assets.app.js\n\
     "license": "MIT",\n\
     "main": "lib.jslint.js",\n\
     "name": "jslint-lite",\n\
+    "nameAliasPublish": "",\n\
     "os": [\n\
         "darwin",\n\
         "linux"\n\
@@ -15787,7 +15929,6 @@ PORT=8081 node ./assets.app.js\n\
         "build-ci": "utility2 shReadmeTest build_ci.sh",\n\
         "env": "env",\n\
         "heroku-postbuild": "npm uninstall utility2 2>/dev/null; npm install kaizhu256/node-utility2#alpha && utility2 shDeployHeroku",\n\
-        "nameAliasPublish": "",\n\
         "postinstall": "[ ! -f npm_scripts.sh ] || ./npm_scripts.sh shNpmScriptPostinstall",\n\
         "start": "PORT=${PORT:-8080} utility2 start test.js",\n\
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"\n\
@@ -16047,7 +16188,9 @@ local.assetsDict['/assets.testReport.template.html'] = '\
         {{#if env.npm_package_homepage}}\n\
         href="{{env.npm_package_homepage}}"\n\
         {{/if env.npm_package_homepage}}\n\
-    >{{env.npm_package_name}} (v{{env.npm_package_version}})</a>\n\
+    >\n\
+        {{env.npm_package_name}} (v{{env.npm_package_version}})\n\
+    </a>\n\
 </h1>\n\
 <div class="platform summary">\n\
 <h2>summary</h2>\n\
@@ -16813,7 +16956,7 @@ local.assetsDict['/favicon.ico'] = '';
          * this function will test webpage's default handling-behavior
          */
             if (local.modeJs === 'browser') {
-                local.validateDocumentStyle();
+                local.domStyleValidate();
                 onError(null, options);
                 return;
             }
@@ -18056,78 +18199,6 @@ return Utf8ArrayToStr(bff);
          * this function will build the app
          */
             options = local.objectSetDefault(options, { assetsList: [] });
-            // validateLineSorted
-            local._debugAssertError = null;
-            options.data = [
-                'README.md',
-                'lib.' + local.env.npm_package_nameLib + '.js',
-                'lib.' + local.env.npm_package_nameLib + '.sh',
-                'npm_scripts.sh'
-            ].map(function (file) {
-                return '\n// file - ' + file + '\n' + (local.tryCatchReadFile(file, 'utf8') + '\n')
-                    // filter `
-                    .replace((/^`.*?\n/gm), '')
-                    // filter skip
-                    .replace((
-                        /^( {4}\/\/ run .*?\bjs-env code\b|\/\* validateLineSortedReset \*\/)/gm
-                    ), '`$1')
-                    .replace((/^(\/\/ init lib)\b/gm), '`$1')
-                    // filter local
-                    .replace((/^ *?local\.(?:modeJs|global|local|tmp)\b.*?\n/gm), '')
-                    .replace((/.*?\b(?:assets\.example|assets\.index|shPrintAndEval)\b.*?\n/g), '')
-                    .replace((/.*?\\n\\\n/g), '')
-                    .replace((/^ .*?\\\n/gm), '')
-                    .replace((/^((?:| {4}| {8})local\.\S*? =(?: |$))/gm), '`$1')
-                    // filter shXxx
-                    .replace((/^(sh[A-Z]\w*?\(\) \{)/gm), '`$1')
-                    // filter `
-                    .replace((/\n\n+/g), '\n')
-                    .replace((/^[^`].*?\n/gm), '')
-                    .replace((/^`/gm), '');
-            }).join('\n').trim();
-            // debug validateLineSorted
-            local.fs.writeFileSync('tmp/validateLineSorted.js', options.data);
-            options.keyLocal = options.keySh = '';
-            options.data.split('\n').forEach(function (line) {
-                line = line.trim();
-                switch (line.slice(0, 2)) {
-                case '':
-                case '/*':
-                case '//':
-                    // reset key
-                    options.keyLocal = options.keySh = '';
-                    // update file
-                    line.replace((/^\/\/ file - (.*?)$/), function (match0, match1) {
-                        match0 = match1;
-                        options.file = match0;
-                    });
-                    break;
-                case 'sh':
-                    // reset key
-                    options.keyLocal = '';
-                    // validate key < line
-                    local.assert(
-                        options.keySh <= line,
-                        'buildApp.sortError\n' + options.file + '\n' + options.keySh + '\n' + line,
-                        console.error
-                    );
-                    // update key
-                    options.keySh = line;
-                    break;
-                default:
-                    // validate key < line
-                    local.assert(
-                        options.keyLocal <= line,
-                        'buildApp.sortError\n' + options.file + '\n' + options.keyLocal + '\n' +
-                            line,
-                        console.error
-                    );
-                    // update key
-                    options.keyLocal = line;
-                }
-            });
-            // validate no error occurred
-            local.assert(!local._debugAssertError, local._debugAssertError);
             // build assets
             local.fsRmrSync(local.env.npm_config_dir_build + '/app');
             local.onParallelList({ list: options.assetsList.concat([{
@@ -18387,7 +18458,8 @@ return Utf8ArrayToStr(bff);
             // init package.json
             options.rgx = (/\n# package.json\n```json\n([\S\s]*?)\n```\n/);
             options.dataFrom.replace(options.rgx, function (match0, match1) {
-                options.packageJson = JSON.parse(match1);
+                // remove null-items from package.json
+                options.packageJson = JSON.parse(match1.replace((/ {4}".*?": null,?$/gm), ''));
                 options.packageJson.description = options.dataFrom.split('\n')[1];
                 local.tryCatchOnError(function () {
                     local.objectSetDefault(options.packageJson, {
@@ -18439,8 +18511,6 @@ return Utf8ArrayToStr(bff);
                 new RegExp('\\n {8}local\\.testRunBrowser = function \\(event\\) \\{\\n' +
                     '[^`]*?^ {12}if \\(!event \\|\\| \\(event &&\\n', 'm'),
                 (/\n {12}\/\/ custom-case\n[^`]*?\n {12}\}\n/),
-                // customize quickstart-html-style
-                (/\n<\/style>\\n\\\n<style>\\n\\\n[^`]*?\\n\\\n<\/style>\\n\\\n/),
                 // customize quickstart-html-body
                 (/\nutility2-comment -->(?:\\n\\\n){4}[^`]*?^<!-- utility2-comment\\n\\\n/m),
                 // customize build script
@@ -18458,14 +18528,30 @@ return Utf8ArrayToStr(bff);
                     });
                 });
             });
+            // customize private-repository
+            if (local.env.npm_package_isPrivate) {
+                options.dataTo = options.dataTo
+                    .replace((
+                        /\n\[!\[NPM\]\(https:\/\/nodei.co\/npm\/.*?\n/
+                    ), '\n')
+                    .replace(
+                        '$ npm install ',
+                        '$ git clone --single-branch -b beta ' +
+                            local.env.npm_package_repository_url
+                            .replace('git+https://github.com/', 'git@github.com:') +
+                            ' node_modules/'
+                    );
+            }
             // customize version
-            options.dataTo = options.dataTo.replace((
-                /^(#### changelog for v|- npm publish v)\d{4}\.\d{1,2}\.\d{1,2}.*?$/gm
-            ), '$1' + options.packageJson.version);
+            ['dataFrom', 'dataTo'].forEach(function (element) {
+                options[element] = options[element].replace((
+                    /^(#### changelog for v|- npm publish v)\d+?\.\d+?\.\d+?.*?$/gm
+                ), '$1' + options.packageJson.version);
+            });
             // customize swaggerdoc
             if (!local.assetsDict['/assets.swgg.swagger.json'] ||
                     (/\bswggUiContainer\b/).test(local.assetsDict['/index.html']) ||
-                    process.env.npm_package_name === 'utility2') {
+                    local.env.npm_package_name === 'utility2') {
                 options.dataTo = options.dataTo.replace((/\n#### swagger doc\n[\S\s]*?\n#### /),
                     '\n#### ');
             }
@@ -18478,12 +18564,13 @@ return Utf8ArrayToStr(bff);
                 );
             }
             // customize comment
-            options.dataFrom.replace((/^( *?)(?:#!\! |#\/\/ |\/\/!\! )(.*?)$/gm), function (
-                match0,
-                match1,
-                match2
-            ) {
-                options.dataTo = options.dataTo.replace(match1 + match2, match0);
+            options.dataFrom.replace((
+                /^( *?)(?:#!\! |#\/\/ |\/\/!\! |<!-- )(.*?)(?: -->)?$/gm
+            ), function (match0, match1, match2) {
+                options.dataTo = options.dataTo.replace(
+                    '\n' + match1 + match2 + '\n',
+                    '\n' + match0 + '\n'
+                );
             });
             options.customize();
             // customize shDeployCustom
@@ -18503,22 +18590,24 @@ return Utf8ArrayToStr(bff);
                     '(?:npmTest|testExampleJs|testExampleSh)' +
                     '.*?\\.png[\\S\\s]*?\\n\\n', 'gm'), '');
             }
-            // customize shDeployGithub and shDeployHeroku
+            // customize shBuildCiAfter and shBuildCiBefore
             [
-                'Github',
-                'Heroku'
+                ['shDeployGithub', (/.*?\/screenshot\.deployGithub.*?\n/g)],
+                ['shDeployHeroku', (/.*?\/screenshot\.deployHeroku.*?\n/g)],
+                ['shReadmeTest example.js', (/.*?\/screenshot\.testExampleJs.*?\n/g)],
+                ['shReadmeTest example.sh', (/.*?\/screenshot\.testExampleSh.*?\n/g)]
             ].forEach(function (element) {
-                if (options.dataFrom.indexOf('    shDeploy' + element + '\n') < 0) {
-                    // customize test-server
-                    options.dataTo = options.dataTo.replace(
-                        new RegExp('\\n\\| test-server-' + element.toLowerCase() + ' : \\|.*?\\n'),
-                        '\n'
-                    );
-                    // customize screenshot
-                    options.dataTo = options.dataTo.replace(new RegExp('^1\\. .*?screenshot\\.' +
-                        'deploy' + element +
-                        '.*?\\.png[\\S\\s]*?\\n\\n', 'gm'), '');
+                if (options.dataFrom.indexOf('    ' + element[0] + '\n') >= 0) {
+                    return;
                 }
+                // customize test-server
+                options.dataTo = options.dataTo.replace(
+                    new RegExp('\\n\\| test-server-' +
+                        element[0].replace('shDeploy', '').toLowerCase() + ' : \\|.*?\\n'),
+                    '\n'
+                );
+                // customize screenshot
+                options.dataTo = options.dataTo.replace(element[1], '');
             });
             // customize assets.index.template.html
             if (local.assetsDict['/assets.index.template.html']
@@ -19019,6 +19108,37 @@ return Utf8ArrayToStr(bff);
             return tmp.content;
         };
 
+        local.domQuerySelectorAllTagNameAndPrint = function (selector) {
+        /*
+         * this function will print all tagName's that match the selector
+         */
+            var dict;
+            dict = {};
+            Array.from(document.querySelectorAll(selector)).forEach(function (element) {
+                dict[element.tagName.toLowerCase()] = true;
+            });
+            console.log(Object.keys(dict).sort().join('\n'));
+        };
+
+        local.domStyleValidate = function () {
+        /*
+         * this function will validate the document's style
+         */
+            var tmp;
+            tmp = [];
+            Array.from(document.querySelectorAll('style')).map(function (element, ii) {
+                element.innerHTML.replace((/^([^\n @].*?)[,\{:].*?$/gm), function (match0, match1) {
+                    ii = document.querySelectorAll(match1).length;
+                    if (!(ii > 1)) {
+                        tmp.push(ii + ' ' + match0);
+                    }
+                });
+            });
+            tmp.sort().forEach(function (element, ii) {
+                console.error('validateDocumentStyleUnmatched ' + ii + '. ' + element);
+            });
+        };
+
         local.echo = function (arg) {
         /*
          * this function will return the arg
@@ -19166,11 +19286,10 @@ return Utf8ArrayToStr(bff);
             urlParsed = require('url').parse(options.url);
             urlParsed.headers = options.headers;
             urlParsed.method = options.method;
-            // debug request
+            // debug request-time
             timeStart = Date.now();
-            request = require(
-                urlParsed.protocol.slice(0, -1)
-            ).request(urlParsed, function (_response) {
+            request = options.request || require(urlParsed.protocol.slice(0, -1)).request;
+            request = request(urlParsed, function (_response) {
                 response = _response;
                 if (response.statusCode < 200 || response.statusCode > 299) {
                     onError2(new Error(response.statusCode));
@@ -19186,8 +19305,8 @@ return Utf8ArrayToStr(bff);
                         onError2();
                     })
                     .on('error', onError2);
-            }).on('error', onError2);
-            request.end(options.data);
+            });
+            request.on('error', onError2).end(options.data);
         };
 
         local.isNullOrUndefined = function (arg) {
@@ -19224,7 +19343,7 @@ return Utf8ArrayToStr(bff);
             }
             // csslint <style>...</style>
             script.replace(
-                (/^<style>(?:\\n\\)?\n([\S\s]+?)\n<\\?\/style>(?:\\n\\)?$/gm),
+                (/^<style>(?:\\n\\)?\n([\S\s]+?)\n<\/style>(?:\\n\\)?$/gm),
                 function (match0, match1, ii, text) {
                     match0 = match1;
                     local.jslintAndPrint(
@@ -19240,22 +19359,21 @@ return Utf8ArrayToStr(bff);
                 }
             );
             // jslint <script>...</script>
-            script.replace(
-                (/^(?:\/\/ )?<script>(?:\\n\\)?\n([\S\s]+?)\n(?:\/\/ )?<\\?\/script>(?:\\n\\)?$/gm),
-                function (match0, match1, ii, text) {
-                    match0 = match1;
-                    local.jslintAndPrint(
-                        // preserve lineno
-                        text.slice(0, ii).replace((/.+/g), '') + '\n' + match0
-                            // filter \\n\\
-                            .replace((/\\n\\$/gm), '')
-                            // filter ' + ... + '\\
-                            .replace((/^' \+ .*? \+ '\\$/gm), ''),
-                        file + '.js',
-                        mode
-                    );
-                }
-            );
+            script.replace((
+                /^(?:\/\/ )?<script>(?:\\n\\)?\n([\S\s]+?)\n(?:\/\/ )?<\/script>(?:\\n\\)?$/gm
+            ), function (match0, match1, ii, text) {
+                match0 = match1;
+                local.jslintAndPrint(
+                    // preserve lineno
+                    text.slice(0, ii).replace((/.+/g), '') + '\n' + match0
+                        // filter \\n\\
+                        .replace((/\\n\\$/gm), '')
+                        // filter ' + ... + '\\
+                        .replace((/^' \+ .*? \+ '\\$/gm), ''),
+                    file + '.js',
+                    mode
+                );
+            });
             return script;
         };
 
@@ -19279,42 +19397,42 @@ return Utf8ArrayToStr(bff);
              * this function will recursively JSON.stringify the jsonObj,
              * with object-keys sorted and circular-references removed
              */
-                // if jsonObj is an object, then recurse its items with object-keys sorted
-                if (jsonObj &&
+                // if jsonObj is not an object or function, then JSON.stringify as normal
+                if (!(jsonObj &&
                         typeof jsonObj === 'object' &&
-                        typeof jsonObj.toJSON !== 'function') {
-                    // ignore circular-reference
-                    if (circularList.indexOf(jsonObj) >= 0) {
-                        return;
-                    }
-                    circularList.push(jsonObj);
-                    // if jsonObj is an array, then recurse its jsonObjs
-                    if (Array.isArray(jsonObj)) {
-                        return '[' + jsonObj.map(function (jsonObj) {
-                            // recurse
-                            tmp = stringify(jsonObj);
-                            return typeof tmp === 'string'
-                                ? tmp
-                                : 'null';
-                        }).join(',') + ']';
-                    }
-                    return '{' + Object.keys(jsonObj)
-                        // sort object-keys
-                        .sort()
-                        .map(function (key) {
-                            // recurse
-                            tmp = stringify(jsonObj[key]);
-                            if (typeof tmp === 'string') {
-                                return JSON.stringify(key) + ':' + tmp;
-                            }
-                        })
-                        .filter(function (jsonObj) {
-                            return typeof jsonObj === 'string';
-                        })
-                        .join(',') + '}';
+                        typeof jsonObj.toJSON !== 'function')) {
+                    return JSON.stringify(jsonObj);
                 }
-                // else JSON.stringify as normal
-                return JSON.stringify(jsonObj);
+                // ignore circular-reference
+                if (circularList.indexOf(jsonObj) >= 0) {
+                    return;
+                }
+                circularList.push(jsonObj);
+                // if jsonObj is an array, then recurse its jsonObjs
+                if (Array.isArray(jsonObj)) {
+                    return '[' + jsonObj.map(function (jsonObj) {
+                        // recurse
+                        tmp = stringify(jsonObj);
+                        return typeof tmp === 'string'
+                            ? tmp
+                            : 'null';
+                    }).join(',') + ']';
+                }
+                // if jsonObj is not an array, then recurse its items with object-keys sorted
+                return '{' + Object.keys(jsonObj)
+                    // sort object-keys
+                    .sort()
+                    .map(function (key) {
+                        // recurse
+                        tmp = stringify(jsonObj[key]);
+                        if (typeof tmp === 'string') {
+                            return JSON.stringify(key) + ':' + tmp;
+                        }
+                    })
+                    .filter(function (jsonObj) {
+                        return typeof jsonObj === 'string';
+                    })
+                    .join(',') + '}';
             };
             circularList = [];
             // try to derefernce all properties in jsonObj
@@ -19931,13 +20049,9 @@ return Utf8ArrayToStr(bff);
                 // then recurse with arg2 and defaults2
                 if (depth > 1 &&
                         // arg2 is a non-null and non-array object
-                        arg2 &&
-                        typeof arg2 === 'object' &&
-                        !Array.isArray(arg2) &&
+                        typeof arg2 === 'object' && arg2 && !Array.isArray(arg2) &&
                         // defaults2 is a non-null and non-array object
-                        defaults2 &&
-                        typeof defaults2 === 'object' &&
-                        !Array.isArray(defaults2)) {
+                        typeof defaults2 === 'object' && defaults2 && !Array.isArray(defaults2)) {
                     // recurse
                     local.objectSetDefault(arg2, defaults2, depth - 1);
                 }
@@ -19963,13 +20077,10 @@ return Utf8ArrayToStr(bff);
                 // then recurse with arg2 and overrides2
                 if (depth > 1 &&
                         // arg2 is a non-null and non-array object
-                        (arg2 &&
-                        typeof arg2 === 'object' &&
-                        !Array.isArray(arg2)) &&
+                        typeof arg2 === 'object' && arg2 && !Array.isArray(arg2) &&
                         // overrides2 is a non-null and non-array object
-                        (overrides2 &&
-                        typeof overrides2 === 'object' &&
-                        !Array.isArray(overrides2))) {
+                        typeof overrides2 === 'object' && overrides2 &&
+                        !Array.isArray(overrides2)) {
                     local.objectSetOverride(arg2, overrides2, depth - 1, env);
                     return;
                 }
@@ -22155,25 +22266,6 @@ instruction\n\
             }
             return id;
         };
-
-        local.validateDocumentStyle = function () {
-        /*
-         * this function will validate the document's style
-         */
-            var tmp;
-            tmp = [];
-            Array.from(document.querySelectorAll('style')).map(function (element, ii) {
-                element.innerHTML.replace((/^([^\n @].*?)[,\{:].*?$/gm), function (match0, match1) {
-                    ii = document.querySelectorAll(match1).length;
-                    if (!(ii > 1)) {
-                        tmp.push(ii + ' ' + match0);
-                    }
-                });
-            });
-            tmp.sort().forEach(function (element, ii) {
-                console.error('validateDocumentStyleUnmatched ' + ii + '. ' + element);
-            });
-        };
     }());
 
 
@@ -22218,7 +22310,6 @@ instruction\n\
             npm_package_version: '0.0.1'
         });
         local.errorDefault = new Error('default error');
-        local.istanbulCoverageMerge = local.istanbul.coverageMerge || local.echo;
         local.istanbulCoverageMerge = local.istanbul.coverageMerge || local.echo;
         // cbranch-no cstat-no fstat-no missing-if-branch
         local.istanbulCoverageReportCreate = local.istanbul.coverageReportCreate || local.echo;
@@ -22553,6 +22644,7 @@ instruction\n\
         [
             '/assets.utility2.example.js',
             '/assets.utility2.html',
+            '/assets.utility2.test.js',
             'lib.apidoc.js',
             'lib.db.js',
             'lib.github_crud.js',
@@ -22591,7 +22683,7 @@ instruction\n\
                                 '<script src="assets.app.js"></script>\n',
                                 '<script src="assets.utility2.rollup.js"></script>\n' +
                                     '<script src="assets.utility2.example.js"></script>\n' +
-                                    '<script src="assets.utiilty2.test.js"></script>\n'
+                                    '<script src="assets.utility2.test.js"></script>\n'
                             )
                             .replace('assets.example.js', 'assets.utility2.example.js')
                             .replace('assets.test.js', 'assets.utility2.test.js')
@@ -22606,6 +22698,9 @@ instruction\n\
                             });
                     });
                 }, local.nop);
+                break;
+            case '/assets.utility2.test.js':
+                local.assetsDict[key] = local.tryCatchReadFile(__dirname + '/test.js', 'utf8');
                 break;
             case 'lib.swgg.js':
             case 'lib.utility2.js':
@@ -22637,12 +22732,14 @@ instruction\n\
             'lib.swgg.js',
             '/assets.utility2.example.js',
             '/assets.utility2.html',
+            '/assets.utility2.test.js',
             '/assets.utility2.rollup.end.js'
         ].map(function (key) {
             var script;
             switch (key) {
             case '/assets.utility2.example.js':
             case '/assets.utility2.html':
+            case '/assets.utility2.test.js':
                 script = local.assetsDict['/assets.utility2.rollup.content.js']
                     .split('/* utility2.rollup.js content */');
                 script.splice(1, 0, 'local.assetsDict["' + key + '"] = ' +
@@ -22751,7 +22848,7 @@ instruction\n\
         } else {
             // require builtins
             Object.keys(process.binding('natives')).forEach(function (key) {
-                if (!local[key] && !(/\/|^_|^sys$/).test(key)) {
+                if (!local[key] && !(/\/|^_|^assert|^sys$/).test(key)) {
                     local[key] = require(key);
                 }
             });
@@ -23457,7 +23554,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/main.handlebars
 local.templateUiMain = '\
 <!-- <div class="swggUiContainer"> -->\n\
-<div class="eventDelegateKeyup eventDelegateSubmit onEventUiReload thead">\n\
+<h2 class="eventDelegateKeyup eventDelegateSubmit hx onEventUiReload thead">\n\
     <a class="td td1" href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
     <input\n\
         class="td td2"\n\
@@ -23472,33 +23569,37 @@ local.templateUiMain = '\
         type="text"\n\
         value="{{apiKeyValue}}"\n\
     >\n\
-    <button class="eventDelegateClick onEventUiReload td td4">explore</button>\n\
+    <button class="button eventDelegateClick onEventUiReload td td4">explore</button>\n\
     <button\n\
-        class="eventDelegateClick onEventUiReload td td5"\n\
+        class="button eventDelegateClick onEventUiReload td td5"\n\
         id="swggApiKeyClearButton1"\n\
-    >clear api-keys</button>\n\
-</div>\n\
+    >\n\
+        clear api-keys\n\
+    </button>\n\
+</h2>\n\
 <div\n\
     class="errorMessage"\n\
     id="swggUiReloadErrorDiv1"\n\
     style="background: none; border: 0;"\n\
 ></div>\n\
 <div class="info reset">\n\
-    {{#if info}}\n\
     {{#if info.x-swgg-homepage}}\n\
-    <a href="{{info.x-swgg-homepage}}" target="_blank"\n\
-    ><h2>{{info.title}} ({{info.version}})</h2></a>\n\
+    <h2 class="hx">\n\
+        <a href="{{info.x-swgg-homepage}}" target="_blank">{{info.title}} ({{info.version}})</a>\n\
+    </h2>\n\
     {{#unless info.x-swgg-homepage}}\n\
-    <h2>{{info.title}} ({{info.version}})</h2>\n\
+    <h2 class="hx">{{info.title}} ({{info.version}})</h2>\n\
     {{/if info.x-swgg-homepage}}\n\
     {{#if info.x-swgg-description}}\n\
     <div class="markdown">{{info.x-swgg-description markdownToHtml}}</div>\n\
     {{/if info.x-swgg-description}}\n\
     {{#if info.description}}\n\
-    <div class="markdown resourceDescription">{{info.description markdownToHtml}}</div>\n\
+    <div class="description markdown">{{info.description markdownToHtml}}</div>\n\
     {{/if info.description}}\n\
     {{#if x-swgg-downloadStandaloneApp}}\n\
-    <h3><a download href="{{x-swgg-downloadStandaloneApp}}">[download standalone app]</a></h3>\n\
+    <a class="button" download href="{{x-swgg-downloadStandaloneApp notHtmlSafe}}">\n\
+        download standalone app\n\
+    </a><br>\n\
     {{/if x-swgg-downloadStandaloneApp}}\n\
     <ul>\n\
         {{#if externalDocs.url}}\n\
@@ -23526,14 +23627,15 @@ local.templateUiMain = '\
             <a\n\
                 target="_parent"\n\
                 href="mailto:{{info.contact.email}}?subject={{info.title}}"\n\
-            >contact the developer</a>\n\
+            >\n\
+                contact the developer\n\
+            </a>\n\
         </li>\n\
         {{/if info.contact.email}}\n\
         {{#if info.license}}\n\
         <li><a target="_blank" href="{{info.license.url}}">{{info.license.name}}</a></li>\n\
         {{/if info.license}}\n\
     </ul>\n\
-    {{/if info}}\n\
 </div>\n\
 {{#if urlSwaggerJson}}\n\
 <h4 class="label">nodejs initialization</h4>\n\
@@ -23562,7 +23664,7 @@ console.log("initialized nodejs swgg-client");\n\
     <span>{{ajaxProgressText}}</span>\n\
     <div class="uiAnimateSpin" style="animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: inline-block; height: 25px; vertical-align: middle; width: 25px;"></div>\n\
 </div>\n\
-<div class="reset resourceList"></div>\n\
+<ol class="reset resourceList" style="list-style-type: upper-roman;"></ol>\n\
 <div class="utility2FooterDiv">\n\
     [ this document was created with\n\
     <a href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
@@ -23576,29 +23678,31 @@ console.log("initialized nodejs swgg-client");\n\
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/operation.handlebars
 local.templateUiOperation = '\
 <div class="operation" data-_method-path="{{_methodPath}}" id="{{id}}">\n\
-<div class="onEventOperationDisplayShow onEventInputValidate thead" tabindex="0">\n\
+<div class="onEventInputValidate onEventOperationDisplayShow thead" tabindex="0">\n\
     <span class="td td1"></span>\n\
     <span class="method{{_method}} td td2">{{_method}}</span>\n\
     <span\n\
         class="td td3"\n\
         {{#if deprecated}}style="text-decoration: line-through;"{{/if deprecated}}\n\
-    >{{_path}}</span>\n\
+    >\n\
+        {{_path}}\n\
+    </span>\n\
     <span class="color777 td td4 textOverflowEllipsis">{{summary}}</span>\n\
 </div>\n\
 <form accept-charset="UTF-8"\n\
-    class="content uiAnimateSlide"\n\
+    class="uiAnimateSlide"\n\
     style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
 >\n\
     {{#if deprecated}}\n\
     <h4 class="errorMessage label">(warning: deprecated)</h4><br>\n\
     {{/if deprecated}}\n\
     <h4 class="label">description</h4>\n\
-    <div class="markdown operationDescription">\n\
-    {{description markdownToHtml}}\n\
+    <div class="description markdown">\n\
+        {{description markdownToHtml}}\n\
     </div>\n\
     {{#if parameters.length}}\n\
     <h4 class="label">parameters</h4>\n\
-    <div class="color777 schemaP styleBorderBottom1px tr">\n\
+    <div class="borderBottom1Px color777 schemaP thead">\n\
         <span class="td td1">name and description</span>\n\
         <span class="td td2">data type</span>\n\
         <span class="td td3">value</span>\n\
@@ -23609,7 +23713,7 @@ local.templateUiOperation = '\
     {{/each parameters}}\n\
     {{/if parameters.length}}\n\
     <h4 class="label">response messages</h4>\n\
-    <div class="color777 schemaResponse styleBorderBottom1px tr">\n\
+    <div class="borderBottom1Px color777 schemaResponse thead">\n\
         <span class="td td1">http status code</span>\n\
         <span class="td td2">reason</span>\n\
     </div>\n\
@@ -23619,7 +23723,7 @@ local.templateUiOperation = '\
         <span class="markdown td td2">{{value.description markdownToHtml}}</span>\n\
     </div>\n\
     {{/each responseList}}\n\
-    <button class="onEventOperationAjax">try it out!</button>\n\
+    <button class="button onEventOperationAjax">try it out!</button>\n\
     <h4 class="label">nodejs request</h4>\n\
     <pre class="requestJavascript"></pre>\n\
     <h4 class="label">curl request</h4>\n\
@@ -23711,8 +23815,8 @@ function (error, data) {\n\
 
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/resource.handlebars
 local.templateUiResource = '\
-<div\n\
-    class="styleBorderBottom1px resource\n\
+<li\n\
+    class="resource\n\
         eventDelegateChange eventDelegateClick eventDelegateKeyup eventDelegateSubmit\n\
     "\n\
     data-name="{{name}}"\n\
@@ -23720,22 +23824,19 @@ local.templateUiResource = '\
 >\n\
 <h3 class="thead">\n\
     <span class="onEventResourceDisplayAction td td1 textOverflowEllipsis" tabindex="0">\n\
-        <div class="onEventResourceDisplayAction resourceIi">{{ii}}.</div>{{name}}:\n\
-        <span class="onEventResourceDisplayAction resourceSummary">{{summary}}</span>\n\
+        {{name}}:&nbsp;&nbsp;{{summary}}\n\
     </span>\n\
-    <span\n\
-        class="onEventResourceDisplayAction td td2"\n\
-        style="border-left: 1px solid #000; margin: 0; padding-left: 20px;"\n\
-        tabindex="0"\n\
-    >expand / collapse operations</span>\n\
+    <span class="onEventResourceDisplayAction td td2" tabindex="0">\n\
+    expand / collapse operations\n\
+    </span>\n\
 </h3>\n\
-<div\n\
+<ol\n\
     class="operationList uiAnimateSlide"\n\
     style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
 >\n\
-    <div class="markdown resourceDescription">{{description markdownToHtml}}</div>\n\
-</div>\n\
-</div>\n\
+    <div class="description markdown">{{description markdownToHtml}}</div>\n\
+</ol>\n\
+</li>\n\
 ';
 
 
@@ -23759,7 +23860,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     .replace('assets.index.default.template.html', '')
     .replace((/<title>.*?<\/title>/), '<title>swgg</title>')
     .replace('\n<!-- utility2-comment\n', '\n')
-    .replace((/\n<\/style>\n<style>\n[\S\s]*\n<\/style>\n/), '\
+    .replace('\n</style>\n', '\
 \n\
 </style>\n\
 <style>\n\
@@ -23772,7 +23873,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     border: 0;\n\
     border-radius: 0;\n\
     margin: 0;\n\
-    margin-bottom: 10px;\n\
     max-width: 100%;\n\
     padding: 0;\n\
 }\n\
@@ -23781,22 +23881,15 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .resource > .thead > .td:focus {\n\
     outline: none;\n\
 }\n\
+.swggUiContainer .description > * {\n\
+    margin-top: 20px;\n\
+}\n\
+.swggUiContainer .description > *:first-child {\n\
+    margin-top: 0;\n\
+}\n\
 /* jslint-ignore-end */\n\
 /* validateLineSortedReset */\n\
 /* general */\n\
-.swggUiContainer {\n\
-    max-width: 1200px;\n\
-}\n\
-.swggUiContainer button,\n\
-.swggUiContainer .operation > .thead,\n\
-.swggUiContainer .resource > .thead {\n\
-    cursor: pointer;\n\
-}\n\
-.swggUiContainer button,\n\
-.swggUiContainer .operation > .thead > .td3 {\n\
-    font-weight: bold;\n\
-    text-decoration: underline;\n\
-}\n\
 .swggUiContainer code,\n\
 .swggUiContainer pre,\n\
 .swggUiContainer textarea {\n\
@@ -23812,13 +23905,20 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer pre {\n\
     white-space: pre;\n\
 }\n\
-.swggUiContainer textarea {\n\
-    white-space: nowrap;\n\
+.swggUiContainer .button,\n\
+.swggUiContainer .operation > .thead,\n\
+.swggUiContainer .resource > .thead {\n\
+    cursor: pointer;\n\
+}\n\
+.swggUiContainer .button,\n\
+.swggUiContainer .operation > .thead > .td3,\n\
+.swggUiContainer .resource > .thead > .td {\n\
+    font-weight: bold;\n\
+    text-decoration: underline;\n\
 }\n\
 .swggUiContainer .markdown pre {\n\
     max-height: none;\n\
 }\n\
-\n\
 .swggUiContainer .multilinePlaceholderContainer {\n\
     min-height: 10rem;\n\
     position: relative;\n\
@@ -23837,12 +23937,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .operation > .thead > .td2 {\n\
     text-align: center;\n\
     width: 5rem;\n\
-}\n\
-.swggUiContainer .resourceIi {\n\
-    min-width: 3rem;\n\
-}\n\
-.swggUiContainer .resourceSummary {\n\
-    font-weight: lighter;\n\
 }\n\
 .swggUiContainer .responseBody,\n\
 .swggUiContainer .responseHeaders,\n\
@@ -23868,18 +23962,17 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .td textarea {\n\
     width: 100%;\n\
 }\n\
-.swggUiContainer > .thead > .td1 {\n\
-    font-size: x-large;\n\
-}\n\
 /* validateLineSortedReset */\n\
 /* background */\n\
-.swggUiContainer button {\n\
+.swggUiContainer code,\n\
+.swggUiContainer pre {\n\
+    background: #ddd;\n\
+}\n\
+.swggUiContainer .button {\n\
     background: #ddf;\n\
 }\n\
-.swggUiContainer code,\n\
-.swggUiContainer pre,\n\
-.swggUiContainer .operationDescription {\n\
-    background: #ddd;\n\
+.swggUiContainer .description {\n\
+    background: #bdb;\n\
 }\n\
 .swggUiContainer .methodDELETE {\n\
     background: #b07;\n\
@@ -23908,37 +24001,35 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer .operation {\n\
     background: #dfd;\n\
 }\n\
-.swggUiContainer .resourceDescription {\n\
-    background: #9d9;\n\
-}\n\
+.swggUiContainer .resource > .thead,\n\
 .swggUiContainer > .thead {\n\
-    background: #7b5;\n\
+    background: #7b7;\n\
 }\n\
 .swggUiContainer > .thead > .td1 {\n\
     background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAqRJREFUeNrEVz1s00AUfnGXii5maMXoEUEHVwIpEkPNgkBdMnQoU5ytiKHJwpp2Q2JIO8DCUDOxIJFIVOoWZyJSh3pp1Q2PVVlcCVBH3ufeVZZ9Zye1Ay86nXV+ue/9fO/lheg/Se02X1rvksmbnTiKvuxQMBNgBnN4a/LCbmnUAP6JV58NCUsBC8CuAJxGPF47OgNqBaA93tolUhnx6jC4NxGwyOEwlccyAs+3kwdzKq0HDn2vEBTi8J2XpyMaywNDE157BhXUE3zJhlq8GKq+Zd2zaWHepPA8oN9XkfLmRdOiJV4XUUg/IyWncLjCYY/SHndV2u7zHr3bPKZtdxgboJOnthvrfGj/oMf3G0r7JVmNlLfKklmrt2MvvcNO7LFOhoFHfuAJI5o6ta10jpt5CQLgwXhXG2YIwvu+34qf78ybOjWTnWwkgR36d7JqJOrW0hHmNrKg9xhiS4+1jFmrxymh03B0w+6kURIAu3yHtOD5oaUNojMnGgbcctNvwdAnyxvxRR+/vaJnjzbpzcZX+nN1SdGv85i9eH8w3qPO+mdm/y4dnQ1iI8Fq6Nf4cxL6GWSjiFDSs0VRnxC5g0xSB2cgHpaseTxfqOv5uoHkNQ6Ha/N1Yz9mNMppEkEkYKj79q6uCq4bCHcSX3fJ0Vk/k9siASjCm1N6gZH6Ec9IXt2WkFES2K/ixoIyktJPAu/ptOA1SgO5zqtr6KASJPF0nMV8dgMsRhRPOcMwqQAOoi0VAIMLAEWJ6YYC1c8ibj1GP51RqwzYwZVMHQuvOzMCBUtb2tGHx5NAdLKqp5AX7Ng4d+Zi8AGDI9z1ijx9yaCH04y3GCP2S+QcvaGl+pcxyUBvinFlawoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=) no-repeat left center;\n\
 }\n\
 /* validateLineSortedReset */\n\
 /* border */\n\
-.swggUiContainer button {\n\
-    border: 1px solid #35b;\n\
-    border-radius: 5px;\n\
-}\n\
 .swggUiContainer input,\n\
 .swggUiContainer pre,\n\
 .swggUiContainer select,\n\
 .swggUiContainer textarea {\n\
     border: 1px solid #999;\n\
 }\n\
-.swggUiContainer .resource:first-child {\n\
-    border-top: 1px solid #777;\n\
-}\n\
-.swggUiContainer .styleBorderBottom1px {\n\
+.swggUiContainer .borderBottom1Px {\n\
     border-bottom: 1px solid #777;\n\
+}\n\
+.swggUiContainer .button {\n\
+    border: 1px solid #35b;\n\
+    border-radius: 5px;\n\
+}\n\
+.swggUiContainer .resource > .thead > .td2 {\n\
+    border-left: 1px solid #037;\n\
 }\n\
 /* validateLineSortedReset */\n\
 /* color */\n\
 .swggUiContainer a,\n\
-.swggUiContainer button,\n\
+.swggUiContainer .button,\n\
 .swggUiContainer .operation > .thead,\n\
 .swggUiContainer .resource > .thead {\n\
     color: #35b;\n\
@@ -23956,14 +24047,9 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     color: #999;\n\
 }\n\
 .swggUiContainer .operation > .thead > .td2,\n\
+.swggUiContainer .resource > .thead,\n\
 .swggUiContainer > .thead > .td1 {\n\
-    color: #eee;\n\
-}\n\
-/* validateLineSortedReset */\n\
-/* display */\n\
-.swggUiContainer .onEventResourceDisplayAction {\n\
-    display: inline-block;\n\
-    text-decoration: underline;\n\
+    color: #fff;\n\
 }\n\
 .swggUiContainer .thead,\n\
 .swggUiContainer .tr {\n\
@@ -24006,49 +24092,48 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 /* validateLineSortedReset */\n\
 /* margin */\n\
-.swggUiContainer {\n\
-    margin: 0 auto;\n\
-}\n\
-.swggUiContainer audio,\n\
-.swggUiContainer img,\n\
-.swggUiContainer option,\n\
-.swggUiContainer video,\n\
-.swggUiContainer .operation .thead,\n\
-.swggUiContainer .responseBody,\n\
-.swggUiContainer .responseMedia,\n\
-.swggUiContainer .td,\n\
-.swggUiContainer .td .onEventResourceDisplayAction {\n\
-    margin-bottom: 0;\n\
+.swggUiContainer li {\n\
+    margin-bottom: 10px;\n\
 }\n\
 .swggUiContainer ol,\n\
-.swggUiContainer ul,\n\
-.swggUiContainer .operation > .thead > .td1,\n\
-.swggUiContainer .td {\n\
+.swggUiContainer ul {\n\
     margin-left: 20px;\n\
+}\n\
+.swggUiContainer .description,\n\
+.swggUiContainer .operation,\n\
+.swggUiContainer .resource,\n\
+.swggUiContainer > div,\n\
+.swggUiContainer > ol,\n\
+.swggUiContainer > pre,\n\
+.swggUiContainer > .info > div,\n\
+.swggUiContainer > .info > .button,\n\
+.swggUiContainer > .info > .hx {\n\
+    margin-bottom: 20px;\n\
 }\n\
 .swggUiContainer .label {\n\
     margin-bottom: 1px;\n\
 }\n\
-.swggUiContainer .onEventOperationAjax,\n\
-.swggUiContainer .schemaP {\n\
+.swggUiContainer .operation:last-child {\n\
+    margin-bottom: 0;\n\
+}\n\
+.swggUiContainer .operation > form > div,\n\
+.swggUiContainer .operation > form > pre {\n\
     margin-bottom: 20px;\n\
 }\n\
-.swggUiContainer .operation button {\n\
-    margin-bottom: 40px;\n\
-    margin-top: 40px;\n\
+.swggUiContainer .operation > form > .button {\n\
+    margin: 50px 0;\n\
 }\n\
-.swggUiContainer .operation > .thead > .td4 {\n\
-    margin-right: 20px;\n\
-}\n\
-.swggUiContainer .td:first-child {\n\
+.swggUiContainer .resource > ol,\n\
+.swggUiContainer .resource > .thead > .td,\n\
+.swggUiContainer .td:first-child,\n\
+.swggUiContainer > ol {\n\
     margin-left: 0;\n\
+}\n\
+.swggUiContainer .td {\n\
+    margin-left: 20px;\n\
 }\n\
 /* validateLineSortedReset */\n\
 /* padding */\n\
-.swggUiContainer button,\n\
-.swggUiContainer > .thead {\n\
-    padding: 10px;\n\
-}\n\
 .swggUiContainer code {\n\
     padding: 2px;\n\
 }\n\
@@ -24059,24 +24144,36 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer textarea {\n\
     padding: 5px;\n\
 }\n\
-.swggUiContainer .operation > .content {\n\
+.swggUiContainer .button,\n\
+.swggUiContainer .resource > .thead > .td,\n\
+.swggUiContainer > .thead {\n\
+    padding: 10px 20px;\n\
+}\n\
+.swggUiContainer .description {\n\
     padding: 20px;\n\
+}\n\
+.swggUiContainer .operation > form {\n\
+    padding: 20px 20px 0 20px;\n\
+}\n\
+.swggUiContainer .operation > form .td1 {\n\
+    padding-left: 0;\n\
+}\n\
+.swggUiContainer .operation > .thead {\n\
+    padding: 0 20px;\n\
 }\n\
 .swggUiContainer .operation > .thead > .td {\n\
     padding: 10px 0;\n\
 }\n\
-.swggUiContainer .operationDescription {\n\
-    padding: 15px 10px 1px 10px;\n\
-}\n\
-.swggUiContainer .resource:first-child {\n\
-    padding-top: 10px;\n\
-}\n\
-.swggUiContainer .resourceDescription {\n\
-    padding: 20px 20px 10px 20px;\n\
-}\n\
 .swggUiContainer > .thead > .td1 {\n\
     padding-left: 40px;\n\
-    padding-top: 5px;\n\
+    padding-top: 4px;\n\
+}\n\
+/* validateLineSortedReset */\n\
+/* .textOverflowEllipsis */\n\
+.swggUiContainer .textOverflowEllipsis {\n\
+    overflow: hidden;\n\
+    text-overflow: ellipsis;\n\
+    white-space: nowrap;\n\
 }\n\
 /* validateLineSortedReset */\n\
 /* @media */\n\
@@ -24100,12 +24197,12 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 /* validateLineSortedReset */\n\
 /* hover */\n\
 .swggUiContainer a:hover,\n\
+.swggUiContainer .resource > .thead > .td:hover,\n\
 .swggUiContainer > .thead > .td1:hover {\n\
     color: #037;\n\
 }\n\
-.swggUiContainer button:hover,\n\
-.swggUiContainer .operation > .thead:hover,\n\
-.swggUiContainer .resource > .thead > .td:hover {\n\
+.swggUiContainer .button:hover,\n\
+.swggUiContainer .operation > .thead:hover {\n\
     background: #bbf;\n\
 }\n\
 /* validateLineSortedReset */\n\
@@ -24127,10 +24224,11 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     .replace((/\n<\/script>\n[\S\s]*\n<\/html>\n/), '\
 \n\
 </script>\n\
-<div class="swggUiContainer">\n\
+<div class="swggUiContainer" style="margin: 0 auto; max-width: 1200px;">\n\
 ' + local.templateRender(local.templateUiMain, {
     ajaxProgressText: 'loading script',
     apiKeyValue: '',
+    info: { 'title': 'title', version: 'version' },
     urlSwaggerJson: ''
 }) + '\
 </div>\n\
@@ -24923,8 +25021,6 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
          * this function will run the middleware that will parse request.bodyRaw
          */
             var boundary, crlf, data, header, ii, jj, name;
-            // jslint-hack - nop
-            local.nop(response);
             // if request is already parsed, then goto nextMiddleware
             if (!request.swgg.operation || !local.isNullOrUndefined(request.swgg.bodyParsed)) {
                 nextMiddleware();
@@ -24941,9 +25037,8 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 request.swgg.bodyParsed = {};
                 local.bufferToString(request.bodyRaw).replace(
                     (/<(.+?)><!\[CDATA\[([\S\s]+?)\]\]>/g),
-                    function (match0, name, value) {
-                        // jslint-hack - nop
-                        local.nop(match0);
+                    function (name, match1, value) {
+                        name = match1;
                         name = decodeURIComponent(name);
                         request.swgg.bodyParsed[name] = local.schemaPType(
                             request.swgg.operation._schemaPDict[name]
@@ -25021,7 +25116,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     request.swgg.bodyParsed = JSON.parse(request.swgg.bodyParsed);
                 }, local.nop);
             }
-            nextMiddleware();
+            nextMiddleware(null, request, response);
         };
 
         local.middlewareCrudBuiltin = function (request, response, nextMiddleware) {
@@ -25228,13 +25323,11 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
         /*
          * this function will run the middleware that will end the builtin crud-operations
          */
-            // jslint-hack - nop
-            local.nop(response);
             if (request.swgg.crud.endArgList) {
                 local.serverRespondJsonapi.apply(null, request.swgg.crud.endArgList);
                 return;
             }
-            nextMiddleware();
+            nextMiddleware(null, request, response);
         };
 
         local.middlewareRouter = function (request, response, nextMiddleware) {
@@ -25243,8 +25336,6 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
          * map the request's method-path to swagger's tags[0]-crudType
          */
             var tmp;
-            // jslint-hack - nop
-            local.nop(response);
             // init swgg object
             local.objectSetDefault(request, { swgg: { crud: { crudType: [] }, user: {} } }, 3);
             // if request.url is not prefixed with swaggerJsonBasePath,
@@ -25277,7 +25368,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     '/$1{}'
                 );
             }
-            nextMiddleware();
+            nextMiddleware(null, request, response);
         };
 
         local.middlewareUserLogin = function (request, response, nextMiddleware) {
@@ -25382,8 +25473,6 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
          * this function will run the middleware that will validate the swagger-request
          */
             var crud, options, tmp;
-            // jslint-hack - nop
-            local.nop(response);
             options = {};
             local.onNext(options, function (error) {
                 switch (options.modeNext) {
@@ -25535,7 +25624,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     nextMiddleware();
                     break;
                 default:
-                    nextMiddleware(error);
+                    nextMiddleware(error, request, response);
                 }
             });
             options.modeNext = 0;
@@ -26320,7 +26409,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
          * this function will show/hide the textarea's multiline placeholder
          */
             var isTransparent, value;
-            isTransparent = event.target2.style.background === 'transparent';
+            isTransparent = event.target2.style.background.indexOf('transparent') >= 0;
             value = event.target2.value;
             if (value && isTransparent) {
                 event.target2.style.background = '';
@@ -26554,9 +26643,9 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             local.uiAnimateSlideDown(element.closest('.resource').querySelector('.operationList'));
             // show the operation, but hide all other operations
             local.uiAnimateSlideAccordian(
-                element.querySelector('.operation > .content'),
+                element.querySelector('.operation > form'),
                 Array.from(element.closest('.operationList').querySelectorAll(
-                    '.operation > .content'
+                    '.operation > form'
                 )),
                 function () {
                     // scrollTo operation
@@ -26602,7 +26691,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     if (event.currentTarget.classList.contains('expanded')) {
                         event.currentTarget.classList.remove('expanded');
                         Array.from(event.currentTarget.querySelectorAll(
-                            '.operation > .content'
+                            '.operation > form'
                         )).forEach(function (element) {
                             local.uiAnimateSlideUp(element);
                         });
@@ -26610,7 +26699,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     } else {
                         event.currentTarget.classList.add('expanded');
                         Array.from(event.currentTarget.querySelectorAll(
-                            '.operation > .content'
+                            '.operation > form'
                         )).forEach(function (element) {
                             local.uiAnimateSlideDown(element);
                             // validate input
@@ -26760,8 +26849,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             // init uiFragment
             swaggerJson.uiFragment = document.createDocumentFragment();
             // init resourceDict
-            Object.keys(swaggerJson.resourceDict).sort().forEach(function (key, ii) {
-                swaggerJson.resourceDict[key].ii = local.numberToRomanNumerals(ii + 1);
+            Object.keys(swaggerJson.resourceDict).sort().forEach(function (key) {
                 // templateRender resource
                 swaggerJson.uiFragment.appendChild(
                     local.domElementRender(local.templateUiResource, swaggerJson.resourceDict[key])
@@ -27597,11 +27685,9 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
     // run node js-env code - init-after
     /* istanbul ignore next */
     case 'node':
-        if (local.fs.existsSync(local.__dirname + '/assets.swgg.swagger.json')) {
-            local.swgg.apiUpdate(JSON.parse(
-                local.fs.readFileSync(local.__dirname + '/assets.swgg.swagger.json')
-            ));
-        }
+        local.swgg.apiUpdate(JSON.parse(
+            local.tryCatchReadFile(local.__dirname + '/assets.swgg.swagger.json') || '{}'
+        ));
         break;
     }
 }());
@@ -27896,7 +27982,7 @@ instruction\n\
         module.exports = local;\n\
         // require builtins\n\
         Object.keys(process.binding('natives')).forEach(function (key) {\n\
-            if (!local[key] && !(/\\/|^_|^sys$/).test(key)) {\n\
+            if (!local[key] && !(/\\/|^_|^assert|^sys$/).test(key)) {\n\
                 local[key] = require(key);\n\
             }\n\
         });\n\
@@ -27964,9 +28050,17 @@ instruction\n\
 \\\n\
 @keyframes uiAnimateSpin {\\n\
 \\\n\
-    0% { transform: rotate(0deg); }\\n\
+    0% {\\n\
 \\\n\
-    100% { transform: rotate(360deg); }\\n\
+        transform: rotate(0deg);\\n\
+\\\n\
+    }\\n\
+\\\n\
+    100% {\\n\
+\\\n\
+        transform: rotate(360deg);\\n\
+\\\n\
+    }\\n\
 \\\n\
 }\\n\
 \\\n\
@@ -27976,45 +28070,35 @@ a {\\n\
 \\\n\
 }\\n\
 \\\n\
-body {\\n\
-\\\n\
-    background: #dde;\\n\
-\\\n\
-    font-family: Arial, Helvetica, sans-serif;\\n\
-\\\n\
-    margin: 0 40px;\\n\
-\\\n\
-}\\n\
-\\\n\
-body > a,\\n\
-\\\n\
-body > button,\\n\
-\\\n\
 body > div,\\n\
-\\\n\
-body > input,\\n\
 \\\n\
 body > pre,\\n\
 \\\n\
-body > select,\\n\
+body > textarea,\\n\
 \\\n\
-body > span,\\n\
-\\\n\
-body > textarea {\\n\
+body > .button {\\n\
 \\\n\
     margin-bottom: 20px;\\n\
 \\\n\
 }\\n\
 \\\n\
-body > button {\\n\
+body > textarea {\\n\
 \\\n\
-    width: 20rem;\\n\
+    height: 10rem;\\n\
+\\\n\
+    width: 100%;\\n\
 \\\n\
 }\\n\
 \\\n\
-button {\\n\
+body > textarea[readonly] {\\n\
 \\\n\
-    cursor: pointer;\\n\
+    background: #ddd;\\n\
+\\\n\
+}\\n\
+\\\n\
+body > .button {\\n\
+\\\n\
+    width: 20rem;\\n\
 \\\n\
 }\\n\
 \\\n\
@@ -28024,7 +28108,7 @@ pre,\\n\
 \\\n\
 textarea {\\n\
 \\\n\
-    font-family: Menlo, Consolas, Courier New, monospace;\\n\
+    font-family: Consolas, Menlo, monospace;\\n\
 \\\n\
     font-size: small;\\n\
 \\\n\
@@ -28038,13 +28122,51 @@ pre {\\n\
 \\\n\
 }\\n\
 \\\n\
-.textOverflowEllipsis {\\n\
+textarea {\\n\
 \\\n\
-    overflow: hidden;\\n\
+    overflow: auto;\\n\
 \\\n\
-    text-overflow: ellipsis;\\n\
+    white-space: pre;\\n\
 \\\n\
-    white-space: nowrap;\\n\
+}\\n\
+\\\n\
+.button {\\n\
+\\\n\
+    background-color: #fff;\\n\
+\\\n\
+    border: 1px solid;\\n\
+\\\n\
+    border-bottom-color: rgb(186, 186, 186);\\n\
+\\\n\
+    border-left-color: rgb(209, 209, 209);\\n\
+\\\n\
+    border-radius: 4px;\\n\
+\\\n\
+    border-right-color: rgb(209, 209, 209);\\n\
+\\\n\
+    border-top-color: rgb(216, 216, 216);\\n\
+\\\n\
+    color: #00d;\\n\
+\\\n\
+    cursor: pointer;\\n\
+\\\n\
+    display: inline-block;\\n\
+\\\n\
+    font-family: Arial, Helvetica, sans-serif;\\n\
+\\\n\
+    font-size: 12px;\\n\
+\\\n\
+    font-style: normal;\\n\
+\\\n\
+    font-weight: normal;\\n\
+\\\n\
+    margin: 0;\\n\
+\\\n\
+    padding: 2px 7px 3px 7px;\\n\
+\\\n\
+    text-align: center;\\n\
+\\\n\
+    text-decoration: underline;\\n\
 \\\n\
 }\\n\
 \\\n\
@@ -28086,43 +28208,17 @@ pre {\\n\
 \\\n\
 </style>\\n\
 \\\n\
-<style>\\n\
-\\\n\
-/*csslint\\n\
-\\\n\
-    ids: false,\\n\
-\\\n\
-*/\\n\
-\\\n\
-textarea {\\n\
-\\\n\
-    height: 10rem;\\n\
-\\\n\
-    width: 100%;\\n\
-\\\n\
-}\\n\
-\\\n\
-textarea[readonly] {\\n\
-\\\n\
-    background: #ddd;\\n\
-\\\n\
-}\\n\
-\\\n\
-#outputPreJslint1 {\\n\
-\\\n\
-    color: #d00;\\n\
-\\\n\
-}\\n\
-\\\n\
-</style>\\n\
-\\\n\
 </head>\\n\
 \\\n\
-<body>\\n\
+<body style=\"background: #ddf; font-family: Arial, Helvetica, sans-serif; margin: 0 40px;\">\\n\
 \\\n\
 <div id=\"ajaxProgressDiv1\" style=\"background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%; z-index: 1;\"></div>\\n\
 \\\n\
 <div class=\"uiAnimateSpin\" style=\"animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: none; height: 25px; vertical-align: middle; width: 25px;\"></div>\\n\
+\\\n\
+<code style=\"display: none;\"></code><div class=\"button uiAnimateShake uiAnimateSlide utility2FooterDiv zeroPixel\" style=\"display: none;\"></div><pre style=\"display: none;\"></pre><textarea readonly style=\"display: none;\"></textarea>\\n\
+\\\n\
+<code style=\"display: none;\"></code><div class=\"button uiAnimateShake uiAnimateSlide utility2FooterDiv zeroPixel\" style=\"display: none;\"></div><pre style=\"display: none;\"></pre><textarea readonly style=\"display: none;\"></textarea>\\n\
 \\\n\
 <script>\\n\
 \\\n\
@@ -28248,9 +28344,9 @@ utility2-comment -->\\n\
 \\\n\
 <!-- utility2-comment\\n\
 \\\n\
-<h4><a download href=\"assets.app.js\">[download standalone app]</a></h4>\\n\
+<a class=\"button\" download href=\"assets.app.js\">download standalone app</a><br>\\n\
 \\\n\
-<button class=\"onclick onreset\" id=\"testRunButton2\">run internal test</button><br>\\n\
+<button class=\"button onclick onreset\" id=\"testRunButton2\">run internal test</button><br>\\n\
 \\\n\
 utility2-comment -->\\n\
 \\\n\
@@ -28370,7 +28466,7 @@ utility2-comment -->\\n\
 \\\n\
 <pre id=\"outputPreJsonStringify1\"></pre>\\n\
 \\\n\
-<pre id=\"outputPreJslint1\"></pre>\\n\
+<pre id=\"outputPreJslint1\" style=\"color: #d00;\"></pre>\\n\
 \\\n\
 <label>instrumented-code</label>\\n\
 \\\n\
@@ -28455,6 +28551,7 @@ utility2-comment -->\\n\
                 );\n\
             }\n\
         });\n\
+/* validateLineSortedReset */\n\
         local.assetsDict['/'] =\n\
             local.assetsDict['/assets.example.html'] =\n\
             local.assetsDict['/assets.index.template.html']\n\
@@ -28533,7 +28630,7 @@ local.assetsDict["/assets.utility2.html"] = "<!doctype html>\n\
 <meta charset=\"UTF-8\">\n\
 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\
 <!-- \"assets.index.default.template.html\" -->\n\
-<title>utility2 (v2018.2.3-alpha)</title>\n\
+<title>utility2 (v2018.3.7-alpha)</title>\n\
 <style>\n\
 /* jslint-utility2 */\n\
 /*csslint\n\
@@ -28557,47 +28654,65 @@ local.assetsDict["/assets.utility2.html"] = "<!doctype html>\n\
     }\n\
 }\n\
 @keyframes uiAnimateSpin {\n\
-    0% { transform: rotate(0deg); }\n\
-    100% { transform: rotate(360deg); }\n\
+    0% {\n\
+        transform: rotate(0deg);\n\
+    }\n\
+    100% {\n\
+        transform: rotate(360deg);\n\
+    }\n\
 }\n\
 a {\n\
     overflow-wrap: break-word;\n\
 }\n\
-body {\n\
-    background: #dde;\n\
-    font-family: Arial, Helvetica, sans-serif;\n\
-    margin: 0 40px;\n\
-}\n\
-body > a,\n\
-body > button,\n\
 body > div,\n\
-body > input,\n\
 body > pre,\n\
-body > select,\n\
-body > span,\n\
-body > textarea {\n\
+body > textarea,\n\
+body > .button {\n\
     margin-bottom: 20px;\n\
 }\n\
-body > button {\n\
-    width: 20rem;\n\
+body > textarea {\n\
+    height: 10rem;\n\
+    width: 100%;\n\
 }\n\
-button {\n\
-    cursor: pointer;\n\
+body > textarea[readonly] {\n\
+    background: #ddd;\n\
+}\n\
+body > .button {\n\
+    width: 20rem;\n\
 }\n\
 code,\n\
 pre,\n\
 textarea {\n\
-    font-family: Menlo, Consolas, Courier New, monospace;\n\
+    font-family: Consolas, Menlo, monospace;\n\
     font-size: small;\n\
 }\n\
 pre {\n\
     overflow-wrap: break-word;\n\
     white-space: pre-wrap;\n\
 }\n\
-.textOverflowEllipsis {\n\
-    overflow: hidden;\n\
-    text-overflow: ellipsis;\n\
-    white-space: nowrap;\n\
+textarea {\n\
+    overflow: auto;\n\
+    white-space: pre;\n\
+}\n\
+.button {\n\
+    background-color: #fff;\n\
+    border: 1px solid;\n\
+    border-bottom-color: rgb(186, 186, 186);\n\
+    border-left-color: rgb(209, 209, 209);\n\
+    border-radius: 4px;\n\
+    border-right-color: rgb(209, 209, 209);\n\
+    border-top-color: rgb(216, 216, 216);\n\
+    color: #00d;\n\
+    cursor: pointer;\n\
+    display: inline-block;\n\
+    font-family: Arial, Helvetica, sans-serif;\n\
+    font-size: 12px;\n\
+    font-style: normal;\n\
+    font-weight: normal;\n\
+    margin: 0;\n\
+    padding: 2px 7px 3px 7px;\n\
+    text-align: center;\n\
+    text-decoration: underline;\n\
 }\n\
 .uiAnimateShake {\n\
     animation-duration: 500ms;\n\
@@ -28618,25 +28733,12 @@ pre {\n\
     width: 0;\n\
 }\n\
 </style>\n\
-<style>\n\
-/*csslint\n\
-    ids: false,\n\
-*/\n\
-textarea {\n\
-    height: 10rem;\n\
-    width: 100%;\n\
-}\n\
-textarea[readonly] {\n\
-    background: #ddd;\n\
-}\n\
-#outputPreJslint1 {\n\
-    color: #d00;\n\
-}\n\
-</style>\n\
 </head>\n\
-<body>\n\
+<body style=\"background: #ddf; font-family: Arial, Helvetica, sans-serif; margin: 0 40px;\">\n\
 <div id=\"ajaxProgressDiv1\" style=\"background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%; z-index: 1;\"></div>\n\
 <div class=\"uiAnimateSpin\" style=\"animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: none; height: 25px; vertical-align: middle; width: 25px;\"></div>\n\
+<code style=\"display: none;\"></code><div class=\"button uiAnimateShake uiAnimateSlide utility2FooterDiv zeroPixel\" style=\"display: none;\"></div><pre style=\"display: none;\"></pre><textarea readonly style=\"display: none;\"></textarea>\n\
+<code style=\"display: none;\"></code><div class=\"button uiAnimateShake uiAnimateSlide utility2FooterDiv zeroPixel\" style=\"display: none;\"></div><pre style=\"display: none;\"></pre><textarea readonly style=\"display: none;\"></textarea>\n\
 <script>\n\
 /* jslint-utility2 */\n\
 /*jslint\n\
@@ -28692,15 +28794,15 @@ textarea[readonly] {\n\
         target=\"_blank\"\n\
     >\n\
 \n\
-        utility2 (v2018.2.3-alpha)\n\
+        utility2 (v2018.3.7-alpha)\n\
 \n\
     </a>\n\
 \n\
 </h1>\n\
 <h3>the zero-dependency, swiss-army-knife utility for building, testing, and deploying webapps</h3>\n\
 \n\
-<h4><a download href=\"assets.app.js\">[download standalone app]</a></h4>\n\
-<button class=\"onclick onreset\" id=\"testRunButton2\">run internal test</button><br>\n\
+<a class=\"button\" download href=\"assets.app.js\">download standalone app</a><br>\n\
+<button class=\"button onclick onreset\" id=\"testRunButton2\">run internal test</button><br>\n\
 \n\
 \n\
 \n\
@@ -28760,7 +28862,7 @@ textarea[readonly] {\n\
 }());\n\
 </textarea>\n\
 <pre id=\"outputPreJsonStringify1\"></pre>\n\
-<pre id=\"outputPreJslint1\"></pre>\n\
+<pre id=\"outputPreJslint1\" style=\"color: #d00;\"></pre>\n\
 <label>instrumented-code</label>\n\
 <textarea class=\"resettable\" id=\"outputTextarea1\" readonly></textarea>\n\
 <label>stderr and stdout</label>\n\
@@ -28771,7 +28873,7 @@ textarea[readonly] {\n\
 \n\
 <script src=\"assets.utility2.rollup.js\"></script>\n\
 <script src=\"assets.utility2.example.js\"></script>\n\
-<script src=\"assets.utiilty2.test.js\"></script>\n\
+<script src=\"assets.utility2.test.js\"></script>\n\
 \n\
 \n\
 <div class=\"utility2FooterDiv\">\n\
@@ -28785,6 +28887,2987 @@ textarea[readonly] {\n\
 /* jslint-ignore-end */
 }());
 /* script-end /assets.utility2.html */
+
+
+
+/* script-begin /assets.utility2.test.js */
+(function () {
+    "use strict";
+    var local;
+    local = (typeof window === "object" && window && window.utility2_rollup) ||
+        global.utility2_rollup;
+    local.local = local;
+/* jslint-ignore-begin */
+local.assetsDict["/assets.utility2.test.js"] = "/* istanbul instrument in package utility2 */\n\
+/* jslint-utility2 */\n\
+/*jslint\n\
+    bitwise: true,\n\
+    browser: true,\n\
+    maxerr: 8,\n\
+    maxlen: 100,\n\
+    node: true,\n\
+    nomen: true,\n\
+    regexp: true,\n\
+    stupid: true\n\
+*/\n\
+(function () {\n\
+    'use strict';\n\
+    var local;\n\
+\n\
+\n\
+\n\
+    // run shared js-env code - init-before\n\
+    (function () {\n\
+        // init local\n\
+        local = {};\n\
+        // init modeJs\n\
+        local.modeJs = (function () {\n\
+            try {\n\
+                return typeof navigator.userAgent === 'string' &&\n\
+                    typeof document.querySelector('body') === 'object' &&\n\
+                    typeof XMLHttpRequest.prototype.open === 'function' &&\n\
+                    'browser';\n\
+            } catch (errorCaughtBrowser) {\n\
+                return module.exports &&\n\
+                    typeof process.versions.node === 'string' &&\n\
+                    typeof require('http').createServer === 'function' &&\n\
+                    'node';\n\
+            }\n\
+        }());\n\
+        // init global\n\
+        local.global = local.modeJs === 'browser'\n\
+            ? window\n\
+            : global;\n\
+        // re-init local\n\
+        local = local.global.local = (local.global.utility2 ||\n\
+            require('./lib.utility2.js')).requireReadme();\n\
+        // init test\n\
+        local.testRunInit(local);\n\
+    }());\n\
+\n\
+\n\
+\n\
+    // run shared js-env code - function\n\
+    (function () {\n\
+        local._testCase_testRunDefault_failure = function (options, onError) {\n\
+        /*\n\
+         * this function will test testRunDefault's failure handling-behavior\n\
+         */\n\
+            // test failure from callback handling-behavior\n\
+            onError(local.errorDefault);\n\
+            // test failure from multiple-callback handling-behavior\n\
+            onError(null, options);\n\
+            // test failure from ajax handling-behavior\n\
+            local.ajax({ url: '/undefined' }, onError);\n\
+            // test failure from thrown error handling-behavior\n\
+            throw local.errorDefault;\n\
+        };\n\
+\n\
+        local.testCase_FormData_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test FormData's default handling-behavior\n\
+         */\n\
+            options = {};\n\
+            options.blob1 = new local.Blob(['aa', 'bb', '\\u1234 ', 0]);\n\
+            options.blob2 = new local.Blob(['aa', 'bb', '\\u1234 ', 0], {\n\
+                type: 'text/plain; charset=utf-8'\n\
+            });\n\
+            options.data = new local.FormData();\n\
+            options.data.append('text1', 'aabb\\u1234 0');\n\
+            // test file-upload handling-behavior\n\
+            options.data.append('file1', options.blob1);\n\
+            // test file-upload and filename handling-behavior\n\
+            options.data.append('file2', options.blob2, 'filename2.txt');\n\
+            options.method = 'POST';\n\
+            options.url = '/test.echo';\n\
+            local.ajax(options, function (error, xhr) {\n\
+                // validate no error occurred\n\
+                local.assert(!error, error);\n\
+                // validate responseText\n\
+                local.assert(xhr.responseText.indexOf(\n\
+                    '\\r\\n\
+Content-Disposition: form-data; ' +\n\
+                        'name=\"text1\"\\r\\n\
+\\r\\n\
+aabb\\u1234 0\\r\\n\
+'\n\
+                ) >= 0, xhr.responseText);\n\
+                local.assert(xhr.responseText.indexOf(\n\
+                    '\\r\\n\
+Content-Disposition: form-data; ' +\n\
+                        'name=\"file1\"\\r\\n\
+\\r\\n\
+aabb\\u1234 0\\r\\n\
+'\n\
+                ) >= 0, xhr.responseText);\n\
+                local.assert(xhr.responseText.indexOf(\n\
+                    '\\r\\n\
+Content-Disposition: form-data; name=\"file2\"; ' +\n\
+                        'filename=\"filename2.txt\"\\r\\n\
+Content-Type: text/plain; ' +\n\
+                        'charset=utf-8\\r\\n\
+\\r\\n\
+aabb\\u1234 0\\r\\n\
+'\n\
+                ) >= 0, xhr.responseText);\n\
+                onError(null, options);\n\
+            });\n\
+        };\n\
+\n\
+        local.testCase_FormData_error = function (options, onError) {\n\
+        /*\n\
+         * this function will test FormData's error handling-behavior\n\
+         */\n\
+            local.testMock([\n\
+                [local.FormData.prototype, { read: function (onError) {\n\
+                    onError(local.errorDefault);\n\
+                } }]\n\
+            ], function (onError) {\n\
+                local.ajax({\n\
+                    data: new local.FormData(),\n\
+                    method: 'POST',\n\
+                    url: '/test.echo'\n\
+                }, function (error) {\n\
+                    // validate error occurred\n\
+                    local.assert(error, error);\n\
+                    onError(null, options);\n\
+                });\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_FormData_nullCase = function (options, onError) {\n\
+        /*\n\
+         * this function will test FormData's null-case handling-behavior\n\
+         */\n\
+            local.ajax({\n\
+                data: new local.FormData(),\n\
+                method: 'POST',\n\
+                url: '/test.echo'\n\
+            }, function (error, xhr) {\n\
+                // validate no error occurred\n\
+                local.assert(!error, error);\n\
+                // validate responseText\n\
+                local.assert((/\\r\\n\
+\\r\\n\
+$/).test(xhr.responseText), xhr.responseText);\n\
+                onError(null, options);\n\
+            });\n\
+        };\n\
+\n\
+        local.testCase_ajaxProgressUpdate_misc = function (options, onError) {\n\
+        /*\n\
+         * this function will test ajaxProgressUpdate's misc handling-behavior\n\
+         */\n\
+            if (!(local.modeJs === 'browser' && document.querySelector('#ajaxProgressDiv1'))) {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.testMock([\n\
+                [local, { ajaxProgressCounter: 0, ajaxProgressState: 0 }],\n\
+                [local.global, { clearTimeou: local.nop, setTimeout: function (fnc) {\n\
+                    local.ajaxProgressState = 1;\n\
+                    fnc();\n\
+                } }]\n\
+            ], function (onError) {\n\
+                // test progress-finish handling-behavior\n\
+                local.ajaxProgressCounter = 0;\n\
+                local.ajaxProgressUpdate();\n\
+                // validate data\n\
+                local.assertJsonEqual(local.ajaxProgressState, 1);\n\
+                // test progress-update handling-behavior\n\
+                local.ajaxProgressCounter = 1;\n\
+                // test NaN handling-behavior\n\
+                document.querySelector('#ajaxProgressDiv1').style.width = '0px';\n\
+                local.ajaxProgressUpdate();\n\
+                // validate data\n\
+                local.assertJsonEqual(local.ajaxProgressState, 1);\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_ajax_abort = function (options, onError) {\n\
+        /*\n\
+         * this function will test ajax's abort handling-behavior\n\
+         */\n\
+            options = local.ajax({ url: '/test.timeout' }, function (error) {\n\
+                // validate error occurred\n\
+                local.assert(error, error);\n\
+                onError(null, options);\n\
+            });\n\
+            // test multiple-callback handling-behavior\n\
+            options.onEvent({ type: 'abort' });\n\
+            options.abort();\n\
+            options.abort();\n\
+        };\n\
+\n\
+        local.testCase_ajax_assets = function (options, onError) {\n\
+        /*\n\
+         * this function will test ajax's assets handling-behavior\n\
+         */\n\
+            local.ajax({ url: 'LICENSE' }, function (error, xhr) {\n\
+                // validate no error occurred\n\
+                local.assert(!error, error);\n\
+                // validate statusCode\n\
+                local.assertJsonEqual(xhr.statusCode, 200);\n\
+                onError(null, options);\n\
+            });\n\
+        };\n\
+\n\
+        local.testCase_ajax_cache = function (options, onError) {\n\
+        /*\n\
+         * this function will test ajax's cache handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            options = {};\n\
+            local.onNext(options, function (error, data) {\n\
+                switch (options.modeNext) {\n\
+                case 1:\n\
+                    // test http GET handling-behavior\n\
+                    local.ajax({ url: 'assets.hello' }, options.onNext);\n\
+                    break;\n\
+                case 2:\n\
+                    // validate responseText\n\
+                    local.assertJsonEqual(data.responseText, 'hello\\n\
+');\n\
+                    // test http GET 304 cache handling-behavior\n\
+                    local.ajax({\n\
+                        headers: {\n\
+                            'If-Modified-Since': new Date(Date.now() + 0xffff).toGMTString()\n\
+                        },\n\
+                        url: 'assets.hello'\n\
+                    }, options.onNext);\n\
+                    break;\n\
+                case 3:\n\
+                    // validate statusCode\n\
+                    local.assertJsonEqual(data.statusCode, 304);\n\
+                    options.onNext();\n\
+                    break;\n\
+                default:\n\
+                    onError(error, options);\n\
+                }\n\
+            });\n\
+            options.modeNext = 0;\n\
+            options.onNext();\n\
+        };\n\
+\n\
+        local.testCase_ajax_error = function (options, onError) {\n\
+        /*\n\
+         * this function will test ajax's error handling-behavior\n\
+         */\n\
+            local.onParallelList({ list: [{\n\
+                // test 404-not-found-error handling-behavior\n\
+                url: '/test.error-404'\n\
+            }, {\n\
+                // test 500-internal-server-error handling-behavior\n\
+                url: '/test.error-500'\n\
+            }, {\n\
+                // test undefined-error handling-behavior\n\
+                url: '/test.error-undefined'\n\
+            }, {\n\
+                // test corsForwardProxyHost handling-behavior\n\
+                corsForwardProxyHost: 'https://undefined:0',\n\
+                location: { host: 'undefined.github.io' },\n\
+                timeout: 1,\n\
+                // test undefined-https-url handling-behavior\n\
+                url: 'https://undefined:0'\n\
+            }] }, function (options2, onParallel) {\n\
+                onParallel.counter += 1;\n\
+                local.ajax(options2.element, function (error, xhr) {\n\
+                    // validate error occurred\n\
+                    local.assert(error, error);\n\
+                    // test getAllResponseHeaders' null-case handling-behavior\n\
+                    xhr.getAllResponseHeaders();\n\
+                    // test getResponseHeader' null-case handling-behavior\n\
+                    xhr.getResponseHeader('undefined');\n\
+                    onParallel(null, options);\n\
+                });\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_ajax_post = function (options, onError) {\n\
+        /*\n\
+         * this function will test ajax's POST handling-behavior\n\
+         */\n\
+            options = {};\n\
+            // test /test.body handling-behavior\n\
+            local.onParallelList({ list: [\n\
+                '',\n\
+                'arraybuffer',\n\
+                'stream',\n\
+                'text'\n\
+            ] }, function (responseType, onParallel) {\n\
+                responseType = responseType.element;\n\
+                onParallel.counter += 1;\n\
+                local.ajax({\n\
+                    data: responseType === 'arraybuffer'\n\
+                        // test buffer post handling-behavior\n\
+                        ? local.bufferCreate('aa')\n\
+                        // test string post handling-behavior\n\
+                        : 'aa',\n\
+                    method: 'POST',\n\
+                    // test nodejs response handling-behavior\n\
+                    responseType: responseType === 'stream' && local.modeJs === 'node'\n\
+                        ? responseType\n\
+                        : '',\n\
+                    url: '/test.body'\n\
+                }, function (error, xhr) {\n\
+                    // validate no error occurred\n\
+                    local.assert(!error, error);\n\
+                    // validate statusCode\n\
+                    local.assertJsonEqual(xhr.statusCode, 200);\n\
+                    // validate response\n\
+                    switch (responseType) {\n\
+                    case 'arraybuffer':\n\
+                    case 'stream':\n\
+                        // cleanup response\n\
+                        local.streamListCleanup([xhr.response]);\n\
+                        // validate response\n\
+                        options.data = xhr.response;\n\
+                        local.assert(options.data, options);\n\
+                        break;\n\
+                    default:\n\
+                        // validate responseText\n\
+                        options.data = xhr.responseText;\n\
+                        local.assertJsonEqual(options.data, 'aa');\n\
+                    }\n\
+                    onParallel(null, options);\n\
+                });\n\
+            }, function (error) {\n\
+                // validate no error occurred\n\
+                local.assert(!error, error);\n\
+                // test /test.echo handling-behavior\n\
+                local.ajax({\n\
+                    data: 'aa',\n\
+                    // test request-header handling-behavior\n\
+                    headers: { 'X-Request-Header-Test': 'aa' },\n\
+                    method: 'POST',\n\
+                    // test modeDebug handling-behavior\n\
+                    modeDebug: true,\n\
+                    url: '/test.echo'\n\
+                }, function (error, xhr) {\n\
+                    // validate no error occurred\n\
+                    local.assert(!error, error);\n\
+                    // validate statusCode\n\
+                    local.assertJsonEqual(xhr.statusCode, 200);\n\
+                    // validate response\n\
+                    options.data = xhr.responseText;\n\
+                    local.assert((/\\r\\n\
+aa$/).test(options.data), options.data);\n\
+                    local.assert(\n\
+                        (/\\r\\n\
+x-request-header-test: aa\\r\\n\
+/).test(options.data),\n\
+                        options.data\n\
+                    );\n\
+                    // validate responseHeaders\n\
+                    options.data = xhr.getAllResponseHeaders();\n\
+                    local.assert(\n\
+                        (/^X-Response-Header-Test: bb\\r\\n\
+/im).test(options.data),\n\
+                        options.data\n\
+                    );\n\
+                    options.data = xhr.getResponseHeader('x-response-header-test');\n\
+                    local.assertJsonEqual(options.data, 'bb');\n\
+                    options.data = xhr.getResponseHeader('undefined');\n\
+                    local.assertJsonEqual(options.data, null);\n\
+                    onError(null, options);\n\
+                });\n\
+            });\n\
+        };\n\
+\n\
+        local.testCase_ajax_standalone = function (options, onError) {\n\
+        /*\n\
+         * this function will test ajax's standalone handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'browser') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.testMock([\n\
+                [local, {\n\
+                    ajaxProgressUpdate: null,\n\
+                    bufferToNodeBuffer: null,\n\
+                    bufferToString: null,\n\
+                    corsForwardProxyHostIfNeeded: null,\n\
+                    errorMessagePrepend: null,\n\
+                    nop: null,\n\
+                    onErrorWithStack: null,\n\
+                    onTimeout: null,\n\
+                    serverLocalUrlTest: null,\n\
+                    streamListCleanup: null,\n\
+                    timeoutDefault: null,\n\
+                    tryCatchOnError: null\n\
+                }]\n\
+            ], function (onError) {\n\
+                local.ajax({ undefined: undefined, url: '/' }, function (error) {\n\
+                    // validate no error occurred\n\
+                    local.assert(!error, error);\n\
+                });\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_ajax_timeout = function (options, onError) {\n\
+        /*\n\
+         * this function will test ajax's timeout handling-behavior\n\
+         */\n\
+            setTimeout(function () {\n\
+                local.ajax({ timeout: 1, url: '/test.timeout' }, function (error) {\n\
+                    // validate error occurred\n\
+                    local.assert(error, error);\n\
+                    onError(null, options);\n\
+                });\n\
+            }, 1000);\n\
+        };\n\
+\n\
+        local.testCase_assertXxx_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test assertXxx's default handling-behavior\n\
+         */\n\
+            // test assertion passed\n\
+            local.assert(true, true);\n\
+            // test assertion failed with undefined message\n\
+            local.tryCatchOnError(function () {\n\
+                local.assert(null);\n\
+            }, function (error) {\n\
+                // validate error occurred\n\
+                local.assert(error, error);\n\
+                // validate error-message\n\
+                local.assertJsonEqual(error.message, '');\n\
+            });\n\
+            // test assertion failed with string message\n\
+            local.tryCatchOnError(function () {\n\
+                local.assert(null, 'aa');\n\
+            }, function (error) {\n\
+                // validate error occurred\n\
+                local.assert(error, error);\n\
+                // validate error-message\n\
+                local.assertJsonEqual(error.message, 'aa');\n\
+            });\n\
+            // test assertion failed with error object\n\
+            local.tryCatchOnError(function () {\n\
+                local.assert(null, local.errorDefault);\n\
+            }, function (error) {\n\
+                // validate error occurred\n\
+                local.assert(error, error);\n\
+            });\n\
+            // test assertion failed with json object\n\
+            local.tryCatchOnError(function () {\n\
+                local.assert(null, { aa: 1 });\n\
+            }, function (error) {\n\
+                // validate error occurred\n\
+                local.assert(error, error);\n\
+                // validate error-message\n\
+                local.assertJsonEqual(error.message, '{\"aa\":1}');\n\
+            });\n\
+            ['', 0, false, null, undefined].forEach(function (aa, ii) {\n\
+                ['', 0, false, null, undefined].forEach(function (bb, jj) {\n\
+                    if (ii === jj) {\n\
+                        // test assertJsonEqual's handling-behavior\n\
+                        local.assertJsonEqual(aa, bb);\n\
+                    } else {\n\
+                        // test assertJsonNotEqual's handling-behavior\n\
+                        local.assertJsonNotEqual(aa, bb);\n\
+                    }\n\
+                });\n\
+            });\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_base64Xxx_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test base64Xxx's default handling-behavior\n\
+         */\n\
+            options = {};\n\
+            options.base64 = local.base64FromString(local.stringCharsetAscii + '\\u1234');\n\
+            // test null-case handling-behavior\n\
+            local.assertJsonEqual(local.base64FromBuffer(), '');\n\
+            local.assertJsonEqual(local.base64FromHex(), '');\n\
+            local.assertJsonEqual(local.base64FromString(), '');\n\
+            local.assertJsonEqual(local.base64ToBuffer(), {});\n\
+            local.assertJsonEqual(local.base64ToHex(), '');\n\
+            local.assertJsonEqual(local.base64ToString(), '');\n\
+            local.assertJsonEqual(local.base64FromBuffer(local.base64ToBuffer()), '');\n\
+            local.assertJsonEqual(local.base64FromHex(local.base64ToHex()), '');\n\
+            local.assertJsonEqual(local.base64FromString(local.base64ToString()), '');\n\
+            // test commutation handling-behavior\n\
+            local.assertJsonEqual(\n\
+                local.base64FromBuffer(local.base64ToBuffer(options.base64)),\n\
+                options.base64\n\
+            );\n\
+            local.assertJsonEqual(\n\
+                local.base64FromHex(local.base64ToHex(options.base64)),\n\
+                options.base64\n\
+            );\n\
+            local.assertJsonEqual(\n\
+                local.base64FromString(local.base64ToString(options.base64)),\n\
+                options.base64\n\
+            );\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_blobRead_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test blobRead's default handling-behavior\n\
+         */\n\
+            local.onParallelList({ list: [\n\
+                new local.Blob(['aa', 'bb', '\\u1234 ', 0]),\n\
+                new local.Blob(['aa', 'bb', '\\u1234 ', 0], {\n\
+                    type: 'text/plain; charset=utf-8'\n\
+                })\n\
+            ] }, function (options2, onParallel) {\n\
+                onParallel.counter += 1;\n\
+                [null, 'dataURL', 'text'].forEach(function (encoding) {\n\
+                    onParallel.counter += 1;\n\
+                    local.blobRead(options2.element, encoding, function (error, data) {\n\
+                        // validate no error occurred\n\
+                        local.assert(!error, error);\n\
+                        // validate data\n\
+                        switch (encoding) {\n\
+                        case 'dataURL':\n\
+                            if (options2.ii === 0) {\n\
+                                local.assertJsonEqual(data, 'data:;base64,YWFiYuGItCAw');\n\
+                                break;\n\
+                            }\n\
+                            local.assertJsonEqual(\n\
+                                data,\n\
+                                'data:text/plain; charset=utf-8;base64,YWFiYuGItCAw'\n\
+                            );\n\
+                            break;\n\
+                        case 'text':\n\
+                            local.assertJsonEqual(data, 'aabb\\u1234 0');\n\
+                            break;\n\
+                        default:\n\
+                            local.assertJsonEqual(\n\
+                                local.bufferToString(data),\n\
+                                'aabb\\u1234 0'\n\
+                            );\n\
+                        }\n\
+                        onParallel(null, options);\n\
+                    });\n\
+                });\n\
+                onParallel(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_blobRead_error = function (options, onError) {\n\
+        /*\n\
+         * this function will test blobRead's error handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'browser') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.testMock([\n\
+                [local.global.FileReader.prototype, { readAsArrayBuffer: function () {\n\
+                    this.onabort({ type: 'abort' });\n\
+                    this.onerror({ type: 'error' });\n\
+                } }]\n\
+            ], function (onError) {\n\
+                local.blobRead(null, null, function (error) {\n\
+                    // validate error occurred\n\
+                    local.assert(error, error);\n\
+                });\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_browserTest_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test browserTest's default handling-behavior\n\
+         */\n\
+            var options2;\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            options = {};\n\
+            local.onNext(options, function (error) {\n\
+                switch (options.modeNext) {\n\
+                // test scrape handling-behavior\n\
+                case 1:\n\
+                    options2 = {};\n\
+                    options2.modeBrowserTest = 'scrape';\n\
+                    options2.modeBrowserTestRecurseDepth = 1;\n\
+                    options2.modeBrowserTestRecurseExclude = 'undefined';\n\
+                    options2.modeTestIgnore = true;\n\
+                    options2.timeoutScreenshot = 1000;\n\
+                    options2.url = local.serverLocalHost + '/assets.recurse1';\n\
+                    local.browserTest(options2, options.onNext);\n\
+                    break;\n\
+                // test translateAfterScrape handling-behavior\n\
+                case 2:\n\
+                    options2.modeBrowserTest = 'translateAfterScrape';\n\
+                    options2.modeBrowserTestTranslate = 'ru,zh-CN';\n\
+                    options2.modeNext = 0;\n\
+                    options2.url = options2.fileScreenshotBase;\n\
+                    local.browserTest(options2, options.onNext);\n\
+                    break;\n\
+                case 3:\n\
+                    // validate scraped files\n\
+                    [\n\
+                        options2.fileScreenshotBase + '.html',\n\
+                        options2.fileScreenshotBase + '.png',\n\
+                        options2.fileScreenshotBase + '.translateAfterScrape.ru.html',\n\
+                        options2.fileScreenshotBase + '.translateAfterScrape.ru.png',\n\
+                        options2.fileScreenshotBase + '.translateAfterScrape.zh-CN.html',\n\
+                        options2.fileScreenshotBase + '.translateAfterScrape.zh-CN.png',\n\
+                        options2.fileScreenshotBase.replace('recurse1', 'recurse2') + '.html',\n\
+                        options2.fileScreenshotBase.replace('recurse1', 'recurse2') + '.png'\n\
+                    ].forEach(function (file) {\n\
+                        local.assert(local.fs.existsSync(file), file);\n\
+                        local.fs.unlinkSync(file);\n\
+                    });\n\
+                    options.onNext();\n\
+                    break;\n\
+                default:\n\
+                    onError(error, options);\n\
+                }\n\
+            });\n\
+            options.modeNext = 0;\n\
+            options.onNext();\n\
+        };\n\
+        local.testCase_browserTest_default.timeout = 60000;\n\
+\n\
+        local.testCase_browserTest_electron = function (options, onError) {\n\
+        /*\n\
+         * this function will test browserTest's electron handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            options = function (arg0, arg1) {\n\
+                // test onParallel handling-behavior\n\
+                if (typeof arg0 === 'function') {\n\
+                    arg0();\n\
+                }\n\
+                // test on handling-behavior\n\
+                if (typeof arg1 === 'function') {\n\
+                    arg1(options, '');\n\
+                    arg1(options, options.fileElectronHtml);\n\
+                    arg1(options, options.fileElectronHtml + ' opened');\n\
+                }\n\
+                return options;\n\
+            };\n\
+            options.BrowserWindow = options;\n\
+            options.app = options;\n\
+            options.electron = options;\n\
+            options.capturePage = options;\n\
+            options.loadURL = options;\n\
+            options.on = options;\n\
+            options.once = options;\n\
+            options.prototype = options;\n\
+            options.toPng = options;\n\
+            options.unref = options;\n\
+            local.testMock([\n\
+                [local.global, { setTimeout: options }],\n\
+                [process.versions, { electron: true }],\n\
+                [local, { onParallel: options }]\n\
+            ], function (onError) {\n\
+                local.browserTest(options, local.nop);\n\
+                options.modeNext = 0;\n\
+                options.modeBrowserTest = 'scrape';\n\
+                local.browserTest(options, local.nop);\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_bufferCreate_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test bufferCreate's default handling-behavior\n\
+         */\n\
+            options = {};\n\
+            options.text1 = '';\n\
+            for (options.ii = 0; options.ii < 0x10000; options.ii += 1) {\n\
+                options.text1 += String.fromCodePoint(options.ii);\n\
+            }\n\
+            for (options.ii = 0x10000; options.ii < 0x110000; options.ii += 0x100) {\n\
+                options.text1 += String.fromCodePoint(options.ii);\n\
+            }\n\
+            // test utf8 handling-behavior\n\
+            options.bff1 = local.bufferCreate(options.text1);\n\
+            options.text2 = local.bufferToString(options.bff1);\n\
+            local.assertJsonEqual(options.text2, local.bufferToString(options.text2));\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_bufferCreate_polyfill = function (options, onError) {\n\
+        /*\n\
+         * this function will test bufferCreate's polyfill handling-behavior\n\
+         */\n\
+            options = [\n\
+                [local.global, { TextDecoder: null, TextEncoder: null }]\n\
+            ];\n\
+            // test exit's default handling-behavior\n\
+            local.testMock(options, function (onError) {\n\
+                local.testCase_bufferCreate_default(null, onError);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_bufferIndexOfSubBuffer_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test bufferIndexOfSubBuffer's default handling-behavior\n\
+         */\n\
+            [\n\
+                { buffer: '', subBuffer: '', validate: 0 },\n\
+                { buffer: '', subBuffer: 'aa', validate: -1 },\n\
+                { buffer: 'aa', subBuffer: '', validate: 0 },\n\
+                { buffer: 'aa', subBuffer: 'aa', validate: 0 },\n\
+                { buffer: 'aa', subBuffer: 'bb', validate: -1 },\n\
+                { buffer: 'aaaa', subBuffer: 'aa', validate: 0 },\n\
+                { buffer: 'aabb', subBuffer: 'aa', validate: 0 },\n\
+                { buffer: 'aabb', subBuffer: 'bb', validate: 2 },\n\
+                { buffer: 'aabbaa', subBuffer: 'aa', validate: 0 },\n\
+                { buffer: 'aabbaa', subBuffer: 'bb', validate: 2 },\n\
+                { buffer: 'aabbaa', subBuffer: 'ba', validate: 3 }\n\
+            ].forEach(function (options) {\n\
+                options.data = local.bufferIndexOfSubBuffer(\n\
+                    local.bufferCreate(options.buffer),\n\
+                    local.bufferCreate(options.subBuffer),\n\
+                    options.fromIndex\n\
+                );\n\
+                local.assertJsonEqual(options.data, options.validate);\n\
+            });\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_buildApidoc_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test buildApidoc's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            options = {};\n\
+            // test $npm_config_mode_coverage=all handling-behavior\n\
+            local.testMock([\n\
+                [local.env, { npm_config_mode_coverage: 'all' }]\n\
+            ], function (onError) {\n\
+                local.buildApidoc(null, onError);\n\
+            }, local.onErrorThrow);\n\
+            // test $npm_package_buildCustomOrg handling-behavior\n\
+            local.testMock([\n\
+                [local.env, { npm_package_buildCustomOrg: 'electron-lite' }]\n\
+            ], function (onError) {\n\
+                local.buildApidoc(options, onError);\n\
+            }, local.onErrorThrow);\n\
+            local.buildApidoc({ blacklistDict: options }, onError);\n\
+        };\n\
+\n\
+        local.testCase_buildApp_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test buildApp's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.testCase_buildReadme_default(options, local.onErrorThrow);\n\
+            local.testCase_buildLib_default(options, local.onErrorThrow);\n\
+            local.testCase_buildTest_default(options, local.onErrorThrow);\n\
+            options = { assetsList: [{\n\
+                file: '/LICENSE',\n\
+                url: '/LICENSE'\n\
+            }, {\n\
+                file: '/assets.hello',\n\
+                url: '/assets.hello'\n\
+            }, {\n\
+                file: '/assets.script_only.html',\n\
+                url: '/assets.script_only.html'\n\
+            }, {\n\
+                file: '/assets.utility2.lib.db.js',\n\
+                url: '/assets.utility2.lib.db.js'\n\
+            }, {\n\
+                file: '/assets.utility2.lib.istanbul.js',\n\
+                url: '/assets.utility2.lib.istanbul.js'\n\
+            }, {\n\
+                file: '/assets.utility2.lib.jslint.js',\n\
+                url: '/assets.utility2.lib.jslint.js'\n\
+            }, {\n\
+                file: '/assets.utility2.lib.marked.js',\n\
+                url: '/assets.utility2.lib.marked.js'\n\
+            }, {\n\
+                file: '/assets.utility2.lib.sjcl.js',\n\
+                url: '/assets.utility2.lib.sjcl.js'\n\
+            }, {\n\
+                file: '/assets.utility2.lib.uglifyjs.js',\n\
+                url: '/assets.utility2.lib.uglifyjs.js'\n\
+            }, {\n\
+                file: '/assets.utility2.rollup.js',\n\
+                url: '/assets.utility2.rollup.js'\n\
+            }] };\n\
+            local.buildApp(options, onError);\n\
+        };\n\
+\n\
+        local.testCase_buildCustomOrg_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test buildCustomOrg's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.testMock([\n\
+                [local.env, { GITHUB_ORG: '', npm_package_buildCustomOrg: 'electron-lite' }],\n\
+                [local.fs, { writeFileSync: local.nop }],\n\
+                [local.global, { setTimeout: function (onError) {\n\
+                    onError(null, options);\n\
+                } }],\n\
+                [process, { on: function (options, onError) {\n\
+                    // test error handling-behavior\n\
+                    onError(local.errorDefault, options);\n\
+                } }]\n\
+            ], function (onError) {\n\
+                // test npmdoc handling-behavior\n\
+                local.env.GITHUB_ORG = 'npmdoc';\n\
+                local.buildCustomOrg({}, local.onErrorThrow);\n\
+                // test npmtest handling-behavior\n\
+                local.env.GITHUB_ORG = 'npmtest';\n\
+                local.buildCustomOrg({}, local.onErrorThrow);\n\
+                // test scrapeitall handling-behavior\n\
+                local.env.GITHUB_ORG = 'scrapeitall';\n\
+                local.buildCustomOrg({}, local.onErrorThrow);\n\
+                onError(null, options);\n\
+            }, local.onErrorThrow);\n\
+            local.buildCustomOrg({}, onError);\n\
+        };\n\
+\n\
+        local.testCase_buildLib_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test buildLib's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            options = {};\n\
+            local.testMock([\n\
+                [local.fs, {\n\
+                    // test customize-local handling-behavior\n\
+                    existsSync: function () {\n\
+                        return true;\n\
+                    },\n\
+                    writeFileSync: local.nop\n\
+                }]\n\
+            ], function (onError) {\n\
+                local.buildLib(options, onError);\n\
+            }, local.onErrorThrow);\n\
+            options = {};\n\
+            local.buildLib(options, onError);\n\
+        };\n\
+\n\
+        local.testCase_buildReadme_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test buildReadme's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            options = {};\n\
+            options.customize = function () {\n\
+                options.dataFrom = options.dataFrom\n\
+                    // test shDeployCustom handling-behavior\n\
+                    .replace('shDeployGithub', 'shDeployCustom')\n\
+                    // test no-assets.index.template.html handling-behavior\n\
+                    .replace('assets.index.default.template.html', '');\n\
+            };\n\
+            options.fsReadFileSync = local.fs.readFileSync;\n\
+            local.testMock([\n\
+                [local.env, {\n\
+                    npm_package_buildCustomOrg: '',\n\
+                    npm_package_isPrivate: '1',\n\
+                    npm_package_name: 'undefined'\n\
+                }],\n\
+                [local.fs, {\n\
+                    existsSync: function () {\n\
+                        return true;\n\
+                    },\n\
+                    readFileSync: function (file) {\n\
+                        return local.tryCatchOnError(function () {\n\
+                            return options.fsReadFileSync(file, 'utf8');\n\
+                        }, function () {\n\
+                            return '{}';\n\
+                        });\n\
+                    },\n\
+                    writeFileSync: local.nop\n\
+                }],\n\
+                [local.assetsDict, {\n\
+                    // test no-assets.index.default.template.html handling-behavior\n\
+                    '/assets.index.template.html': '',\n\
+                    // test customize example.js handling-behavior\n\
+                    '/index.html': ''\n\
+                }]\n\
+            ], function (onError) {\n\
+                local.buildReadme(options, onError);\n\
+                // test $npm_package_buildCustomOrg handling-behavior\n\
+                local.env.npm_package_buildCustomOrg = 'aa';\n\
+                local.buildReadme(options, onError);\n\
+                onError(null, options);\n\
+            }, local.onErrorThrow);\n\
+            options = {};\n\
+            options.customize = function () {\n\
+                // search-and-replace - customize dataTo\n\
+                [\n\
+                    // customize quickstart example.js\n\
+                    (/# quickstart example.js[\\S\\s]*?istanbul instrument in package/),\n\
+                    // customize quickstart-footer\n\
+                    (/>download standalone app<[^`]*?\"utility2FooterDiv\"/),\n\
+                    (/```[^`]*?\\n\
+# extra screenshots/),\n\
+                    // customize build-script\n\
+                    (/# run shBuildCi[^`]*?```/)\n\
+                ].forEach(function (rgx) {\n\
+                    options.dataFrom.replace(rgx, function (match0) {\n\
+                        options.dataTo = options.dataTo.replace(rgx, match0);\n\
+                    });\n\
+                });\n\
+            };\n\
+            local.buildReadme(options, onError);\n\
+        };\n\
+\n\
+        local.testCase_buildXxx_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test buildXxx's default handling-behavior\n\
+         */\n\
+            local.testMock([\n\
+                [local, {\n\
+                    assetsDict: { '/': '' },\n\
+                    browserTest: local.nop,\n\
+                    buildApidoc: local.nop,\n\
+                    buildCustomOrg: local.nop,\n\
+                    buildLib: local.nop,\n\
+                    buildReadme: local.nop,\n\
+                    buildTest: local.nop,\n\
+                    testCase_buildReadme_default: local.nop,\n\
+                    testCase_buildLib_default: local.nop,\n\
+                    testCase_buildTest_default: local.nop,\n\
+                    testCase_buildCustomOrg_default: local.nop\n\
+                }]\n\
+            ], function (onError) {\n\
+                local._testCase_buildApidoc_default(null, local.nop);\n\
+                local._testCase_buildApp_default(null, local.nop);\n\
+                local._testCase_buildCustomOrg_default(null, local.nop);\n\
+                local._testCase_buildLib_default(null, local.nop);\n\
+                local._testCase_buildReadme_default(null, local.nop);\n\
+                local._testCase_buildTest_default(null, local.nop);\n\
+                local._testCase_webpage_default(null, local.nop);\n\
+                local.assetsDict['/'] = '<script src=\"assets.test.js\"></script>';\n\
+                local._testCase_webpage_default(null, local.nop);\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_childProcessSpawnWithTimeout_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test childProcessSpawnWithTimeout's default handling-behavior\n\
+         */\n\
+            var onParallel;\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            options = {};\n\
+            onParallel = local.onParallel(onError);\n\
+            onParallel.counter += 1;\n\
+            // test default handling-behavior\n\
+            onParallel.counter += 1;\n\
+            local.childProcessSpawnWithTimeout('ls')\n\
+                .on('error', onParallel)\n\
+                .on('exit', function (exitCode, signal) {\n\
+                    // validate exitCode\n\
+                    local.assertJsonEqual(exitCode, 0);\n\
+                    // validate signal\n\
+                    local.assertJsonEqual(signal, null);\n\
+                    onParallel(null, options);\n\
+                });\n\
+            // test timeout handling-behavior\n\
+            onParallel.counter += 1;\n\
+            local.testMock([\n\
+                [local, { timeoutDefault: 1000 }]\n\
+            ], function (onError) {\n\
+                options.childProcess = local.childProcessSpawnWithTimeout('sleep', [5000]);\n\
+                onError(null, options);\n\
+            }, local.onErrorThrow);\n\
+            options.childProcess\n\
+                .on('error', onParallel)\n\
+                .on('exit', function (exitCode, signal) {\n\
+                    // validate exitCode\n\
+                    local.assertJsonEqual(exitCode, null);\n\
+                    // validate signal\n\
+                    local.assertJsonEqual(signal, 'SIGKILL');\n\
+                    onParallel(null, options);\n\
+                });\n\
+            onParallel(null, options);\n\
+        };\n\
+\n\
+        local.testCase_cliRun_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test cliRun's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.testMock([\n\
+                [local, { replStart: null }],\n\
+                [local.cliDict, { _default: null }],\n\
+                [local.vm, { runInThisContext: local.nop }],\n\
+                [process, { argv: [] }]\n\
+            ], function (onError) {\n\
+                local.cliRun();\n\
+                local.replStart = local.nop;\n\
+                process.argv[2] = '--help';\n\
+                local.cliRun();\n\
+                ['--eval', '--help', '--interactive', '--version'].forEach(function (key) {\n\
+                    local.cliDict[key]();\n\
+                });\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_cookieXxx_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test cookieXxx's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'browser') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            // test cookieRemoveAll handling-behavior\n\
+            local.cookieRemoveAll();\n\
+            // validate data\n\
+            local.assertJsonEqual(local.cookieDict().aa, undefined);\n\
+            // test cookieSet handling-behavior\n\
+            local.cookieSet('aa', 'bb', 1000);\n\
+            // validate data\n\
+            local.assertJsonEqual(local.cookieDict().aa, 'bb');\n\
+            // test cookieRemove handling-behavior\n\
+            local.cookieRemove('aa');\n\
+            // validate data\n\
+            local.assertJsonEqual(local.cookieDict().aa, undefined);\n\
+            // test cookieSet handling-behavior\n\
+            local.cookieSet('aa', 'bb', 1000);\n\
+            // test cookieRemoveAll handling-behavior\n\
+            local.cookieRemoveAll();\n\
+            // validate data\n\
+            local.assertJsonEqual(local.cookieDict().aa, undefined);\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_corsBackendHostInject_default = function (options, onError) {\n\
+        /*\n\
+         * this function will corsBackendHostInject's default handling-behavior\n\
+         */\n\
+            // test null-case handling-behavior\n\
+            local.assertJsonEqual(local.corsBackendHostInject(), undefined);\n\
+            // test override-all handling-behavior\n\
+            local.assertJsonEqual(local.corsBackendHostInject(\n\
+                'cc.com',\n\
+                'aa-alpha.bb.com',\n\
+                null,\n\
+                { host: 'github.io', pathname: '/build..beta..travis-ci.org/' }\n\
+            ), 'aa-beta.bb.com');\n\
+            // test override-rgx handling-behavior\n\
+            local.assertJsonEqual(local.corsBackendHostInject(\n\
+                'cc/dd',\n\
+                'aa-alpha.bb.com/',\n\
+                (/(^cc\\/)/),\n\
+                { host: 'github.io', pathname: '/build..beta..travis-ci.org/' }\n\
+            ), 'aa-beta.bb.com/cc/dd');\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_corsForwardProxyHostIfNeeded_default = function (options, onError) {\n\
+        /*\n\
+         * this function will corsForwardProxyHostIfNeeded's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'browser') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.assert(local.corsForwardProxyHostIfNeeded({\n\
+                location: { host: 'undefined.github.io' },\n\
+                url: 'https://example.com'\n\
+            }).indexOf('.herokuapp.com') >= 0);\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_dbTableCustomOrgXxx_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test dbTableCustomOrgXxx's default handling-behavior\n\
+         */\n\
+            local.testMock([\n\
+                [local, {\n\
+                    ajax: function (options, onError) {\n\
+                        onError(null, {\n\
+                            responseText: JSON.stringify({\n\
+                                '@pagination': { count: 0 },\n\
+                                repositories: [{\n\
+                                    _id: '',\n\
+                                    name: 'node-aa-bb-cc',\n\
+                                    private: false,\n\
+                                    slug: 'aa/node-aa-bb-cc'\n\
+                                }]\n\
+                            })\n\
+                        }, options);\n\
+                    },\n\
+                    db: {\n\
+                        crudGetManyByQuery: local.nop,\n\
+                        crudRemoveManyByQuery: local.nop,\n\
+                        crudSetManyById: local.nop,\n\
+                        dbTableCreateOne: function (options, onError) {\n\
+                            (onError || local.nop)(null, local.db, options);\n\
+                            return local.db;\n\
+                        },\n\
+                        save: function (onError) {\n\
+                            onError(null, options);\n\
+                        }\n\
+                    },\n\
+                    setTimeoutOnError: function (onError, timeout, error) {\n\
+                        onError(error, timeout);\n\
+                    }\n\
+                }]\n\
+            ], function (onError) {\n\
+                local.dbTableCustomOrgUpdate({ customOrg: 'aa' }, local.onErrorThrow);\n\
+                local.dbTableCustomOrgCrudGetManyByQuery({});\n\
+                onError(null, options);\n\
+            }, local.onErrorThrow);\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_debug_inline_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test debug_inline's default handling-behavior\n\
+         */\n\
+            options = {};\n\
+            local.testMock([\n\
+                [local, { _consoleError: function (arg) {\n\
+                    options.data += (arg || '') + '\\n\
+';\n\
+                } }]\n\
+            ], function (onError) {\n\
+                options.data = '';\n\
+                local.global['debug_inline'.replace('_i', 'I')]('aa');\n\
+                // validate data\n\
+                local.assertJsonEqual(\n\
+                    options.data,\n\
+                    '\\n\
+\\n\
+\\n\
+debug_inline\\n\
+aa\\n\
+\\n\
+'.replace('_i', 'I')\n\
+                );\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_domElementRender_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test domElementRender's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'browser') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.assertJsonEqual(local.domElementRender('<div>{{value}}</div>', {\n\
+                value: 'aa'\n\
+            }).children[0].outerHTML, '<div>aa</div>');\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_domQuerySelectorAllTagNameAndPrint_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test domQuerySelectorAllTagNameAndPrint's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'browser') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.domQuerySelectorAllTagNameAndPrint('body');\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_echo_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test echo's default handling-behavior\n\
+         */\n\
+            local.assertJsonEqual(local.echo('aa'), 'aa');\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_envSanitize_default = function (options, onError) {\n\
+        /*\n\
+         * this function will envSanitize's default handling-behavior\n\
+         */\n\
+            // test invalid envSanitize-code handling-behavior\n\
+            local.assertJsonEqual(local.envSanitize({\n\
+                aa: '',\n\
+                aaPassword: '',\n\
+                aa_password: '',\n\
+                aapassword: '',\n\
+                bb: null,\n\
+                passport: '',\n\
+                password: ''\n\
+            }), { aa: '', aapassword: '' });\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_exit_error = function (options, onError) {\n\
+        /*\n\
+         * this function will exit's error handling-behavior\n\
+         */\n\
+            // test invalid exit-code handling-behavior\n\
+            local.exit('invalid exit-code');\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_fsWriteFileWithMkdirpSync_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test fsWriteFileWithMkdirpSync's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.fsRmrSync('tmp/build/testCase_fsWriteFileWithMkdirpSync_default');\n\
+            // validate data\n\
+            local.assertJsonEqual(local.tryCatchReadFile(\n\
+                'tmp/build/testCase_fsWriteFileWithMkdirpSync_default/aa.txt',\n\
+                'utf8'\n\
+            ), '');\n\
+            local.fsWriteFileWithMkdirpSync(\n\
+                'tmp/build/testCase_fsWriteFileWithMkdirpSync_default/aa.txt',\n\
+                'aa'\n\
+            );\n\
+            // validate data\n\
+            local.assertJsonEqual(local.tryCatchReadFile(\n\
+                'tmp/build/testCase_fsWriteFileWithMkdirpSync_default/aa.txt',\n\
+                'utf8'\n\
+            ), 'aa');\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_httpRequest_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test httpRequest's default handling-behavior\n\
+         */\n\
+            var onParallel;\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            onParallel = local.onParallel(onError);\n\
+            onParallel.counter += 1;\n\
+            // test default handling-behavior\n\
+            onParallel.counter += 1;\n\
+            local.httpRequest({\n\
+                data: 'aa',\n\
+                // test request-header handling-behavior\n\
+                headers: { 'X-Request-Header-Test': 'aa' },\n\
+                method: 'POST',\n\
+                url: local.serverLocalHost + '/test.echo'\n\
+            }, function (error, response) {\n\
+                // validate no error occurred\n\
+                local.assert(!error, error);\n\
+                // validate response.statusCode\n\
+                local.assertJsonEqual(response.statusCode, 200);\n\
+                // validate response.headers\n\
+                local.assertJsonEqual(response.headers['x-response-header-test'], 'bb');\n\
+                // validate response.data\n\
+                options = String(response.data);\n\
+                local.assert((/\\r\\n\
+aa$/).test(options), options);\n\
+                local.assert((/\\r\\n\
+x-request-header-test: aa\\r\\n\
+/).test(options), options);\n\
+                onParallel(null, options);\n\
+            });\n\
+            // test error handling-behavior\n\
+            onParallel.counter += 1;\n\
+            local.httpRequest({\n\
+                url: local.serverLocalHost + '/test.error-404'\n\
+            }, function (error) {\n\
+                // validate error occurred\n\
+                local.assert(error, error);\n\
+                onParallel(null, options);\n\
+            });\n\
+            // test serverLog-fallback handling-behavior\n\
+            onParallel.counter += 1;\n\
+            local.testMock([\n\
+                [local.http, { request: null }],\n\
+                [local, { serverLog: null }]\n\
+            ], function (onError) {\n\
+                local.http.request = function () {\n\
+                    return local.http.request;\n\
+                };\n\
+                local.http.request.end = local.http.request.on = local.http.request;\n\
+                local.httpRequest({ url: 'http://example.com' });\n\
+                onError(null, options);\n\
+            }, onParallel);\n\
+            // test timeout handling-behavior\n\
+            onParallel.counter += 1;\n\
+            setTimeout(function () {\n\
+                local.httpRequest({\n\
+                    timeout: 1,\n\
+                    url: local.serverLocalHost + '/test.timeout'\n\
+                }, function (error) {\n\
+                    // validate error occurred\n\
+                    local.assert(error, error);\n\
+                    onParallel(null, options);\n\
+                });\n\
+            }, 1000);\n\
+            onParallel(null, options);\n\
+        };\n\
+\n\
+        local.testCase_isNullOrUndefined_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test isNullOrUndefined's default handling-behavior\n\
+         */\n\
+            // validate data\n\
+            local.assertJsonEqual(local.isNullOrUndefined(null), true);\n\
+            // validate data\n\
+            local.assertJsonEqual(local.isNullOrUndefined(undefined), true);\n\
+            // validate data\n\
+            local.assertJsonEqual(local.isNullOrUndefined(false), false);\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_jslintAndPrintConditional_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test jslintAndPrintConditional's default handling-behavior\n\
+         */\n\
+            local.testMock([\n\
+                [local.jslint, { errorText: '' }]\n\
+            ], function (onError) {\n\
+                // test no csslint handling-behavior\n\
+                local.jslintAndPrintConditional('no csslint', 'empty.css');\n\
+                // validate no error occurred\n\
+                local.assert(!local.jslint.errorText, local.jslint.errorText);\n\
+                // test csslint passed handling-behavior\n\
+                local.jslintAndPrintConditional(\n\
+                    '/*csslint*/\\n\
+body { display: block; }',\n\
+                    'passed.css',\n\
+                    'force'\n\
+                );\n\
+                // validate no error occurred\n\
+                local.assert(!local.jslint.errorText, local.jslint.errorText);\n\
+                // test no jslint handling-behavior\n\
+                local.jslintAndPrintConditional('no jslint', 'empty.js');\n\
+                // validate no error occurred\n\
+                local.assert(!local.jslint.errorText, local.jslint.errorText);\n\
+                // test jslint passed handling-behavior\n\
+                local.jslintAndPrintConditional(\n\
+                    '/*jslint node: true*/\\n\
+console.log(\"aa\");',\n\
+                    'passed.js',\n\
+                    'force'\n\
+                );\n\
+                // validate no error occurred\n\
+                local.assert(!local.jslint.errorText, local.jslint.errorText);\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_jsonCopy_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test jsonCopy's default handling-behavior\n\
+         */\n\
+            // test various data-type handling-behavior\n\
+            [undefined, null, false, true, 0, 1, 1.5, 'a'].forEach(function (element) {\n\
+                local.assertJsonEqual(local.jsonCopy(element), element);\n\
+            });\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_jsonStringifyOrdered_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test jsonStringifyOrdered's default handling-behavior\n\
+         */\n\
+            options = {};\n\
+            // test data-type handling-behavior\n\
+            [undefined, null, false, true, 0, 1, 1.5, 'a', {}, []].forEach(function (data) {\n\
+                options.aa = local.jsonStringifyOrdered(data);\n\
+                options.bb = JSON.stringify(data);\n\
+                local.assertJsonEqual(options.aa, options.bb);\n\
+            });\n\
+            // test data-ordering handling-behavior\n\
+            options = {\n\
+                // test nested dict handling-behavior\n\
+                ff: { hh: 2, gg: 1},\n\
+                // test nested array handling-behavior\n\
+                ee: [1, null, undefined],\n\
+                dd: local.nop,\n\
+                cc: undefined,\n\
+                bb: null,\n\
+                aa: 1\n\
+            };\n\
+            // test circular-reference handling-behavior\n\
+            options.zz = options;\n\
+            local.assertJsonEqual(\n\
+                options,\n\
+                { aa: 1, bb: null, ee: [ 1, null, null ], ff: { gg: 1, hh: 2 } }\n\
+            );\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_jwtA256GcmXxx_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test jwtA256GcmXxx's default handling-behavior\n\
+         */\n\
+            options = {};\n\
+            options.key = local.jwtAes256KeyCreate();\n\
+            // use canonical example at https://jwt.io/\n\
+            options.data = { sub: '1234567890', name: 'John Doe', admin: true };\n\
+            options.data = local.normalizeJwt(options.data);\n\
+            options.data = JSON.parse(local.jsonStringifyOrdered(options.data));\n\
+            // encrypt token\n\
+            options.token = local.jwtA256GcmEncrypt(options.data, options.key);\n\
+            // validate encrypted-token\n\
+            local.assertJsonEqual(\n\
+                local.jwtA256GcmDecrypt(options.token, options.key),\n\
+                options.data\n\
+            );\n\
+            // test decryption-failed handling-behavior\n\
+            local.assertJsonEqual(local.jwtA256GcmDecrypt(options.token, null), {});\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_jwtHs256Xxx_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test jwtHs256Xxx's default handling-behavior\n\
+         */\n\
+            options = {};\n\
+            options.key = local.normalizeJwtBase64Url(local.base64FromString('secret'));\n\
+            // use canonical example at https://jwt.io/\n\
+            options.data = { sub: '1234567890', name: 'John Doe', admin: true };\n\
+            options.token = local.jwtHs256Encode(options.data, options.key);\n\
+            // validate encoded-token\n\
+            local.assertJsonEqual(\n\
+                options.token,\n\
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9' +\n\
+                    '.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9' +\n\
+                    '.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ'\n\
+            );\n\
+            options.data = local.jwtHs256Decode(options.token, options.key);\n\
+            // validate decoded-data\n\
+            local.assertJsonEqual(\n\
+                options.data,\n\
+                { admin: true, name: 'John Doe', sub: '1234567890' }\n\
+            );\n\
+            // test decoding-failed handling-behavior\n\
+            options.data = local.jwtHs256Decode(options.token, 'undefined');\n\
+            local.assertJsonEqual(options.data, {});\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_libUtility2Js_standalone = function (options, onError) {\n\
+        /*\n\
+         * this function will test lib.utility2.js's standalone handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.fs.writeFileSync('tmp/lib.utility2.js', local.fs.readFileSync(\n\
+                'lib.utility2.js',\n\
+                'utf8'\n\
+            ).replace('/* istanbul instrument in package utility2 */', ''));\n\
+            require('./tmp/lib.utility2.js');\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_listGetElementRandom_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test listGetRandom's default handling-behavior\n\
+         */\n\
+            options = {};\n\
+            // init list\n\
+            options.list = ['aa', 'bb', 'cc', 'dd'];\n\
+            options.elementDict = {};\n\
+            // get 100 random elements from list\n\
+            for (options.ii = 0; options.ii < 1024; options.ii += 1) {\n\
+                options.elementDict[local.listGetElementRandom(options.list)] = true;\n\
+            }\n\
+            // validate all elements were retrieved from list\n\
+            local.assertJsonEqual(\n\
+                Object.keys(options.elementDict).sort(),\n\
+                ['aa', 'bb', 'cc', 'dd']\n\
+            );\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_listShuffle_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test listShuffle's default handling-behavior\n\
+         */\n\
+            options = {};\n\
+            // init list\n\
+            options.list = '[0,1]';\n\
+            // shuffle list 100 times\n\
+            for (options.ii = 0; options.ii < 100; options.ii += 1) {\n\
+                options.listShuffled =\n\
+                    JSON.stringify(local.listShuffle(JSON.parse(options.list)));\n\
+                // validate shuffled list\n\
+                local.assertJsonEqual(options.listShuffled.length, options.list.length);\n\
+                options.changed = options.changed || options.listShuffled !== options.list;\n\
+            }\n\
+            // validate list changed at least once during the shuffle\n\
+            local.assert(options.changed, options);\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_localStorageSetItemOrClear_default = function (options, onError) {\n\
+        /*\n\
+         * this function will localStorageSetItemOrClear's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'browser') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.localStorageSetItemOrClear(\n\
+                'testCase_localStorageSetItemOrClear_default',\n\
+                null\n\
+            );\n\
+            local.assertJsonEqual(\n\
+                localStorage.testCase_localStorageSetItemOrClear_default,\n\
+                'null'\n\
+            );\n\
+            local.testMock([\n\
+                [localStorage, {\n\
+                    clear: null,\n\
+                    setItem: function () {\n\
+                        throw local.errorDefault;\n\
+                    }\n\
+                }]\n\
+            ], function (onError) {\n\
+                localStorage.clear = onError;\n\
+                local.localStorageSetItemOrClear(\n\
+                    'testCase_localStorageSetItemOrClear_default',\n\
+                    null\n\
+                );\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_middlewareForwardProxy_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test middlewareForwardProxy's default handling-behavior\n\
+         */\n\
+            var onParallel;\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            onParallel = local.onParallel(onError);\n\
+            onParallel.counter += 1;\n\
+            // test preflight-cors handling-behavior\n\
+            onParallel.counter += 1;\n\
+            local.ajax({ headers: {\n\
+                'access-control-request-headers': 'forward-proxy-headers,forward-proxy-url'\n\
+            }, method: 'OPTIONS', url: '' }, onParallel);\n\
+            // test forward-proxy-http handling-behavior\n\
+            onParallel.counter += 1;\n\
+            local.ajax({ headers: {\n\
+                'forward-proxy-url': '/assets.hello'\n\
+            }, url: '' }, function (error, data) {\n\
+                // validate no error occurred\n\
+                local.assert(!error, error);\n\
+                // validate responseText\n\
+                local.assertJsonEqual(data.responseText, 'hello\\n\
+');\n\
+                onParallel(null, options);\n\
+            });\n\
+            // test error handling-behavior\n\
+            onParallel.counter += 1;\n\
+            local.ajax({ headers: {\n\
+                'forward-proxy-url': 'https://undefined:0'\n\
+            }, url: '' }, function (error) {\n\
+                // validate error occurred\n\
+                local.assert(error, error);\n\
+                onParallel(null, options);\n\
+            });\n\
+            onParallel(null, options);\n\
+        };\n\
+\n\
+        local.testCase_moduleDirname_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test moduleDirname's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            // test null-case handling-behavior\n\
+            local.assertJsonEqual(local.moduleDirname(null, module.paths), process.cwd());\n\
+            // test path handling-behavior\n\
+            local.assertJsonEqual(local.moduleDirname('.', module.paths), process.cwd());\n\
+            local.assertJsonEqual(local.moduleDirname('./', module.paths), process.cwd());\n\
+            // test module exists handling-behavior\n\
+            options = local.moduleDirname('electron-lite', module.paths);\n\
+            local.assert((/\\/electron-lite$/).test(options), options);\n\
+            // test module does not exists handling-behavior\n\
+            local.assertJsonEqual(local.moduleDirname('syntax error', module.paths), '');\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_normalizeValue_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test normalizeValue's default handling-behavior\n\
+         */\n\
+            // test list handling-behavior\n\
+            local.assertJsonEqual(local.normalizeValue('list', [1]), [1]);\n\
+            local.assertJsonEqual(local.normalizeValue('list', null), []);\n\
+            local.assertJsonEqual(local.normalizeValue('list', {}), []);\n\
+            // test number handling-behavior\n\
+            local.assertJsonEqual(local.normalizeValue('number', 0.5), 0.5);\n\
+            local.assertJsonEqual(local.normalizeValue('number', null), 0);\n\
+            local.assertJsonEqual(local.normalizeValue('number', {}), 0);\n\
+            // test string handling-behavior\n\
+            local.assertJsonEqual(local.normalizeValue('string', 'aa'), 'aa');\n\
+            local.assertJsonEqual(local.normalizeValue('string', null), '');\n\
+            local.assertJsonEqual(local.normalizeValue('string', {}), '');\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_numberToRomanNumerals_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test numberToRomanNumerals's default handling-behavior\n\
+         */\n\
+            options = {};\n\
+            options.list = [\n\
+            /* jslint-ignore-next-line */\n\
+\"\",\"I\",\"II\",\"III\",\"IV\",\"V\",\"VI\",\"VII\",\"VIII\",\"IX\",\"X\",\"XI\",\"XII\",\"XIII\",\"XIV\",\"XV\",\"XVI\",\"XVII\",\"XVIII\",\"XIX\",\"XX\",\"XXI\",\"XXII\",\"XXIII\",\"XXIV\",\"XXV\",\"XXVI\",\"XXVII\",\"XXVIII\",\"XXIX\",\"XXX\",\"XXXI\",\"XXXII\",\"XXXIII\",\"XXXIV\",\"XXXV\",\"XXXVI\",\"XXXVII\",\"XXXVIII\",\"XXXIX\",\"XL\",\"XLI\",\"XLII\",\"XLIII\",\"XLIV\",\"XLV\",\"XLVI\",\"XLVII\",\"XLVIII\",\"XLIX\",\"L\",\"LI\",\"LII\",\"LIII\",\"LIV\",\"LV\",\"LVI\",\"LVII\",\"LVIII\",\"LIX\",\"LX\",\"LXI\",\"LXII\",\"LXIII\",\"LXIV\",\"LXV\",\"LXVI\",\"LXVII\",\"LXVIII\",\"LXIX\",\"LXX\",\"LXXI\",\"LXXII\",\"LXXIII\",\"LXXIV\",\"LXXV\",\"LXXVI\",\"LXXVII\",\"LXXVIII\",\"LXXIX\",\"LXXX\",\"LXXXI\",\"LXXXII\",\"LXXXIII\",\"LXXXIV\",\"LXXXV\",\"LXXXVI\",\"LXXXVII\",\"LXXXVIII\",\"LXXXIX\",\"XC\",\"XCI\",\"XCII\",\"XCIII\",\"XCIV\",\"XCV\",\"XCVI\",\"XCVII\",\"XCVIII\",\"XCIX\",\"C\"\n\
+            ];\n\
+            for (options.ii = 0; options.ii < 10; options.ii += 1) {\n\
+                local.assertJsonEqual(\n\
+                    local.numberToRomanNumerals(options.ii),\n\
+                    options.list[options.ii]\n\
+                );\n\
+            }\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_objectGetElementFirst_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test objectGetElementFirst's default handling-behavior\n\
+         */\n\
+            local.assertJsonEqual(\n\
+                local.objectGetElementFirst({ aa: 1, bb: 2 }),\n\
+                { key: 'aa', value: 1 }\n\
+            );\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_objectKeysTypeOf_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test objectKeysTypeOf's default handling-behavior\n\
+         */\n\
+            local.assertJsonEqual(local.objectKeysTypeof({\n\
+                aa: true,\n\
+                bb: local.nop,\n\
+                cc: 0,\n\
+                dd: null,\n\
+                ee: '',\n\
+                ff: undefined\n\
+            }), 'boolean aa\\n\
+function bb\\n\
+number cc\\n\
+object dd\\n\
+string ee\\n\
+undefined ff');\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_objectLiteralize_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test objectLiteralize's default handling-behavior\n\
+         */\n\
+            local.assertJsonEqual(local.objectLiteralize({\n\
+                '': '$[]',\n\
+                '$[]1': [1, { '$[]2': [2, 3] }]\n\
+            }), { 1: { 2: 3 }, '': '$[]' });\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_objectSetDefault_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test objectSetDefault's default handling-behavior\n\
+         */\n\
+            // test null-case handling-behavior\n\
+            local.objectSetDefault();\n\
+            local.objectSetDefault({});\n\
+            // test falsey handling-behavior\n\
+            ['', 0, false, null, undefined].forEach(function (aa) {\n\
+                ['', 0, false, null, undefined].forEach(function (bb) {\n\
+                    local.assertJsonEqual(\n\
+                        local.objectSetDefault({ data: aa }, { data: bb }).data,\n\
+                        aa === 0 || aa === false || bb === undefined\n\
+                            ? aa\n\
+                            : bb\n\
+                    );\n\
+                });\n\
+            });\n\
+            // test non-recursive handling-behavior\n\
+            local.assertJsonEqual(local.objectSetDefault(\n\
+                { aa: 0, bb: { cc: 1 }, cc: { dd: {} }, dd: [1, 1], ee: [1, 1] },\n\
+                { aa: 2, bb: { dd: 2 }, cc: { dd: { ee: 2 } }, dd: [2, 2], ee: { ff: 2 } },\n\
+                // test default-depth handling-behavior\n\
+                null\n\
+            ), { aa: 0, bb: { cc: 1 }, cc: { dd: {} }, dd: [1, 1], ee: [1, 1] });\n\
+            // test recursive handling-behavior\n\
+            local.assertJsonEqual(local.objectSetDefault(\n\
+                { aa: 0, bb: { cc: 1 }, cc: { dd: {} }, dd: [1, 1], ee: [1, 1] },\n\
+                { aa: 2, bb: { dd: 2 }, cc: { dd: { ee: 2 } }, dd: [2, 2], ee: { ff: 2 } },\n\
+                // test depth handling-behavior\n\
+                2\n\
+            ), { aa: 0, bb: { cc: 1, dd: 2 }, cc: { dd: {} }, dd: [1, 1], ee: [1, 1] });\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_objectSetOverride_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test objectSetOverride's default handling-behavior\n\
+         */\n\
+            // test null-case handling-behavior\n\
+            local.objectSetOverride();\n\
+            local.objectSetOverride({});\n\
+            // test falsey handling-behavior\n\
+            ['', 0, false, null, undefined].forEach(function (aa) {\n\
+                ['', 0, false, null, undefined].forEach(function (bb) {\n\
+                    local.assertJsonEqual(\n\
+                        local.objectSetOverride({ data: aa }, { data: bb }).data,\n\
+                        bb === undefined\n\
+                            ? aa\n\
+                            : bb\n\
+                    );\n\
+                });\n\
+            });\n\
+            // test non-recursive handling-behavior\n\
+            local.assertJsonEqual(local.objectSetOverride(\n\
+                { aa: 1, bb: { cc: 1 }, cc: { dd: 1 }, dd: [1, 1], ee: [1, 1] },\n\
+                { aa: 2, bb: { dd: 2 }, cc: { ee: 2 }, dd: [2, 2], ee: { ff: 2 } },\n\
+                // test default-depth handling-behavior\n\
+                null\n\
+            ), { aa: 2, bb: { dd: 2 }, cc: { ee: 2 }, dd: [2, 2], ee: { ff: 2 } });\n\
+            // test recursive handling-behavior\n\
+            local.assertJsonEqual(local.objectSetOverride(\n\
+                { aa: 1, bb: { cc: 1 }, cc: { dd: 1 }, dd: [1, 1], ee: [1, 1] },\n\
+                { aa: 2, bb: { dd: 2 }, cc: { ee: 2 }, dd: [2, 2], ee: { ff: 2 } },\n\
+                // test depth handling-behavior\n\
+                2\n\
+            ), { aa: 2, bb: { cc: 1, dd: 2 }, cc: { dd: 1, ee: 2 }, dd: [2, 2], ee: { ff: 2 } });\n\
+            // test env with empty-string handling-behavior\n\
+            local.assertJsonEqual(local.objectSetOverride(\n\
+                local.env,\n\
+                { 'emptyString': null },\n\
+                // test default-depth handling-behavior\n\
+                null,\n\
+                local.env\n\
+            ).emptyString, '');\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_objectTraverse_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test objectTraverse's default handling-behavior\n\
+         */\n\
+            options = { aa: null, bb: 2, cc: { dd: 4, ee: [5, 6, 7] } };\n\
+            // test circular-reference handling-behavior\n\
+            options.data = options;\n\
+            local.objectTraverse(options, function (element) {\n\
+                if (typeof element === 'object' && element && !Array.isArray(element)) {\n\
+                    element.zz = true;\n\
+                }\n\
+            });\n\
+            // validate options\n\
+            local.assertJsonEqual(\n\
+                options,\n\
+                { aa: null, bb: 2, cc: { dd: 4, ee: [5, 6, 7], zz: true }, zz: true }\n\
+            );\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_onErrorDefault_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test onErrorDefault's default handling-behavior\n\
+         */\n\
+            local.testMock([\n\
+                [console, { error: function (arg) {\n\
+                    options = arg;\n\
+                } }],\n\
+                [local.global, { __coverage__: null }]\n\
+            ], function (onError) {\n\
+                // test no error handling-behavior\n\
+                local.onErrorDefault();\n\
+                // validate options\n\
+                local.assert(!options, options);\n\
+                // test error handling-behavior\n\
+                local.onErrorDefault(local.errorDefault);\n\
+                // validate options\n\
+                local.assert(options, options);\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_onErrorThrow_error = function (options, onError) {\n\
+        /*\n\
+         * this function will test onErrorThrow's error handling-behavior\n\
+         */\n\
+            local.tryCatchOnError(function () {\n\
+                local.onErrorThrow(local.errorDefault);\n\
+            }, function (error) {\n\
+                // validate error occurred\n\
+                local.assert(error, error);\n\
+                onError(null, options);\n\
+            });\n\
+        };\n\
+\n\
+        local.testCase_onFileModifiedRestart_watchFile = function (options, onError) {\n\
+        /*\n\
+         * this function will test onFileModifiedRestart's watchFile handling-behavior\n\
+         */\n\
+            var onParallel;\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            onParallel = local.onParallel(onError);\n\
+            onParallel.counter += 1;\n\
+            local.fs.stat(__filename, function (error, stat) {\n\
+                // test default watchFile handling-behavior\n\
+                onParallel.counter += 1;\n\
+                local.fs.utimes(__filename, stat.atime, new Date(), onParallel);\n\
+                // test nop watchFile handling-behavior\n\
+                onParallel.counter += 1;\n\
+                setTimeout(function () {\n\
+                    local.fs.utimes(__filename, stat.atime, stat.mtime, onParallel);\n\
+                // coverage-hack - use 1500 ms to cover setInterval\n\
+                }, 1500);\n\
+                onParallel(error, options);\n\
+            });\n\
+        };\n\
+\n\
+        local.testCase_onNext_error = function (options, onError) {\n\
+        /*\n\
+         * this function will test onNext's error handling-behavior\n\
+         */\n\
+\n\
+            options = {};\n\
+            local.onNext(options, function () {\n\
+                throw local.errorDefault;\n\
+            });\n\
+            options.modeNext = 0;\n\
+            local.tryCatchOnError(function () {\n\
+                options.onNext();\n\
+            }, function (error) {\n\
+                // validate error occurred\n\
+                local.assert(error, error);\n\
+                onError(null, options);\n\
+            });\n\
+        };\n\
+\n\
+        local.testCase_onParallelList_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test onParallelList's default handling-behavior\n\
+         */\n\
+            options = {};\n\
+            local.onNext(options, function (error) {\n\
+                switch (options.modeNext) {\n\
+                case 1:\n\
+                    // test null-case handling-behavior\n\
+                    local.onParallelList({}, local.onErrorThrow, options.onNext);\n\
+                    break;\n\
+                case 2:\n\
+                    options.list = [null];\n\
+                    // test retryLimit handling-behavior\n\
+                    options.retryLimit = 1;\n\
+                    local.onParallelList(options, function (data, onParallel) {\n\
+                        onParallel.counter += 1;\n\
+                        // test error handling-behavior\n\
+                        onParallel(local.errorDefault, data);\n\
+                        // test multiple callback handling-behavior\n\
+                        setTimeout(onParallel, 5000);\n\
+                    }, function (error) {\n\
+                        // validate error occurred\n\
+                        local.assert(error, error);\n\
+                        options.onNext();\n\
+                    });\n\
+                    break;\n\
+                case 3:\n\
+                    options.data = [];\n\
+                    // test rateLimit handling-behavior\n\
+                    options.rateLimit = 3;\n\
+                    options.rateMax = 0;\n\
+                    // test retryLimit handling-behavior\n\
+                    options.retryLimit = 1;\n\
+                    local.onParallelList({\n\
+                        list: [1, 2, 3, 4, 5],\n\
+                        rateLimit: options.rateLimit\n\
+                    }, function (data, onParallel) {\n\
+                        onParallel.counter += 1;\n\
+                        options.rateMax = Math.max(onParallel.counter - 1, options.rateMax);\n\
+                        // test async handling-behavior\n\
+                        setTimeout(function () {\n\
+                            options.data[data.ii] = data.element;\n\
+                            onParallel(data.retry < 1 && local.onErrorDefault, data);\n\
+                        });\n\
+                    }, options.onNext, options.rateLimit);\n\
+                    break;\n\
+                case 4:\n\
+                    // validate data\n\
+                    local.assertJsonEqual(options.data, [1, 2, 3, 4, 5]);\n\
+                    local.assertJsonEqual(options.rateMax, 3);\n\
+                    options.data = [];\n\
+                    options.rateLimit = 'syntax error';\n\
+                    options.rateMax = 0;\n\
+                    local.onParallelList({\n\
+                        list: [1, 2, 3, 4, 5],\n\
+                        rateLimit: options.rateLimit\n\
+                    }, function (data, onParallel) {\n\
+                        // test sync handling-behavior\n\
+                        onParallel.counter += 1;\n\
+                        options.rateMax = Math.max(onParallel.counter, options.rateMax);\n\
+                        options.data[data.ii] = data.element;\n\
+                        onParallel(null, options);\n\
+                    }, options.onNext);\n\
+                    break;\n\
+                case 5:\n\
+                    // validate data\n\
+                    local.assertJsonEqual(options.data, [1, 2, 3, 4, 5]);\n\
+                    local.assertJsonEqual(options.rateMax, 2);\n\
+                    options.onNext();\n\
+                    break;\n\
+                default:\n\
+                    onError(error, options);\n\
+                }\n\
+            });\n\
+            options.modeNext = 0;\n\
+            options.onNext();\n\
+        };\n\
+\n\
+        local.testCase_onParallel_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test onParallel's default handling-behavior\n\
+         */\n\
+            var onParallel, onParallelError;\n\
+            // test onEach handling-behavior\n\
+            onParallel = local.onParallel(onError, function () {\n\
+                // validate counter\n\
+                local.assert(onParallel.counter >= 0, onParallel);\n\
+            });\n\
+            onParallel.counter += 1;\n\
+            // test multiple-task handling-behavior\n\
+            onParallel.counter += 1;\n\
+            setTimeout(function () {\n\
+                onParallelError = local.onParallel(function (error) {\n\
+                    // validate error occurred\n\
+                    local.assert(error, error);\n\
+                    onParallel(null, options);\n\
+                });\n\
+                onParallelError.counter += 1;\n\
+                // test error handling-behavior\n\
+                onParallelError.counter += 1;\n\
+                onParallelError(local.errorDefault);\n\
+                // test ignore-after-error handling-behavior\n\
+                onParallelError();\n\
+            });\n\
+            // test default handling-behavior\n\
+            onParallel(null, options);\n\
+        };\n\
+\n\
+        local.testCase_onTimeout_timeout = function (options, onError) {\n\
+        /*\n\
+         * this function will test onTimeout's timeout handling-behavior\n\
+         */\n\
+            options = local.timeElapsedStart();\n\
+            local.onTimeout(function (error) {\n\
+                // validate error occurred\n\
+                local.assert(error, error);\n\
+                // validate error message\n\
+                local.assert(\n\
+                    error.message.indexOf('testCase_onTimeout_errorTimeout') >= 0,\n\
+                    error\n\
+                );\n\
+                // poll timeElapsed\n\
+                local.timeElapsedPoll(options);\n\
+                // validate timeElapsed passed is greater than timeout\n\
+                local.assert(options.timeElapsed >= 1500, options);\n\
+                onError(null, options);\n\
+            // coverage-hack - use 1500 ms to cover setInterval\n\
+            }, 1500, function () {\n\
+                return 'testCase_onTimeout_errorTimeout';\n\
+            });\n\
+        };\n\
+\n\
+        local.testCase_profileXxx_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test profileXxx's default handling-behavior\n\
+         */\n\
+            options = {};\n\
+            // test profileSync's handling-behavior\n\
+            options.timeElapsed = local.profileSync(function () {\n\
+                return;\n\
+            });\n\
+            // validate timeElapsed\n\
+            local.assert(\n\
+                0 <= options.timeElapsed && options.timeElapsed < 1000,\n\
+                options.timeElapsed\n\
+            );\n\
+            // test profile's async handling-behavior\n\
+            local.profile(function (onError) {\n\
+                setTimeout(onError);\n\
+            }, function (error, timeElapsed) {\n\
+                // validate no error occurred\n\
+                local.assert(!error, error);\n\
+                options.timeElapsed = timeElapsed;\n\
+                // validate timeElapsed\n\
+                local.assert(0 <= options.timeElapsed &&\n\
+                    options.timeElapsed < local.timeoutDefault, options.timeElapsed);\n\
+                onError(null, options);\n\
+            });\n\
+        };\n\
+\n\
+        local.testCase_replStart_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test replStart's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            /*jslint evil: true*/\n\
+            local.replStart();\n\
+            // coverage-hack - test replStart's muliple-call handling-behavior\n\
+            local.replStart();\n\
+            local.testMock([\n\
+                [local.child_process, { spawn: function () {\n\
+                    return { on: function (event, callback) {\n\
+                        callback(null, event);\n\
+                    } };\n\
+                } }],\n\
+                // suppress process.stdout\n\
+                [process.stdout, { write: local.nop }]\n\
+            ], function (onError) {\n\
+                [\n\
+                    // test null-case handling-behavior\n\
+                    '',\n\
+                    // test shell handling-behavior\n\
+                    '$ :\\n\
+',\n\
+                    // test git diff handling-behavior\n\
+                    '$ git diff\\n\
+',\n\
+                    // test git log handling-behavior\n\
+                    '$ git log\\n\
+',\n\
+                    // test grep handling-behavior\n\
+                    'grep \\\\baa\\\\b\\n\
+',\n\
+                    // test keys handling-behavior\n\
+                    'keys {}\\n\
+',\n\
+                    // test print handling-behavior\n\
+                    'print\\n\
+',\n\
+                    // test error handling-behavior\n\
+                    'undefined()\\n\
+'\n\
+                ].forEach(function (script) {\n\
+                    local.global.utility2_serverRepl1.eval(script, null, 'repl', local.nop);\n\
+                });\n\
+                // test nop handling-behavior\n\
+                local.global.utility2_serverRepl1.nop();\n\
+                // test error handling-behavior\n\
+                local.global.utility2_serverRepl1.onError(local.errorDefault);\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_replStart_tcp = function (options, onError) {\n\
+        /*\n\
+         * this function will test replStart's tcp handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            options = {};\n\
+            options.data = '';\n\
+            options.input = Math.random();\n\
+            options.socket = local.net.createConnection(local.env.PORT_REPL);\n\
+            options.socket.on('data', function (data) {\n\
+            /*\n\
+             * this function will concat data to options.data\n\
+             */\n\
+                options.data += data;\n\
+            });\n\
+            options.socket.setEncoding('utf8');\n\
+            options.socket.on('end', function () {\n\
+                // validate data\n\
+                local.assert(\n\
+                    options.data.indexOf(options.input) >= 0,\n\
+                    JSON.stringify([options.data, options.input])\n\
+                );\n\
+                onError(null, options);\n\
+            });\n\
+            options.socket.write(options.input + '\\n\
+');\n\
+            // test error handling-behavior\n\
+            options.socket.end('undefined()\\n\
+');\n\
+        };\n\
+\n\
+        local.testCase_requireReadme_start = function (options, onError) {\n\
+        /*\n\
+         * this function will test requireReadme's start handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.testMock([\n\
+                [local, {\n\
+                    assetsDict: { '/assets.index.template.html': '' },\n\
+                    onFileModifiedRestart: local.nop\n\
+                }],\n\
+                [local.env, {\n\
+                    npm_config_mode_start: '1',\n\
+                    npm_package_nameLib: '_testCase_requireReadme_start'\n\
+                }],\n\
+                [local.fs, {\n\
+                    readFile: function (file, options, onError) {\n\
+                        onError(null, '{}', file, options);\n\
+                    },\n\
+                    readdirSync: function () {\n\
+                        // test jslintAndPrintConditional behavior\n\
+                        return [\n\
+                            'aa.css',\n\
+                            'aa.html',\n\
+                            'aa.js',\n\
+                            'aa.json',\n\
+                            'aa.rollup.js',\n\
+                            'assets.swgg.swagger.json'\n\
+                        ];\n\
+                    }\n\
+                }]\n\
+            ], function (onError) {\n\
+                // validate data\n\
+                local.requireReadme();\n\
+                local.assert(local._testCase_requireReadme_start === local);\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_serverLog_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test serverLog's default handling-behavior\n\
+         */\n\
+            local._serverLog({});\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_serverRespondTimeoutDefault_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test serverRespondTimeoutDefault's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.testMock([\n\
+                [local, { timeoutDefault: 1000 }]\n\
+            ], function (onError) {\n\
+                local.serverRespondTimeoutDefault(\n\
+                    {\n\
+                        on: local.nop,\n\
+                        // test default onTimeout handling-behavior\n\
+                        onTimeout: null,\n\
+                        url: ''\n\
+                    },\n\
+                    { end: local.nop, headersSent: true, on: local.nop },\n\
+                    // test default timeout handling-behavior\n\
+                    null\n\
+                );\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_setTimeoutOnError_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test setTimeoutOnError's default handling-behavior\n\
+         */\n\
+            options = {};\n\
+            // test null-case handling-behavior\n\
+            local.assertJsonEqual(local.setTimeoutOnError(), undefined);\n\
+            // test onError handling-behavior\n\
+            local.assertJsonEqual(local.setTimeoutOnError(onError, 0, null, options), {});\n\
+        };\n\
+\n\
+        local.testCase_sjclHashScryptXxx_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test sjclHashScryptXxx's default handling-behavior\n\
+         */\n\
+            // test sjclHashScryptCreate's null-case handling-behavior\n\
+            local.assertJsonEqual(local.sjclHashScryptCreate().slice(0, 10), '$s0$10801$');\n\
+            // https://github.com/wg/scrypt\n\
+            // test sjclHashScryptValidate's fail handling-behavior\n\
+            local.assertJsonEqual(local.sjclHashScryptValidate(\n\
+                'password',\n\
+                '$s0$80801$epIxT/h6HbbwHaehFnh/bw==' +\n\
+                    '$l/guDhz2Q0v/D93gq0K0qtSX6FWP8pH5maAJkbIcRaEA'\n\
+            ), false);\n\
+            // https://github.com/wg/scrypt\n\
+            // test sjclHashScryptValidate's pass handling-behavior\n\
+            local.assertJsonEqual(local.sjclHashScryptValidate(\n\
+                'password',\n\
+                '$s0$80801$epIxT/h6HbbwHaehFnh/bw==' +\n\
+                    '$l/guDhz2Q0v/D93gq0K0qtSX6FWP8pH5maAJkbIcRaE='\n\
+            ), true);\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_sjclHashShaXxxCreate_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test sjclHashShaXxxCreate's default handling-behavior\n\
+         */\n\
+            local.assertJsonEqual(\n\
+                local.sjclHashSha1Create('aa'),\n\
+                '4MkDWJjdUvxlxBRUzsnE0mEb+zc='\n\
+            );\n\
+            local.assertJsonEqual(\n\
+                local.sjclHashSha256Create('aa'),\n\
+                'lhtt0+3jy47LqsvWjeBAzXjrLtWIkTDM60xJJo6k1QY='\n\
+            );\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_sjclHmacShaXxx_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test sjclHmacShaXxx's default handling-behavior\n\
+         */\n\
+            local.assertJsonEqual(\n\
+                local.sjclHmacSha1Create('aa', 'bb'),\n\
+                '15pOinCz63A+qZoxnv+mJB6UF1k='\n\
+            );\n\
+            local.assertJsonEqual(\n\
+                local.sjclHmacSha256Create('aa', 'bb'),\n\
+                '94Xv3VdPHA+ohKyjkM1pb0W5ZVAuMVcmIAAI2AqNRCQ='\n\
+            );\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_stringHtmlSafe_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test stringHtmlSafe's default handling-behavior\n\
+         */\n\
+            local.assertJsonEqual(\n\
+                local.stringHtmlSafe(local.stringHtmlSafe(local.stringCharsetAscii).slice(32, -1)),\n\
+                ' !&quot;#$%&amp;&apos;()*+,-./0123456789:;&lt;=&gt;?@' +\n\
+                    'ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~'\n\
+            );\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_stringRegexpEscape_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test stringRegexpEscape's default handling-behavior\n\
+         */\n\
+            local.assertJsonEqual(local.stringRegexpEscape(local.stringCharsetAscii), String() +\n\
+                '\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007' +\n\
+                '\\b\\t\\n\
+\\u000b\\f\\r\\u000e\\u000f' +\n\
+                '\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017' +\n\
+                '\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f' +\n\
+                ' !\"#\\\\$%&\\'\\\\(\\\\)\\\\*\\\\+,\\\\-\\\\.\\\\/0123456789:;<=>\\\\?@' +\n\
+                'ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\\[\\\\\\\\\\\\]\\\\^_`abcdefghijklmnopqrstuvwxyz\\\\{\\\\|\\\\}~' +\n\
+                '\\u007f');\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_stringTruncate_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test stringTruncate's default handling-behavior\n\
+         */\n\
+            local.assertJsonEqual(local.stringTruncate('aa'), 'aa');\n\
+            local.assertJsonEqual(local.stringTruncate('aa', 1), '...');\n\
+            local.assertJsonEqual(local.stringTruncate('aa', 2), 'aa');\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_stringUniqueKey_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test stringUniqueKey's default handling-behavior\n\
+         */\n\
+            local.assert(('zqxj').indexOf(local.stringUniqueKey('zqxj') < 0));\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_taskCreateCached_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test taskCreateCached's default handling-behavior\n\
+         */\n\
+            var cacheValue, onTask, optionsCopy;\n\
+            options = {};\n\
+            local.onNext(options, function (error, data) {\n\
+                switch (options.modeNext) {\n\
+                // test no cache handling-behavior\n\
+                case 1:\n\
+                    onTask = function (onError) {\n\
+                        onError(null, cacheValue);\n\
+                    };\n\
+                    options.cacheDict = 'testCase_taskCreateCached_default';\n\
+                    options.key = 'memory';\n\
+                    // cleanup memory-cache\n\
+                    local.cacheDict[options.cacheDict] = null;\n\
+                    cacheValue = 'aa';\n\
+                    optionsCopy = {\n\
+                        cacheDict: options.cacheDict,\n\
+                        key: options.key,\n\
+                        // test onCacheWrite handling-behavior\n\
+                        onCacheWrite: options.onNext\n\
+                    };\n\
+                    local.taskCreateCached(optionsCopy, onTask, options.onNext);\n\
+                    break;\n\
+                case 2:\n\
+                    // validate data\n\
+                    local.assertJsonEqual(data, 'aa');\n\
+                    // validate no cache-hit\n\
+                    local.assert(!optionsCopy.modeCacheHit, optionsCopy.modeCacheHit);\n\
+                    break;\n\
+                // test cache with update handling-behavior\n\
+                case 3:\n\
+                    cacheValue = 'bb';\n\
+                    optionsCopy = {\n\
+                        cacheDict: options.cacheDict,\n\
+                        key: options.key,\n\
+                        // test modeCacheUpdate handling-behavior\n\
+                        modeCacheUpdate: true,\n\
+                        // test onCacheWrite handling-behavior\n\
+                        onCacheWrite: options.onNext\n\
+                    };\n\
+                    local.taskCreateCached(optionsCopy, onTask, options.onNext);\n\
+                    break;\n\
+                case 4:\n\
+                    // validate data\n\
+                    local.assertJsonEqual(data, 'aa');\n\
+                    // validate modeCacheHit\n\
+                    local.assertJsonEqual(optionsCopy.modeCacheHit, true);\n\
+                    break;\n\
+                // test cache handling-behavior\n\
+                case 5:\n\
+                    optionsCopy = {\n\
+                        cacheDict: options.cacheDict,\n\
+                        key: options.key\n\
+                    };\n\
+                    local.taskCreateCached(optionsCopy, onTask, options.onNext);\n\
+                    break;\n\
+                case 6:\n\
+                    // validate data\n\
+                    local.assertJsonEqual(data, 'bb');\n\
+                    // validate modeCacheHit\n\
+                    local.assertJsonEqual(optionsCopy.modeCacheHit, true);\n\
+                    options.onNext();\n\
+                    break;\n\
+                default:\n\
+                    onError(error, options);\n\
+                }\n\
+            });\n\
+            options.modeNext = 0;\n\
+            options.onNext();\n\
+        };\n\
+\n\
+        local.testCase_taskCreate_multipleCallback = function (options, onError) {\n\
+        /*\n\
+         * this function will test taskCreate's multiple-callback handling-behavior\n\
+         */\n\
+            options = { counter: 0, key: 'testCase_taskCreate_multiCallback' };\n\
+            local.taskCreate(options, function (onError) {\n\
+                onError(null, options);\n\
+                // test multiple-callback handling-behavior\n\
+                onError(null, options);\n\
+            }, function () {\n\
+                options.counter += 1;\n\
+            });\n\
+            // validate counter incremented once\n\
+            local.assertJsonEqual(options.counter, 1);\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_taskCreate_upsert = function (options, onError) {\n\
+        /*\n\
+         * this function will test taskCreate's upsert handling-behavior\n\
+         */\n\
+            options = { counter: 0, key: 'testCase_taskCreate_upsert' };\n\
+            // test upsert handling-behavior\n\
+            [null, null].forEach(function () {\n\
+                local.taskCreate(options, function (onError) {\n\
+                    options.counter += 1;\n\
+                    setTimeout(onError);\n\
+                });\n\
+            });\n\
+            // validate counter incremented once\n\
+            setTimeout(function () {\n\
+                local.assertJsonEqual(options.counter, 1);\n\
+                onError(null, options);\n\
+            });\n\
+        };\n\
+\n\
+        local.testCase_templateRender_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test templateRender's default handling-behavior\n\
+         */\n\
+            // test null-case handling-behavior\n\
+            local.assertJsonEqual(local.templateRender(), '');\n\
+            // test undefined-value handling-behavior\n\
+            local.assertJsonEqual(local.templateRender('{{aa}}', {}), '{{aa}}');\n\
+            // test basic handling-behavior\n\
+            local.assertJsonEqual(local.templateRender('{{aa}}', {\n\
+                aa: '```<aa\\n\
+bb>```'\n\
+            }), '```&lt;aa\\n\
+bb&gt;```');\n\
+            // test markdownToHtml handling-behavior\n\
+            local.assertJsonEqual(local.templateRender('{{aa markdownToHtml}}', {\n\
+                aa: local.stringCharsetAscii.slice(32, -1)\n\
+            }), '<p> !&quot;#$%&amp;&apos;()*+,-./0123456789:;&lt;=&gt;?@' +\n\
+                'ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~</p>\\n\
+');\n\
+            // test markdownSafe handling-behavior\n\
+            local.assertJsonEqual(local.templateRender('{{aa markdownSafe notHtmlSafe}}', {\n\
+                aa: local.stringCharsetAscii.slice(32, -1)\n\
+            }), ' !\"#$%&\\'()*+,-./0123456789:;<=>?@' +\n\
+                'ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_\\'abcdefghijklmnopqrstuvwxyz{|}~');\n\
+            // test notHtmlSafe handling-behavior\n\
+            local.assertJsonEqual(local.templateRender('{{aa notHtmlSafe}}', {\n\
+                aa: '```<aa\\n\
+bb>```'\n\
+            }), '```<aa\\n\
+bb>```');\n\
+            // test default handling-behavior\n\
+            local.assertJsonEqual(local.templateRender('{{aa alphanumeric}} ' +\n\
+                '{{aa truncate 4 truncate 4}} ' +\n\
+                '{{aa jsonStringify jsonStringify4 decodeURIComponent encodeURIComponent trim}} ' +\n\
+                '{{bb}} {{cc}} {{dd}} {{ee.ff}}', {\n\
+                    // test string value handling-behavior\n\
+                    aa: '`<aa>`',\n\
+                    // test non-string value handling-behavior\n\
+                    bb: 1,\n\
+                    // test null-value handling-behavior\n\
+                    cc: null,\n\
+                    // test undefined-value handling-behavior\n\
+                    dd: undefined,\n\
+                    // test nested value handling-behavior\n\
+                    ee: { ff: 'gg' }\n\
+                }), '__aa__ `... %22%5C%22%60%3Caa%3E%60%5C%22%22 1 null {{dd}} gg');\n\
+            // test partial handling-behavior\n\
+            local.assertJsonEqual(local.templateRender('{{#undefined aa}}\\n\
+' +\n\
+                'list1{{#each list1}}\\n\
+' +\n\
+                '    aa - {{aa}}\\n\
+' +\n\
+                '    list2{{#eachTrimRightComma list2}}\\n\
+' +\n\
+                '        {{#this/ notHtmlSafe jsonStringify}}\\n\
+' +\n\
+                '        bb - {{bb}}\\n\
+' +\n\
+                '        {{#if bb}}\\n\
+' +\n\
+                '        if\\n\
+' +\n\
+                '        {{#unless bb}}\\n\
+' +\n\
+                '        else\\n\
+' +\n\
+                '        {{/if bb}}\\n\
+' +\n\
+                '        {{#unless bb}}\\n\
+' +\n\
+                '        unless\\n\
+' +\n\
+                '        {{/unless bb}}\\n\
+' +\n\
+                '        ,\\n\
+' +\n\
+                '    {{/eachTrimRightComma list2}}\\n\
+' +\n\
+                '{{/each list1}}\\n\
+' +\n\
+                '{{/undefined aa}}\\n\
+', { list1: [\n\
+                    // test null-value handling-behavior\n\
+                    null,\n\
+                    {\n\
+                        aa: 'aa',\n\
+                        // test recursive-list handling-behavior\n\
+                        list2: [{ bb: 'bb' }, { bb: null }]\n\
+                    }\n\
+                ]\n\
+                    }), '{{#undefined aa}}\\n\
+' +\n\
+                'list1\\n\
+' +\n\
+                '    aa - {{aa}}\\n\
+' +\n\
+                '    list2\\n\
+' +\n\
+                '\\n\
+' +\n\
+                '    aa - aa\\n\
+' +\n\
+                '    list2\\n\
+' +\n\
+                '        {\"bb\":\"bb\"}\\n\
+' +\n\
+                '        bb - bb\\n\
+' +\n\
+                '        \\n\
+' +\n\
+                '        if\\n\
+' +\n\
+                '        \\n\
+' +\n\
+                '        \\n\
+' +\n\
+                '        ,\\n\
+' +\n\
+                '    \\n\
+' +\n\
+                '        {\"bb\":null}\\n\
+' +\n\
+                '        bb - null\\n\
+' +\n\
+                '        \\n\
+' +\n\
+                '        else\\n\
+' +\n\
+                '        \\n\
+' +\n\
+                '        \\n\
+' +\n\
+                '        unless\\n\
+' +\n\
+                '        \\n\
+' +\n\
+                '        \\n\
+' +\n\
+                '\\n\
+' +\n\
+                '{{/undefined aa}}\\n\
+');\n\
+            // test error handling-behavior\n\
+            local.tryCatchOnError(function () {\n\
+                local.templateRender('{{aa bb}}', { aa: 1 });\n\
+            }, local.nop);\n\
+            // validate error occurred\n\
+            local.assert(local._debugTryCatchError, local._debugTryCatchError);\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_testReportCreate_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test testReport's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.testMock([], function (onError) {\n\
+                // test null-case handling-behavior\n\
+                local.testReportCreate();\n\
+                // test testsFailed handling-behavior\n\
+                local.testReportCreate({ testPlatformList: [{\n\
+                    testCaseList: [{ status: 'failed' }, { status: 'passed' }]\n\
+                }] });\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_testRunDefault_nop = function (options, onError) {\n\
+        /*\n\
+         * this function will test testRunDefault's nop handling-behavior\n\
+         */\n\
+            options = {};\n\
+            local.testRunDefault(options);\n\
+            local.testMock([\n\
+                [local, { env: {}, modeTest: null }]\n\
+            ], function (onError) {\n\
+                local.testRunDefault(options);\n\
+                // validate no options.onReadyAfter\n\
+                local.assert(!options.onReadyAfter, options);\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_testRunInit_testRunButton1 = function (options, onError) {\n\
+        /*\n\
+         * this function will test testRunInit's testRunButton1 handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'browser') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.testMock([\n\
+                [document, {\n\
+                    querySelector: function () {\n\
+                        return { click: local.nop };\n\
+                    }\n\
+                }],\n\
+                [local, {\n\
+                    modeTest: true,\n\
+                    testRunBrowser: local.nop,\n\
+                    testRunDefault: local.nop\n\
+                }],\n\
+                [local.global, {\n\
+                    setTimeout: function (fnc) {\n\
+                        fnc();\n\
+                    },\n\
+                    utility2_serverHttp1: null\n\
+                }]\n\
+            ], function (onError) {\n\
+                local.testRunInit(local);\n\
+                local.testRunBrowser = null;\n\
+                local.testRunInit(local);\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_throwError_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test throwError's default handling-behavior\n\
+         */\n\
+            local.tryCatchOnError(function () {\n\
+                local.throwError();\n\
+            }, function (error) {\n\
+                // validate error occurred\n\
+                local.assert(error, error);\n\
+                onError(null, options);\n\
+            });\n\
+        };\n\
+\n\
+        local.testCase_uglify_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test uglify's default handling-behavior\n\
+         */\n\
+            // test css handling-behavior\n\
+            local.assertJsonEqual(local.uglify('body { margin: 0; }', 'aa.css'), 'body{margin:0;}');\n\
+            // test js handling-behavior\n\
+            local.assertJsonEqual(local.uglify('aa = 1', 'aa.js'), 'aa=1');\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_uiAnimateXxx_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test uiAnimateXxx's default handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'browser') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            options = document.createElement('div');\n\
+            // test uiAnimateShake handling-behavior\n\
+            local.uiAnimateShake();\n\
+            local.uiAnimateShake(options);\n\
+            local.assert(options.classList.contains('uiAnimateShake'), options.classList);\n\
+            local.uiAnimateShake(options);\n\
+            local.assert(options.classList.contains('uiAnimateShake'), options.classList);\n\
+            // test uiAnimateShakeIfError handling-behavior\n\
+            local.uiAnimateShakeIfError();\n\
+            local.uiAnimateShakeIfError(null, options);\n\
+            local.assert(!options.classList.contains('hasError'), options.classList);\n\
+            local.uiAnimateShakeIfError(true, options);\n\
+            local.assert(options.classList.contains('hasError'), options.classList);\n\
+            local.uiAnimateShakeIfError(null, options);\n\
+            local.assert(!options.classList.contains('hasError'), options.classList);\n\
+            // test uiAnimateSlideXxx handling-behavior\n\
+            local.uiAnimateSlideDown();\n\
+            local.uiAnimateSlideUp();\n\
+            options.classList.add('uiAnimateSlide');\n\
+            local.uiAnimateSlideDown(options);\n\
+            local.assert(options.style.maxHeight.indexOf('px') >= 0, options.style.maxHeight);\n\
+            local.uiAnimateSlideUp(options);\n\
+            local.assertJsonEqual(options.style.maxHeight, '0px');\n\
+            // test uiAnimateSlideAccordian handling-behavior\n\
+            local.uiAnimateSlideAccordian(options, [options, document.createElement('div')]);\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_urlParse_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test urlParse's default handling-behavior\n\
+         */\n\
+            local.testMock([\n\
+                [local, {\n\
+                    // test default PORT handling-behavior\n\
+                    env: {},\n\
+                    // test init-serverLocalHost handling-behavior\n\
+                    serverLocalHost: ''\n\
+                }]\n\
+            ], function (onError) {\n\
+                // test default handling-behavior\n\
+                local.assertJsonEqual(local.urlParse(\n\
+                    'https://127.0.0.1:80/foo/bar?aa=1&bb%20cc=dd%20=ee&aa=2&aa#zz=1'\n\
+                ), {\n\
+                    hash: '#zz=1',\n\
+                    host: '127.0.0.1:80',\n\
+                    hostname: '127.0.0.1',\n\
+                    href: 'https://127.0.0.1:80/foo/bar?aa=1&bb%20cc=dd%20=ee&aa=2&aa#zz=1',\n\
+                    path: '/foo/bar?aa=1&bb%20cc=dd%20=ee&aa=2&aa',\n\
+                    pathname: '/foo/bar',\n\
+                    port: '80',\n\
+                    protocol: 'https:',\n\
+                    query: { aa: ['1', '2', ''], 'bb cc': 'dd =ee' },\n\
+                    search: '?aa=1&bb%20cc=dd%20=ee&aa=2&aa'\n\
+                });\n\
+                // test error handling-behavior\n\
+                local.assertJsonEqual(local.urlParse(null), {\n\
+                    hash: '',\n\
+                    host: '',\n\
+                    hostname: '',\n\
+                    href: '',\n\
+                    path: '',\n\
+                    pathname: '',\n\
+                    port: '',\n\
+                    protocol: '',\n\
+                    query: {},\n\
+                    search: ''\n\
+                });\n\
+                onError(null, options);\n\
+            }, onError);\n\
+        };\n\
+\n\
+        local.testCase_uuid4Create_default = function (options, onError) {\n\
+        /*\n\
+         * this function will test uuid4Create's default handling-behavior\n\
+         */\n\
+            local.assert((local.regexpValidateUuid).test(local.uuid4Create()), local.uuid4Create());\n\
+            onError(null, options);\n\
+        };\n\
+\n\
+        local.testCase_webpage_error = function (options, onError) {\n\
+        /*\n\
+         * this function will test webpage's error handling-behavior\n\
+         */\n\
+            if (local.modeJs !== 'node') {\n\
+                onError(null, options);\n\
+                return;\n\
+            }\n\
+            local.browserTest({\n\
+                modeCoverageMerge: true,\n\
+                // test browserTest's modeSilent handling-behavior\n\
+                modeSilent: true,\n\
+                modeTestIgnore: true,\n\
+                timeoutDefault: local.timeoutDefault - 1000,\n\
+                url: local.serverLocalHost +\n\
+                    // test script_only handling-behavior\n\
+                    '/assets.script_only.html' +\n\
+                    // test electron-callback handling-behavior\n\
+                    '?modeTest=1&' +\n\
+                    // test specific testCase handling-behavior\n\
+                    // test testRunDefault's failure handling-behavior\n\
+                    'modeTestCase=_testCase_testRunDefault_failure&' +\n\
+                    // test timeExit handling-behavior\n\
+                    'timeExit={{timeExit}}'\n\
+            }, function (error) {\n\
+                // validate error occurred\n\
+                local.assert(error, error);\n\
+                onError(null, options);\n\
+            });\n\
+        };\n\
+\n\
+        local.utility2.serverLocalUrlTest = function (url) {\n\
+        /*\n\
+         * this function will test if the url is local\n\
+         */\n\
+            url = local.urlParse(url).pathname;\n\
+            return local.modeJs === 'browser' &&\n\
+                !local.env.npm_config_mode_backend &&\n\
+                (/^\\/test\\./).test(url);\n\
+        };\n\
+    }());\n\
+    switch (local.modeJs) {\n\
+\n\
+\n\
+\n\
+    // run node js-env code - function\n\
+    case 'node':\n\
+        break;\n\
+    }\n\
+\n\
+\n\
+\n\
+    // run shared js-env code - init-after\n\
+    (function () {\n\
+        // init assets\n\
+        local.assetsDict['/assets.swgg.swagger.json'] =\n\
+            local.assetsDict['/assets.swgg.swagger.json'] ||\n\
+            local.assetsDict['/assets.swgg.swagger.petstore.json'];\n\
+        // coverage-hack - re-run test-server\n\
+        local.testRunServer(local);\n\
+        // coverage-hack - stateInit\n\
+        local.stateInit({});\n\
+        // init test-middleware\n\
+        local.middlewareList.push(function (request, response, nextMiddleware) {\n\
+        /*\n\
+         * this function will run the test-middleware\n\
+         */\n\
+            switch (request.urlParsed.pathname) {\n\
+            // test http POST handling-behavior\n\
+            case '/test.echo':\n\
+                // test response header handling-behavior\n\
+                local.serverRespondHeadSet(request, response, null, {\n\
+                    'X-Response-Header-Test': 'bb'\n\
+                });\n\
+                local.serverRespondEcho(request, response);\n\
+                break;\n\
+            // test http POST handling-behavior\n\
+            case '/test.body':\n\
+                // test request-body-read handling-behavior\n\
+                local.middlewareBodyRead(request, response, function () {\n\
+                    // test multiple request-body-read handling-behavior\n\
+                    local.middlewareBodyRead(request, response, function () {\n\
+                        response.write(request.bodyRaw);\n\
+                        response.end();\n\
+                    });\n\
+                });\n\
+                break;\n\
+            // test 500-internal-server-error handling-behavior\n\
+            case '/test.error-500':\n\
+                // test multiple-callback serverRespondHeadSet handling-behavior\n\
+                local.serverRespondHeadSet(request, response, null, {});\n\
+                nextMiddleware(local.errorDefault);\n\
+                // test multiple-callback error handling-behavior\n\
+                nextMiddleware(local.errorDefault);\n\
+                // test onErrorDefault handling-behavior\n\
+                local.testMock([\n\
+                ], function (onError) {\n\
+                    var error;\n\
+                    error = new Error('error');\n\
+                    error.statusCode = 500;\n\
+                    local.middlewareError(error, request, response);\n\
+                    onError();\n\
+                }, local.onErrorThrow);\n\
+                break;\n\
+            // test undefined-error handling-behavior\n\
+            case '/test.error-undefined':\n\
+                local.serverRespondDefault(request, response, 999);\n\
+                break;\n\
+            // test timeout handling-behavior\n\
+            case '/test.timeout':\n\
+                setTimeout(function () {\n\
+                    response.end();\n\
+                }, 2000);\n\
+                break;\n\
+            // serve file\n\
+            default:\n\
+                local.middlewareFileServer(request, response, nextMiddleware);\n\
+            }\n\
+        });\n\
+    }());\n\
+    switch (local.modeJs) {\n\
+\n\
+\n\
+\n\
+    // run node js-env code - init-after\n\
+    /* istanbul ignore next */\n\
+    case 'node':\n\
+        switch (local.env.HEROKU_APP_NAME) {\n\
+        case 'h1-cron1':\n\
+            // heroku-keepalive\n\
+            setInterval(function () {\n\
+                local.ajax({ url: 'https://h1-cron1.herokuapp.com' }, local.onErrorThrow);\n\
+            }, 5 * 60 * 1000);\n\
+            local.cronJob = local.nop;\n\
+            // update cron\n\
+            local.ajax({\n\
+                url: 'https://kaizhu256.github.io/node-utility2/cronJob.js'\n\
+            }, function (error, data) {\n\
+                if (!error && data.responseText !== local.cronScript) {\n\
+                    local.cronScript = data.responseText;\n\
+                    local.vm.runInThisContext(local.cronScript);\n\
+                }\n\
+            });\n\
+            setInterval(function () {\n\
+                var cronTime;\n\
+                cronTime = new Date();\n\
+                if (cronTime.toISOString().slice(0, 16) <\n\
+                        (local.cronTime && local.cronTime.toISOString())) {\n\
+                    return;\n\
+                }\n\
+                local.cronTime = cronTime;\n\
+                // cron every 5 minutes\n\
+                if (local.cronTime.getUTCMinutes() % 5 === 0) {\n\
+                    // update cron\n\
+                    local.ajax({\n\
+                        url: 'https://kaizhu256.github.io/node-utility2/cronJob.js'\n\
+                    }, function (error, data) {\n\
+                        if (!error && data.responseText !== local.cronScript) {\n\
+                            local.cronScript = data.responseText;\n\
+                            local.vm.runInThisContext(local.cronScript);\n\
+                        }\n\
+                    });\n\
+                }\n\
+                local.cronJob();\n\
+            }, 30000);\n\
+            break;\n\
+        case 'h1-proxy1':\n\
+            // heroku-keepalive\n\
+            setInterval(function () {\n\
+                local.ajax({ url: 'https://h1-proxy1.herokuapp.com' }, local.onErrorThrow);\n\
+            }, 5 * 60 * 1000);\n\
+            break;\n\
+        }\n\
+        // init cli\n\
+        if (module !== require.main || local.global.utility2_rollup) {\n\
+            return;\n\
+        }\n\
+        local.assetsDict['/assets.recurse1'] = local.assetsDict['/assets.recurse2'] =\n\
+            '<a href=\"assets.recurse1\"></a>\\n\
+' +\n\
+            '<a href=\"assets.recurse2\"></a>\\n\
+' +\n\
+            '<a href=\"assets.undefined\"></a>\\n\
+';\n\
+        local.assetsDict['/assets.script_only.html'] = '<h1>script_only_test</h1>\\n\
+' +\n\
+            '<script src=\"assets.utility2.js\"></script>\\n\
+' +\n\
+            '<script>window.utility2.onReadyBefore.counter += 1;</script>\\n\
+' +\n\
+            '<script src=\"assets.example.js\"></script>\\n\
+' +\n\
+            '<script src=\"assets.test.js\"></script>\\n\
+' +\n\
+            '<script>window.utility2.onReadyBefore();</script>\\n\
+';\n\
+        if (process.argv[2]) {\n\
+            // start with coverage\n\
+            if (local.env.npm_config_mode_coverage) {\n\
+                process.argv.splice(1, 1, __dirname + '/lib.istanbul.js', 'cover');\n\
+                local.istanbul.cliDict[process.argv[2]]();\n\
+                return;\n\
+            }\n\
+            // start\n\
+            process.argv.splice(1, 1);\n\
+            process.argv[1] = local.path.resolve(process.cwd(), process.argv[1]);\n\
+            local.Module.runMain();\n\
+        }\n\
+        break;\n\
+    }\n\
+}());\n\
+"
+/* jslint-ignore-end */
+}());
+/* script-end /assets.utility2.test.js */
 
 
 

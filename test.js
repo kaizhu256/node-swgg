@@ -1687,7 +1687,8 @@ curl /undefined\n\
             onError();
         }, local.onErrorThrow);
         // init assets
-        local.assetsDict['/assets.swgg.swagger.test.json'] = local.normalizeSwaggerJson(
+        local.assetsDict['/assets.swgg.swagger.test.json'] = (function () {
+            return local.normalizeSwaggerJson(
 /* jslint-ignore-begin */
 {
     "basePath": "/api/v0",
@@ -2412,7 +2413,8 @@ curl /undefined\n\
     }
 }
 /* jslint-ignore-end */
-        );
+            );
+        }());
         Object.keys(
             local.assetsDict['/assets.swgg.swagger.test.json'].parameters
         ).forEach(function (key) {
