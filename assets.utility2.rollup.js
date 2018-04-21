@@ -8,7 +8,7 @@
 /*jslint
     bitwise: true,
     browser: true,
-    maxerr: 8,
+    maxerr: 4,
     maxlen: 100,
     node: true,
     nomen: true,
@@ -49,7 +49,7 @@
 /*jslint
     bitwise: true,
     browser: true,
-    maxerr: 8,
+    maxerr: 4,
     maxlen: 100,
     node: true,
     nomen: true,
@@ -98,11 +98,40 @@
             local.global.utility2_apidoc = local;
         } else {
             // require builtins
-            Object.keys(process.binding('natives')).forEach(function (key) {
-                if (!local[key] && !(/\/|^_|^sys$/).test(key)) {
-                    local[key] = require(key);
-                }
-            });
+            // local.assert = require('assert');
+            local.buffer = require('buffer');
+            local.child_process = require('child_process');
+            local.cluster = require('cluster');
+            local.console = require('console');
+            local.constants = require('constants');
+            local.crypto = require('crypto');
+            local.dgram = require('dgram');
+            local.dns = require('dns');
+            local.domain = require('domain');
+            local.events = require('events');
+            local.fs = require('fs');
+            local.http = require('http');
+            local.https = require('https');
+            local.module = require('module');
+            local.net = require('net');
+            local.os = require('os');
+            local.path = require('path');
+            local.process = require('process');
+            local.punycode = require('punycode');
+            local.querystring = require('querystring');
+            local.readline = require('readline');
+            local.repl = require('repl');
+            local.stream = require('stream');
+            local.string_decoder = require('string_decoder');
+            local.timers = require('timers');
+            local.tls = require('tls');
+            local.tty = require('tty');
+            local.url = require('url');
+            local.util = require('util');
+            local.v8 = require('v8');
+            local.vm = require('vm');
+            local.zlib = require('zlib');
+/* validateLineSortedReset */
             module.exports = local;
             module.exports.__dirname = __dirname;
         }
@@ -166,6 +195,8 @@
              * print help
              */
                 var element, result, lengthList, sortDict;
+                console.log(require(__dirname + '/package.json').name + ' v' +
+                    require(__dirname + '/package.json').version);
                 sortDict = {};
                 result = [['[command]', '[args]', '[description]', -1]];
                 lengthList = [result[0][0].length, result[0][1].length];
@@ -206,7 +237,7 @@
                         }
                     });
                     element = element.slice(0, 3).join('---- ');
-                    if (ii === 0) {
+                    if (!ii) {
                         element = element.replace((/-/g), ' ');
                     }
                     console.log(element);
@@ -229,6 +260,15 @@
                     local.cliDict._interactive;
                 local.cliDict['-i'] = local.cliDict['-i'] || local.cliDict._interactive;
             }
+            local.cliDict._version = local.cliDict._version || function () {
+            /*
+             * [none]
+             * print version
+             */
+                console.log(require(__dirname + '/package.json').version);
+            };
+            local.cliDict['--version'] = local.cliDict['--version'] || local.cliDict._version;
+            local.cliDict['-v'] = local.cliDict['-v'] || local.cliDict._version;
             // run fnc()
             fnc = fnc || function () {
                 if (local.cliDict[process.argv[2]]) {
@@ -303,13 +343,9 @@
                 // then recurse with arg2 and defaults2
                 if (depth > 1 &&
                         // arg2 is a non-null and non-array object
-                        arg2 &&
-                        typeof arg2 === 'object' &&
-                        !Array.isArray(arg2) &&
+                        typeof arg2 === 'object' && arg2 && !Array.isArray(arg2) &&
                         // defaults2 is a non-null and non-array object
-                        defaults2 &&
-                        typeof defaults2 === 'object' &&
-                        !Array.isArray(defaults2)) {
+                        typeof defaults2 === 'object' && defaults2 && !Array.isArray(defaults2)) {
                     // recurse
                     local.objectSetDefault(arg2, defaults2, depth - 1);
                 }
@@ -839,9 +875,9 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             );
             // init circularList - builtin
             Object.keys(process.binding('natives')).forEach(function (key) {
-                if (!(/\/|^_linklist$|^sys$/).test(key)) {
+                local.tryCatchOnError(function () {
                     options.circularList.push(require(key));
-                }
+                }, local.nop);
             });
             // init circularList - blacklistDict
             Object.keys(options.blacklistDict).forEach(function (key) {
@@ -992,52 +1028,56 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
         /*
          * this function will add the modules in moduleDict to options.moduleDict
          */
-            var isModule, tmp;
+            var isModule, objectKeys, tmp;
+            objectKeys = function (dict) {
+            /*
+             * this function will return a list of the dict's keys, with valid getters
+             */
+                return Object.keys(dict).sort().filter(function (key) {
+                    return local.tryCatchOnError(function () {
+                        return dict[key] || true;
+                    }, local.nop);
+                });
+            };
             ['child', 'prototype', 'grandchild', 'prototype'].forEach(function (element) {
-                Object.keys(moduleDict).sort().forEach(function (prefix) {
+                objectKeys(moduleDict).forEach(function (prefix) {
                     if (!(/^\w[\w\-.]*?$/).test(prefix)) {
                         return;
                     }
-                    Object.keys(moduleDict[prefix]).forEach(function (key) {
-                        // bug-workaround - buggy electron getter / setter
-                        local.tryCatchOnError(function () {
-                            if (!(/^\w[\w\-.]*?$/).test(key) || !moduleDict[prefix][key]) {
-                                return;
+                    objectKeys(moduleDict[prefix]).forEach(function (key) {
+                        if (!(/^\w[\w\-.]*?$/).test(key) || !moduleDict[prefix][key]) {
+                            return;
+                        }
+                        tmp = element === 'prototype'
+                            ? {
+                                module: moduleDict[prefix][key].prototype,
+                                name: prefix + '.' + key + '.prototype'
                             }
-                            tmp = element === 'prototype'
-                                ? {
-                                    module: moduleDict[prefix][key].prototype,
-                                    name: prefix + '.' + key + '.prototype'
-                                }
-                                : {
-                                    module: moduleDict[prefix][key],
-                                    name: prefix + '.' + key
-                                };
-                            if (!tmp.module ||
-                                    !(typeof tmp.module === 'function' ||
-                                    typeof tmp.module === 'object') ||
-                                    Array.isArray(tmp.module) ||
-                                    options.moduleDict[tmp.name] ||
-                                    options.circularList.indexOf(tmp.module) >= 0) {
-                                return;
-                            }
-                            isModule = [
-                                tmp.module,
-                                tmp.module.prototype
-                            ].some(function (dict) {
-                                return Object.keys(dict || {}).some(function (key) {
-                                    // bug-workaround - buggy electron getter / setter
-                                    return local.tryCatchOnError(function () {
-                                        return typeof dict[key] === 'function';
-                                    }, console.error);
-                                });
+                            : {
+                                module: moduleDict[prefix][key],
+                                name: prefix + '.' + key
+                            };
+                        if (!tmp.module ||
+                                !(typeof tmp.module === 'function' ||
+                                typeof tmp.module === 'object') ||
+                                Array.isArray(tmp.module) ||
+                                options.moduleDict[tmp.name] ||
+                                options.circularList.indexOf(tmp.module) >= 0) {
+                            return;
+                        }
+                        isModule = [
+                            tmp.module,
+                            tmp.module.prototype
+                        ].some(function (dict) {
+                            return objectKeys(dict || {}).some(function (key) {
+                                return typeof dict[key] === 'function';
                             });
-                            if (!isModule) {
-                                return;
-                            }
-                            options.circularList.push(tmp.module);
-                            options.moduleDict[tmp.name] = tmp.module;
-                        }, console.error);
+                        });
+                        if (!isModule) {
+                            return;
+                        }
+                        options.circularList.push(tmp.module);
+                        options.moduleDict[tmp.name] = tmp.module;
                     });
                 });
             });
@@ -1117,7 +1157,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
 /*jslint
     bitwise: true,
     browser: true,
-    maxerr: 8,
+    maxerr: 4,
     maxlen: 100,
     node: true,
     nomen: true,
@@ -1166,11 +1206,40 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             local.global.utility2_db = local;
         } else {
             // require builtins
-            Object.keys(process.binding('natives')).forEach(function (key) {
-                if (!local[key] && !(/\/|^_|^sys$/).test(key)) {
-                    local[key] = require(key);
-                }
-            });
+            // local.assert = require('assert');
+            local.buffer = require('buffer');
+            local.child_process = require('child_process');
+            local.cluster = require('cluster');
+            local.console = require('console');
+            local.constants = require('constants');
+            local.crypto = require('crypto');
+            local.dgram = require('dgram');
+            local.dns = require('dns');
+            local.domain = require('domain');
+            local.events = require('events');
+            local.fs = require('fs');
+            local.http = require('http');
+            local.https = require('https');
+            local.module = require('module');
+            local.net = require('net');
+            local.os = require('os');
+            local.path = require('path');
+            local.process = require('process');
+            local.punycode = require('punycode');
+            local.querystring = require('querystring');
+            local.readline = require('readline');
+            local.repl = require('repl');
+            local.stream = require('stream');
+            local.string_decoder = require('string_decoder');
+            local.timers = require('timers');
+            local.tls = require('tls');
+            local.tty = require('tty');
+            local.url = require('url');
+            local.util = require('util');
+            local.v8 = require('v8');
+            local.vm = require('vm');
+            local.zlib = require('zlib');
+/* validateLineSortedReset */
             module.exports = local;
             module.exports.__dirname = __dirname;
         }
@@ -1276,7 +1345,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                         }
                     });
                     element = element.slice(0, 3).join('---- ');
-                    if (ii === 0) {
+                    if (!ii) {
                         element = element.replace((/-/g), ' ');
                     }
                     console.log(element);
@@ -1339,42 +1408,42 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
              * this function will recursively JSON.stringify the jsonObj,
              * with object-keys sorted and circular-references removed
              */
-                // if jsonObj is an object, then recurse its items with object-keys sorted
-                if (jsonObj &&
+                // if jsonObj is not an object or function, then JSON.stringify as normal
+                if (!(jsonObj &&
                         typeof jsonObj === 'object' &&
-                        typeof jsonObj.toJSON !== 'function') {
-                    // ignore circular-reference
-                    if (circularList.indexOf(jsonObj) >= 0) {
-                        return;
-                    }
-                    circularList.push(jsonObj);
-                    // if jsonObj is an array, then recurse its jsonObjs
-                    if (Array.isArray(jsonObj)) {
-                        return '[' + jsonObj.map(function (jsonObj) {
-                            // recurse
-                            tmp = stringify(jsonObj);
-                            return typeof tmp === 'string'
-                                ? tmp
-                                : 'null';
-                        }).join(',') + ']';
-                    }
-                    return '{' + Object.keys(jsonObj)
-                        // sort object-keys
-                        .sort()
-                        .map(function (key) {
-                            // recurse
-                            tmp = stringify(jsonObj[key]);
-                            if (typeof tmp === 'string') {
-                                return JSON.stringify(key) + ':' + tmp;
-                            }
-                        })
-                        .filter(function (jsonObj) {
-                            return typeof jsonObj === 'string';
-                        })
-                        .join(',') + '}';
+                        typeof jsonObj.toJSON !== 'function')) {
+                    return JSON.stringify(jsonObj);
                 }
-                // else JSON.stringify as normal
-                return JSON.stringify(jsonObj);
+                // ignore circular-reference
+                if (circularList.indexOf(jsonObj) >= 0) {
+                    return;
+                }
+                circularList.push(jsonObj);
+                // if jsonObj is an array, then recurse its jsonObjs
+                if (Array.isArray(jsonObj)) {
+                    return '[' + jsonObj.map(function (jsonObj) {
+                        // recurse
+                        tmp = stringify(jsonObj);
+                        return typeof tmp === 'string'
+                            ? tmp
+                            : 'null';
+                    }).join(',') + ']';
+                }
+                // if jsonObj is not an array, then recurse its items with object-keys sorted
+                return '{' + Object.keys(jsonObj)
+                    // sort object-keys
+                    .sort()
+                    .map(function (key) {
+                        // recurse
+                        tmp = stringify(jsonObj[key]);
+                        if (typeof tmp === 'string') {
+                            return JSON.stringify(key) + ':' + tmp;
+                        }
+                    })
+                    .filter(function (jsonObj) {
+                        return typeof jsonObj === 'string';
+                    })
+                    .join(',') + '}';
             };
             circularList = [];
             // try to derefernce all properties in jsonObj
@@ -1449,13 +1518,10 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 // then recurse with arg2 and overrides2
                 if (depth > 1 &&
                         // arg2 is a non-null and non-array object
-                        (arg2 &&
-                        typeof arg2 === 'object' &&
-                        !Array.isArray(arg2)) &&
+                        typeof arg2 === 'object' && arg2 && !Array.isArray(arg2) &&
                         // overrides2 is a non-null and non-array object
-                        (overrides2 &&
-                        typeof overrides2 === 'object' &&
-                        !Array.isArray(overrides2))) {
+                        typeof overrides2 === 'object' && overrides2 &&
+                        !Array.isArray(overrides2)) {
                     local.objectSetOverride(arg2, overrides2, depth - 1, env);
                     return;
                 }
@@ -3158,7 +3224,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
 /*jslint
     bitwise: true,
     browser: true,
-    maxerr: 8,
+    maxerr: 4,
     maxlen: 100,
     node: true,
     nomen: true,
@@ -3207,11 +3273,40 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             local.global.utility2_github_crud = local;
         } else {
             // require builtins
-            Object.keys(process.binding('natives')).forEach(function (key) {
-                if (!local[key] && !(/\/|^_|^assert|^sys$/).test(key)) {
-                    local[key] = require(key);
-                }
-            });
+            // local.assert = require('assert');
+            local.buffer = require('buffer');
+            local.child_process = require('child_process');
+            local.cluster = require('cluster');
+            local.console = require('console');
+            local.constants = require('constants');
+            local.crypto = require('crypto');
+            local.dgram = require('dgram');
+            local.dns = require('dns');
+            local.domain = require('domain');
+            local.events = require('events');
+            local.fs = require('fs');
+            local.http = require('http');
+            local.https = require('https');
+            local.module = require('module');
+            local.net = require('net');
+            local.os = require('os');
+            local.path = require('path');
+            local.process = require('process');
+            local.punycode = require('punycode');
+            local.querystring = require('querystring');
+            local.readline = require('readline');
+            local.repl = require('repl');
+            local.stream = require('stream');
+            local.string_decoder = require('string_decoder');
+            local.timers = require('timers');
+            local.tls = require('tls');
+            local.tty = require('tty');
+            local.url = require('url');
+            local.util = require('util');
+            local.v8 = require('v8');
+            local.vm = require('vm');
+            local.zlib = require('zlib');
+/* validateLineSortedReset */
             module.exports = local;
             module.exports.__dirname = __dirname;
         }
@@ -3619,13 +3714,13 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                         return;
                     }
                     // delete tree
-                    local.onParallelList({ list: data }, function (data, onParallel) {
+                    local.onParallelList({ list: data }, function (options2, onParallel) {
                         onParallel.counter += 1;
                         // recurse
                         local.contentDelete({
                             message: options.message,
                             request: options.request,
-                            url: data.element.url
+                            url: options2.element.url
                         }, onParallel);
                     }, options.onNext);
                     break;
@@ -3875,13 +3970,13 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
          * this function will touch options.urlList in parallel
          * https://developer.github.com/v3/repos/contents/#update-a-file
          */
-            local.onParallelList({ list: options.urlList }, function (data, onParallel) {
+            local.onParallelList({ list: options.urlList }, function (options2, onParallel) {
                 onParallel.counter += 1;
                 local.contentTouch({
                     message: options.message,
                     modeErrorIgnore: true,
                     request: options.request,
-                    url: data.element
+                    url: options2.element
                 }, onParallel);
             }, onError);
         };
@@ -3983,7 +4078,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
 /*jslint
     bitwise: true,
     browser: true,
-    maxerr: 8,
+    maxerr: 4,
     maxlen: 100,
     node: true,
     nomen: true,
@@ -4032,11 +4127,40 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             local.global.utility2_istanbul = local;
         } else {
             // require builtins
-            Object.keys(process.binding('natives')).forEach(function (key) {
-                if (!local[key] && !(/\/|^_|^assert|^sys$/).test(key)) {
-                    local[key] = require(key);
-                }
-            });
+            // local.assert = require('assert');
+            local.buffer = require('buffer');
+            local.child_process = require('child_process');
+            local.cluster = require('cluster');
+            local.console = require('console');
+            local.constants = require('constants');
+            local.crypto = require('crypto');
+            local.dgram = require('dgram');
+            local.dns = require('dns');
+            local.domain = require('domain');
+            local.events = require('events');
+            local.fs = require('fs');
+            local.http = require('http');
+            local.https = require('https');
+            local.module = require('module');
+            local.net = require('net');
+            local.os = require('os');
+            local.path = require('path');
+            local.process = require('process');
+            local.punycode = require('punycode');
+            local.querystring = require('querystring');
+            local.readline = require('readline');
+            local.repl = require('repl');
+            local.stream = require('stream');
+            local.string_decoder = require('string_decoder');
+            local.timers = require('timers');
+            local.tls = require('tls');
+            local.tty = require('tty');
+            local.url = require('url');
+            local.util = require('util');
+            local.v8 = require('v8');
+            local.vm = require('vm');
+            local.zlib = require('zlib');
+/* validateLineSortedReset */
             module.exports = local;
             module.exports.__dirname = __dirname;
         }
@@ -6219,7 +6343,7 @@ local['head.txt'] = '\
 .x-istanbul .coverage td .cline-any {\n\
     display: inline-block;\n\
     padding: 0 5px;\n\
-    width: 40px;\n\
+    width: 60px;\n\
 }\n\
 .x-istanbul .coverage td .cline-neutral {\n\
     background: #eee;\n\
@@ -6758,7 +6882,7 @@ local.templateCoverageBadgeSvg =
 /*jslint
     bitwise: true,
     browser: true,
-    maxerr: 8,
+    maxerr: 4,
     maxlen: 100,
     node: true,
     nomen: true,
@@ -6807,11 +6931,40 @@ local.templateCoverageBadgeSvg =
             local.global.utility2_jslint = local;
         } else {
             // require builtins
-            Object.keys(process.binding('natives')).forEach(function (key) {
-                if (!local[key] && !(/\/|^_|^assert|^sys$/).test(key)) {
-                    local[key] = require(key);
-                }
-            });
+            // local.assert = require('assert');
+            local.buffer = require('buffer');
+            local.child_process = require('child_process');
+            local.cluster = require('cluster');
+            local.console = require('console');
+            local.constants = require('constants');
+            local.crypto = require('crypto');
+            local.dgram = require('dgram');
+            local.dns = require('dns');
+            local.domain = require('domain');
+            local.events = require('events');
+            local.fs = require('fs');
+            local.http = require('http');
+            local.https = require('https');
+            local.module = require('module');
+            local.net = require('net');
+            local.os = require('os');
+            local.path = require('path');
+            local.process = require('process');
+            local.punycode = require('punycode');
+            local.querystring = require('querystring');
+            local.readline = require('readline');
+            local.repl = require('repl');
+            local.stream = require('stream');
+            local.string_decoder = require('string_decoder');
+            local.timers = require('timers');
+            local.tls = require('tls');
+            local.tty = require('tty');
+            local.url = require('url');
+            local.util = require('util');
+            local.v8 = require('v8');
+            local.vm = require('vm');
+            local.zlib = require('zlib');
+/* validateLineSortedReset */
             module.exports = local;
             module.exports.__dirname = __dirname;
         }
@@ -13323,7 +13476,8 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
                     jj = 0;
                     message = '';
                     // validate 4-space indent
-                    if (!(/^ * \*/).test(line) && ((/^ */).exec(line)[0].length % 4 !== 0)) {
+                    if (!(/^ +(?:\*|\/\/!!)/).test(line) &&
+                            ((/^ */).exec(line)[0].length % 4 !== 0)) {
                         jj = jj || 1;
                         message = message || 'non 4-space indent';
                     }
@@ -13464,8 +13618,8 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
             script.replace((/^.*?$/gm), function (line) {
                 current = line.trim();
                 ii += 1;
-                // validate className sorted
-                tmp = (/class="([^"]+?)"/g).exec(current);
+                // validate tag.classList sorted
+                tmp = (/class=\\?"([^"]+?)\\?"/g).exec(current);
                 tmp = JSON.stringify(
                     (tmp && tmp[1].match(/\w\S*?\{\{[^}]*?\}\}|\w\S*|\{\{[^}]*?\}\}/g)) || []
                 );
@@ -13483,7 +13637,7 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
                     previous = '';
                     return;
                 }
-                if (!(/^(?: {4}| {8})local\.\S*? =(?: |$)/m).test(line) ||
+                if (!(/^(?:| {4}| {8})local\.\S*? =(?: |$)/m).test(line) ||
                         (/^local\.(?:modeJs|global|local|tmp)\b/).test(current)) {
                     return;
                 }
@@ -13509,7 +13663,7 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
             previous = '';
             script.replace((/^.*?$/gm), function (line) {
                 ii += 1;
-                if (!(/^sh\w+?\(\) \{/).test(line)) {
+                if (!(/^sh\w+? \(\) \{/).test(line)) {
                     return;
                 }
                 // validate previous < line
@@ -13567,7 +13721,7 @@ local.CSSLint = CSSLint; local.JSLINT = JSLINT, local.jslintEs6 = jslint; }());
 /*jslint
     bitwise: true,
     browser: true,
-    maxerr: 8,
+    maxerr: 4,
     maxlen: 100,
     node: true,
     nomen: true,
@@ -13821,7 +13975,7 @@ local.marked = module.exports; }());
 /*jslint
     bitwise: true,
     browser: true,
-    maxerr: 8,
+    maxerr: 4,
     maxlen: 100,
     node: true,
     nomen: true,
@@ -14262,7 +14416,7 @@ s=0;s<i;s++)n[r+s]=e[t+s]|0},sjcl.misc.scrypt.blockxor=function(e,t,n,r,i){var s
 /*jslint
     bitwise: true,
     browser: true,
-    maxerr: 8,
+    maxerr: 4,
     maxlen: 100,
     node: true,
     nomen: true,
@@ -14311,11 +14465,40 @@ s=0;s<i;s++)n[r+s]=e[t+s]|0},sjcl.misc.scrypt.blockxor=function(e,t,n,r,i){var s
             local.global.utility2_uglifyjs = local;
         } else {
             // require builtins
-            Object.keys(process.binding('natives')).forEach(function (key) {
-                if (!local[key] && !(/\/|^_|^sys$/).test(key)) {
-                    local[key] = require(key);
-                }
-            });
+            // local.assert = require('assert');
+            local.buffer = require('buffer');
+            local.child_process = require('child_process');
+            local.cluster = require('cluster');
+            local.console = require('console');
+            local.constants = require('constants');
+            local.crypto = require('crypto');
+            local.dgram = require('dgram');
+            local.dns = require('dns');
+            local.domain = require('domain');
+            local.events = require('events');
+            local.fs = require('fs');
+            local.http = require('http');
+            local.https = require('https');
+            local.module = require('module');
+            local.net = require('net');
+            local.os = require('os');
+            local.path = require('path');
+            local.process = require('process');
+            local.punycode = require('punycode');
+            local.querystring = require('querystring');
+            local.readline = require('readline');
+            local.repl = require('repl');
+            local.stream = require('stream');
+            local.string_decoder = require('string_decoder');
+            local.timers = require('timers');
+            local.tls = require('tls');
+            local.tty = require('tty');
+            local.url = require('url');
+            local.util = require('util');
+            local.v8 = require('v8');
+            local.vm = require('vm');
+            local.zlib = require('zlib');
+/* validateLineSortedReset */
             module.exports = local;
             module.exports.__dirname = __dirname;
         }
@@ -14354,6 +14537,8 @@ s=0;s<i;s++)n[r+s]=e[t+s]|0},sjcl.misc.scrypt.blockxor=function(e,t,n,r,i){var s
              * print help
              */
                 var element, result, lengthList, sortDict;
+                console.log(require(__dirname + '/package.json').name + ' v' +
+                    require(__dirname + '/package.json').version);
                 sortDict = {};
                 result = [['[command]', '[args]', '[description]', -1]];
                 lengthList = [result[0][0].length, result[0][1].length];
@@ -14394,7 +14579,7 @@ s=0;s<i;s++)n[r+s]=e[t+s]|0},sjcl.misc.scrypt.blockxor=function(e,t,n,r,i){var s
                         }
                     });
                     element = element.slice(0, 3).join('---- ');
-                    if (ii === 0) {
+                    if (!ii) {
                         element = element.replace((/-/g), ' ');
                     }
                     console.log(element);
@@ -14417,6 +14602,15 @@ s=0;s<i;s++)n[r+s]=e[t+s]|0},sjcl.misc.scrypt.blockxor=function(e,t,n,r,i){var s
                     local.cliDict._interactive;
                 local.cliDict['-i'] = local.cliDict['-i'] || local.cliDict._interactive;
             }
+            local.cliDict._version = local.cliDict._version || function () {
+            /*
+             * [none]
+             * print version
+             */
+                console.log(require(__dirname + '/package.json').version);
+            };
+            local.cliDict['--version'] = local.cliDict['--version'] || local.cliDict._version;
+            local.cliDict['-v'] = local.cliDict['-v'] || local.cliDict._version;
             // run fnc()
             fnc = fnc || function () {
                 if (local.cliDict[process.argv[2]]) {
@@ -14998,7 +15192,7 @@ split_lines=split_lines,exports.MAP=MAP,exports.ast_squeeze_more=require("./sque
         /*
          * this function will uglify the js-code
          */
-            var ast;
+            var tmp;
             // uglify css
             if ((file || '').slice(-4) === '.css') {
                 return code
@@ -15014,16 +15208,19 @@ split_lines=split_lines,exports.MAP=MAP,exports.ast_squeeze_more=require("./sque
                     .trim();
             }
             // parse code and get the initial AST
-            ast = local.parse(code
+            tmp = local.parse(code
                 .trim()
                 // comment shebang
                 .replace((/^#!/), '//'));
             // get a new AST with mangled names
-            ast = local.ast_mangle(ast);
+            tmp = local.ast_mangle(tmp);
             // get an AST with compression optimizations
-            ast = local.ast_squeeze(ast);
+            tmp = local.ast_squeeze(tmp);
             // compressed code here
-            return local.split_lines(local.gen_code(ast, { ascii_only: true }), 79);
+            tmp = local.split_lines(local.gen_code(tmp, { ascii_only: true }), 79);
+            // escape \r and \t
+            tmp = tmp.replace((/\r/g), '\\r').replace((/\t/g), '\\t');
+            return tmp;
         };
     }());
     switch (local.modeJs) {
@@ -15086,7 +15283,7 @@ split_lines=split_lines,exports.MAP=MAP,exports.ast_squeeze_more=require("./sque
 /*jslint
     bitwise: true,
     browser: true,
-    maxerr: 8,
+    maxerr: 4,
     maxlen: 100,
     node: true,
     nomen: true,
@@ -15135,11 +15332,40 @@ split_lines=split_lines,exports.MAP=MAP,exports.ast_squeeze_more=require("./sque
             local.global.utility2_utility2 = local;
         } else {
             // require builtins
-            Object.keys(process.binding('natives')).forEach(function (key) {
-                if (!local[key] && !(/\/|^_|^assert|^sys$/).test(key)) {
-                    local[key] = require(key);
-                }
-            });
+            // local.assert = require('assert');
+            local.buffer = require('buffer');
+            local.child_process = require('child_process');
+            local.cluster = require('cluster');
+            local.console = require('console');
+            local.constants = require('constants');
+            local.crypto = require('crypto');
+            local.dgram = require('dgram');
+            local.dns = require('dns');
+            local.domain = require('domain');
+            local.events = require('events');
+            local.fs = require('fs');
+            local.http = require('http');
+            local.https = require('https');
+            local.module = require('module');
+            local.net = require('net');
+            local.os = require('os');
+            local.path = require('path');
+            local.process = require('process');
+            local.punycode = require('punycode');
+            local.querystring = require('querystring');
+            local.readline = require('readline');
+            local.repl = require('repl');
+            local.stream = require('stream');
+            local.string_decoder = require('string_decoder');
+            local.timers = require('timers');
+            local.tls = require('tls');
+            local.tty = require('tty');
+            local.url = require('url');
+            local.util = require('util');
+            local.v8 = require('v8');
+            local.vm = require('vm');
+            local.zlib = require('zlib');
+/* validateLineSortedReset */
             module.exports = local;
             module.exports.__dirname = __dirname;
         }
@@ -15161,7 +15387,6 @@ split_lines=split_lines,exports.MAP=MAP,exports.ast_squeeze_more=require("./sque
 
     // run shared js-env code - function-before
     (function () {
-        local._consoleError = console.error;
         // init global.debug_inline
         local.global['debug_inline'.replace('_i', 'I')] = local.global[
             'debug_inline'.replace('_i', 'I')
@@ -15171,6 +15396,7 @@ split_lines=split_lines,exports.MAP=MAP,exports.ast_squeeze_more=require("./sque
          */
             // debug arguments
             local['_debug_inlineArguments'.replace('_i', 'I')] = arguments;
+            local._consoleError = local._consoleError || console.error;
             local._consoleError('\n\n\ndebug_inline'.replace('_i', 'I'));
             local._consoleError.apply(console, arguments);
             local._consoleError();
@@ -15286,6 +15512,9 @@ textarea {\n\
     text-align: center;\n\
     text-decoration: underline;\n\
 }\n\
+.colorError {\n\
+    color: #d00;\n\
+}\n\
 .uiAnimateShake {\n\
     animation-duration: 500ms;\n\
     animation-name: uiAnimateShake;\n\
@@ -15323,17 +15552,16 @@ local.assetsDict['/assets.index.template.html'] = '\
 ' + local.assetsDict['/assets.utility2.css'] + '\
 </style>\n\
 </head>\n\
-<body style="background: #ddf; font-family: Arial, Helvetica, sans-serif; margin: 0 40px;">\n\
+<body style="background: #eef; font-family: Arial, Helvetica, sans-serif; margin: 0 40px;">\n\
 <div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%; z-index: 1;"></div>\n\
 <div class="uiAnimateSpin" style="animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: none; height: 25px; vertical-align: middle; width: 25px;"></div>\n\
-<code style="display: none;"></code><div class="button uiAnimateShake uiAnimateSlide utility2FooterDiv zeroPixel" style="display: none;"></div><pre style="display: none;"></pre><textarea readonly style="display: none;"></textarea>\n\
 <code style="display: none;"></code><div class="button uiAnimateShake uiAnimateSlide utility2FooterDiv zeroPixel" style="display: none;"></div><pre style="display: none;"></pre><textarea readonly style="display: none;"></textarea>\n\
 <script>\n\
 /* jslint-utility2 */\n\
 /*jslint\n\
     bitwise: true,\n\
     browser: true,\n\
-    maxerr: 8,\n\
+    maxerr: 4,\n\
     maxlen: 100,\n\
     node: true,\n\
     nomen: true,\n\
@@ -15456,7 +15684,7 @@ instruction\n\
 /*jslint\n\
     bitwise: true,\n\
     browser: true,\n\
-    maxerr: 8,\n\
+    maxerr: 4,\n\
     maxlen: 100,\n\
     node: true,\n\
     nomen: true,\n\
@@ -15595,11 +15823,40 @@ instruction\n\
         // init exports\n\
         module.exports = local;\n\
         // require builtins\n\
-        Object.keys(process.binding(\'natives\')).forEach(function (key) {\n\
-            if (!local[key] && !(/\\/|^_|^assert|^sys$/).test(key)) {\n\
-                local[key] = require(key);\n\
-            }\n\
-        });\n\
+        // local.assert = require(\'assert\');\n\
+        local.buffer = require(\'buffer\');\n\
+        local.child_process = require(\'child_process\');\n\
+        local.cluster = require(\'cluster\');\n\
+        local.console = require(\'console\');\n\
+        local.constants = require(\'constants\');\n\
+        local.crypto = require(\'crypto\');\n\
+        local.dgram = require(\'dgram\');\n\
+        local.dns = require(\'dns\');\n\
+        local.domain = require(\'domain\');\n\
+        local.events = require(\'events\');\n\
+        local.fs = require(\'fs\');\n\
+        local.http = require(\'http\');\n\
+        local.https = require(\'https\');\n\
+        local.module = require(\'module\');\n\
+        local.net = require(\'net\');\n\
+        local.os = require(\'os\');\n\
+        local.path = require(\'path\');\n\
+        local.process = require(\'process\');\n\
+        local.punycode = require(\'punycode\');\n\
+        local.querystring = require(\'querystring\');\n\
+        local.readline = require(\'readline\');\n\
+        local.repl = require(\'repl\');\n\
+        local.stream = require(\'stream\');\n\
+        local.string_decoder = require(\'string_decoder\');\n\
+        local.timers = require(\'timers\');\n\
+        local.tls = require(\'tls\');\n\
+        local.tty = require(\'tty\');\n\
+        local.url = require(\'url\');\n\
+        local.util = require(\'util\');\n\
+        local.v8 = require(\'v8\');\n\
+        local.vm = require(\'vm\');\n\
+        local.zlib = require(\'zlib\');\n\
+/* validateLineSortedReset */\n\
         // init assets\n\
         local.assetsDict = local.assetsDict || {};\n\
         /* jslint-ignore-begin */\n\
@@ -15621,6 +15878,12 @@ local.assetsDict['/assets.index.template.html'].replace((/\n/g), '\\n\\\n') + '\
                 );\n\
             }\n\
         });\n\
+/* validateLineSortedReset */\n\
+        // bug-workaround - long $npm_package_buildCustomOrg\n\
+        /* jslint-ignore-begin */\n\
+        local.assetsDict[\'/assets.jslint.js\'] = local.assetsDict[\'/assets.jslint.js\'] ||\n\
+            local.fs.readFileSync(local.__dirname + \'/lib.jslint.js\', \'utf8\'\n\
+        ).replace((/^#!/), \'//\');\n\
 /* validateLineSortedReset */\n\
         local.assetsDict[\'/\'] =\n\
             local.assetsDict[\'/assets.example.html\'] =\n\
@@ -15646,14 +15909,6 @@ local.assetsDict['/assets.index.template.html'].replace((/\n/g), '\\n\\\n') + '\
         local.assetsDict[\'/assets.example.js\'] =\n\
             local.assetsDict[\'/assets.example.js\'] ||\n\
             local.fs.readFileSync(__filename, \'utf8\');\n\
-        // bug-workaround - long $npm_package_buildCustomOrg\n\
-        /* jslint-ignore-begin */\n\
-        local.assetsDict[\'/assets.jslint.js\'] =\n\
-            local.assetsDict[\'/assets.jslint.js\'] ||\n\
-            local.fs.readFileSync(\n\
-                local.__dirname + \'/lib.jslint.js\',\n\
-                \'utf8\'\n\
-            ).replace((/^#!/), \'//\');\n\
         /* jslint-ignore-end */\n\
         local.assetsDict[\'/favicon.ico\'] = local.assetsDict[\'/favicon.ico\'] || \'\';\n\
         // if $npm_config_timeout_exit exists,\n\
@@ -15689,7 +15944,7 @@ local.assetsDict['/assets.lib.template.js'] = '\
 /*jslint\n\
     bitwise: true,\n\
     browser: true,\n\
-    maxerr: 8,\n\
+    maxerr: 4,\n\
     maxlen: 100,\n\
     node: true,\n\
     nomen: true,\n\
@@ -15738,11 +15993,40 @@ local.assetsDict['/assets.lib.template.js'] = '\
             local.global.utility2_jslint = local;\n\
         } else {\n\
             // require builtins\n\
-            Object.keys(process.binding(\'natives\')).forEach(function (key) {\n\
-                if (!local[key] && !(/\\/|^_|^assert|^sys$/).test(key)) {\n\
-                    local[key] = require(key);\n\
-                }\n\
-            });\n\
+            // local.assert = require(\'assert\');\n\
+            local.buffer = require(\'buffer\');\n\
+            local.child_process = require(\'child_process\');\n\
+            local.cluster = require(\'cluster\');\n\
+            local.console = require(\'console\');\n\
+            local.constants = require(\'constants\');\n\
+            local.crypto = require(\'crypto\');\n\
+            local.dgram = require(\'dgram\');\n\
+            local.dns = require(\'dns\');\n\
+            local.domain = require(\'domain\');\n\
+            local.events = require(\'events\');\n\
+            local.fs = require(\'fs\');\n\
+            local.http = require(\'http\');\n\
+            local.https = require(\'https\');\n\
+            local.module = require(\'module\');\n\
+            local.net = require(\'net\');\n\
+            local.os = require(\'os\');\n\
+            local.path = require(\'path\');\n\
+            local.process = require(\'process\');\n\
+            local.punycode = require(\'punycode\');\n\
+            local.querystring = require(\'querystring\');\n\
+            local.readline = require(\'readline\');\n\
+            local.repl = require(\'repl\');\n\
+            local.stream = require(\'stream\');\n\
+            local.string_decoder = require(\'string_decoder\');\n\
+            local.timers = require(\'timers\');\n\
+            local.tls = require(\'tls\');\n\
+            local.tty = require(\'tty\');\n\
+            local.url = require(\'url\');\n\
+            local.util = require(\'util\');\n\
+            local.v8 = require(\'v8\');\n\
+            local.vm = require(\'vm\');\n\
+            local.zlib = require(\'zlib\');\n\
+/* validateLineSortedReset */\n\
             module.exports = local;\n\
             module.exports.__dirname = __dirname;\n\
         }\n\
@@ -15928,7 +16212,7 @@ PORT=8081 node ./assets.app.js\n\
         "apidocRawFetch": "[ ! -f npm_scripts.sh ] || ./npm_scripts.sh shNpmScriptApidocRawFetch",\n\
         "build-ci": "utility2 shReadmeTest build_ci.sh",\n\
         "env": "env",\n\
-        "heroku-postbuild": "npm uninstall utility2 2>/dev/null; npm install kaizhu256/node-utility2#alpha && utility2 shDeployHeroku",\n\
+        "heroku-postbuild": "npm install kaizhu256/node-utility2#alpha --prefix . && utility2 shDeployHeroku",\n\
         "postinstall": "[ ! -f npm_scripts.sh ] || ./npm_scripts.sh shNpmScriptPostinstall",\n\
         "start": "PORT=${PORT:-8080} utility2 start test.js",\n\
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"\n\
@@ -15951,14 +16235,14 @@ PORT=8081 node ./assets.app.js\n\
 \n\
 # this shell script will run the build for this package\n\
 \n\
-shBuildCiAfter() {(set -e\n\
+shBuildCiAfter () {(set -e\n\
     # shDeployCustom\n\
     shDeployGithub\n\
     # shDeployHeroku\n\
     shReadmeTest example.sh\n\
 )}\n\
 \n\
-shBuildCiBefore() {(set -e\n\
+shBuildCiBefore () {(set -e\n\
     shNpmTestPublished\n\
     shReadmeTest example.js\n\
 )}\n\
@@ -16078,7 +16362,7 @@ local.assetsDict['/assets.test.template.js'] = '\
 /*jslint\n\
     bitwise: true,\n\
     browser: true,\n\
-    maxerr: 8,\n\
+    maxerr: 4,\n\
     maxlen: 100,\n\
     node: true,\n\
     nomen: true,\n\
@@ -16284,7 +16568,7 @@ local.assetsDict['/assets.utility2.rollup.begin.js'] = '\
 /*jslint\n\
     bitwise: true,\n\
     browser: true,\n\
-    maxerr: 8,\n\
+    maxerr: 4,\n\
     maxlen: 100,\n\
     node: true,\n\
     nomen: true,\n\
@@ -16445,12 +16729,12 @@ local.assetsDict['/favicon.ico'] = '';
             result = [];
             local.onParallelList({
                 list: this.entryList
-            }, function (options, onParallel) {
+            }, function (options2, onParallel) {
                 var value;
-                value = options.element.value;
+                value = options2.element.value;
                 if (!(value instanceof local.Blob)) {
-                    result[options.ii] = [boundary +
-                        '\r\nContent-Disposition: form-data; name="' + options.element.name +
+                    result[options2.ii] = [boundary +
+                        '\r\nContent-Disposition: form-data; name="' + options2.element.name +
                         '"\r\n\r\n', value, '\r\n'];
                     onParallel.counter += 1;
                     onParallel();
@@ -16459,8 +16743,8 @@ local.assetsDict['/favicon.ico'] = '';
                 // read from blob in parallel
                 onParallel.counter += 1;
                 local.blobRead(value, 'binary', function (error, data) {
-                    result[options.ii] = !error && [boundary +
-                        '\r\nContent-Disposition: form-data; name="' + options.element.name +
+                    result[options2.ii] = !error && [boundary +
+                        '\r\nContent-Disposition: form-data; name="' + options2.element.name +
                         '"' +
                         // read param filename
                         (value && value.name
@@ -17215,14 +17499,14 @@ local.assetsDict['/favicon.ico'] = '';
             onError(error);
         };
 
-        local.assertJsonEqual = function (aa, bb) {
+        local.assertJsonEqual = function (aa, bb, message) {
         /*
          * this function will assert
          * jsonStringifyOrdered(aa) === JSON.stringify(bb)
          */
             aa = local.jsonStringifyOrdered(aa);
             bb = JSON.stringify(bb);
-            local.assert(aa === bb, [aa, bb]);
+            local.assert(aa === bb, message || [aa, bb]);
         };
 
         local.assertJsonNotEqual = function (aa, bb) {
@@ -18171,10 +18455,6 @@ return Utf8ArrayToStr(bff);
         /*
          * this function will build the apidoc
          */
-            if (local.env.npm_package_buildCustomOrg && !options.modeForce) {
-                onError();
-                return;
-            }
             // optimization - do not run if $npm_config_mode_coverage = all
             if (local.env.npm_config_mode_coverage === 'all') {
                 onError();
@@ -18184,6 +18464,10 @@ return Utf8ArrayToStr(bff);
                 blacklistDict: local,
                 require: local.requireInSandbox
             });
+            if (local.env.npm_package_buildCustomOrg && !options.modeForce) {
+                onError();
+                return;
+            }
             // create apidoc.html
             local.fsWriteFileWithMkdirpSync(
                 local.env.npm_config_dir_build + '/apidoc.html',
@@ -18202,6 +18486,9 @@ return Utf8ArrayToStr(bff);
             // build assets
             local.fsRmrSync(local.env.npm_config_dir_build + '/app');
             local.onParallelList({ list: options.assetsList.concat([{
+                file: '/LICENSE',
+                url: '/LICENSE'
+            }, {
                 file: '/assets.' + local.env.npm_package_nameLib + '.html',
                 url: '/index.html'
             }, {
@@ -18243,18 +18530,18 @@ return Utf8ArrayToStr(bff);
             }, {
                 file: '/jsonp.utility2.stateInit',
                 url: '/jsonp.utility2.stateInit?callback=window.utility2.stateInit'
-            }]) }, function (options, onParallel) {
-                options = options.element;
+            }]) }, function (options2, onParallel) {
+                options2 = options2.element;
                 onParallel.counter += 1;
-                local.ajax(options, function (error, xhr) {
+                local.ajax(options2, function (error, xhr) {
                     // validate no error occurred
                     local.assert(!error, error);
                     // jslint file
-                    local.jslintAndPrintConditional(xhr.responseText, options.file);
+                    local.jslintAndPrintConditional(xhr.responseText, options2.file);
                     // validate no error occurred
                     local.assert(!local.jslint.errorText, local.jslint.errorText);
                     local.fsWriteFileWithMkdirpSync(
-                        local.env.npm_config_dir_build + '/app' + options.file,
+                        local.env.npm_config_dir_build + '/app' + options2.file,
                         new Buffer(xhr.response)
                     );
                     onParallel();
@@ -18315,11 +18602,9 @@ return Utf8ArrayToStr(bff);
             options.packageJson = JSON.parse(local.fs.readFileSync('package.json', 'utf8'));
             switch (local.env.GITHUB_ORG) {
             case 'npmdoc':
-                local.objectSetOverride(options, {
-                    packageJson: {
-                        keywords: ['documentation', local.env.npm_package_buildCustomOrg]
-                    }
-                }, 2);
+                local.objectSetOverride(options, { packageJson: {
+                    keywords: ['documentation', local.env.npm_package_buildCustomOrg]
+                } }, 2);
                 // build apidoc.html
                 onParallel.counter += 1;
                 local.buildApidoc({
@@ -18379,7 +18664,7 @@ return Utf8ArrayToStr(bff);
                 (/[\S\s]*?^\/\* istanbul instrument in package /m),
                 // customize body after use strict
                 (/\n {4}'use strict';\n[\S\s]*?\n\n\n\n/),
-                // customize body after init exports
+                // customize body after init lib
                 (/\n {8}\/\/ init lib\n[\S\s]*?$/)
             ].forEach(function (rgx) {
                 // handle large string-replace
@@ -18416,10 +18701,10 @@ return Utf8ArrayToStr(bff);
                 if (local.env.npm_config_mode_coverage) {
                     return;
                 }
-                options.dataFunctionBefore = (local.tryCatchReadFile(
+                options.dataFunctionBefore = local.tryCatchReadFile(
                     file,
                     'utf8'
-                )).replace(file.slice(-3) === '.js'
+                ).replace(file.slice(-3) === '.js'
                     ? new RegExp('\\n {4}\\/\\/ run shared js-env code - function-before\\n' +
                         '[\\S\\s]+?\\n {4}\\}\\(\\)\\);\\n')
                     : (/^[\S\s]*?$/), function (match0) {
@@ -18515,8 +18800,8 @@ return Utf8ArrayToStr(bff);
                 (/\nutility2-comment -->(?:\\n\\\n){4}[^`]*?^<!-- utility2-comment\\n\\\n/m),
                 // customize build script
                 (/\n# internal build script\n[\S\s]*?^- build_ci\.sh\n/m),
-                (/\nshBuildCiAfter\(\) \{\(set -e\n[^`]*?\n\)\}\n/),
-                (/\nshBuildCiBefore\(\) \{\(set -e\n[^`]*?\n\)\}\n/)
+                (/\nshBuildCiAfter \(\) \{\(set -e\n[^`]*?\n\)\}\n/),
+                (/\nshBuildCiBefore \(\) \{\(set -e\n[^`]*?\n\)\}\n/)
             ].forEach(function (rgx) {
                 // handle large string-replace
                 options.dataFrom.replace(rgx, function (match0) {
@@ -18680,8 +18965,8 @@ return Utf8ArrayToStr(bff);
             });
             // search-and-replace - customize dataTo
             [
-                // customize js\-env code
-                (/\n {4}\}\(\)\);\n[\S\s]*?$/)
+                // customize shared js\-env code
+                (/\n {4}\(function \(\) \{\n[\S\s]*?$/)
             ].forEach(function (rgx) {
                 // handle large string-replace
                 options.dataFrom.replace(rgx, function (match0) {
@@ -19327,7 +19612,7 @@ return Utf8ArrayToStr(bff);
             }
             switch (file.replace((/^.*\./), '.')) {
             case '.css':
-                if (script.indexOf('/*csslint') >= 0 || mode === 'force') {
+                if (script.indexOf('/*csslint') >= 0) {
                     local.jslintAndPrint(script, file);
                 }
                 break;
@@ -19341,29 +19626,28 @@ return Utf8ArrayToStr(bff);
                 }
                 break;
             }
-            // csslint <style>...</style>
+            // recurse - csslint <style>...</style>
             script.replace(
                 (/^<style>(?:\\n\\)?\n([\S\s]+?)\n<\/style>(?:\\n\\)?$/gm),
                 function (match0, match1, ii, text) {
                     match0 = match1;
-                    local.jslintAndPrint(
+                    local.jslintAndPrintConditional(
                         // preserve lineno
                         text.slice(0, ii).replace((/.+/g), '') + '\n' + match0
                             // filter \\n\\
                             .replace((/\\n\\$/gm), '')
                             // filter ' + ... + '\\
                             .replace((/^' \+ .*? \+ '\\$/gm), ''),
-                        file + '.css',
-                        mode
+                        file + '.css'
                     );
                 }
             );
-            // jslint <script>...</script>
+            // recurse - jslint <script>...</script>
             script.replace((
                 /^(?:\/\/ )?<script>(?:\\n\\)?\n([\S\s]+?)\n(?:\/\/ )?<\/script>(?:\\n\\)?$/gm
             ), function (match0, match1, ii, text) {
                 match0 = match1;
-                local.jslintAndPrint(
+                local.jslintAndPrintConditional(
                     // preserve lineno
                     text.slice(0, ii).replace((/.+/g), '') + '\n' + match0
                         // filter \\n\\
@@ -19661,24 +19945,26 @@ return Utf8ArrayToStr(bff);
          * this function will run the middleware that will update the response-header Last-Modified
          */
             // do not cache if headers already sent or url has '?' search indicator
-            if (!(response.headersSent || request.url.indexOf('?') >= 0)) {
-                // init serverResponseHeaderLastModified
-                local.serverResponseHeaderLastModified = local.serverResponseHeaderLastModified ||
-                    // resolve to 1000 ms
-                    new Date(new Date(Math.floor(Date.now() / 1000) * 1000).toGMTString());
-                // respond with 304 If-Modified-Since serverResponseHeaderLastModified
-                if (new Date(request.headers['if-modified-since']) >=
-                        local.serverResponseHeaderLastModified) {
-                    response.statusCode = 304;
-                    response.end();
-                    return;
-                }
-                response.setHeader('Cache-Control', 'no-cache');
-                response.setHeader(
-                    'Last-Modified',
-                    local.serverResponseHeaderLastModified.toGMTString()
-                );
+            if (response.headersSent || request.url.indexOf('?') >= 0) {
+                nextMiddleware();
+                return;
             }
+            // init serverResponseHeaderLastModified
+            local.serverResponseHeaderLastModified = local.serverResponseHeaderLastModified ||
+                // resolve to 1000 ms
+                new Date(new Date(Math.floor(Date.now() / 1000) * 1000).toGMTString());
+            // respond with 304 If-Modified-Since serverResponseHeaderLastModified
+            if (new Date(request.headers['if-modified-since']) >=
+                    local.serverResponseHeaderLastModified) {
+                response.statusCode = 304;
+                response.end();
+                return;
+            }
+            response.setHeader('Cache-Control', 'no-cache');
+            response.setHeader(
+                'Last-Modified',
+                local.serverResponseHeaderLastModified.toGMTString()
+            );
             nextMiddleware();
         };
 
@@ -20589,7 +20875,7 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                         local.tryCatchOnError(function () {
                             // validate no error occurred
                             local.assert(!error, error);
-                            local.swgg.swaggerValidateJson(JSON.parse(data));
+                            local.swgg.swaggerValidate(JSON.parse(data));
                         }, local.onErrorDefault);
                     });
                     break;
@@ -20633,13 +20919,9 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 return module.exports;
             }
             // init file $npm_package_main
-            tmp = process.cwd() + '/' + local.env.npm_package_main;
-            global.utility2_moduleExports = require(tmp);
-            local.assetsDict['/assets.' + local.env.npm_package_nameLib + '.js'] =
-                local.istanbulInstrumentInPackage(
-                    local.fs.readFileSync(tmp, 'utf8').replace((/^#!/), '//'),
-                    tmp
-                );
+            global.utility2_moduleExports = require(
+                process.cwd() + '/' + local.env.npm_package_main
+            );
             global.utility2_moduleExports.global = global;
             // read script from README.md
             script = local.templateRenderJslintLite(
@@ -20677,7 +20959,15 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             module.exports.utility2 = local;
             module.exports[local.env.npm_package_nameLib] = global.utility2_moduleExports;
             // init assets
+            tmp = process.cwd() + '/' + local.env.npm_package_main;
+            local.assetsDict['/assets.' + local.env.npm_package_nameLib + '.js'] =
+                local.fs.readFileSync(tmp, 'utf8').replace((/^#!/), '//');
             local.objectSetOverride(local.assetsDict, module.exports.assetsDict);
+            local.assetsDict['/assets.' + local.env.npm_package_nameLib + '.js'] =
+                local.istanbulInstrumentInPackage(
+                    local.assetsDict['/assets.' + local.env.npm_package_nameLib + '.js'],
+                    tmp
+                );
             module.exports.assetsDict = local.assetsDict;
             local.assetsDict['/assets.example.js'] = script;
             local.assetsDict['/assets.test.js'] = local.istanbulInstrumentInPackage(
@@ -22343,7 +22633,7 @@ instruction\n\
         local.swgg = local.swgg || {
             apiUpdate: local.nop,
             normalizeSwaggerJson: local.nop,
-            swaggerValidateJson: local.nop
+            swaggerValidate: local.nop
         };
         local.taskOnTaskDict = {};
         local.testReport = { testPlatformList: [{
@@ -22436,9 +22726,9 @@ instruction\n\
                 list: process.argv[3].split(/\s+/).filter(function (element) {
                     return element;
                 })
-            }, function (options, onParallel) {
+            }, function (options2, onParallel) {
                 onParallel.counter += 1;
-                local.browserTest({ url: options.element }, function () {
+                local.browserTest({ url: options2.element }, function () {
                     onParallel();
                 });
             }, local.exit);
@@ -22543,15 +22833,15 @@ instruction\n\
                 }),
                 rateLimit: process.argv[4],
                 retryLimit: process.argv[5]
-            }, function (options, onParallel) {
+            }, function (options2, onParallel) {
                 onParallel.counter += 1;
                 local.child_process.spawn(
-                    '. ' + local.__dirname + '/lib.utility2.sh; ' + options.element,
+                    '. ' + local.__dirname + '/lib.utility2.sh; ' + options2.element,
                     { shell: true, stdio: ['ignore', 1, 2] }
                 ).on('exit', function (exitCode) {
                     console.error('onParallelListExec - [' + (onParallel.ii + 1) +
-                        ' of ' + options.list.length + '] exitCode ' + exitCode);
-                    onParallel(exitCode && new Error(exitCode), options);
+                        ' of ' + options2.list.length + '] exitCode ' + exitCode);
+                    onParallel(exitCode && new Error(exitCode), options2);
                 });
             }, local.exit);
         };
@@ -22790,7 +23080,7 @@ instruction\n\
 /*jslint
     bitwise: true,
     browser: true,
-    maxerr: 8,
+    maxerr: 4,
     maxlen: 100,
     node: true,
     nomen: true,
@@ -22847,11 +23137,40 @@ instruction\n\
             local.global.utility2_swgg = local;
         } else {
             // require builtins
-            Object.keys(process.binding('natives')).forEach(function (key) {
-                if (!local[key] && !(/\/|^_|^assert|^sys$/).test(key)) {
-                    local[key] = require(key);
-                }
-            });
+            // local.assert = require('assert');
+            local.buffer = require('buffer');
+            local.child_process = require('child_process');
+            local.cluster = require('cluster');
+            local.console = require('console');
+            local.constants = require('constants');
+            local.crypto = require('crypto');
+            local.dgram = require('dgram');
+            local.dns = require('dns');
+            local.domain = require('domain');
+            local.events = require('events');
+            local.fs = require('fs');
+            local.http = require('http');
+            local.https = require('https');
+            local.module = require('module');
+            local.net = require('net');
+            local.os = require('os');
+            local.path = require('path');
+            local.process = require('process');
+            local.punycode = require('punycode');
+            local.querystring = require('querystring');
+            local.readline = require('readline');
+            local.repl = require('repl');
+            local.stream = require('stream');
+            local.string_decoder = require('string_decoder');
+            local.timers = require('timers');
+            local.tls = require('tls');
+            local.tty = require('tty');
+            local.url = require('url');
+            local.util = require('util');
+            local.v8 = require('v8');
+            local.vm = require('vm');
+            local.zlib = require('zlib');
+/* validateLineSortedReset */
             module.exports = local;
             module.exports.__dirname = __dirname;
         }
@@ -22920,33 +23239,98 @@ local.swaggerErrorTypeDict = {
     objectDependencies: '{{type2}} {{prefix0}} with item {{key jsonStringify}} must have dependency {{key2 jsonStringify}}',
     objectMaxProperties: '{{type2}} {{prefix0}} must have <= {{schema.maxProperties}} properties',
     objectMinProperties: '{{type2}} {{prefix0}} must have >= {{schema.minProperties}} properties',
-    objectRequired: '{{type2}} {{prefix0}} must have property {{key jsonStringify}}',
-    schemaDeferenceCircular: 'cannot dereference circular-reference schema {{schema2}}',
-    schemaDeference: 'cannot dereference schema {{schema2}}',
-    // https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation/semantic-validators/validators
-    semanticInvalidInFormdata: 'Parameter "in: formdata" is invalid, did you mean "in: formData" ( camelCase )?',
-    semanticMinimumMoreThanMaximum: 'Minimum cannot be more than maximum',
-    semanticMinPropertiesMoreThanMaxProperties: 'minProperties cannot be more than maxProperties',
-    semanticMinLengthMoreThanMaxLength: 'minLength cannot be more than maxLength',
-    semanticRequired: 'Schema properties specified as "required" must be defined',
-    semanticRequiredArrayItems: 'schema {{schema2}} with "array" type requires an "items" property',
-    semanticRequiredConsumesFormData: 'Operations with Parameters of "in: formData" must include "application/x-www-form-urlencoded" or "multipart/form-data" in their "consumes" property',
-    semanticRequiredConsumesMultipartFormData: 'Operations with Parameters of "type: file" must include "multipart/form-data" in their "consumes" property',
-    semanticRequiredInFormData: 'Parameters with "type: file" must have "in: formData"',
-    semanticRequiredReadOnly: 'Read only properties cannot marked as required by a schema',
-    semanticRequiredTypeString: '${path} must have required string "type" param',
-    semanticTypeString: '"type" should be a string',
-    semanticUniqueInBodyFormDataParameter: 'Parameters cannot have both a "in: body" and "in: formData", as "formData" _will_ be the body',
-    semanticUniqueInBodyFormDataOperation: 'Operations cannot have both a "body" parameter and "formData" parameter',
-    semanticUniqueInBodyOperation: 'Operations must have no more than one body parameter',
-    semanticUniqueParameterName: 'Operation parameters must have unique "name" + "in" properties',
-    semanticUniquePath: 'Equivalent paths are not allowed - {{prefix0}}',
-    semanticUniqueOperationId: 'operationId {{prefix0}} is not unique',
-    semanticUnusedDefinition: 'Definition was declared but never used in document',
-    semanticUnusedNameInPath: 'Path parameter ${parameterDefinition.name} was defined but never used',
+    objectRequired: '{{type2}} {{prefix0}} is required',
+    schemaDereferenceCircular: 'cannot dereference circular-reference schema {{schema2}}',
+    schemaDereference: 'cannot dereference schema {{schema2}}',
+    // https://github.com/swagger-api/swagger-editor/tree/v3.1.20/src/plugins/validation/semantic-validators/validators
+    // shGrep swagger-editor/src/plugins/validation/semantic-validators/validators 'message:'
+    // form-data.js:90: "Parameter \"in: formdata\" is invalid, did you mean \"in: formData\" ( camelCase )?",
+    semanticFormData1: "Parameter {{prefix0}} is invalid, did you mean \"in: formData\" ( camelCase )?",
+    // form-data.js:109: "Parameters cannot have both a \"in: body\" and \"in: formData\", as \"formData\" _will_ be the body"
+    semanticFormData2: "Parameters cannot have both a \"in: body\" and \"in: formData\", as \"formData\" _will_ be the body",
+    // form-data.js:131: "Parameters with \"type: file\" must have \"in: formData\"",
+    semanticFormData3: "Parameter {{prefix0}} with \"type: file\" must have \"in: formData\"",
+    // form-data.js:140: "Operations with Parameters of \"type: file\" must include \"multipart/form-data\" in their \"consumes\" property",
+    semanticFormData4: "Operation {{prefix0}} with Parameters of \"type: file\" must include \"multipart/form-data\" in their \"consumes\" property",
+    // form-data.js:163: "Operations with Parameters of \"in: formData\" must include \"application/x-www-form-urlencoded\" or \"multipart/form-data\" in their \"consumes\" property",
+    semanticFormData5: "Operation {{prefix0}} with Parameters of \"in: formData\" must include \"application/x-www-form-urlencoded\" or \"multipart/form-data\" in their \"consumes\" property",
+    // items-required-for-array-objects.js:27: "Schema objects with 'array' type require an 'items' property"
+    semanticItemsRequiredForArrayObjects1: "Schema {{schema2}} with 'array' type require an 'items' property",
+    // items-required-for-array-objects.js:38: "Schema properties specified as 'required' must be defined"
+    semanticItemsRequiredForArrayObjects2: "{{type2}} {{prefix0}} must have property {{key jsonStringify}}",
+    // items-required-for-array-objects.js:50: "Headers with 'array' type require an 'items' property"
+    semanticItemsRequiredForArrayObjects3: "Headers with 'array' type require an 'items' property",
+    // items-required-for-array-objects.js:59: "Model properties with 'array' type require an 'items' property"
+    semanticItemsRequiredForArrayObjects4: "Model properties with 'array' type require an 'items' property",
+    // operation-ids.js:40: "operationIds must be unique"
+    semanticOperationIds1: 'operationId {{prefix0}} must be unique',
+    // operations.js:30: "Operations cannot have both a \"body\" parameter and \"formData\" parameter"
+    semanticOperations1: "Operation {{prefix0}} cannot have both a \"body\" parameter and \"formData\" parameter",
+    // operations.js:38: "Operations must have no more than one body parameter"
+    semanticOperations2: "Operation {{prefix0}} must have no more than one body parameter",
+    // operations.js:53: "Operation parameters must have unique 'name' + 'in' properties"
+    semanticOperations3: "Operation parameters {{prefix0}} must have unique 'name' + 'in' properties",
+    // parameters.js:18: "Parameters with 'array' type require an 'items' property."
+    semanticParameters1: "Parameters with 'array' type require an 'items' property.",
+    // parameters.js:24: "Non-body parameters require a 'type' property."
+    semanticParameters2: "Non-body parameter {{prefix0}} require a 'type' property.",
+    // paths.js:48: "Query strings in paths are not allowed."
+    semanticPaths1: "Query strings in path {{prefix2 jsonStringify}} are not allowed",
+    // paths.js:79: "Equivalent paths are not allowed."
+    semanticPaths2: 'Equivalent paths {{pathList jsonStringify}} are not allowed',
+    // paths.js:94: "Path parameters must have unique 'name' + 'in' properties"
+    semanticPaths3: "Path parameters must have unique 'name' + 'in' properties",
+    // paths.js:107: `Path parameter ${parameterDefinition.name} was defined but never used`
+    semanticPaths4: 'Path parameter ${parameterDefinition.name} was defined but never used',
+    // paths.js:119: "Empty path parameter declarations are not valid"
+    semanticPaths5: "Empty path parameter declarations are not valid - {{prefix2 jsonStringify}}",
+    // paths.js:131: `Declared path parameter "${parameter}" needs to be defined as a path parameter at either the path or operation level`
+    semanticPaths6: 'Declared path parameter {{name jsonStringify}} needs to be defined as a path parameter {{prefix2}} at either the path or operation level',
+    // paths.js:141: `Path parameter ${parameterDefinition.name} was defined but never used`
+    semanticPaths7: 'Path parameter {{prefix0}} was defined but never used',
+    // refs.js:37: "Definition was declared but never used in document"
+    semanticRefs1: 'Definition was declared but never used in document',
+    // schema.js:61: "Read only properties cannot marked as required by a schema."
+    semanticSchema1: "Read only property {{prefix0}} cannot be marked as required by a schema.",
+    // security-definitions.js:33: `${path} must have required string 'type' param`,
+    semanticSecurityDefinitions1: '${path} must have required string "type" param',
+    // security-definitions.js:44: "apiKey authorization must have required 'in' param, valid values are 'query' or 'header'.",
+    semanticSecurityDefinitions2: `apiKey authorization must have required "in" param, valid values are "query" or "header".`,
+    // security-definitions.js:52: "apiKey authorization must have required 'name' string param. The name of the header or query parameter to be used.",
+    semanticSecurityDefinitions3: "apiKey authorization must have required 'name' string param. The name of the header or query parameter to be used.",
+    // security-definitions.js:66: "oauth2 authorization must have required 'flow' string param. Valid values are 'implicit', 'password', 'application' or 'accessCode'",
+    semanticSecurityDefinitions4: "oauth2 authorization must have required 'flow' string param. Valid values are 'implicit', 'password', 'application' or 'accessCode'",
+    // security-definitions.js:73: "oauth2 authorization implicit flow must have required 'authorizationUrl' parameter.",
+    semanticSecurityDefinitions5: "oauth2 authorization implicit flow must have required 'authorizationUrl' parameter.",
+    // security-definitions.js:81: "oauth2 authorization accessCode flow must have required 'authorizationUrl' and 'tokenUrl' string parameters.",
+    semanticSecurityDefinitions6: "oauth2 authorization accessCode flow must have required 'authorizationUrl' and 'tokenUrl' string parameters.",
+    // security-definitions.js:89: "oauth2 authorization password flow must have required 'tokenUrl' string parameter.",
+    semanticSecurityDefinitions7: "oauth2 authorization password flow must have required 'tokenUrl' string parameter.",
+    // security-definitions.js:97: "oauth2 authorization application flow must have required 'tokenUrl' string parameter.",
+    semanticSecurityDefinitions8: "oauth2 authorization application flow must have required 'tokenUrl' string parameter.",
+    // security-definitions.js:106: "'scopes' is required property type object. The available scopes for the OAuth2 security scheme.",
+    semanticSecurityDefinitions9: "'scopes' is required property type object. The available scopes for the OAuth2 security scheme.",
+    // security.js:23: "security requirements must match a security definition",
+    semanticSecurity1: "security requirements must match a security definition",
+    // security.js:37: `Security scope definition ${scope} could not be resolved`,
+    semanticSecurity2: 'Security scope definition ${scope} could not be resolved',
+    // walker.js:27: "\"type\" should be a string"
+    semanticWalker1: "type {{prefix0}} should be a string",
+    // walker.js:39: "Minimum cannot be more than maximum"
+    semanticWalker2: 'Minimum cannot be more than maximum - {{prefix0}}',
+    // walker.js:48: "minProperties cannot be more than maxProperties"
+    semanticWalker3: 'minProperties cannot be more than maxProperties - {{prefix0}}',
+    // walker.js:57: "minLength cannot be more than maxLength"
+    semanticWalker4: 'minLength cannot be more than maxLength - {{prefix0}}',
+    // walker.js:76: `${path[path.length - 2]} $refs cannot match any of the following: ${humanFriendlyRefBlacklist}`
+    // semanticWalker5: '${path[path.length - 2]} $refs cannot match any of the following: ${humanFriendlyRefBlacklist}',
+    // walker.js:89: "$ref paths must begin with `#/`"
+    semanticWalker6: '$ref {{prefix0}} must begin with "#/"',
+    // walker.js:108: "Values alongside a $ref will be ignored."
+    semanticWalker7: 'Values alongside a $ref will be ignored.',
     stringMaxLength: '{{type2}} {{prefix0}} must have <= {{schema.maxLength}} characters',
     stringMinLength: '{{type2}} {{prefix0}} must have >= {{schema.minLength}} characters',
-    stringPattern: '{{type2}} {{prefix0}} must match regexp pattern {{schema.pattern jsonStringify}}',
+    stringPattern: '{{type2}} {{prefix0}} must match regexp pattern {{schema.pattern jsonStringify}}'
 };
 
 
@@ -23532,6 +23916,61 @@ Object.keys(local.templateApiDict).forEach(function (key) {
 
 
 
+// https://swaggerhub.com/wp-content/uploads/2017/10/Swagger-Icon.svg
+local.templateSwaggerUiLogoMediumBase64 = '\
+iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAMAAAAL34HQAAAC6FBMVEUAAABqn0BqmUBumUBtmj9tmUBt\
+mT9tmkBtmj9tmT9tmUBsmkBsmUBtmj9smkBsmUBsmT9tm0BtmkFvmTxsnEFtmT9smT9smUBtmT9tmkBs\
+mkBtmkBsmj9tmz+AgABqmj9smT9tmUBtmkBsmkBsmj9tm0BVqlVgn0BtmkBsmj9tmUBxnDltkkltmD5s\
+mT9tmj9smkBtmUFsmEBsmUBtmkBtmT9vnUEA/wBsmj5smkBsmkBmmTNtmj5smj9smT9rmz9smT9smj9t\
+mj9um0Fvmz1tmj9qmz5wmT1smj9smkBtmj9mmTNsmT9tmkBrmj9tmEFtmT9smkBtmUBsmUBtmD9roUNt\
+mT9smkCAv0Bsm0Bqnj5tmz5smUBrmUBtmkBsmj9smkBtmT9smUBtmkBsmUBtmUBsmkFsnTttmkBwl0Bt\
+mkBtmT9tmUCRs2+kwIe2zZ92oEyauXttmkBrmkDj7Nv///+/0qt/p1htmj+JrWTa5s/I2bdtmT9pljxt\
+mkCkwIj2+fObunxsmEB0okZsmUBtmT9Vqittmj9rmkGtx5TS4MRumj7b5tDt8+j2+fSStHBrmEFsmT/k\
+7Ny2zKBtmT5um0Ftmj9umD5smj9tmj9tmkBsmT9tmkBsmj9smT9tmj9smT5tnD5smj9tmT9smUBtmUJs\
+mEDI2bhrmD/R38Nsmj+sxpNtmz9/pljt8ue1zJ+IrWSauXyjv4dsmT5tmT9rmj+txpS/06xrmj9sm0Bs\
+mT+Rs3C2zaBsmkBtmUBsmUBtmkBrmUBsmkFinTttmUBsmkBtpDdqnEBsmkBsmT9smD9tmUBtmD1smT9t\
+mUBtmUBolzpsmT9umj9smz5tmT9qlUBumT9tnj2txpNsmT9rmjxrnEJtmT9smj9rmUFsmUBtmT9smT9r\
+mT1rmD5smkBxqjltmT9smUBtmT9tmkBtm0BsmUBsmUBmmURtmUBsmT9smkBsmj9unEBrmz5tmUBtmT9s\
+m0Bvm0OD9tkQAAAA+HRSTlMAGDxkgYyWn6myvL+vnYt4ZlQ/Hjt6pcvx/9SwiT0CNXa39Pe9OAMIW7Zs\
+EgdS9fmsSzSg6IonAU7EuAVi1sFFVd7KTy7JKRn+/I0KfeNRL9pv+PBNE7mQBEAdXntrk4anraODgGdH\
+Gu8gzM6P//////+ITP/////y////5hG7////Vwvn4QZ+K///Vv////9Dzf//RjPFJZLqpJ5grqrtLTFt\
+buwjXP85/0n/Wf///////1ppef//cn+Z//+Xm4d3X1MNw3QOJM/pYdwq7nOUFt1dIXUMQRX/xiYfkdk3\
+UP36Mj6cCfYo1asc89cP6+Lg5SxKcL5jF9reEmcAAAc2SURBVHgB7NGDYQNAAAXQX9v8sW2ntt0Gtfdf\
+oQOUl0Oqt8ID8O9fS2tbe0dnV3dPb1//wODQ8MjoGJprfGJyappvsFhtw3Y0gcPpcnv4Ia9vwh+AQcGQ\
+dZpf4glHojAiFu9OUEAylQ5At0w2QWG5fAEaFUtlNmjGD01m5+YpYWEROiwtU9LKKlRbK1OB9Q2otJnd\
+ohLbO7tQJbjnoTL7B1Dj8IhKhcegwPEJFTs9g6xKlRrU6pBynqMW6xeQcLlFYfojr6jRNRp0Q61u0YjA\
+HTXLQlywSu3u6xDlpgHVXQgppmiE2wERXTTkAQIeacwTvuyZBoXwwrxdfbltxFEcnzLTU88tMzMzMzMz\
+k7PaZhWvvG1ll+3KUrNhLjvMTOU2KTP/L0WtZGfvaH6Nxj77ee5Rv7EmI82MInT2JeigSx9SIg8/go7a\
+71HRNPoYOuxxyTryCWgVhnX9B5BzCoXuru5CAXpPKqPh0BjW4yYAOXdAz4giuEuM2yiP9oLySq6bIyvW\
+54B66mmV7RlQvuvayHLLFVC7q0zPgvLcvFkJH1Tmeui558EUy/ayXA/MCy8qvZtB9bgWs0qgXlJaL18K\
+pujazNLcxutuUzqPgarazaqBOkZpvALBPQz+ATkEf6u7zRxQuslrN1COmwgjbCQ/dBMRqF0VdQq4iP8t\
+EiJzTBXcq4oZCa6S3kDk0O8OGAVuW0WMhsYofj0hcpkaNMaQrLHm61XsZAXQuFcNchJ0avqxajnrknFq\
+QydCJ+hYFsarDU1od5YvmI1P2Msw4O1nRYIsnK1aTRwaWZNUi8v3h5ZrJ8uRZPW2bpZMRtuzQLJMr4NT\
+hkrWVNVsWgeyAklW78kq9Rr0nI5m4XWVekP2N6iIPGqirDdV6hhZFmBnmo+Eg2uaKCvsRNZbGY9p/iYf\
+IJcKWWQQbydZR8rfk3KIZO9t78hOKwLD1eRkf777+QNRv+6p2MoqI8M9fH2on7Y85BOIZprzkqyjRa9J\
+Iaxl+dB7RMVug56T3sMGcqrKBtfhcdZ06M1wrQ0tFGXX2jvOmgnAvAdYx//ndM8q0KVi2YPWDXHWbFrU\
+1dVX4hstc2bNmFuaNx8tFvSVSjMWtkaN+LdgVvOEmugrQGNRnLWYz6Kt+jFgfrwJN6u5IL7ZJYcMyxlk\
+0Gc8N3aOs5YIssJiU1VsKXk7KLFbtgyxYijIWh5n7WHOCj3yJy47yR0k93qBS/5DLzRnrYizVmqzyAbS\
+fDbclrmJRvoDplaBdvGsHcmzh2b1O0gsdVOryZgJ2DhagIRTM2WtibPWmrJ6HL5Dvywrq0F/LaCPZNGT\
+9SeMN7HsiW9ijfU75KmhzdqSnbXyIV9mQz6ckzXknZD834s95iH/bpz1njnLLacTRJg1QQTAoNbQSVLn\
+uuasneKsO0H4QUh3+ZOucCkGD+TAGfzy0T8fzTc7UQ8aFRCL46z3wTmVgD98/EZQWz0HLRYsC4KGjxZz\
+ljaCZT5dRIVVmB4+H0ArSn+yucgtvYX9RWgNF7zYeBZfbCrkUZZxbPAhMjTyLXz4parI8Kh+g5L9XGXk\
+VBYtz49WAz5ChrqVnRH5scPIJGutbEejamux35B9dfNxvqsROU5DliRZM+W/vZWsKjKcn2R9ggyRlZlL\
+fhryqUqsk81cyCUQZa2nR+eE/ayi8Duzq2RZXgf2Tj9TqcMxVHaacZvgmLrzWZ+rZncPlayVqtkXHcia\
+K8k6VrVYNzQOV77cS7X4SnI5v+1ZX6tW31wiuNwoO1l1aB3IvyfrSFYAnW/Vhr5rd5bHswyf7J6+Hhqh\
+naxI8Pb9vRrkB/N8E7T5EOMANdiPve3N8s2vWz8p4m5wo+y8cDWM099Yxfx8NCjfynzqlY0vIjMVtcZ4\
+zlnuxsYp/JJWhdolD7fJUcJvIZfl+jawof/WgLvC9BIeC9rwJSV+VTovvgDGt5vlgLn0N6W1C6i6zaxR\
+oC5TGc4CE1nMqoF6/mCV4aJLwPjWsvodULuoTHuAqlrKCjRVpymD80B5gYWsegXcfr8L/nkBFzXCPFlh\
+sMx39PuSRkdCqxhVR40aVYkc2PWHEpiEv9qDZ4BcozAAwO+1zffatpndkq0p7UPTv+U929qz7bHlt5mx\
+tscP55z4PIwlhgAH3jJkKj4OOKkcR5bsgSP5R2SnHDhTeCArncBDEzJyCnhpQSY+/QR+viIDr4G3KKTu\
+bgrw14WUnQRBwpVIkUcXCPRZhdSoroBg6lGkJEkDInhrkYr/gyCO8ziSl68DsY70IWH6BiDg57FiJOm/\
+AcgIvOCBpOibXwIxNUYkw2QGkl40WVA8qwZIm4q+jeLE+74ACmw3plG4mUc2oERXNovCOGUCVaHaD8jX\
+h7yjQJ2uSqJE7vzOZ+qAjbcNX+eQC0/JPxswNT8R9BS38vF35+cB2AnZC76TQY64zu1beTeuwk67VnNl\
+8V7M0tkzp0+dPHF8+f4KHDoEq3MUjwHy2w4OAAAAAElFTkSuQmCC\
+';
+
+
+
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/dist/images/logo_small.png
 local.templateSwaggerUiLogoSmallBase64 = '\
 iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFn\
@@ -23578,11 +24017,12 @@ local.templateUiMain = '\
     </button>\n\
 </h2>\n\
 <div\n\
-    class="errorMessage"\n\
+    class="colorError"\n\
     id="swggUiReloadErrorDiv1"\n\
     style="background: none; border: 0;"\n\
 ></div>\n\
 <div class="info reset">\n\
+    {{#if info}}\n\
     {{#if info.x-swgg-homepage}}\n\
     <h2 class="hx">\n\
         <a href="{{info.x-swgg-homepage}}" target="_blank">{{info.title}} ({{info.version}})</a>\n\
@@ -23636,6 +24076,7 @@ local.templateUiMain = '\
         <li><a target="_blank" href="{{info.license.url}}">{{info.license.name}}</a></li>\n\
         {{/if info.license}}\n\
     </ul>\n\
+    {{/if info}}\n\
 </div>\n\
 {{#if urlSwaggerJson}}\n\
 <h4 class="label">nodejs initialization</h4>\n\
@@ -23694,7 +24135,7 @@ local.templateUiOperation = '\
     style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
 >\n\
     {{#if deprecated}}\n\
-    <h4 class="errorMessage label">(warning: deprecated)</h4><br>\n\
+    <h4 class="colorError label">(warning: deprecated)</h4><br>\n\
     {{/if deprecated}}\n\
     <h4 class="label">description</h4>\n\
     <div class="description markdown">\n\
@@ -23784,7 +24225,7 @@ local.templateUiParameter = '\
         type="text"\n\
     >\n\
     {{/if isInputText}}\n\
-    <div class="errorMessage"></div>\n\
+    <div class="colorError"></div>\n\
 </span>\n\
 <span class="td td4">\n\
     {{#if schemaText}}<pre>{{schemaText}}</pre>{{/if schemaText}}\n\
@@ -23816,8 +24257,8 @@ function (error, data) {\n\
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/resource.handlebars
 local.templateUiResource = '\
 <li\n\
-    class="resource\n\
-        eventDelegateChange eventDelegateClick eventDelegateKeyup eventDelegateSubmit\n\
+    class="\n\
+        eventDelegateChange eventDelegateClick eventDelegateKeyup eventDelegateSubmit resource\n\
     "\n\
     data-name="{{name}}"\n\
     id="{{id}}"\n\
@@ -24093,35 +24534,33 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 /* validateLineSortedReset */\n\
 /* margin */\n\
 .swggUiContainer li {\n\
-    margin-bottom: 10px;\n\
+    margin-top: 10px;\n\
 }\n\
 .swggUiContainer ol,\n\
-.swggUiContainer ul {\n\
+.swggUiContainer ul,\n\
+.swggUiContainer .td {\n\
     margin-left: 20px;\n\
 }\n\
 .swggUiContainer .description,\n\
+.swggUiContainer .label,\n\
 .swggUiContainer .operation,\n\
+.swggUiContainer .operation > form > div,\n\
+.swggUiContainer .operation > form > pre,\n\
 .swggUiContainer .resource,\n\
 .swggUiContainer > div,\n\
 .swggUiContainer > ol,\n\
 .swggUiContainer > pre,\n\
 .swggUiContainer > .info > div,\n\
+.swggUiContainer > .info > ul,\n\
 .swggUiContainer > .info > .button,\n\
 .swggUiContainer > .info > .hx {\n\
-    margin-bottom: 20px;\n\
+    margin-top: 20px;\n\
 }\n\
 .swggUiContainer .label {\n\
-    margin-bottom: 1px;\n\
-}\n\
-.swggUiContainer .operation:last-child {\n\
-    margin-bottom: 0;\n\
-}\n\
-.swggUiContainer .operation > form > div,\n\
-.swggUiContainer .operation > form > pre {\n\
-    margin-bottom: 20px;\n\
+    margin-bottom: -19px;\n\
 }\n\
 .swggUiContainer .operation > form > .button {\n\
-    margin: 50px 0;\n\
+    margin: 40px 0 20px 0;\n\
 }\n\
 .swggUiContainer .resource > ol,\n\
 .swggUiContainer .resource > .thead > .td,\n\
@@ -24129,8 +24568,8 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 .swggUiContainer > ol {\n\
     margin-left: 0;\n\
 }\n\
-.swggUiContainer .td {\n\
-    margin-left: 20px;\n\
+.swggUiContainer .resource > ol > .description {\n\
+    margin-top: 0;\n\
 }\n\
 /* validateLineSortedReset */\n\
 /* padding */\n\
@@ -24153,7 +24592,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
     padding: 20px;\n\
 }\n\
 .swggUiContainer .operation > form {\n\
-    padding: 20px 20px 0 20px;\n\
+    padding: 0 20px;\n\
 }\n\
 .swggUiContainer .operation > form .td1 {\n\
     padding-left: 0;\n\
@@ -24214,10 +24653,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 }\n\
 .swggUiContainer input.hasError,\n\
 .swggUiContainer select.hasError {\n\
-    border: 5px solid #c00;\n\
-}\n\
-.swggUiContainer .errorMessage {\n\
-    color: #c00;\n\
+    border: 5px solid #d00;\n\
 }\n\
 </style>\n\
 ')
@@ -24228,7 +24664,6 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 ' + local.templateRender(local.templateUiMain, {
     ajaxProgressText: 'loading script',
     apiKeyValue: '',
-    info: { 'title': 'title', version: 'version' },
     urlSwaggerJson: ''
 }) + '\
 </div>\n\
@@ -24236,7 +24671,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.
 /*jslint\n\
     bitwise: true,\n\
     browser: true,\n\
-    maxerr: 8,\n\
+    maxerr: 4,\n\
     maxlen: 100,\n\
     node: true,\n\
     nomen: true,\n\
@@ -24288,7 +24723,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 local.normalizeSwaggerParamDict(options);
             }
             // try to validate paramDict
-            options.error = local.validateBySwaggerParameters({
+            options.error = local.swaggerValidateDataParameters({
                 // normalize paramDict
                 data: local.normalizeSwaggerParamDict({
                     modeNoDefault: options.modeNoDefault,
@@ -24565,7 +25000,8 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     tmp[tag.name] = local.objectSetOverride(tmp[tag.name], tag);
                 });
             });
-            tmp = Object.keys(tmp).sort().map(function (key) {
+            local.swaggerJson['x-swgg-tagNameList'] = Object.keys(tmp).sort();
+            tmp = local.swaggerJson['x-swgg-tagNameList'].map(function (key) {
                 return tmp[key];
             });
             // merge swaggerJson into local.swaggerJson
@@ -24578,7 +25014,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 : local.swaggerJson.basePath;
             Object.keys(swaggerJson.definitions).forEach(function (schemaName) {
                 tmp = swaggerJson.definitions[schemaName] = local.jsonCopy(
-                    local.validateBySwaggerSchema({
+                    local.swaggerValidateDataSchema({
                         // dereference definition
                         modeDereference: true,
                         prefix: ['swaggerJson', 'definitions', schemaName],
@@ -24587,7 +25023,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     })
                 );
                 (tmp.allOf || []).forEach(function (element) {
-                    local.objectSetDefault(tmp, local.jsonCopy(local.validateBySwaggerSchema({
+                    local.objectSetDefault(tmp, local.jsonCopy(local.swaggerValidateDataSchema({
                         // dereference definition.allOf
                         modeDereference: true,
                         prefix: ['swaggerJson', 'definitions', schemaName, 'allOf'],
@@ -24668,7 +25104,6 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 tmp = self['x-swgg-consumes0'] || (self.consumes && self.consumes[0]);
                 self.parameters.some(function (schemaP) {
                     tmp = tmp ||
-                        (schemaP.in === 'formData' && 'application/x-www-form-urlencoded') ||
                         (schemaP.in === 'body' && schemaP.schema.type === 'string' && 'text/plain');
                     return tmp;
                 });
@@ -24762,7 +25197,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             local.swaggerJson = JSON.parse(local.jsonStringifyOrdered(swaggerJson));
             // try to validate swaggerJson
             local.tryCatchOnError(function () {
-                local.swaggerValidateJson(local.swaggerJson);
+                local.swaggerValidate(local.swaggerJson);
             }, local.onErrorDefault);
             // init corsForwardProxyHost
             local.corsForwardProxyHost = local.corsForwardProxyHost ||
@@ -24945,7 +25380,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             var ii, dbRow, properties;
             dbRow = {};
             options = local.objectSetDefault(options, { override: local.nop, prefix: ['dbRow'] });
-            properties = local.validateBySwaggerSchema({
+            properties = local.swaggerValidateDataSchema({
                 // dereference property
                 modeDereference: true,
                 prefix: options.prefix,
@@ -24962,7 +25397,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 dbRow[key] = local.dbFieldRandomCreate({
                     depth: options.depth,
                     modeNotRandom: options.modeNotRandom,
-                    schemaP: local.validateBySwaggerSchema({
+                    schemaP: local.swaggerValidateDataSchema({
                         // dereference property
                         modeDereference: true,
                         prefix: options.prefix.concat([key]),
@@ -24974,7 +25409,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             dbRow = local.jsonCopy(local.objectSetOverride(dbRow, options.override(options)));
             // try to validate data
             local.tryCatchOnError(function () {
-                local.validateBySwaggerSchema({
+                local.swaggerValidateDataSchema({
                     data: dbRow,
                     prefix: options.prefix,
                     schema: options.schema,
@@ -25542,7 +25977,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     // normalize paramDict
                     local.normalizeSwaggerParamDict(request.swgg);
                     // validate paramDict
-                    error = local.validateBySwaggerParameters({
+                    error = local.swaggerValidateDataParameters({
                         data: request.swgg.paramDict,
                         prefix: ['operation', request.swgg.methodPath],
                         parameters: request.swgg.operation.parameters,
@@ -25646,7 +26081,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 }
             });
             local.objectSetDefault(swaggerJson, { paths: {}, tags: [] });
-            // fix error - semanticUniquePath
+            // fix error - semanticPaths2
             pathDict = {};
             Object.keys(swaggerJson.paths).forEach(function (path) {
                 tmp = path.replace((/\{.*?\}/g), '{}');
@@ -25655,13 +26090,13 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             });
             Object.keys(pathDict).forEach(function (key) {
                 Object.keys(pathDict[key]).sort().forEach(function (path, ii) {
+                    // fix error.semanticUniquePath
                     if (ii && swaggerJson['x-swgg-fixErrorSemanticUniquePath']) {
                         swaggerJson.paths[path + '#' + ii] = swaggerJson.paths[path];
                         delete swaggerJson.paths[path];
                     }
                 });
             });
-            // auto-create operationId from path
             Object.keys(swaggerJson.paths).forEach(function (path) {
                 Object.keys(swaggerJson.paths[path]).forEach(function (method) {
                     tmp = swaggerJson.paths[path][method];
@@ -25733,9 +26168,8 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             ['definitions', 'parameters', 'responses'].forEach(function (schema) {
                 schema = swaggerJson[schema] || {};
                 Object.keys(schema).forEach(function (key) {
-                    if (schema[key]['x-swgg-tags0'] &&
-                            schema[key]['x-swgg-tags0'] !== 'all' &&
-                            schema[key]['x-swgg-tags0'] !== local.env.npm_package_swggTags0) {
+                    tmp = schema[key]['x-swgg-tags0'];
+                    if (tmp && tmp !== 'all' && tmp !== local.env.npm_package_swggTags0) {
                         delete schema[key];
                     }
                 });
@@ -25743,10 +26177,8 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             // filter $npm_package_swggTags0 - paths
             Object.keys(swaggerJson.paths).forEach(function (path) {
                 Object.keys(swaggerJson.paths[path]).forEach(function (method) {
-                    tmp = swaggerJson.paths[path][method];
-                    if (tmp['x-swgg-tags0'] &&
-                            tmp['x-swgg-tags0'] !== 'all' &&
-                            tmp['x-swgg-tags0'] !== local.env.npm_package_swggTags0) {
+                    tmp = swaggerJson.paths[path][method]['x-swgg-tags0'];
+                    if (tmp && tmp !== 'all' && tmp !== local.env.npm_package_swggTags0) {
                         delete swaggerJson.paths[path][method];
                         return;
                     }
@@ -26197,9 +26629,835 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             return { $ref: '#/definitions/' + prefix };
         };
 
+        local.swaggerValidate = function (swaggerJson) {
+        /*
+         * this function will validate the json-object swaggerJson
+         */
+            var operation, operationIdDict, pathDict, prefix, test, tmp;
+            operationIdDict = {};
+            swaggerJson = swaggerJson || {};
+            local.swaggerValidateDataSchema({
+                data: swaggerJson,
+                modeSchema: true,
+                prefix: ['swaggerJson'],
+                schema: local.swaggerSchemaJson,
+                swaggerJson: swaggerJson
+            });
+            pathDict = {};
+            Object.keys(swaggerJson.paths).forEach(function (path) {
+                prefix = ['swaggerJson', 'paths', path];
+                // validate semanticPaths1
+                test = path.indexOf('?') < 0;
+                local.throwSwaggerError(!test && {
+                    errorType: 'semanticPaths1',
+                    prefix: prefix
+                });
+                tmp = path.replace((/\{.*?\}/g), '{}');
+                // validate semanticPaths2
+                test = !pathDict[tmp];
+                local.throwSwaggerError(!test && {
+                    errorType: 'semanticPaths2',
+                    pathList: [pathDict[tmp], path],
+                    prefix: prefix
+                });
+                pathDict[tmp] = path;
+                // validate semanticPaths5
+                test = path.indexOf('{}') < 0;
+                local.throwSwaggerError(!test && {
+                    errorType: 'semanticPaths5',
+                    prefix: prefix
+                });
+            });
+            // validate swaggerJson.definitions[key].properties[ii].default
+            Object.keys(swaggerJson.definitions || {}).forEach(function (schemaName) {
+                tmp = local.swaggerValidateDataSchema({
+                    // dereference definition
+                    modeDereference: true,
+                    prefix: ['swaggerJson', 'definitions', schemaName],
+                    schema: swaggerJson.definitions[schemaName],
+                    swaggerJson: swaggerJson
+                });
+                Object.keys(tmp.properties || {}).forEach(function (key) {
+                    local.swaggerValidateDataSchema({
+                        modeDefault: true,
+                        prefix: ['swaggerJson', 'definitions', schemaName, 'properties', key],
+                        schema: tmp.properties[key],
+                        swaggerJson: swaggerJson
+                    });
+                });
+            });
+            // validate swaggerJson.parameters[key].default
+            Object.keys(swaggerJson.parameters || []).forEach(function (key) {
+                local.swaggerValidateDataSchema({
+                    modeDefault: true,
+                    prefix: ['swaggerJson', 'parameters', key],
+                    schema: swaggerJson.parameters[key],
+                    swaggerJson: swaggerJson
+                });
+            });
+            // validate swaggerJson.paths[key][key].parameters[ii].default
+            Object.keys(swaggerJson.paths).forEach(function (path) {
+                Object.keys(swaggerJson.paths[path]).forEach(function (method) {
+                    prefix = ['swaggerJson', 'paths', path, method];
+                    operation = local.swaggerValidateDataSchema({
+                        // dereference operation
+                        modeDereference: true,
+                        prefix: prefix,
+                        schema: swaggerJson.paths[path][method],
+                        swaggerJson: swaggerJson
+                    });
+                    // validate semanticOperationIds1
+                    test = !operationIdDict[operation.operationId];
+                    local.throwSwaggerError(!test && {
+                        data: operation.operationId,
+                        errorType: 'semanticOperationIds1',
+                        prefix: prefix.concat(['operationId'])
+                    });
+                    operationIdDict[operation.operationId] = true;
+                    tmp = { in: {}, name: {}, path: {}, type: {} };
+                    path.replace((/\{.*?\}/g), function (match0) {
+                        match0 = match0.slice(1, -1);
+                        tmp.path[match0] = tmp.path[match0] || [];
+                        tmp.path[match0][0] = true;
+                    });
+                    (operation.parameters || []).forEach(function (schemaP, ii) {
+                        // validate semanticOperations2
+                        test = !(tmp.in.body && schemaP.in === 'body');
+                        local.throwSwaggerError(!test && {
+                            data: operation,
+                            errorType: 'semanticOperations2',
+                            prefix: prefix,
+                            schema: operation
+                        });
+                        // validate semanticOperations3
+                        test = schemaP.name === undefined ||
+                            schemaP.in === undefined ||
+                            !tmp.name[schemaP.name + ' ' + schemaP.in];
+                        local.throwSwaggerError(!test && {
+                            data: operation.parameters,
+                            errorType: 'semanticOperations3',
+                            prefix: prefix.concat(['parameters'])
+                        });
+                        tmp.in[schemaP.in] = true;
+                        tmp.name[schemaP.name + ' ' + schemaP.in] = true;
+                        tmp.type[schemaP.type] = true;
+                        // validate semanticOperations1
+                        test = !(tmp.in.body && tmp.in.formData);
+                        local.throwSwaggerError(!test && {
+                            data: operation,
+                            errorType: 'semanticOperations1',
+                            prefix: prefix
+                        });
+                        // validate schemaP
+                        local.swaggerValidateDataSchema({
+                            modeDefault: true,
+                            prefix: prefix.concat(['parameters', schemaP.name]),
+                            schema: schemaP,
+                            swaggerJson: swaggerJson
+                        });
+                        if (schemaP.in === 'path') {
+                            tmp.path[schemaP.name] = tmp.path[schemaP.name] || [];
+                            tmp.path[schemaP.name][1] = true;
+                            // validate semanticPaths7
+                            test = tmp.path[schemaP.name][0];
+                            local.throwSwaggerError(!test && {
+                                data: schemaP,
+                                errorType: 'semanticPaths7',
+                                prefix: prefix.concat(['parameters', ii])
+                            });
+                        }
+                    });
+                    Object.keys(tmp.path).forEach(function (name) {
+                        // validate semanticPaths6
+                        test = tmp.path[name][1];
+                        local.throwSwaggerError(!test && {
+                            errorType: 'semanticPaths6',
+                            name: name,
+                            prefix: prefix.concat(['parameters', 'ii'])
+                        });
+                    });
+                    // validate semanticFormData4
+                    test = !tmp.type.file ||
+                        (operation.consumes || []).indexOf('multipart/form-data') >= 0;
+                    local.throwSwaggerError(!test && {
+                        data: operation,
+                        errorType: 'semanticFormData4',
+                        prefix: prefix
+                    });
+                    // validate semanticFormData5
+                    test = !tmp.in.formData ||
+                        (operation.consumes || []).indexOf(
+                            'application/x-www-form-urlencoded'
+                        ) >= 0 ||
+                        (operation.consumes || []).indexOf('multipart/form-data') >= 0;
+                    local.throwSwaggerError(!test && {
+                        data: operation,
+                        errorType: 'semanticFormData5',
+                        prefix: prefix,
+                        schema: operation
+                    });
+                });
+            });
+        };
+
+        local.swaggerValidateDataParameters = function (options) {
+        /*
+         * this function will validate the items in options.paramDict
+         * against the schemaP's in options.parameters
+         */
+            var errorList;
+            errorList = [];
+            options.parameters.forEach(function (schemaP) {
+                local.tryCatchOnError(function () {
+                    local.swaggerValidateDataSchema({
+                        data: options.data[schemaP.name],
+                        dataReadonlyRemove: [
+                            options.dataReadonlyRemove || {},
+                            schemaP.name,
+                            (options.dataReadonlyRemove || {})[schemaP.name]
+                        ],
+                        prefix: options.prefix.concat([schemaP.name]),
+                        schema: schemaP,
+                        swaggerJson: local.swaggerJson
+                    });
+                }, function (errorCaught) {
+                    errorList.push(errorCaught);
+                    errorCaught.errorList = errorList;
+                });
+            });
+            return errorList;
+        };
+
+        local.swaggerValidateDataSchema = function (options) {
+        /*
+         * this function will validate options.data against the swagger options.schema
+         * http://json-schema.org/draft-04/json-schema-validation.html#rfc.section.5
+         */
+            var $ref,
+                circularList,
+                data,
+                dataReadonlyRemove2,
+                ii,
+                list,
+                oneOf,
+                schema,
+                test,
+                tmp;
+            if (!options.schema) {
+                return;
+            }
+            data = options.data;
+            options.dataReadonlyRemove = options.dataReadonlyRemove || [{}, '', null];
+            dataReadonlyRemove2 = options.dataReadonlyRemove[2] || {};
+            schema = options.schema;
+            circularList = [];
+            while (true) {
+                // dereference schema.schema
+                while (schema.schema) {
+                    schema = schema.schema;
+                }
+                // dereference schema.oneOf
+                oneOf = (data && schema.oneOf) || [];
+                for (ii = 0; ii < oneOf.length; ii += 1) {
+                    tmp = String(oneOf[ii] && oneOf[ii].$ref)
+                        .replace('http://json-schema.org/draft-04/schema#', '#');
+                    switch (tmp + ' ' + (!local.isNullOrUndefined(data.$ref) || data.in)) {
+                    case '#/definitions/bodyParameter body':
+                    case '#/definitions/formDataParameterSubSchema formData':
+                    case '#/definitions/headerParameterSubSchema header':
+                    case '#/definitions/jsonReference true':
+                    case '#/definitions/pathParameterSubSchema path':
+                    case '#/definitions/queryParameterSubSchema query':
+                        schema = local.swaggerSchemaJson.definitions[tmp.split('/')[2]];
+                        break;
+                    default:
+                        switch (tmp) {
+                        case '#/definitions/bodyParameter':
+                        case '#/definitions/jsonReference':
+                            schema = oneOf[ii ^ 1];
+                            break;
+                        }
+                    }
+                    if (!schema.oneOf) {
+                        break;
+                    }
+                }
+                // dereference schema.$ref
+                $ref = schema && schema.$ref;
+                if (!$ref) {
+                    break;
+                }
+                test = circularList.indexOf($ref) < 0;
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'schemaDereferenceCircular',
+                    prefix: options.prefix,
+                    schema: schema
+                });
+                circularList.push($ref);
+                // validate semanticWalker6
+                test = $ref.indexOf('#/') === 0 ||
+                    $ref.indexOf('http://json-schema.org/draft-04/schema#/') === 0;
+                local.throwSwaggerError(!test && {
+                    data: $ref,
+                    errorType: 'semanticWalker6',
+                    prefix: options.prefix.concat(['$ref'])
+                });
+                switch (options.modeSchema && $ref) {
+                case 'http://json-schema.org/draft-04/schema#/definitions/parameter':
+                    // validate semanticFormData1
+                    test = data.in !== 'formdata';
+                    local.throwSwaggerError(!test && {
+                        data: data.in,
+                        errorType: 'semanticFormData1',
+                        prefix: options.prefix.concat(['in'])
+                    });
+                    // validate semanticFormData3
+                    test = data.type !== 'file' || data.in === 'formData';
+                    local.throwSwaggerError(!test && {
+                        data: data,
+                        errorType: 'semanticFormData3',
+                        prefix: options.prefix
+                    });
+                    // validate semanticParameters2
+                    test = data.in === 'body' || !local.isNullOrUndefined(data.type);
+                    local.throwSwaggerError(!test && {
+                        data: data,
+                        errorType: 'semanticParameters2',
+                        prefix: options.prefix
+                    });
+                    break;
+                case 'http://json-schema.org/draft-04/schema#/definitions/schema':
+                    list = data.required || [];
+                    for (ii = 0; ii < list.length; ii += 1) {
+                        tmp = list[ii];
+                        // validate semanticSchema1
+                        test = !(data.properties &&
+                            data.properties[tmp] &&
+                            data.properties[tmp].readOnly);
+                        local.throwSwaggerError(!test && {
+                            data: data.properties[tmp],
+                            errorType: 'semanticSchema1',
+                            prefix: options.prefix.concat(['properties', tmp])
+                        });
+                    }
+                    // validate semanticWalker1
+                    test = local.isNullOrUndefined(data.type) || typeof data.type === 'string';
+                    local.throwSwaggerError(!test && {
+                        data: data.type,
+                        errorType: 'semanticWalker1',
+                        prefix: options.prefix.concat(['type'])
+                    });
+                    // validate semanticWalker2
+                    test = !(data.maximum < data.minimum);
+                    local.throwSwaggerError(!test && {
+                        data: data,
+                        errorType: 'semanticWalker2',
+                        prefix: options.prefix
+                    });
+                    // validate semanticWalker3
+                    test = !(data.maxProperties < data.minProperties);
+                    local.throwSwaggerError(!test && {
+                        data: data,
+                        errorType: 'semanticWalker3',
+                        prefix: options.prefix
+                    });
+                    // validate semanticWalker4
+                    test = !(data.maxLength < data.minLength);
+                    local.throwSwaggerError(!test && {
+                        data: data,
+                        errorType: 'semanticWalker4',
+                        prefix: options.prefix,
+                        schema: schema
+                    });
+                    break;
+                }
+                tmp = $ref.split('/').slice(-2);
+                schema = $ref.indexOf('http://json-schema.org/draft-04/schema#/') === 0
+                    ? local.swaggerSchemaJson[tmp[0]]
+                    : options.swaggerJson[tmp[0]];
+                schema = schema && schema[tmp[1]];
+                test = schema;
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'schemaDereference',
+                    prefix: options.prefix,
+                    schema: options.schema
+                });
+            }
+            if (options.modeDereference) {
+                if (options.modeDereferenceDepth > 1) {
+                    schema = local.jsonCopy(schema);
+                    Object.keys(schema.properties || {}).forEach(function (key) {
+                        schema.properties[key] = local.swaggerValidateDataSchema({
+                            // dereference property
+                            modeDereference: true,
+                            modeDereferenceDepth: options.modeDereferenceDepth - 1,
+                            prefix: options.prefix.concat(['properties', key]),
+                            schema: schema.properties[key],
+                            swaggerJson: options.swaggerJson
+                        });
+                    });
+                }
+                return schema;
+            }
+            // validate schema.default
+            if (options.modeDefault) {
+                data = schema.default;
+            }
+            // validate schema.required
+            test = options.modeDefault ||
+                !local.isNullOrUndefined(data) ||
+                schema.required !== true ||
+                schema['x-swgg-notRequired'];
+            local.throwSwaggerError(!test && {
+                data: data,
+                errorType: 'objectRequired',
+                prefix: options.prefix,
+                schema: schema
+            });
+            if (local.isNullOrUndefined(data)) {
+                return;
+            }
+            // validate semanticItemsRequiredForArrayObjects1
+            test = !options.modeSchema || local.schemaPType(data) !== 'array' ||
+                (typeof local.schemaPItems(data) === 'object' && local.schemaPItems(data));
+            local.throwSwaggerError(!test && {
+                errorType: 'semanticItemsRequiredForArrayObjects1',
+                prefix: options.prefix,
+                schema: data
+            });
+            // remove readOnly property
+            if (schema.readOnly) {
+                delete options.dataReadonlyRemove[0][options.dataReadonlyRemove[1]];
+            }
+            // optimization - validate schema.type first
+            // 5.5.2. type
+            // https://swagger.io/docs/specification/data-models/data-types/
+            // https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#data-types
+            switch (local.schemaPType(schema)) {
+            case 'array':
+                test = Array.isArray(data);
+                break;
+            case 'boolean':
+                test = typeof data === 'boolean';
+                break;
+            case 'file':
+                test = !options.modeSchema;
+                break;
+            case 'integer':
+                test = Number.isInteger(data);
+                switch (schema.format) {
+                case 'int32':
+                    break;
+                case 'int64':
+                    break;
+                }
+                break;
+            case 'number':
+                test = Number.isFinite(data);
+                switch (schema.format) {
+                case 'double':
+                    break;
+                case 'float':
+                    break;
+                }
+                break;
+            case 'string':
+                test = typeof data === 'string' ||
+                    (!options.modeSchema && schema.format === 'binary');
+                switch (test && !options.modeSchema && schema.format) {
+                // Clarify 'byte' format #50
+                // https://github.com/swagger-api/swagger-spec/issues/50
+                case 'byte':
+                    test = !(/[^\n\r\+\/0-9\=A-Za-z]/).test(data);
+                    break;
+                case 'date':
+                case 'date-time':
+                    test = JSON.stringify(new Date(data)) !== 'null';
+                    break;
+                case 'email':
+                    test = local.regexpValidateEmail.test(data);
+                    break;
+                case 'json':
+                    test = local.tryCatchOnError(function () {
+                        JSON.parse(data);
+                        return true;
+                    }, local.nop);
+                    break;
+                case 'phone':
+                    test = local.regexpValidatePhone.test(data);
+                    break;
+                }
+                break;
+            default:
+                test = options.modeSchema || typeof data === 'object';
+                break;
+            }
+            local.throwSwaggerError(!test && {
+                data: data,
+                errorType: 'itemType',
+                prefix: options.prefix,
+                schema: schema,
+                typeof: typeof data
+            });
+            tmp = typeof data;
+            if (tmp === 'object' && Array.isArray(data)) {
+                tmp = 'array';
+            }
+            switch (tmp) {
+            // 5.1. Validation keywords for numeric instances (number and integer)
+            case 'number':
+                // 5.1.1. multipleOf
+                test = typeof schema.multipleOf !== 'number' || data % schema.multipleOf === 0;
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'numberMultipleOf',
+                    prefix: options.prefix,
+                    schema: schema
+                });
+                // 5.1.2. maximum and exclusiveMaximum
+                test = typeof schema.maximum !== 'number' || (schema.exclusiveMaximum
+                    ? data < schema.maximum
+                    : data <= schema.maximum);
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: schema.exclusiveMaximum
+                        ? 'numberExclusiveMaximum'
+                        : 'numberMaximum',
+                    prefix: options.prefix,
+                    schema: schema
+                });
+                // 5.1.3. minimum and exclusiveMinimum
+                test = typeof schema.minimum !== 'number' || (schema.exclusiveMinimum
+                    ? data > schema.minimum
+                    : data >= schema.minimum);
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: schema.exclusiveMinimum
+                        ? 'numberExclusiveMinimum'
+                        : 'numberMinimum',
+                    prefix: options.prefix,
+                    schema: schema
+                });
+                break;
+            // 5.2. Validation keywords for strings
+            case 'string':
+                // 5.2.1. maxLength
+                test = typeof schema.maxLength !== 'number' || data.length <= schema.maxLength;
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'stringMaxLength',
+                    prefix: options.prefix,
+                    schema: schema
+                });
+                // 5.2.2. minLength
+                test = typeof schema.minLength !== 'number' || data.length >= schema.minLength;
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'stringMinLength',
+                    prefix: options.prefix,
+                    schema: schema
+                });
+                // 5.2.3. pattern
+                test = !schema.pattern || new RegExp(schema.pattern).test(data);
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'stringPattern',
+                    prefix: options.prefix,
+                    schema: schema
+                });
+                break;
+            // 5.3. Validation keywords for arrays
+            case 'array':
+                // 5.3.1. additionalItems and items
+                // swagger disallows array items
+                data.forEach(function (element, ii) {
+                    // recurse - schema.additionalItems and schema.items
+                    local.swaggerValidateDataSchema({
+                        data: element,
+                        dataReadonlyRemove: [dataReadonlyRemove2, ii, dataReadonlyRemove2[ii]],
+                        modeSchema: options.modeSchema,
+                        prefix: options.prefix.concat([ii]),
+                        schema: local.schemaPItems(schema) || schema.additionalItems,
+                        swaggerJson: options.swaggerJson
+                    });
+                });
+                // 5.3.2. maxItems
+                test = typeof schema.maxItems !== 'number' || data.length <= schema.maxItems;
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'arrayMaxItems',
+                    prefix: options.prefix,
+                    schema: schema
+                });
+                // 5.3.3. minItems
+                test = typeof schema.minItems !== 'number' || data.length >= schema.minItems;
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'arrayMinItems',
+                    prefix: options.prefix,
+                    schema: schema
+                });
+                // 5.3.4. uniqueItems
+                test = !schema.uniqueItems || data.every(function (element) {
+                    tmp = element;
+                    return data.indexOf(element) === data.lastIndexOf(element);
+                });
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'arrayUniqueItems',
+                    prefix: options.prefix,
+                    schema: schema,
+                    tmp: tmp
+                });
+                break;
+            // 5.4. Validation keywords for objects
+            case 'object':
+                // 5.4.1. maxProperties
+                test = typeof schema.maxProperties !== 'number' ||
+                    Object.keys(data).length <= schema.maxProperties;
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'objectMaxProperties',
+                    prefix: options.prefix,
+                    schema: schema
+                });
+                // 5.4.2. minProperties
+                test = typeof schema.minProperties !== 'number' ||
+                    Object.keys(data).length >= schema.minProperties;
+                local.throwSwaggerError(!test && {
+                    data: data,
+                    errorType: 'objectMinProperties',
+                    prefix: options.prefix,
+                    schema: schema
+                });
+                // 5.4.3. required
+                local.normalizeValue('list', schema.required).forEach(function (key) {
+                    // validate semanticItemsRequiredForArrayObjects2
+                    test = !local.isNullOrUndefined(data[key]);
+                    local.throwSwaggerError(!test && {
+                        data: data,
+                        errorType: 'semanticItemsRequiredForArrayObjects2',
+                        key: key,
+                        prefix: options.prefix,
+                        schema: schema
+                    });
+                });
+                // 5.4.4. additionalProperties, properties and patternProperties
+                Object.keys(data).forEach(function (key) {
+                    tmp = null;
+                    if (schema.properties && schema.properties[key]) {
+                        tmp = true;
+                        // recurse - schema.properties
+                        local.swaggerValidateDataSchema({
+                            data: data[key],
+                            dataReadonlyRemove: [
+                                dataReadonlyRemove2,
+                                key,
+                                dataReadonlyRemove2[key]
+                            ],
+                            modeSchema: options.modeSchema,
+                            prefix: options.prefix.concat([key]),
+                            schema: schema.properties[key],
+                            swaggerJson: options.swaggerJson
+                        });
+                    }
+                    Object.keys(schema.patternProperties || {}).forEach(function (rgx) {
+                        if (new RegExp(rgx).test(key)) {
+                            tmp = true;
+                            // recurse - schema.patternProperties
+                            local.swaggerValidateDataSchema({
+                                data: data[key],
+                                modeSchema: options.modeSchema,
+                                prefix: options.prefix.concat([key]),
+                                schema: schema.patternProperties[rgx],
+                                swaggerJson: options.swaggerJson
+                            });
+                        }
+                    });
+/*
+ * validate
+ * 5.4.4.4. If "additionalProperties" has boolean value false
+ *
+ * In this case, validation of the instance depends on the property set of
+ * "properties" and "patternProperties". In this section, the property names of
+ * "patternProperties" will be called regexes for convenience.
+ *
+ * The first step is to collect the following sets:
+ *
+ * s
+ * The property set of the instance to validate.
+ * p
+ * The property set from "properties".
+ * pp
+ * The property set from "patternProperties".
+ * Having collected these three sets, the process is as follows:
+ *
+ * remove from "s" all elements of "p", if any;
+ * for each regex in "pp", remove all elements of "s" which this regex matches.
+ * Validation of the instance succeeds if, after these two steps, set "s" is empty.
+ */
+                    test = tmp || schema.additionalProperties !== false;
+                    local.throwSwaggerError(!test && {
+                        data: data,
+                        errorType: 'objectAdditionalProperties',
+                        key: key,
+                        prefix: options.prefix,
+                        schema: schema
+                    });
+                    // recurse - schema.additionalProperties
+                    local.swaggerValidateDataSchema({
+                        data: data[key],
+                        modeSchema: options.modeSchema,
+                        prefix: options.prefix.concat([key]),
+                        schema: schema.additionalProperties,
+                        swaggerJson: options.swaggerJson
+                    });
+                });
+                // 5.4.5. dependencies
+                Object.keys(schema.dependencies || {}).forEach(function (key) {
+                    if (local.isNullOrUndefined(data[key])) {
+                        return;
+                    }
+                    // 5.4.5.2.1. Schema dependencies
+                    // recurse - schema.dependencies
+                    local.swaggerValidateDataSchema({
+                        data: data[key],
+                        modeSchema: options.modeSchema,
+                        prefix: options.prefix.concat([key]),
+                        schema: schema.dependencies[key],
+                        swaggerJson: options.swaggerJson
+                    });
+                    // 5.4.5.2.2. Property dependencies
+                    local.normalizeValue('list', schema.dependencies[key]).every(function (key2) {
+                        test = !local.isNullOrUndefined(data[key2]);
+                        local.throwSwaggerError(!test && {
+                            data: data,
+                            errorType: 'objectDependencies',
+                            key: key,
+                            key2: key2,
+                            prefix: options.prefix,
+                            schema: schema
+                        });
+                    });
+                });
+                break;
+            }
+            // 5.5. Validation keywords for any instance type
+            // 5.5.1. enum
+            tmp = schema.enum || (!options.modeSchema && (local.schemaPItems(schema) || {}).enum);
+            test = !tmp || (Array.isArray(data)
+                ? data
+                : [data]).every(function (element) {
+                return tmp.indexOf(element) >= 0;
+            });
+            local.throwSwaggerError(!test && {
+                data: data,
+                errorType: 'itemEnum',
+                prefix: options.prefix,
+                schema: schema,
+                tmp: tmp
+            });
+            // 5.5.2. type
+            local.nop();
+            // 5.5.3. allOf
+            (schema.allOf || []).forEach(function (element) {
+                // recurse - schema.allOf
+                local.swaggerValidateDataSchema({
+                    data: data,
+                    prefix: options.prefix,
+                    modeSchema: options.modeSchema,
+                    schema: element,
+                    swaggerJson: options.swaggerJson
+                });
+            });
+            // 5.5.4. anyOf
+            tmp = null;
+            test = !schema.anyOf || schema.anyOf.some(function (element) {
+                local.tryCatchOnError(function () {
+                    // recurse - schema.anyOf
+                    local.swaggerValidateDataSchema({
+                        data: data,
+                        modeSchema: options.modeSchema,
+                        prefix: options.prefix,
+                        schema: element,
+                        swaggerJson: options.swaggerJson
+                    });
+                    return true;
+                }, local.nop);
+                tmp = tmp || local.utility2._debugTryCatchError;
+                return !tmp;
+            });
+            local.throwSwaggerError(!test && {
+                data: data,
+                errorType: 'itemOneOf',
+                prefix: options.prefix,
+                schema: schema,
+                tmp: tmp
+            });
+            // 5.5.5. oneOf
+            tmp = !schema.oneOf
+                ? 1
+                : 0;
+            (schema.oneOf || []).some(function (element) {
+                local.tryCatchOnError(function () {
+                    // recurse - schema.oneOf
+                    local.swaggerValidateDataSchema({
+                        data: data,
+                        modeSchema: options.modeSchema,
+                        prefix: options.prefix,
+                        schema: element,
+                        swaggerJson: options.swaggerJson
+                    });
+                    tmp += 1;
+                }, local.nop);
+                return tmp > 1;
+            });
+            test = tmp === 1;
+            local.throwSwaggerError(!test && {
+                data: data,
+                errorType: 'itemOneOf',
+                prefix: options.prefix,
+                schema: schema,
+                tmp: tmp
+            });
+            // 5.5.6. not
+            test = !schema.not || !local.tryCatchOnError(function () {
+                // recurse - schema.not
+                local.swaggerValidateDataSchema({
+                    data: data,
+                    modeSchema: options.modeSchema,
+                    prefix: options.prefix,
+                    schema: schema.not,
+                    swaggerJson: options.swaggerJson
+                });
+                return true;
+            }, local.nop);
+            local.throwSwaggerError(!test && {
+                data: data,
+                errorType: 'itemNot',
+                prefix: options.prefix,
+                schema: schema
+            });
+            // 5.5.7. definitions
+            local.nop();
+            // validate data.$ref
+            if (schema === local.swaggerSchemaJson.definitions.jsonReference) {
+                local.swaggerValidateDataSchema({
+                    modeDereference: true,
+                    modeSchema: options.modeSchema,
+                    prefix: options.prefix,
+                    schema: data,
+                    swaggerJson: options.swaggerJson
+                });
+            }
+            return schema;
+        };
+
         local.swaggerValidateFile = function (options, onError) {
         /*
-         * this function will swagger-validate the json-file options.file
+         * this function will validate the json-file options.file
          */
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
@@ -26210,8 +27468,8 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     }
                     // fetch url
                     if ((/^(?:http|https):\/\//).test(options.file)) {
-                        local.ajax({ url: options.file }, function (error, data) {
-                            options.onNext(error, data && data.responseText);
+                        local.ajax({ url: options.file }, function (error, xhr) {
+                            options.onNext(error, xhr && xhr.responseText);
                         });
                         return;
                     }
@@ -26226,101 +27484,18 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                         local.jslint.errorText.replace((/\u001b\[\d+m/g), '')
                     );
                     // validate
-                    local.swgg.swaggerValidateJson(JSON.parse(data));
+                    local.swgg.swaggerValidate(JSON.parse(data));
                     options.onNext();
                     break;
                 default:
-                    onError(error, error
+                    console.error(error
                         ? 'swagger-validate - failed - ' + options.file + '\n\n' + error.message
                         : 'swagger-validate - passed - ' + options.file);
+                    onError(error);
                 }
             });
             options.modeNext = 0;
             options.onNext();
-        };
-
-        local.swaggerValidateJson = function (swaggerJson) {
-        /*
-         * this function will swagger-validate the json-object swaggerJson
-         */
-            var operation, operationIdDict, pathDict, prefix, test, tmp;
-            operationIdDict = {};
-            swaggerJson = swaggerJson || {};
-            local.validateBySwaggerSchema({
-                data: swaggerJson,
-                modeSchema: true,
-                prefix: ['swaggerJson'],
-                schema: local.swaggerSchemaJson,
-                swaggerJson: swaggerJson
-            });
-            // validate semanticUniquePath
-            pathDict = {};
-            Object.keys(swaggerJson.paths).forEach(function (path) {
-                tmp = path.replace((/\{.*?\}/g), '{}');
-                test = !pathDict[tmp];
-                local.throwSwaggerError(!test && {
-                    data: {},
-                    errorType: 'semanticUniquePath',
-                    prefix: ['swaggerJson', 'paths', path]
-                });
-                pathDict[tmp] = true;
-            });
-            // validate swaggerJson.definitions[key].properties[ii].default
-            Object.keys(swaggerJson.definitions || {}).forEach(function (schemaName) {
-                tmp = local.validateBySwaggerSchema({
-                    // dereference definition
-                    modeDereference: true,
-                    prefix: ['swaggerJson', 'definitions', schemaName],
-                    schema: swaggerJson.definitions[schemaName],
-                    swaggerJson: swaggerJson
-                });
-                Object.keys(tmp.properties || {}).forEach(function (key) {
-                    local.validateBySwaggerSchema({
-                        modeDefault: true,
-                        prefix: ['swaggerJson', 'definitions', schemaName, 'properties', key],
-                        schema: tmp.properties[key],
-                        swaggerJson: swaggerJson
-                    });
-                });
-            });
-            // validate swaggerJson.parameters[key].default
-            Object.keys(swaggerJson.parameters || []).forEach(function (key) {
-                local.validateBySwaggerSchema({
-                    modeDefault: true,
-                    prefix: ['swaggerJson', 'parameters', key],
-                    schema: swaggerJson.parameters[key],
-                    swaggerJson: swaggerJson
-                });
-            });
-            // validate swaggerJson.paths[key][key].parameters[ii].default
-            Object.keys(swaggerJson.paths).forEach(function (path) {
-                Object.keys(swaggerJson.paths[path]).forEach(function (method) {
-                    prefix = ['swaggerJson', 'paths', path, method];
-                    operation = local.validateBySwaggerSchema({
-                        // dereference operation
-                        modeDereference: true,
-                        prefix: prefix,
-                        schema: swaggerJson.paths[path][method],
-                        swaggerJson: swaggerJson
-                    });
-                    // validate semanticUniqueOperationId
-                    test = !operationIdDict[operation.operationId];
-                    local.throwSwaggerError(!test && {
-                        data: operation.operationId,
-                        errorType: 'semanticUniqueOperationId',
-                        prefix: prefix.concat(['operationId'])
-                    });
-                    operationIdDict[operation.operationId] = true;
-                    (operation.parameters || []).forEach(function (schemaP) {
-                        local.validateBySwaggerSchema({
-                            modeDefault: true,
-                            prefix: prefix.concat(['parameters', schemaP.name]),
-                            schema: schemaP,
-                            swaggerJson: swaggerJson
-                        });
-                    });
-                });
-            });
         };
 
         local.throwSwaggerError = function (options) {
@@ -26519,7 +27694,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             )).forEach(function (element) {
                 tmp = errorDict[element.dataset.name];
                 local.uiAnimateShakeIfError(tmp, element.querySelector('.input'));
-                element.querySelector('.errorMessage').textContent = tmp
+                element.querySelector('.colorError').textContent = tmp
                     ? tmp.messageShort
                     : '';
             });
@@ -27014,7 +28189,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 schemaP.schema,
                 schemaP.schema && local.schemaPItems(schemaP.schema)
             ].some(function (element) {
-                schemaP.schema2 = (local.validateBySwaggerSchema({
+                schemaP.schema2 = (local.swaggerValidateDataSchema({
                     // dereference schemaP
                     modeDereference: true,
                     modeDereferenceDepth: 2,
@@ -27101,582 +28276,6 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             }
             local.serverRespondJsonapi(request, response, error);
         };
-
-        local.validateBySwaggerParameters = function (options) {
-        /*
-         * this function will validate the items in options.paramDict
-         * against the schemaP's in options.parameters
-         */
-            var errorList;
-            errorList = [];
-            options.parameters.forEach(function (schemaP) {
-                local.tryCatchOnError(function () {
-                    local.validateBySwaggerSchema({
-                        data: options.data[schemaP.name],
-                        dataReadonlyRemove: [
-                            options.dataReadonlyRemove || {},
-                            schemaP.name,
-                            (options.dataReadonlyRemove || {})[schemaP.name]
-                        ],
-                        prefix: options.prefix.concat([schemaP.name]),
-                        schema: schemaP,
-                        swaggerJson: local.swaggerJson
-                    });
-                }, function (errorCaught) {
-                    errorList.push(errorCaught);
-                    errorCaught.errorList = errorList;
-                });
-            });
-            return errorList;
-        };
-
-        local.validateBySwaggerSchema = function (options) {
-        /*
-         * this function will validate options.data against the swagger options.schema
-         * http://json-schema.org/draft-04/json-schema-validation.html#rfc.section.5
-         */
-            var $ref,
-                circularList,
-                data,
-                dataReadonlyRemove2,
-                ii,
-                oneOf,
-                schema,
-                test,
-                tmp;
-            if (!options.schema) {
-                return;
-            }
-            data = options.data;
-            options.dataReadonlyRemove = options.dataReadonlyRemove || [{}, '', null];
-            dataReadonlyRemove2 = options.dataReadonlyRemove[2] || {};
-            schema = options.schema;
-            circularList = [];
-            while (true) {
-                // dereference schema.schema
-                while (schema.schema) {
-                    schema = schema.schema;
-                }
-                // dereference schema.oneOf
-                oneOf = (data && schema.oneOf) || [];
-                for (ii = 0; ii < oneOf.length; ii += 1) {
-                    tmp = String(oneOf[ii] && oneOf[ii].$ref)
-                        .replace('http://json-schema.org/draft-04/schema#', '#');
-                    switch (tmp + ' ' + (!local.isNullOrUndefined(data.$ref) || data.in)) {
-                    case '#/definitions/bodyParameter body':
-                    case '#/definitions/formDataParameterSubSchema formData':
-                    case '#/definitions/headerParameterSubSchema header':
-                    case '#/definitions/jsonReference true':
-                    case '#/definitions/pathParameterSubSchema path':
-                    case '#/definitions/queryParameterSubSchema query':
-                        schema = local.swaggerSchemaJson.definitions[tmp.split('/')[2]];
-                        break;
-                    default:
-                        switch (tmp) {
-                        case '#/definitions/bodyParameter':
-                        case '#/definitions/jsonReference':
-                            schema = oneOf[ii ^ 1];
-                            break;
-                        }
-                    }
-                    if (!schema.oneOf) {
-                        break;
-                    }
-                }
-                // dereference schema.$ref
-                $ref = schema && schema.$ref;
-                if (!$ref) {
-                    break;
-                }
-                test = circularList.indexOf($ref) < 0;
-                local.throwSwaggerError(!test && {
-                    data: data,
-                    errorType: 'schemaDeferenceCircular',
-                    prefix: options.prefix,
-                    schema: schema
-                });
-                circularList.push($ref);
-                tmp = $ref.split('/').slice(-2);
-                schema = $ref.indexOf('http://json-schema.org/draft-04/schema#/') === 0
-                    ? local.swaggerSchemaJson[tmp[0]]
-                    : options.swaggerJson[tmp[0]];
-                schema = schema && schema[tmp[1]];
-                test = schema;
-                local.throwSwaggerError(!test && {
-                    data: data,
-                    errorType: 'schemaDeference',
-                    prefix: options.prefix,
-                    schema: options.schema
-                });
-            }
-            if (options.modeDereference) {
-                if (options.modeDereferenceDepth > 1) {
-                    schema = local.jsonCopy(schema);
-                    Object.keys(schema.properties || {}).forEach(function (key) {
-                        schema.properties[key] = local.validateBySwaggerSchema({
-                            // dereference property
-                            modeDereference: true,
-                            modeDereferenceDepth: options.modeDereferenceDepth - 1,
-                            prefix: options.prefix.concat(['properties', key]),
-                            schema: schema.properties[key],
-                            swaggerJson: options.swaggerJson
-                        });
-                    });
-                }
-                return schema;
-            }
-            // validate schema.default
-            if (options.modeDefault) {
-                data = schema.default;
-            }
-            // validate semanticRequired
-            test = options.modeDefault ||
-                !local.isNullOrUndefined(data) ||
-                schema.required !== true ||
-                schema['x-swgg-notRequired'];
-            local.throwSwaggerError(!test && {
-                data: data,
-                errorType: 'semanticRequired',
-                prefix: options.prefix,
-                schema: schema
-            });
-            if (local.isNullOrUndefined(data)) {
-                return;
-            }
-            // validate semanticRequiredArrayItems
-            test = !options.modeSchema || local.schemaPType(data) !== 'array' ||
-                (typeof local.schemaPItems(data) === 'object' && local.schemaPItems(data));
-            local.throwSwaggerError(!test && {
-                errorType: 'semanticRequiredArrayItems',
-                prefix: options.prefix,
-                schema: data
-            });
-            // remove readOnly property
-            if (schema.readOnly) {
-                delete options.dataReadonlyRemove[0][options.dataReadonlyRemove[1]];
-            }
-            // optimization - validate schema.type first
-            // 5.5.2. type
-            // https://swagger.io/docs/specification/data-models/data-types/
-            // https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#data-types
-            switch (local.schemaPType(schema)) {
-            case 'array':
-                test = Array.isArray(data);
-                break;
-            case 'boolean':
-                test = typeof data === 'boolean';
-                break;
-            case 'file':
-                test = !options.modeSchema;
-                break;
-            case 'integer':
-                test = Number.isInteger(data);
-                switch (schema.format) {
-                case 'int32':
-                    break;
-                case 'int64':
-                    break;
-                }
-                break;
-            case 'number':
-                test = Number.isFinite(data);
-                switch (schema.format) {
-                case 'double':
-                    break;
-                case 'float':
-                    break;
-                }
-                break;
-            case 'string':
-                test = typeof data === 'string' ||
-                    (!options.modeSchema && schema.format === 'binary');
-                switch (test && !options.modeSchema && schema.format) {
-                // Clarify 'byte' format #50
-                // https://github.com/swagger-api/swagger-spec/issues/50
-                case 'byte':
-                    test = !(/[^\n\r\+\/0-9\=A-Za-z]/).test(data);
-                    break;
-                case 'date':
-                case 'date-time':
-                    test = JSON.stringify(new Date(data)) !== 'null';
-                    break;
-                case 'email':
-                    test = local.regexpValidateEmail.test(data);
-                    break;
-                case 'json':
-                    test = local.tryCatchOnError(function () {
-                        JSON.parse(data);
-                        return true;
-                    }, local.nop);
-                    break;
-                case 'phone':
-                    test = local.regexpValidatePhone.test(data);
-                    break;
-                }
-                break;
-            default:
-                test = options.modeSchema || typeof data === 'object';
-                break;
-            }
-            local.throwSwaggerError(!test && {
-                data: data,
-                errorType: 'itemType',
-                prefix: options.prefix,
-                schema: schema,
-                typeof: typeof data
-            });
-            tmp = typeof data;
-            if (tmp === 'object' && Array.isArray(data)) {
-                tmp = 'array';
-            }
-            switch (tmp) {
-            // 5.1. Validation keywords for numeric instances (number and integer)
-            case 'number':
-                // 5.1.1. multipleOf
-                test = typeof schema.multipleOf !== 'number' || data % schema.multipleOf === 0;
-                local.throwSwaggerError(!test && {
-                    data: data,
-                    errorType: 'numberMultipleOf',
-                    prefix: options.prefix,
-                    schema: schema
-                });
-                // 5.1.2. maximum and exclusiveMaximum
-                test = typeof schema.maximum !== 'number' || (schema.exclusiveMaximum
-                    ? data < schema.maximum
-                    : data <= schema.maximum);
-                local.throwSwaggerError(!test && {
-                    data: data,
-                    errorType: schema.exclusiveMaximum
-                        ? 'numberExclusiveMaximum'
-                        : 'numberMaximum',
-                    prefix: options.prefix,
-                    schema: schema
-                });
-                // 5.1.3. minimum and exclusiveMinimum
-                test = typeof schema.minimum !== 'number' || (schema.exclusiveMinimum
-                    ? data > schema.minimum
-                    : data >= schema.minimum);
-                local.throwSwaggerError(!test && {
-                    data: data,
-                    errorType: schema.exclusiveMinimum
-                        ? 'numberExclusiveMinimum'
-                        : 'numberMinimum',
-                    prefix: options.prefix,
-                    schema: schema
-                });
-                break;
-            // 5.2. Validation keywords for strings
-            case 'string':
-                // 5.2.1. maxLength
-                test = typeof schema.maxLength !== 'number' || data.length <= schema.maxLength;
-                local.throwSwaggerError(!test && {
-                    data: data,
-                    errorType: 'stringMaxLength',
-                    prefix: options.prefix,
-                    schema: schema
-                });
-                // 5.2.2. minLength
-                test = typeof schema.minLength !== 'number' || data.length >= schema.minLength;
-                local.throwSwaggerError(!test && {
-                    data: data,
-                    errorType: 'stringMinLength',
-                    prefix: options.prefix,
-                    schema: schema
-                });
-                // 5.2.3. pattern
-                test = !schema.pattern || new RegExp(schema.pattern).test(data);
-                local.throwSwaggerError(!test && {
-                    data: data,
-                    errorType: 'stringPattern',
-                    prefix: options.prefix,
-                    schema: schema
-                });
-                break;
-            // 5.3. Validation keywords for arrays
-            case 'array':
-                // 5.3.1. additionalItems and items
-                // swagger disallows array items
-                data.forEach(function (element, ii) {
-                    // recurse - schema.additionalItems and schema.items
-                    local.validateBySwaggerSchema({
-                        data: element,
-                        dataReadonlyRemove: [dataReadonlyRemove2, ii, dataReadonlyRemove2[ii]],
-                        modeSchema: options.modeSchema,
-                        prefix: options.prefix.concat([ii]),
-                        schema: local.schemaPItems(schema) || schema.additionalItems,
-                        swaggerJson: options.swaggerJson
-                    });
-                });
-                // 5.3.2. maxItems
-                test = typeof schema.maxItems !== 'number' || data.length <= schema.maxItems;
-                local.throwSwaggerError(!test && {
-                    data: data,
-                    errorType: 'arrayMaxItems',
-                    prefix: options.prefix,
-                    schema: schema
-                });
-                // 5.3.3. minItems
-                test = typeof schema.minItems !== 'number' || data.length >= schema.minItems;
-                local.throwSwaggerError(!test && {
-                    data: data,
-                    errorType: 'arrayMinItems',
-                    prefix: options.prefix,
-                    schema: schema
-                });
-                // 5.3.4. uniqueItems
-                test = !schema.uniqueItems || data.every(function (element) {
-                    tmp = element;
-                    return data.indexOf(element) === data.lastIndexOf(element);
-                });
-                local.throwSwaggerError(!test && {
-                    data: data,
-                    errorType: 'arrayUniqueItems',
-                    prefix: options.prefix,
-                    schema: schema,
-                    tmp: tmp
-                });
-                break;
-            // 5.4. Validation keywords for objects
-            case 'object':
-                // 5.4.1. maxProperties
-                test = typeof schema.maxProperties !== 'number' ||
-                    Object.keys(data).length <= schema.maxProperties;
-                local.throwSwaggerError(!test && {
-                    data: data,
-                    errorType: 'objectMaxProperties',
-                    prefix: options.prefix,
-                    schema: schema
-                });
-                // 5.4.2. minProperties
-                test = typeof schema.minProperties !== 'number' ||
-                    Object.keys(data).length >= schema.minProperties;
-                local.throwSwaggerError(!test && {
-                    data: data,
-                    errorType: 'objectMinProperties',
-                    prefix: options.prefix,
-                    schema: schema
-                });
-                // 5.4.3. required
-                local.normalizeValue('list', schema.required).forEach(function (key) {
-                    test = !local.isNullOrUndefined(data[key]);
-                    local.throwSwaggerError(!test && {
-                        data: data,
-                        errorType: 'objectRequired',
-                        key: key,
-                        prefix: options.prefix,
-                        schema: schema
-                    });
-                });
-                // 5.4.4. additionalProperties, properties and patternProperties
-                Object.keys(data).forEach(function (key) {
-                    tmp = null;
-                    if (schema.properties && schema.properties[key]) {
-                        tmp = true;
-                        // recurse - schema.properties
-                        local.validateBySwaggerSchema({
-                            data: data[key],
-                            dataReadonlyRemove: [
-                                dataReadonlyRemove2,
-                                key,
-                                dataReadonlyRemove2[key]
-                            ],
-                            modeSchema: options.modeSchema,
-                            prefix: options.prefix.concat([key]),
-                            schema: schema.properties[key],
-                            swaggerJson: options.swaggerJson
-                        });
-                    }
-                    Object.keys(schema.patternProperties || {}).forEach(function (rgx) {
-                        if (new RegExp(rgx).test(key)) {
-                            tmp = true;
-                            // recurse - schema.patternProperties
-                            local.validateBySwaggerSchema({
-                                data: data[key],
-                                modeSchema: options.modeSchema,
-                                prefix: options.prefix.concat([key]),
-                                schema: schema.patternProperties[rgx],
-                                swaggerJson: options.swaggerJson
-                            });
-                        }
-                    });
-/*
- * validate
- * 5.4.4.4. If "additionalProperties" has boolean value false
- *
- * In this case, validation of the instance depends on the property set of
- * "properties" and "patternProperties". In this section, the property names of
- * "patternProperties" will be called regexes for convenience.
- *
- * The first step is to collect the following sets:
- *
- * s
- * The property set of the instance to validate.
- * p
- * The property set from "properties".
- * pp
- * The property set from "patternProperties".
- * Having collected these three sets, the process is as follows:
- *
- * remove from "s" all elements of "p", if any;
- * for each regex in "pp", remove all elements of "s" which this regex matches.
- * Validation of the instance succeeds if, after these two steps, set "s" is empty.
- */
-                    test = tmp || schema.additionalProperties !== false;
-                    local.throwSwaggerError(!test && {
-                        data: data,
-                        errorType: 'objectAdditionalProperties',
-                        key: key,
-                        prefix: options.prefix,
-                        schema: schema
-                    });
-                    // recurse - schema.additionalProperties
-                    local.validateBySwaggerSchema({
-                        data: data[key],
-                        modeSchema: options.modeSchema,
-                        prefix: options.prefix.concat([key]),
-                        schema: schema.additionalProperties,
-                        swaggerJson: options.swaggerJson
-                    });
-                });
-                // 5.4.5. dependencies
-                Object.keys(schema.dependencies || {}).forEach(function (key) {
-                    if (local.isNullOrUndefined(data[key])) {
-                        return;
-                    }
-                    // 5.4.5.2.1. Schema dependencies
-                    // recurse - schema.dependencies
-                    local.validateBySwaggerSchema({
-                        data: data[key],
-                        modeSchema: options.modeSchema,
-                        prefix: options.prefix.concat([key]),
-                        schema: schema.dependencies[key],
-                        swaggerJson: options.swaggerJson
-                    });
-                    // 5.4.5.2.2. Property dependencies
-                    local.normalizeValue('list', schema.dependencies[key]).every(function (key2) {
-                        test = !local.isNullOrUndefined(data[key2]);
-                        local.throwSwaggerError(!test && {
-                            data: data,
-                            errorType: 'objectDependencies',
-                            key: key,
-                            key2: key2,
-                            prefix: options.prefix,
-                            schema: schema
-                        });
-                    });
-                });
-                break;
-            }
-            // 5.5. Validation keywords for any instance type
-            // 5.5.1. enum
-            tmp = schema.enum || (!options.modeSchema && (local.schemaPItems(schema) || {}).enum);
-            test = !tmp || (Array.isArray(data)
-                ? data
-                : [data]).every(function (element) {
-                return tmp.indexOf(element) >= 0;
-            });
-            local.throwSwaggerError(!test && {
-                data: data,
-                errorType: 'itemEnum',
-                prefix: options.prefix,
-                schema: schema,
-                tmp: tmp
-            });
-            // 5.5.2. type
-            local.nop();
-            // 5.5.3. allOf
-            (schema.allOf || []).forEach(function (element) {
-                // recurse - schema.allOf
-                local.validateBySwaggerSchema({
-                    data: data,
-                    prefix: options.prefix,
-                    modeSchema: options.modeSchema,
-                    schema: element,
-                    swaggerJson: options.swaggerJson
-                });
-            });
-            // 5.5.4. anyOf
-            tmp = null;
-            test = !schema.anyOf || schema.anyOf.some(function (element) {
-                local.tryCatchOnError(function () {
-                    // recurse - schema.anyOf
-                    local.validateBySwaggerSchema({
-                        data: data,
-                        modeSchema: options.modeSchema,
-                        prefix: options.prefix,
-                        schema: element,
-                        swaggerJson: options.swaggerJson
-                    });
-                    return true;
-                }, local.nop);
-                tmp = tmp || local.utility2._debugTryCatchError;
-                return !tmp;
-            });
-            local.throwSwaggerError(!test && {
-                data: data,
-                errorType: 'itemOneOf',
-                prefix: options.prefix,
-                schema: schema,
-                tmp: tmp
-            });
-            // 5.5.5. oneOf
-            tmp = !schema.oneOf
-                ? 1
-                : 0;
-            (schema.oneOf || []).some(function (element) {
-                local.tryCatchOnError(function () {
-                    // recurse - schema.oneOf
-                    local.validateBySwaggerSchema({
-                        data: data,
-                        modeSchema: options.modeSchema,
-                        prefix: options.prefix,
-                        schema: element,
-                        swaggerJson: options.swaggerJson
-                    });
-                    tmp += 1;
-                }, local.nop);
-                return tmp > 1;
-            });
-            test = tmp === 1;
-            local.throwSwaggerError(!test && {
-                data: data,
-                errorType: 'itemOneOf',
-                prefix: options.prefix,
-                schema: schema,
-                tmp: tmp
-            });
-            // 5.5.6. not
-            test = !schema.not || !local.tryCatchOnError(function () {
-                // recurse - schema.not
-                local.validateBySwaggerSchema({
-                    data: data,
-                    modeSchema: options.modeSchema,
-                    prefix: options.prefix,
-                    schema: schema.not,
-                    swaggerJson: options.swaggerJson
-                });
-                return true;
-            }, local.nop);
-            local.throwSwaggerError(!test && {
-                data: data,
-                errorType: 'itemNot',
-                prefix: options.prefix,
-                schema: schema
-            });
-            // 5.5.7. definitions
-            local.nop();
-            // validate data.$ref
-            if (schema === local.swaggerSchemaJson.definitions.jsonReference) {
-                local.validateBySwaggerSchema({
-                    modeDereference: true,
-                    modeSchema: options.modeSchema,
-                    prefix: options.prefix,
-                    schema: data,
-                    swaggerJson: options.swaggerJson
-                });
-            }
-            return schema;
-        };
     }());
     switch (local.modeJs) {
 
@@ -27685,6 +28284,14 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
     // run node js-env code - init-after
     /* istanbul ignore next */
     case 'node':
+        local.assetsDict['/assets.swagger-ui.logo.medium.png'] = new Buffer(
+            local.templateSwaggerUiLogoMediumBase64,
+            'base64'
+        );
+        local.assetsDict['/assets.swagger-ui.logo.small.png'] = new Buffer(
+            local.templateSwaggerUiLogoSmallBase64,
+            'base64'
+        );
         local.swgg.apiUpdate(JSON.parse(
             local.tryCatchReadFile(local.__dirname + '/assets.swgg.swagger.json') || '{}'
         ));
@@ -27727,7 +28334,7 @@ instruction\n\
 /*jslint\n\
     bitwise: true,\n\
     browser: true,\n\
-    maxerr: 8,\n\
+    maxerr: 4,\n\
     maxlen: 100,\n\
     node: true,\n\
     nomen: true,\n\
@@ -27981,11 +28588,40 @@ instruction\n\
         // init exports\n\
         module.exports = local;\n\
         // require builtins\n\
-        Object.keys(process.binding('natives')).forEach(function (key) {\n\
-            if (!local[key] && !(/\\/|^_|^assert|^sys$/).test(key)) {\n\
-                local[key] = require(key);\n\
-            }\n\
-        });\n\
+        // local.assert = require('assert');\n\
+        local.buffer = require('buffer');\n\
+        local.child_process = require('child_process');\n\
+        local.cluster = require('cluster');\n\
+        local.console = require('console');\n\
+        local.constants = require('constants');\n\
+        local.crypto = require('crypto');\n\
+        local.dgram = require('dgram');\n\
+        local.dns = require('dns');\n\
+        local.domain = require('domain');\n\
+        local.events = require('events');\n\
+        local.fs = require('fs');\n\
+        local.http = require('http');\n\
+        local.https = require('https');\n\
+        local.module = require('module');\n\
+        local.net = require('net');\n\
+        local.os = require('os');\n\
+        local.path = require('path');\n\
+        local.process = require('process');\n\
+        local.punycode = require('punycode');\n\
+        local.querystring = require('querystring');\n\
+        local.readline = require('readline');\n\
+        local.repl = require('repl');\n\
+        local.stream = require('stream');\n\
+        local.string_decoder = require('string_decoder');\n\
+        local.timers = require('timers');\n\
+        local.tls = require('tls');\n\
+        local.tty = require('tty');\n\
+        local.url = require('url');\n\
+        local.util = require('util');\n\
+        local.v8 = require('v8');\n\
+        local.vm = require('vm');\n\
+        local.zlib = require('zlib');\n\
+/* validateLineSortedReset */\n\
         // init assets\n\
         local.assetsDict = local.assetsDict || {};\n\
         /* jslint-ignore-begin */\n\
@@ -28170,6 +28806,12 @@ textarea {\\n\
 \\\n\
 }\\n\
 \\\n\
+.colorError {\\n\
+\\\n\
+    color: #d00;\\n\
+\\\n\
+}\\n\
+\\\n\
 .uiAnimateShake {\\n\
 \\\n\
     animation-duration: 500ms;\\n\
@@ -28210,13 +28852,11 @@ textarea {\\n\
 \\\n\
 </head>\\n\
 \\\n\
-<body style=\"background: #ddf; font-family: Arial, Helvetica, sans-serif; margin: 0 40px;\">\\n\
+<body style=\"background: #eef; font-family: Arial, Helvetica, sans-serif; margin: 0 40px;\">\\n\
 \\\n\
 <div id=\"ajaxProgressDiv1\" style=\"background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%; z-index: 1;\"></div>\\n\
 \\\n\
 <div class=\"uiAnimateSpin\" style=\"animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: none; height: 25px; vertical-align: middle; width: 25px;\"></div>\\n\
-\\\n\
-<code style=\"display: none;\"></code><div class=\"button uiAnimateShake uiAnimateSlide utility2FooterDiv zeroPixel\" style=\"display: none;\"></div><pre style=\"display: none;\"></pre><textarea readonly style=\"display: none;\"></textarea>\\n\
 \\\n\
 <code style=\"display: none;\"></code><div class=\"button uiAnimateShake uiAnimateSlide utility2FooterDiv zeroPixel\" style=\"display: none;\"></div><pre style=\"display: none;\"></pre><textarea readonly style=\"display: none;\"></textarea>\\n\
 \\\n\
@@ -28230,7 +28870,7 @@ textarea {\\n\
 \\\n\
     browser: true,\\n\
 \\\n\
-    maxerr: 8,\\n\
+    maxerr: 4,\\n\
 \\\n\
     maxlen: 100,\\n\
 \\\n\
@@ -28386,13 +29026,7 @@ utility2-comment -->\\n\
 \\\n\
     // comment this testCase to disable the failed assertion demo\\n\
 \\\n\
-    testCaseDict.testCase_failed_assertion_demo = function (\\n\
-\\\n\
-        options,\\n\
-\\\n\
-        onError\\n\
-\\\n\
-    ) {\\n\
+    testCaseDict.testCase_failed_assertion_demo = function (options, onError) {\\n\
 \\\n\
     /*\\n\
 \\\n\
@@ -28466,7 +29100,7 @@ utility2-comment -->\\n\
 \\\n\
 <pre id=\"outputPreJsonStringify1\"></pre>\\n\
 \\\n\
-<pre id=\"outputPreJslint1\" style=\"color: #d00;\"></pre>\\n\
+<pre class= \"colorError\" id=\"outputPreJslint1\"></pre>\\n\
 \\\n\
 <label>instrumented-code</label>\\n\
 \\\n\
@@ -28552,6 +29186,12 @@ utility2-comment -->\\n\
             }\n\
         });\n\
 /* validateLineSortedReset */\n\
+        // bug-workaround - long $npm_package_buildCustomOrg\n\
+        /* jslint-ignore-begin */\n\
+        local.assetsDict['/assets.utility2.js'] = local.assetsDict['/assets.utility2.js'] ||\n\
+            local.fs.readFileSync(local.__dirname + '/lib.utility2.js', 'utf8'\n\
+        ).replace((/^#!/), '//');\n\
+/* validateLineSortedReset */\n\
         local.assetsDict['/'] =\n\
             local.assetsDict['/assets.example.html'] =\n\
             local.assetsDict['/assets.index.template.html']\n\
@@ -28576,14 +29216,6 @@ utility2-comment -->\\n\
         local.assetsDict['/assets.example.js'] =\n\
             local.assetsDict['/assets.example.js'] ||\n\
             local.fs.readFileSync(__filename, 'utf8');\n\
-        // bug-workaround - long $npm_package_buildCustomOrg\n\
-        /* jslint-ignore-begin */\n\
-        local.assetsDict['/assets.utility2.js'] =\n\
-            local.assetsDict['/assets.utility2.js'] ||\n\
-            local.fs.readFileSync(\n\
-                local.__dirname + '/lib.utility2.js',\n\
-                'utf8'\n\
-            ).replace((/^#!/), '//');\n\
         /* jslint-ignore-end */\n\
         local.assetsDict['/favicon.ico'] = local.assetsDict['/favicon.ico'] || '';\n\
         // if $npm_config_timeout_exit exists,\n\
@@ -28630,7 +29262,7 @@ local.assetsDict["/assets.utility2.html"] = "<!doctype html>\n\
 <meta charset=\"UTF-8\">\n\
 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\
 <!-- \"assets.index.default.template.html\" -->\n\
-<title>utility2 (v2018.3.7-alpha)</title>\n\
+<title>utility2 (v2018.4.8-alpha)</title>\n\
 <style>\n\
 /* jslint-utility2 */\n\
 /*csslint\n\
@@ -28714,6 +29346,9 @@ textarea {\n\
     text-align: center;\n\
     text-decoration: underline;\n\
 }\n\
+.colorError {\n\
+    color: #d00;\n\
+}\n\
 .uiAnimateShake {\n\
     animation-duration: 500ms;\n\
     animation-name: uiAnimateShake;\n\
@@ -28734,17 +29369,16 @@ textarea {\n\
 }\n\
 </style>\n\
 </head>\n\
-<body style=\"background: #ddf; font-family: Arial, Helvetica, sans-serif; margin: 0 40px;\">\n\
+<body style=\"background: #eef; font-family: Arial, Helvetica, sans-serif; margin: 0 40px;\">\n\
 <div id=\"ajaxProgressDiv1\" style=\"background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%; z-index: 1;\"></div>\n\
 <div class=\"uiAnimateSpin\" style=\"animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: none; height: 25px; vertical-align: middle; width: 25px;\"></div>\n\
-<code style=\"display: none;\"></code><div class=\"button uiAnimateShake uiAnimateSlide utility2FooterDiv zeroPixel\" style=\"display: none;\"></div><pre style=\"display: none;\"></pre><textarea readonly style=\"display: none;\"></textarea>\n\
 <code style=\"display: none;\"></code><div class=\"button uiAnimateShake uiAnimateSlide utility2FooterDiv zeroPixel\" style=\"display: none;\"></div><pre style=\"display: none;\"></pre><textarea readonly style=\"display: none;\"></textarea>\n\
 <script>\n\
 /* jslint-utility2 */\n\
 /*jslint\n\
     bitwise: true,\n\
     browser: true,\n\
-    maxerr: 8,\n\
+    maxerr: 4,\n\
     maxlen: 100,\n\
     node: true,\n\
     nomen: true,\n\
@@ -28794,7 +29428,7 @@ textarea {\n\
         target=\"_blank\"\n\
     >\n\
 \n\
-        utility2 (v2018.3.7-alpha)\n\
+        utility2 (v2018.4.8-alpha)\n\
 \n\
     </a>\n\
 \n\
@@ -28822,10 +29456,7 @@ textarea {\n\
     testCaseDict.modeTest = true;\n\
 \n\
     // comment this testCase to disable the failed assertion demo\n\
-    testCaseDict.testCase_failed_assertion_demo = function (\n\
-        options,\n\
-        onError\n\
-    ) {\n\
+    testCaseDict.testCase_failed_assertion_demo = function (options, onError) {\n\
     /*\n\
      * this function will demo a failed assertion test\n\
      */\n\
@@ -28862,7 +29493,7 @@ textarea {\n\
 }());\n\
 </textarea>\n\
 <pre id=\"outputPreJsonStringify1\"></pre>\n\
-<pre id=\"outputPreJslint1\" style=\"color: #d00;\"></pre>\n\
+<pre class= \"colorError\" id=\"outputPreJslint1\"></pre>\n\
 <label>instrumented-code</label>\n\
 <textarea class=\"resettable\" id=\"outputTextarea1\" readonly></textarea>\n\
 <label>stderr and stdout</label>\n\
@@ -28903,7 +29534,7 @@ local.assetsDict["/assets.utility2.test.js"] = "/* istanbul instrument in packag
 /*jslint\n\
     bitwise: true,\n\
     browser: true,\n\
-    maxerr: 8,\n\
+    maxerr: 4,\n\
     maxlen: 100,\n\
     node: true,\n\
     nomen: true,\n\
@@ -29100,19 +29731,6 @@ $/).test(xhr.responseText), xhr.responseText);\n\
             options.abort();\n\
         };\n\
 \n\
-        local.testCase_ajax_assets = function (options, onError) {\n\
-        /*\n\
-         * this function will test ajax's assets handling-behavior\n\
-         */\n\
-            local.ajax({ url: 'LICENSE' }, function (error, xhr) {\n\
-                // validate no error occurred\n\
-                local.assert(!error, error);\n\
-                // validate statusCode\n\
-                local.assertJsonEqual(xhr.statusCode, 200);\n\
-                onError(null, options);\n\
-            });\n\
-        };\n\
-\n\
         local.testCase_ajax_cache = function (options, onError) {\n\
         /*\n\
          * this function will test ajax's cache handling-behavior\n\
@@ -29185,6 +29803,19 @@ $/).test(xhr.responseText), xhr.responseText);\n\
                     onParallel(null, options);\n\
                 });\n\
             }, onError);\n\
+        };\n\
+\n\
+        local.testCase_ajax_file = function (options, onError) {\n\
+        /*\n\
+         * this function will test ajax's file handling-behavior\n\
+         */\n\
+            local.ajax({ url: 'LICENSE' }, function (error, xhr) {\n\
+                // validate no error occurred\n\
+                local.assert(!error, error);\n\
+                // validate statusCode\n\
+                local.assertJsonEqual(xhr.statusCode, 200);\n\
+                onError(null, options);\n\
+            });\n\
         };\n\
 \n\
         local.testCase_ajax_post = function (options, onError) {\n\
@@ -29671,9 +30302,6 @@ x-request-header-test: aa\\r\\n\
             local.testCase_buildLib_default(options, local.onErrorThrow);\n\
             local.testCase_buildTest_default(options, local.onErrorThrow);\n\
             options = { assetsList: [{\n\
-                file: '/LICENSE',\n\
-                url: '/LICENSE'\n\
-            }, {\n\
                 file: '/assets.hello',\n\
                 url: '/assets.hello'\n\
             }, {\n\
@@ -30047,24 +30675,9 @@ x-request-header-test: aa\\r\\n\
          */\n\
             options = {};\n\
             local.testMock([\n\
-                [local, { _consoleError: function (arg) {\n\
-                    options.data += (arg || '') + '\\n\
-';\n\
-                } }]\n\
+                [local, { _consoleError: null }]\n\
             ], function (onError) {\n\
-                options.data = '';\n\
                 local.global['debug_inline'.replace('_i', 'I')]('aa');\n\
-                // validate data\n\
-                local.assertJsonEqual(\n\
-                    options.data,\n\
-                    '\\n\
-\\n\
-\\n\
-debug_inline\\n\
-aa\\n\
-\\n\
-'.replace('_i', 'I')\n\
-                );\n\
                 onError(null, options);\n\
             }, onError);\n\
         };\n\
@@ -30477,11 +31090,11 @@ console.log(\"aa\");',\n\
             onParallel.counter += 1;\n\
             local.ajax({ headers: {\n\
                 'forward-proxy-url': '/assets.hello'\n\
-            }, url: '' }, function (error, data) {\n\
+            }, url: '' }, function (error, xhr) {\n\
                 // validate no error occurred\n\
                 local.assert(!error, error);\n\
                 // validate responseText\n\
-                local.assertJsonEqual(data.responseText, 'hello\\n\
+                local.assertJsonEqual(xhr.responseText, 'hello\\n\
 ');\n\
                 onParallel(null, options);\n\
             });\n\
@@ -30789,10 +31402,10 @@ undefined ff');\n\
                     options.list = [null];\n\
                     // test retryLimit handling-behavior\n\
                     options.retryLimit = 1;\n\
-                    local.onParallelList(options, function (data, onParallel) {\n\
+                    local.onParallelList(options, function (options2, onParallel) {\n\
                         onParallel.counter += 1;\n\
                         // test error handling-behavior\n\
-                        onParallel(local.errorDefault, data);\n\
+                        onParallel(local.errorDefault, options2);\n\
                         // test multiple callback handling-behavior\n\
                         setTimeout(onParallel, 5000);\n\
                     }, function (error) {\n\
@@ -30811,13 +31424,13 @@ undefined ff');\n\
                     local.onParallelList({\n\
                         list: [1, 2, 3, 4, 5],\n\
                         rateLimit: options.rateLimit\n\
-                    }, function (data, onParallel) {\n\
+                    }, function (options2, onParallel) {\n\
                         onParallel.counter += 1;\n\
                         options.rateMax = Math.max(onParallel.counter - 1, options.rateMax);\n\
                         // test async handling-behavior\n\
                         setTimeout(function () {\n\
-                            options.data[data.ii] = data.element;\n\
-                            onParallel(data.retry < 1 && local.onErrorDefault, data);\n\
+                            options.data[options2.ii] = options2.element;\n\
+                            onParallel(options2.retry < 1 && local.onErrorDefault, options2);\n\
                         });\n\
                     }, options.onNext, options.rateLimit);\n\
                     break;\n\
@@ -30831,11 +31444,11 @@ undefined ff');\n\
                     local.onParallelList({\n\
                         list: [1, 2, 3, 4, 5],\n\
                         rateLimit: options.rateLimit\n\
-                    }, function (data, onParallel) {\n\
+                    }, function (options2, onParallel) {\n\
                         // test sync handling-behavior\n\
                         onParallel.counter += 1;\n\
                         options.rateMax = Math.max(onParallel.counter, options.rateMax);\n\
-                        options.data[data.ii] = data.element;\n\
+                        options.data[options2.ii] = options2.element;\n\
                         onParallel(null, options);\n\
                     }, options.onNext);\n\
                     break;\n\
@@ -31790,9 +32403,9 @@ bb>```');\n\
             // update cron\n\
             local.ajax({\n\
                 url: 'https://kaizhu256.github.io/node-utility2/cronJob.js'\n\
-            }, function (error, data) {\n\
-                if (!error && data.responseText !== local.cronScript) {\n\
-                    local.cronScript = data.responseText;\n\
+            }, function (error, xhr) {\n\
+                if (!error && xhr.responseText !== local.cronScript) {\n\
+                    local.cronScript = xhr.responseText;\n\
                     local.vm.runInThisContext(local.cronScript);\n\
                 }\n\
             });\n\
@@ -31809,9 +32422,9 @@ bb>```');\n\
                     // update cron\n\
                     local.ajax({\n\
                         url: 'https://kaizhu256.github.io/node-utility2/cronJob.js'\n\
-                    }, function (error, data) {\n\
-                        if (!error && data.responseText !== local.cronScript) {\n\
-                            local.cronScript = data.responseText;\n\
+                    }, function (error, xhr) {\n\
+                        if (!error && xhr.responseText !== local.cronScript) {\n\
+                            local.cronScript = xhr.responseText;\n\
                             local.vm.runInThisContext(local.cronScript);\n\
                         }\n\
                     });\n\

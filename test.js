@@ -3,7 +3,7 @@
 /*jslint
     bitwise: true,
     browser: true,
-    maxerr: 8,
+    maxerr: 4,
     maxlen: 100,
     node: true,
     nomen: true,
@@ -137,6 +137,28 @@
                 });
             });
             onParallel(null, options);
+        };
+
+        local.testCase_buildApp_default = function (options, onError) {
+        /*
+         * this function will test buildApp's default handling-behavior
+         */
+            if (local.modeJs !== 'node') {
+                onError(null, options);
+                return;
+            }
+            local.testCase_buildReadme_default(options, local.onErrorThrow);
+            local.testCase_buildLib_default(options, local.onErrorThrow);
+            local.testCase_buildTest_default(options, local.onErrorThrow);
+            local.testCase_buildCustomOrg_default(options, local.onErrorThrow);
+            options = { assetsList: [{
+                file: '/assets.swagger-ui.logo.medium.png',
+                url: '/assets.swagger-ui.logo.medium.png'
+            }, {
+                file: '/assets.swagger-ui.logo.small.png',
+                url: '/assets.swagger-ui.logo.small.png'
+            }] };
+            local.buildApp(options, onError);
         };
 
         local.testCase_crudCountManyByQuery_default = function (options, onError) {
@@ -956,7 +978,7 @@ curl \\\n\
 curl /undefined\n\
 '
             );
-            local.swaggerValidateJson(options.swaggerJson);
+            local.swaggerValidate(options.swaggerJson);
             local.assertJsonEqual(
                 options.swaggerJson,
 {
@@ -1167,9 +1189,145 @@ curl /undefined\n\
             onError(null, options);
         };
 
+        local.testCase_swaggerValidateDataParameters_default = function (options, onError) {
+        /*
+         * this function will test swaggerValidateDataParameters's default handling-behavior
+         */
+            var onParallel;
+            onParallel = local.onParallel(onError);
+            onParallel.counter += 1;
+            options = {};
+            Object.keys(local.apiDict).forEach(function (key) {
+                if (key.indexOf('operationId.x-test.parameters') < 0) {
+                    return;
+                }
+                // test null-case handling-behavior
+                onParallel.counter += 1;
+                local.apiDict[key].ajax({}, function (error, data) {
+                    // validate no error occurred
+                    local.assert(!error, data);
+                    onParallel(null, options);
+                });
+                onParallel.counter += 1;
+                local.apiDict[key].ajax({ modeDefault: true }, function (error, data) {
+                    // validate no error occurred
+                    local.assert(!error, error);
+                    // validate data
+                    data = data.paramDict;
+                    local.assert(data, data);
+                    onParallel(null, options);
+                });
+            });
+            onParallel(null, options);
+        };
+
+        local.testCase_swaggerValidateDataParameters_error = function (options, onError) {
+        /*
+         * this function will test swaggerValidateDataParameters's error handling-behavior
+         */
+            var onParallel;
+            onParallel = local.onParallel(onError);
+            onParallel.counter += 1;
+            [
+                // 5.1. Validation keywords for numeric instances (number and integer)
+                // 5.1.1. multipleOf
+                { typeInteger1: 1, 'x-errorType': 'numberMultipleOf' },
+                // 5.1.2. maximum and exclusiveMaximum - maximum
+                { typeInteger1: 10, 'x-errorType': 'numberMaximum' },
+                // 5.1.2. maximum and exclusiveMaximum - exclusiveMaximum
+                { typeInteger2: 10, 'x-errorType': 'numberExclusiveMaximum' },
+                // 5.1.3. minimum and exclusiveMinimum - minimum
+                { typeInteger1: -10, 'x-errorType': 'numberMinimum' },
+                // 5.1.3. minimum and exclusiveMinimum - exclusiveMinimum
+                { typeInteger2: -10, 'x-errorType': 'numberExclusiveMinimum' },
+                // 5.2. Validation keywords for strings
+                // 5.2.1. maxLength
+                { typeString1: '01234567890123456789', 'x-errorType': 'stringMaxLength' },
+                // 5.2.2. minLength
+                { typeString1: '', 'x-errorType': 'stringMinLength' },
+                // 5.2.3. pattern
+                { typeString1: '0123456789012345~', 'x-errorType': 'stringPattern' },
+                // 5.3. Validation keywords for arrays
+                // 5.3.2. maxItems
+                {
+                    typeArrayItemsNumber2: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                    'x-errorType': 'arrayMaxItems'
+                },
+                // 5.3.2. minItems
+                { typeArrayItemsNumber2: [], 'x-errorType': 'arrayMinItems' },
+                // 5.3.4. uniqueItems
+                { typeArrayItemsNumber2: [0, 0], 'x-errorType': 'arrayUniqueItems' },
+                // 5.5. Validation keywords for any instance type
+                // 5.5.1. enum
+                { typeNumberEnum: 0, 'x-errorType': 'itemEnum' },
+                // 5.5.2. type - string
+                { typeString0: true, 'x-errorType': 'itemType' },
+                // 5.5.2. type - byte
+                { typeStringFormatByte: '~', 'x-errorType': 'itemType' }
+                // 5.5.3. allOf
+                // 5.5.4. anyOf
+                // 5.5.5. oneOf
+                // testCase_swaggerValidate_default
+                // 5.5.6. not
+                // testCase_swaggerValidate_default
+                // 5.5.7. definitions
+            ].forEach(function (paramDict, ii) {
+                onParallel.counter += 1;
+                local.apiDict['operationId.x-test.parametersDefault'].ajax({
+                    paramDict: local.jsonCopy(paramDict)
+                }, function (error) {
+                    // validate error occurred
+                    local.assert(error, JSON.stringify(paramDict));
+                    // validate statusCode
+                    local.assertJsonEqual(error.statusCode, 400);
+                    // validate x-errorType
+                    local.assertJsonEqual(paramDict['x-errorType'], error.options.errorType);
+                    // debug error.message
+                    console.error('swaggerValidateDataParameters - ' + ii + ' - ' + error.message);
+                    onParallel(null, options);
+                });
+            });
+            [
+                // 5.4. Validation keywords for objects
+                // 5.4.1. maxProperties
+                { typeObjectInBody: {
+                    typeBooleanRequired: true,
+                    typeObjectMisc: { aa: 1, bb: 2, cc: 3, dd: 4, de: 5, ff: 6 }
+
+                }, 'x-errorType': 'objectMaxProperties' },
+                // 5.4.2. minProperties
+                { typeObjectInBody: {
+                    typeBooleanRequired: true,
+                    typeObjectMisc: {}
+                }, 'x-errorType': 'objectMinProperties' },
+                // 5.4.3. required
+                { typeObjectInBody: {}, 'x-errorType': 'semanticItemsRequiredForArrayObjects2' }
+                // 5.4.4. additionalProperties, properties and patternProperties
+                // testCase_swaggerValidate_default
+                // 5.4.5. dependencies
+                // testCase_swaggerValidate_default
+            ].forEach(function (paramDict, ii) {
+                onParallel.counter += 1;
+                local.apiDict['operationId.x-test.parametersObjectInBody'].ajax({
+                    paramDict: local.jsonCopy(paramDict)
+                }, function (error) {
+                    // validate error occurred
+                    local.assert(error, JSON.stringify(paramDict));
+                    // validate statusCode
+                    local.assertJsonEqual(error.statusCode, 400);
+                    // validate x-errorType
+                    local.assertJsonEqual(paramDict['x-errorType'], error.options.errorType);
+                    // debug error.message
+                    console.error(ii, error.message);
+                    onParallel(null, options);
+                });
+            });
+            onParallel(null, options);
+        };
+
         local.testCase_swaggerValidateFile_default = function (options, onError) {
         /*
-         * this function will test swaggerValidateFile's default handling-behavior
+         * this function will test swaggerValidate's file handling-behavior
          */
             if (local.modeJs !== 'node') {
                 onError(null, options);
@@ -1199,13 +1357,13 @@ curl /undefined\n\
             }, onError);
         };
 
-        local.testCase_swaggerValidateJson_default = function (options, onError) {
+        local.testCase_swaggerValidate_default = function (options, onError) {
         /*
-         * this function will test swaggerValidateJson's default handling-behavior
+         * this function will test swaggerValidate's default handling-behavior
          */
             var error;
             // test default handling-behavior
-            local.swaggerValidateJson({
+            local.swaggerValidate({
                 info: { title: '', version: '' },
                 paths: { '/aa': { get: { responses: { 200: { description: '' } } } } },
                 swagger: '2.0'
@@ -1241,55 +1399,338 @@ curl /undefined\n\
                 swagger: '2.0',
                 'x-errorType': 'itemNot'
             }, {
-                // validate schemaDeference
+                // validate schemaDereference
                 info: { title: '', version: '' },
-                paths: { '/aa': { get: { responses: { 200: { $ref: 'undefined' } } } } },
+                paths: { '/aa': { get: { responses: { 200: { $ref: '#/undefined' } } } } },
                 swagger: '2.0',
-                'x-errorType': 'schemaDeference'
+                'x-errorType': 'schemaDereference'
             }, {
-                // validate schemaDeferenceCircular
+                // validate schemaDereferenceCircular
                 info: { title: '', version: '' },
                 paths: { '/aa': { get: { responses: { 200: { $ref: '#/x-test/aa' } } } } },
                 'x-test': { aa: { $ref: '#/x-test/aa' } },
                 swagger: '2.0',
-                'x-errorType': 'schemaDeferenceCircular'
+                'x-errorType': 'schemaDereferenceCircular'
             }, {
-                // validate semanticRequiredArrayItems
+                // validate semanticFormData1
                 info: { title: '', version: '' },
-                paths: { '/aa': { get: { responses: { 200: { description: '' } } } } },
+                paths: { '/aa': { get: { parameters: [{
+                    in: 'formdata'
+                }], responses: { 200: { description: '' } } } } },
                 swagger: '2.0',
-                type: 'array',
-                'x-errorType': 'semanticRequiredArrayItems'
+                'x-errorType': 'semanticFormData1'
             }, {
-                // validate semanticUniqueOperationId
+                // validate semanticFormData2
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{
+                    in: 'body',
+                    name: 'aa',
+                    schema: { type: 'string' }
+                }, {
+                    in: 'formData',
+                    type: 'string'
+                }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                // 'x-errorType': 'semanticFormData2'
+                'x-errorType': 'semanticOperations1'
+            }, {
+                // validate semanticFormData3
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{
+                    in: 'query',
+                    type: 'file'
+                }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticFormData3'
+            }, {
+                // validate semanticFormData4
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{
+                    in: 'formData',
+                    type: 'file'
+                }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticFormData4'
+            }, {
+                // validate semanticFormData5
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{
+                    in: 'formData',
+                    type: 'string'
+                }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticFormData5'
+            }, {
+                // validate semanticItemsRequiredForArrayObjects1
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{
+                    type: 'array'
+                }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticItemsRequiredForArrayObjects1'
+            }, {
+                // validate semanticItemsRequiredForArrayObjects2
+                'x-errorType': 'semanticItemsRequiredForArrayObjects2'
+            }, {
+                // validate semanticItemsRequiredForArrayObjects3
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
+                    type: 'array'
+                } }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                // 'x-errorType': 'semanticItemsRequiredForArrayObjects3'
+                'x-errorType': 'semanticItemsRequiredForArrayObjects1'
+            }, {
+                // validate semanticItemsRequiredForArrayObjects4
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{
+                    in: 'header',
+                    type: 'array'
+                }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                // 'x-errorType': 'semanticItemsRequiredForArrayObjects4'
+                'x-errorType': 'semanticItemsRequiredForArrayObjects1'
+            }, {
+                // validate semanticOperationIds1
                 info: { title: '', version: '' },
                 paths: {
                     '/aa': { get: { operationId: 'aa', responses: { 200: { description: '' } } } },
                     '/bb': { get: { operationId: 'aa', responses: { 200: { description: '' } } } }
                 },
                 swagger: '2.0',
-                'x-errorType': 'semanticUniqueOperationId'
+                'x-errorType': 'semanticOperationIds1'
             }, {
-                // validate semanticUniquePath
+                // validate semanticOperations1
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{
+                    in: 'body',
+                    name: 'aa',
+                    schema: { type: 'string' }
+                }, {
+                    in: 'formData',
+                    type: 'string'
+                }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticOperations1'
+            }, {
+                // validate semanticOperations2
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{
+                    in: 'body',
+                    name: 'aa',
+                    schema: { type: 'string' }
+                }, {
+                    in: 'body',
+                    name: 'bb',
+                    schema: { type: 'string' }
+                }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticOperations2'
+            }, {
+                // validate semanticOperations3
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{
+                    in: 'query',
+                    name: 'aa',
+                    type: 'string'
+                }, {
+                    in: 'query',
+                    name: 'aa',
+                    type: 'string'
+                }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticOperations3'
+            }, {
+                // validate semanticParameters1
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{
+                    type: 'array'
+                }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                // 'x-errorType': 'semanticParameters1'
+                'x-errorType': 'semanticItemsRequiredForArrayObjects1'
+            }, {
+                // validate semanticParameters2
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{
+                    in: 'query'
+                }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticParameters2'
+            }, {
+                // validate semanticPaths1
+                info: { title: '', version: '' },
+                paths: { '/aa?': { get: { responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticPaths1'
+            }, {
+                // validate semanticPaths2
                 info: { title: '', version: '' },
                 paths: {
                     '/{aa}': { get: { responses: { 200: { description: '' } } } },
                     '/{bb}': { get: { responses: { 200: { description: '' } } } }
                 },
                 swagger: '2.0',
-                'x-errorType': 'semanticUniquePath'
+                'x-errorType': 'semanticPaths2'
+            }, {
+                // validate semanticPaths3
+                info: { title: '', version: '' },
+                paths: { '/{aa}/{aa}': { get: { parameters: [{
+                    in: 'path',
+                    name: 'aa',
+                    required: true,
+                    type: 'string'
+                }, {
+                    in: 'path',
+                    name: 'aa',
+                    required: true,
+                    type: 'string'
+                }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                // 'x-errorType': 'semanticPaths3'
+                'x-errorType': 'semanticOperations3'
+            // }, {
+                // // validate semanticPaths4
+                // 'x-errorType': 'semanticPaths4'
+            }, {
+                // validate semanticPaths5
+                info: { title: '', version: '' },
+                paths: { '/{}': { get: { responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticPaths5'
+            }, {
+                // validate semanticPaths6
+                info: { title: '', version: '' },
+                paths: { '/{aa}': { get: { responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticPaths6'
+            }, {
+                // validate semanticPaths7
+                info: { title: '', version: '' },
+                paths: { '/': { get: { parameters: [{
+                    in: 'path',
+                    name: 'aa',
+                    required: true,
+                    type: 'string'
+                }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticPaths7'
+            // }, {
+                // validate semanticRefs1
+                // 'x-errorType': 'semanticRefs1'
+            }, {
+                // validate semanticSchema1
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
+                    required: ['aa'],
+                    properties: { aa: { readOnly: true } }
+                } }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticSchema1'
+            // }, {
+                // // validate semanticSecurityDefinitions1
+                // 'x-errorType': 'semanticSecurityDefinitions1'
+            // }, {
+                // // validate semanticSecurityDefinitions2
+                // 'x-errorType': 'semanticSecurityDefinitions2'
+            // }, {
+                // // validate semanticSecurityDefinitions3
+                // 'x-errorType': 'semanticSecurityDefinitions3'
+            // }, {
+                // // validate semanticSecurityDefinitions4
+                // 'x-errorType': 'semanticSecurityDefinitions4'
+            // }, {
+                // // validate semanticSecurityDefinitions5
+                // 'x-errorType': 'semanticSecurityDefinitions5'
+            // }, {
+                // // validate semanticSecurityDefinitions6
+                // 'x-errorType': 'semanticSecurityDefinitions6'
+            // }, {
+                // // validate semanticSecurityDefinitions7
+                // 'x-errorType': 'semanticSecurityDefinitions7'
+            // }, {
+                // // validate semanticSecurityDefinitions8
+                // 'x-errorType': 'semanticSecurityDefinitions8'
+            // }, {
+                // // validate semanticSecurityDefinitions9
+                // 'x-errorType': 'semanticSecurityDefinitions9'
+            // }, {
+                // // validate semanticSecurity1
+                // 'x-errorType': 'semanticSecurity1'
+            // }, {
+                // // validate semanticSecurity2
+                // 'x-errorType': 'semanticSecurity2'
+            }, {
+                // validate semanticWalker1
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
+                    type: 1
+                } }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticWalker1'
+            }, {
+                // validate semanticWalker2
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
+                    maximum: 0,
+                    minimum: 1,
+                    type: 'number'
+                } }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticWalker2'
+            }, {
+                // validate semanticWalker3
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
+                    maxProperties: 0,
+                    minProperties: 1,
+                    type: 'object'
+                } }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticWalker3'
+            }, {
+                // validate semanticWalker4
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
+                    maxLength: 0,
+                    minLength: 1,
+                    type: 'object'
+                } }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticWalker4'
+            // }, {
+                // // validate semanticWalker5
+                // 'x-errorType': 'semanticWalker5'
+            }, {
+                // validate semanticWalker6
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
+                    $ref: 'aa'
+                } }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                'x-errorType': 'semanticWalker6'
+            }, {
+                // validate semanticWalker7
+                info: { title: '', version: '' },
+                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
+                    $ref: '#/aa',
+                    aa: true
+                } }], responses: { 200: { description: '' } } } } },
+                swagger: '2.0',
+                // 'x-errorType': 'semanticWalker7'
+                'x-errorType': 'objectAdditionalProperties'
             }].forEach(function (element, ii) {
                 local.tryCatchOnError(function () {
-                    local.swaggerValidateJson(element);
+                    local.swaggerValidate(element);
                 }, local.nop);
                 error = local.utility2._debugTryCatchError;
                 // validate error occurred
                 local.assert(error, element);
                 // validate x-errorType
                 if (element && element['x-errorType']) {
-                    local.assertJsonEqual(element['x-errorType'], error.options.errorType);
+                    local.assertJsonEqual(element['x-errorType'], error.options.errorType, error);
                 }
-                console.error('swaggerValidateJson - ' + ii + ' - ' + error.message);
+                console.error('swaggerValidate - ' + ii + ' - ' + error.message);
             });
             onError(null, options);
         };
@@ -1515,142 +1956,6 @@ curl /undefined\n\
                 }
             };
             onNext();
-        };
-
-        local.testCase_validateBySwaggerParameters_default = function (options, onError) {
-        /*
-         * this function will test validateBySwaggerParameters's default handling-behavior
-         */
-            var onParallel;
-            onParallel = local.onParallel(onError);
-            onParallel.counter += 1;
-            options = {};
-            Object.keys(local.apiDict).forEach(function (key) {
-                if (key.indexOf('operationId.x-test.parameters') < 0) {
-                    return;
-                }
-                // test null-case handling-behavior
-                onParallel.counter += 1;
-                local.apiDict[key].ajax({}, function (error, data) {
-                    // validate no error occurred
-                    local.assert(!error, data);
-                    onParallel(null, options);
-                });
-                onParallel.counter += 1;
-                local.apiDict[key].ajax({ modeDefault: true }, function (error, data) {
-                    // validate no error occurred
-                    local.assert(!error, error);
-                    // validate data
-                    data = data.paramDict;
-                    local.assert(data, data);
-                    onParallel(null, options);
-                });
-            });
-            onParallel(null, options);
-        };
-
-        local.testCase_validateBySwaggerParameters_error = function (options, onError) {
-        /*
-         * this function will test validateBySwaggerParameters's error handling-behavior
-         */
-            var onParallel;
-            onParallel = local.onParallel(onError);
-            onParallel.counter += 1;
-            [
-                // 5.1. Validation keywords for numeric instances (number and integer)
-                // 5.1.1. multipleOf
-                { typeInteger1: 1, 'x-errorType': 'numberMultipleOf' },
-                // 5.1.2. maximum and exclusiveMaximum - maximum
-                { typeInteger1: 10, 'x-errorType': 'numberMaximum' },
-                // 5.1.2. maximum and exclusiveMaximum - exclusiveMaximum
-                { typeInteger2: 10, 'x-errorType': 'numberExclusiveMaximum' },
-                // 5.1.3. minimum and exclusiveMinimum - minimum
-                { typeInteger1: -10, 'x-errorType': 'numberMinimum' },
-                // 5.1.3. minimum and exclusiveMinimum - exclusiveMinimum
-                { typeInteger2: -10, 'x-errorType': 'numberExclusiveMinimum' },
-                // 5.2. Validation keywords for strings
-                // 5.2.1. maxLength
-                { typeString1: '01234567890123456789', 'x-errorType': 'stringMaxLength' },
-                // 5.2.2. minLength
-                { typeString1: '', 'x-errorType': 'stringMinLength' },
-                // 5.2.3. pattern
-                { typeString1: '0123456789012345~', 'x-errorType': 'stringPattern' },
-                // 5.3. Validation keywords for arrays
-                // 5.3.2. maxItems
-                {
-                    typeArrayItemsNumber2: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                    'x-errorType': 'arrayMaxItems'
-                },
-                // 5.3.2. minItems
-                { typeArrayItemsNumber2: [], 'x-errorType': 'arrayMinItems' },
-                // 5.3.4. uniqueItems
-                { typeArrayItemsNumber2: [0, 0], 'x-errorType': 'arrayUniqueItems' },
-                // 5.5. Validation keywords for any instance type
-                // 5.5.1. enum
-                { typeNumberEnum: 0, 'x-errorType': 'itemEnum' },
-                // 5.5.2. type - string
-                { typeString0: true, 'x-errorType': 'itemType' },
-                // 5.5.2. type - byte
-                { typeStringFormatByte: '~', 'x-errorType': 'itemType' }
-                // 5.5.3. allOf
-                // 5.5.4. anyOf
-                // 5.5.5. oneOf
-                // testCase_swaggerValidateJson_default
-                // 5.5.6. not
-                // testCase_swaggerValidateJson_default
-                // 5.5.7. definitions
-            ].forEach(function (paramDict, ii) {
-                onParallel.counter += 1;
-                local.apiDict['operationId.x-test.parametersDefault'].ajax({
-                    paramDict: local.jsonCopy(paramDict)
-                }, function (error) {
-                    // validate error occurred
-                    local.assert(error, JSON.stringify(paramDict));
-                    // validate statusCode
-                    local.assertJsonEqual(error.statusCode, 400);
-                    // validate x-errorType
-                    local.assertJsonEqual(paramDict['x-errorType'], error.options.errorType);
-                    // debug error.message
-                    console.error('validateBySwaggerParameters - ' + ii + ' - ' + error.message);
-                    onParallel(null, options);
-                });
-            });
-            [
-                // 5.4. Validation keywords for objects
-                // 5.4.1. maxProperties
-                { typeObjectInBody: {
-                    typeBooleanRequired: true,
-                    typeObjectMisc: { aa: 1, bb: 2, cc: 3, dd: 4, de: 5, ff: 6 }
-
-                }, 'x-errorType': 'objectMaxProperties' },
-                // 5.4.2. minProperties
-                { typeObjectInBody: {
-                    typeBooleanRequired: true,
-                    typeObjectMisc: {}
-                }, 'x-errorType': 'objectMinProperties' },
-                // 5.4.3. required
-                { typeObjectInBody: {}, 'x-errorType': 'objectRequired' }
-                // 5.4.4. additionalProperties, properties and patternProperties
-                // testCase_swaggerValidateJson_default
-                // 5.4.5. dependencies
-                // testCase_swaggerValidateJson_default
-            ].forEach(function (paramDict, ii) {
-                onParallel.counter += 1;
-                local.apiDict['operationId.x-test.parametersObjectInBody'].ajax({
-                    paramDict: local.jsonCopy(paramDict)
-                }, function (error) {
-                    // validate error occurred
-                    local.assert(error, JSON.stringify(paramDict));
-                    // validate statusCode
-                    local.assertJsonEqual(error.statusCode, 400);
-                    // validate x-errorType
-                    local.assertJsonEqual(paramDict['x-errorType'], error.options.errorType);
-                    // debug error.message
-                    console.error(ii, error.message);
-                    onParallel(null, options);
-                });
-            });
-            onParallel(null, options);
         };
 
         local.utility2.serverLocalUrlTest = function (url) {
@@ -2155,7 +2460,7 @@ curl /undefined\n\
                         "type": "string"
                     }
                 ],
-                "summary": "test fix-error-semanticUniquePath's handling-behavior",
+                "summary": "test x-swgg-fixErrorSemanticUniquePath's handling-behavior",
                 "tags": [
                     "x-test"
                 ]
@@ -2172,7 +2477,7 @@ curl /undefined\n\
                         "type": "string"
                     }
                 ],
-                "summary": "test fix-error-semanticUniquePath's handling-behavior",
+                "summary": "test x-swgg-fixErrorSemanticUniquePath's handling-behavior",
                 "tags": [
                     "x-test"
                 ]
@@ -2205,6 +2510,7 @@ curl /undefined\n\
         },
         "/x-test/parametersDefault/{typeStringInPath}": {
             "post": {
+                "consumes": ["application/x-www-form-urlencoded"],
                 "operationId": "x-test.parametersDefault",
                 "parameters": [],
                 "summary": "test parameters' default handling-behavior",
@@ -2534,9 +2840,9 @@ curl /undefined\n\
         // run validation test
         // local.tryCatchOnError(function () {
             // local.testCase_swaggerJsonFromCurl_default(null, local.onErrorDefault);
-            // local.testCase_swaggerValidateJson_default(null, local.onErrorDefault);
-            // local.testCase_validateBySwaggerParameters_default(null, local.onErrorDefault);
-            // local.testCase_validateBySwaggerParameters_error(null, local.onErrorDefault);
+            // local.testCase_swaggerValidate_default(null, local.onErrorDefault);
+            // local.testCase_swaggerValidateDataParameters_default(null, local.onErrorDefault);
+            // local.testCase_swaggerValidateDataParameters_error(null, local.onErrorDefault);
         // }, local.onErrorDefault);
     }());
 }());

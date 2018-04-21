@@ -59,10 +59,8 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 #### todo
 - add swagger.json editor
-- css - merge .resourceDescripton into .resource > .thead
 - allow parsing of default path-argument, e.g. /aa/{bb=1}/{cc=2}
 - add hmacSha256 support for wechat-pay
-- add validators from https://github.com/swagger-api/swagger-editor/blob/v3.0.17/src/plugins/validation/semantic-validators/validators/items-required-for-array-objects.js
 - add property parameters.x-swgg-persist to persist to localStorage
 - revamp datatable with card-expansion ui
 - add authorization-header hook
@@ -71,10 +69,17 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2018.3.25
-- npm publish v2018.3.25
-- fix transparency bug in firefox for textarea
-- revamp css
+#### changelog for v2018.4.21
+- npm publish v2018.4.21
+- add semantic validators from https://github.com/swagger-api/swagger-editor/tree/v3.1.20/src/plugins/validation/semantic-validators/validators
+- add function swaggerValidateSchemaSemanticFormData
+- rename function validateBySwaggerParameters -> swaggerValidateDataParameters
+- rename function validateBySwaggerSchema -> swaggerValidateDataSchema
+- rename function swaggerValidateJson -> swaggerValidate
+- add assets assets.swagger-ui.logo.medium.png, assets.swagger-ui.logo.small.png
+- update function apiUpdate to auto-create property x-swgg-tagNameList
+- hide info-template during initial render
+- fix css button margins
 - none
 
 #### this package requires
@@ -138,7 +143,7 @@ instruction
 /*jslint
     bitwise: true,
     browser: true,
-    maxerr: 8,
+    maxerr: 4,
     maxlen: 100,
     node: true,
     nomen: true,
@@ -798,11 +803,40 @@ utility2-comment -->\n\
         // init exports
         module.exports = local;
         // require builtins
-        Object.keys(process.binding('natives')).forEach(function (key) {
-            if (!local[key] && !(/\/|^_|^assert|^sys$/).test(key)) {
-                local[key] = require(key);
-            }
-        });
+        // local.assert = require('assert');
+        local.buffer = require('buffer');
+        local.child_process = require('child_process');
+        local.cluster = require('cluster');
+        local.console = require('console');
+        local.constants = require('constants');
+        local.crypto = require('crypto');
+        local.dgram = require('dgram');
+        local.dns = require('dns');
+        local.domain = require('domain');
+        local.events = require('events');
+        local.fs = require('fs');
+        local.http = require('http');
+        local.https = require('https');
+        local.module = require('module');
+        local.net = require('net');
+        local.os = require('os');
+        local.path = require('path');
+        local.process = require('process');
+        local.punycode = require('punycode');
+        local.querystring = require('querystring');
+        local.readline = require('readline');
+        local.repl = require('repl');
+        local.stream = require('stream');
+        local.string_decoder = require('string_decoder');
+        local.timers = require('timers');
+        local.tls = require('tls');
+        local.tty = require('tty');
+        local.url = require('url');
+        local.util = require('util');
+        local.v8 = require('v8');
+        local.vm = require('vm');
+        local.zlib = require('zlib');
+/* validateLineSortedReset */
         // init assets
         local.assetsDict = local.assetsDict || {};
         [
@@ -820,6 +854,12 @@ utility2-comment -->\n\
                 );
             }
         });
+/* validateLineSortedReset */
+        // bug-workaround - long $npm_package_buildCustomOrg
+        /* jslint-ignore-begin */
+        local.assetsDict['/assets.swgg.js'] = local.assetsDict['/assets.swgg.js'] ||
+            local.fs.readFileSync(local.__dirname + '/lib.swgg.js', 'utf8'
+        ).replace((/^#!/), '//');
 /* validateLineSortedReset */
         local.assetsDict['/'] =
             local.assetsDict['/assets.example.html'] =
@@ -845,14 +885,6 @@ utility2-comment -->\n\
         local.assetsDict['/assets.example.js'] =
             local.assetsDict['/assets.example.js'] ||
             local.fs.readFileSync(__filename, 'utf8');
-        // bug-workaround - long $npm_package_buildCustomOrg
-        /* jslint-ignore-begin */
-        local.assetsDict['/assets.swgg.js'] =
-            local.assetsDict['/assets.swgg.js'] ||
-            local.fs.readFileSync(
-                local.__dirname + '/lib.swgg.js',
-                'utf8'
-            ).replace((/^#!/), '//');
         /* jslint-ignore-end */
         local.assetsDict['/favicon.ico'] = local.assetsDict['/favicon.ico'] || '';
         // if $npm_config_timeout_exit exists,
@@ -965,12 +997,12 @@ utility2-comment -->\n\
         "apidocRawFetch": "[ ! -f npm_scripts.sh ] || ./npm_scripts.sh shNpmScriptApidocRawFetch",
         "build-ci": "utility2 shReadmeTest build_ci.sh",
         "env": "env",
-        "heroku-postbuild": "npm uninstall utility2 2>/dev/null; npm install kaizhu256/node-utility2#alpha && utility2 shDeployHeroku",
+        "heroku-postbuild": "npm install kaizhu256/node-utility2#alpha --prefix . && utility2 shDeployHeroku",
         "postinstall": "[ ! -f npm_scripts.sh ] || ./npm_scripts.sh shNpmScriptPostinstall",
         "start": "PORT=${PORT:-8080} utility2 start test.js",
         "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
     },
-    "version": "2018.3.25"
+    "version": "2018.4.21"
 }
 ```
 
@@ -988,14 +1020,14 @@ utility2-comment -->\n\
 
 # this shell script will run the build for this package
 
-shBuildCiAfter() {(set -e
+shBuildCiAfter () {(set -e
     # shDeployCustom
     shDeployGithub
     shDeployHeroku
     shReadmeTest example.sh
 )}
 
-shBuildCiBefore() {(set -e
+shBuildCiBefore () {(set -e
     shNpmTestPublished
     shReadmeTest example.js
 )}
