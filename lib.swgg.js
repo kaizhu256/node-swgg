@@ -13,48 +13,61 @@
 (function () {
     'use strict';
     var local;
-    /* istanbul ignore next */
-    if (typeof global === 'object' &&
-            !global.utility2_app &&
-            global.utility2_rollup &&
-            global.process &&
-            global.process.env.npm_package_nameLib === 'swgg') {
-        return;
-    }
 
 
 
     // run shared js-env code - init-before
+    /* istanbul ignore next */
     (function () {
+        // init debug_inline
+        (function () {
+            var consoleError, context, key;
+            context = (typeof window === "object" && window) || global;
+            key = "debug_inline".replace("_i", "I");
+            if (context[key]) {
+                return;
+            }
+            consoleError = console.error;
+            context[key] = function (arg0) {
+            /*
+             * this function will both print arg0 to stderr and return it
+             */
+                // debug arguments
+                context["_" + key + "Arguments"] = arguments;
+                consoleError("\n\n" + key);
+                consoleError.apply(console, arguments);
+                consoleError("\n");
+                // return arg0 for inspection
+                return arg0;
+            };
+        }());
         // init local
         local = {};
         // init modeJs
-        local.modeJs = (function () {
+        (function () {
             try {
-                return typeof navigator.userAgent === 'string' &&
-                    typeof document.querySelector('body') === 'object' &&
-                    typeof XMLHttpRequest.prototype.open === 'function' &&
-                    'browser';
-            } catch (errorCaughtBrowser) {
-                return module.exports &&
-                    typeof process.versions.node === 'string' &&
+                local.modeJs = typeof process.versions.node === 'string' &&
                     typeof require('http').createServer === 'function' &&
                     'node';
+            } catch (ignore) {
             }
+            local.modeJs = local.modeJs || 'browser';
         }());
         // init global
         local.global = local.modeJs === 'browser'
             ? window
             : global;
-        // init utility2_rollup
-        local = local.global.utility2_rollup || local;
-        /* istanbul ignore next */
-        if (!local) {
-            local = local.global.utility2_rollup ||
-                local.global.utility2_rollup_old ||
-                require('./assets.utility2.rollup.js');
-            local.fs = null;
-        }
+        // re-init local
+        local = local.global.utility2_rollup ||
+            // local.global.utility2_rollup_old || require('./assets.utility2.rollup.js') ||
+            local;
+        // init nop
+        local.nop = function () {
+        /*
+         * this function will do nothing
+         */
+            return;
+        };
         // init exports
         if (local.modeJs === 'browser') {
             local.global.utility2_swgg = local;
@@ -93,30 +106,32 @@
             local.v8 = require('v8');
             local.vm = require('vm');
             local.zlib = require('zlib');
-/* validateLineSortedReset */
             module.exports = local;
             module.exports.__dirname = __dirname;
         }
-        // init lib
+        // init lib main
         local.local = local.swgg = local;
-        // init lib swgg
-        local.global.swgg = local.global.utility2_swgg = local.swgg = local;
+
+
+
+        /* validateLineSortedReset */
         // init lib utility2
         local.utility2 = local.global.utility2_rollup || (local.modeJs === 'browser'
             ? local.global.utility2
             : (function () {
                 try {
-                    return require(__dirname + '/lib.utility2.js');
+                    return require('./lib.utility2.js');
                 } catch (errorCaught) {
-                    return require(__dirname + '/assets.utility2.rollup.js');
+                    return require('./assets.utility2.rollup.js');
                 }
             }()));
         local.utility2.objectSetDefault(local, local.utility2);
-        local.utility2.swgg = local;
-/* validateLineSortedReset */
+        // init lib swgg
+        local.global.swgg = local.utility2.swgg = local;
+        /* validateLineSortedReset */
         // init assets and templates
-/* jslint-ignore-begin */
 // https://github.com/json-schema-org/json-schema-org.github.io/blob/eb4805e94c3e27932352344767d19cc4c3c3381c/draft-04/schema
+/* jslint-ignore-begin */
 // curl -Ls https://raw.githubusercontent.com/json-schema-org/json-schema-org.github.io/eb4805e94c3e27932352344767d19cc4c3c3381c/draft-04/schema > /tmp/aa.json; node -e "console.log(JSON.stringify(require('/tmp/aa.json')));"
 local.assetsDict['/assets.swgg.json-schema.json'] = JSON.stringify(
 {"id":"http://json-schema.org/draft-04/schema#","$schema":"http://json-schema.org/draft-04/schema#","description":"Core schema meta-schema","definitions":{"schemaArray":{"type":"array","minItems":1,"items":{"$ref":"#"}},"positiveInteger":{"type":"integer","minimum":0},"positiveIntegerDefault0":{"allOf":[{"$ref":"#/definitions/positiveInteger"},{"default":0}]},"simpleTypes":{"enum":["array","boolean","integer","null","number","object","string"]},"stringArray":{"type":"array","items":{"type":"string"},"minItems":1,"uniqueItems":true}},"type":"object","properties":{"id":{"type":"string","format":"uri"},"$schema":{"type":"string","format":"uri"},"title":{"type":"string"},"description":{"type":"string"},"default":{},"multipleOf":{"type":"number","minimum":0,"exclusiveMinimum":true},"maximum":{"type":"number"},"exclusiveMaximum":{"type":"boolean","default":false},"minimum":{"type":"number"},"exclusiveMinimum":{"type":"boolean","default":false},"maxLength":{"$ref":"#/definitions/positiveInteger"},"minLength":{"$ref":"#/definitions/positiveIntegerDefault0"},"pattern":{"type":"string","format":"regex"},"additionalItems":{"anyOf":[{"type":"boolean"},{"$ref":"#"}],"default":{}},"items":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/schemaArray"}],"default":{}},"maxItems":{"$ref":"#/definitions/positiveInteger"},"minItems":{"$ref":"#/definitions/positiveIntegerDefault0"},"uniqueItems":{"type":"boolean","default":false},"maxProperties":{"$ref":"#/definitions/positiveInteger"},"minProperties":{"$ref":"#/definitions/positiveIntegerDefault0"},"required":{"$ref":"#/definitions/stringArray"},"additionalProperties":{"anyOf":[{"type":"boolean"},{"$ref":"#"}],"default":{}},"definitions":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"properties":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"patternProperties":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"dependencies":{"type":"object","additionalProperties":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/stringArray"}]}},"enum":{"type":"array","minItems":1,"uniqueItems":true},"type":{"anyOf":[{"$ref":"#/definitions/simpleTypes"},{"type":"array","items":{"$ref":"#/definitions/simpleTypes"},"minItems":1,"uniqueItems":true}]},"allOf":{"$ref":"#/definitions/schemaArray"},"anyOf":{"$ref":"#/definitions/schemaArray"},"oneOf":{"$ref":"#/definitions/schemaArray"},"not":{"$ref":"#"}},"dependencies":{"exclusiveMaximum":["maximum"],"exclusiveMinimum":["minimum"]},"default":{}}
@@ -1003,7 +1018,7 @@ local.templateUiMain = '\
 </div>\n\
 {{#if urlSwaggerJson}}\n\
 <h4 class="label">nodejs initialization</h4>\n\
-<pre id="swggAjaxProgressPre1">\n\
+<pre id="swggAjaxProgressPre1" tabIndex="0">\n\
 /*\n\
  * initialize nodejs swgg-client\n\
  * 1. download currently-loaded apis to file swagger.json:\n\
@@ -1042,7 +1057,7 @@ console.log("initialized nodejs swgg-client");\n\
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/operation.handlebars
 local.templateUiOperation = '\
 <div class="operation" data-_method-path="{{_methodPath}}" id="{{id}}">\n\
-<div class="onEventInputValidate onEventOperationDisplayShow thead" tabindex="0">\n\
+<div class="onEventInputValidateAndAjax onEventOperationDisplayShow thead" tabindex="0">\n\
     <span class="td td1"></span>\n\
     <span class="method{{_method}} td td2">{{_method}}</span>\n\
     <span\n\
@@ -1089,15 +1104,15 @@ local.templateUiOperation = '\
     {{/each responseList}}\n\
     <button class="button onEventOperationAjax">try it out!</button>\n\
     <h4 class="label">nodejs request</h4>\n\
-    <pre class="requestJavascript"></pre>\n\
+    <pre class="requestJavascript" tabIndex="0"></pre>\n\
     <h4 class="label">curl request</h4>\n\
-    <pre class="requestCurl"></pre>\n\
+    <pre class="requestCurl" tabIndex="0"></pre>\n\
     <h4 class="label">response status code</h4>\n\
     <pre class="responseStatusCode" tabindex="0"></pre>\n\
     <h4 class="label">response headers</h4>\n\
-    <pre class="responseHeaders"></pre>\n\
+    <pre class="responseHeaders" tabIndex="0"></pre>\n\
     <h4 class="label">response body</h4>\n\
-    <pre class="responseBody"></pre>\n\
+    <pre class="responseBody" tabIndex="0"></pre>\n\
     <div class="responseMedia"></div>\n\
 </form>\n\
 </div>\n\
@@ -1151,7 +1166,7 @@ local.templateUiParameter = '\
     <div class="colorError"></div>\n\
 </span>\n\
 <span class="td td4">\n\
-    {{#if schemaText}}<pre>{{schemaText}}</pre>{{/if schemaText}}\n\
+    {{#if schemaText}}<pre tabIndex="0">{{schemaText}}</pre>{{/if schemaText}}\n\
 </span>\n\
 </div>\n\
 ';
@@ -1220,8 +1235,8 @@ swgg\n\
 
 
 /* validateLineSortedReset */
-local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.index.default.template.html']
-    .replace('assets.index.default.template.html', '')
+local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.utility2.template.html']
+    .replace('assets.utility2.template.html', '')
     .replace((/<title>.*?<\/title>/), '<title>swgg</title>')
     .replace('\n<!-- utility2-comment\n', '\n')
     .replace('\n</style>\n', '\
@@ -1769,10 +1784,11 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             options.url += local.swaggerJsonBasePath;
             options.url += options.inPath + '?' + options.inQuery.slice(1);
             options.url = options.url.replace((/\?$/), '');
-            if (options.error || options.modeValidate) {
+            if (options.modeAjax === 'validate' || (options.error && options.modeAjax !== 'ajax')) {
                 onError(options.error);
                 return;
             }
+            options.error = null;
             // send ajax-request
             return local.ajax(options, function (error, xhr) {
                 // try to init responseJson
@@ -1780,9 +1796,8 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     xhr.responseJson = JSON.parse(xhr.responseText);
                 }, local.nop);
                 // init userJwtEncrypted
-                if (xhr.getResponseHeader('swgg-jwt-encrypted')) {
-                    local.userJwtEncrypted = xhr.getResponseHeader('swgg-jwt-encrypted');
-                }
+                local.userJwtEncrypted = xhr.responseHeaders['swgg-jwt-encrypted'] ||
+                    local.userJwtEncrypted;
                 onError(error, xhr);
             });
         };
@@ -2407,7 +2422,6 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 );
                 break;
             /*
-             * https://tools.ietf.org/html/rfc7578
              * parse multipart/form-data, e.g.
              * --Boundary\r\n
              * Content-Disposition: form-data; name="key"\r\n
@@ -2424,6 +2438,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
              * \r\n
              * <data2>\r\n
              * --Boundary--\r\n
+             * https://tools.ietf.org/html/rfc7578
              */
             case 'multipart/form-data':
                 request.swgg.bodyParsed = {};
@@ -2585,8 +2600,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                                 tmp.id = tmp.id ||
                                     ((1 + Math.random()) * 0x10000000000000).toString(36).slice(1);
                                 local.objectSetOverride(tmp, {
-                                    fileBlob:
-                                        local.base64FromBuffer(request.swgg.bodyParsed[key]),
+                                    fileBlob: local.base64FromBuffer(request.swgg.bodyParsed[key]),
                                     fileContentType: request.swgg.bodyMeta[key].contentType,
                                     fileFilename: request.swgg.bodyMeta[key].filename,
                                     fileInputName: request.swgg.bodyMeta[key].name,
@@ -3192,10 +3206,10 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
 
         local.onErrorJsonapi = function (onError) {
         /*
-         * http://jsonapi.org/format/#errors
-         * http://jsonapi.org/format/#document-structure-resource-objects
          * this function will normalize the error and data to jsonapi format,
          * and pass them to onError
+         * http://jsonapi.org/format/#errors
+         * http://jsonapi.org/format/#document-structure-resource-objects
          */
             return function (error, data, meta) {
                 data = [error, data].map(function (data, ii) {
@@ -3241,10 +3255,10 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     }
                     data.meta = local.jsonCopy(meta || {});
                     data.meta.isJsonapiResponse = true;
-                    if (!ii) {
-                        data.meta.errorsLength = (data.errors && data.errors.length) | 0;
+                    if (ii) {
+                        data.meta.dataLength = data.data.length;
                     } else {
-                        data.meta.dataLength = (data.data && data.data.length) | 0;
+                        data.meta.errorsLength = data.errors.length;
                     }
                     data.meta.statusCode = Number(data.meta.statusCode) ||
                         Number(data.statusCode) ||
@@ -3289,9 +3303,9 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
 
         local.serverRespondJsonapi = function (request, response, error, data, meta) {
         /*
+         * this function will respond in jsonapi format
          * http://jsonapi.org/format/#errors
          * http://jsonapi.org/format/#document-structure-resource-objects
-         * this function will respond in jsonapi format
          */
             local.onErrorJsonapi(function (error, data) {
                 local.serverRespondHeadSet(request, response, error && error.statusCode, {
@@ -4156,7 +4170,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     schema: schema
                 });
                 // 5.4.3. required
-                local.normalizeValue('list', schema.required).forEach(function (key) {
+                Array.from(schema.required || []).forEach(function (key) {
                     // validate semanticItemsRequiredForArrayObjects2
                     test = !local.isNullOrUndefined(data[key]);
                     local.throwSwaggerError(!test && {
@@ -4253,7 +4267,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                         swaggerJson: options.swaggerJson
                     });
                     // 5.4.5.2.2. Property dependencies
-                    local.normalizeValue('list', schema.dependencies[key]).every(function (key2) {
+                    Array.from(schema.dependencies[key]).every(function (key2) {
                         test = !local.isNullOrUndefined(data[key2]);
                         local.throwSwaggerError(!test && {
                             data: data,
@@ -4495,7 +4509,8 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 local.timerTimeoutOnEventInputValidate = setTimeout(function () {
                     local.timerTimeoutOnEventInputValidate = null;
                     // validate input
-                    local.uiEventListenerDict['.onEventInputValidate'](event);
+                    event.modeAjax = 'validate';
+                    local.uiEventListenerDict['.onEventInputValidateAndAjax'](event);
                 }, 25);
             }
         };
@@ -4517,7 +4532,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             }
         };
 
-        local.uiEventListenerDict['.onEventInputValidate'] = function (options, onError) {
+        local.uiEventListenerDict['.onEventInputValidateAndAjax'] = function (options, onError) {
         /*
          * this function will validate the input parameters
          * against the schemas in options.parameters
@@ -4536,7 +4551,6 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             options.api = local.apiDict[options.targetOperation.dataset._methodPath];
             options.headers = {};
             options.modeNoDefault = true;
-            options.modeValidate = !options.modeAjax;
             options.paramDict = {};
             options.url = '';
             options.api.parameters.forEach(function (schemaP) {
@@ -4657,13 +4671,13 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
-                    // init ajax
-                    options.modeAjax = true;
+                    // force ajax
+                    options.modeAjax = 'ajax';
                     // validate input
-                    local.uiEventListenerDict['.onEventInputValidate'](options, options.onNext);
-                    if (options.error) {
-                        return;
-                    }
+                    local.uiEventListenerDict['.onEventInputValidateAndAjax'](
+                        options,
+                        options.onNext
+                    );
                     // reset response output
                     Array.from(options.targetOperation.querySelectorAll(
                         '.responseBody, .responseHeaders, .responseStatusCode'
@@ -4677,9 +4691,6 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     break;
                 default:
                     local.onErrorDefault(error);
-                    if (options.error) {
-                        return;
-                    }
                     data = local.objectSetDefault(data, {
                         contentType: 'undefined',
                         statusCode: 'undefined'
@@ -4689,7 +4700,9 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                         data.statusCode;
                     // init responseHeaders
                     options.targetOperation.querySelector('.responseHeaders').textContent =
-                        data.getAllResponseHeaders().trim();
+                        Object.keys(data.responseHeaders).map(function (key) {
+                            return key + ': ' + data.responseHeaders[key] + '\r\n';
+                        }).join('');
                     // init responseBody
                     options.targetOperation.querySelector('.responseHeaders').textContent.replace((
                         /^content-type:(.*?)$/im
@@ -4750,7 +4763,8 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     element.querySelector('[tabIndex]').blur();
                     element.querySelector('[tabIndex]').focus();
                     // validate input
-                    local.uiEventListenerDict['.onEventInputValidate']({
+                    local.uiEventListenerDict['.onEventInputValidateAndAjax']({
+                        modeAjax: 'validate',
                         targetOperation: element
                     });
                     local.setTimeoutOnError(onError, 0, null, element);
@@ -4801,7 +4815,8 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                         )).forEach(function (element) {
                             local.uiAnimateSlideDown(element);
                             // validate input
-                            local.uiEventListenerDict['.onEventInputValidate']({
+                            local.uiEventListenerDict['.onEventInputValidateAndAjax']({
+                                modeAjax: 'validate',
                                 targetOperation: element.closest('.operation')
                             });
                         });
@@ -4936,6 +4951,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     resource = swaggerJson.resourceDict[tag] = local.objectSetDefault(
                         swaggerJson.resourceDict[tag] || swaggerJson.tagDict[tag],
                         {
+                            description: 'no description',
                             name: tag
                         }
                     );
@@ -5188,7 +5204,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             local.apiDict["GET /user/userLogout"].ajax(options, onError);
         };
 
-        local.utility2.middlewareError = function (error, request, response) {
+        local.utility2._middlewareError = function (error, request, response) {
         /*
          * this function will run the middleware that will
          * handle errors according to http://jsonapi.org/format/#errors
@@ -5207,11 +5223,11 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
     // run node js-env code - init-after
     /* istanbul ignore next */
     case 'node':
-        local.assetsDict['/assets.swagger-ui.logo.medium.png'] = new Buffer(
+        local.assetsDict['/assets.swagger-ui.logo.medium.png'] = Buffer.from(
             local.templateSwaggerUiLogoMediumBase64,
             'base64'
         );
-        local.assetsDict['/assets.swagger-ui.logo.small.png'] = new Buffer(
+        local.assetsDict['/assets.swagger-ui.logo.small.png'] = Buffer.from(
             local.templateSwaggerUiLogoSmallBase64,
             'base64'
         );

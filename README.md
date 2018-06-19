@@ -58,6 +58,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
+- update function swaggerJsonFromAjax to inline definitions
 - add swagger.json editor
 - allow parsing of default path-argument, e.g. /aa/{bb=1}/{cc=2}
 - add hmacSha256 support for wechat-pay
@@ -69,17 +70,13 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog for v2018.4.21
-- npm publish v2018.4.21
-- add semantic validators from https://github.com/swagger-api/swagger-editor/tree/v3.1.20/src/plugins/validation/semantic-validators/validators
-- add function swaggerValidateSchemaSemanticFormData
-- rename function validateBySwaggerParameters -> swaggerValidateDataParameters
-- rename function validateBySwaggerSchema -> swaggerValidateDataSchema
-- rename function swaggerValidateJson -> swaggerValidate
-- add assets assets.swagger-ui.logo.medium.png, assets.swagger-ui.logo.small.png
-- update function apiUpdate to auto-create property x-swgg-tagNameList
-- hide info-template during initial render
-- fix css button margins
+#### changelog 2018.6.16
+- npm publish 2018.6.16
+- add sample testAudio1, testImage1, testVideo1 for file-upload api
+- fix default description for tags
+- add better test audio/image for file-upload api
+- allow submit-override in ui, in spite of validation-errors
+- revamp function buildLib
 - none
 
 #### this package requires
@@ -161,24 +158,20 @@ instruction
         // init local
         local = {};
         // init modeJs
-        local.modeJs = (function () {
+        (function () {
             try {
-                return typeof navigator.userAgent === 'string' &&
-                    typeof document.querySelector('body') === 'object' &&
-                    typeof XMLHttpRequest.prototype.open === 'function' &&
-                    'browser';
-            } catch (errorCaughtBrowser) {
-                return module.exports &&
-                    typeof process.versions.node === 'string' &&
+                local.modeJs = typeof process.versions.node === 'string' &&
                     typeof require('http').createServer === 'function' &&
                     'node';
+            } catch (ignore) {
             }
+            local.modeJs = local.modeJs || 'browser';
         }());
         // init global
         local.global = local.modeJs === 'browser'
             ? window
             : global;
-        // init utility2_rollup
+        // re-init local
         local = local.global.utility2_rollup || (local.modeJs === 'browser'
             ? local.global.utility2_swgg
             : require('swgg'));
@@ -528,7 +521,7 @@ utility2-comment -->\n\
                 }
             }
         });
-/* validateLineSortedReset */
+        /* validateLineSortedReset */
         // init db
         local.dbSeedList = [{
             dbRowList: [{
@@ -836,11 +829,10 @@ utility2-comment -->\n\
         local.v8 = require('v8');
         local.vm = require('vm');
         local.zlib = require('zlib');
-/* validateLineSortedReset */
+        /* validateLineSortedReset */
         // init assets
         local.assetsDict = local.assetsDict || {};
         [
-            'assets.index.css',
             'assets.index.template.html',
             'assets.swgg.swagger.json',
             'assets.swgg.swagger.server.json'
@@ -854,13 +846,15 @@ utility2-comment -->\n\
                 );
             }
         });
-/* validateLineSortedReset */
-        // bug-workaround - long $npm_package_buildCustomOrg
+        /* validateLineSortedReset */
         /* jslint-ignore-begin */
-        local.assetsDict['/assets.swgg.js'] = local.assetsDict['/assets.swgg.js'] ||
+        // bug-workaround - long $npm_package_buildCustomOrg
+        local.assetsDict['/assets.swgg.js'] =
+            local.assetsDict['/assets.swgg.js'] ||
             local.fs.readFileSync(local.__dirname + '/lib.swgg.js', 'utf8'
-        ).replace((/^#!/), '//');
-/* validateLineSortedReset */
+        ).replace((/^#!\//), '// ');
+        /* jslint-ignore-end */
+        /* validateLineSortedReset */
         local.assetsDict['/'] =
             local.assetsDict['/assets.example.html'] =
             local.assetsDict['/assets.index.template.html']
@@ -885,7 +879,6 @@ utility2-comment -->\n\
         local.assetsDict['/assets.example.js'] =
             local.assetsDict['/assets.example.js'] ||
             local.fs.readFileSync(__filename, 'utf8');
-        /* jslint-ignore-end */
         local.assetsDict['/favicon.ico'] = local.assetsDict['/favicon.ico'] || '';
         // if $npm_config_timeout_exit exists,
         // then exit this process after $npm_config_timeout_exit ms
@@ -993,16 +986,15 @@ utility2-comment -->\n\
         "url": "https://github.com/kaizhu256/node-swgg.git"
     },
     "scripts": {
-        "apidocRawCreate": "[ ! -f npm_scripts.sh ] || ./npm_scripts.sh shNpmScriptApidocRawCreate",
-        "apidocRawFetch": "[ ! -f npm_scripts.sh ] || ./npm_scripts.sh shNpmScriptApidocRawFetch",
-        "build-ci": "utility2 shReadmeTest build_ci.sh",
-        "env": "env",
-        "heroku-postbuild": "npm install kaizhu256/node-utility2#alpha --prefix . && utility2 shDeployHeroku",
-        "postinstall": "[ ! -f npm_scripts.sh ] || ./npm_scripts.sh shNpmScriptPostinstall",
-        "start": "PORT=${PORT:-8080} utility2 start test.js",
-        "test": "PORT=$(utility2 shServerPortRandom) utility2 test test.js"
+        "build-ci": "./npm_scripts.sh",
+        "eval": "./npm_scripts.sh",
+        "heroku-postbuild": "./npm_scripts.sh",
+        "postinstall": "./npm_scripts.sh",
+        "start": "./npm_scripts.sh",
+        "test": "./npm_scripts.sh",
+        "utility2": "./npm_scripts.sh"
     },
-    "version": "2018.4.21"
+    "version": "2018.6.16"
 }
 ```
 
@@ -1033,7 +1025,7 @@ shBuildCiBefore () {(set -e
 )}
 
 # run shBuildCi
-eval $(utility2 source)
+eval "$(utility2 source)"
 shBuildCi
 ```
 
