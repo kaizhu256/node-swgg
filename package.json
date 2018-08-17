@@ -31,6 +31,7 @@
     },
     "scripts": {
         "build-ci": "./npm_scripts.sh",
+        "env": "env",
         "eval": "./npm_scripts.sh",
         "heroku-postbuild": "./npm_scripts.sh",
         "postinstall": "./npm_scripts.sh",
@@ -38,5 +39,5 @@
         "test": "./npm_scripts.sh",
         "utility2": "./npm_scripts.sh"
     },
-    "version": "2018.6.16"
+    "version": "2018.8.17"
 }

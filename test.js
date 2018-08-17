@@ -20,18 +20,13 @@
     (function () {
         // init local
         local = {};
-        // init modeJs
-        (function () {
-            try {
-                local.modeJs = typeof process.versions.node === 'string' &&
-                    typeof require('http').createServer === 'function' &&
-                    'node';
-            } catch (ignore) {
-            }
-            local.modeJs = local.modeJs || 'browser';
-        }());
+        // init isBrowser
+        local.isBrowser = typeof window === "object" &&
+            typeof window.XMLHttpRequest === "function" &&
+            window.document &&
+            typeof window.document.querySelectorAll === "function";
         // init global
-        local.global = local.modeJs === 'browser'
+        local.global = local.isBrowser
             ? window
             : global;
         // re-init local
@@ -139,7 +134,7 @@
         /*
          * this function will test buildApp's default handling-behavior
          */
-            if (local.modeJs !== 'node') {
+            if (local.isBrowser) {
                 onError(null, options);
                 return;
             }
@@ -696,7 +691,7 @@
         /*
          * this function will test domAnimateShake's default handling-behavior
          */
-            if (local.modeJs !== 'browser') {
+            if (!local.isBrowser) {
                 onError(null, options);
                 return;
             }
@@ -1325,7 +1320,7 @@ curl /undefined\n\
         /*
          * this function will test swaggerValidate's file handling-behavior
          */
-            if (local.modeJs !== 'node') {
+            if (local.isBrowser) {
                 onError(null, options);
                 return;
             }
@@ -1362,6 +1357,21 @@ curl /undefined\n\
             local.swaggerValidate({
                 info: { title: '', version: '' },
                 paths: { '/aa': { get: { responses: { 200: { description: '' } } } } },
+                swagger: '2.0'
+            });
+            // test path handling-behavior
+            local.swaggerValidate({
+                info: { title: '', version: '' },
+                parameters: { aa: {
+                    in: 'path',
+                    name: 'aa',
+                    required: true,
+                    type: 'string'
+                } },
+                paths: { '/{aa}': { get: {
+                    parameters: [{ $ref: '#/parameters/aa' }],
+                    responses: { 200: { description: '' } }
+                } } },
                 swagger: '2.0'
             });
             // test error handling-behavior
@@ -1576,15 +1586,9 @@ curl /undefined\n\
                     name: 'aa',
                     required: true,
                     type: 'string'
-                }, {
-                    in: 'path',
-                    name: 'aa',
-                    required: true,
-                    type: 'string'
                 }], responses: { 200: { description: '' } } } } },
                 swagger: '2.0',
-                // 'x-errorType': 'semanticPaths3'
-                'x-errorType': 'semanticOperations3'
+                'x-errorType': 'semanticPaths3'
             // }, {
                 // validate semanticPaths4
                 // 'x-errorType': 'semanticPaths4'
@@ -1700,18 +1704,13 @@ curl /undefined\n\
             }, {
                 // validate semanticWalker6
                 info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
-                    $ref: 'aa'
-                } }], responses: { 200: { description: '' } } } } },
+                paths: { '/aa': { get: { responses: { 200: { $ref: 'aa' } } } } },
                 swagger: '2.0',
                 'x-errorType': 'semanticWalker6'
             }, {
                 // validate semanticWalker7
                 info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
-                    $ref: '#/aa',
-                    aa: true
-                } }], responses: { 200: { description: '' } } } } },
+                paths: { '/aa': { get: { responses: { 200: { $ref: '#/aa', aa: true } } } } },
                 swagger: '2.0',
                 // 'x-errorType': 'semanticWalker7'
                 'x-errorType': 'objectAdditionalProperties'
@@ -1735,7 +1734,7 @@ curl /undefined\n\
         /*
          * this function will test ui's apiKey handling-behavior
          */
-            if (local.modeJs !== 'browser') {
+            if (!local.isBrowser) {
                 onError(null, options);
                 return;
             }
@@ -1753,7 +1752,7 @@ curl /undefined\n\
          * this function will test ui's click handling-behavior
          */
             var onParallel;
-            if (local.modeJs !== 'browser') {
+            if (!local.isBrowser) {
                 onError(null, options);
                 return;
             }
@@ -1768,6 +1767,9 @@ curl /undefined\n\
             options = {};
             // test click handling-behavior
             Object.keys(local.uiEventListenerDict).sort().forEach(function (selector) {
+                if (selector === '.onEventDbReset') {
+                    return;
+                }
                 Array.from(document.querySelectorAll(selector)).forEach(function (
                     element,
                     ii,
@@ -1807,7 +1809,7 @@ curl /undefined\n\
         /*
          * this function will test ui's fileMedia handling-behavior
          */
-            if (local.modeJs !== 'browser') {
+            if (!local.isBrowser) {
                 onError(null, options);
                 return;
             }
@@ -1829,7 +1831,7 @@ curl /undefined\n\
         /*
          * this function will test ui's keyup handling-behavior
          */
-            if (local.modeJs !== 'browser') {
+            if (!local.isBrowser) {
                 onError(null, options);
                 return;
             }
@@ -1845,6 +1847,58 @@ curl /undefined\n\
                 });
             });
             onError(null, options);
+        };
+
+        local.testCase_ui_onEventDbReset = function (options, onError) {
+        /*
+         * this function will test ui's onEventDbReset handling-behavior
+         */
+            if (!local.isBrowser) {
+                onError(null, options);
+                return;
+            }
+            options = { click: local.nop, files: [] };
+            local.testMock([
+                [document, { querySelector: function () {
+                    return options;
+                } }],
+                [local, { ajaxProgressUpdate: local.nop }],
+                [local.db, { dbExport: local.nop, dbImport: local.nop }],
+                [local.utility2, { testRunBefore: local.nop }],
+                [local.global, {
+                    FileReader: function () {
+                        this.addEventListener = function (_, fnc) {
+                            fnc(_);
+                        };
+                        this.readAsText = local.nop;
+                    },
+                    URL: {
+                        createObjectURL: local.nop,
+                        revokeObjectURL: local.nop
+                    },
+                    setTimeout: function (fnc) {
+                        fnc();
+                    }
+                }]
+            ], function (onError) {
+                [
+                    'swggDbExportButton1',
+                    'swggDbImportButton1',
+                    'swggDbImportInput1',
+                    'swggDbResetButton1'
+                ].forEach(function (id) {
+                    ['change', 'click'].forEach(function (type) {
+                        [0, 1].forEach(function (ii) {
+                            options.files[0] = ii;
+                            local.uiEventListenerDict['.onEventDbReset']({
+                                target2: { id: id },
+                                type: type
+                            });
+                        });
+                    });
+                });
+                onError();
+            }, onError);
         };
 
         local.testCase_userLoginXxx_default = function (options, onError) {
@@ -1911,7 +1965,7 @@ curl /undefined\n\
                     local.assert(local.userJwtEncrypted, local.userJwtEncrypted);
                     // test userLogout's 200 handling-behavior
                     // test jwtEncoded's update handling-behavior
-                    options = { jwtEncrypted: local.jwtA256GcmEncrypt({ sub: 'admin' }) };
+                    options = { jwtEncrypted: local.jwtAes256GcmEncrypt({ sub: 'admin' }) };
                     local.userLogout(options, onNext);
                     break;
                 case 7:
@@ -1939,7 +1993,7 @@ curl /undefined\n\
                     // validate statusCode
                     local.assertJsonEqual(data.statusCode, 400);
                     // test userLogout's invalid-username handling-behavior
-                    options = { jwtEncrypted: local.jwtA256GcmEncrypt({ sub: 'undefined' }) };
+                    options = { jwtEncrypted: local.jwtAes256GcmEncrypt({ sub: 'undefined' }) };
                     local.userLogout(options, onNext);
                     break;
                 case 10:
@@ -1956,7 +2010,7 @@ curl /undefined\n\
 
         local.utility2.serverLocalUrlTest = function (url) {
             url = local.urlParse(url).pathname;
-            return local.modeJs === 'browser' &&
+            return local.isBrowser &&
                 !local.env.npm_config_mode_backend &&
                 (/^\/test\.|\/api\/v0\//).test(url);
         };
@@ -2721,6 +2775,7 @@ curl /undefined\n\
             "_schemaName": "TestCrud"
         }
     },
+    "x-swgg-buttonDatabase": true,
     "x-swgg-downloadStandaloneApp": "http://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js",
     "x-swgg-fixErrorSemanticUniquePath": true,
     "x-swgg-tags0-override": {
@@ -2756,7 +2811,7 @@ curl /undefined\n\
             '/x-test-markdown/description'
         ].get.description =
             local.assetsDict['/assets.swgg.swagger.test.json'].tags[1].description =
-            local.tryCatchReadFile('README.md', 'utf8');
+            local.fsReadFileOrEmptyStringSync('README.md', 'utf8');
         local.assetsDict['/assets.swgg.swagger.test.json'] = JSON.stringify(
             local.assetsDict['/assets.swgg.swagger.test.json']
         );

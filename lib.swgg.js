@@ -43,18 +43,13 @@
         }());
         // init local
         local = {};
-        // init modeJs
-        (function () {
-            try {
-                local.modeJs = typeof process.versions.node === 'string' &&
-                    typeof require('http').createServer === 'function' &&
-                    'node';
-            } catch (ignore) {
-            }
-            local.modeJs = local.modeJs || 'browser';
-        }());
+        // init isBrowser
+        local.isBrowser = typeof window === "object" &&
+            typeof window.XMLHttpRequest === "function" &&
+            window.document &&
+            typeof window.document.querySelectorAll === "function";
         // init global
-        local.global = local.modeJs === 'browser'
+        local.global = local.isBrowser
             ? window
             : global;
         // re-init local
@@ -69,7 +64,7 @@
             return;
         };
         // init exports
-        if (local.modeJs === 'browser') {
+        if (local.isBrowser) {
             local.global.utility2_swgg = local;
         } else {
             // require builtins
@@ -77,8 +72,6 @@
             local.buffer = require('buffer');
             local.child_process = require('child_process');
             local.cluster = require('cluster');
-            local.console = require('console');
-            local.constants = require('constants');
             local.crypto = require('crypto');
             local.dgram = require('dgram');
             local.dns = require('dns');
@@ -87,12 +80,9 @@
             local.fs = require('fs');
             local.http = require('http');
             local.https = require('https');
-            local.module = require('module');
             local.net = require('net');
             local.os = require('os');
             local.path = require('path');
-            local.process = require('process');
-            local.punycode = require('punycode');
             local.querystring = require('querystring');
             local.readline = require('readline');
             local.repl = require('repl');
@@ -116,7 +106,7 @@
 
         /* validateLineSortedReset */
         // init lib utility2
-        local.utility2 = local.global.utility2_rollup || (local.modeJs === 'browser'
+        local.utility2 = local.global.utility2_rollup || (local.isBrowser
             ? local.global.utility2
             : (function () {
                 try {
@@ -217,13 +207,13 @@ local.swaggerErrorTypeDict = {
     // paths.js:79: "Equivalent paths are not allowed."
     semanticPaths2: 'Equivalent paths {{pathList jsonStringify}} are not allowed',
     // paths.js:94: "Path parameters must have unique 'name' + 'in' properties"
-    semanticPaths3: "Path parameters must have unique 'name' + 'in' properties",
+    semanticPaths3: "Path parameter ${parameterDefinition.name jsonStringify} must be unique",
     // paths.js:107: `Path parameter ${parameterDefinition.name} was defined but never used`
     semanticPaths4: 'Path parameter ${parameterDefinition.name} was defined but never used',
     // paths.js:119: "Empty path parameter declarations are not valid"
     semanticPaths5: "Empty path parameter declarations are not valid - {{prefix2 jsonStringify}}",
     // paths.js:131: `Declared path parameter "${parameter}" needs to be defined as a path parameter at either the path or operation level`
-    semanticPaths6: 'Declared path parameter {{name jsonStringify}} needs to be defined as a path parameter {{prefix2}} at either the path or operation level',
+    semanticPaths6: 'Declared path parameter {{name jsonStringify}} needs to be defined as a path parameter {{prefix2 jsonStringify}} at either the path or operation level',
     // paths.js:141: `Path parameter ${parameterDefinition.name} was defined but never used`
     semanticPaths7: 'Path parameter {{prefix0}} was defined but never used',
     // refs.js:37: "Definition was declared but never used in document"
@@ -233,7 +223,7 @@ local.swaggerErrorTypeDict = {
     // security-definitions.js:33: `${path} must have required string 'type' param`,
     semanticSecurityDefinitions1: '${path} must have required string "type" param',
     // security-definitions.js:44: "apiKey authorization must have required 'in' param, valid values are 'query' or 'header'.",
-    semanticSecurityDefinitions2: `apiKey authorization must have required "in" param, valid values are "query" or "header".`,
+    semanticSecurityDefinitions2: 'apiKey authorization must have required "in" param, valid values are "query" or "header".',
     // security-definitions.js:52: "apiKey authorization must have required 'name' string param. The name of the header or query parameter to be used.",
     semanticSecurityDefinitions3: "apiKey authorization must have required 'name' string param. The name of the header or query parameter to be used.",
     // security-definitions.js:66: "oauth2 authorization must have required 'flow' string param. Valid values are 'implicit', 'password', 'application' or 'accessCode'",
@@ -959,7 +949,7 @@ local.templateUiMain = '\
     id="swggUiReloadErrorDiv1"\n\
     style="background: none; border: 0;"\n\
 ></div>\n\
-<div class="info reset">\n\
+<div class="eventDelegateChange eventDelegateClick info reset">\n\
     {{#if info}}\n\
     {{#if info.x-swgg-homepage}}\n\
     <h2 class="hx">\n\
@@ -979,6 +969,18 @@ local.templateUiMain = '\
         download standalone app\n\
     </a><br>\n\
     {{/if x-swgg-downloadStandaloneApp}}\n\
+    {{#if x-swgg-buttonDatabase}}\n\
+    <button class="button onEventDbReset" id="swggDbResetButton1">\n\
+        reset database\n\
+    </button><br>\n\
+    <button class="button onEventDbReset" id="swggDbExportButton1">\n\
+        export database -&gt; file\n\
+    </button><a download="db.persistence.json" href="" id="swggDbExportA1"></a><br>\n\
+    <button class="button onEventDbReset" id="swggDbImportButton1">\n\
+        import database &lt;- file\n\
+    </button><br>\n\
+    <input class="onEventDbReset zeroPixel" type="file" id="swggDbImportInput1">\n\
+    {{/if x-swgg-buttonDatabase}}\n\
     <ul>\n\
         {{#if externalDocs.url}}\n\
         <li>\n\
@@ -1195,9 +1197,7 @@ function (error, data) {\n\
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/resource.handlebars
 local.templateUiResource = '\
 <li\n\
-    class="\n\
-        eventDelegateChange eventDelegateClick eventDelegateKeyup eventDelegateSubmit resource\n\
-    "\n\
+    class="eventDelegateChange eventDelegateClick eventDelegateKeyup eventDelegateSubmit resource"\n\
     data-name="{{name}}"\n\
     id="{{id}}"\n\
 >\n\
@@ -1341,6 +1341,13 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.utility2.templ
 .swggUiContainer .td textarea {\n\
     width: 100%;\n\
 }\n\
+.swggUiContainer .zeroPixel {\n\
+    border: 0;\n\
+    height: 0;\n\
+    margin: 0;\n\
+    padding: 0;\n\
+    width: 0;\n\
+}\n\
 /* validateLineSortedReset */\n\
 /* background */\n\
 .swggUiContainer code,\n\
@@ -1383,6 +1390,9 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.utility2.templ
 .swggUiContainer .resource > .thead,\n\
 .swggUiContainer > .thead {\n\
     background: #7b7;\n\
+}\n\
+.swggUiContainer > .info > .button {\n\
+    width: 20rem;\n\
 }\n\
 .swggUiContainer > .thead > .td1 {\n\
     background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAqRJREFUeNrEVz1s00AUfnGXii5maMXoEUEHVwIpEkPNgkBdMnQoU5ytiKHJwpp2Q2JIO8DCUDOxIJFIVOoWZyJSh3pp1Q2PVVlcCVBH3ufeVZZ9Zye1Ay86nXV+ue/9fO/lheg/Se02X1rvksmbnTiKvuxQMBNgBnN4a/LCbmnUAP6JV58NCUsBC8CuAJxGPF47OgNqBaA93tolUhnx6jC4NxGwyOEwlccyAs+3kwdzKq0HDn2vEBTi8J2XpyMaywNDE157BhXUE3zJhlq8GKq+Zd2zaWHepPA8oN9XkfLmRdOiJV4XUUg/IyWncLjCYY/SHndV2u7zHr3bPKZtdxgboJOnthvrfGj/oMf3G0r7JVmNlLfKklmrt2MvvcNO7LFOhoFHfuAJI5o6ta10jpt5CQLgwXhXG2YIwvu+34qf78ybOjWTnWwkgR36d7JqJOrW0hHmNrKg9xhiS4+1jFmrxymh03B0w+6kURIAu3yHtOD5oaUNojMnGgbcctNvwdAnyxvxRR+/vaJnjzbpzcZX+nN1SdGv85i9eH8w3qPO+mdm/y4dnQ1iI8Fq6Nf4cxL6GWSjiFDSs0VRnxC5g0xSB2cgHpaseTxfqOv5uoHkNQ6Ha/N1Yz9mNMppEkEkYKj79q6uCq4bCHcSX3fJ0Vk/k9siASjCm1N6gZH6Ec9IXt2WkFES2K/ixoIyktJPAu/ptOA1SgO5zqtr6KASJPF0nMV8dgMsRhRPOcMwqQAOoi0VAIMLAEWJ6YYC1c8ibj1GP51RqwzYwZVMHQuvOzMCBUtb2tGHx5NAdLKqp5AX7Ng4d+Zi8AGDI9z1ijx9yaCH04y3GCP2S+QcvaGl+pcxyUBvinFlawoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=) no-repeat left center;\n\
@@ -1616,10 +1626,90 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.utility2.templ
     regexp: true,\n\
     stupid: true\n\
 */\n\
-"use strict";\n\
+// init domOnEventMediaHotkeys\n\
+(function () {\n\
+/*\n\
+ * this function will add media-hotkeys to elements with class=".domOnEventMediaHotkeysInit"\n\
+ */\n\
+    "use strict";\n\
+    var input, onEvent;\n\
+    if (window.domOnEventMediaHotkeys) {\n\
+        return;\n\
+    }\n\
+    onEvent = window.domOnEventMediaHotkeys = function (event) {\n\
+        var media;\n\
+        if (event === "init") {\n\
+            Array.from(document.querySelectorAll(\n\
+                ".domOnEventMediaHotkeysInit"\n\
+            )).forEach(function (media) {\n\
+                media.classList.remove("domOnEventMediaHotkeysInit");\n\
+                media.classList.add("domOnEventMediaHotkeys");\n\
+                ["play", "pause", "seeking"].forEach(function (event) {\n\
+                    media.addEventListener(event, onEvent);\n\
+                });\n\
+            });\n\
+            return;\n\
+        }\n\
+        if (event.currentTarget.classList.contains("domOnEventMediaHotkeys")) {\n\
+            window.domOnEventMediaHotkeysMedia1 = event.currentTarget;\n\
+            window.domOnEventMediaHotkeysInput.focus();\n\
+            return;\n\
+        }\n\
+        media = window.domOnEventMediaHotkeysMedia1;\n\
+        try {\n\
+            switch (event.key || event.type) {\n\
+            case ",":\n\
+            case ".":\n\
+                media.currentTime += (event.key === "," && -0.03125) || 0.03125;\n\
+                break;\n\
+            case "<":\n\
+            case ">":\n\
+                media.playbackRate *= (event.key === "<" && 0.5) || 2;\n\
+                break;\n\
+            case "ArrowDown":\n\
+            case "ArrowUp":\n\
+                media.volume += (event.key === "ArrowDown" && -0.05) || 0.05;\n\
+                break;\n\
+            case "ArrowLeft":\n\
+            case "ArrowRight":\n\
+                media.currentTime += (event.key === "ArrowLeft" && -5) || 5;\n\
+                break;\n\
+            case "j":\n\
+            case "l":\n\
+                media.currentTime += (event.key === "j" && -10) || 10;\n\
+                break;\n\
+            case "k":\n\
+            case " ":\n\
+                if (media.paused) {\n\
+                    media.play();\n\
+                } else {\n\
+                    media.pause();\n\
+                }\n\
+                break;\n\
+            case "m":\n\
+                media.muted = !media.muted;\n\
+                break;\n\
+            default:\n\
+                if (event.key >= 0) {\n\
+                    media.currentTime = 0.1 * event.key * media.duration;\n\
+                    break;\n\
+                }\n\
+                return;\n\
+            }\n\
+        } catch (ignore) {\n\
+        }\n\
+        event.preventDefault();\n\
+    };\n\
+    input = window.domOnEventMediaHotkeysInput = document.createElement("button");\n\
+    input.style = "border:0;height:0;margin:0;padding:0;position:fixed;width:0;z-index:-1;";\n\
+    input.addEventListener("click", onEvent);\n\
+    input.addEventListener("keydown", onEvent);\n\
+    document.body.appendChild(input);\n\
+    onEvent("init");\n\
+}());\n\
 document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
     ((/\\bmodeSwaggerJsonUrl=([^&]+)/g).exec(location.search) || {})[1] ||\n\
-        "assets.swgg.swagger.json";\n\
+    "assets.swgg.swagger.json";\n\
 </script>\n\
 <script src="assets.utility2.rollup.js"></script>\n\
 <script>\n\
@@ -1627,6 +1717,8 @@ document.querySelector(".swggUiContainer > .thead > .td2").value =\n\
 window.local = window.local || window.swgg;\n\
 window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
 </script>\n\
+<!-- swgg-script-extra-begin -->\n\
+<!-- swgg-script-extra-end -->\n\
 </body>\n\
 </html>\n\
 ');
@@ -2049,18 +2141,17 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 // init _methodPath
                 self._methodPath = self._method + ' ' + self._path.replace((/\{.*?\}/g), '{}');
                 self.parameters.forEach(function (schemaP) {
-                    // dereference schemaP.$ref
-                    String(schemaP['x-swgg-$ref'] || schemaP.$ref).replace(
-                        (/#\/parameters\/(.+?$)/),
-                        function (match0, match1) {
-                            match0 = match1;
-                            local.objectSetDefault(
-                                schemaP,
-                                local.jsonCopy(swaggerJson.parameters[match0])
-                            );
-                            schemaP.$ref = undefined;
-                        }
-                    );
+                    // dereference schemaP
+                    String(schemaP['x-swgg-$ref'] || schemaP.$ref).replace((
+                        /#\/parameters\/(.+?$)/
+                    ), function (match0, match1) {
+                        match0 = match1;
+                        local.objectSetDefault(
+                            schemaP,
+                            local.jsonCopy(swaggerJson.parameters[match0])
+                        );
+                        schemaP.$ref = undefined;
+                    });
                     // init _idName.format and _idName.type
                     if (self._schemaName && schemaP.name === self._idName) {
                         schemaP.format = swaggerJson.definitions[self._schemaName]
@@ -2757,7 +2848,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     user = request.swgg.user = {};
                     user.jwtEncrypted = request.headers.authorization &&
                         request.headers.authorization.replace('Bearer ', '');
-                    user.jwtDecrypted = local.jwtA256GcmDecrypt(user.jwtEncrypted);
+                    user.jwtDecrypted = local.jwtAes256GcmDecrypt(user.jwtEncrypted);
                     switch (crud.crudType[0]) {
                     // coverage-hack - test error handling-behavior
                     case 'crudErrorLogin':
@@ -2805,7 +2896,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                         user.jwtDecrypted = {};
                         user.jwtDecrypted.sub = user.data.username;
                         // update jwtEncrypted in client
-                        user.jwtEncrypted = local.jwtA256GcmEncrypt(user.jwtDecrypted);
+                        user.jwtEncrypted = local.jwtAes256GcmEncrypt(user.jwtDecrypted);
                         local.serverRespondHeadSet(request, response, null, {
                             'swgg-jwt-encrypted': user.jwtEncrypted
                         });
@@ -2823,7 +2914,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                             // update jwtEncrypted in client
                             if (data.jwtEncrypted !== user.jwtEncrypted) {
                                 user.jwtEncrypted = data.jwtEncrypted;
-                                user.jwtDecrypted = local.jwtA256GcmDecrypt(user.jwtEncrypted);
+                                user.jwtDecrypted = local.jwtAes256GcmDecrypt(user.jwtEncrypted);
                                 local.serverRespondHeadSet(request, response, null, {
                                     'swgg-jwt-encrypted': user.jwtEncrypted
                                 });
@@ -3598,6 +3689,17 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     prefix: prefix
                 });
                 pathDict[tmp] = path;
+                // validate semanticPaths3
+                tmp = {};
+                path.replace((/\{.*?\}/g), function (match0) {
+                    test = !tmp[match0];
+                    local.throwSwaggerError(!test && {
+                        errorType: 'semanticPaths3',
+                        name: match0,
+                        prefix: prefix
+                    });
+                    tmp[match0] = true;
+                });
                 // validate semanticPaths5
                 test = path.indexOf('{}') < 0;
                 local.throwSwaggerError(!test && {
@@ -3658,6 +3760,17 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                         tmp.path[match0][0] = true;
                     });
                     (operation.parameters || []).forEach(function (schemaP, ii) {
+                        // dereference schemaP
+                        String(schemaP['x-swgg-$ref'] || schemaP.$ref).replace((
+                            /#\/parameters\/(.+?$)/
+                        ), function (match0, match1) {
+                            match0 = match1;
+                            schemaP = local.objectSetDefault(
+                                local.jsonCopy(schemaP),
+                                local.jsonCopy(swaggerJson.parameters[match0])
+                            );
+                            schemaP.$ref = undefined;
+                        });
                         // validate semanticOperations2
                         test = !(tmp.in.body && schemaP.in === 'body');
                         local.throwSwaggerError(!test && {
@@ -4488,6 +4601,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             event.targetOperation = event.target2.closest('.operation');
             Object.keys(local.uiEventListenerDict).sort().some(function (key) {
                 switch (key) {
+                case '.onEventDbReset':
                 case '.onEventOperationDisplayShow':
                     event.target2 = event.target2.closest(key) || event.target2;
                     break;
@@ -4516,6 +4630,47 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
         };
 
         local.uiEventListenerDict = {};
+
+        local.uiEventListenerDict['.onEventDbReset'] = function (event) {
+        /*
+         * this function will show/hide the textarea's multiline placeholder
+         */
+            var reader, tmp;
+            switch (event.target2.id) {
+            case 'swggDbExportButton1':
+                tmp = local.global.URL.createObjectURL(
+                    new local.global.Blob([local.db.dbExport()])
+                );
+                document.querySelector('#swggDbExportA1').href = tmp;
+                document.querySelector('#swggDbExportA1').click();
+                setTimeout(function () {
+                    local.global.URL.revokeObjectURL(tmp);
+                }, 30000);
+                break;
+            case 'swggDbImportButton1':
+                document.querySelector('#swggDbImportInput1').click();
+                break;
+            case 'swggDbImportInput1':
+                if (event.type !== 'change') {
+                    return;
+                }
+                local.ajaxProgressUpdate();
+                reader = new local.global.FileReader();
+                tmp = document.querySelector('#swggDbImportInput1').files[0];
+                if (!tmp) {
+                    return;
+                }
+                reader.addEventListener('load', function () {
+                    local.db.dbImport(reader.result);
+                    local.ajaxProgressUpdate();
+                });
+                reader.readAsText(tmp);
+                break;
+            case 'swggDbResetButton1':
+                local.utility2.testRunBefore();
+                break;
+            }
+        };
 
         local.uiEventListenerDict['.onEventInputTextareaChange'] = function (event) {
         /*
@@ -4718,9 +4873,12 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                         options.targetOperation.querySelector('.responseBody').textContent =
                             data.contentType;
                         options.targetOperation.querySelector('.responseMedia').innerHTML =
-                            '<' + data.mediaType + ' controls src="data:' + data.contentType +
+                            '<' + data.mediaType +
+                            ' class="domOnEventMediaHotkeysInit" controls src="data:' +
+                            data.contentType +
                             ';base64,' + local.base64FromBuffer(data.response) + '"></' +
                             data.mediaType + '>';
+                        local.global.domOnEventMediaHotkeys('init');
                         break;
                     default:
                         options.targetOperation.querySelector('.responseBody').textContent =
@@ -4985,15 +5143,16 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     operation = local.jsonCopy(operation);
                     resource = swaggerJson.resourceDict[tag];
                     local.objectSetDefault(operation, {
+                        description: 'no description',
                         responseList: Object.keys(operation.responses).sort().map(function (key) {
                             return {
                                 key: key,
                                 value: operation.responses[key]
                             };
-                        }),
-                        summary: operation.description
-                            .replace((/\bhttps?:\/\/[^\s<]+[^<.,:;"')\]\s]/g), '')
+                        })
                     });
+                    operation.summary = operation.summary ||
+                        operation.description.replace((/\bhttps?:\/\/[^\s<]+[^<.,:;"')\]\s]/g), '');
                     operation.parameters.forEach(local.uiRenderSchemaP);
                     // templateRender operation
                     swaggerJson.uiFragment.querySelector('#' + resource.id + ' .operationList')
@@ -5027,7 +5186,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 }
             });
             // init event-handling
-            ['Click', 'Keyup', 'Submit'].forEach(function (eventType) {
+            ['Change', 'Click', 'Keyup', 'Submit'].forEach(function (eventType) {
                 Array.from(document.querySelectorAll(
                     '.swggUiContainer .eventDelegate' + eventType
                 )).forEach(function (element) {
@@ -5216,13 +5375,15 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             local.serverRespondJsonapi(request, response, error);
         };
     }());
-    switch (local.modeJs) {
 
 
 
     // run node js-env code - init-after
     /* istanbul ignore next */
-    case 'node':
+    (function () {
+        if (local.isBrowser) {
+            return;
+        }
         local.assetsDict['/assets.swagger-ui.logo.medium.png'] = Buffer.from(
             local.templateSwaggerUiLogoMediumBase64,
             'base64'
@@ -5231,9 +5392,9 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             local.templateSwaggerUiLogoSmallBase64,
             'base64'
         );
-        local.swgg.apiUpdate(JSON.parse(
-            local.tryCatchReadFile(local.__dirname + '/assets.swgg.swagger.json') || '{}'
-        ));
-        break;
-    }
+        local.swgg.apiUpdate(JSON.parse(local.fsReadFileOrEmptyStringSync(
+            local.__dirname + '/assets.swgg.swagger.json',
+            'utf8'
+        ) || '{}'));
+    }());
 }());

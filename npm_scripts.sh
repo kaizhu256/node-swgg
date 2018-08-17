@@ -3,11 +3,11 @@
 
 shMain() {(set -e
 # this function will run the main program
-    # run command custom
-    case "$1" in
-    esac
-
-    # run command default
+    if [ "$*" ]
+    then
+        printf "running command 'npm run $*' ...\n" 1>&2
+    fi
+    # run command
     case "$1" in
     build-ci)
         if [ "$npm_package_nameLib" = utility2 ]
@@ -68,26 +68,13 @@ shMain() {(set -e
         utility2 "$@"
         ;;
     esac
+    if [ "$*" ]
+    then
+        printf "... finished running command 'npm run $*'\n" 1>&2
+    fi
 )}
 
 # run command
-eval shMain "$npm_lifecycle_event" "$(node -e "
-// <script>
-/* jslint-utility2 */
-/*jslint
-    bitwise: true,
-    browser: true,
-    maxerr: 4,
-    maxlen: 100,
-    node: true,
-    nomen: true,
-    regexp: true,
-    stupid: true
-*/
-'use strict';
-console.log(
+shMain "$npm_lifecycle_event" "$(node -e "console.log(
     JSON.parse(process.env.npm_config_argv).original.join(' ').replace((/^(?:run )?\S+ /), '')
-);
-// </script>
-"
-)"
+)")"

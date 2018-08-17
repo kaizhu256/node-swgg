@@ -70,13 +70,14 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog 2018.6.16
-- npm publish 2018.6.16
-- add sample testAudio1, testImage1, testVideo1 for file-upload api
-- fix default description for tags
-- add better test audio/image for file-upload api
-- allow submit-override in ui, in spite of validation-errors
-- revamp function buildLib
+#### changelog 2018.8.17
+- npm publish 2018.8.17
+- add swaggerJson param x-swgg-buttonDatabase
+- do not require following nodejs builtins by default: console, constants, module, process, punycode
+- add benchmark analytics domOnEventWindowOnloadTimeElapsed
+- add BigInt-support for jslint and istanbul
+- migrate from modeJs -> isBrowser
+- add validator semanticPaths3
 - none
 
 #### this package requires
@@ -157,22 +158,17 @@ instruction
     (function () {
         // init local
         local = {};
-        // init modeJs
-        (function () {
-            try {
-                local.modeJs = typeof process.versions.node === 'string' &&
-                    typeof require('http').createServer === 'function' &&
-                    'node';
-            } catch (ignore) {
-            }
-            local.modeJs = local.modeJs || 'browser';
-        }());
+        // init isBrowser
+        local.isBrowser = typeof window === "object" &&
+            typeof window.XMLHttpRequest === "function" &&
+            window.document &&
+            typeof window.document.querySelectorAll === "function";
         // init global
-        local.global = local.modeJs === 'browser'
+        local.global = local.isBrowser
             ? window
             : global;
         // re-init local
-        local = local.global.utility2_rollup || (local.modeJs === 'browser'
+        local = local.global.utility2_rollup || (local.isBrowser
             ? local.global.utility2_swgg
             : require('swgg'));
         // init exports
@@ -298,8 +294,8 @@ instruction
 \n\
 \n\
 <button class="button onclick" id="dbResetButton1">reset database</button><br>\n\
-<button class="button onclick" id="dbExportButton1">export database -&gt; file</button><br>\n\
-<a download="db.persistence.json" href="" id="dbExportA1"></a>\n\
+<button class="button onclick" id="dbExportButton1">export database -&gt; file</button>\n\
+<a download="db.persistence.json" href="" id="dbExportA1"></a><br>\n\
 <button class="button onclick" id="dbImportButton1">import database &lt;- file</button><br>\n\
 <input class="onchange zeroPixel" type="file" id="dbImportInput1">\n\
 ')
@@ -663,13 +659,15 @@ utility2-comment -->\n\
             name: 'User'
         }];
     }());
-    switch (local.modeJs) {
 
 
 
     // run browser js-env code - init-test
     /* istanbul ignore next */
-    case 'browser':
+    (function () {
+        if (!local.isBrowser) {
+            return;
+        }
         local.testRunBrowser = function (event) {
             var reader, tmp;
             if (!event || (event &&
@@ -678,9 +676,9 @@ utility2-comment -->\n\
                     event.currentTarget.className.includes &&
                     event.currentTarget.className.includes('onreset'))) {
                 // reset output
-                Array.from(
-                    document.querySelectorAll('body > .resettable')
-                ).forEach(function (element) {
+                Array.from(document.querySelectorAll(
+                    'body > .resettable'
+                )).forEach(function (element) {
                     switch (element.tagName) {
                     case 'INPUT':
                     case 'TEXTAREA':
@@ -718,7 +716,7 @@ utility2-comment -->\n\
                 document.querySelector('#dbImportInput1').click();
                 break;
             case 'dbImportInput1':
-                local.ajaxProgressShow();
+                local.ajaxProgressUpdate();
                 reader = new window.FileReader();
                 tmp = document.querySelector('#dbImportInput1').files[0];
                 if (!tmp) {
@@ -758,17 +756,17 @@ utility2-comment -->\n\
                 }
             }
         };
-        // log stderr and stdout to #outputTextareaStdout1
+        // log stderr and stdout to #outputStdoutTextarea1
         ['error', 'log'].forEach(function (key) {
             console[key + '_original'] = console[key];
             console[key] = function () {
                 var element;
                 console[key + '_original'].apply(console, arguments);
-                element = document.querySelector('#outputTextareaStdout1');
+                element = document.querySelector('#outputStdoutTextarea1');
                 if (!element) {
                     return;
                 }
-                // append text to #outputTextareaStdout1
+                // append text to #outputStdoutTextarea1
                 element.value += Array.from(arguments).map(function (arg) {
                     return typeof arg === 'string'
                         ? arg
@@ -786,13 +784,16 @@ utility2-comment -->\n\
         });
         // run tests
         local.testRunBrowser();
-        break;
+    }());
 
 
 
     // run node js-env code - init-test
     /* istanbul ignore next */
-    case 'node':
+    (function () {
+        if (local.isBrowser) {
+            return;
+        }
         // init exports
         module.exports = local;
         // require builtins
@@ -800,8 +801,6 @@ utility2-comment -->\n\
         local.buffer = require('buffer');
         local.child_process = require('child_process');
         local.cluster = require('cluster');
-        local.console = require('console');
-        local.constants = require('constants');
         local.crypto = require('crypto');
         local.dgram = require('dgram');
         local.dns = require('dns');
@@ -810,12 +809,9 @@ utility2-comment -->\n\
         local.fs = require('fs');
         local.http = require('http');
         local.https = require('https');
-        local.module = require('module');
         local.net = require('net');
         local.os = require('os');
         local.path = require('path');
-        local.process = require('process');
-        local.punycode = require('punycode');
         local.querystring = require('querystring');
         local.readline = require('readline');
         local.repl = require('repl');
@@ -874,7 +870,7 @@ utility2-comment -->\n\
             });
         // init cli
         if (module !== require.main || local.global.utility2_rollup) {
-            break;
+            return;
         }
         local.assetsDict['/assets.example.js'] =
             local.assetsDict['/assets.example.js'] ||
@@ -887,7 +883,7 @@ utility2-comment -->\n\
         }
         // start server
         if (local.global.utility2_serverHttp1) {
-            break;
+            return;
         }
         process.env.PORT = process.env.PORT || '8081';
         console.error('server starting on port ' + process.env.PORT);
@@ -900,8 +896,7 @@ utility2-comment -->\n\
             response.statusCode = 404;
             response.end();
         }).listen(process.env.PORT);
-        break;
-    }
+    }());
 }());
 ```
 
@@ -987,6 +982,7 @@ utility2-comment -->\n\
     },
     "scripts": {
         "build-ci": "./npm_scripts.sh",
+        "env": "env",
         "eval": "./npm_scripts.sh",
         "heroku-postbuild": "./npm_scripts.sh",
         "postinstall": "./npm_scripts.sh",
@@ -994,7 +990,7 @@ utility2-comment -->\n\
         "test": "./npm_scripts.sh",
         "utility2": "./npm_scripts.sh"
     },
-    "version": "2018.6.16"
+    "version": "2018.8.17"
 }
 ```
 
