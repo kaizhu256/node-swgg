@@ -1,14 +1,15 @@
 #!/bin/sh
 # jslint-utility2
 
-shMain() {(set -e
+shMain () {(set -e
 # this function will run the main program
-    if [ "$*" ]
-    then
-        printf "running command 'npm run $*' ...\n" 1>&2
-    fi
-    # run command
+    printf "running command 'npm run $*' ...\n" 1>&2
+    ARG1="$1"
+    # run command - custom
     case "$1" in
+    esac
+    # run command - default
+    case "$ARG1" in
     build-ci)
         if [ "$npm_package_nameLib" = utility2 ]
         then
@@ -68,10 +69,7 @@ shMain() {(set -e
         utility2 "$@"
         ;;
     esac
-    if [ "$*" ]
-    then
-        printf "... finished running command 'npm run $*'\n" 1>&2
-    fi
+    printf "... finished running command 'npm run $*'\n" 1>&2
 )}
 
 # run command

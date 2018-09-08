@@ -70,21 +70,23 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog 2018.8.17
-- npm publish 2018.8.17
-- add swaggerJson param x-swgg-buttonDatabase
-- do not require following nodejs builtins by default: console, constants, module, process, punycode
-- add benchmark analytics domOnEventWindowOnloadTimeElapsed
-- add BigInt-support for jslint and istanbul
-- migrate from modeJs -> isBrowser
-- add validator semanticPaths3
+#### changelog 2018.9.8
+- npm publish 2018.9.8
+- prepare for jslint v2018.05.14
+- update function buildLib to add section 'local functions - builtin' and remove duplicate local functions
+- merge env var modeTest and utility2_modeTestRun -> local.global.utility2_modeTest
+- merge function onResetXxx -> utility2_onReadyXxx
+- revamp bootstrap-mechanism before running tests
+- revamp event-handling function uiEventDelegate
+- integrate function db.onEventDomDb with utility2_onReadyBefore
+- cleanup base64 <-> buffer helpers
 - none
 
 #### this package requires
 - darwin or linux os
 
 #### this swagger-implementation is compliant with json-schema-validation (draft-04)
-- [http://json-schema.org/draft-04/json-schema-validation.html](http://json-schema.org/draft-04/json-schema-validation.html)
+- [https://json-schema.org/draft-04/json-schema-validation.html](https://json-schema.org/draft-04/json-schema-validation.html)
 
 #### this swagger-implementation is compliant with OpenAPI Specification (2.0)
 - [https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md](https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md)
@@ -178,7 +180,7 @@ instruction
             local.assetsDict['/assets.swgg.swagger.petstore.json'];
         // load db
         local.db.dbLoad(function () {
-            console.log('db loaded from ' + local.storageDir);
+            console.error('db loaded from ' + local.storageDir);
         });
     }());
 
@@ -240,7 +242,7 @@ instruction
          * this function will run the middleware that will custom-init the request and response
          */
             // enable cors
-            // http://en.wikipedia.org/wiki/Cross-origin_resource_sharing
+            // https://en.wikipedia.org/wiki/Cross-origin_resource_sharing
             response.setHeader(
                 'Access-Control-Allow-Methods',
                 'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'
@@ -254,20 +256,6 @@ instruction
                 return;
             }
             nextMiddleware();
-        };
-
-        local.utility2.testRunBefore = function () {
-            local.onResetBefore.counter += 1;
-            // reset db
-            local.db.dbDrop(local.onResetBefore);
-            // seed db
-            local.onResetAfter(function () {
-                console.log('db seeding ...');
-                local.onReadyBefore.counter += 1;
-                local.db.dbTableCreateMany(local.dbSeedList, local.onReadyBefore);
-                local.onReadyBefore.counter += 1;
-                local.db.dbTableCreateMany(local.dbSeedTestList, local.onReadyBefore);
-            });
         };
     }());
 
@@ -294,8 +282,7 @@ instruction
 \n\
 \n\
 <button class="button onclick" id="dbResetButton1">reset database</button><br>\n\
-<button class="button onclick" id="dbExportButton1">export database -&gt; file</button>\n\
-<a download="db.persistence.json" href="" id="dbExportA1"></a><br>\n\
+<button class="button onclick" id="dbExportButton1">export database -&gt; file</button><br>\n\
 <button class="button onclick" id="dbImportButton1">import database &lt;- file</button><br>\n\
 <input class="onchange zeroPixel" type="file" id="dbImportInput1">\n\
 ')
@@ -308,12 +295,12 @@ instruction
 {{#unless isRollup}}\n\
 utility2-comment -->\n\
 <script src="assets.utility2.rollup.js"></script>\n\
-<script>window.utility2.onResetBefore.counter += 1;</script>\n\
+<script>window.utility2_onReadyBefore.counter += 1;</script>\n\
 <script src="jsonp.utility2.stateInit?callback=window.utility2.stateInit"></script>\n\
 <script src="assets.swgg.js"></script>\n\
 <script src="assets.example.js"></script>\n\
 <script src="assets.test.js"></script>\n\
-<script>window.utility2.onResetBefore();</script>\n\
+<script>window.utility2_onReadyBefore();</script>\n\
 <!-- utility2-comment\n\
 {{/if isRollup}}\n\
 utility2-comment -->\n\
@@ -519,7 +506,7 @@ utility2-comment -->\n\
         });
         /* validateLineSortedReset */
         // init db
-        local.dbSeedList = [{
+        local.global.utility2_dbSeedList = [{
             dbRowList: [{
                 id: 'testCase_swaggerUiLogoSmall',
                 fileBlob: local.swgg.templateSwaggerUiLogoSmallBase64,
@@ -565,7 +552,7 @@ utility2-comment -->\n\
                         ]
                     };
                 },
-                schema: { properties: local.swgg.swaggerJson.definitions.Pet.properties }
+                schema: local.swgg.swaggerJson.definitions.Pet
             }),
             idIndexCreateList: [{
                 isInteger: true,
@@ -595,7 +582,7 @@ utility2-comment -->\n\
                         petId: options.ii + 100
                     };
                 },
-                schema: { properties: local.swgg.swaggerJson.definitions.Order.properties }
+                schema: local.swgg.swaggerJson.definitions.Order
             }),
             idIndexCreateList: [{
                 isInteger: true,
@@ -646,7 +633,7 @@ utility2-comment -->\n\
                         ]
                     };
                 },
-                schema: { properties: local.swgg.swaggerJson.definitions.User.properties }
+                schema: local.swgg.swaggerJson.definitions.User
             }),
             idIndexCreateList: [{
                 name: 'email'
@@ -658,6 +645,15 @@ utility2-comment -->\n\
             }],
             name: 'User'
         }];
+        // seed db
+        local.db.dbSeed(local.global.utility2_dbSeedList, local.onErrorThrow);
+        // init serverLocal
+        local.utility2.serverLocalUrlTest = function (url) {
+            url = local.urlParse(url).pathname;
+            return local.isBrowser &&
+                !local.env.npm_config_mode_backend &&
+                (/^\/test\.|\/api\/v0\//).test(url);
+        };
     }());
 
 
@@ -669,7 +665,6 @@ utility2-comment -->\n\
             return;
         }
         local.testRunBrowser = function (event) {
-            var reader, tmp;
             if (!event || (event &&
                     event.currentTarget &&
                     event.currentTarget.className &&
@@ -695,7 +690,7 @@ utility2-comment -->\n\
                 if (document.querySelector('#testReportDiv1').style.maxHeight === '0px') {
                     local.uiAnimateSlideDown(document.querySelector('#testReportDiv1'));
                     document.querySelector('#testRunButton1').textContent = 'hide internal test';
-                    local.modeTest = true;
+                    local.modeTest = 1;
                     local.testRunDefault(local);
                 // hide tests
                 } else {
@@ -705,36 +700,18 @@ utility2-comment -->\n\
                 break;
             // custom-case
             case 'dbExportButton1':
-                tmp = window.URL.createObjectURL(new window.Blob([local.db.dbExport()]));
-                document.querySelector('#dbExportA1').href = tmp;
-                document.querySelector('#dbExportA1').click();
-                setTimeout(function () {
-                    window.URL.revokeObjectURL(tmp);
-                }, 30000);
-                break;
             case 'dbImportButton1':
-                document.querySelector('#dbImportInput1').click();
-                break;
             case 'dbImportInput1':
-                local.ajaxProgressUpdate();
-                reader = new window.FileReader();
-                tmp = document.querySelector('#dbImportInput1').files[0];
-                if (!tmp) {
-                    return;
-                }
-                reader.addEventListener('load', function () {
-                    local.db.dbImport(reader.result);
-                    local.ajaxProgressUpdate();
-                });
-                reader.readAsText(tmp);
-                break;
             case 'dbResetButton1':
-                local.utility2.testRunBefore();
+                local.db.onEventDomDb(event);
                 break;
             case undefined:
                 // init ui
-                local.onReadyBefore.counter += 1;
-                local.swgg.uiEventListenerDict['.onEventUiReload'](null, local.onReadyBefore);
+                local.global.utility2_onReadyBefore.counter += 1;
+                local.swgg.uiEventListenerDict['.onEventUiReload'](
+                    null,
+                    local.global.utility2_onReadyBefore
+                );
                 // coverage-hack - ignore else-statement
                 local.nop(local.modeTest && (function () {
                     document.querySelector('#testRunButton1').textContent =
@@ -756,9 +733,10 @@ utility2-comment -->\n\
                 }
             }
         };
+
         // log stderr and stdout to #outputStdoutTextarea1
         ['error', 'log'].forEach(function (key) {
-            console[key + '_original'] = console[key];
+            console[key + '_original'] = console[key + '_original'] || console[key];
             console[key] = function () {
                 var element;
                 console[key + '_original'].apply(console, arguments);
@@ -771,7 +749,7 @@ utility2-comment -->\n\
                     return typeof arg === 'string'
                         ? arg
                         : JSON.stringify(arg, null, 4);
-                }).join(' ') + '\n';
+                }).join(' ').replace((/\u001b\[\d*m/g), '') + '\n';
                 // scroll textarea to bottom
                 element.scrollTop = element.scrollHeight;
             };
@@ -822,7 +800,6 @@ utility2-comment -->\n\
         local.tty = require('tty');
         local.url = require('url');
         local.util = require('util');
-        local.v8 = require('v8');
         local.vm = require('vm');
         local.zlib = require('zlib');
         /* validateLineSortedReset */
@@ -853,6 +830,7 @@ utility2-comment -->\n\
         /* validateLineSortedReset */
         local.assetsDict['/'] =
             local.assetsDict['/assets.example.html'] =
+            local.assetsDict['/index.html'] =
             local.assetsDict['/assets.index.template.html']
             .replace((/\{\{env\.(\w+?)\}\}/g), function (match0, match1) {
                 switch (match1) {
@@ -990,7 +968,7 @@ utility2-comment -->\n\
         "test": "./npm_scripts.sh",
         "utility2": "./npm_scripts.sh"
     },
-    "version": "2018.8.17"
+    "version": "2018.9.8"
 }
 ```
 

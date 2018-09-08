@@ -1,3 +1,13 @@
+#!/usr/bin/env node
+/*
+ * lib.swgg.js (2018.9.8)
+ * https://github.com/kaizhu256/node-swgg
+ * this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend), with a working web-demo
+ *
+ */
+
+
+
 /* istanbul instrument in package swgg */
 /* jslint-utility2 */
 /*jslint
@@ -22,21 +32,18 @@
         // init debug_inline
         (function () {
             var consoleError, context, key;
-            context = (typeof window === "object" && window) || global;
-            key = "debug_inline".replace("_i", "I");
-            if (context[key]) {
-                return;
-            }
             consoleError = console.error;
-            context[key] = function (arg0) {
+            context = (typeof window === 'object' && window) || global;
+            key = 'debug_inline'.replace('_i', 'I');
+            context[key] = context[key] || function (arg0) {
             /*
              * this function will both print arg0 to stderr and return it
              */
                 // debug arguments
-                context["_" + key + "Arguments"] = arguments;
-                consoleError("\n\n" + key);
+                context['_' + key + 'Arguments'] = arguments;
+                consoleError('\n\n' + key);
                 consoleError.apply(console, arguments);
-                consoleError("\n");
+                consoleError(new Error().stack + '\n');
                 // return arg0 for inspection
                 return arg0;
             };
@@ -44,10 +51,10 @@
         // init local
         local = {};
         // init isBrowser
-        local.isBrowser = typeof window === "object" &&
-            typeof window.XMLHttpRequest === "function" &&
+        local.isBrowser = typeof window === 'object' &&
+            typeof window.XMLHttpRequest === 'function' &&
             window.document &&
-            typeof window.document.querySelectorAll === "function";
+            typeof window.document.querySelectorAll === 'function';
         // init global
         local.global = local.isBrowser
             ? window
@@ -56,13 +63,6 @@
         local = local.global.utility2_rollup ||
             // local.global.utility2_rollup_old || require('./assets.utility2.rollup.js') ||
             local;
-        // init nop
-        local.nop = function () {
-        /*
-         * this function will do nothing
-         */
-            return;
-        };
         // init exports
         if (local.isBrowser) {
             local.global.utility2_swgg = local;
@@ -93,7 +93,6 @@
             local.tty = require('tty');
             local.url = require('url');
             local.util = require('util');
-            local.v8 = require('v8');
             local.vm = require('vm');
             local.zlib = require('zlib');
             module.exports = local;
@@ -921,7 +920,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/main.handlebars
 local.templateUiMain = '\
 <!-- <div class="swggUiContainer"> -->\n\
-<h2 class="eventDelegateKeyup eventDelegateSubmit hx onEventUiReload thead">\n\
+<h2 class="eventDelegateSubmit hx onEvent onEventUiReload thead">\n\
     <a class="td td1" href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
     <input\n\
         class="td td2"\n\
@@ -936,9 +935,9 @@ local.templateUiMain = '\
         type="text"\n\
         value="{{apiKeyValue}}"\n\
     >\n\
-    <button class="button eventDelegateClick onEventUiReload td td4">explore</button>\n\
+    <button class="button eventDelegateClick onEvent onEventUiReload td td4">explore</button>\n\
     <button\n\
-        class="button eventDelegateClick onEventUiReload td td5"\n\
+        class="button eventDelegateClick onEvent onEventUiReload td td5"\n\
         id="swggApiKeyClearButton1"\n\
     >\n\
         clear api-keys\n\
@@ -949,7 +948,7 @@ local.templateUiMain = '\
     id="swggUiReloadErrorDiv1"\n\
     style="background: none; border: 0;"\n\
 ></div>\n\
-<div class="eventDelegateChange eventDelegateClick info reset">\n\
+<div class="eventDelegateClick info reset">\n\
     {{#if info}}\n\
     {{#if info.x-swgg-homepage}}\n\
     <h2 class="hx">\n\
@@ -969,18 +968,17 @@ local.templateUiMain = '\
         download standalone app\n\
     </a><br>\n\
     {{/if x-swgg-downloadStandaloneApp}}\n\
-    {{#if x-swgg-buttonDatabase}}\n\
-    <button class="button onEventDbReset" id="swggDbResetButton1">\n\
+    {{#if x-swgg-onEventDomDb}}\n\
+    <button class="button onEvent onEventDomDb" data-dom-on-event-db="dbResetButton1">\n\
         reset database\n\
     </button><br>\n\
-    <button class="button onEventDbReset" id="swggDbExportButton1">\n\
+    <button class="button onEvent onEventDomDb" data-dom-on-event-db="dbExportButton1">\n\
         export database -&gt; file\n\
-    </button><a download="db.persistence.json" href="" id="swggDbExportA1"></a><br>\n\
-    <button class="button onEventDbReset" id="swggDbImportButton1">\n\
+    </button><br>\n\
+    <button class="button onEvent onEventDomDb" data-dom-on-event-db="dbImportButton1">\n\
         import database &lt;- file\n\
     </button><br>\n\
-    <input class="onEventDbReset zeroPixel" type="file" id="swggDbImportInput1">\n\
-    {{/if x-swgg-buttonDatabase}}\n\
+    {{/if x-swgg-onEventDomDb}}\n\
     <ul>\n\
         {{#if externalDocs.url}}\n\
         <li>\n\
@@ -1059,7 +1057,7 @@ console.log("initialized nodejs swgg-client");\n\
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/operation.handlebars
 local.templateUiOperation = '\
 <div class="operation" data-_method-path="{{_methodPath}}" id="{{id}}">\n\
-<div class="onEventInputValidateAndAjax onEventOperationDisplayShow thead" tabindex="0">\n\
+<div class="onEvent onEventOperationDisplayShow thead" tabindex="0">\n\
     <span class="td td1"></span>\n\
     <span class="method{{_method}} td td2">{{_method}}</span>\n\
     <span\n\
@@ -1071,7 +1069,7 @@ local.templateUiOperation = '\
     <span class="color777 td td4 textOverflowEllipsis">{{summary}}</span>\n\
 </div>\n\
 <form accept-charset="UTF-8"\n\
-    class="uiAnimateSlide"\n\
+    class="onEventInputValidateAndAjax uiAnimateSlide"\n\
     style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"\n\
 >\n\
     {{#if deprecated}}\n\
@@ -1104,7 +1102,7 @@ local.templateUiOperation = '\
         <span class="markdown td td2">{{value.description markdownToHtml}}</span>\n\
     </div>\n\
     {{/each responseList}}\n\
-    <button class="button onEventOperationAjax">try it out!</button>\n\
+    <button class="button onEvent onEventOperationAjax">try it out!</button>\n\
     <h4 class="label">nodejs request</h4>\n\
     <pre class="requestJavascript" tabIndex="0"></pre>\n\
     <h4 class="label">curl request</h4>\n\
@@ -1134,12 +1132,12 @@ local.templateUiParameter = '\
     {{/if description}}\n\
 </span>\n\
 <span class="td td2">{{type2}}{{#if format2}}<br>({{format2}}){{/if format2}}</span>\n\
-<span class="td td3">\n\
+<span class="onEvent onEventInputValidateAndAjax td td3">\n\
     {{#if isTextarea}}\n\
     <div class="multilinePlaceholderContainer">\n\
         <pre class="multilinePlaceholderPre">{{placeholder}}</pre>\n\
         <textarea\n\
-            class="input multilinePlaceholderTextarea onEventInputTextareaChange"\n\
+            class="input multilinePlaceholderTextarea onEvent onEventInputTextareaChange"\n\
             data-value-text="{{valueText encodeURIComponent notHtmlSafe}}"\n\
         ></textarea>\n\
     </div>\n\
@@ -1202,10 +1200,10 @@ local.templateUiResource = '\
     id="{{id}}"\n\
 >\n\
 <h3 class="thead">\n\
-    <span class="onEventResourceDisplayAction td td1 textOverflowEllipsis" tabindex="0">\n\
+    <span class="onEvent onEventResourceDisplayAction td td1 textOverflowEllipsis" tabindex="0">\n\
         {{name}}:&nbsp;&nbsp;{{summary}}\n\
     </span>\n\
-    <span class="onEventResourceDisplayAction td td2" tabindex="0">\n\
+    <span class="onEvent onEventResourceDisplayAction td td2" tabindex="0">\n\
     expand / collapse operations\n\
     </span>\n\
 </h3>\n\
@@ -1413,7 +1411,7 @@ local.assetsDict['/assets.swgg.html'] = local.assetsDict['/assets.utility2.templ
     border-radius: 5px;\n\
 }\n\
 .swggUiContainer .resource > .thead > .td2 {\n\
-    border-left: 1px solid #037;\n\
+    border-left: 1px solid #333;\n\
 }\n\
 /* validateLineSortedReset */\n\
 /* color */\n\
@@ -2324,7 +2322,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     : ((1 + Math.random()) * 0x10000000000000).toString(36).slice(1);
                 switch (schemaP.format) {
                 case 'byte':
-                    value = local.base64FromString(value);
+                    value = local.base64FromBuffer(value);
                     break;
                 case 'date':
                 case 'date-time':
@@ -3284,7 +3282,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 // JSON.parse paramDict
                 } else if (local.schemaPType(schemaP) !== 'file' &&
                         local.schemaPType(schemaP) !== 'string' &&
-                        (typeof tmp === 'string' || tmp instanceof local.global.Uint8Array)) {
+                        (typeof tmp === 'string' || tmp instanceof Uint8Array)) {
                     // try to JSON.parse the string
                     local.tryCatchOnError(function () {
                         tmp = JSON.parse(local.bufferToString(tmp));
@@ -3871,6 +3869,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                         swaggerJson: local.swaggerJson
                     });
                 }, function (errorCaught) {
+                    console.error(errorCaught.message);
                     errorList.push(errorCaught);
                     errorCaught.errorList = errorList;
                 });
@@ -4283,7 +4282,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     schema: schema
                 });
                 // 5.4.3. required
-                Array.from(schema.required || []).forEach(function (key) {
+                (schema.required || []).forEach(function (key) {
                     // validate semanticItemsRequiredForArrayObjects2
                     test = !local.isNullOrUndefined(data[key]);
                     local.throwSwaggerError(!test && {
@@ -4380,7 +4379,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                         swaggerJson: options.swaggerJson
                     });
                     // 5.4.5.2.2. Property dependencies
-                    Array.from(schema.dependencies[key]).every(function (key2) {
+                    schema.dependencies[key].every(function (key2) {
                         test = !local.isNullOrUndefined(data[key2]);
                         local.throwSwaggerError(!test && {
                             data: data,
@@ -4531,7 +4530,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     local.jslint.jslintAndPrint(data, options.file);
                     local.assert(
                         !local.jslint.errorText,
-                        local.jslint.errorText.replace((/\u001b\[\d+m/g), '')
+                        local.jslint.errorText.replace((/\u001b\[\d*m/g), '')
                     );
                     // validate
                     local.swgg.swaggerValidate(JSON.parse(data));
@@ -4539,7 +4538,8 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     break;
                 default:
                     console.error(error
-                        ? 'swagger-validate - failed - ' + options.file + '\n\n' + error.message
+                        ? '\u001b[31mswagger-validate - failed - ' + options.file + '\n' +
+                            error.message + '\u001b[39m'
                         : 'swagger-validate - passed - ' + options.file);
                     onError(error);
                 }
@@ -4591,25 +4591,18 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
         };
 
         local.uiEventDelegate = function (event) {
-            event.target2 = event.target;
+            event.targetOnEvent = event.target.closest('.onEvent');
             // filter non-input keyup-event
-            if (event.type === 'keyup' &&
-                    !event.target2.closest('input, option, select, textarea')) {
+            if (!event.targetOnEvent ||
+                    (event.type === 'keyup' &&
+                    !event.target.closest('input, option, select, textarea'))) {
                 return;
             }
-            // delegate event in .operation
-            event.targetOperation = event.target2.closest('.operation');
             Object.keys(local.uiEventListenerDict).sort().some(function (key) {
-                switch (key) {
-                case '.onEventDbReset':
-                case '.onEventOperationDisplayShow':
-                    event.target2 = event.target2.closest(key) || event.target2;
-                    break;
-                }
-                if (!(event.currentTarget.matches(key) || event.target2.matches(key))) {
+                if (!event.targetOnEvent.matches(key)) {
                     return;
                 }
-                switch (event.target2.tagName) {
+                switch (event.targetOnEvent.tagName) {
                 case 'BUTTON':
                 case 'FORM':
                     event.preventDefault();
@@ -4619,72 +4612,28 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 local.uiEventListenerDict[key](event);
                 return true;
             });
-            if (event.targetOperation && !local.timerTimeoutOnEventInputValidate) {
-                local.timerTimeoutOnEventInputValidate = setTimeout(function () {
-                    local.timerTimeoutOnEventInputValidate = null;
-                    // validate input
-                    event.modeAjax = 'validate';
-                    local.uiEventListenerDict['.onEventInputValidateAndAjax'](event);
-                }, 25);
-            }
         };
 
         local.uiEventListenerDict = {};
 
-        local.uiEventListenerDict['.onEventDbReset'] = function (event) {
-        /*
-         * this function will show/hide the textarea's multiline placeholder
-         */
-            var reader, tmp;
-            switch (event.target2.id) {
-            case 'swggDbExportButton1':
-                tmp = local.global.URL.createObjectURL(
-                    new local.global.Blob([local.db.dbExport()])
-                );
-                document.querySelector('#swggDbExportA1').href = tmp;
-                document.querySelector('#swggDbExportA1').click();
-                setTimeout(function () {
-                    local.global.URL.revokeObjectURL(tmp);
-                }, 30000);
-                break;
-            case 'swggDbImportButton1':
-                document.querySelector('#swggDbImportInput1').click();
-                break;
-            case 'swggDbImportInput1':
-                if (event.type !== 'change') {
-                    return;
-                }
-                local.ajaxProgressUpdate();
-                reader = new local.global.FileReader();
-                tmp = document.querySelector('#swggDbImportInput1').files[0];
-                if (!tmp) {
-                    return;
-                }
-                reader.addEventListener('load', function () {
-                    local.db.dbImport(reader.result);
-                    local.ajaxProgressUpdate();
-                });
-                reader.readAsText(tmp);
-                break;
-            case 'swggDbResetButton1':
-                local.utility2.testRunBefore();
-                break;
-            }
-        };
+        local.uiEventListenerDict['.onEventDomDb'] = local.db.onEventDomDb;
 
         local.uiEventListenerDict['.onEventInputTextareaChange'] = function (event) {
         /*
          * this function will show/hide the textarea's multiline placeholder
          */
             var isTransparent, value;
-            isTransparent = event.target2.style.background.indexOf('transparent') >= 0;
-            value = event.target2.value;
+            isTransparent = event.targetOnEvent.style.background.indexOf('transparent') >= 0;
+            value = event.targetOnEvent.value;
             if (value && isTransparent) {
-                event.target2.style.background = '';
+                event.targetOnEvent.style.background = '';
             }
             if (!value && !isTransparent) {
-                event.target2.style.background = 'transparent';
+                event.targetOnEvent.style.background = 'transparent';
             }
+            local.uiEventListenerDict['.onEventInputValidateAndAjax']({
+                targetOnEvent: event.targetOnEvent
+            });
         };
 
         local.uiEventListenerDict['.onEventInputValidateAndAjax'] = function (options, onError) {
@@ -4703,13 +4652,15 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     return text;
                 });
             };
-            options.api = local.apiDict[options.targetOperation.dataset._methodPath];
+            options.targetOnEvent = options.targetOnEvent.closest('.operation');
+            options.api = local.apiDict[options.targetOnEvent.dataset._methodPath];
             options.headers = {};
+            options.modeAjax = options.modeAjax || 'validate';
             options.modeNoDefault = true;
             options.paramDict = {};
             options.url = '';
             options.api.parameters.forEach(function (schemaP) {
-                tmp = options.targetOperation.querySelector(
+                tmp = options.targetOnEvent.querySelector(
                     '.schemaP[data-name=' + JSON.stringify(schemaP.name) + '] .input'
                 );
                 switch (tmp.tagName) {
@@ -4781,7 +4732,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 errorDict[error.options.prefix[2]] = error;
             });
             // shake input on error
-            Array.from(options.targetOperation.querySelectorAll(
+            Array.from(options.targetOnEvent.querySelectorAll(
                 '.schemaP[data-name]'
             )).forEach(function (element) {
                 tmp = errorDict[element.dataset.name];
@@ -4793,7 +4744,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             // shake submit-button on error
             local.uiAnimateShakeIfError(
                 options.error,
-                options.targetOperation.querySelector('.onEventOperationAjax')
+                options.targetOnEvent.querySelector('.onEventOperationAjax')
             );
             // init requestCurl
             tmp = options.data;
@@ -4806,9 +4757,9 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 }).join('') + '--data-binary ' + (typeof tmp === 'string'
                     ? "'" + tmp.replace(/'/g, "'\"'\"'") + "'"
                     : '<blob>') + ' \\\n"' + options.url.replace((/&/g), '&\\\n') + '"';
-            options.targetOperation.querySelector('.requestCurl').textContent = tmp;
+            options.targetOnEvent.querySelector('.requestCurl').textContent = tmp;
             // init requestJavascript
-            options.targetOperation.querySelector('.requestJavascript').textContent =
+            options.targetOnEvent.querySelector('.requestJavascript').textContent =
                 local.templateRender(local.templateUiRequestJavascript, {
                     options: options,
                     optionsJson: JSON.stringify({
@@ -4822,7 +4773,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
          * this function will submit the operation to the backend
          */
             // ensure options is stateless
-            options = { targetOperation: options.targetOperation };
+            options = { targetOnEvent: options.targetOnEvent.closest('.operation') };
             local.onNext(options, function (error, data) {
                 switch (options.modeNext) {
                 case 1:
@@ -4834,15 +4785,15 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                         options.onNext
                     );
                     // reset response output
-                    Array.from(options.targetOperation.querySelectorAll(
+                    Array.from(options.targetOnEvent.querySelectorAll(
                         '.responseBody, .responseHeaders, .responseStatusCode'
                     )).forEach(function (element) {
                         element.classList.remove('hasError');
                         element.textContent = 'loading ...';
                     });
-                    options.targetOperation.querySelector('.responseMedia').innerHTML = '';
+                    options.targetOnEvent.querySelector('.responseMedia').innerHTML = '';
                     // scrollTo response
-                    options.targetOperation.querySelector('.responseStatusCode').focus();
+                    options.targetOnEvent.querySelector('.responseStatusCode').focus();
                     break;
                 default:
                     local.onErrorDefault(error);
@@ -4851,15 +4802,15 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                         statusCode: 'undefined'
                     });
                     // init responseStatusCode
-                    options.targetOperation.querySelector('.responseStatusCode').textContent =
+                    options.targetOnEvent.querySelector('.responseStatusCode').textContent =
                         data.statusCode;
                     // init responseHeaders
-                    options.targetOperation.querySelector('.responseHeaders').textContent =
+                    options.targetOnEvent.querySelector('.responseHeaders').textContent =
                         Object.keys(data.responseHeaders).map(function (key) {
                             return key + ': ' + data.responseHeaders[key] + '\r\n';
                         }).join('');
                     // init responseBody
-                    options.targetOperation.querySelector('.responseHeaders').textContent.replace((
+                    options.targetOnEvent.querySelector('.responseHeaders').textContent.replace((
                         /^content-type:(.*?)$/im
                     ), function (match0, match1) {
                         match0 = match1;
@@ -4870,24 +4821,24 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     case 'audio':
                     case 'img':
                     case 'video':
-                        options.targetOperation.querySelector('.responseBody').textContent =
+                        options.targetOnEvent.querySelector('.responseBody').textContent =
                             data.contentType;
-                        options.targetOperation.querySelector('.responseMedia').innerHTML =
+                        options.targetOnEvent.querySelector('.responseMedia').innerHTML =
                             '<' + data.mediaType +
                             ' class="domOnEventMediaHotkeysInit" controls src="data:' +
                             data.contentType +
-                            ';base64,' + local.base64FromBuffer(data.response) + '"></' +
+                            ';base64,' + local.base64FromBuffer(data.responseBuffer) + '"></' +
                             data.mediaType + '>';
                         local.global.domOnEventMediaHotkeys('init');
                         break;
                     default:
-                        options.targetOperation.querySelector('.responseBody').textContent =
+                        options.targetOnEvent.querySelector('.responseBody').textContent =
                             data.responseJson
                             ? JSON.stringify(data.responseJson, null, 4)
-                            : data.responseText;
+                            : data.response;
                     }
                     // shake response on error
-                    Array.from(options.targetOperation.querySelectorAll(
+                    Array.from(options.targetOnEvent.querySelectorAll(
                         '.responseBody, .responseHeaders, .responseStatusCode'
                     )).forEach(function (element) {
                         local.uiAnimateShakeIfError(data.statusCode >= 400, element);
@@ -4904,7 +4855,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
          * this function will toggle the display of the operation
          */
             var element;
-            element = event.target2;
+            element = event.targetOnEvent;
             element = element.querySelector('.operation') || element.closest('.operation');
             location.hash = '!' + element.id;
             element.closest('.resource').classList.remove('expanded');
@@ -4913,17 +4864,14 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             // show the operation, but hide all other operations
             local.uiAnimateSlideAccordian(
                 element.querySelector('.operation > form'),
-                Array.from(element.closest('.operationList').querySelectorAll(
-                    '.operation > form'
-                )),
+                Array.from(element.closest('.operationList').querySelectorAll('.operation > form')),
                 function () {
                     // scrollTo operation
                     element.querySelector('[tabIndex]').blur();
                     element.querySelector('[tabIndex]').focus();
                     // validate input
                     local.uiEventListenerDict['.onEventInputValidateAndAjax']({
-                        modeAjax: 'validate',
-                        targetOperation: element
+                        targetOnEvent: element
                     });
                     local.setTimeoutOnError(onError, 0, null, element);
                 }
@@ -4935,8 +4883,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
          * this function will toggle the display of the resource
          */
             location.hash = '!' + event.currentTarget.id;
-            event.target2 = event.target2.closest('.onEventResourceDisplayAction.td');
-            event.target2.className.split(' ').some(function (className) {
+            event.targetOnEvent.className.split(' ').some(function (className) {
                 switch (className) {
                 case 'td1':
                     // show the resource, but hide all other resources
@@ -4946,7 +4893,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     );
                     // show at least one operation in the resource
                     local.uiEventListenerDict['.onEventOperationDisplayShow']({
-                        target2: event.currentTarget.querySelector(
+                        targetOnEvent: event.currentTarget.querySelector(
                             '.operation .uiAnimateSlide[style*="max-height: 100%"]'
                         ) || event.currentTarget.querySelector('.operation')
                     });
@@ -4974,8 +4921,7 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                             local.uiAnimateSlideDown(element);
                             // validate input
                             local.uiEventListenerDict['.onEventInputValidateAndAjax']({
-                                modeAjax: 'validate',
-                                targetOperation: element.closest('.operation')
+                                targetOnEvent: element
                             });
                         });
                     }
@@ -4995,7 +4941,8 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 case 1:
                     options.inputUrl = document.querySelector('.swggUiContainer > .thead > .td2');
                     // clear all apiKeyValue's from localStorage
-                    if (options.target2 && options.target2.id === 'swggApiKeyClearButton1') {
+                    if (options.targetOnEvent &&
+                            options.targetOnEvent.id === 'swggApiKeyClearButton1') {
                         local.apiKeyValue = '';
                         Object.keys(localStorage).forEach(function (key) {
                             if (key.indexOf('utility2_swgg_apiKeyKey_') === 0) {
@@ -5004,10 +4951,9 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                         });
                     // restore apiKeyValue
                     } else if (options.swggInit) {
-                        local.apiKeyKey = 'utility2_swgg_apiKeyKey_' +
-                            encodeURIComponent(local.urlParse(
-                                options.inputUrl.value.replace((/^\//), '')
-                            ).href);
+                        local.apiKeyKey = 'utility2_swgg_apiKeyKey_' + encodeURIComponent(
+                            local.urlParse(options.inputUrl.value.replace((/^\//), '')).href
+                        );
                         local.apiKeyValue = localStorage.getItem(local.apiKeyKey) || '';
                     // save apiKeyValue
                     } else {
@@ -5017,7 +4963,9 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                     // if keyup-event is not return-key, then return
                     if ((options.type === 'keyup' && options.code !== 'Enter') ||
                             // do not reload ui during test
-                            local.global.utility2_modeTestRun >= 2) {
+                            local.global.utility2_modeTest >= 4) {
+                        options.modeNext = Infinity;
+                        options.onNext();
                         return;
                     }
                     // reset ui
@@ -5182,7 +5130,9 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
                 delete element.dataset.valueText;
                 // init textarea's multiline placeholder
                 if (element.tagName === 'TEXTAREA') {
-                    local.uiEventListenerDict['.onEventInputTextareaChange']({ target2: element });
+                    local.uiEventListenerDict['.onEventInputTextareaChange']({
+                        targetOnEvent: element
+                    });
                 }
             });
             // init event-handling
@@ -5195,7 +5145,8 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
             });
             // scrollTo location.hash
             local.uiEventListenerDict['.onEventOperationDisplayShow']({
-                target2: document.querySelector('#' + (location.hash.slice(2) || 'undefined')) ||
+                targetOnEvent:
+                    document.querySelector('#' + (location.hash.slice(2) || 'undefined')) ||
                     document.querySelector('.swggUiContainer .operation')
             });
             local.setTimeoutOnError(onError);
@@ -5361,18 +5312,6 @@ window.swgg.uiEventListenerDict[".onEventUiReload"]({ swggInit: true });\n\
          * this function will send a logout request
          */
             local.apiDict["GET /user/userLogout"].ajax(options, onError);
-        };
-
-        local.utility2._middlewareError = function (error, request, response) {
-        /*
-         * this function will run the middleware that will
-         * handle errors according to http://jsonapi.org/format/#errors
-         */
-            if (!error) {
-                local.serverRespondDefault(request, response, 404);
-                return;
-            }
-            local.serverRespondJsonapi(request, response, error);
         };
     }());
 

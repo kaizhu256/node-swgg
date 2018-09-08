@@ -33,7 +33,7 @@
         local = local.global.local = (local.global.utility2 ||
             require('./assets.utility2.rollup.js')).requireReadme();
         // init test
-        local.testRunInit(local);
+        local.testRunDefault(local);
     }());
 
 
@@ -142,14 +142,13 @@
             local.testCase_buildLib_default(options, local.onErrorThrow);
             local.testCase_buildTest_default(options, local.onErrorThrow);
             local.testCase_buildCustomOrg_default(options, local.onErrorThrow);
-            options = { assetsList: [{
+            local.buildApp({ assetsList: [{
                 file: '/assets.swagger-ui.logo.medium.png',
                 url: '/assets.swagger-ui.logo.medium.png'
             }, {
                 file: '/assets.swagger-ui.logo.small.png',
                 url: '/assets.swagger-ui.logo.small.png'
-            }] };
-            local.buildApp(options, onError);
+            }] }, onError);
         };
 
         local.testCase_crudCountManyByQuery_default = function (options, onError) {
@@ -273,8 +272,7 @@
                 'operationId.x-test.crudErrorPut'
             ].forEach(function (key) {
                 onParallel.counter += 1;
-                options = {};
-                local.apiDict[key].ajax(options, function (error, data) {
+                local.apiDict[key].ajax({}, function (error, data) {
                     // validate error occurred
                     local.assert(error, error);
                     // validate statusCode
@@ -398,7 +396,6 @@
             var onParallel;
             onParallel = local.onParallel(onError);
             onParallel.counter += 1;
-            options = {};
             [
                 'operationId.x-test.crudNullDelete',
                 'operationId.x-test.crudNullGet',
@@ -409,7 +406,7 @@
                 'operationId.x-test.crudNullPut'
             ].forEach(function (key) {
                 onParallel.counter += 1;
-                local.apiDict[key].ajax(options, onParallel);
+                local.apiDict[key].ajax({}, onParallel);
             });
             onParallel(null, options);
         };
@@ -695,9 +692,7 @@
                 onError(null, options);
                 return;
             }
-            options = {};
-            options.element = document.querySelector('div');
-            local.uiAnimateShake(options.element);
+            local.uiAnimateShake(document.querySelector('div'));
             setTimeout(onError, 1500);
         };
 
@@ -726,7 +721,7 @@
                     options.data = data.responseHeaders['content-type'];
                     local.assertJsonEqual(options.data, 'image/png');
                     // validate response
-                    options.data = local.base64FromBuffer(data.response);
+                    options.data = local.base64FromBuffer(data.responseBuffer);
                     local.assertJsonEqual(options.data, local.templateSwaggerUiLogoSmallBase64);
                     // test fileGetOneById's 404 handling-behavior
                     local.apiDict['operationId.file.fileGetOneById.id.id'].ajax({
@@ -756,9 +751,7 @@
                 switch (options.modeNext) {
                 case 1:
                     options.blob = new local.Blob(
-                        [local.bufferToNodeBuffer(
-                            local.base64ToBuffer(local.templateSwaggerUiLogoSmallBase64)
-                        )],
+                        [local.base64ToBuffer(local.templateSwaggerUiLogoSmallBase64)],
                         { type: 'image/png' }
                     );
                     options.blob.name = 'a00.png';
@@ -832,11 +825,10 @@
                 'hello',
                 ['hello'],
                 { data: ['hello'], meta: { isJsonapiResponse: true } }
-            ].forEach(function (_) {
-                options = _;
+            ].forEach(function (data) {
                 onParallel.counter += 1;
                 local.apiDict['operationId.x-test.onErrorJsonapi'].ajax({
-                    paramDict: { data: JSON.stringify(options) }
+                    paramDict: { data: JSON.stringify(data) }
                 }, function (error, data) {
                     // validate no error occurred
                     local.assert(!error, error);
@@ -855,9 +847,10 @@
             var onParallel;
             onParallel = local.onParallel(onError);
             onParallel.counter += 1;
-            options = { paramDict: { data: '[]' } };
             onParallel.counter += 1;
-            local.apiDict['operationId.x-test.onErrorJsonapi'].ajax(options, function (
+            local.apiDict['operationId.x-test.onErrorJsonapi'].ajax({
+                paramDict: { data: '[]' }
+            }, function (
                 error,
                 data
             ) {
@@ -867,9 +860,10 @@
                 local.assertJsonEqual(data.responseJson.data[0], undefined);
                 onParallel();
             });
-            options = { paramDict: { error: '[]' } };
             onParallel.counter += 1;
-            local.apiDict['operationId.x-test.onErrorJsonapi'].ajax(options, function (
+            local.apiDict['operationId.x-test.onErrorJsonapi'].ajax({
+                paramDict: { error: '[]' }
+            }, function (
                 error,
                 data
             ) {
@@ -899,9 +893,10 @@
                     statusCode: 500
                 }
             ].forEach(function (data) {
-                options = { paramDict: { error: JSON.stringify(data) } };
                 onParallel.counter += 1;
-                local.apiDict['operationId.x-test.onErrorJsonapi'].ajax(options, function (
+                local.apiDict['operationId.x-test.onErrorJsonapi'].ajax({
+                    paramDict: { error: JSON.stringify(data) }
+                }, function (
                     error,
                     data
                 ) {
@@ -943,8 +938,7 @@
         /*
          * this function will test swaggerJsonFromCurl's default handling-behavior
          */
-            options = {};
-            options.swaggerJson = local.swaggerJsonFromCurl(
+            options = local.swaggerJsonFromCurl(
 /* jslint-ignore-begin */
                 null,
 '\
@@ -969,9 +963,9 @@ curl \\\n\
 curl /undefined\n\
 '
             );
-            local.swaggerValidate(options.swaggerJson);
+            local.swaggerValidate(options);
             local.assertJsonEqual(
-                options.swaggerJson,
+                options,
 {
     "basePath": "/",
     "definitions": {
@@ -1187,7 +1181,6 @@ curl /undefined\n\
             var onParallel;
             onParallel = local.onParallel(onError);
             onParallel.counter += 1;
-            options = {};
             Object.keys(local.apiDict).forEach(function (key) {
                 if (key.indexOf('operationId.x-test.parameters') < 0) {
                     return;
@@ -1202,10 +1195,10 @@ curl /undefined\n\
                 onParallel.counter += 1;
                 local.apiDict[key].ajax({ modeDefault: true }, function (error, data) {
                     // validate no error occurred
-                    local.assert(!error, error);
+                    local.assert(!error, [error, key]);
                     // validate data
                     data = data.paramDict;
-                    local.assert(data, data);
+                    local.assert(data, [data, key]);
                     onParallel(null, options);
                 });
             });
@@ -1284,7 +1277,6 @@ curl /undefined\n\
                 { typeObjectInBody: {
                     typeBooleanRequired: true,
                     typeObjectMisc: { aa: 1, bb: 2, cc: 3, dd: 4, de: 5, ff: 6 }
-
                 }, 'x-errorType': 'objectMaxProperties' },
                 // 5.4.2. minProperties
                 { typeObjectInBody: {
@@ -1741,7 +1733,7 @@ curl /undefined\n\
             localStorage.setItem('utility2_swgg_apiKeyKey_', '');
             local.uiEventListenerDict['.onEventUiReload']({
                 swggInit: true,
-                target2: { id: 'swggApiKeyInput1' },
+                targetOnEvent: { id: 'swggApiKeyInput1' },
                 type: 'keyup'
             });
             onError(null, options);
@@ -1767,7 +1759,7 @@ curl /undefined\n\
             options = {};
             // test click handling-behavior
             Object.keys(local.uiEventListenerDict).sort().forEach(function (selector) {
-                if (selector === '.onEventDbReset') {
+                if (selector === '.onEventDomDb') {
                     return;
                 }
                 Array.from(document.querySelectorAll(selector)).forEach(function (
@@ -1796,11 +1788,15 @@ curl /undefined\n\
             // test onEventInputTextareaChange's empty-value handling-behavior
             options.element = document.querySelector('.schemaP textarea');
             options.element.value = '';
-            local.uiEventListenerDict['.onEventInputTextareaChange']({ target2: options.element });
+            local.uiEventListenerDict['.onEventInputTextareaChange']({
+                targetOnEvent: options.element
+            });
             options.element.closest('.operation').querySelector('.onEventOperationAjax').click();
             // test onEventInputTextareaChange's non-empty-value handling-behavior
             options.element.value = '{}';
-            local.uiEventListenerDict['.onEventInputTextareaChange']({ target2: options.element });
+            local.uiEventListenerDict['.onEventInputTextareaChange']({
+                targetOnEvent: options.element
+            });
             options.element.closest('.operation').querySelector('.onEventOperationAjax').click();
             onParallel(null, options);
         };
@@ -1813,12 +1809,11 @@ curl /undefined\n\
                 onError(null, options);
                 return;
             }
-            options = [
+            [
                 'testCase_ui_fileMedia_audioNull',
                 'testCase_ui_fileMedia_imageNull',
                 'testCase_ui_fileMedia_videoNull'
-            ];
-            options.forEach(function (id) {
+            ].forEach(function (id) {
                 document.querySelector('#swgg_id_file_fileGetOneById_id_id_1 .input').value = id;
                 document.querySelector(
                     '#swgg_id_file_fileGetOneById_id_id_1 .onEventOperationAjax'
@@ -1835,70 +1830,8 @@ curl /undefined\n\
                 onError(null, options);
                 return;
             }
-            Object.keys(local.uiEventListenerDict).concat(['input']).sort().forEach(function (
-                selector
-            ) {
-                local.uiEventDelegate({
-                    currentTarget: document.querySelector('.resource'),
-                    preventDefault: local.nop,
-                    stopPropagation: local.nop,
-                    target: document.querySelector(selector),
-                    type: 'keyup'
-                });
-            });
+            local.uiEventDelegate({ target: document.querySelector('.onEvent'), type: 'keyup' });
             onError(null, options);
-        };
-
-        local.testCase_ui_onEventDbReset = function (options, onError) {
-        /*
-         * this function will test ui's onEventDbReset handling-behavior
-         */
-            if (!local.isBrowser) {
-                onError(null, options);
-                return;
-            }
-            options = { click: local.nop, files: [] };
-            local.testMock([
-                [document, { querySelector: function () {
-                    return options;
-                } }],
-                [local, { ajaxProgressUpdate: local.nop }],
-                [local.db, { dbExport: local.nop, dbImport: local.nop }],
-                [local.utility2, { testRunBefore: local.nop }],
-                [local.global, {
-                    FileReader: function () {
-                        this.addEventListener = function (_, fnc) {
-                            fnc(_);
-                        };
-                        this.readAsText = local.nop;
-                    },
-                    URL: {
-                        createObjectURL: local.nop,
-                        revokeObjectURL: local.nop
-                    },
-                    setTimeout: function (fnc) {
-                        fnc();
-                    }
-                }]
-            ], function (onError) {
-                [
-                    'swggDbExportButton1',
-                    'swggDbImportButton1',
-                    'swggDbImportInput1',
-                    'swggDbResetButton1'
-                ].forEach(function (id) {
-                    ['change', 'click'].forEach(function (type) {
-                        [0, 1].forEach(function (ii) {
-                            options.files[0] = ii;
-                            local.uiEventListenerDict['.onEventDbReset']({
-                                target2: { id: id },
-                                type: type
-                            });
-                        });
-                    });
-                });
-                onError();
-            }, onError);
         };
 
         local.testCase_userLoginXxx_default = function (options, onError) {
@@ -1914,15 +1847,16 @@ curl /undefined\n\
                     // cleanup userJwtEncrypted
                     delete local.userJwtEncrypted;
                     // test userLogout's default handling-behavior
-                    options = {};
-                    local.userLogout(options, onNext);
+                    local.userLogout({}, onNext);
                     break;
                 case 2:
                     // validate error occurred
                     local.assert(error, error);
                     // test userLoginByPassword's 401 handling-behavior
-                    options = { password: 'undefined', username: 'undefined' };
-                    local.userLoginByPassword(options, onNext);
+                    local.userLoginByPassword({
+                        password: 'undefined',
+                        username: 'undefined'
+                    }, onNext);
                     break;
                 case 3:
                     // validate error occurred
@@ -1932,8 +1866,7 @@ curl /undefined\n\
                     // validate userJwtEncrypted does not exist
                     local.assert(!local.userJwtEncrypted, local.userJwtEncrypted);
                     // test userLogout's 401 handling-behavior
-                    options = {};
-                    local.userLogout(options, onNext);
+                    local.userLogout({}, onNext);
                     break;
                 case 4:
                     // validate error occurred
@@ -1943,8 +1876,10 @@ curl /undefined\n\
                     // validate userJwtEncrypted does not exist
                     local.assert(!local.userJwtEncrypted, local.userJwtEncrypted);
                     // test userLoginByPassword's 200 handling-behavior
-                    options = { password: 'secret', username: 'admin' };
-                    local.userLoginByPassword(options, onNext);
+                    local.userLoginByPassword({
+                        password: 'secret',
+                        username: 'admin'
+                    }, onNext);
                     break;
                 case 5:
                     // validate no error occurred
@@ -1965,8 +1900,9 @@ curl /undefined\n\
                     local.assert(local.userJwtEncrypted, local.userJwtEncrypted);
                     // test userLogout's 200 handling-behavior
                     // test jwtEncoded's update handling-behavior
-                    options = { jwtEncrypted: local.jwtAes256GcmEncrypt({ sub: 'admin' }) };
-                    local.userLogout(options, onNext);
+                    local.userLogout({
+                        jwtEncrypted: local.jwtAes256GcmEncrypt({ sub: 'admin' })
+                    }, onNext);
                     break;
                 case 7:
                     // validate no error occurred
@@ -1976,8 +1912,7 @@ curl /undefined\n\
                     // validate userJwtEncrypted exists
                     local.assert(local.userJwtEncrypted, local.userJwtEncrypted);
                     // test userLogout's 401 handling-behavior
-                    options = {};
-                    local.userLogout(options, onNext);
+                    local.userLogout({}, onNext);
                     break;
                 case 8:
                     // validate error occurred
@@ -1993,26 +1928,20 @@ curl /undefined\n\
                     // validate statusCode
                     local.assertJsonEqual(data.statusCode, 400);
                     // test userLogout's invalid-username handling-behavior
-                    options = { jwtEncrypted: local.jwtAes256GcmEncrypt({ sub: 'undefined' }) };
-                    local.userLogout(options, onNext);
+                    local.userLogout({
+                        jwtEncrypted: local.jwtAes256GcmEncrypt({ sub: 'undefined' })
+                    }, onNext);
                     break;
                 case 10:
                     // validate error occurred
                     local.assert(error, error);
                     // validate statusCode
                     local.assertJsonEqual(data.statusCode, 401);
-                    onError(null, data);
+                    onError(null, options);
                     break;
                 }
             };
             onNext();
-        };
-
-        local.utility2.serverLocalUrlTest = function (url) {
-            url = local.urlParse(url).pathname;
-            return local.isBrowser &&
-                !local.env.npm_config_mode_backend &&
-                (/^\/test\.|\/api\/v0\//).test(url);
         };
     }());
 
@@ -2775,9 +2704,9 @@ curl /undefined\n\
             "_schemaName": "TestCrud"
         }
     },
-    "x-swgg-buttonDatabase": true,
     "x-swgg-downloadStandaloneApp": "http://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js",
     "x-swgg-fixErrorSemanticUniquePath": true,
+    "x-swgg-onEventDomDb": true,
     "x-swgg-tags0-override": {
         "x-test": {
             "description": "internal test-api",
@@ -2847,7 +2776,7 @@ curl /undefined\n\
         // init db
         // test dbRowRandomCreate's null-case handling-behavior
         local.dbRowRandomCreate();
-        local.dbSeedTestList = [{
+        local.global.utility2_dbSeedList = local.global.utility2_dbSeedList.concat([{
             // test dbRowListRandomCreate's default handling-behavior
             dbRowList: local.dbRowListRandomCreate({
                 // init 100 extra random objects
@@ -2870,7 +2799,7 @@ curl /undefined\n\
                         id: 'testCase_dbRowListRandomCreate_' + (options.ii + 100)
                     };
                 },
-                schema: { properties: local.swaggerJson.definitions.TestCrud.properties }
+                schema: local.swaggerJson.definitions.TestCrud
             }),
             idIndexCreateList: [{
                 name: 'id'
@@ -4539,7 +4468,9 @@ HFO7awEAAAAAAAASu5CzgSG3i/eBAfGCEe7wggJS\
                 name: 'id'
             }],
             name: 'File'
-        }];
+        }]);
+        // seed db
+        local.db.dbSeed(local.global.utility2_dbSeedList, local.onErrorThrow);
         // run validation test
         // local.tryCatchOnError(function () {
             // local.testCase_swaggerJsonFromCurl_default(null, local.onErrorDefault);
