@@ -1,5 +1,5 @@
 #!/bin/sh
-# jslint-utility2
+# jslint utility2:true
 
 shMain () {(set -e
 # this function will run the main program
@@ -73,6 +73,6 @@ shMain () {(set -e
 )}
 
 # run command
-shMain "$npm_lifecycle_event" "$(node -e "console.log(
-    JSON.parse(process.env.npm_config_argv).original.join(' ').replace((/^(?:run )?\S+ /), '')
-)")"
+shMain "$npm_lifecycle_event" "$(node -e 'console.log(
+    JSON.parse(process.env.npm_config_argv).original.join(" ").replace((/^(?:run )?\S+ /), "")
+)')"

@@ -1,946 +1,1022 @@
 /* istanbul instrument in package swgg */
-/* jslint-utility2 */
-/*jslint
-    bitwise: true,
-    browser: true,
-    maxerr: 4,
-    maxlen: 100,
-    node: true,
-    nomen: true,
-    regexp: true,
-    stupid: true
-*/
-(function () {
-    'use strict';
+/* istanbul ignore next */
+/* jslint utility2:true */
+(function (globalThis) {
+    "use strict";
+    var consoleError;
     var local;
-
-
-
-    // run shared js-env code - init-before
+    // init globalThis
     (function () {
-        // init local
-        local = {};
-        // init isBrowser
-        local.isBrowser = typeof window === "object" &&
-            typeof window.XMLHttpRequest === "function" &&
-            window.document &&
-            typeof window.document.querySelectorAll === "function";
-        // init global
-        local.global = local.isBrowser
-            ? window
-            : global;
-        // re-init local
-        local = local.global.local = (local.global.utility2 ||
-            require('./assets.utility2.rollup.js')).requireReadme();
-        // init test
-        local.testRunDefault(local);
+        try {
+            globalThis = Function("return this")(); // jslint ignore:line
+        } catch (ignore) {}
     }());
-
-
-
-    // run shared js-env code - function
-    (function () {
-        local.crudOptionsSetDefault = function (options, defaults) {
+    globalThis.globalThis = globalThis;
+    // init local
+    local = {};
+    // init isBrowser
+    local.isBrowser = (
+        typeof window === "object"
+        && window === globalThis
+        && typeof window.XMLHttpRequest === "function"
+        && window.document
+        && typeof window.document.querySelectorAll === "function"
+    );
+    globalThis.globalLocal = local;
+    // init function
+    local.assertThrow = function (passed, message) {
+    /*
+     * this function will throw the error <message> if <passed> is falsy
+     */
+        var error;
+        if (passed) {
+            return;
+        }
+        error = (
+            // ternary-operator
+            (
+                message
+                && typeof message.message === "string"
+                && typeof message.stack === "string"
+            )
+            // if message is an error-object, then leave it as is
+            ? message
+            : new Error(
+                typeof message === "string"
+                // if message is a string, then leave it as is
+                ? message
+                // else JSON.stringify message
+                : JSON.stringify(message, null, 4)
+            )
+        );
+        throw error;
+    };
+    local.functionOrNop = function (fnc) {
+    /*
+     * this function will if <fnc> exists,
+     * them return <fnc>,
+     * else return <nop>
+     */
+        return fnc || local.nop;
+    };
+    local.identity = function (value) {
+    /*
+     * this function will return <value>
+     */
+        return value;
+    };
+    local.nop = function () {
+    /*
+     * this function will do nothing
+     */
+        return;
+    };
+    // init debug_inline
+    if (!globalThis["debug\u0049nline"]) {
+        consoleError = console.error;
+        globalThis["debug\u0049nline"] = function () {
         /*
-         * this function will set default-values for options
+         * this function will both print <arguments> to stderr
+         * and return <arguments>[0]
          */
-            options = local.objectSetDefault(options, defaults);
-            switch (options._tags0) {
-            case 'pet':
-                local.objectSetDefault(options, {
-                    crudGetOneById: local.apiDict['operationId.getPetById'],
-                    crudRemoveOneById: local.apiDict['operationId.deletePet'],
-                    crudSetOneById: local.apiDict['operationId.addPet'],
-                    crudType: ['undefined', 'petId', 'id'],
-                    crudUpdateOneById: local.apiDict['operationId.updatePetWithForm']
-                });
-                break;
-            case 'store':
-                local.objectSetDefault(options, {
-                    crudGetOneById: local.apiDict['operationId.getOrderById'],
-                    crudRemoveOneById: local.apiDict['operationId.deleteOrder'],
-                    crudSetOneById: local.apiDict['operationId.placeOrder'],
-                    crudType: ['undefined', 'orderId', 'id'],
-                    crudUpdateOneById: local.apiDict['operationId.store.crudUpdateOneById.id.id']
-                });
-                break;
-            case 'user':
-                local.objectSetDefault(options, {
-                    crudGetOneById: local.apiDict['operationId.getUserByName'],
-                    crudRemoveOneById: local.apiDict['operationId.deleteUser'],
-                    crudSetOneById: local.apiDict['operationId.createUser'],
-                    crudType: ['undefined', 'username', 'username'],
-                    crudUpdateOneById: local.apiDict['operationId.updateUser']
-                });
-                break;
-            default:
-                Object.keys(local.apiDict).forEach(function (key) {
-                    key.replace((/^operationId\.x-test\.(\w+)/), function (match0, match1) {
-                        match0 = match1;
-                        options[match0] = options[match0] || local.apiDict[key];
-                    });
-                });
-                local.objectSetDefault(options, { crudType: ['undefined', 'id', 'id'] });
-            }
-            local.idNameInit(options);
-            // shallow-copy options
-            return local.objectSetDefault({}, options);
+            var argList;
+            argList = Array.from(arguments); // jslint ignore:line
+            // debug arguments
+            globalThis["debug\u0049nlineArguments"] = argList;
+            consoleError("\n\ndebug\u0049nline");
+            consoleError.apply(console, argList);
+            consoleError("\n");
+            // return arg0 for inspection
+            return argList[0];
         };
+    }
+}(this));
 
-        local.testCase_ajax_error = function (options, onError) {
-        /*
-         * this function will test ajax's error handling-behavior
-         */
-            var onParallel;
-            onParallel = local.onParallel(onError);
-            onParallel.counter += 1;
-            [{
-                // test 404 undefined-api-error-1 handling-behavior
-                statusCode: 404,
-                url: '/api/v0/x-test/errorUndefined'
-            }, {
-                // test 404 undefined-api-error-2 handling-behavior
-                statusCode: 404,
-                url: '/api/v0/x-test/errorUndefinedApi'
-            }, {
-                method: 'POST',
-                // test 400 param-parse-error handling-behavior
-                statusCode: 400,
-                url: '/api/v0/x-test/parametersDefault/aa?typeStringFormatJson=syntax%20error'
-            }, {
-                // test 404 undefined-map-file handling-behavior
-                statusCode: 404,
-                url: '/api/v0/x-test/undefined.map'
-            }].forEach(function (options) {
-                onParallel.counter += 1;
-                local.ajax(options, function (error, xhr) {
-                    // validate error occurred
-                    local.assert(error, options);
-                    // validate statusCode
-                    local.assertJsonEqual(error.statusCode, options.statusCode);
-                    // validate error is in jsonapi-format
-                    if (options.url === '/api/v0/x-test/parametersDefault/aa' +
-                            '?typeStringFormatJson=syntax%20error') {
-                        error = JSON.parse(xhr.responseText);
-                        local.assert(error.errors[0], error);
-                    }
-                    onParallel();
-                });
+
+
+(function (local) {
+"use strict";
+
+
+
+// run shared js-env code - init-before
+(function () {
+// init local
+local = (globalThis.utility2 || require("./assets.utility2.rollup.js")).requireReadme();
+globalThis.local = local;
+// init test
+local.testRunDefault(local);
+}());
+
+
+
+// run shared js-env code - function
+(function () {
+local.crudOptionsSetDefault = function (options, defaults) {
+/*
+ * this function will set default-values for options
+ */
+    options = local.objectSetDefault(options, defaults);
+    switch (options._tags0) {
+    case "pet":
+        local.objectSetDefault(options, {
+            crudGetOneById: local.apiDict["operationId.getPetById"],
+            crudRemoveOneById: local.apiDict["operationId.deletePet"],
+            crudSetOneById: local.apiDict["operationId.addPet"],
+            crudType: ["undefined", "petId", "id"],
+            crudUpdateOneById: local.apiDict["operationId.updatePetWithForm"]
+        });
+        break;
+    case "store":
+        local.objectSetDefault(options, {
+            crudGetOneById: local.apiDict["operationId.getOrderById"],
+            crudRemoveOneById: local.apiDict["operationId.deleteOrder"],
+            crudSetOneById: local.apiDict["operationId.placeOrder"],
+            crudType: ["undefined", "orderId", "id"],
+            crudUpdateOneById: local.apiDict["operationId.store.crudUpdateOneById.id.id"]
+        });
+        break;
+    case "user":
+        local.objectSetDefault(options, {
+            crudGetOneById: local.apiDict["operationId.getUserByName"],
+            crudRemoveOneById: local.apiDict["operationId.deleteUser"],
+            crudSetOneById: local.apiDict["operationId.createUser"],
+            crudType: ["undefined", "username", "username"],
+            crudUpdateOneById: local.apiDict["operationId.updateUser"]
+        });
+        break;
+    default:
+        Object.keys(local.apiDict).forEach(function (key) {
+            key.replace((
+                /^operationId\.x-test\.(\w+)/
+            ), function (ignore, match1) {
+                options[match1] = options[match1] || local.apiDict[key];
             });
-            onParallel(null, options);
-        };
+        });
+        local.objectSetDefault(options, {crudType: ["undefined", "id", "id"]});
+    }
+    local.idNameInit(options);
+    // shallow-copy options
+    return local.objectSetDefault({}, options);
+};
 
-        local.testCase_buildApp_default = function (options, onError) {
-        /*
-         * this function will test buildApp's default handling-behavior
-         */
-            if (local.isBrowser) {
-                onError(null, options);
+local.testCase_ajax_error = function (options, onError) {
+/*
+ * this function will test ajax's error handling-behavior
+ */
+    var onParallel;
+    onParallel = local.onParallel(onError);
+    onParallel.counter += 1;
+    [{
+        // test 404 undefined-api-error-1 handling-behavior
+        statusCode: 404,
+        url: "/api/v0/x-test/errorUndefined"
+    }, {
+        // test 404 undefined-api-error-2 handling-behavior
+        statusCode: 404,
+        url: "/api/v0/x-test/errorUndefinedApi"
+    }, {
+        method: "POST",
+        // test 400 param-parse-error handling-behavior
+        statusCode: 400,
+        url: "/api/v0/x-test/parametersDefault/aa?typeStringFormatJson=syntax%20error"
+    }, {
+        // test 404 undefined-map-file handling-behavior
+        statusCode: 404,
+        url: "/api/v0/x-test/undefined.map"
+    }].forEach(function (options) {
+        onParallel.counter += 1;
+        local.ajax(options, function (error, xhr) {
+            // validate error occurred
+            local.assertThrow(error, options);
+            // validate statusCode
+            local.assertJsonEqual(error.statusCode, options.statusCode);
+            // validate error is in jsonapi-format
+            if (
+                options.url === "/api/v0/x-test/parametersDefault/aa"
+                + "?typeStringFormatJson=syntax%20error"
+            ) {
+                error = JSON.parse(xhr.responseText);
+                local.assertThrow(error.errors[0], error);
+            }
+            onParallel();
+        });
+    });
+    onParallel(null, options);
+};
+
+local.testCase_buildApp_default = function (options, onError) {
+/*
+ * this function will test buildApp's default handling-behavior
+ */
+    if (local.isBrowser) {
+        onError(null, options);
+        return;
+    }
+    local.testCase_buildReadme_default(options, local.onErrorThrow);
+    local.testCase_buildLib_default(options, local.onErrorThrow);
+    local.testCase_buildTest_default(options, local.onErrorThrow);
+    local.testCase_buildCustomOrg_default(options, local.onErrorThrow);
+    local.buildApp({assetsList: [{
+        file: "/assets.swagger-ui.logo.medium.png",
+        url: "/assets.swagger-ui.logo.medium.png"
+    }, {
+        file: "/assets.swagger-ui.logo.small.png",
+        url: "/assets.swagger-ui.logo.small.png"
+    }]}, onError);
+};
+
+local.testCase_crudCountManyByQuery_default = function (options, onError) {
+/*
+ * this function will test crudCountManyByQuery's default handling-behavior
+ */
+    options = local.crudOptionsSetDefault(options, {
+        idValue: "testCase_crudCountManyByQuery_default"
+    });
+    local.onNext(options, function (error, data) {
+        switch (options.modeNext) {
+        case 1:
+            // ajax - crudCountManyByQuery
+            options.crudCountManyByQuery.ajax({
+                paramDict: {_queryWhere: JSON.stringify(options.queryById)}
+            }, options.onNext);
+            break;
+        case 2:
+            // validate data
+            local.assertJsonEqual(data.responseJson.data.length, 1);
+            local.assertThrow(data.responseJson.data[0] === 1, data.responseJson);
+            options.onNext();
+            break;
+        default:
+            onError(error, data);
+        }
+    });
+    options.modeNext = 0;
+    options.onNext();
+};
+
+local.testCase_crudCreateReplaceUpdateRemoveMany_default = function (options, onError) {
+/*
+ * this function will test crudCreateReplaceUpdateRemoveMany's default handling-behavior
+ */
+    var onParallel;
+    onParallel = local.onParallel(onError);
+    onParallel.counter += 1;
+    [{
+        _tags0: "x-test",
+        data: {}
+    }, {
+        _tags0: "pet",
+        data: {name: "name", photoUrls: ["photoUrls"]},
+        dataValidateReplace: {name: "name", status: "available"},
+        dataValidateUpdate1: {name: "name", status: "available"},
+        dataValidateUpdate2: {status: "pending"}
+    }, {
+        _tags0: "store",
+        data: {id: 10},
+        dataValidateReplace: {petId: 10, status: "placed"},
+        dataValidateUpdate1: {petId: 10, status: "placed"},
+        dataValidateUpdate2: {status: "approved"}
+    }, {
+        _tags0: "user",
+        data: {username: "testCase_crudCreateReplaceUpdateRemoveMany_default"},
+        dataValidateReplace: {firstName: "firstName", userStatus: 1},
+        dataValidateUpdate1: {firstName: "firstName", userStatus: 1},
+        dataValidateUpdate2: {userStatus: 2}
+    }].forEach(function (options) {
+        onParallel.counter += 1;
+        // test crudCreateReplaceUpdateRemoveOne's default handling-behavior
+        local.testCase_crudCreateReplaceUpdateRemoveOne_default(options, onParallel);
+    });
+    onParallel(null, options);
+};
+
+local.testCase_crudCreateReplaceUpdateRemoveOne_default = function (options, onError) {
+/*
+ * this function will test crudCreateReplaceUpdateRemoveOne's default handling-behavior
+ */
+    options = local.crudOptionsSetDefault(options, {data: {}});
+    local.onNext(options, function (error, data) {
+        switch (options.modeNext) {
+        case 1:
+            // test crudSetOneById's create handling-behavior
+            local.testCase_crudSetOneById_default(
+                options,
+                options.onNext
+            );
+            break;
+        case 2:
+            // test crudSetOneById's replace handling-behavior
+            local.testCase_crudSetOneById_default(
+                options,
+                options.onNext
+            );
+            break;
+        case 3:
+            // test crudUpdateOneById's default handling-behavior
+            local.testCase_crudUpdateOneById_default(options, options.onNext);
+            break;
+        case 4:
+            // test crudRemoveOneById's default handling-behavior
+            local.testCase_crudRemoveOneById_default(options, options.onNext);
+            break;
+        default:
+            onError(error, data);
+        }
+    });
+    options.modeNext = 0;
+    options.onNext();
+};
+
+local.testCase_crudErrorXxx_default = function (options, onError) {
+/*
+ * this function will test crudErrorXxx's default handling-behavior
+ */
+    var onParallel;
+    onParallel = local.onParallel(onError);
+    onParallel.counter += 1;
+    [
+        "operationId.x-test.crudErrorDelete",
+        "operationId.x-test.crudErrorGet",
+        "operationId.x-test.crudErrorHead",
+        "operationId.x-test.crudErrorLogin",
+        "operationId.x-test.crudErrorOptions",
+        "operationId.x-test.crudErrorPatch",
+        "operationId.x-test.crudErrorPost",
+        "operationId.x-test.crudErrorPre",
+        "operationId.x-test.crudErrorPut"
+    ].forEach(function (key) {
+        onParallel.counter += 1;
+        local.apiDict[key].ajax({}, function (error, data) {
+            // validate error occurred
+            local.assertThrow(error, error);
+            // validate statusCode
+            local.assertJsonEqual(data.statusCode, 500);
+            onParallel();
+        });
+    });
+    onParallel(null, options);
+};
+
+local.testCase_crudGetManyByQuery_default = function (options, onError) {
+/*
+ * this function will test crudGetManyByQuery's default handling-behavior
+ */
+    options = local.crudOptionsSetDefault(options, {
+        idValue: "testCase_crudGetManyByQuery_default"
+    });
+    local.onNext(options, function (error, data) {
+        switch (options.modeNext) {
+        case 1:
+            // ajax - crudGetManyByQuery
+            options.crudGetManyByQuery.ajax({
+                paramDict: {_queryWhere: JSON.stringify(options.queryById)}
+            }, options.onNext);
+            break;
+        case 2:
+            // validate data
+            local.assertJsonEqual(data.responseJson.data.length, 1);
+            local.assertThrow(
+                data.responseJson.data[0][options.idBackend] === options.idValue,
+                data.responseJson
+            );
+            options.onNext();
+            break;
+        default:
+            onError(error, data);
+        }
+    });
+    options.modeNext = 0;
+    options.onNext();
+};
+
+local.testCase_crudGetOneById_default = function (options, onError) {
+/*
+ * this function will test crudGetOneById's default handling-behavior
+ */
+    options = local.crudOptionsSetDefault(options, {
+        dataValidate: {},
+        idValue: "testCase_crudGetOneById_default"
+    });
+    local.onNext(options, function (error, data) {
+        switch (options.modeNext) {
+        case 1:
+            // ajax - crudGetOneById
+            options.crudGetOneById.ajax({
+                paramDict: options.queryById
+            }, options.onNext);
+            break;
+        case 2:
+            // validate data
+            local.assertJsonEqual(data.responseJson.data.length, 1);
+            local.assertThrow(
+                data.responseJson.data[0][options.idBackend] === options.idValue,
+                data.responseJson
+            );
+            // validate dataValidate
+            Object.keys(options.dataValidate).forEach(function (key) {
+                local.assertThrow(
+                    data.responseJson.data[0][key] === options.dataValidate[key],
+                    [key, data.responseJson.data[0][key], options.dataValidate[key]]
+                );
+            });
+            // cleanup dataValidate
+            options.dataValidate = {};
+            options.onNext(null, data);
+            break;
+        default:
+            onError(error, data);
+        }
+    });
+    options.modeNext = 0;
+    options.onNext();
+};
+
+local.testCase_crudGetOneByQuery_default = function (options, onError) {
+/*
+ * this function will test crudGetOneByQuery's default handling-behavior
+ */
+    options = local.crudOptionsSetDefault(options, {
+        idValue: "testCase_crudGetOneByQuery_default"
+    });
+    local.onNext(options, function (error, data) {
+        switch (options.modeNext) {
+        case 1:
+            // ajax - crudGetOneByQuery
+            options.crudGetOneByQuery.ajax({
+                paramDict: {_queryWhere: JSON.stringify(options.queryById)}
+            }, options.onNext);
+            break;
+        case 2:
+            // validate data
+            local.assertJsonEqual(data.responseJson.data.length, 1);
+            local.assertThrow(
+                data.responseJson.data[0][options.idBackend] === options.idValue,
+                data.responseJson
+            );
+            options.onNext();
+            break;
+        default:
+            onError(error, data);
+        }
+    });
+    options.modeNext = 0;
+    options.onNext();
+};
+
+local.testCase_crudNullXxx_default = function (options, onError) {
+/*
+ * this function will test crudNullXxx's default handling-behavior
+ */
+    var onParallel;
+    onParallel = local.onParallel(onError);
+    onParallel.counter += 1;
+    [
+        "operationId.x-test.crudNullDelete",
+        "operationId.x-test.crudNullGet",
+        "operationId.x-test.crudNullHead",
+        "operationId.x-test.crudNullOptions",
+        "operationId.x-test.crudNullPatch",
+        "operationId.x-test.crudNullPost",
+        "operationId.x-test.crudNullPut"
+    ].forEach(function (key) {
+        onParallel.counter += 1;
+        local.apiDict[key].ajax({}, onParallel);
+    });
+    onParallel(null, options);
+};
+
+local.testCase_crudRemoveManyByQuery_default = function (options, onError) {
+/*
+ * this function will test crudRemoveManyByQuery's default handling-behavior
+ */
+    options = local.crudOptionsSetDefault(options, {
+        idValue: "testCase_crudRemoveManyByQuery_default"
+    });
+    local.onNext(options, function (error, data) {
+        switch (options.modeNext) {
+        case 1:
+            // ajax - crudSetOneById
+            options.crudSetOneById.ajax({
+                paramDict: {body: {
+                    id: "testCase_crudRemoveManyByQuery_default",
+                    typeBooleanRequired: true
+                }}
+            }, options.onNext);
+            break;
+        case 2:
+            // ajax - crudRemoveManyByQuery
+            options.crudRemoveManyByQuery.ajax({
+                paramDict: {_queryWhere: JSON.stringify(options.queryById)}
+            }, options.onNext);
+            break;
+        case 3:
+            // ajax - crudGetOneById
+            options.crudGetOneById.ajax({
+                paramDict: options.queryById
+            }, options.onNext);
+            break;
+        case 4:
+            // validate data was removed
+            local.assertJsonEqual(data.responseJson.data.length, 1);
+            local.assertThrow(data.responseJson.data[0] === null, data.responseJson);
+            options.onNext();
+            break;
+        default:
+            onError(error, data);
+        }
+    });
+    options.modeNext = 0;
+    options.onNext();
+};
+
+local.testCase_crudRemoveOneById_default = function (options, onError) {
+/*
+ * this function will test crudRemoveOneById's default handling-behavior
+ */
+    options = local.crudOptionsSetDefault(options, {
+        idValue: "testCase_crudRemoveOneById_default"
+    });
+    local.onNext(options, function (error, data) {
+        switch (options.modeNext) {
+        case 1:
+            if (options.idValue === "testCase_crudRemoveOneById_default") {
+                // ajax - crudSetOneById
+                options.crudSetOneById.ajax({
+                    paramDict: {body: {
+                        id: "testCase_crudRemoveOneById_default",
+                        typeBooleanRequired: true
+                    }}
+                }, options.onNext);
                 return;
             }
-            local.testCase_buildReadme_default(options, local.onErrorThrow);
-            local.testCase_buildLib_default(options, local.onErrorThrow);
-            local.testCase_buildTest_default(options, local.onErrorThrow);
-            local.testCase_buildCustomOrg_default(options, local.onErrorThrow);
-            local.buildApp({ assetsList: [{
-                file: '/assets.swagger-ui.logo.medium.png',
-                url: '/assets.swagger-ui.logo.medium.png'
-            }, {
-                file: '/assets.swagger-ui.logo.small.png',
-                url: '/assets.swagger-ui.logo.small.png'
-            }] }, onError);
-        };
-
-        local.testCase_crudCountManyByQuery_default = function (options, onError) {
-        /*
-         * this function will test crudCountManyByQuery's default handling-behavior
-         */
-            options = local.crudOptionsSetDefault(options, {
-                idValue: 'testCase_crudCountManyByQuery_default'
-            });
-            local.onNext(options, function (error, data) {
-                switch (options.modeNext) {
-                case 1:
-                    // ajax - crudCountManyByQuery
-                    options.crudCountManyByQuery.ajax({
-                        paramDict: { _queryWhere: JSON.stringify(options.queryById) }
-                    }, options.onNext);
-                    break;
-                case 2:
-                    // validate data
-                    local.assertJsonEqual(data.responseJson.data.length, 1);
-                    local.assert(data.responseJson.data[0] === 1, data.responseJson);
-                    options.onNext();
-                    break;
-                default:
-                    onError(error, data);
-                }
-            });
-            options.modeNext = 0;
             options.onNext();
-        };
+            break;
+        case 2:
+            // ajax - crudRemoveOneById
+            options.crudRemoveOneById.ajax({
+                paramDict: options.queryById
+            }, options.onNext);
+            break;
+        case 3:
+            // ajax - crudGetOneById
+            options.crudGetOneById.ajax({
+                paramDict: options.queryById
+            }, options.onNext);
+            break;
+        case 4:
+            // validate data was removed
+            local.assertJsonEqual(data.responseJson.data.length, 1);
+            local.assertThrow(data.responseJson.data[0] === null, data.responseJson);
+            options.onNext();
+            break;
+        default:
+            onError(error, data);
+        }
+    });
+    options.modeNext = 0;
+    options.onNext();
+};
 
-        local.testCase_crudCreateReplaceUpdateRemoveMany_default = function (options, onError) {
-        /*
-         * this function will test crudCreateReplaceUpdateRemoveMany's default handling-behavior
-         */
-            var onParallel;
-            onParallel = local.onParallel(onError);
+local.testCase_crudSetManyById_default = function (options, onError) {
+/*
+ * this function will test crudSetManyById's default handling-behavior
+ */
+    var onParallel;
+    options = local.crudOptionsSetDefault(options, {
+        data: [{
+            id: "testCase_crudSetManyById_default_1",
+            typeBooleanRequired: true
+        }, {
+            id: "testCase_crudSetManyById_default_2",
+            typeBooleanRequired: true
+        }]
+    });
+    local.onNext(options, function (error, data) {
+        switch (options.modeNext) {
+        case 1:
+            // ajax - crudSetManyById
+            options.crudSetManyById.ajax({
+                paramDict: {body: options.data}
+            }, options.onNext);
+            break;
+        case 2:
+            onParallel = local.onParallel(options.onNext);
             onParallel.counter += 1;
-            [{
-                _tags0: 'x-test',
-                data: {}
-            }, {
-                _tags0: 'pet',
-                data: { name: 'name', photoUrls: ['photoUrls'] },
-                dataValidateReplace: { name: 'name', status: 'available' },
-                dataValidateUpdate1: { name: 'name', status: 'available' },
-                dataValidateUpdate2: { status: 'pending' }
-            }, {
-                _tags0: 'store',
-                data: { id: 10 },
-                dataValidateReplace: { petId: 10, status: 'placed' },
-                dataValidateUpdate1: { petId: 10, status: 'placed' },
-                dataValidateUpdate2: { status: 'approved' }
-            }, {
-                _tags0: 'user',
-                data: { username: 'testCase_crudCreateReplaceUpdateRemoveMany_default' },
-                dataValidateReplace: { firstName: 'firstName', userStatus: 1 },
-                dataValidateUpdate1: { firstName: 'firstName', userStatus: 1 },
-                dataValidateUpdate2: { userStatus: 2 }
-            }].forEach(function (options) {
+            options.data.forEach(function (element) {
                 onParallel.counter += 1;
-                // test crudCreateReplaceUpdateRemoveOne's default handling-behavior
-                local.testCase_crudCreateReplaceUpdateRemoveOne_default(options, onParallel);
+                // test crudGetOneById's default handling-behavior
+                local.testCase_crudGetOneById_default({
+                    idValue: element.id
+                }, onParallel);
             });
-            onParallel(null, options);
-        };
+            onParallel();
+            break;
+        default:
+            onError(error, data);
+        }
+    });
+    options.modeNext = 0;
+    options.onNext();
+};
 
-        local.testCase_crudCreateReplaceUpdateRemoveOne_default = function (options, onError) {
-        /*
-         * this function will test crudCreateReplaceUpdateRemoveOne's default handling-behavior
-         */
-            options = local.crudOptionsSetDefault(options, { data: {} });
-            local.onNext(options, function (error, data) {
-                switch (options.modeNext) {
-                case 1:
-                    // test crudSetOneById's create handling-behavior
-                    local.testCase_crudSetOneById_default(
-                        options,
-                        options.onNext
-                    );
-                    break;
-                case 2:
-                    // test crudSetOneById's replace handling-behavior
-                    local.testCase_crudSetOneById_default(
-                        options,
-                        options.onNext
-                    );
-                    break;
-                case 3:
-                    // test crudUpdateOneById's default handling-behavior
-                    local.testCase_crudUpdateOneById_default(options, options.onNext);
-                    break;
-                case 4:
-                    // test crudRemoveOneById's default handling-behavior
-                    local.testCase_crudRemoveOneById_default(options, options.onNext);
-                    break;
-                default:
-                    onError(error, data);
-                }
-            });
-            options.modeNext = 0;
-            options.onNext();
-        };
+local.testCase_crudSetOneById_default = function (options, onError) {
+/*
+ * this function will test crudSetOneById's default handling-behavior
+ */
+    var paramDict;
+    options = local.crudOptionsSetDefault(options, {
+        data: {
+            // test dataReadonlyRemove handling-behavior
+            _timeCreated: "1970-01-01T00:00:00.000Z",
+            _timeUpdated: "1970-01-01T00:00:00.000Z",
+            id: "testCase_crudSetOneById_default"
+        },
+        dataValidateReplace: {typeBooleanRequired: true}
+    });
+    local.onNext(options, function (error, data) {
+        switch (options.modeNext) {
+        case 1:
+            // init paramDict
+            paramDict = {};
+            paramDict.body = local.objectSetOverride(
+                local.jsonCopy(options.data),
+                options.dataValidateReplace
+            );
+            // ajax - crudSetOneById
+            options.crudSetOneById.ajax({paramDict: paramDict}, options.onNext);
+            break;
+        case 2:
+            // init id
+            options.data.id = data.responseJson.data[0].id;
+            // validate time _timeCreated
+            local.assertThrow(
+                data.responseJson.data[0]._timeCreated > "1970-01-01T00:00:00.000Z",
+                data.responseJson
+            );
+            local.assertThrow(
+                data.responseJson.data[0]._timeCreated < new Date().toISOString(),
+                data.responseJson
+            );
+            // validate time _timeUpdated
+            local.assertThrow(
+                data.responseJson.data[0]._timeUpdated > "1970-01-01T00:00:00.000Z",
+                data.responseJson
+            );
+            local.assertThrow(
+                data.responseJson.data[0]._timeUpdated < new Date().toISOString(),
+                data.responseJson
+            );
+            // test crudGetOneById's default handling-behavior
+            options.dataValidate = options.dataValidateReplace;
+            local.testCase_crudGetOneById_default(options, options.onNext);
+            break;
+        default:
+            onError(error, data);
+        }
+    });
+    options.modeNext = 0;
+    options.onNext();
+};
 
-        local.testCase_crudErrorXxx_default = function (options, onError) {
-        /*
-         * this function will test crudErrorXxx's default handling-behavior
-         */
-            var onParallel;
-            onParallel = local.onParallel(onError);
-            onParallel.counter += 1;
-            [
-                'operationId.x-test.crudErrorDelete',
-                'operationId.x-test.crudErrorGet',
-                'operationId.x-test.crudErrorHead',
-                'operationId.x-test.crudErrorLogin',
-                'operationId.x-test.crudErrorOptions',
-                'operationId.x-test.crudErrorPatch',
-                'operationId.x-test.crudErrorPost',
-                'operationId.x-test.crudErrorPre',
-                'operationId.x-test.crudErrorPut'
-            ].forEach(function (key) {
-                onParallel.counter += 1;
-                local.apiDict[key].ajax({}, function (error, data) {
-                    // validate error occurred
-                    local.assert(error, error);
-                    // validate statusCode
-                    local.assertJsonEqual(data.statusCode, 500);
-                    onParallel();
-                });
-            });
-            onParallel(null, options);
-        };
-
-        local.testCase_crudGetManyByQuery_default = function (options, onError) {
-        /*
-         * this function will test crudGetManyByQuery's default handling-behavior
-         */
-            options = local.crudOptionsSetDefault(options, {
-                idValue: 'testCase_crudGetManyByQuery_default'
-            });
-            local.onNext(options, function (error, data) {
-                switch (options.modeNext) {
-                case 1:
-                    // ajax - crudGetManyByQuery
-                    options.crudGetManyByQuery.ajax({
-                        paramDict: { _queryWhere: JSON.stringify(options.queryById) }
-                    }, options.onNext);
-                    break;
-                case 2:
-                    // validate data
-                    local.assertJsonEqual(data.responseJson.data.length, 1);
-                    local.assert(
-                        data.responseJson.data[0][options.idBackend] === options.idValue,
-                        data.responseJson
-                    );
-                    options.onNext();
-                    break;
-                default:
-                    onError(error, data);
-                }
-            });
-            options.modeNext = 0;
-            options.onNext();
-        };
-
-        local.testCase_crudGetOneById_default = function (options, onError) {
-        /*
-         * this function will test crudGetOneById's default handling-behavior
-         */
-            options = local.crudOptionsSetDefault(options, {
-                dataValidate: {},
-                idValue: 'testCase_crudGetOneById_default'
-            });
-            local.onNext(options, function (error, data) {
-                switch (options.modeNext) {
-                case 1:
-                    // ajax - crudGetOneById
-                    options.crudGetOneById.ajax({
-                        paramDict: options.queryById
-                    }, options.onNext);
-                    break;
-                case 2:
-                    // validate data
-                    local.assertJsonEqual(data.responseJson.data.length, 1);
-                    local.assert(
-                        data.responseJson.data[0][options.idBackend] === options.idValue,
-                        data.responseJson
-                    );
-                    // validate dataValidate
-                    Object.keys(options.dataValidate).forEach(function (key) {
-                        local.assert(
-                            data.responseJson.data[0][key] === options.dataValidate[key],
-                            [key, data.responseJson.data[0][key], options.dataValidate[key]]
-                        );
-                    });
-                    // cleanup dataValidate
-                    options.dataValidate = {};
-                    options.onNext(null, data);
-                    break;
-                default:
-                    onError(error, data);
-                }
-            });
-            options.modeNext = 0;
-            options.onNext();
-        };
-
-        local.testCase_crudGetOneByQuery_default = function (options, onError) {
-        /*
-         * this function will test crudGetOneByQuery's default handling-behavior
-         */
-            options = local.crudOptionsSetDefault(options, {
-                idValue: 'testCase_crudGetOneByQuery_default'
-            });
-            local.onNext(options, function (error, data) {
-                switch (options.modeNext) {
-                case 1:
-                    // ajax - crudGetOneByQuery
-                    options.crudGetOneByQuery.ajax({
-                        paramDict: { _queryWhere: JSON.stringify(options.queryById) }
-                    }, options.onNext);
-                    break;
-                case 2:
-                    // validate data
-                    local.assertJsonEqual(data.responseJson.data.length, 1);
-                    local.assert(
-                        data.responseJson.data[0][options.idBackend] === options.idValue,
-                        data.responseJson
-                    );
-                    options.onNext();
-                    break;
-                default:
-                    onError(error, data);
-                }
-            });
-            options.modeNext = 0;
-            options.onNext();
-        };
-
-        local.testCase_crudNullXxx_default = function (options, onError) {
-        /*
-         * this function will test crudNullXxx's default handling-behavior
-         */
-            var onParallel;
-            onParallel = local.onParallel(onError);
-            onParallel.counter += 1;
-            [
-                'operationId.x-test.crudNullDelete',
-                'operationId.x-test.crudNullGet',
-                'operationId.x-test.crudNullHead',
-                'operationId.x-test.crudNullOptions',
-                'operationId.x-test.crudNullPatch',
-                'operationId.x-test.crudNullPost',
-                'operationId.x-test.crudNullPut'
-            ].forEach(function (key) {
-                onParallel.counter += 1;
-                local.apiDict[key].ajax({}, onParallel);
-            });
-            onParallel(null, options);
-        };
-
-        local.testCase_crudRemoveManyByQuery_default = function (options, onError) {
-        /*
-         * this function will test crudRemoveManyByQuery's default handling-behavior
-         */
-            options = local.crudOptionsSetDefault(options, {
-                idValue: 'testCase_crudRemoveManyByQuery_default'
-            });
-            local.onNext(options, function (error, data) {
-                switch (options.modeNext) {
-                case 1:
-                    // ajax - crudSetOneById
-                    options.crudSetOneById.ajax({
-                        paramDict: { body: {
-                            id: 'testCase_crudRemoveManyByQuery_default',
-                            typeBooleanRequired: true
-                        } }
-                    }, options.onNext);
-                    break;
-                case 2:
-                    // ajax - crudRemoveManyByQuery
-                    options.crudRemoveManyByQuery.ajax({
-                        paramDict: { _queryWhere: JSON.stringify(options.queryById) }
-                    }, options.onNext);
-                    break;
-                case 3:
-                    // ajax - crudGetOneById
-                    options.crudGetOneById.ajax({
-                        paramDict: options.queryById
-                    }, options.onNext);
-                    break;
-                case 4:
-                    // validate data was removed
-                    local.assertJsonEqual(data.responseJson.data.length, 1);
-                    local.assert(data.responseJson.data[0] === null, data.responseJson);
-                    options.onNext();
-                    break;
-                default:
-                    onError(error, data);
-                }
-            });
-            options.modeNext = 0;
-            options.onNext();
-        };
-
-        local.testCase_crudRemoveOneById_default = function (options, onError) {
-        /*
-         * this function will test crudRemoveOneById's default handling-behavior
-         */
-            options = local.crudOptionsSetDefault(options, {
-                idValue: 'testCase_crudRemoveOneById_default'
-            });
-            local.onNext(options, function (error, data) {
-                switch (options.modeNext) {
-                case 1:
-                    if (options.idValue === 'testCase_crudRemoveOneById_default') {
-                        // ajax - crudSetOneById
-                        options.crudSetOneById.ajax({
-                            paramDict: { body: {
-                                id: 'testCase_crudRemoveOneById_default',
-                                typeBooleanRequired: true
-                            } }
-                        }, options.onNext);
-                        return;
-                    }
-                    options.onNext();
-                    break;
-                case 2:
-                    // ajax - crudRemoveOneById
-                    options.crudRemoveOneById.ajax({
-                        paramDict: options.queryById
-                    }, options.onNext);
-                    break;
-                case 3:
-                    // ajax - crudGetOneById
-                    options.crudGetOneById.ajax({
-                        paramDict: options.queryById
-                    }, options.onNext);
-                    break;
-                case 4:
-                    // validate data was removed
-                    local.assertJsonEqual(data.responseJson.data.length, 1);
-                    local.assert(data.responseJson.data[0] === null, data.responseJson);
-                    options.onNext();
-                    break;
-                default:
-                    onError(error, data);
-                }
-            });
-            options.modeNext = 0;
-            options.onNext();
-        };
-
-        local.testCase_crudSetManyById_default = function (options, onError) {
-        /*
-         * this function will test crudSetManyById's default handling-behavior
-         */
-            var onParallel;
-            options = local.crudOptionsSetDefault(options, {
-                data: [{
-                    id: 'testCase_crudSetManyById_default_1',
-                    typeBooleanRequired: true
-                }, {
-                    id: 'testCase_crudSetManyById_default_2',
-                    typeBooleanRequired: true
-                }]
-            });
-            local.onNext(options, function (error, data) {
-                switch (options.modeNext) {
-                case 1:
-                    // ajax - crudSetManyById
-                    options.crudSetManyById.ajax({
-                        paramDict: { body: options.data }
-                    }, options.onNext);
-                    break;
-                case 2:
-                    onParallel = local.onParallel(options.onNext);
-                    onParallel.counter += 1;
-                    options.data.forEach(function (element) {
-                        onParallel.counter += 1;
-                        // test crudGetOneById's default handling-behavior
-                        local.testCase_crudGetOneById_default({
-                            idValue: element.id
-                        }, onParallel);
-                    });
-                    onParallel();
-                    break;
-                default:
-                    onError(error, data);
-                }
-            });
-            options.modeNext = 0;
-            options.onNext();
-        };
-
-        local.testCase_crudSetOneById_default = function (options, onError) {
-        /*
-         * this function will test crudSetOneById's default handling-behavior
-         */
-            var paramDict;
-            options = local.crudOptionsSetDefault(options, {
-                data: {
-                    // test dataReadonlyRemove handling-behavior
-                    _timeCreated: '1970-01-01T00:00:00.000Z',
-                    _timeUpdated: '1970-01-01T00:00:00.000Z',
-                    id: 'testCase_crudSetOneById_default'
-                },
-                dataValidateReplace: { typeBooleanRequired: true }
-            });
-            local.onNext(options, function (error, data) {
-                switch (options.modeNext) {
-                case 1:
-                    // init paramDict
-                    paramDict = {};
-                    paramDict.body = local.objectSetOverride(
-                        local.jsonCopy(options.data),
-                        options.dataValidateReplace
-                    );
-                    // ajax - crudSetOneById
-                    options.crudSetOneById.ajax({ paramDict: paramDict }, options.onNext);
-                    break;
-                case 2:
-                    // init id
-                    options.data.id = data.responseJson.data[0].id;
-                    // validate time _timeCreated
-                    local.assert(
-                        data.responseJson.data[0]._timeCreated > '1970-01-01T00:00:00.000Z',
-                        data.responseJson
-                    );
-                    local.assert(
-                        data.responseJson.data[0]._timeCreated < new Date().toISOString(),
-                        data.responseJson
-                    );
-                    // validate time _timeUpdated
-                    local.assert(
-                        data.responseJson.data[0]._timeUpdated > '1970-01-01T00:00:00.000Z',
-                        data.responseJson
-                    );
-                    local.assert(
-                        data.responseJson.data[0]._timeUpdated < new Date().toISOString(),
-                        data.responseJson
-                    );
-                    // test crudGetOneById's default handling-behavior
-                    options.dataValidate = options.dataValidateReplace;
-                    local.testCase_crudGetOneById_default(options, options.onNext);
-                    break;
-                default:
-                    onError(error, data);
-                }
-            });
-            options.modeNext = 0;
-            options.onNext();
-        };
-
-        local.testCase_crudUpdateOneById_default = function (options, onError) {
-        /*
-         * this function will test crudUpdateOneById's default handling-behavior
-         */
-            var paramDict;
-            options = local.crudOptionsSetDefault(options, {
-                data: { id: 'testCase_crudUpdateOneById_default' },
-                dataValidateUpdate1: { typeBooleanRequired: true },
-                dataValidateUpdate2: { typeBooleanRequired: false }
-            });
-            local.onNext(options, function (error, data) {
-                switch (options.modeNext) {
-                case 1:
-                    // test crudGetOneById's default handling-behavior
-                    options.dataValidate = options.dataValidateUpdate1;
-                    if (options.data.id === 'testCase_crudUpdateOneById_default') {
-                        // ajax - crudSetOneById
-                        options.crudSetOneById.ajax({
-                            paramDict: { body: {
-                                id: 'testCase_crudUpdateOneById_default',
-                                typeBooleanRequired: true
-                            } }
-                        }, options.onNext);
-                        return;
-                    }
-                    options.onNext();
-                    break;
-                case 2:
-                    local.testCase_crudGetOneById_default(options, options.onNext);
-                    break;
-                case 3:
-                    options._timeCreated = data.responseJson.data[0]._timeCreated;
-                    options._timeUpdated = data.responseJson.data[0]._timeUpdated;
-                    // init paramDict
-                    paramDict = local.jsonCopy(options.queryById);
-                    paramDict.body = local.objectSetOverride(
-                        local.jsonCopy(options.data),
-                        options.dataValidateUpdate2
-                    );
-                    // test application/x-www-form-urlencoded's handling-behavior
-                    local.objectSetOverride(paramDict, paramDict.body);
-                    // ajax - crudUpdateOneById
-                    options.crudUpdateOneById.ajax({
-                        paramDict: paramDict
-                    }, options.onNext);
-                    break;
-                case 4:
-                    // validate time _timeCreated
-                    local.assert(
-                        data.responseJson.data[0]._timeCreated === options._timeCreated,
-                        data.responseJson
-                    );
-                    local.assert(
-                        data.responseJson.data[0]._timeCreated < new Date().toISOString(),
-                        data.responseJson
-                    );
-                    // validate time _timeUpdated
-                    local.assert(
-                        data.responseJson.data[0]._timeUpdated > options._timeUpdated,
-                        data.responseJson
-                    );
-                    local.assert(
-                        data.responseJson.data[0]._timeUpdated < new Date().toISOString(),
-                        data.responseJson
-                    );
-                    // test crudGetOneById's default handling-behavior
-                    options.dataValidate = local.objectSetOverride(
-                        local.jsonCopy(options.dataValidateUpdate1),
-                        options.dataValidateUpdate2
-                    );
-                    local.testCase_crudGetOneById_default(options, options.onNext);
-                    break;
-                default:
-                    onError(error, data);
-                }
-            });
-            options.modeNext = 0;
-            options.onNext();
-        };
-
-        local.testCase_domAnimateShake_default = function (options, onError) {
-        /*
-         * this function will test domAnimateShake's default handling-behavior
-         */
-            if (!local.isBrowser) {
-                onError(null, options);
+local.testCase_crudUpdateOneById_default = function (options, onError) {
+/*
+ * this function will test crudUpdateOneById's default handling-behavior
+ */
+    var paramDict;
+    options = local.crudOptionsSetDefault(options, {
+        data: {id: "testCase_crudUpdateOneById_default"},
+        dataValidateUpdate1: {typeBooleanRequired: true},
+        dataValidateUpdate2: {typeBooleanRequired: false}
+    });
+    local.onNext(options, function (error, data) {
+        switch (options.modeNext) {
+        case 1:
+            // test crudGetOneById's default handling-behavior
+            options.dataValidate = options.dataValidateUpdate1;
+            if (options.data.id === "testCase_crudUpdateOneById_default") {
+                // ajax - crudSetOneById
+                options.crudSetOneById.ajax({
+                    paramDict: {body: {
+                        id: "testCase_crudUpdateOneById_default",
+                        typeBooleanRequired: true
+                    }}
+                }, options.onNext);
                 return;
             }
-            local.uiAnimateShake(document.querySelector('div'));
-            setTimeout(onError, 1500);
-        };
+            options.onNext();
+            break;
+        case 2:
+            local.testCase_crudGetOneById_default(options, options.onNext);
+            break;
+        case 3:
+            options._timeCreated = data.responseJson.data[0]._timeCreated;
+            options._timeUpdated = data.responseJson.data[0]._timeUpdated;
+            // init paramDict
+            paramDict = local.jsonCopy(options.queryById);
+            paramDict.body = local.objectSetOverride(
+                local.jsonCopy(options.data),
+                options.dataValidateUpdate2
+            );
+            // test application/x-www-form-urlencoded's handling-behavior
+            local.objectSetOverride(paramDict, paramDict.body);
+            // ajax - crudUpdateOneById
+            options.crudUpdateOneById.ajax({
+                paramDict: paramDict
+            }, options.onNext);
+            break;
+        case 4:
+            // validate time _timeCreated
+            local.assertThrow(
+                data.responseJson.data[0]._timeCreated === options._timeCreated,
+                data.responseJson
+            );
+            local.assertThrow(
+                data.responseJson.data[0]._timeCreated < new Date().toISOString(),
+                data.responseJson
+            );
+            // validate time _timeUpdated
+            local.assertThrow(
+                data.responseJson.data[0]._timeUpdated > options._timeUpdated,
+                data.responseJson
+            );
+            local.assertThrow(
+                data.responseJson.data[0]._timeUpdated < new Date().toISOString(),
+                data.responseJson
+            );
+            // test crudGetOneById's default handling-behavior
+            options.dataValidate = local.objectSetOverride(
+                local.jsonCopy(options.dataValidateUpdate1),
+                options.dataValidateUpdate2
+            );
+            local.testCase_crudGetOneById_default(options, options.onNext);
+            break;
+        default:
+            onError(error, data);
+        }
+    });
+    options.modeNext = 0;
+    options.onNext();
+};
 
-        local.testCase_fileGetOneById_default = function (options, onError) {
-        /*
-         * this function will test fileGetOneById's default handling-behavior
-         */
-            var modeNext, onNext;
-            modeNext = 0;
-            onNext = function (error, data) {
-                modeNext += 1;
-                switch (modeNext) {
-                case 1:
-                    options = local.crudOptionsSetDefault(options, {
-                        idValue: 'testCase_fileGetOneById_default'
-                    });
-                    // ajax - fileGetOneById
-                    local.apiDict['operationId.file.fileGetOneById.id.id'].ajax({
-                        paramDict: options.queryById
-                    }, onNext);
-                    break;
-                case 2:
-                    // validate no error occurred
-                    local.assert(!error, error);
-                    // validate Content-Type
-                    options.data = data.responseHeaders['content-type'];
-                    local.assertJsonEqual(options.data, 'image/png');
-                    // validate response
-                    options.data = local.base64FromBuffer(data.responseBuffer);
-                    local.assertJsonEqual(options.data, local.templateSwaggerUiLogoSmallBase64);
-                    // test fileGetOneById's 404 handling-behavior
-                    local.apiDict['operationId.file.fileGetOneById.id.id'].ajax({
-                        paramDict: { id: 'testCase_fileGetOneById_default_undefined' }
-                    }, onNext);
-                    break;
-                case 3:
-                    // validate error occurred
-                    local.assert(error, error);
-                    // validate statusCode
-                    local.assertJsonEqual(data.statusCode, 404);
-                    onNext();
-                    break;
-                default:
-                    onError(error, data);
-                }
-            };
+local.testCase_domAnimateShake_default = function (options, onError) {
+/*
+ * this function will test domAnimateShake's default handling-behavior
+ */
+    if (!local.isBrowser) {
+        onError(null, options);
+        return;
+    }
+    local.uiAnimateShake(document.querySelector("div"));
+    setTimeout(onError, 1500);
+};
+
+local.testCase_fileGetOneById_default = function (options, onError) {
+/*
+ * this function will test fileGetOneById's default handling-behavior
+ */
+    var modeNext;
+    var onNext;
+    modeNext = 0;
+    onNext = function (error, data) {
+        modeNext += 1;
+        switch (modeNext) {
+        case 1:
+            options = local.crudOptionsSetDefault(options, {
+                idValue: "testCase_fileGetOneById_default"
+            });
+            // ajax - fileGetOneById
+            local.apiDict["operationId.file.fileGetOneById.id.id"].ajax({
+                paramDict: options.queryById
+            }, onNext);
+            break;
+        case 2:
+            // validate no error occurred
+            local.assertThrow(!error, error);
+            // validate Content-Type
+            options.data = data.responseHeaders["content-type"];
+            local.assertJsonEqual(options.data, "image/png");
+            // validate response
+            options.data = local.base64FromBuffer(data.responseBuffer);
+            local.assertJsonEqual(options.data, local.templateSwaggerUiLogoSmallBase64);
+            // test fileGetOneById's 404 handling-behavior
+            local.apiDict["operationId.file.fileGetOneById.id.id"].ajax({
+                paramDict: {id: "testCase_fileGetOneById_default_undefined"}
+            }, onNext);
+            break;
+        case 3:
+            // validate error occurred
+            local.assertThrow(error, error);
+            // validate statusCode
+            local.assertJsonEqual(data.statusCode, 404);
             onNext();
-        };
+            break;
+        default:
+            onError(error, data);
+        }
+    };
+    onNext();
+};
 
-        local.testCase_fileUploadManyByForm_default = function (options, onError) {
-        /*
-         * this function will test fileUploadManyByForm's default handling-behavior
-         */
-            options = {};
-            local.onNext(options, function (error, data) {
-                switch (options.modeNext) {
-                case 1:
-                    options.blob = new local.Blob(
-                        [local.base64ToBuffer(local.templateSwaggerUiLogoSmallBase64)],
-                        { type: 'image/png' }
-                    );
-                    options.blob.name = 'a00.png';
-                    // ajax - fileUploadManyByForm
-                    local.apiDict['operationId.file.fileUploadManyByForm.2'].ajax({
-                        paramDict: {
-                            fileDescription: 'hello',
-                            file1: options.blob,
-                            file2: options.blob,
-                            file3: options.blob
-                        }
-                    }, options.onNext);
-                    break;
-                case 2:
-                    // validate data
-                    local.assertJsonEqual(data.responseJson.data.length, 2);
-                    local.assertJsonEqual(data.responseJson.data[0].fileDescription, 'hello');
-                    local.crudOptionsSetDefault(options, {
-                        idValue: data.responseJson.data[0].id
-                    });
-                    // test fileGetOneById's default handling-behavior
-                    local.testCase_fileGetOneById_default(options, options.onNext);
-                    break;
-                case 3:
-                    // test crudRemoveOneById's default handling-behavior
-                    local.testCase_crudRemoveOneById_default(options, options.onNext);
-                    break;
-                default:
-                    onError(error);
+local.testCase_fileUploadManyByForm_default = function (options, onError) {
+/*
+ * this function will test fileUploadManyByForm's default handling-behavior
+ */
+    options = {};
+    local.onNext(options, function (error, data) {
+        switch (options.modeNext) {
+        case 1:
+            options.blob = new local.Blob(
+                [local.base64ToBuffer(local.templateSwaggerUiLogoSmallBase64)],
+                {type: "image/png"}
+            );
+            options.blob.name = "a00.png";
+            // ajax - fileUploadManyByForm
+            local.apiDict["operationId.file.fileUploadManyByForm.2"].ajax({
+                paramDict: {
+                    fileDescription: "hello",
+                    file1: options.blob,
+                    file2: options.blob,
+                    file3: options.blob
                 }
+            }, options.onNext);
+            break;
+        case 2:
+            // validate data
+            local.assertJsonEqual(data.responseJson.data.length, 2);
+            local.assertJsonEqual(data.responseJson.data[0].fileDescription, "hello");
+            local.crudOptionsSetDefault(options, {
+                idValue: data.responseJson.data[0].id
             });
-            options.modeNext = 0;
+            // test fileGetOneById's default handling-behavior
+            local.testCase_fileGetOneById_default(options, options.onNext);
+            break;
+        case 3:
+            // test crudRemoveOneById's default handling-behavior
+            local.testCase_crudRemoveOneById_default(options, options.onNext);
+            break;
+        default:
+            onError(error);
+        }
+    });
+    options.modeNext = 0;
+    options.onNext();
+};
+
+local.testCase_fileUploadManyByForm_nullCase = function (options, onError) {
+/*
+ * this function will test fileUploadManyByForm's null-case handling-behavior
+ */
+    options = {};
+    local.onNext(options, function (error, data) {
+        switch (options.modeNext) {
+        case 1:
+            // ajax - fileUploadManyByForm
+            local.apiDict["operationId.file.fileUploadManyByForm.2"].ajax(
+                options,
+                options.onNext
+            );
+            break;
+        case 2:
+            // validate data
+            local.assertJsonEqual(data.responseJson.data.length, 0);
             options.onNext();
-        };
+            break;
+        default:
+            onError(error);
+        }
+    });
+    options.modeNext = 0;
+    options.onNext();
+};
 
-        local.testCase_fileUploadManyByForm_nullCase = function (options, onError) {
-        /*
-         * this function will test fileUploadManyByForm's null-case handling-behavior
-         */
-            options = {};
-            local.onNext(options, function (error, data) {
-                switch (options.modeNext) {
-                case 1:
-                    // ajax - fileUploadManyByForm
-                    local.apiDict['operationId.file.fileUploadManyByForm.2'].ajax(
-                        options,
-                        options.onNext
-                    );
-                    break;
-                case 2:
-                    // validate data
-                    local.assertJsonEqual(data.responseJson.data.length, 0);
-                    options.onNext();
-                    break;
-                default:
-                    onError(error);
-                }
-            });
-            options.modeNext = 0;
+local.testCase_onErrorJsonapi_default = function (options, onError) {
+/*
+ * this function will test onErrorJsonapi's default handling-behavior
+ */
+    var onParallel;
+    onParallel = local.onParallel(onError);
+    onParallel.counter += 1;
+    [
+        "hello",
+        ["hello"],
+        {data: ["hello"], meta: {isJsonapiResponse: true}}
+    ].forEach(function (data) {
+        onParallel.counter += 1;
+        local.apiDict["operationId.x-test.onErrorJsonapi"].ajax({
+            paramDict: {data: JSON.stringify(data)}
+        }, function (error, data) {
+            // validate no error occurred
+            local.assertThrow(!error, error);
+            // validate data
+            local.assertJsonEqual(data.responseJson.data[0], "hello");
+            onParallel();
+        });
+    });
+    onParallel(null, options);
+};
+
+local.testCase_onErrorJsonapi_emptyArray = function (options, onError) {
+/*
+ * this function will test onErrorJsonapi's empty-array handling-behavior
+ */
+    var onParallel;
+    onParallel = local.onParallel(onError);
+    onParallel.counter += 1;
+    onParallel.counter += 1;
+    local.apiDict["operationId.x-test.onErrorJsonapi"].ajax({
+        paramDict: {data: "[]"}
+    }, function (
+        error,
+        data
+    ) {
+        // validate no error occurred
+        local.assertThrow(!error, error);
+        // validate data
+        local.assertJsonEqual(data.responseJson.data[0], undefined);
+        onParallel();
+    });
+    onParallel.counter += 1;
+    local.apiDict["operationId.x-test.onErrorJsonapi"].ajax({
+        paramDict: {error: "[]"}
+    }, function (
+        error,
+        data
+    ) {
+        // validate error occurred
+        local.assertThrow(error, error);
+        // validate error
+        local.assertThrow(data.responseJson.errors[0].message === "null", error);
+        onParallel();
+    });
+    onParallel(null, options);
+};
+
+local.testCase_onErrorJsonapi_error = function (options, onError) {
+/*
+ * this function will test onErrorJsonapi's error handling-behavior
+ */
+    var onParallel;
+    onParallel = local.onParallel(onError);
+    onParallel.counter += 1;
+    [
+        "hello",
+        ["hello"],
+        [{message: "hello"}],
+        {
+            errors: [{message: "hello"}],
+            meta: {isJsonapiResponse: true},
+            statusCode: 500
+        }
+    ].forEach(function (data) {
+        onParallel.counter += 1;
+        local.apiDict["operationId.x-test.onErrorJsonapi"].ajax({
+            paramDict: {error: JSON.stringify(data)}
+        }, function (
+            error,
+            data
+        ) {
+            // validate error occurred
+            local.assertThrow(error, error);
+            // validate error
+            local.assertThrow(data.responseJson.errors[0].message === "hello", error);
+            onParallel();
+        });
+    });
+    onParallel(null, options);
+};
+
+local.testCase_petstoreStoreGetInventory_default = function (options, onError) {
+/*
+ * this function will test petstoreStoreGetInventory's default handling-behavior
+ */
+    options = {};
+    local.onNext(options, function (error, data) {
+        switch (options.modeNext) {
+        case 1:
+            local.apiDict["operationId.getInventory"].ajax(options, options.onNext);
+            break;
+        case 2:
+            // validate data
+            local.assertJsonEqual(data.responseJson.data.length, 1);
+            local.assertThrow(data.responseJson.data[0]);
             options.onNext();
-        };
+            break;
+        default:
+            onError(error);
+        }
+    });
+    options.modeNext = 0;
+    options.onNext();
+};
 
-        local.testCase_onErrorJsonapi_default = function (options, onError) {
-        /*
-         * this function will test onErrorJsonapi's default handling-behavior
-         */
-            var onParallel;
-            onParallel = local.onParallel(onError);
-            onParallel.counter += 1;
-            [
-                'hello',
-                ['hello'],
-                { data: ['hello'], meta: { isJsonapiResponse: true } }
-            ].forEach(function (data) {
-                onParallel.counter += 1;
-                local.apiDict['operationId.x-test.onErrorJsonapi'].ajax({
-                    paramDict: { data: JSON.stringify(data) }
-                }, function (error, data) {
-                    // validate no error occurred
-                    local.assert(!error, error);
-                    // validate data
-                    local.assertJsonEqual(data.responseJson.data[0], 'hello');
-                    onParallel();
-                });
-            });
-            onParallel(null, options);
-        };
-
-        local.testCase_onErrorJsonapi_emptyArray = function (options, onError) {
-        /*
-         * this function will test onErrorJsonapi's empty-array handling-behavior
-         */
-            var onParallel;
-            onParallel = local.onParallel(onError);
-            onParallel.counter += 1;
-            onParallel.counter += 1;
-            local.apiDict['operationId.x-test.onErrorJsonapi'].ajax({
-                paramDict: { data: '[]' }
-            }, function (
-                error,
-                data
-            ) {
-                // validate no error occurred
-                local.assert(!error, error);
-                // validate data
-                local.assertJsonEqual(data.responseJson.data[0], undefined);
-                onParallel();
-            });
-            onParallel.counter += 1;
-            local.apiDict['operationId.x-test.onErrorJsonapi'].ajax({
-                paramDict: { error: '[]' }
-            }, function (
-                error,
-                data
-            ) {
-                // validate error occurred
-                local.assert(error, error);
-                // validate error
-                local.assert(data.responseJson.errors[0].message === 'null', error);
-                onParallel();
-            });
-            onParallel(null, options);
-        };
-
-        local.testCase_onErrorJsonapi_error = function (options, onError) {
-        /*
-         * this function will test onErrorJsonapi's error handling-behavior
-         */
-            var onParallel;
-            onParallel = local.onParallel(onError);
-            onParallel.counter += 1;
-            [
-                'hello',
-                ['hello'],
-                [{ message: 'hello' }],
-                {
-                    errors: [{ message: 'hello' }],
-                    meta: { isJsonapiResponse: true },
-                    statusCode: 500
-                }
-            ].forEach(function (data) {
-                onParallel.counter += 1;
-                local.apiDict['operationId.x-test.onErrorJsonapi'].ajax({
-                    paramDict: { error: JSON.stringify(data) }
-                }, function (
-                    error,
-                    data
-                ) {
-                    // validate error occurred
-                    local.assert(error, error);
-                    // validate error
-                    local.assert(data.responseJson.errors[0].message === 'hello', error);
-                    onParallel();
-                });
-            });
-            onParallel(null, options);
-        };
-
-        local.testCase_petstoreStoreGetInventory_default = function (options, onError) {
-        /*
-         * this function will test petstoreStoreGetInventory's default handling-behavior
-         */
-            options = {};
-            local.onNext(options, function (error, data) {
-                switch (options.modeNext) {
-                case 1:
-                    local.apiDict['operationId.getInventory'].ajax(options, options.onNext);
-                    break;
-                case 2:
-                    // validate data
-                    local.assertJsonEqual(data.responseJson.data.length, 1);
-                    local.assert(data.responseJson.data[0]);
-                    options.onNext();
-                    break;
-                default:
-                    onError(error);
-                }
-            });
-            options.modeNext = 0;
-            options.onNext();
-        };
-
-        local.testCase_swaggerJsonFromCurl_default = function (options, onError) {
-        /*
-         * this function will test swaggerJsonFromCurl's default handling-behavior
-         */
-            options = local.swaggerJsonFromCurl(
-/* jslint-ignore-begin */
-                null,
+local.testCase_swaggerJsonFromCurl_default = function (options, onError) {
+/*
+ * this function will test swaggerJsonFromCurl's default handling-behavior
+ */
+    options = local.swaggerJsonFromCurl(
+/* jslint ignore:start */
+null,
 '\
 # test no-data handling-behavior\n\
 curl https://example.com\n\
@@ -1169,811 +1245,820 @@ curl /undefined\n\
     },
     "swagger": "2.0"
 }
-/* jslint-ignore-end */
-            );
-            onError(null, options);
-        };
+/* jslint ignore:end */
+    );
+    onError(null, options);
+};
 
-        local.testCase_swaggerValidateDataParameters_default = function (options, onError) {
-        /*
-         * this function will test swaggerValidateDataParameters's default handling-behavior
-         */
-            var onParallel;
-            onParallel = local.onParallel(onError);
-            onParallel.counter += 1;
-            Object.keys(local.apiDict).forEach(function (key) {
-                if (key.indexOf('operationId.x-test.parameters') < 0) {
-                    return;
-                }
-                // test null-case handling-behavior
-                onParallel.counter += 1;
-                local.apiDict[key].ajax({}, function (error, data) {
-                    // validate no error occurred
-                    local.assert(!error, data);
-                    onParallel(null, options);
-                });
-                onParallel.counter += 1;
-                local.apiDict[key].ajax({ modeDefault: true }, function (error, data) {
-                    // validate no error occurred
-                    local.assert(!error, [error, key]);
-                    // validate data
-                    data = data.paramDict;
-                    local.assert(data, [data, key]);
-                    onParallel(null, options);
-                });
-            });
+local.testCase_swaggerValidateDataParameters_default = function (options, onError) {
+/*
+ * this function will test swaggerValidateDataParameters's default handling-behavior
+ */
+    var onParallel;
+    onParallel = local.onParallel(onError);
+    onParallel.counter += 1;
+    Object.keys(local.apiDict).forEach(function (key) {
+        if (key.indexOf("operationId.x-test.parameters") < 0) {
+            return;
+        }
+        // test null-case handling-behavior
+        onParallel.counter += 1;
+        local.apiDict[key].ajax({}, function (error, data) {
+            // validate no error occurred
+            local.assertThrow(!error, data);
             onParallel(null, options);
-        };
-
-        local.testCase_swaggerValidateDataParameters_error = function (options, onError) {
-        /*
-         * this function will test swaggerValidateDataParameters's error handling-behavior
-         */
-            var onParallel;
-            onParallel = local.onParallel(onError);
-            onParallel.counter += 1;
-            [
-                // 5.1. Validation keywords for numeric instances (number and integer)
-                // 5.1.1. multipleOf
-                { typeInteger1: 1, 'x-errorType': 'numberMultipleOf' },
-                // 5.1.2. maximum and exclusiveMaximum - maximum
-                { typeInteger1: 10, 'x-errorType': 'numberMaximum' },
-                // 5.1.2. maximum and exclusiveMaximum - exclusiveMaximum
-                { typeInteger2: 10, 'x-errorType': 'numberExclusiveMaximum' },
-                // 5.1.3. minimum and exclusiveMinimum - minimum
-                { typeInteger1: -10, 'x-errorType': 'numberMinimum' },
-                // 5.1.3. minimum and exclusiveMinimum - exclusiveMinimum
-                { typeInteger2: -10, 'x-errorType': 'numberExclusiveMinimum' },
-                // 5.2. Validation keywords for strings
-                // 5.2.1. maxLength
-                { typeString1: '01234567890123456789', 'x-errorType': 'stringMaxLength' },
-                // 5.2.2. minLength
-                { typeString1: '', 'x-errorType': 'stringMinLength' },
-                // 5.2.3. pattern
-                { typeString1: '0123456789012345~', 'x-errorType': 'stringPattern' },
-                // 5.3. Validation keywords for arrays
-                // 5.3.2. maxItems
-                {
-                    typeArrayItemsNumber2: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                    'x-errorType': 'arrayMaxItems'
-                },
-                // 5.3.2. minItems
-                { typeArrayItemsNumber2: [], 'x-errorType': 'arrayMinItems' },
-                // 5.3.4. uniqueItems
-                { typeArrayItemsNumber2: [0, 0], 'x-errorType': 'arrayUniqueItems' },
-                // 5.5. Validation keywords for any instance type
-                // 5.5.1. enum
-                { typeNumberEnum: 0, 'x-errorType': 'itemEnum' },
-                // 5.5.2. type - string
-                { typeString0: true, 'x-errorType': 'itemType' },
-                // 5.5.2. type - byte
-                { typeStringFormatByte: '~', 'x-errorType': 'itemType' }
-                // 5.5.3. allOf
-                // 5.5.4. anyOf
-                // 5.5.5. oneOf
-                // testCase_swaggerValidate_default
-                // 5.5.6. not
-                // testCase_swaggerValidate_default
-                // 5.5.7. definitions
-            ].forEach(function (paramDict, ii) {
-                onParallel.counter += 1;
-                local.apiDict['operationId.x-test.parametersDefault'].ajax({
-                    paramDict: local.jsonCopy(paramDict)
-                }, function (error) {
-                    // validate error occurred
-                    local.assert(error, JSON.stringify(paramDict));
-                    // validate statusCode
-                    local.assertJsonEqual(error.statusCode, 400);
-                    // validate x-errorType
-                    local.assertJsonEqual(paramDict['x-errorType'], error.options.errorType);
-                    // debug error.message
-                    console.error('swaggerValidateDataParameters - ' + ii + ' - ' + error.message);
-                    onParallel(null, options);
-                });
-            });
-            [
-                // 5.4. Validation keywords for objects
-                // 5.4.1. maxProperties
-                { typeObjectInBody: {
-                    typeBooleanRequired: true,
-                    typeObjectMisc: { aa: 1, bb: 2, cc: 3, dd: 4, de: 5, ff: 6 }
-                }, 'x-errorType': 'objectMaxProperties' },
-                // 5.4.2. minProperties
-                { typeObjectInBody: {
-                    typeBooleanRequired: true,
-                    typeObjectMisc: {}
-                }, 'x-errorType': 'objectMinProperties' },
-                // 5.4.3. required
-                { typeObjectInBody: {}, 'x-errorType': 'semanticItemsRequiredForArrayObjects2' }
-                // 5.4.4. additionalProperties, properties and patternProperties
-                // testCase_swaggerValidate_default
-                // 5.4.5. dependencies
-                // testCase_swaggerValidate_default
-            ].forEach(function (paramDict, ii) {
-                onParallel.counter += 1;
-                local.apiDict['operationId.x-test.parametersObjectInBody'].ajax({
-                    paramDict: local.jsonCopy(paramDict)
-                }, function (error) {
-                    // validate error occurred
-                    local.assert(error, JSON.stringify(paramDict));
-                    // validate statusCode
-                    local.assertJsonEqual(error.statusCode, 400);
-                    // validate x-errorType
-                    local.assertJsonEqual(paramDict['x-errorType'], error.options.errorType);
-                    // debug error.message
-                    console.error(ii, error.message);
-                    onParallel(null, options);
-                });
-            });
+        });
+        onParallel.counter += 1;
+        local.apiDict[key].ajax({modeDefault: true}, function (error, data) {
+            // validate no error occurred
+            local.assertThrow(!error, [error, key]);
+            // validate data
+            data = data.paramDict;
+            local.assertThrow(data, [data, key]);
             onParallel(null, options);
-        };
+        });
+    });
+    onParallel(null, options);
+};
 
-        local.testCase_swaggerValidateFile_default = function (options, onError) {
-        /*
-         * this function will test swaggerValidate's file handling-behavior
-         */
-            if (local.isBrowser) {
-                onError(null, options);
-                return;
-            }
-            local.onParallelList({ list: [{
-                // test data handling-behavior
-                data: local.assetsDict['/assets.swgg.swagger.petstore.json'],
-                file: 'assets.swgg.swagger.petstore.json'
-            }, {
-                // test error handling-behavior
-                data: '{}',
-                file: 'error.json'
-            }, {
-                // test file handling-behavior
-                file: 'assets.swgg.swagger.petstore.json'
-            }, {
-                // test url handling-behavior
-                file: local.serverLocalHost + '/assets.swgg.swagger.petstore.json'
-            }] }, function (options2, onParallel) {
-                onParallel.counter += 1;
-                local.swgg.swaggerValidateFile(options2.element, function (error) {
-                    // validate no error occurred
-                    local.assert(!error || options2.element.file === 'error.json', error);
-                    onParallel(null, options);
-                });
-            }, onError);
-        };
-
-        local.testCase_swaggerValidate_default = function (options, onError) {
-        /*
-         * this function will test swaggerValidate's default handling-behavior
-         */
-            var error;
-            // test default handling-behavior
-            local.swaggerValidate({
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { responses: { 200: { description: '' } } } } },
-                swagger: '2.0'
-            });
-            // test path handling-behavior
-            local.swaggerValidate({
-                info: { title: '', version: '' },
-                parameters: { aa: {
-                    in: 'path',
-                    name: 'aa',
-                    required: true,
-                    type: 'string'
-                } },
-                paths: { '/{aa}': { get: {
-                    parameters: [{ $ref: '#/parameters/aa' }],
-                    responses: { 200: { description: '' } }
-                } } },
-                swagger: '2.0'
-            });
-            // test error handling-behavior
-            // 5.4. Validation keywords for objects
-            // 5.5. Validation keywords for any instance type
-            [null, undefined, {}, {
-                // 5.4.4. additionalProperties, properties and patternProperties
-                aa: true,
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'objectAdditionalProperties'
-            }, {
-                // 5.4.5. dependencies
-                exclusiveMaximum: true,
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'objectDependencies'
-            }, {
-                // 5.5.5. oneOf
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { responses: { 200: { description: '' } } } } },
-                securityDefinitions: { aa: true },
-                swagger: '2.0',
-                'x-errorType': 'itemOneOf'
-            }, {
-                // 5.5.6. not
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { responses: { 'x-': true } } } },
-                swagger: '2.0',
-                'x-errorType': 'itemNot'
-            }, {
-                // validate schemaDereference
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { responses: { 200: { $ref: '#/undefined' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'schemaDereference'
-            }, {
-                // validate schemaDereferenceCircular
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { responses: { 200: { $ref: '#/x-test/aa' } } } } },
-                'x-test': { aa: { $ref: '#/x-test/aa' } },
-                swagger: '2.0',
-                'x-errorType': 'schemaDereferenceCircular'
-            }, {
-                // validate semanticFormData1
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{
-                    in: 'formdata'
-                }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticFormData1'
-            }, {
-                // validate semanticFormData2
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{
-                    in: 'body',
-                    name: 'aa',
-                    schema: { type: 'string' }
-                }, {
-                    in: 'formData',
-                    type: 'string'
-                }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                // 'x-errorType': 'semanticFormData2'
-                'x-errorType': 'semanticOperations1'
-            }, {
-                // validate semanticFormData3
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{
-                    in: 'query',
-                    type: 'file'
-                }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticFormData3'
-            }, {
-                // validate semanticFormData4
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{
-                    in: 'formData',
-                    type: 'file'
-                }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticFormData4'
-            }, {
-                // validate semanticFormData5
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{
-                    in: 'formData',
-                    type: 'string'
-                }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticFormData5'
-            }, {
-                // validate semanticItemsRequiredForArrayObjects1
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{
-                    type: 'array'
-                }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticItemsRequiredForArrayObjects1'
-            }, {
-                // validate semanticItemsRequiredForArrayObjects2
-                'x-errorType': 'semanticItemsRequiredForArrayObjects2'
-            }, {
-                // validate semanticItemsRequiredForArrayObjects3
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
-                    type: 'array'
-                } }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                // 'x-errorType': 'semanticItemsRequiredForArrayObjects3'
-                'x-errorType': 'semanticItemsRequiredForArrayObjects1'
-            }, {
-                // validate semanticItemsRequiredForArrayObjects4
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{
-                    in: 'header',
-                    type: 'array'
-                }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                // 'x-errorType': 'semanticItemsRequiredForArrayObjects4'
-                'x-errorType': 'semanticItemsRequiredForArrayObjects1'
-            }, {
-                // validate semanticOperationIds1
-                info: { title: '', version: '' },
-                paths: {
-                    '/aa': { get: { operationId: 'aa', responses: { 200: { description: '' } } } },
-                    '/bb': { get: { operationId: 'aa', responses: { 200: { description: '' } } } }
-                },
-                swagger: '2.0',
-                'x-errorType': 'semanticOperationIds1'
-            }, {
-                // validate semanticOperations1
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{
-                    in: 'body',
-                    name: 'aa',
-                    schema: { type: 'string' }
-                }, {
-                    in: 'formData',
-                    type: 'string'
-                }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticOperations1'
-            }, {
-                // validate semanticOperations2
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{
-                    in: 'body',
-                    name: 'aa',
-                    schema: { type: 'string' }
-                }, {
-                    in: 'body',
-                    name: 'bb',
-                    schema: { type: 'string' }
-                }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticOperations2'
-            }, {
-                // validate semanticOperations3
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{
-                    in: 'query',
-                    name: 'aa',
-                    type: 'string'
-                }, {
-                    in: 'query',
-                    name: 'aa',
-                    type: 'string'
-                }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticOperations3'
-            }, {
-                // validate semanticParameters1
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{
-                    type: 'array'
-                }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                // 'x-errorType': 'semanticParameters1'
-                'x-errorType': 'semanticItemsRequiredForArrayObjects1'
-            }, {
-                // validate semanticParameters2
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{
-                    in: 'query'
-                }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticParameters2'
-            }, {
-                // validate semanticPaths1
-                info: { title: '', version: '' },
-                paths: { '/aa?': { get: { responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticPaths1'
-            }, {
-                // validate semanticPaths2
-                info: { title: '', version: '' },
-                paths: {
-                    '/{aa}': { get: { responses: { 200: { description: '' } } } },
-                    '/{bb}': { get: { responses: { 200: { description: '' } } } }
-                },
-                swagger: '2.0',
-                'x-errorType': 'semanticPaths2'
-            }, {
-                // validate semanticPaths3
-                info: { title: '', version: '' },
-                paths: { '/{aa}/{aa}': { get: { parameters: [{
-                    in: 'path',
-                    name: 'aa',
-                    required: true,
-                    type: 'string'
-                }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticPaths3'
-            // }, {
-                // validate semanticPaths4
-                // 'x-errorType': 'semanticPaths4'
-            }, {
-                // validate semanticPaths5
-                info: { title: '', version: '' },
-                paths: { '/{}': { get: { responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticPaths5'
-            }, {
-                // validate semanticPaths6
-                info: { title: '', version: '' },
-                paths: { '/{aa}': { get: { responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticPaths6'
-            }, {
-                // validate semanticPaths7
-                info: { title: '', version: '' },
-                paths: { '/': { get: { parameters: [{
-                    in: 'path',
-                    name: 'aa',
-                    required: true,
-                    type: 'string'
-                }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticPaths7'
-            // }, {
-                // validate semanticRefs1
-                // 'x-errorType': 'semanticRefs1'
-            }, {
-                // validate semanticSchema1
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
-                    required: ['aa'],
-                    properties: { aa: { readOnly: true } }
-                } }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticSchema1'
-            // }, {
-                // validate semanticSecurityDefinitions1
-                // 'x-errorType': 'semanticSecurityDefinitions1'
-            // }, {
-                // validate semanticSecurityDefinitions2
-                // 'x-errorType': 'semanticSecurityDefinitions2'
-            // }, {
-                // validate semanticSecurityDefinitions3
-                // 'x-errorType': 'semanticSecurityDefinitions3'
-            // }, {
-                // validate semanticSecurityDefinitions4
-                // 'x-errorType': 'semanticSecurityDefinitions4'
-            // }, {
-                // validate semanticSecurityDefinitions5
-                // 'x-errorType': 'semanticSecurityDefinitions5'
-            // }, {
-                // validate semanticSecurityDefinitions6
-                // 'x-errorType': 'semanticSecurityDefinitions6'
-            // }, {
-                // validate semanticSecurityDefinitions7
-                // 'x-errorType': 'semanticSecurityDefinitions7'
-            // }, {
-                // validate semanticSecurityDefinitions8
-                // 'x-errorType': 'semanticSecurityDefinitions8'
-            // }, {
-                // validate semanticSecurityDefinitions9
-                // 'x-errorType': 'semanticSecurityDefinitions9'
-            // }, {
-                // validate semanticSecurity1
-                // 'x-errorType': 'semanticSecurity1'
-            // }, {
-                // validate semanticSecurity2
-                // 'x-errorType': 'semanticSecurity2'
-            }, {
-                // validate semanticWalker1
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
-                    type: 1
-                } }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticWalker1'
-            }, {
-                // validate semanticWalker2
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
-                    maximum: 0,
-                    minimum: 1,
-                    type: 'number'
-                } }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticWalker2'
-            }, {
-                // validate semanticWalker3
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
-                    maxProperties: 0,
-                    minProperties: 1,
-                    type: 'object'
-                } }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticWalker3'
-            }, {
-                // validate semanticWalker4
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { parameters: [{ in: 'body', name: 'aa', schema: {
-                    maxLength: 0,
-                    minLength: 1,
-                    type: 'object'
-                } }], responses: { 200: { description: '' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticWalker4'
-            // }, {
-                // validate semanticWalker5
-                // 'x-errorType': 'semanticWalker5'
-            }, {
-                // validate semanticWalker6
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { responses: { 200: { $ref: 'aa' } } } } },
-                swagger: '2.0',
-                'x-errorType': 'semanticWalker6'
-            }, {
-                // validate semanticWalker7
-                info: { title: '', version: '' },
-                paths: { '/aa': { get: { responses: { 200: { $ref: '#/aa', aa: true } } } } },
-                swagger: '2.0',
-                // 'x-errorType': 'semanticWalker7'
-                'x-errorType': 'objectAdditionalProperties'
-            }].forEach(function (element, ii) {
-                local.tryCatchOnError(function () {
-                    local.swaggerValidate(element);
-                }, local.nop);
-                error = local.utility2._debugTryCatchError;
-                // validate error occurred
-                local.assert(error, element);
-                // validate x-errorType
-                if (element && element['x-errorType']) {
-                    local.assertJsonEqual(element['x-errorType'], error.options.errorType, error);
-                }
-                console.error('swaggerValidate - ' + ii + ' - ' + error.message);
-            });
-            onError(null, options);
-        };
-
-        local.testCase_ui_apiKey = function (options, onError) {
-        /*
-         * this function will test ui's apiKey handling-behavior
-         */
-            if (!local.isBrowser) {
-                onError(null, options);
-                return;
-            }
-            localStorage.setItem('utility2_swgg_apiKeyKey_', '');
-            local.uiEventListenerDict['.onEventUiReload']({
-                swggInit: true,
-                targetOnEvent: { id: 'swggApiKeyInput1' },
-                type: 'keyup'
-            });
-            onError(null, options);
-        };
-
-        local.testCase_ui_click = function (options, onError) {
-        /*
-         * this function will test ui's click handling-behavior
-         */
-            var onParallel;
-            if (!local.isBrowser) {
-                onError(null, options);
-                return;
-            }
-            onParallel = local.onParallel(function (error) {
-                setTimeout(function () {
-                    // reset location.hash
-                    document.querySelector('#swgg_id_pet_1 .td1').click();
-                    onError(error);
-                }, 1000);
-            });
-            onParallel.counter += 1;
-            options = {};
-            // test click handling-behavior
-            Object.keys(local.uiEventListenerDict).sort().forEach(function (selector) {
-                if (selector === '.onEventDomDb') {
-                    return;
-                }
-                Array.from(document.querySelectorAll(selector)).forEach(function (
-                    element,
-                    ii,
-                    list
-                ) {
-                    onParallel.counter += 1;
-                    setTimeout(function () {
-                        element.click();
-                        // test duplicate-click handling-behavior
-                        if (ii < 10) {
-                            element.click();
-                        }
-                        onParallel();
-                    }, ii * 1000 / list.length);
-                });
-            });
-            // test empty-input handling-behavior
-            options.element = document.querySelector('#swgg_id_typeNumber0_1 .input');
-            options.element.value = '';
-            options.element.closest('.operation').querySelector('.onEventOperationAjax').click();
-            // test onEventOperationAjax's error handling-behavior
-            options.element.value = 'syntax error';
-            options.element.closest('.operation').querySelector('.onEventOperationAjax').click();
-            // test onEventInputTextareaChange's empty-value handling-behavior
-            options.element = document.querySelector('.schemaP textarea');
-            options.element.value = '';
-            local.uiEventListenerDict['.onEventInputTextareaChange']({
-                targetOnEvent: options.element
-            });
-            options.element.closest('.operation').querySelector('.onEventOperationAjax').click();
-            // test onEventInputTextareaChange's non-empty-value handling-behavior
-            options.element.value = '{}';
-            local.uiEventListenerDict['.onEventInputTextareaChange']({
-                targetOnEvent: options.element
-            });
-            options.element.closest('.operation').querySelector('.onEventOperationAjax').click();
+local.testCase_swaggerValidateDataParameters_error = function (options, onError) {
+/*
+ * this function will test swaggerValidateDataParameters's error handling-behavior
+ */
+    var onParallel;
+    onParallel = local.onParallel(onError);
+    onParallel.counter += 1;
+    [
+        // 5.1. Validation keywords for numeric instances (number and integer)
+        // 5.1.1. multipleOf
+        {typeInteger1: 1, "x-errorType": "numberMultipleOf"},
+        // 5.1.2. maximum and exclusiveMaximum - maximum
+        {typeInteger1: 10, "x-errorType": "numberMaximum"},
+        // 5.1.2. maximum and exclusiveMaximum - exclusiveMaximum
+        {typeInteger2: 10, "x-errorType": "numberExclusiveMaximum"},
+        // 5.1.3. minimum and exclusiveMinimum - minimum
+        {typeInteger1: -10, "x-errorType": "numberMinimum"},
+        // 5.1.3. minimum and exclusiveMinimum - exclusiveMinimum
+        {typeInteger2: -10, "x-errorType": "numberExclusiveMinimum"},
+        // 5.2. Validation keywords for strings
+        // 5.2.1. maxLength
+        {typeString1: "01234567890123456789", "x-errorType": "stringMaxLength"},
+        // 5.2.2. minLength
+        {typeString1: "", "x-errorType": "stringMinLength"},
+        // 5.2.3. pattern
+        {typeString1: "0123456789012345~", "x-errorType": "stringPattern"},
+        // 5.3. Validation keywords for arrays
+        // 5.3.2. maxItems
+        {
+            typeArrayItemsNumber2: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "x-errorType": "arrayMaxItems"
+        },
+        // 5.3.2. minItems
+        {typeArrayItemsNumber2: [], "x-errorType": "arrayMinItems"},
+        // 5.3.4. uniqueItems
+        {typeArrayItemsNumber2: [0, 0], "x-errorType": "arrayUniqueItems"},
+        // 5.5. Validation keywords for any instance type
+        // 5.5.1. enum
+        {typeNumberEnum: 0, "x-errorType": "itemEnum"},
+        // 5.5.2. type - string
+        {typeString0: true, "x-errorType": "itemType"},
+        // 5.5.2. type - byte
+        {typeStringFormatByte: "~", "x-errorType": "itemType"}
+    // 5.5.3. allOf
+    // 5.5.4. anyOf
+    // 5.5.5. oneOf
+    // testCase_swaggerValidate_default
+    // 5.5.6. not
+    // testCase_swaggerValidate_default
+    // 5.5.7. definitions
+    ].forEach(function (paramDict, ii) {
+        onParallel.counter += 1;
+        local.apiDict["operationId.x-test.parametersDefault"].ajax({
+            paramDict: local.jsonCopy(paramDict)
+        }, function (error) {
+            // validate error occurred
+            local.assertThrow(error, JSON.stringify(paramDict));
+            // validate statusCode
+            local.assertJsonEqual(error.statusCode, 400);
+            // validate x-errorType
+            local.assertJsonEqual(paramDict["x-errorType"], error.options.errorType);
+            // debug error.message
+            console.error("swaggerValidateDataParameters - " + ii + " - " + error.message);
             onParallel(null, options);
-        };
+        });
+    });
+    [
+        // 5.4. Validation keywords for objects
+        // 5.4.1. maxProperties
+        {typeObjectInBody: {
+            typeBooleanRequired: true,
+            typeObjectMisc: {aa: 1, bb: 2, cc: 3, dd: 4, de: 5, ff: 6}
+        }, "x-errorType": "objectMaxProperties"},
+        // 5.4.2. minProperties
+        {typeObjectInBody: {
+            typeBooleanRequired: true,
+            typeObjectMisc: {}
+        }, "x-errorType": "objectMinProperties"},
+        // 5.4.3. required
+        {typeObjectInBody: {}, "x-errorType": "semanticItemsRequiredForArrayObjects2"}
+    // 5.4.4. additionalProperties, properties and patternProperties
+    // testCase_swaggerValidate_default
+    // 5.4.5. dependencies
+    // testCase_swaggerValidate_default
+    ].forEach(function (paramDict, ii) {
+        onParallel.counter += 1;
+        local.apiDict["operationId.x-test.parametersObjectInBody"].ajax({
+            paramDict: local.jsonCopy(paramDict)
+        }, function (error) {
+            // validate error occurred
+            local.assertThrow(error, JSON.stringify(paramDict));
+            // validate statusCode
+            local.assertJsonEqual(error.statusCode, 400);
+            // validate x-errorType
+            local.assertJsonEqual(paramDict["x-errorType"], error.options.errorType);
+            // debug error.message
+            console.error(ii, error.message);
+            onParallel(null, options);
+        });
+    });
+    onParallel(null, options);
+};
 
-        local.testCase_ui_fileMedia = function (options, onError) {
-        /*
-         * this function will test ui's fileMedia handling-behavior
-         */
-            if (!local.isBrowser) {
-                onError(null, options);
-                return;
-            }
-            [
-                'testCase_ui_fileMedia_audioNull',
-                'testCase_ui_fileMedia_imageNull',
-                'testCase_ui_fileMedia_videoNull'
-            ].forEach(function (id) {
-                document.querySelector('#swgg_id_file_fileGetOneById_id_id_1 .input').value = id;
-                document.querySelector(
-                    '#swgg_id_file_fileGetOneById_id_id_1 .onEventOperationAjax'
-                ).click();
-            });
-            onError(null, options);
-        };
+local.testCase_swaggerValidateFile_default = function (options, onError) {
+/*
+ * this function will test swaggerValidate's file handling-behavior
+ */
+    if (local.isBrowser) {
+        onError(null, options);
+        return;
+    }
+    local.onParallelList({list: [{
+        // test data handling-behavior
+        data: local.assetsDict["/assets.swgg.swagger.petstore.json"],
+        file: "assets.swgg.swagger.petstore.json"
+    }, {
+        // test error handling-behavior
+        data: "{}",
+        file: "error.json"
+    }, {
+        // test file handling-behavior
+        file: "assets.swgg.swagger.petstore.json"
+    }, {
+        // test url handling-behavior
+        file: local.serverLocalHost + "/assets.swgg.swagger.petstore.json"
+    }]}, function (options2, onParallel) {
+        onParallel.counter += 1;
+        local.swgg.swaggerValidateFile(options2.element, function (error) {
+            // validate no error occurred
+            local.assertThrow(!error || options2.element.file === "error.json", error);
+            onParallel(null, options);
+        });
+    }, onError);
+};
 
-        local.testCase_ui_keyup = function (options, onError) {
-        /*
-         * this function will test ui's keyup handling-behavior
-         */
-            if (!local.isBrowser) {
-                onError(null, options);
-                return;
-            }
-            local.uiEventDelegate({ target: document.querySelector('.onEvent'), type: 'keyup' });
-            onError(null, options);
-        };
+local.testCase_swaggerValidate_default = function (options, onError) {
+/*
+ * this function will test swaggerValidate's default handling-behavior
+ */
+    var error;
+    // test default handling-behavior
+    local.swaggerValidate({
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {responses: {"200": {description: ""}}}}},
+        swagger: "2.0"
+    });
+    // test path handling-behavior
+    local.swaggerValidate({
+        info: {title: "", version: ""},
+        parameters: {aa: {
+            in: "path",
+            name: "aa",
+            required: true,
+            type: "string"
+        }},
+        paths: {"/{aa}": {get: {
+            parameters: [{$ref: "#/parameters/aa"}],
+            responses: {"200": {description: ""}}
+        }}},
+        swagger: "2.0"
+    });
+    // test error handling-behavior
+    // 5.4. Validation keywords for objects
+    // 5.5. Validation keywords for any instance type
+    [null, undefined, {}, {
+        // 5.4.4. additionalProperties, properties and patternProperties
+        aa: true,
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "objectAdditionalProperties"
+    }, {
+        // 5.4.5. dependencies
+        exclusiveMaximum: true,
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "objectDependencies"
+    }, {
+        // 5.5.5. oneOf
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {responses: {"200": {description: ""}}}}},
+        securityDefinitions: {aa: true},
+        swagger: "2.0",
+        "x-errorType": "itemOneOf"
+    }, {
+        // 5.5.6. not
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {responses: {"x-": true}}}},
+        swagger: "2.0",
+        "x-errorType": "itemNot"
+    }, {
+        // validate schemaDereference
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {responses: {"200": {$ref: "#/undefined"}}}}},
+        swagger: "2.0",
+        "x-errorType": "schemaDereference"
+    }, {
+        // validate schemaDereferenceCircular
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {responses: {"200": {$ref: "#/x-test/aa"}}}}},
+        "x-test": {aa: {$ref: "#/x-test/aa"}},
+        swagger: "2.0",
+        "x-errorType": "schemaDereferenceCircular"
+    }, {
+        // validate semanticFormData1
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{
+            in: "formdata"
+        }], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticFormData1"
+    }, {
+        // validate semanticFormData2
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{
+            in: "body",
+            name: "aa",
+            schema: {type: "string"}
+        }, {
+            in: "formData",
+            type: "string"
+        }], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        // 'x-errorType': 'semanticFormData2'
+        "x-errorType": "semanticOperations1"
+    }, {
+        // validate semanticFormData3
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{
+            in: "query",
+            type: "file"
+        }], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticFormData3"
+    }, {
+        // validate semanticFormData4
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{
+            in: "formData",
+            type: "file"
+        }], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticFormData4"
+    }, {
+        // validate semanticFormData5
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{
+            in: "formData",
+            type: "string"
+        }], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticFormData5"
+    }, {
+        // validate semanticItemsRequiredForArrayObjects1
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{
+            type: "array"
+        }], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticItemsRequiredForArrayObjects1"
+    }, {
+        // validate semanticItemsRequiredForArrayObjects2
+        "x-errorType": "semanticItemsRequiredForArrayObjects2"
+    }, {
+        // validate semanticItemsRequiredForArrayObjects3
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{in: "body", name: "aa", schema: {
+            type: "array"
+        }}], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        // 'x-errorType': 'semanticItemsRequiredForArrayObjects3'
+        "x-errorType": "semanticItemsRequiredForArrayObjects1"
+    }, {
+        // validate semanticItemsRequiredForArrayObjects4
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{
+            in: "header",
+            type: "array"
+        }], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        // 'x-errorType': 'semanticItemsRequiredForArrayObjects4'
+        "x-errorType": "semanticItemsRequiredForArrayObjects1"
+    }, {
+        // validate semanticOperationIds1
+        info: {title: "", version: ""},
+        paths: {
+            "/aa": {get: {operationId: "aa", responses: {"200": {description: ""}}}},
+            "/bb": {get: {operationId: "aa", responses: {"200": {description: ""}}}}
+        },
+        swagger: "2.0",
+        "x-errorType": "semanticOperationIds1"
+    }, {
+        // validate semanticOperations1
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{
+            in: "body",
+            name: "aa",
+            schema: {type: "string"}
+        }, {
+            in: "formData",
+            type: "string"
+        }], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticOperations1"
+    }, {
+        // validate semanticOperations2
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{
+            in: "body",
+            name: "aa",
+            schema: {type: "string"}
+        }, {
+            in: "body",
+            name: "bb",
+            schema: {type: "string"}
+        }], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticOperations2"
+    }, {
+        // validate semanticOperations3
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{
+            in: "query",
+            name: "aa",
+            type: "string"
+        }, {
+            in: "query",
+            name: "aa",
+            type: "string"
+        }], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticOperations3"
+    }, {
+        // validate semanticParameters1
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{
+            type: "array"
+        }], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        // 'x-errorType': 'semanticParameters1'
+        "x-errorType": "semanticItemsRequiredForArrayObjects1"
+    }, {
+        // validate semanticParameters2
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{
+            in: "query"
+        }], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticParameters2"
+    }, {
+        // validate semanticPaths1
+        info: {title: "", version: ""},
+        paths: {"/aa?": {get: {responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticPaths1"
+    }, {
+        // validate semanticPaths2
+        info: {title: "", version: ""},
+        paths: {
+            "/{aa}": {get: {responses: {"200": {description: ""}}}},
+            "/{bb}": {get: {responses: {"200": {description: ""}}}}
+        },
+        swagger: "2.0",
+        "x-errorType": "semanticPaths2"
+    }, {
+        // validate semanticPaths3
+        info: {title: "", version: ""},
+        paths: {"/{aa}/{aa}": {get: {parameters: [{
+            in: "path",
+            name: "aa",
+            required: true,
+            type: "string"
+        }], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticPaths3"
+    // }, {
+    // validate semanticPaths4
+    // 'x-errorType': 'semanticPaths4'
+    }, {
+        // validate semanticPaths5
+        info: {title: "", version: ""},
+        paths: {"/{}": {get: {responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticPaths5"
+    }, {
+        // validate semanticPaths6
+        info: {title: "", version: ""},
+        paths: {"/{aa}": {get: {responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticPaths6"
+    }, {
+        // validate semanticPaths7
+        info: {title: "", version: ""},
+        paths: {"/": {get: {parameters: [{
+            in: "path",
+            name: "aa",
+            required: true,
+            type: "string"
+        }], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticPaths7"
+    // }, {
+    // validate semanticRefs1
+    // 'x-errorType': 'semanticRefs1'
+    }, {
+        // validate semanticSchema1
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{in: "body", name: "aa", schema: {
+            required: ["aa"],
+            properties: {aa: {readOnly: true}}
+        }}], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticSchema1"
+    // }, {
+    // validate semanticSecurityDefinitions1
+    // 'x-errorType': 'semanticSecurityDefinitions1'
+    // }, {
+    // validate semanticSecurityDefinitions2
+    // 'x-errorType': 'semanticSecurityDefinitions2'
+    // }, {
+    // validate semanticSecurityDefinitions3
+    // 'x-errorType': 'semanticSecurityDefinitions3'
+    // }, {
+    // validate semanticSecurityDefinitions4
+    // 'x-errorType': 'semanticSecurityDefinitions4'
+    // }, {
+    // validate semanticSecurityDefinitions5
+    // 'x-errorType': 'semanticSecurityDefinitions5'
+    // }, {
+    // validate semanticSecurityDefinitions6
+    // 'x-errorType': 'semanticSecurityDefinitions6'
+    // }, {
+    // validate semanticSecurityDefinitions7
+    // 'x-errorType': 'semanticSecurityDefinitions7'
+    // }, {
+    // validate semanticSecurityDefinitions8
+    // 'x-errorType': 'semanticSecurityDefinitions8'
+    // }, {
+    // validate semanticSecurityDefinitions9
+    // 'x-errorType': 'semanticSecurityDefinitions9'
+    // }, {
+    // validate semanticSecurity1
+    // 'x-errorType': 'semanticSecurity1'
+    // }, {
+    // validate semanticSecurity2
+    // 'x-errorType': 'semanticSecurity2'
+    }, {
+        // validate semanticWalker1
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{in: "body", name: "aa", schema: {
+            type: 1
+        }}], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticWalker1"
+    }, {
+        // validate semanticWalker2
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{in: "body", name: "aa", schema: {
+            maximum: 0,
+            minimum: 1,
+            type: "number"
+        }}], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticWalker2"
+    }, {
+        // validate semanticWalker3
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{in: "body", name: "aa", schema: {
+            maxProperties: 0,
+            minProperties: 1,
+            type: "object"
+        }}], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticWalker3"
+    }, {
+        // validate semanticWalker4
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {parameters: [{in: "body", name: "aa", schema: {
+            maxLength: 0,
+            minLength: 1,
+            type: "object"
+        }}], responses: {"200": {description: ""}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticWalker4"
+    // }, {
+    // validate semanticWalker5
+    // 'x-errorType': 'semanticWalker5'
+    }, {
+        // validate semanticWalker6
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {responses: {"200": {$ref: "aa"}}}}},
+        swagger: "2.0",
+        "x-errorType": "semanticWalker6"
+    }, {
+        // validate semanticWalker7
+        info: {title: "", version: ""},
+        paths: {"/aa": {get: {responses: {"200": {$ref: "#/aa", aa: true}}}}},
+        swagger: "2.0",
+        // 'x-errorType': 'semanticWalker7'
+        "x-errorType": "objectAdditionalProperties"
+    }].forEach(function (element, ii) {
+        local.tryCatchOnError(function () {
+            local.swaggerValidate(element);
+        }, local.nop);
+        error = local.utility2._debugTryCatchError;
+        // validate error occurred
+        local.assertThrow(error, element);
+        // validate x-errorType
+        if (element && element["x-errorType"]) {
+            local.assertJsonEqual(element["x-errorType"], error.options.errorType, error);
+        }
+        console.error("swaggerValidate - " + ii + " - " + error.message);
+    });
+    onError(null, options);
+};
 
-        local.testCase_userLoginXxx_default = function (options, onError) {
-        /*
-         * this function will test userLoginXxx's default handling-behavior
-         */
-            var modeNext, onNext;
-            modeNext = 0;
-            onNext = function (error, data) {
-                modeNext += 1;
-                switch (modeNext) {
-                case 1:
-                    // cleanup userJwtEncrypted
-                    delete local.userJwtEncrypted;
-                    // test userLogout's default handling-behavior
-                    local.userLogout({}, onNext);
-                    break;
-                case 2:
-                    // validate error occurred
-                    local.assert(error, error);
-                    // test userLoginByPassword's 401 handling-behavior
-                    local.userLoginByPassword({
-                        password: 'undefined',
-                        username: 'undefined'
-                    }, onNext);
-                    break;
-                case 3:
-                    // validate error occurred
-                    local.assert(error, error);
-                    // validate statusCode
-                    local.assertJsonEqual(data.statusCode, 401);
-                    // validate userJwtEncrypted does not exist
-                    local.assert(!local.userJwtEncrypted, local.userJwtEncrypted);
-                    // test userLogout's 401 handling-behavior
-                    local.userLogout({}, onNext);
-                    break;
-                case 4:
-                    // validate error occurred
-                    local.assert(error, error);
-                    // validate statusCode
-                    local.assertJsonEqual(data.statusCode, 401);
-                    // validate userJwtEncrypted does not exist
-                    local.assert(!local.userJwtEncrypted, local.userJwtEncrypted);
-                    // test userLoginByPassword's 200 handling-behavior
-                    local.userLoginByPassword({
-                        password: 'secret',
-                        username: 'admin'
-                    }, onNext);
-                    break;
-                case 5:
-                    // validate no error occurred
-                    local.assert(!error, error);
-                    // validate statusCode
-                    local.assertJsonEqual(data.statusCode, 200);
-                    // validate userJwtEncrypted exists
-                    local.assert(local.userJwtEncrypted, local.userJwtEncrypted);
-                    // test persistent-session handling-behavior
-                    local.apiDict['operationId.x-test.crudNullGet'].ajax({}, onNext);
-                    break;
-                case 6:
-                    // validate no error occurred
-                    local.assert(!error, error);
-                    // validate statusCode
-                    local.assertJsonEqual(data.statusCode, 200);
-                    // validate userJwtEncrypted exists
-                    local.assert(local.userJwtEncrypted, local.userJwtEncrypted);
-                    // test userLogout's 200 handling-behavior
-                    // test jwtEncoded's update handling-behavior
-                    local.userLogout({
-                        jwtEncrypted: local.jwtAes256GcmEncrypt({ sub: 'admin' })
-                    }, onNext);
-                    break;
-                case 7:
-                    // validate no error occurred
-                    local.assert(!error, error);
-                    // validate statusCode
-                    local.assertJsonEqual(data.statusCode, 200);
-                    // validate userJwtEncrypted exists
-                    local.assert(local.userJwtEncrypted, local.userJwtEncrypted);
-                    // test userLogout's 401 handling-behavior
-                    local.userLogout({}, onNext);
-                    break;
-                case 8:
-                    // validate error occurred
-                    local.assert(error, error);
-                    // validate statusCode
-                    local.assertJsonEqual(data.statusCode, 401);
-                    // test userLoginByPassword's 400 handling-behavior
-                    local.ajax({ url: '/api/v0/user/userLoginByPassword?password=1' }, onNext);
-                    break;
-                case 9:
-                    // validate error occurred
-                    local.assert(error, error);
-                    // validate statusCode
-                    local.assertJsonEqual(data.statusCode, 400);
-                    // test userLogout's invalid-username handling-behavior
-                    local.userLogout({
-                        jwtEncrypted: local.jwtAes256GcmEncrypt({ sub: 'undefined' })
-                    }, onNext);
-                    break;
-                case 10:
-                    // validate error occurred
-                    local.assert(error, error);
-                    // validate statusCode
-                    local.assertJsonEqual(data.statusCode, 401);
-                    onError(null, options);
-                    break;
+local.testCase_ui_apiKey = function (options, onError) {
+/*
+ * this function will test ui's apiKey handling-behavior
+ */
+    if (!local.isBrowser) {
+        onError(null, options);
+        return;
+    }
+    localStorage.setItem("utility2_swgg_apiKeyKey_", "");
+    local.uiEventListenerDict.onEventUiReload({
+        swggInit: true,
+        targetOnEvent: {id: "swggApiKeyInput1"},
+        type: "keyup"
+    });
+    onError(null, options);
+};
+
+local.testCase_ui_click = function (options, onError) {
+/*
+ * this function will test ui's click handling-behavior
+ */
+    var onParallel;
+    if (!local.isBrowser) {
+        onError(null, options);
+        return;
+    }
+    onParallel = local.onParallel(function (error) {
+        setTimeout(function () {
+            // reset location.hash
+            document.querySelector("#swgg_id_pet_1 .td1").click();
+            onError(error);
+        }, 1000);
+    });
+    onParallel.counter += 1;
+    options = {};
+    // test click handling-behavior
+    Object.keys(local.uiEventListenerDict).sort().forEach(function (selector) {
+        if (selector === "onEventDomDb") {
+            return;
+        }
+        Array.from(document.querySelectorAll("[data-event=" + selector + "]")).forEach(function (
+            element,
+            ii,
+            list
+        ) {
+            onParallel.counter += 1;
+            setTimeout(function () {
+                element.click();
+                // test duplicate-click handling-behavior
+                if (ii < 10) {
+                    element.click();
                 }
-            };
-            onNext();
-        };
-    }());
+                onParallel();
+            }, ii * 1000 / list.length);
+        });
+    });
+    // test empty-input handling-behavior
+    options.element = document.querySelector("#swgg_id_typeNumber0_1 .input");
+    options.element.value = "";
+    options.element.closest(".operation").querySelector(
+        "[data-event=onEventOperationAjax]"
+    ).click();
+    // test onEventOperationAjax's error handling-behavior
+    options.element.value = "syntax error";
+    options.element.closest(".operation").querySelector(
+        "[data-event=onEventOperationAjax]"
+    ).click();
+    // test onEventInputTextareaChange's empty-value handling-behavior
+    options.element = document.querySelector(".schemaP textarea");
+    options.element.value = "";
+    local.uiEventListenerDict.onEventInputTextareaChange({
+        targetOnEvent: options.element
+    });
+    options.element.closest(".operation").querySelector(
+        "[data-event=onEventOperationAjax]"
+    ).click();
+    // test onEventInputTextareaChange's non-empty-value handling-behavior
+    options.element.value = "{}";
+    local.uiEventListenerDict.onEventInputTextareaChange({
+        targetOnEvent: options.element
+    });
+    options.element.closest(".operation").querySelector(
+        "[data-event=onEventOperationAjax]"
+    ).click();
+    onParallel(null, options);
+};
+
+local.testCase_ui_fileMedia = function (options, onError) {
+/*
+ * this function will test ui's fileMedia handling-behavior
+ */
+    if (!local.isBrowser) {
+        onError(null, options);
+        return;
+    }
+    [
+        "testCase_ui_fileMedia_audioNull",
+        "testCase_ui_fileMedia_imageNull",
+        "testCase_ui_fileMedia_videoNull"
+    ].forEach(function (id) {
+        document.querySelector("#swgg_id_file_fileGetOneById_id_id_1 .input").value = id;
+        document.querySelector(
+            "#swgg_id_file_fileGetOneById_id_id_1 [data-event=onEventOperationAjax]"
+        ).click();
+    });
+    onError(null, options);
+};
+
+local.testCase_ui_keyup = function (options, onError) {
+/*
+ * this function will test ui's keyup handling-behavior
+ */
+    if (!local.isBrowser) {
+        onError(null, options);
+        return;
+    }
+    local.uiEventDelegate({target: document.querySelector("[data-event]"), type: "keyup"});
+    onError(null, options);
+};
+
+local.testCase_userLoginXxx_default = function (options, onError) {
+/*
+ * this function will test userLoginXxx's default handling-behavior
+ */
+    var modeNext;
+    var onNext;
+    modeNext = 0;
+    onNext = function (error, data) {
+        modeNext += 1;
+        switch (modeNext) {
+        case 1:
+            // cleanup userJwtEncrypted
+            delete local.userJwtEncrypted;
+            // test userLogout's default handling-behavior
+            local.userLogout({}, onNext);
+            break;
+        case 2:
+            // validate error occurred
+            local.assertThrow(error, error);
+            // test userLoginByPassword's 401 handling-behavior
+            local.userLoginByPassword({
+                password: "undefined",
+                username: "undefined"
+            }, onNext);
+            break;
+        case 3:
+            // validate error occurred
+            local.assertThrow(error, error);
+            // validate statusCode
+            local.assertJsonEqual(data.statusCode, 401);
+            // validate userJwtEncrypted does not exist
+            local.assertThrow(!local.userJwtEncrypted, local.userJwtEncrypted);
+            // test userLogout's 401 handling-behavior
+            local.userLogout({}, onNext);
+            break;
+        case 4:
+            // validate error occurred
+            local.assertThrow(error, error);
+            // validate statusCode
+            local.assertJsonEqual(data.statusCode, 401);
+            // validate userJwtEncrypted does not exist
+            local.assertThrow(!local.userJwtEncrypted, local.userJwtEncrypted);
+            // test userLoginByPassword's 200 handling-behavior
+            local.userLoginByPassword({
+                password: "secret",
+                username: "admin"
+            }, onNext);
+            break;
+        case 5:
+            // validate no error occurred
+            local.assertThrow(!error, error);
+            // validate statusCode
+            local.assertJsonEqual(data.statusCode, 200);
+            // validate userJwtEncrypted exists
+            local.assertThrow(local.userJwtEncrypted, local.userJwtEncrypted);
+            // test persistent-session handling-behavior
+            local.apiDict["operationId.x-test.crudNullGet"].ajax({}, onNext);
+            break;
+        case 6:
+            // validate no error occurred
+            local.assertThrow(!error, error);
+            // validate statusCode
+            local.assertJsonEqual(data.statusCode, 200);
+            // validate userJwtEncrypted exists
+            local.assertThrow(local.userJwtEncrypted, local.userJwtEncrypted);
+            // test userLogout's 200 handling-behavior
+            // test jwtEncoded's update handling-behavior
+            local.userLogout({
+                jwtEncrypted: local.jwtAes256GcmEncrypt({sub: "admin"})
+            }, onNext);
+            break;
+        case 7:
+            // validate no error occurred
+            local.assertThrow(!error, error);
+            // validate statusCode
+            local.assertJsonEqual(data.statusCode, 200);
+            // validate userJwtEncrypted exists
+            local.assertThrow(local.userJwtEncrypted, local.userJwtEncrypted);
+            // test userLogout's 401 handling-behavior
+            local.userLogout({}, onNext);
+            break;
+        case 8:
+            // validate error occurred
+            local.assertThrow(error, error);
+            // validate statusCode
+            local.assertJsonEqual(data.statusCode, 401);
+            // test userLoginByPassword's 400 handling-behavior
+            local.ajax({url: "/api/v0/user/userLoginByPassword?password=1"}, onNext);
+            break;
+        case 9:
+            // validate error occurred
+            local.assertThrow(error, error);
+            // validate statusCode
+            local.assertJsonEqual(data.statusCode, 400);
+            // test userLogout's invalid-username handling-behavior
+            local.userLogout({
+                jwtEncrypted: local.jwtAes256GcmEncrypt({sub: "undefined"})
+            }, onNext);
+            break;
+        case 10:
+            // validate error occurred
+            local.assertThrow(error, error);
+            // validate statusCode
+            local.assertJsonEqual(data.statusCode, 401);
+            onError(null, options);
+            break;
+        }
+    };
+    onNext();
+};
+}());
 
 
 
-    // run shared js-env code - init-after
-    (function () {
-        // test apiUpdate's null-case handling-behavior
-        local.apiUpdate();
-        // test apiUpdate's root-basePath handling-behavior
-        local.apiUpdate({ basePath: '/' });
-        local.assertJsonEqual(local.swaggerJsonBasePath, '');
-        // test apiUpdate's $npm_package_swggTags0 handling-behavior
-        local.testMock([
-            [local.env, { npm_package_swggTags0: 'x-test-tags0-filter' }]
-        ], function (onError) {
-            local.apiUpdate({
-                definitions: { Aa: {}, Bb: { 'x-swgg-tags0': 'undefined' } },
-                // test operationId's auto-create handling-behavior
-                paths: {
-                    '/x-test/tags0Filter': { get: { tags: ['x-test'] } },
-                    '/x-test/tags0FilterUndefined': { get: { 'x-swgg-tags0': 'undefined' } }
-                },
-                tags: [{ 'x-swgg-tags0': 'undefined' }],
-                'x-swgg-tags0-override': {}
-            });
-            onError();
-        }, local.onErrorThrow);
-        // init assets
-        local.assetsDict['/assets.swgg.swagger.test.json'] = (function () {
-            return local.normalizeSwaggerJson(
-/* jslint-ignore-begin */
+// run shared js-env code - init-after
+(function () {
+// test apiUpdate's null-case handling-behavior
+local.apiUpdate();
+// test apiUpdate's root-basePath handling-behavior
+local.apiUpdate({basePath: "/"});
+local.assertJsonEqual(local.swaggerJsonBasePath, "");
+// test apiUpdate's $npm_package_swggTags0 handling-behavior
+local.testMock([
+    [local.env, {npm_package_swggTags0: "x-test-tags0-filter"}]
+], function (onError) {
+    local.apiUpdate({
+        definitions: {Aa: {}, Bb: {"x-swgg-tags0": "undefined"}},
+        // test operationId's auto-create handling-behavior
+        paths: {
+            "/x-test/tags0Filter": {get: {tags: ["x-test"]}},
+            "/x-test/tags0FilterUndefined": {get: {"x-swgg-tags0": "undefined"}}
+        },
+        tags: [{"x-swgg-tags0": "undefined"}],
+        "x-swgg-tags0-override": {}
+    });
+    onError();
+}, local.onErrorThrow);
+// init assets
+local.assetsDict["/assets.swgg.swagger.test.json"] = (function () {
+    return local.normalizeSwaggerJson(
+/* jslint ignore:start */
 {
     "basePath": "/api/v0",
     "definitions": {
@@ -2716,123 +2801,127 @@ curl /undefined\n\
         }
     }
 }
-/* jslint-ignore-end */
-            );
-        }());
-        Object.keys(
-            local.assetsDict['/assets.swgg.swagger.test.json'].parameters
-        ).forEach(function (key) {
-            local.assertJsonEqual(
-                key,
-                local.assetsDict['/assets.swgg.swagger.test.json'].parameters[key].name
-            );
-            local.assetsDict['/assets.swgg.swagger.test.json']
-                .paths['/x-test/parametersDefault/{typeStringInPath}']
-                .post
-                .parameters
-                .push({ $ref: '#/parameters/' + key });
-            local.assetsDict['/assets.swgg.swagger.test.json']
-                .definitions
-                .TestCrud
-                .properties[key] = { $ref: '#/parameters/' + key };
-        });
-        local.assetsDict['/assets.swgg.swagger.test.json'].paths[
-            '/x-test-markdown/description'
-        ].get.description =
-            local.assetsDict['/assets.swgg.swagger.test.json'].tags[1].description =
-            local.fsReadFileOrEmptyStringSync('README.md', 'utf8');
-        local.assetsDict['/assets.swgg.swagger.test.json'] = JSON.stringify(
-            local.assetsDict['/assets.swgg.swagger.test.json']
+/* jslint ignore:end */
+    );
+}());
+
+
+
+Object.keys(
+    local.assetsDict["/assets.swgg.swagger.test.json"].parameters
+).forEach(function (key) {
+    local.assertJsonEqual(
+        key,
+        local.assetsDict["/assets.swgg.swagger.test.json"].parameters[key].name
+    );
+    local.assetsDict["/assets.swgg.swagger.test.json"]
+    .paths["/x-test/parametersDefault/{typeStringInPath}"]
+    .post
+    .parameters
+    .push({$ref: "#/parameters/" + key});
+    local.assetsDict["/assets.swgg.swagger.test.json"]
+    .definitions
+    .TestCrud
+    .properties[key] = {$ref: "#/parameters/" + key};
+});
+local.assetsDict["/assets.swgg.swagger.test.json"].tags[1].description = (
+    local.fsReadFileOrEmptyStringSync("README.md", "utf8")
+);
+local.assetsDict["/assets.swgg.swagger.test.json"].paths[
+    "/x-test-markdown/description"
+].get.description = local.assetsDict["/assets.swgg.swagger.test.json"].tags[1].description;
+local.assetsDict["/assets.swgg.swagger.test.json"] = JSON.stringify(
+    local.assetsDict["/assets.swgg.swagger.test.json"]
+);
+// init test-api
+local.apiUpdate(JSON.parse(local.assetsDict["/assets.swgg.swagger.test.json"]));
+// test redundant http-body-parse-middleware handling-behavior
+local.middlewareList.push(local.middlewareBodyParse);
+// init test-middleware
+local.middlewareList.push(function (request, response, nextMiddleware) {
+    switch (request.swgg.operation && request.swgg.operation.operationId) {
+    case "x-test.onErrorJsonapi":
+        // test redundant onErrorJsonapi handling-behavior
+        local.onErrorJsonapi(function (error, data) {
+            local.serverRespondJsonapi(request, response, error, data);
+        })(
+            JSON.parse(request.swgg.paramDict.error || "null"),
+            JSON.parse(request.swgg.paramDict.data || "null")
         );
-        // init test-api
-        local.apiUpdate(JSON.parse(local.assetsDict['/assets.swgg.swagger.test.json']));
-        // test redundant http-body-parse-middleware handling-behavior
-        local.middlewareList.push(local.middlewareBodyParse);
-        // init test-middleware
-        local.middlewareList.push(function (request, response, nextMiddleware) {
-            switch (request.swgg.operation && request.swgg.operation.operationId) {
-            case 'x-test.onErrorJsonapi':
-                // test redundant onErrorJsonapi handling-behavior
-                local.onErrorJsonapi(function (error, data) {
-                    local.serverRespondJsonapi(request, response, error, data);
-                })(
-                    JSON.parse(request.swgg.paramDict.error || 'null'),
-                    JSON.parse(request.swgg.paramDict.data || 'null')
-                );
-                break;
-            case 'x-test.parametersDefault':
-            case 'x-test.parametersDefaultInFormDataXml':
-            case 'x-test.parametersObjectInBody':
-            case 'x-test.parametersStringInBody':
-            case 'x-test.parametersStringInBodyRequired':
-                // test redundant onErrorJsonapi handling-behavior
-                local.serverRespondJsonapi(request, response, null, request.swgg.paramDict);
-                break;
-            default:
-                // serve file
-                local.middlewareFileServer(request, response, nextMiddleware);
-            }
-        });
-        // init db
-        // test dbRowRandomCreate's null-case handling-behavior
-        local.dbRowRandomCreate();
-        local.global.utility2_dbSeedList = local.global.utility2_dbSeedList.concat([{
-            // test dbRowListRandomCreate's default handling-behavior
-            dbRowList: local.dbRowListRandomCreate({
-                // init 100 extra random objects
-                length: 100,
-                dbRowList: [{
-                    id: 'testCase_crudCountManyByQuery_default',
-                    typeBooleanRequired: true
-                }, {
-                    id: 'testCase_crudGetManyByQuery_default',
-                    typeBooleanRequired: true
-                }, {
-                    id: 'testCase_crudGetOneById_default',
-                    typeBooleanRequired: true
-                }, {
-                    id: 'testCase_crudGetOneByQuery_default',
-                    typeBooleanRequired: true
-                }],
-                override: function (options) {
-                    return {
-                        id: 'testCase_dbRowListRandomCreate_' + (options.ii + 100)
-                    };
-                },
-                schema: local.swaggerJson.definitions.TestCrud
-            }),
-            idIndexCreateList: [{
-                name: 'id'
-            }],
-            name: 'TestCrud'
+        break;
+    case "x-test.parametersDefault":
+    case "x-test.parametersDefaultInFormDataXml":
+    case "x-test.parametersObjectInBody":
+    case "x-test.parametersStringInBody":
+    case "x-test.parametersStringInBodyRequired":
+        // test redundant onErrorJsonapi handling-behavior
+        local.serverRespondJsonapi(request, response, null, request.swgg.paramDict);
+        break;
+    default:
+        // serve file
+        local.middlewareFileServer(request, response, nextMiddleware);
+    }
+});
+// init db
+// test dbRowRandomCreate's null-case handling-behavior
+local.dbRowRandomCreate();
+globalThis.utility2_dbSeedList = globalThis.utility2_dbSeedList.concat([{
+    // test dbRowListRandomCreate's default handling-behavior
+    dbRowList: local.dbRowListRandomCreate({
+        // init 100 extra random objects
+        length: 100,
+        dbRowList: [{
+            id: "testCase_crudCountManyByQuery_default",
+            typeBooleanRequired: true
         }, {
-            dbRowList: [{
-                id: 'testCase_fileGetOneById_default',
-                fileBlob: local.templateSwaggerUiLogoSmallBase64,
-                fileContentType: 'image/png',
-                typeBooleanRequired: true
-            }, {
-                id: 'testCase_ui_fileMedia_audioNull',
-                fileBlob: '',
-                fileContentType: 'audio/wav',
-                fileDescription: 'null audio file',
-                fileFilename: 'testCase_ui_fileMedia_audioNull.wav'
-            }, {
-                id: 'testCase_ui_fileMedia_imageNull',
-                fileBlob: '',
-                fileContentType: 'image/bmp',
-                fileDescription: 'null image file',
-                fileFilename: 'testCase_ui_fileMedia_imageNull.wav'
-            }, {
-                id: 'testCase_ui_fileMedia_videoNull',
-                fileBlob: '',
-                fileContentType: 'video/mpeg',
-                fileDescription: 'null video file',
-                fileFilename: 'testCase_ui_fileMedia_videoNull.mpg'
-            }, {
-                id: 'testAudio1',
-/* jslint-ignore-begin */
-                fileBlob: '\
+            id: "testCase_crudGetManyByQuery_default",
+            typeBooleanRequired: true
+        }, {
+            id: "testCase_crudGetOneById_default",
+            typeBooleanRequired: true
+        }, {
+            id: "testCase_crudGetOneByQuery_default",
+            typeBooleanRequired: true
+        }],
+        override: function (options) {
+            return {
+                id: "testCase_dbRowListRandomCreate_" + (options.ii + 100)
+            };
+        },
+        schema: local.swaggerJson.definitions.TestCrud
+    }),
+    idIndexCreateList: [{
+        name: "id"
+    }],
+    name: "TestCrud"
+}, {
+    dbRowList: [{
+        id: "testCase_fileGetOneById_default",
+        fileBlob: local.templateSwaggerUiLogoSmallBase64,
+        fileContentType: "image/png",
+        typeBooleanRequired: true
+    }, {
+        id: "testCase_ui_fileMedia_audioNull",
+        fileBlob: "",
+        fileContentType: "audio/wav",
+        fileDescription: "null audio file",
+        fileFilename: "testCase_ui_fileMedia_audioNull.wav"
+    }, {
+        id: "testCase_ui_fileMedia_imageNull",
+        fileBlob: "",
+        fileContentType: "image/bmp",
+        fileDescription: "null image file",
+        fileFilename: "testCase_ui_fileMedia_imageNull.wav"
+    }, {
+        id: "testCase_ui_fileMedia_videoNull",
+        fileBlob: "",
+        fileContentType: "video/mpeg",
+        fileDescription: "null video file",
+        fileFilename: "testCase_ui_fileMedia_videoNull.mpg"
+    }, {
+        id: "testAudio1",
+/* jslint ignore:start */
+        fileBlob: '\
 T2dnUwACAAAAAAAAAACjCeQLAAAAADx3X4QBHgF2b3JiaXMAAAAAASJWAAAAAAAAHp0AAAAAAACpAU9n\
 Z1MAAAAAAAAAAAAAownkCwEAAADaEOOYDkD////////////////FA3ZvcmJpcw0AAABMYXZmNTYuNDAu\
 MTAxAQAAAB8AAABlbmNvZGVyPUxhdmM1Ni42MC4xMDAgbGlidm9yYmlzAQV2b3JiaXMiQkNWAQBAAAAY\
@@ -2955,14 +3044,14 @@ wJb6bHA5a3ueknJyrVckK38sf16V9s0RwVNLE4oW19muEgwsrchr05w9wA6QBXDFLevXL9d4jHFUp0tL
 EpGX7548lVElzgfTdapZmC4tPXvR0IyWXOgqXJ6IpfkuoCK0kwN89lfB5S+kI8qKMsO9n5+EWaTunKWr\
 kDf707k/nwYa6Pkl/gDgAAAAAA4ODg4ODg4ODg4=\
 ' ,
-/* jslint-ignore-end */
-                fileContentType: 'audio/ogg',
-                fileDescription: 'test audio',
-                fileFilename: 'Hello_world_said_by_eSpeakNG.ogg'
-            }, {
-                id: 'testImage1',
-/* jslint-ignore-begin */
-                fileBlob: '\
+/* jslint ignore:end */
+        fileContentType: "audio/ogg",
+        fileDescription: "test audio",
+        fileFilename: "Hello_world_said_by_eSpeakNG.ogg"
+    }, {
+        id: "testImage1",
+/* jslint ignore:start */
+        fileBlob: '\
 /9j/4AAQSkZJRgABAQAASABIAAD/2wCEABwcHBwcHDAcHDBEMDAwRFxEREREXHRcXFxcXHSMdHR0dHR0\
 jIyMjIyMjIyoqKioqKjExMTExNzc3Nzc3Nzc3NwBIiQkODQ4YDQ0YOacgJzm5ubm5ubm5ubm5ubm5ubm\
 5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5v/AABEIAUoBSgMBIgACEQEDEQH/xAB+AAAC\
@@ -3077,14 +3166,14 @@ GHlCVYStvXKT+wsulF0eu3wgCiEdxshFIphg0xMdVtmGSHFGJUIQIKEBCKMMCQhAJLBRArIEZFiK0OgT
 VyLEVIsQ2dZddDdQ3f7Xc5cWduv+TL6HEeSocWoLQIZLGTWmVWy4k0r2NL6THPuOHUb4shEm3YMSyHUW\
 hbGOyJmqz7GqfSc2QQhScsFnpDUjQK1Uj//Z\
 ' ,
-/* jslint-ignore-end */
-                fileContentType: 'image/jpeg',
-                fileDescription: 'test image',
-                fileFilename: '330px-Lenna_(test_image).jpg'
-            }, {
-                id: 'testVideo1',
-/* jslint-ignore-begin */
-                fileBlob: '\
+/* jslint ignore:end */
+        fileContentType: "image/jpeg",
+        fileDescription: "test image",
+        fileFilename: "330px-Lenna_(test_image).jpg"
+    }, {
+        id: "testVideo1",
+/* jslint ignore:start */
+        fileBlob: '\
 GkXfowEAAAAAAAAfQoaBAUL3gQFC8oEEQvOBCEKChHdlYm1Ch4ECQoWBAhhTgGcBAAAAAAFBdxFNm3RA\
 PE27i1OrhBVJqWZTrIHlTbuMU6uEFlSua1OsggEjTbuMU6uEElTDZ1OsghEiTbuNU6uEHFO7a1OsgwFB\
 WewBAAAAAAAAmgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\
@@ -4459,24 +4548,27 @@ AICFkwyNxSLITsjz/WoY1SrbCABemEwsBFCpyv7x7+cjGOfrHJVQAWLZaG1GBwLVrraFuphJyiH9eJp5
 XQPNhlg+OYr4w94QbHTekmyfKgjoiDgpk7zHT5/1RQz0ufMJUAo7540qX6tRw9HQ73dlrQ3s/XV5JUEB\
 HFO7awEAAAAAAAASu5CzgSG3i/eBAfGCEe7wggJS\
 ' ,
-/* jslint-ignore-end */
-                fileContentType: 'video/webm',
-                fileDescription: 'test video',
-                fileFilename: 'big_buck_bunny_trailer.2008.160p.webm'
-            }],
-            idIndexCreateList: [{
-                name: 'id'
-            }],
-            name: 'File'
-        }]);
-        // seed db
-        local.db.dbSeed(local.global.utility2_dbSeedList, local.onErrorThrow);
-        // run validation test
-        // local.tryCatchOnError(function () {
-            // local.testCase_swaggerJsonFromCurl_default(null, local.onErrorDefault);
-            // local.testCase_swaggerValidate_default(null, local.onErrorDefault);
-            // local.testCase_swaggerValidateDataParameters_default(null, local.onErrorDefault);
-            // local.testCase_swaggerValidateDataParameters_error(null, local.onErrorDefault);
-        // }, local.onErrorDefault);
-    }());
+/* jslint ignore:end */
+        fileContentType: "video/webm",
+        fileDescription: "test video",
+        fileFilename: "big_buck_bunny_trailer.2008.160p.webm"
+    }],
+    idIndexCreateList: [{
+        name: "id"
+    }],
+    name: "File"
+}]);
+// seed db
+local.db.dbSeed(globalThis.utility2_dbSeedList, local.onErrorThrow);
+// run validation test
+// local.tryCatchOnError(function () {
+// local.testCase_swaggerJsonFromCurl_default(null, local.onErrorDefault);
+// local.testCase_swaggerValidate_default(null, local.onErrorDefault);
+// local.testCase_swaggerValidateDataParameters_default(null, local.onErrorDefault);
+// local.testCase_swaggerValidateDataParameters_error(null, local.onErrorDefault);
+// }, local.onErrorDefault);
+}());
+
+
+
 }());
