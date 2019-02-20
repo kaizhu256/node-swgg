@@ -17,28 +17,48 @@
         } catch (ignore) {}
     }());
     globalThis.globalThis = globalThis;
+    // init debug_inline
+    if (!globalThis["debug\u0049nline"]) {
+        consoleError = console.error;
+        globalThis["debug\u0049nline"] = function () {
+        /*
+         * this function will both print <arguments> to stderr
+         * and return <arguments>[0]
+         */
+            var argList;
+            argList = Array.from(arguments); // jslint ignore:line
+            // debug arguments
+            globalThis["debug\u0049nlineArguments"] = argList;
+            consoleError("\n\ndebug\u0049nline");
+            consoleError.apply(console, argList);
+            consoleError("\n");
+            // return arg0 for inspection
+            return argList[0];
+        };
+    }
     // init local
     local = {};
+    local.local = local;
+    globalThis.globalLocal = local;
     // init isBrowser
     local.isBrowser = (
         typeof window === "object"
         && window === globalThis
         && typeof window.XMLHttpRequest === "function"
         && window.document
-        && typeof window.document.querySelectorAll === "function"
+        && typeof window.document.querySelector === "function"
     );
-    globalThis.globalLocal = local;
     // init function
     local.assertThrow = function (passed, message) {
     /*
-     * this function will throw the error <message> if <passed> is falsy
+     * this function will throw error <message> if <passed> is falsy
      */
         var error;
         if (passed) {
             return;
         }
         error = (
-            // ternary-operator
+            // ternary-condition
             (
                 message
                 && typeof message.message === "string"
@@ -76,24 +96,53 @@
      */
         return;
     };
-    // init debug_inline
-    if (!globalThis["debug\u0049nline"]) {
-        consoleError = console.error;
-        globalThis["debug\u0049nline"] = function () {
-        /*
-         * this function will both print <arguments> to stderr
-         * and return <arguments>[0]
-         */
-            var argList;
-            argList = Array.from(arguments); // jslint ignore:line
-            // debug arguments
-            globalThis["debug\u0049nlineArguments"] = argList;
-            consoleError("\n\ndebug\u0049nline");
-            consoleError.apply(console, argList);
-            consoleError("\n");
-            // return arg0 for inspection
-            return argList[0];
-        };
+    local.objectAssignDefault = function (target, source) {
+    /*
+     * this function will if items from <target> are
+     * null, undefined, or empty-string,
+     * then overwrite them with items from <source>
+     */
+        target = target || {};
+        Object.keys(source || {}).forEach(function (key) {
+            if (
+                target[key] === null
+                || target[key] === undefined
+                || target[key] === ""
+            ) {
+                target[key] = target[key] || source[key];
+            }
+        });
+        return target;
+    };
+    // require builtin
+    if (!local.isBrowser) {
+        local.assert = require("assert");
+        local.buffer = require("buffer");
+        local.child_process = require("child_process");
+        local.cluster = require("cluster");
+        local.crypto = require("crypto");
+        local.dgram = require("dgram");
+        local.dns = require("dns");
+        local.domain = require("domain");
+        local.events = require("events");
+        local.fs = require("fs");
+        local.http = require("http");
+        local.https = require("https");
+        local.net = require("net");
+        local.os = require("os");
+        local.path = require("path");
+        local.querystring = require("querystring");
+        local.readline = require("readline");
+        local.repl = require("repl");
+        local.stream = require("stream");
+        local.string_decoder = require("string_decoder");
+        local.timers = require("timers");
+        local.tls = require("tls");
+        local.tty = require("tty");
+        local.url = require("url");
+        local.util = require("util");
+        local.vm = require("vm");
+        local.zlib = require("zlib");
     }
 }(this));
 
@@ -138,28 +187,48 @@
         } catch (ignore) {}
     }());
     globalThis.globalThis = globalThis;
+    // init debug_inline
+    if (!globalThis["debug\u0049nline"]) {
+        consoleError = console.error;
+        globalThis["debug\u0049nline"] = function () {
+        /*
+         * this function will both print <arguments> to stderr
+         * and return <arguments>[0]
+         */
+            var argList;
+            argList = Array.from(arguments); // jslint ignore:line
+            // debug arguments
+            globalThis["debug\u0049nlineArguments"] = argList;
+            consoleError("\n\ndebug\u0049nline");
+            consoleError.apply(console, argList);
+            consoleError("\n");
+            // return arg0 for inspection
+            return argList[0];
+        };
+    }
     // init local
     local = {};
+    local.local = local;
+    globalThis.globalLocal = local;
     // init isBrowser
     local.isBrowser = (
         typeof window === "object"
         && window === globalThis
         && typeof window.XMLHttpRequest === "function"
         && window.document
-        && typeof window.document.querySelectorAll === "function"
+        && typeof window.document.querySelector === "function"
     );
-    globalThis.globalLocal = local;
     // init function
     local.assertThrow = function (passed, message) {
     /*
-     * this function will throw the error <message> if <passed> is falsy
+     * this function will throw error <message> if <passed> is falsy
      */
         var error;
         if (passed) {
             return;
         }
         error = (
-            // ternary-operator
+            // ternary-condition
             (
                 message
                 && typeof message.message === "string"
@@ -197,24 +266,53 @@
      */
         return;
     };
-    // init debug_inline
-    if (!globalThis["debug\u0049nline"]) {
-        consoleError = console.error;
-        globalThis["debug\u0049nline"] = function () {
-        /*
-         * this function will both print <arguments> to stderr
-         * and return <arguments>[0]
-         */
-            var argList;
-            argList = Array.from(arguments); // jslint ignore:line
-            // debug arguments
-            globalThis["debug\u0049nlineArguments"] = argList;
-            consoleError("\n\ndebug\u0049nline");
-            consoleError.apply(console, argList);
-            consoleError("\n");
-            // return arg0 for inspection
-            return argList[0];
-        };
+    local.objectAssignDefault = function (target, source) {
+    /*
+     * this function will if items from <target> are
+     * null, undefined, or empty-string,
+     * then overwrite them with items from <source>
+     */
+        target = target || {};
+        Object.keys(source || {}).forEach(function (key) {
+            if (
+                target[key] === null
+                || target[key] === undefined
+                || target[key] === ""
+            ) {
+                target[key] = target[key] || source[key];
+            }
+        });
+        return target;
+    };
+    // require builtin
+    if (!local.isBrowser) {
+        local.assert = require("assert");
+        local.buffer = require("buffer");
+        local.child_process = require("child_process");
+        local.cluster = require("cluster");
+        local.crypto = require("crypto");
+        local.dgram = require("dgram");
+        local.dns = require("dns");
+        local.domain = require("domain");
+        local.events = require("events");
+        local.fs = require("fs");
+        local.http = require("http");
+        local.https = require("https");
+        local.net = require("net");
+        local.os = require("os");
+        local.path = require("path");
+        local.querystring = require("querystring");
+        local.readline = require("readline");
+        local.repl = require("repl");
+        local.stream = require("stream");
+        local.string_decoder = require("string_decoder");
+        local.timers = require("timers");
+        local.tls = require("tls");
+        local.tty = require("tty");
+        local.url = require("url");
+        local.util = require("util");
+        local.vm = require("vm");
+        local.zlib = require("zlib");
     }
 }(this));
 
@@ -239,45 +337,16 @@ local = (
 if (local.isBrowser) {
     globalThis.utility2_apidoc = local;
 } else {
-    // require builtins
-    local.assert = require("assert");
-    local.buffer = require("buffer");
-    local.child_process = require("child_process");
-    local.cluster = require("cluster");
-    local.crypto = require("crypto");
-    local.dgram = require("dgram");
-    local.dns = require("dns");
-    local.domain = require("domain");
-    local.events = require("events");
-    local.fs = require("fs");
-    local.http = require("http");
-    local.https = require("https");
-    local.net = require("net");
-    local.os = require("os");
-    local.path = require("path");
-    local.querystring = require("querystring");
-    local.readline = require("readline");
-    local.repl = require("repl");
-    local.stream = require("stream");
-    local.string_decoder = require("string_decoder");
-    local.timers = require("timers");
-    local.tls = require("tls");
-    local.tty = require("tty");
-    local.url = require("url");
-    local.util = require("util");
-    local.vm = require("vm");
-    local.zlib = require("zlib");
     module.exports = local;
     module.exports.__dirname = __dirname;
 }
 // init lib main
-local.local = local;
 local.apidoc = local;
 
 
 
 /* validateLineSortedReset */
-local.cliRun = function (options) {
+local.cliRun = function (option) {
 /*
  * this function will run the cli
  */
@@ -313,10 +382,10 @@ local.cliRun = function (options) {
         file = __filename.replace((
             /.*\//
         ), "");
-        options = Object.assign({}, options);
+        option = Object.assign({}, option);
         packageJson = require("./package.json");
         // validate comment
-        options.rgxComment = options.rgxComment || (
+        option.rgxComment = option.rgxComment || (
             /\)\u0020\{\n(?:|\u0020{4})\/\*\n(?:\u0020|\u0020{5})\*((?:\u0020<[^>]*?>|\u0020\.\.\.)*?)\n(?:\u0020|\u0020{5})\*\u0020(will\u0020.*?\S)\n(?:\u0020|\u0020{5})\*\/\n(?:\u0020{4}|\u0020{8})\S/
         );
         textDict = {};
@@ -335,7 +404,7 @@ local.cliRun = function (options) {
                 return;
             }
             try {
-                commandList[ii] = options.rgxComment.exec(text);
+                commandList[ii] = option.rgxComment.exec(text);
                 commandList[ii] = {
                     argList: (commandList[ii][1] || "").trim(),
                     command: [key],
@@ -344,21 +413,21 @@ local.cliRun = function (options) {
             } catch (ignore) {
                 local.assertThrow(null, new Error(
                     "cliRun - cannot parse comment in COMMAND "
-                    + key + ":\nnew RegExp(" + JSON.stringify(options.rgxComment.source)
-                    + ").exec(" + JSON.stringify(text)
-                    .replace((
+                    + key + ":\nnew RegExp("
+                    + JSON.stringify(option.rgxComment.source)
+                    + ").exec(" + JSON.stringify(text).replace((
                         /\\\\/g
-                    ), "\u0000")
-                    .replace((
+                    ), "\u0000").replace((
                         /\\n/g
-                    ), "\\n\\\n")
-                    .replace((
+                    ), "\\n\\\n").replace((
                         /\u0000/g
                     ), "\\\\") + ");"
                 ));
             }
         });
-        console.log(packageJson.name + " (" + packageJson.version + ")\n\n" + commandList
+        text = "";
+        text += packageJson.name + " (" + packageJson.version + ")\n\n";
+        text += commandList
         .filter(function (element) {
             return element;
         })
@@ -388,7 +457,8 @@ local.cliRun = function (options) {
                 + element.argList.join("  ")
             );
         })
-        .join("\n\n"));
+        .join("\n\n");
+        console.log(text);
     };
     local.cliDict["--help"] = local.cliDict["--help"] || local.cliDict._help;
     local.cliDict["-h"] = local.cliDict["-h"] || local.cliDict._help;
@@ -400,7 +470,7 @@ local.cliRun = function (options) {
      * will start interactive-mode
      */
         globalThis.local = local;
-        local.functionOrNop(local.replStart || require("repl").start)({
+        local.identity(local.replStart || require("repl").start)({
             useGlobal: true
         });
     };
@@ -416,7 +486,10 @@ local.cliRun = function (options) {
      */
         console.log(require(__dirname + "/package.json").version);
     };
-    local.cliDict["--version"] = local.cliDict["--version"] || local.cliDict._version;
+    local.cliDict["--version"] = (
+        local.cliDict["--version"]
+        || local.cliDict._version
+    );
     local.cliDict["-v"] = local.cliDict["-v"] || local.cliDict._version;
     // default to --help command if no arguments are given
     if (process.argv.length <= 2) {
@@ -446,7 +519,10 @@ local.moduleDirname = function (module, modulePathList) {
     .concat([process.env.HOME + "/node_modules", "/usr/local/lib/node_modules"])
     .some(function (modulePath) {
         try {
-            result = require("path").resolve(process.cwd(), modulePath + "/" + module);
+            result = require("path").resolve(
+                process.cwd(),
+                modulePath + "/" + module
+            );
             result = require("fs").statSync(result).isDirectory() && result;
             return result;
         } catch (ignore) {
@@ -489,7 +565,8 @@ local.objectSetDefault = function (dict, defaults, depth) {
             // dict2 is a non-null and non-array object
             && typeof dict2 === "object" && dict2 && !Array.isArray(dict2)
             // defaults2 is a non-null and non-array object
-            && typeof defaults2 === "object" && defaults2 && !Array.isArray(defaults2)
+            && typeof defaults2 === "object" && defaults2
+            && !Array.isArray(defaults2)
         ) {
             // recurse
             local.objectSetDefault(dict2, defaults2, depth - 1);
@@ -524,216 +601,6 @@ local.stringHtmlSafe = function (text) {
     ), "&$1");
 };
 
-local.templateRender = function (template, dict, options) {
-/*
- * this function will render the template with the given dict
- */
-    var argList;
-    var getValue;
-    var match;
-    var renderPartial;
-    var rgx;
-    var skip;
-    var value;
-    dict = dict || {};
-    options = options || {};
-    getValue = function (key) {
-        argList = key.split(" ");
-        value = dict;
-        if (argList[0] === "#this/") {
-            return;
-        }
-        // iteratively lookup nested values in the dict
-        argList[0].split(".").forEach(function (key) {
-            value = value && value[key];
-        });
-        return value;
-    };
-    renderPartial = function (match0, helper, key, partial) {
-        switch (helper) {
-        case "each":
-        case "eachTrimRightComma":
-            value = getValue(key);
-            value = (
-                Array.isArray(value)
-                ? value.map(function (dict) {
-                    // recurse with partial
-                    return local.templateRender(partial, dict, options);
-                }).join("")
-                : ""
-            );
-            // remove trailing-comma from last element
-            if (helper === "eachTrimRightComma") {
-                value = value.trimRight().replace((
-                    /,$/
-                ), "");
-            }
-            return value;
-        case "if":
-            partial = partial.split("{{#unless " + key + "}}");
-            partial = (
-                getValue(key)
-                ? partial[0]
-                // handle 'unless' case
-                : partial.slice(1).join("{{#unless " + key + "}}")
-            );
-            // recurse with partial
-            return local.templateRender(partial, dict, options);
-        case "unless":
-            return (
-                getValue(key)
-                ? ""
-                // recurse with partial
-                : local.templateRender(partial, dict, options)
-            );
-        default:
-            // recurse with partial
-            return match0[0] + local.templateRender(match0.slice(1), dict, options);
-        }
-    };
-    // render partials
-    rgx = (
-        /\{\{#(\w+)\u0020([^}]+?)\}\}/g
-    );
-    template = template || "";
-    match = rgx.exec(template);
-    while (match) {
-        rgx.lastIndex += 1 - match[0].length;
-        template = template.replace(
-            new RegExp(
-                "\\{\\{#(" + match[1] + ") (" + match[2]
-                + ")\\}\\}([\\S\\s]*?)\\{\\{/" + match[1] + " " + match[2]
-                + "\\}\\}"
-            ),
-            renderPartial
-        );
-        match = rgx.exec(template);
-    }
-    // search for keys in the template
-    return template.replace((
-        /\{\{[^}]+?\}\}/g
-    ), function (match0) {
-        var markdownToHtml;
-        var notHtmlSafe;
-        notHtmlSafe = options.notHtmlSafe;
-        try {
-            getValue(match0.slice(2, -2));
-            if (value === undefined) {
-                return match0;
-            }
-            argList.slice(1).forEach(function (arg0, ii, list) {
-                switch (arg0) {
-                case "alphanumeric":
-                    value = value.replace((
-                        /\W/g
-                    ), "_");
-                    break;
-                case "decodeURIComponent":
-                    value = decodeURIComponent(value);
-                    break;
-                case "encodeURIComponent":
-                    value = encodeURIComponent(value);
-                    break;
-                case "jsonStringify":
-                    value = JSON.stringify(value);
-                    break;
-                case "jsonStringify4":
-                    value = JSON.stringify(value, null, 4);
-                    break;
-                case "markdownSafe":
-                    value = value.replace((
-                        /`/g
-                    ), "'");
-                    break;
-                case "markdownToHtml":
-                    markdownToHtml = true;
-                    break;
-                case "notHtmlSafe":
-                    notHtmlSafe = true;
-                    break;
-                case "truncate":
-                    skip = ii + 1;
-                    if (value.length > list[skip]) {
-                        value = value.slice(0, list[skip] - 3).trimRight() + "...";
-                    }
-                    break;
-                // default to String.prototype[arg0]()
-                default:
-                    if (ii === skip) {
-                        break;
-                    }
-                    value = value[arg0]();
-                }
-            });
-            value = String(value);
-            // default to htmlSafe
-            if (!notHtmlSafe) {
-                value = value
-                .replace((
-                    /&/g
-                ), "&amp;")
-                .replace((
-                    /"/g
-                ), "&quot;")
-                .replace((
-                    /'/g
-                ), "&apos;")
-                .replace((
-                    /</g
-                ), "&lt;")
-                .replace((
-                    />/g
-                ), "&gt;")
-                .replace((
-                    /&amp;(amp;|apos;|gt;|lt;|quot;)/ig
-                ), "&$1");
-            }
-            markdownToHtml = (
-                markdownToHtml
-                && (typeof local.marked === "function" && local.marked)
-            );
-            if (markdownToHtml) {
-                value = markdownToHtml(value)
-                .replace((
-                    /&amp;(amp;|apos;|gt;|lt;|quot;)/ig
-                ), "&$1");
-            }
-            return value;
-        } catch (errorCaught) {
-            errorCaught.message = (
-                "templateRender could not render expression "
-                + JSON.stringify(match0) + "\n"
-            ) + errorCaught.message;
-            local.assertThrow(null, errorCaught);
-        }
-    });
-};
-
-local.tryCatchOnError = function (fnc, onError) {
-/*
- * this function will run the fnc in a tryCatch block,
- * else call onError with the errorCaught
- */
-    var result;
-    // validate onError
-    local.assertThrow(typeof onError === "function", typeof onError);
-    try {
-        // reset errorCaught
-        local._debugTryCatchError = null;
-        result = fnc();
-        local._debugTryCatchError = null;
-        return result;
-    } catch (errorCaught) {
-        // debug errorCaught
-        local._debugTryCatchError = errorCaught;
-        return onError(errorCaught);
-    }
-};
-}());
-
-
-
-// run shared js-env code - init-before
 /* jslint ignore:start */
 local.templateApidocHtml = '\
 <div class="apidocDiv">\n\
@@ -842,13 +709,241 @@ local.templateApidocHtml = '\
 ';
 /* jslint ignore:end */
 
+local.templateRender = function (template, dict, option) {
+/*
+ * this function will render the template with given dict
+ */
+    var argList;
+    var getValue;
+    var match;
+    var renderPartial;
+    var rgx;
+    var skip;
+    var value;
+    dict = dict || {};
+    option = option || {};
+    getValue = function (key) {
+        argList = key.split(" ");
+        value = dict;
+        if (argList[0] === "#this/") {
+            return;
+        }
+        // iteratively lookup nested values in the dict
+        argList[0].split(".").forEach(function (key) {
+            value = value && value[key];
+        });
+        return value;
+    };
+    renderPartial = function (match0, helper, key, partial) {
+        switch (helper) {
+        case "each":
+        case "eachTrimRightComma":
+            value = getValue(key);
+            value = (
+                Array.isArray(value)
+                ? value.map(function (dict) {
+                    // recurse with partial
+                    return local.templateRender(partial, dict, option);
+                }).join("")
+                : ""
+            );
+            // remove trailing-comma from last element
+            if (helper === "eachTrimRightComma") {
+                value = value.trimRight().replace((
+                    /,$/
+                ), "");
+            }
+            return value;
+        case "if":
+            partial = partial.split("{{#unless " + key + "}}");
+            partial = (
+                getValue(key)
+                ? partial[0]
+                // handle 'unless' case
+                : partial.slice(1).join("{{#unless " + key + "}}")
+            );
+            // recurse with partial
+            return local.templateRender(partial, dict, option);
+        case "unless":
+            return (
+                getValue(key)
+                ? ""
+                // recurse with partial
+                : local.templateRender(partial, dict, option)
+            );
+        default:
+            // recurse with partial
+            return match0[0] + local.templateRender(
+                match0.slice(1),
+                dict,
+                option
+            );
+        }
+    };
+    // render partials
+    rgx = (
+        /\{\{#(\w+)\u0020([^}]+?)\}\}/g
+    );
+    template = template || "";
+    match = rgx.exec(template);
+    while (match) {
+        rgx.lastIndex += 1 - match[0].length;
+        template = template.replace(
+            new RegExp(
+                "\\{\\{#(" + match[1] + ") (" + match[2]
+                + ")\\}\\}([\\S\\s]*?)\\{\\{/" + match[1] + " " + match[2]
+                + "\\}\\}"
+            ),
+            renderPartial
+        );
+        match = rgx.exec(template);
+    }
+    // search for keys in the template
+    return template.replace((
+        /\{\{[^}]+?\}\}/g
+    ), function (match0) {
+        var markdownToHtml;
+        var notHtmlSafe;
+        notHtmlSafe = option.notHtmlSafe;
+        try {
+            getValue(match0.slice(2, -2));
+            if (value === undefined) {
+                return match0;
+            }
+            argList.slice(1).forEach(function (arg0, ii, list) {
+                switch (arg0) {
+                case "alphanumeric":
+                    value = value.replace((
+                        /\W/g
+                    ), "_");
+                    break;
+                case "decodeURIComponent":
+                    value = decodeURIComponent(value);
+                    break;
+                case "encodeURIComponent":
+                    value = encodeURIComponent(value);
+                    break;
+                case "jsonStringify":
+                    value = JSON.stringify(value);
+                    break;
+                case "jsonStringify4":
+                    value = JSON.stringify(value, null, 4);
+                    break;
+                case "markdownSafe":
+                    value = value.replace((
+                        /`/g
+                    ), "'");
+                    break;
+                case "markdownToHtml":
+                    markdownToHtml = true;
+                    break;
+                case "notHtmlSafe":
+                    notHtmlSafe = true;
+                    break;
+                case "padEnd":
+                    skip = ii + 2;
+                    value = String(value).padEnd(
+                        list[skip - 1],
+                        list[skip]
+                    );
+                    break;
+                case "padStart":
+                    skip = ii + 2;
+                    value = String(value).padStart(
+                        list[skip - 1],
+                        list[skip]
+                    );
+                    break;
+                case "truncate":
+                    skip = ii + 1;
+                    if (value.length > list[skip]) {
+                        value = value.slice(
+                            0,
+                            Math.max(list[skip] - 3, 0)
+                        ).trimRight() + "...";
+                    }
+                    break;
+                // default to String.prototype[arg0]()
+                default:
+                    if (ii <= skip) {
+                        break;
+                    }
+                    value = value[arg0]();
+                }
+            });
+            value = String(value);
+            // default to htmlSafe
+            if (!notHtmlSafe) {
+                value = value
+                .replace((
+                    /&/g
+                ), "&amp;")
+                .replace((
+                    /"/g
+                ), "&quot;")
+                .replace((
+                    /'/g
+                ), "&apos;")
+                .replace((
+                    /</g
+                ), "&lt;")
+                .replace((
+                    />/g
+                ), "&gt;")
+                .replace((
+                    /&amp;(amp;|apos;|gt;|lt;|quot;)/ig
+                ), "&$1");
+            }
+            markdownToHtml = (
+                markdownToHtml
+                && (typeof local.marked === "function" && local.marked)
+            );
+            if (markdownToHtml) {
+                value = markdownToHtml(value)
+                .replace((
+                    /&amp;(amp;|apos;|gt;|lt;|quot;)/ig
+                ), "&$1");
+            }
+            return value;
+        } catch (errorCaught) {
+            errorCaught.message = (
+                "templateRender could not render expression "
+                + JSON.stringify(match0) + "\n"
+            ) + errorCaught.message;
+            local.assertThrow(null, errorCaught);
+        }
+    });
+};
+
+local.tryCatchOnError = function (fnc, onError) {
+/*
+ * this function will run the fnc in a tryCatch block,
+ * else call onError with the errorCaught
+ */
+    var result;
+    // validate onError
+    local.assertThrow(typeof onError === "function", typeof onError);
+    try {
+        // reset errorCaught
+        local._debugTryCatchError = null;
+        result = fnc();
+        local._debugTryCatchError = null;
+        return result;
+    } catch (errorCaught) {
+        // debug errorCaught
+        local._debugTryCatchError = errorCaught;
+        return onError(errorCaught);
+    }
+};
+}());
+
 
 
 // run shared js-env code - function
 (function () {
-local.apidocCreate = function (options) {
+local.apidocCreate = function (option) {
 /*
- * this function will create the apidoc from options.dir
+ * this function will create the apidoc from option.dir
  */
     var elementCreate;
     var module;
@@ -859,10 +954,10 @@ local.apidocCreate = function (options) {
     var trimLeft;
     elementCreate = function (module, prefix, key) {
     /*
-     * this function will create the apidoc-element in the given module
+     * this function will create the apidoc-element in given module
      */
         var element;
-        if (options.modeNoApidoc) {
+        if (option.modeNoApidoc) {
             return element;
         }
         element = {};
@@ -908,7 +1003,7 @@ local.apidocCreate = function (options) {
             /^function\u0020\(/
         ), key + " = function (");
         // init example
-        options.exampleList.some(function (example) {
+        option.exampleList.some(function (example) {
             example.replace(
                 new RegExp("((?:\n.*?){8}\\.)(" + key + ")(\\((?:.*?\n){8})"),
                 function (ignore, match1, match2, match3) {
@@ -928,11 +1023,11 @@ local.apidocCreate = function (options) {
     };
     readExample = function (file) {
     /*
-     * this function will read the example from the given file
+     * this function will read the example from given file
      */
         var result;
         local.tryCatchOnError(function () {
-            file = local.path.resolve(options.dir, file);
+            file = local.path.resolve(option.dir, file);
             console.error("apidocCreate - readExample " + file);
             result = "";
             result = (
@@ -981,12 +1076,12 @@ local.apidocCreate = function (options) {
         });
         return text;
     };
-    // init options
-    options.dir = local.moduleDirname(
-        options.dir,
-        options.modulePathList || require("module").paths
+    // init option
+    option.dir = local.moduleDirname(
+        option.dir,
+        option.modulePathList || require("module").paths
     );
-    local.objectSetDefault(options, {
+    local.objectSetDefault(option, {
         env: {
             npm_package_description: ""
         },
@@ -997,8 +1092,8 @@ local.apidocCreate = function (options) {
             }, console.error);
         }
     });
-    Object.keys(options.packageJson).forEach(function (key) {
-        tmp = options.packageJson[key];
+    Object.keys(option.packageJson).forEach(function (key) {
+        tmp = option.packageJson[key];
         // strip email from npmdoc documentation
         // https://github.com/npmdoc/node-npmdoc-hpp/issues/1
         if (tmp) {
@@ -1014,16 +1109,16 @@ local.apidocCreate = function (options) {
             }
         }
         if (key[0] === "_" || key === "readme") {
-            delete options.packageJson[key];
+            delete option.packageJson[key];
         } else if (typeof tmp === "string") {
-            options.env["npm_package_" + key] = tmp;
+            option.env["npm_package_" + key] = tmp;
         }
     });
-    local.objectSetDefault(options, {
+    local.objectSetDefault(option, {
         blacklistDict: {
             globalThis: globalThis
         },
-        circularList: [globalThis],
+        circularSet: new Set([globalThis]),
         exampleDict: {},
         exampleList: [],
         html: "",
@@ -1038,13 +1133,13 @@ local.apidocCreate = function (options) {
     }, 2);
     // init exampleList
     [1, 2, 3, 4].forEach(function (depth) {
-        options.exampleList = options.exampleList.concat(
+        option.exampleList = option.exampleList.concat(
             // find . -maxdepth 1 -mindepth 1 -name "*.js" -type f
             // http://stackoverflow.com/questions/4509624/how-to-limit-depth-for-recursive-file-list
             local.child_process.execSync(
-                "find \"" + options.dir
+                "find \"" + option.dir
                 + "\" -maxdepth " + depth + " -mindepth " + depth
-                + " -type f | sed -e \"s|" + options.dir
+                + " -type f | sed -e \"s|" + option.dir
                 + "/||\" | grep -iv "
 /* jslint ignore:start */
 + '"\
@@ -1064,26 +1159,26 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             .split("\n")
         );
     });
-    options.exampleList = options.exampleList.filter(function (file) {
-        if (file && !options.exampleDict[file]) {
-            options.exampleDict[file] = true;
+    option.exampleList = option.exampleList.filter(function (file) {
+        if (file && !option.exampleDict[file]) {
+            option.exampleDict[file] = true;
             return true;
         }
     }).slice(0, 256).map(readExample);
     // init moduleMain
     local.tryCatchOnError(function () {
-        console.error("apidocCreate - requiring " + options.dir + " ...");
+        console.error("apidocCreate - requiring " + option.dir + " ...");
         moduleMain = {};
         moduleMain = (
-            options.moduleDict[options.env.npm_package_name]
-            || options.require(options.dir)
-            || options.require(
-                options.dir + "/"
-                + (options.packageJson.bin)[Object.keys(options.packageJson.bin)[0]]
+            option.moduleDict[option.env.npm_package_name]
+            || option.require(option.dir)
+            || option.require(
+                option.dir + "/"
+                + (option.packageJson.bin)[Object.keys(option.packageJson.bin)[0]]
             ) || {}
         );
-        options.circularList.push(moduleMain);
-        console.error("apidocCreate - ... required " + options.dir);
+        option.circularSet.add(moduleMain);
+        console.error("apidocCreate - ... required " + option.dir);
     }, console.error);
     tmp = {};
     // handle case where module is a function
@@ -1109,8 +1204,8 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
     }
     // normalize moduleMain
     moduleMain = local.objectSetDefault(tmp, moduleMain);
-    options.moduleDict[options.env.npm_package_name] = moduleMain;
-    // init circularList - builtins
+    option.moduleDict[option.env.npm_package_name] = moduleMain;
+    // init circularSet - builtins
     [
         "assert",
         "buffer",
@@ -1141,55 +1236,46 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
         "zlib"
     ].forEach(function (key) {
         local.tryCatchOnError(function () {
-            options.circularList.push(require(key));
+            option.circularSet.add(require(key));
         }, local.nop);
     });
-    // init circularList - blacklistDict
-    Object.keys(options.blacklistDict).forEach(function (key) {
-        options.circularList.push(options.blacklistDict[key]);
+    // init circularSet - blacklistDict
+    Object.keys(option.blacklistDict).forEach(function (key) {
+        option.circularSet.add(option.blacklistDict[key]);
     });
-    // init circularList - moduleDict
-    Object.keys(options.moduleDict).forEach(function (key) {
-        options.circularList.push(options.moduleDict[key]);
+    // init circularSet - moduleDict
+    Object.keys(option.moduleDict).forEach(function (key) {
+        option.circularSet.add(option.moduleDict[key]);
     });
-    // init circularList - prototype
-    Object.keys(options.circularList).forEach(function (key) {
-        tmp = options.circularList[key];
-        options.circularList.push(tmp && tmp.prototype);
-    });
-    // deduplicate circularList
-    tmp = options.circularList;
-    options.circularList = [];
-    tmp.forEach(function (element) {
-        if (options.circularList.indexOf(element) < 0) {
-            options.circularList.push(element);
-        }
+    // init circularSet - prototype
+    option.circularSet.forEach(function (element) {
+        option.circularSet.add(element && element.prototype);
     });
     // init moduleDict child
-    local.apidocModuleDictAdd(options, options.moduleDict);
+    local.apidocModuleDictAdd(option, option.moduleDict);
     // init swgg.apiDict
     Object.keys((moduleMain.swgg && moduleMain.swgg.apiDict) || {}).forEach(function (key) {
         tmp = "swgg.apiDict";
-        options.moduleDict[tmp] = options.moduleDict[tmp] || {};
-        tmp = options.moduleDict[tmp];
+        option.moduleDict[tmp] = option.moduleDict[tmp] || {};
+        tmp = option.moduleDict[tmp];
         tmp[key + ".ajax"] = (
             moduleMain.swgg.apiDict[key]
             && moduleMain.swgg.apiDict[key].ajax
         );
     });
     // init moduleExtraDict
-    options.moduleExtraDict[options.env.npm_package_name] = (
-        options.moduleExtraDict[options.env.npm_package_name] || {}
+    option.moduleExtraDict[option.env.npm_package_name] = (
+        option.moduleExtraDict[option.env.npm_package_name] || {}
     );
-    module = options.moduleExtraDict[options.env.npm_package_name];
+    module = option.moduleExtraDict[option.env.npm_package_name];
     [1, 2, 3, 4].forEach(function (depth) {
-        options.libFileList = options.libFileList.concat(
+        option.libFileList = option.libFileList.concat(
             // find . -maxdepth 1 -mindepth 1 -name "*.js" -type f
             // http://stackoverflow.com/questions/4509624/how-to-limit-depth-for-recursive-file-list
             local.child_process.execSync(
-                "find \"" + options.dir
+                "find \"" + option.dir
                 + "\" -maxdepth " + depth + " -mindepth " + depth
-                + " -name \"*.js\" -type f | sed -e \"s|" + options.dir
+                + " -name \"*.js\" -type f | sed -e \"s|" + option.dir
                 + "/||\" | grep -iv "
 /* jslint ignore:start */
 + '"\
@@ -1215,8 +1301,8 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
             .split("\n")
         );
     });
-    options.ii = 256;
-    options.libFileList.every(function (file) {
+    option.ii = 256;
+    option.libFileList.every(function (file) {
         local.tryCatchOnError(function () {
             tmp = {};
             tmp.name = local.path.basename(file)
@@ -1232,8 +1318,8 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 tmp.name.slice(0, 1).toUpperCase() + tmp.name.slice(1)
             ]).some(function (name) {
                 tmp.isFiltered = name && (
-                    !options.packageJson.main
-                    || ("./" + file).indexOf(options.packageJson.main) < 0
+                    !option.packageJson.main
+                    || ("./" + file).indexOf(option.packageJson.main) < 0
                 ) && !module[name];
                 return !tmp.isFiltered;
             });
@@ -1241,29 +1327,29 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                 return;
             }
             console.error("apidocCreate - libFile " + file);
-            tmp.module = options.require(options.dir + "/" + file);
+            tmp.module = option.require(option.dir + "/" + file);
             // filter circular-reference
-            if (!(tmp.module && options.circularList.indexOf(tmp.module) < 0)) {
+            if (!(tmp.module && option.circularSet.has(tmp.module))) {
                 return;
             }
-            options.ii -= 1;
+            option.ii -= 1;
             module[tmp.name] = tmp.module;
         }, console.error);
-        return options.ii;
+        return option.ii;
     });
-    local.apidocModuleDictAdd(options, options.moduleExtraDict);
-    Object.keys(options.moduleDict).forEach(function (key) {
-        if (key.indexOf(options.env.npm_package_name + ".") !== 0) {
+    local.apidocModuleDictAdd(option, option.moduleExtraDict);
+    Object.keys(option.moduleDict).forEach(function (key) {
+        if (key.indexOf(option.env.npm_package_name + ".") !== 0) {
             return;
         }
         tmp = key.split(".").slice(1).join(".");
-        moduleMain[tmp] = moduleMain[tmp] || options.moduleDict[key];
+        moduleMain[tmp] = moduleMain[tmp] || option.moduleDict[key];
     });
     // init moduleList
-    options.moduleList = Object.keys(options.moduleDict)
+    option.moduleList = Object.keys(option.moduleDict)
     .sort()
     .map(function (prefix) {
-        module = options.moduleDict[prefix];
+        module = option.moduleDict[prefix];
         // handle case where module is a function
         if (typeof module === "function") {
             local.tryCatchOnError(function () {
@@ -1283,8 +1369,8 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
                         ).test(key)
                         && key.indexOf("testCase_") !== 0
                         && (
-                            module[key] !== options.blacklistDict[key]
-                            || options.whitelistDict[key]
+                            module[key] !== option.blacklistDict[key]
+                            || option.whitelistDict[key]
                         )
                     );
                 }, console.error);
@@ -1304,19 +1390,19 @@ vendor\\)s\\{0,1\\}\\(\\b\\|_\\)\
         };
     });
     // render apidoc
-    options.result = local.templateRender(options.template, options, {
+    option.result = local.templateRender(option.template, option, {
         notHtmlSafe: true
     })
     .trim()
     .replace((
         /\u0020+$/gm
     ), "") + "\n";
-    return options.result;
+    return option.result;
 };
 
-local.apidocModuleDictAdd = function (options, moduleDict) {
+local.apidocModuleDictAdd = function (option, moduleDict) {
 /*
- * this function will add the modules in moduleDict to options.moduleDict
+ * this function will add the modules in moduleDict to option.moduleDict
  */
     var isModule;
     var objectKeys;
@@ -1362,8 +1448,8 @@ local.apidocModuleDictAdd = function (options, moduleDict) {
                         || typeof tmp.module === "object"
                     )
                     || Array.isArray(tmp.module)
-                    || options.moduleDict[tmp.name]
-                    || options.circularList.indexOf(tmp.module) >= 0
+                    || option.moduleDict[tmp.name]
+                    || option.circularSet.has(tmp.module)
                 ) {
                     return;
                 }
@@ -1378,8 +1464,8 @@ local.apidocModuleDictAdd = function (options, moduleDict) {
                 if (!isModule) {
                     return;
                 }
-                options.circularList.push(tmp.module);
-                options.moduleDict[tmp.name] = tmp.module;
+                option.circularSet.add(tmp.module);
+                option.moduleDict[tmp.name] = tmp.module;
             });
         });
     });
@@ -1411,7 +1497,7 @@ local.cliDict._default = function () {
     }));
 };
 
-// run cli
+// run the cli
 if (module === require.main && !globalThis.utility2_rollup) {
     local.cliRun();
 }
@@ -1427,7 +1513,7 @@ if (module === require.main && !globalThis.utility2_rollup) {
 /* script-begin /assets.utility2.lib.db.js */
 // usr/bin/env node
 /*
- * lib.db.js (2018.9.1)
+ * lib.db.js (2018.12.31)
  * https://github.com/kaizhu256/node-db-lite
  * this zero-dependency package will provide a persistent, in-browser database, with a working web-demo
  *
@@ -1476,28 +1562,48 @@ if (module === require.main && !globalThis.utility2_rollup) {
         } catch (ignore) {}
     }());
     globalThis.globalThis = globalThis;
+    // init debug_inline
+    if (!globalThis["debug\u0049nline"]) {
+        consoleError = console.error;
+        globalThis["debug\u0049nline"] = function () {
+        /*
+         * this function will both print <arguments> to stderr
+         * and return <arguments>[0]
+         */
+            var argList;
+            argList = Array.from(arguments); // jslint ignore:line
+            // debug arguments
+            globalThis["debug\u0049nlineArguments"] = argList;
+            consoleError("\n\ndebug\u0049nline");
+            consoleError.apply(console, argList);
+            consoleError("\n");
+            // return arg0 for inspection
+            return argList[0];
+        };
+    }
     // init local
     local = {};
+    local.local = local;
+    globalThis.globalLocal = local;
     // init isBrowser
     local.isBrowser = (
         typeof window === "object"
         && window === globalThis
         && typeof window.XMLHttpRequest === "function"
         && window.document
-        && typeof window.document.querySelectorAll === "function"
+        && typeof window.document.querySelector === "function"
     );
-    globalThis.globalLocal = local;
     // init function
     local.assertThrow = function (passed, message) {
     /*
-     * this function will throw the error <message> if <passed> is falsy
+     * this function will throw error <message> if <passed> is falsy
      */
         var error;
         if (passed) {
             return;
         }
         error = (
-            // ternary-operator
+            // ternary-condition
             (
                 message
                 && typeof message.message === "string"
@@ -1535,24 +1641,53 @@ if (module === require.main && !globalThis.utility2_rollup) {
      */
         return;
     };
-    // init debug_inline
-    if (!globalThis["debug\u0049nline"]) {
-        consoleError = console.error;
-        globalThis["debug\u0049nline"] = function () {
-        /*
-         * this function will both print <arguments> to stderr
-         * and return <arguments>[0]
-         */
-            var argList;
-            argList = Array.from(arguments); // jslint ignore:line
-            // debug arguments
-            globalThis["debug\u0049nlineArguments"] = argList;
-            consoleError("\n\ndebug\u0049nline");
-            consoleError.apply(console, argList);
-            consoleError("\n");
-            // return arg0 for inspection
-            return argList[0];
-        };
+    local.objectAssignDefault = function (target, source) {
+    /*
+     * this function will if items from <target> are
+     * null, undefined, or empty-string,
+     * then overwrite them with items from <source>
+     */
+        target = target || {};
+        Object.keys(source || {}).forEach(function (key) {
+            if (
+                target[key] === null
+                || target[key] === undefined
+                || target[key] === ""
+            ) {
+                target[key] = target[key] || source[key];
+            }
+        });
+        return target;
+    };
+    // require builtin
+    if (!local.isBrowser) {
+        local.assert = require("assert");
+        local.buffer = require("buffer");
+        local.child_process = require("child_process");
+        local.cluster = require("cluster");
+        local.crypto = require("crypto");
+        local.dgram = require("dgram");
+        local.dns = require("dns");
+        local.domain = require("domain");
+        local.events = require("events");
+        local.fs = require("fs");
+        local.http = require("http");
+        local.https = require("https");
+        local.net = require("net");
+        local.os = require("os");
+        local.path = require("path");
+        local.querystring = require("querystring");
+        local.readline = require("readline");
+        local.repl = require("repl");
+        local.stream = require("stream");
+        local.string_decoder = require("string_decoder");
+        local.timers = require("timers");
+        local.tls = require("tls");
+        local.tty = require("tty");
+        local.url = require("url");
+        local.util = require("util");
+        local.vm = require("vm");
+        local.zlib = require("zlib");
     }
 }(this));
 
@@ -1577,45 +1712,16 @@ local = (
 if (local.isBrowser) {
     globalThis.utility2_db = local;
 } else {
-    // require builtins
-    local.assert = require("assert");
-    local.buffer = require("buffer");
-    local.child_process = require("child_process");
-    local.cluster = require("cluster");
-    local.crypto = require("crypto");
-    local.dgram = require("dgram");
-    local.dns = require("dns");
-    local.domain = require("domain");
-    local.events = require("events");
-    local.fs = require("fs");
-    local.http = require("http");
-    local.https = require("https");
-    local.net = require("net");
-    local.os = require("os");
-    local.path = require("path");
-    local.querystring = require("querystring");
-    local.readline = require("readline");
-    local.repl = require("repl");
-    local.stream = require("stream");
-    local.string_decoder = require("string_decoder");
-    local.timers = require("timers");
-    local.tls = require("tls");
-    local.tty = require("tty");
-    local.url = require("url");
-    local.util = require("util");
-    local.vm = require("vm");
-    local.zlib = require("zlib");
     module.exports = local;
     module.exports.__dirname = __dirname;
 }
 // init lib main
-local.local = local;
 local.db = local;
 
 
 
 /* validateLineSortedReset */
-local.cliRun = function (options) {
+local.cliRun = function (option) {
 /*
  * this function will run the cli
  */
@@ -1651,10 +1757,10 @@ local.cliRun = function (options) {
         file = __filename.replace((
             /.*\//
         ), "");
-        options = Object.assign({}, options);
+        option = Object.assign({}, option);
         packageJson = require("./package.json");
         // validate comment
-        options.rgxComment = options.rgxComment || (
+        option.rgxComment = option.rgxComment || (
             /\)\u0020\{\n(?:|\u0020{4})\/\*\n(?:\u0020|\u0020{5})\*((?:\u0020<[^>]*?>|\u0020\.\.\.)*?)\n(?:\u0020|\u0020{5})\*\u0020(will\u0020.*?\S)\n(?:\u0020|\u0020{5})\*\/\n(?:\u0020{4}|\u0020{8})\S/
         );
         textDict = {};
@@ -1673,7 +1779,7 @@ local.cliRun = function (options) {
                 return;
             }
             try {
-                commandList[ii] = options.rgxComment.exec(text);
+                commandList[ii] = option.rgxComment.exec(text);
                 commandList[ii] = {
                     argList: (commandList[ii][1] || "").trim(),
                     command: [key],
@@ -1682,21 +1788,21 @@ local.cliRun = function (options) {
             } catch (ignore) {
                 local.assertThrow(null, new Error(
                     "cliRun - cannot parse comment in COMMAND "
-                    + key + ":\nnew RegExp(" + JSON.stringify(options.rgxComment.source)
-                    + ").exec(" + JSON.stringify(text)
-                    .replace((
+                    + key + ":\nnew RegExp("
+                    + JSON.stringify(option.rgxComment.source)
+                    + ").exec(" + JSON.stringify(text).replace((
                         /\\\\/g
-                    ), "\u0000")
-                    .replace((
+                    ), "\u0000").replace((
                         /\\n/g
-                    ), "\\n\\\n")
-                    .replace((
+                    ), "\\n\\\n").replace((
                         /\u0000/g
                     ), "\\\\") + ");"
                 ));
             }
         });
-        console.log(packageJson.name + " (" + packageJson.version + ")\n\n" + commandList
+        text = "";
+        text += packageJson.name + " (" + packageJson.version + ")\n\n";
+        text += commandList
         .filter(function (element) {
             return element;
         })
@@ -1726,7 +1832,8 @@ local.cliRun = function (options) {
                 + element.argList.join("  ")
             );
         })
-        .join("\n\n"));
+        .join("\n\n");
+        console.log(text);
     };
     local.cliDict["--help"] = local.cliDict["--help"] || local.cliDict._help;
     local.cliDict["-h"] = local.cliDict["-h"] || local.cliDict._help;
@@ -1738,7 +1845,7 @@ local.cliRun = function (options) {
      * will start interactive-mode
      */
         globalThis.local = local;
-        local.functionOrNop(local.replStart || require("repl").start)({
+        local.identity(local.replStart || require("repl").start)({
             useGlobal: true
         });
     };
@@ -1754,7 +1861,10 @@ local.cliRun = function (options) {
      */
         console.log(require(__dirname + "/package.json").version);
     };
-    local.cliDict["--version"] = local.cliDict["--version"] || local.cliDict._version;
+    local.cliDict["--version"] = (
+        local.cliDict["--version"]
+        || local.cliDict._version
+    );
     local.cliDict["-v"] = local.cliDict["-v"] || local.cliDict._version;
     // default to --help command if no arguments are given
     if (process.argv.length <= 2) {
@@ -1820,33 +1930,27 @@ local.jsonStringifyOrdered = function (obj, replacer, space) {
             circularSet.delete(obj);
             return tmp;
         }
-        // if obj is not an array, then recurse its items with object-keys sorted
-        tmp = "{" + Object.keys(obj)
-        // sort object-keys
-        .sort()
-        .map(function (key) {
+        // if obj is not an array,
+        // then recurse its items with object-keys sorted
+        tmp = "{" + Object.keys(obj).sort().map(function (key) {
             // recurse
             tmp = stringify(obj[key]);
             if (typeof tmp === "string") {
                 return JSON.stringify(key) + ":" + tmp;
             }
-        })
-        .filter(function (obj) {
+        }).filter(function (obj) {
             return typeof obj === "string";
-        })
-        .join(",") + "}";
+        }).join(",") + "}";
         circularSet.delete(obj);
         return tmp;
     };
     circularSet = new Set();
-    return JSON.stringify(
+    return JSON.stringify((
         (typeof obj === "object" && obj)
         // recurse
         ? JSON.parse(stringify(obj))
-        : obj,
-        replacer,
-        space
-    );
+        : obj
+    ), replacer, space);
 };
 
 local.listShuffle = function (list) {
@@ -1964,7 +2068,9 @@ local.onParallel = function (onError, onEach, onRetry) {
         onParallel.counter -= 1;
         // validate counter
         if (!(onParallel.counter >= 0 || error || onParallel.error)) {
-            error = new Error("invalid onParallel.counter = " + onParallel.counter);
+            error = new Error(
+                "invalid onParallel.counter = " + onParallel.counter
+            );
         // ensure onError is run only once
         } else if (onParallel.counter < 0) {
             return;
@@ -1993,46 +2099,52 @@ local.replStart = function () {
  * this function will start the repl-debugger
  */
     var that;
-    if (globalThis.utility2_serverRepl1) {
+    if (globalThis.utility2_repl1) {
         return;
     }
-    // start replServer
+    // start repl
     that = require("repl").start({
         useGlobal: true
     });
-    globalThis.utility2_serverRepl1 = that;
+    globalThis.utility2_repl1 = that;
     that.onError = function (error) {
     /*
-     * this function will debug any repl-error
+     * this function will debug repl-error
      */
-        // debug error
         globalThis.utility2_debugReplError = error;
         console.error(error);
     };
-    // save repl eval function
+    // save eval-function
     that.evalDefault = that.eval;
-    // hook custom repl eval function
+    // hook custom-eval-function
     that.eval = function (script, context, file, onError) {
         var onError2;
         onError2 = function (error, data) {
             // debug error
-            globalThis.utility2_debugReplError = error || globalThis.utility2_debugReplError;
+            globalThis.utility2_debugReplError = (
+                error
+                || globalThis.utility2_debugReplError
+            );
             onError(error, data);
         };
         script.replace((
             /^(\S+)\u0020(.*?)\n/
         ), function (ignore, match1, match2) {
             switch (match1) {
-            // syntax-sugar to run async shell-command
+            // syntax-sugar - run async shell-command
             case "$":
                 switch (match2) {
-                // syntax-sugar to run git diff
+                // syntax-sugar - run git diff
                 case "git diff":
                     match2 = "git diff --color | cat";
                     break;
-                // syntax-sugar to run git log
+                // syntax-sugar - run git log
                 case "git log":
                     match2 = "git log -n 4 | cat";
+                    break;
+                // syntax-sugar - run git log
+                case "ll":
+                    match2 = "ls -Fal";
                     break;
                 }
                 // source lib.utility2.sh
@@ -2046,9 +2158,8 @@ local.replStart = function () {
                 require("child_process").spawn(match2, {
                     shell: true,
                     stdio: ["ignore", 1, 2]
-                })
                 // on shell exit, print return prompt
-                .on("exit", function (exitCode) {
+                }).on("exit", function (exitCode) {
                     console.error("exit-code " + exitCode);
                     that.evalDefault(
                         "\n",
@@ -2059,21 +2170,24 @@ local.replStart = function () {
                 });
                 script = "\n";
                 break;
-            // syntax-sugar to map text with charCodeAt
+            // syntax-sugar - map text with charCodeAt
             case "charCode":
-                script = "console.error(" + JSON.stringify(
+                console.error(
                     match2.split("").map(function (chr) {
-                        return "\\u" + chr.charCodeAt(0).toString(16).padStart(4, 0);
+                        return (
+                            "\\u"
+                            + chr.charCodeAt(0).toString(16).padStart(4, 0)
+                        );
                     }).join("")
-                ) + ")\n";
+                );
+                script = "\n";
                 break;
-            // syntax-sugar to sort chr
+            // syntax-sugar - sort chr
             case "charSort":
-                script = "console.error(" + JSON.stringify(
-                    match2.split("").sort().join("")
-                ) + ")\n";
+                console.error(JSON.stringify(match2.split("").sort().join("")));
+                script = "\n";
                 break;
-            // syntax-sugar to grep current dir
+            // syntax-sugar - grep current dir
             case "grep":
                 // run async shell-command
                 require("child_process").spawn((
@@ -2116,28 +2230,31 @@ vendor)s{0,1}(\\b|_)\
                 });
                 script = "\n";
                 break;
-            // syntax-sugar to list object's keys, sorted by item-type
-            // console.log(Object.keys(globalThis).map(function(key){return(typeof window[key]==='object'&&window[key]&&window[key]===globalThis[key]?'globalThis':typeof window[key])+' '+key;}).sort().join('\n'))
+            // syntax-sugar - list object's keys, sorted by item-type
+            // console.error(Object.keys(global).map(function(key){return(typeof global[key]==='object'&&global[key]&&global[key]===global[key]?'global':typeof global[key])+' '+key;}).sort().join('\n')) // jslint ignore:line
             case "keys":
                 script = (
-                    "console.log(Object.keys(" + match2 + ").map(function(key){return("
+                    "console.error(Object.keys(" + match2
+                    + ").map(function(key){return("
                     + "typeof " + match2 + "[key]==='object'&&"
                     + match2 + "[key]&&"
-                    + match2 + "[key]===globalThis[key]"
-                    + "?'globalThis'"
+                    + match2 + "[key]===global[key]"
+                    + "?'global'"
                     + ":typeof " + match2 + "[key]"
                     + ")+' '+key;"
                     + "}).sort().join('\\n'))\n"
                 );
                 break;
-            // syntax-sugar to print stringified arg
+            // syntax-sugar - print stringified arg
             case "print":
                 script = "console.error(String(" + match2 + "))\n";
                 break;
-            // syntax-sugar to read file
+            // syntax-sugar - read file
             case "readFile":
                 try {
-                    globalThis.readFileData = require("fs").readFileSync(match2, "utf8");
+                    console.error(JSON.stringify(
+                        require("fs").readFileSync(match2, "utf8")
+                    ));
                 } catch (errorCaught) {
                     console.error(errorCaught);
                 }
@@ -2165,8 +2282,10 @@ vendor)s{0,1}(\\b|_)\
             that.socket.write(chunk, encoding);
         }()));
     };
-    // start tcp-server
-    globalThis.utility2_serverReplTcp1 = require("net").createServer(function (socket) {
+    // start serverRepl1
+    globalThis.utility2_serverRepl1 = require("net").createServer(function (
+        socket
+    ) {
         // init socket
         that.socket = socket;
         that.socket.on("data", that.write.bind(that));
@@ -2175,8 +2294,10 @@ vendor)s{0,1}(\\b|_)\
     });
     // coverage-hack - ignore else-statement
     local.nop(process.env.PORT_REPL && (function () {
-        console.error("repl-server listening on tcp-port " + process.env.PORT_REPL);
-        globalThis.utility2_serverReplTcp1.listen(process.env.PORT_REPL);
+        console.error(
+            "repl-server listening on port " + process.env.PORT_REPL
+        );
+        globalThis.utility2_serverRepl1.listen(process.env.PORT_REPL);
     }()));
 };
 
@@ -2233,9 +2354,9 @@ clear = function (onError) {
     }, onError);
 };
 
-defer = function (options, onError) {
+defer = function (option, onError) {
 /*
- * this function will defer options.action until storage is ready
+ * this function will defer option.action until storage is ready
  */
     var data;
     var isDone;
@@ -2249,7 +2370,7 @@ defer = function (options, onError) {
     };
     if (!storage) {
         deferList.push(function () {
-            defer(options, onError);
+            defer(option, onError);
         });
         init();
         return;
@@ -2266,7 +2387,7 @@ defer = function (options, onError) {
                 data || request.result || ""
             );
         };
-        switch (options.action) {
+        switch (option.action) {
         case "clear":
         case "removeItem":
         case "setItem":
@@ -2279,18 +2400,19 @@ defer = function (options, onError) {
             .transaction(storageDir, "readonly")
             .objectStore(storageDir);
         }
-        switch (options.action) {
+        switch (option.action) {
         case "clear":
             request = objectStore.clear();
             break;
         case "getItem":
-            request = objectStore.get(String(options.key));
+            request = objectStore.get(String(option.key));
             break;
         case "keys":
             data = [];
             request = objectStore.openCursor();
             request.onsuccess = function () {
                 if (!request.result) {
+                    onError2();
                     return;
                 }
                 data.push(request.result.key);
@@ -2301,10 +2423,10 @@ defer = function (options, onError) {
             request = objectStore.count();
             break;
         case "removeItem":
-            request = objectStore.delete(String(options.key));
+            request = objectStore.delete(String(option.key));
             break;
         case "setItem":
-            request = objectStore.put(options.value, String(options.key));
+            request = objectStore.put(option.value, String(option.key));
             break;
         }
         ["onabort", "onerror", "onsuccess"].forEach(function (handler) {
@@ -2313,7 +2435,7 @@ defer = function (options, onError) {
         // debug request
         local._debugStorageRequest = request;
     } else {
-        switch (options.action) {
+        switch (option.action) {
         case "clear":
             child_process.spawnSync("rm -f " + storage + "/*", {
                 shell: true,
@@ -2323,7 +2445,7 @@ defer = function (options, onError) {
             break;
         case "getItem":
             fs.readFile(
-                storage + "/" + encodeURIComponent(String(options.key)),
+                storage + "/" + encodeURIComponent(String(option.key)),
                 "utf8",
                 function (ignore, data) {
                     onError(null, data || "");
@@ -2342,7 +2464,7 @@ defer = function (options, onError) {
             break;
         case "removeItem":
             fs.unlink(
-                storage + "/" + encodeURIComponent(String(options.key)),
+                storage + "/" + encodeURIComponent(String(option.key)),
                 // ignore error
                 function () {
                     onError();
@@ -2352,13 +2474,13 @@ defer = function (options, onError) {
         case "setItem":
             tmp = os.tmpdir() + "/" + Date.now() + Math.random();
             // save to tmp
-            fs.writeFile(tmp, options.value, function (error) {
+            fs.writeFile(tmp, option.value, function (error) {
                 // validate no error occurred
                 local.assertThrow(!error, error);
                 // rename tmp to key
                 fs.rename(
                     tmp,
-                    storage + "/" + encodeURIComponent(String(options.key)),
+                    storage + "/" + encodeURIComponent(String(option.key)),
                     onError
                 );
             });
@@ -2371,7 +2493,7 @@ deferList = [];
 
 getItem = function (key, onError) {
 /*
- * this function will get the item with the given key from storage
+ * this function will get the item with given key from storage
  */
     defer({
         action: "getItem",
@@ -2449,7 +2571,7 @@ length = function (onError) {
 
 removeItem = function (key, onError) {
 /*
- * this function will remove the item with the given key from storage
+ * this function will remove the item with given key from storage
  */
     defer({
         action: "removeItem",
@@ -2459,7 +2581,7 @@ removeItem = function (key, onError) {
 
 setItem = function (key, value, onError) {
 /*
- * this function will set the item with the given key and value to storage
+ * this function will set the item with given key and value to storage
  */
     defer({
         action: "setItem",
@@ -2486,11 +2608,11 @@ local.storageSetItem = setItem;
 
 // run shared js-env code - lib.dbTable.js
 (function () {
-local._DbTable = function (options) {
+local._DbTable = function (option) {
 /*
  * this function will create a dbTable
  */
-    this.name = String(options.name);
+    this.name = String(option.name);
     // register dbTable in dbTableDict
     local.dbTableDict[this.name] = this;
     this.dbRowList = [];
@@ -2501,7 +2623,7 @@ local._DbTable = function (options) {
         dict: {}
     }];
     this.onSaveList = [];
-    this.sizeLimit = options.sizeLimit || 0;
+    this.sizeLimit = option.sizeLimit || 0;
 };
 
 local._DbTable.prototype._cleanup = function () {
@@ -2542,7 +2664,7 @@ local._DbTable.prototype._crudGetManyByQuery = function (
 ) {
 /*
  * this function will get the dbRow's in the dbTable,
- * with the given query, sort, skip, and limit
+ * with given query, sort, skip, and limit
  */
     var ii;
     var result;
@@ -2583,7 +2705,7 @@ local._DbTable.prototype._crudGetManyByQuery = function (
 
 local._DbTable.prototype._crudGetOneById = function (idDict) {
 /*
- * this function will get the dbRow in the dbTable with the given idDict
+ * this function will get the dbRow in the dbTable with given idDict
  */
     var id;
     var result;
@@ -2600,9 +2722,9 @@ local._DbTable.prototype._crudGetOneById = function (idDict) {
     return result;
 };
 
-local._DbTable.prototype._crudRemoveOneById = function (idDict, circularList) {
+local._DbTable.prototype._crudRemoveOneById = function (idDict, circularSet) {
 /*
- * this function will remove the dbRow from the dbTable with the given idDict
+ * this function will remove the dbRow from the dbTable with given idDict
  */
     var id;
     var result;
@@ -2611,7 +2733,7 @@ local._DbTable.prototype._crudRemoveOneById = function (idDict, circularList) {
         return null;
     }
     that = this;
-    circularList = circularList || [idDict];
+    circularSet = circularSet || new Set([idDict]);
     result = null;
     that.idIndexList.forEach(function (idIndex) {
         id = idDict[idIndex.name];
@@ -2624,12 +2746,12 @@ local._DbTable.prototype._crudRemoveOneById = function (idDict, circularList) {
         // optimization - soft-delete
         result.$isRemoved = true;
         that.isDirty = true;
-        if (circularList.indexOf(result) >= 0) {
+        if (circularSet.has(result)) {
             return;
         }
-        circularList.push(result);
+        circularSet.add(result);
         // recurse
-        that._crudRemoveOneById(result, circularList);
+        that._crudRemoveOneById(result, circularSet);
     });
     that.save();
     return result;
@@ -2637,7 +2759,7 @@ local._DbTable.prototype._crudRemoveOneById = function (idDict, circularList) {
 
 local._DbTable.prototype._crudSetOneById = function (dbRow) {
 /*
- * this function will set the dbRow into the dbTable with the given dbRow._id
+ * this function will set the dbRow into the dbTable with given dbRow._id
  * WARNING - existing dbRow with conflicting dbRow._id will be removed
  */
     var existing;
@@ -2706,7 +2828,7 @@ local._DbTable.prototype._crudSetOneById = function (dbRow) {
 local._DbTable.prototype._crudUpdateOneById = function (dbRow) {
 /*
  * this function will update the dbRow in the dbTable,
- * if it exists with the given dbRow._id
+ * if it exists with given dbRow._id
  * WARNING
  * existing dbRow's with conflicting unique-keys (besides the one being updated)
  * will be removed
@@ -2743,7 +2865,7 @@ local._DbTable.prototype.crudCountAll = function (onError) {
 
 local._DbTable.prototype.crudCountManyByQuery = function (query, onError) {
 /*
- * this function will count the number of dbRow's in the dbTable with the given query
+ * this function will count the number of dbRow's in the dbTable with given query
  */
     this._cleanup();
     return local.setTimeoutOnError(
@@ -2756,7 +2878,7 @@ local._DbTable.prototype.crudCountManyByQuery = function (query, onError) {
 
 local._DbTable.prototype.crudGetManyById = function (idDictList, onError) {
 /*
- * this function will get the dbRow's in the dbTable with the given idDictList
+ * this function will get the dbRow's in the dbTable with given idDictList
  */
     var that;
     this._cleanup();
@@ -2768,27 +2890,27 @@ local._DbTable.prototype.crudGetManyById = function (idDictList, onError) {
     ));
 };
 
-local._DbTable.prototype.crudGetManyByQuery = function (options, onError) {
+local._DbTable.prototype.crudGetManyByQuery = function (option, onError) {
 /*
- * this function will get the dbRow's in the dbTable with the given options.query
+ * this function will get the dbRow's in the dbTable with given option.query
  */
     this._cleanup();
-    options = local.objectSetOverride(options);
+    option = local.objectSetOverride(option);
     return local.setTimeoutOnError(onError, 0, null, local.dbRowProject(
         this._crudGetManyByQuery(
-            options.query,
-            options.sort || this.sortDefault,
-            options.skip,
-            options.limit,
-            options.shuffle
+            option.query,
+            option.sort || this.sortDefault,
+            option.skip,
+            option.limit,
+            option.shuffle
         ),
-        options.fieldList
+        option.fieldList
     ));
 };
 
 local._DbTable.prototype.crudGetOneById = function (idDict, onError) {
 /*
- * this function will get the dbRow in the dbTable with the given idDict
+ * this function will get the dbRow in the dbTable with given idDict
  */
     this._cleanup();
     return local.setTimeoutOnError(onError, 0, null, local.dbRowProject(
@@ -2798,7 +2920,7 @@ local._DbTable.prototype.crudGetOneById = function (idDict, onError) {
 
 local._DbTable.prototype.crudGetOneByQuery = function (query, onError) {
 /*
- * this function will get the dbRow in the dbTable with the given query
+ * this function will get the dbRow in the dbTable with given query
  */
     var ii;
     var result;
@@ -2843,7 +2965,7 @@ local._DbTable.prototype.crudRemoveAll = function (onError) {
 
 local._DbTable.prototype.crudRemoveManyById = function (idDictList, onError) {
 /*
- * this function will remove the dbRow's from the dbTable with the given idDictList
+ * this function will remove the dbRow's from the dbTable with given idDictList
  */
     var that;
     that = this;
@@ -2856,7 +2978,7 @@ local._DbTable.prototype.crudRemoveManyById = function (idDictList, onError) {
 
 local._DbTable.prototype.crudRemoveManyByQuery = function (query, onError) {
 /*
- * this function will remove the dbRow's from the dbTable with the given query
+ * this function will remove the dbRow's from the dbTable with given query
  */
     var that;
     that = this;
@@ -2869,7 +2991,7 @@ local._DbTable.prototype.crudRemoveManyByQuery = function (query, onError) {
 
 local._DbTable.prototype.crudRemoveOneById = function (idDict, onError) {
 /*
- * this function will remove the dbRow from the dbTable with the given idDict
+ * this function will remove the dbRow from the dbTable with given idDict
  */
     return local.setTimeoutOnError(onError, 0, null, local.dbRowProject(
         this._crudRemoveOneById(idDict)
@@ -2891,7 +3013,7 @@ local._DbTable.prototype.crudSetManyById = function (dbRowList, onError) {
 
 local._DbTable.prototype.crudSetOneById = function (dbRow, onError) {
 /*
- * this function will set the dbRow into the dbTable with the given dbRow._id
+ * this function will set the dbRow into the dbTable with given dbRow._id
  */
     return local.setTimeoutOnError(onError, 0, null, local.dbRowProject(
         this._crudSetOneById(dbRow)
@@ -2901,7 +3023,7 @@ local._DbTable.prototype.crudSetOneById = function (dbRow, onError) {
 local._DbTable.prototype.crudUpdateManyById = function (dbRowList, onError) {
 /*
  * this function will update the dbRowList in the dbTable,
- * if they exist with the given dbRow._id's
+ * if they exist with given dbRow._id's
  */
     var that;
     that = this;
@@ -2914,7 +3036,7 @@ local._DbTable.prototype.crudUpdateManyById = function (dbRowList, onError) {
 
 local._DbTable.prototype.crudUpdateManyByQuery = function (query, dbRow, onError) {
 /*
- * this function will update the dbRow's in the dbTable with the given query
+ * this function will update the dbRow's in the dbTable with given query
  */
     var result;
     var that;
@@ -2931,7 +3053,7 @@ local._DbTable.prototype.crudUpdateManyByQuery = function (query, dbRow, onError
 local._DbTable.prototype.crudUpdateOneById = function (dbRow, onError) {
 /*
  * this function will update the dbRow in the dbTable,
- * if it exists with the given dbRow._id
+ * if it exists with given dbRow._id
  */
     return local.setTimeoutOnError(onError, 0, null, local.dbRowProject(
         this._crudUpdateOneById(dbRow)
@@ -2977,26 +3099,26 @@ local._DbTable.prototype.export = function (onError) {
     return local.setTimeoutOnError(onError, 0, null, result.trim());
 };
 
-local._DbTable.prototype.idIndexCreate = function (options, onError) {
+local._DbTable.prototype.idIndexCreate = function (option, onError) {
 /*
- * this function will create an idIndex with the given options.name
+ * this function will create an idIndex with given option.name
  */
     var dbRow;
     var idIndex;
     var ii;
     var name;
-    options = local.objectSetOverride(options);
-    name = String(options.name);
+    option = local.objectSetOverride(option);
+    name = String(option.name);
     // disallow idIndex with dot-name
     if (name.indexOf(".") >= 0 || name === "_id") {
         return local.setTimeoutOnError(onError);
     }
     // remove existing idIndex
-    this.idIndexRemove(options);
+    this.idIndexRemove(option);
     // init idIndex
     idIndex = {
         dict: {},
-        isInteger: Boolean(options.isInteger),
+        isInteger: Boolean(option.isInteger),
         name: name
     };
     this.idIndexList.push(idIndex);
@@ -3015,13 +3137,13 @@ local._DbTable.prototype.idIndexCreate = function (options, onError) {
     return local.setTimeoutOnError(onError);
 };
 
-local._DbTable.prototype.idIndexRemove = function (options, onError) {
+local._DbTable.prototype.idIndexRemove = function (option, onError) {
 /*
- * this function will remove the idIndex with the given options.name
+ * this function will remove the idIndex with given option.name
  */
     var name;
-    options = local.objectSetOverride(options);
-    name = String(options.name);
+    option = local.objectSetOverride(option);
+    name = String(option.name);
     this.idIndexList = this.idIndexList.filter(function (idIndex) {
         return idIndex.name !== name || idIndex.name === "_id";
     });
@@ -3173,6 +3295,7 @@ local.dbLoad = function (onError) {
     });
     local.storageKeys(function (error, data) {
         onParallel.counter += 1;
+        // validate no error occurred
         onParallel.counter += 1;
         onParallel(error);
         (data || []).forEach(function (key) {
@@ -3192,7 +3315,7 @@ local.dbLoad = function (onError) {
 
 local.dbReset = function (dbSeedList, onError) {
 /*
- * this function will drop and seed the db with the given dbSeedList
+ * this function will drop and seed the db with given dbSeedList
  */
     var onParallel;
     onParallel = globalThis.utility2_onReadyBefore || local.onParallel(onError);
@@ -3211,7 +3334,7 @@ local.dbReset = function (dbSeedList, onError) {
 
 local.dbRowGetItem = function (dbRow, key) {
 /*
- * this function will get the item with the given key from dbRow
+ * this function will get the item with given key from dbRow
  */
     var ii;
     var value;
@@ -3232,7 +3355,7 @@ local.dbRowGetItem = function (dbRow, key) {
 
 local.dbRowListGetManyByOperator = function (dbRowList, fieldName, operator, bb, not) {
 /*
- * this function will get the dbRow's in dbRowList with the given operator
+ * this function will get the dbRow's in dbRowList with given operator
  */
     var fieldValue;
     var ii;
@@ -3355,7 +3478,7 @@ local.dbRowListGetManyByOperator = function (dbRowList, fieldName, operator, bb,
 
 local.dbRowListGetManyByQuery = function (dbRowList, query, fieldName, not) {
 /*
- * this function will get the dbRow's in dbRowList with the given query
+ * this function will get the dbRow's in dbRowList with given query
  */
     var bb;
     var dbRowDict;
@@ -3403,7 +3526,7 @@ local.dbRowListGetManyByQuery = function (dbRowList, query, fieldName, not) {
 
 local.dbRowProject = function (dbRow, fieldList) {
 /*
- * this function will deepcopy and project the dbRow with the given fieldList
+ * this function will deepcopy and project the dbRow with given fieldList
  */
     var result;
     if (!dbRow) {
@@ -3432,7 +3555,7 @@ local.dbRowProject = function (dbRow, fieldList) {
 local.dbRowSetId = function (dbRow, idIndex) {
 /*
  * this function will if does not exist,
- * then set a random and unique id into dbRow for the given idIndex,
+ * then set a random and unique id into dbRow for given idIndex,
  */
     var id;
     id = dbRow[idIndex.name];
@@ -3468,7 +3591,7 @@ local.dbSave = function (onError) {
 
 local.dbSeed = function (dbSeedList, onError) {
 /*
- * this function will seed the db with the given dbSeedList
+ * this function will seed the db with given dbSeedList
  */
     var dbTableDict;
     var onParallel;
@@ -3478,8 +3601,8 @@ local.dbSeed = function (dbSeedList, onError) {
     // seed db
     onParallel.counter += 1;
     local.dbTableCreateMany(dbSeedList, onParallel);
-    (dbSeedList || []).forEach(function (options) {
-        dbTableDict[options.name] = true;
+    (dbSeedList || []).forEach(function (option) {
+        dbTableDict[option.name] = true;
     });
     Object.keys(dbTableDict).forEach(function (name) {
         console.error("db - seeding dbTable " + name + " ...");
@@ -3488,9 +3611,9 @@ local.dbSeed = function (dbSeedList, onError) {
     onParallel();
 };
 
-local.dbTableCreateMany = function (optionsList, onError) {
+local.dbTableCreateMany = function (optionList, onError) {
 /*
- * this function will create many dbTables with the given optionsList
+ * this function will create many dbTables with given optionList
  */
     var onParallel;
     var result;
@@ -3498,26 +3621,26 @@ local.dbTableCreateMany = function (optionsList, onError) {
         local.setTimeoutOnError(onError, 0, error, result);
     });
     onParallel.counter += 1;
-    result = (optionsList || []).map(function (options) {
+    result = (optionList || []).map(function (option) {
         onParallel.counter += 1;
-        return local.dbTableCreateOne(options, onParallel);
+        return local.dbTableCreateOne(option, onParallel);
     });
     return local.setTimeoutOnError(onParallel, 0, null, result);
 };
 
-local.dbTableCreateOne = function (options, onError) {
+local.dbTableCreateOne = function (option, onError) {
 /*
- * this function will create a dbTable with the given options
+ * this function will create a dbTable with given option
  */
     var DbTable;
     var that;
-    options = local.objectSetOverride(options);
+    option = local.objectSetOverride(option);
     // register dbTable
     DbTable = local._DbTable;
-    local.dbTableDict[options.name] = local.dbTableDict[options.name] || new DbTable(options);
-    that = local.dbTableDict[options.name];
+    local.dbTableDict[option.name] = local.dbTableDict[option.name] || new DbTable(option);
+    that = local.dbTableDict[option.name];
     that.sortDefault = (
-        options.sortDefault
+        option.sortDefault
         || that.sortDefault
         || [{
             fieldName: "_timeUpdated",
@@ -3525,17 +3648,17 @@ local.dbTableCreateOne = function (options, onError) {
         }]
     );
     // remove idIndex
-    (options.idIndexRemoveList || []).forEach(function (idIndex) {
+    (option.idIndexRemoveList || []).forEach(function (idIndex) {
         that.idIndexRemove(idIndex);
     });
     // create idIndex
-    (options.idIndexCreateList || []).forEach(function (idIndex) {
+    (option.idIndexCreateList || []).forEach(function (idIndex) {
         that.idIndexCreate(idIndex);
     });
     // upsert dbRow
-    that.crudSetManyById(options.dbRowList);
+    that.crudSetManyById(option.dbRowList);
     // restore dbTable from persistent-storage
-    that.isLoaded = that.isLoaded || options.isLoaded;
+    that.isLoaded = that.isLoaded || option.isLoaded;
     if (!that.isLoaded) {
         local.storageGetItem("dbTable." + that.name + ".json", function (error, data) {
             // validate no error occurred
@@ -3563,40 +3686,37 @@ local.onEventDomDb = function (event) {
     var utility2;
     utility2 = globalThis.utility2 || {};
     ajaxProgressUpdate = utility2.ajaxProgressUpdate || local.nop;
-    switch (event.target.dataset.onEventDomDb || event.target.id) {
-    case "dbExportButton1":
-        tmp = globalThis.URL.createObjectURL(new globalThis.Blob([local.dbExport()]));
-        document.querySelector("#dbExportA1").href = tmp;
-        document.querySelector("#dbExportA1").click();
+    switch (event.target.dataset.oneventDb) {
+    case "dbExport":
+        tmp = URL.createObjectURL(new globalThis.Blob([local.dbExport()]));
+        document.querySelector(
+            "#dbExportA1"
+        ).href = tmp;
+        document.querySelector(
+            "#dbExportA1"
+        ).click();
         setTimeout(function () {
-            globalThis.URL.revokeObjectURL(tmp);
+            URL.revokeObjectURL(tmp);
         }, 30000);
         break;
-    case "dbImportButton1":
-        tmp = document.querySelector("#dbImportInput1");
-        if (!tmp.onEventDomDb) {
-            tmp.onEventDomDb = local.onEventDomDb;
-            tmp.addEventListener("change", local.onEventDomDb);
-        }
-        tmp.click();
+    case "dbImport":
+        document.querySelector(
+            "[data-onevent-db='dbImportInput']"
+        ).click();
         break;
-    case "dbImportInput1":
+    case "dbImportInput":
         if (event.type !== "change") {
             return;
         }
         ajaxProgressUpdate();
-        reader = new globalThis.FileReader();
-        tmp = document.querySelector("#dbImportInput1").files[0];
-        if (!tmp) {
-            return;
-        }
+        reader = new FileReader();
         reader.addEventListener("load", function () {
             local.dbImport(reader.result);
             ajaxProgressUpdate();
         });
-        reader.readAsText(tmp);
+        reader.readAsText(event.target.files[0]);
         break;
-    case "dbResetButton1":
+    case "dbReset":
         ajaxProgressUpdate();
         local.dbReset(globalThis.utility2_dbSeedList, function (error) {
             local.onErrorDefault(error);
@@ -3843,7 +3963,7 @@ local.cliDict.dbTableRemove = function () {
     });
 };
 
-// run cli
+// run the cli
 if (module === require.main && !globalThis.utility2_rollup) {
     local.cliRun();
 }
@@ -3859,7 +3979,7 @@ if (module === require.main && !globalThis.utility2_rollup) {
 /* script-begin /assets.utility2.lib.github_crud.js */
 // usr/bin/env node
 /*
- * lib.github_crud.js (2018.8.8)
+ * lib.github_crud.js (2019.1.21)
  * https://github.com/kaizhu256/node-github-crud
  * this zero-dependency package will provide a simple cli-tool to PUT / GET / DELETE github files
  *
@@ -3881,28 +4001,48 @@ if (module === require.main && !globalThis.utility2_rollup) {
         } catch (ignore) {}
     }());
     globalThis.globalThis = globalThis;
+    // init debug_inline
+    if (!globalThis["debug\u0049nline"]) {
+        consoleError = console.error;
+        globalThis["debug\u0049nline"] = function () {
+        /*
+         * this function will both print <arguments> to stderr
+         * and return <arguments>[0]
+         */
+            var argList;
+            argList = Array.from(arguments); // jslint ignore:line
+            // debug arguments
+            globalThis["debug\u0049nlineArguments"] = argList;
+            consoleError("\n\ndebug\u0049nline");
+            consoleError.apply(console, argList);
+            consoleError("\n");
+            // return arg0 for inspection
+            return argList[0];
+        };
+    }
     // init local
     local = {};
+    local.local = local;
+    globalThis.globalLocal = local;
     // init isBrowser
     local.isBrowser = (
         typeof window === "object"
         && window === globalThis
         && typeof window.XMLHttpRequest === "function"
         && window.document
-        && typeof window.document.querySelectorAll === "function"
+        && typeof window.document.querySelector === "function"
     );
-    globalThis.globalLocal = local;
     // init function
     local.assertThrow = function (passed, message) {
     /*
-     * this function will throw the error <message> if <passed> is falsy
+     * this function will throw error <message> if <passed> is falsy
      */
         var error;
         if (passed) {
             return;
         }
         error = (
-            // ternary-operator
+            // ternary-condition
             (
                 message
                 && typeof message.message === "string"
@@ -3940,24 +4080,53 @@ if (module === require.main && !globalThis.utility2_rollup) {
      */
         return;
     };
-    // init debug_inline
-    if (!globalThis["debug\u0049nline"]) {
-        consoleError = console.error;
-        globalThis["debug\u0049nline"] = function () {
-        /*
-         * this function will both print <arguments> to stderr
-         * and return <arguments>[0]
-         */
-            var argList;
-            argList = Array.from(arguments); // jslint ignore:line
-            // debug arguments
-            globalThis["debug\u0049nlineArguments"] = argList;
-            consoleError("\n\ndebug\u0049nline");
-            consoleError.apply(console, argList);
-            consoleError("\n");
-            // return arg0 for inspection
-            return argList[0];
-        };
+    local.objectAssignDefault = function (target, source) {
+    /*
+     * this function will if items from <target> are
+     * null, undefined, or empty-string,
+     * then overwrite them with items from <source>
+     */
+        target = target || {};
+        Object.keys(source || {}).forEach(function (key) {
+            if (
+                target[key] === null
+                || target[key] === undefined
+                || target[key] === ""
+            ) {
+                target[key] = target[key] || source[key];
+            }
+        });
+        return target;
+    };
+    // require builtin
+    if (!local.isBrowser) {
+        local.assert = require("assert");
+        local.buffer = require("buffer");
+        local.child_process = require("child_process");
+        local.cluster = require("cluster");
+        local.crypto = require("crypto");
+        local.dgram = require("dgram");
+        local.dns = require("dns");
+        local.domain = require("domain");
+        local.events = require("events");
+        local.fs = require("fs");
+        local.http = require("http");
+        local.https = require("https");
+        local.net = require("net");
+        local.os = require("os");
+        local.path = require("path");
+        local.querystring = require("querystring");
+        local.readline = require("readline");
+        local.repl = require("repl");
+        local.stream = require("stream");
+        local.string_decoder = require("string_decoder");
+        local.timers = require("timers");
+        local.tls = require("tls");
+        local.tty = require("tty");
+        local.url = require("url");
+        local.util = require("util");
+        local.vm = require("vm");
+        local.zlib = require("zlib");
     }
 }(this));
 
@@ -3982,47 +4151,18 @@ local = (
 if (local.isBrowser) {
     globalThis.utility2_github_crud = local;
 } else {
-    // require builtins
-    local.assert = require("assert");
-    local.buffer = require("buffer");
-    local.child_process = require("child_process");
-    local.cluster = require("cluster");
-    local.crypto = require("crypto");
-    local.dgram = require("dgram");
-    local.dns = require("dns");
-    local.domain = require("domain");
-    local.events = require("events");
-    local.fs = require("fs");
-    local.http = require("http");
-    local.https = require("https");
-    local.net = require("net");
-    local.os = require("os");
-    local.path = require("path");
-    local.querystring = require("querystring");
-    local.readline = require("readline");
-    local.repl = require("repl");
-    local.stream = require("stream");
-    local.string_decoder = require("string_decoder");
-    local.timers = require("timers");
-    local.tls = require("tls");
-    local.tty = require("tty");
-    local.url = require("url");
-    local.util = require("util");
-    local.vm = require("vm");
-    local.zlib = require("zlib");
     module.exports = local;
     module.exports.__dirname = __dirname;
 }
 // init lib main
-local.local = local;
 local.github_crud = local;
 
 
 
 /* validateLineSortedReset */
-local.ajax = function (options, onError) {
+local.ajax = function (option, onError) {
 /*
- * this function will send an ajax-request with the given options.url,
+ * this function will send an ajax-request with given <option>.url,
  * with error-handling and timeout
  * example usage:
     local.ajax({
@@ -4041,23 +4181,27 @@ local.ajax = function (options, onError) {
     var local2;
     var onEvent;
     var streamCleanup;
+    var timeout;
     var tmp;
     var xhr;
     var xhrInit;
     // init local2
-    local2 = local.utility2 || {};
+    local2 = option.local2 || local.utility2 || {};
     // init function
     ajaxProgressUpdate = local2.ajaxProgressUpdate || local.nop;
-    bufferValidateAndCoerce = local2.bufferValidateAndCoerce || function (bff, mode) {
+    bufferValidateAndCoerce = local2.bufferValidateAndCoerce || function (
+        bff,
+        mode
+    ) {
     /*
-     * this function will validate and coerce/convert
-     * ArrayBuffer, String, or Uint8Array -> Buffer or String
+     * this function will validate and coerce/convert <bff> -> Buffer
+     * (or String if <mode> = "string")
      */
         // coerce ArrayBuffer -> Buffer
         if (Object.prototype.toString.call(bff) === "[object ArrayBuffer]") {
             bff = new Uint8Array(bff);
         }
-        // convert Buffer -> String
+        // convert Buffer -> utf8
         if (mode === "string" && typeof bff !== "string") {
             bff = String(bff);
         }
@@ -4085,7 +4229,10 @@ local.ajax = function (options, onError) {
             }
             isDone = true;
             // decrement ajaxProgressCounter
-            local2.ajaxProgressCounter = Math.max(local2.ajaxProgressCounter - 1, 0);
+            local2.ajaxProgressCounter = Math.max(
+                local2.ajaxProgressCounter - 1,
+                0
+            );
             ajaxProgressUpdate();
             // handle abort or error event
             switch (!xhr.error && event.type) {
@@ -4095,15 +4242,18 @@ local.ajax = function (options, onError) {
                 break;
             case "load":
                 if (xhr.statusCode >= 400) {
-                    xhr.error = new Error("ajax - statusCode " + xhr.statusCode);
+                    xhr.error = new Error(
+                        "ajax - statusCode " + xhr.statusCode
+                    );
                 }
                 break;
             }
             // debug statusCode / method / url
             if (xhr.error) {
+                xhr.statusCode = xhr.statusCode || 500;
                 xhr.error.statusCode = xhr.statusCode;
                 tmp = (
-                    // ternary-operator
+                    // ternary-condition
                     (
                         local.isBrowser
                         ? "browser"
@@ -4126,8 +4276,9 @@ local.ajax = function (options, onError) {
             }
             // debug ajaxResponse
             xhr.responseContentLength = (
-                (xhr.response && (xhr.response.byteLength || xhr.response.length)) | 0
-            );
+                xhr.response
+                && (xhr.response.byteLength || xhr.response.length)
+            ) | 0;
             xhr.timeElapsed = Date.now() - xhr.timeStart;
             if (xhr.modeDebug) {
                 console.error("serverLog - " + JSON.stringify({
@@ -4151,7 +4302,10 @@ local.ajax = function (options, onError) {
                 if (typeof xhr.responseText === "string") {
                     break;
                 }
-                xhr.responseText = bufferValidateAndCoerce(xhr.response, "string");
+                xhr.responseText = bufferValidateAndCoerce(
+                    xhr.response,
+                    "string"
+                );
                 break;
             case "arraybuffer":
                 xhr.responseBuffer = bufferValidateAndCoerce(xhr.response);
@@ -4168,16 +4322,16 @@ local.ajax = function (options, onError) {
     };
     streamCleanup = function (stream) {
     /*
-     * this function will try to end or destroy the stream
+     * this function will try to end or destroy <stream>
      */
         var error;
-        // try to end the stream
+        // try to end stream
         try {
             stream.end();
         } catch (errorCaught) {
             error = errorCaught;
         }
-        // if error, then try to destroy the stream
+        // if error, then try to destroy stream
         if (error) {
             try {
                 stream.destroy();
@@ -4188,23 +4342,35 @@ local.ajax = function (options, onError) {
     /*
      * this function will init xhr
      */
-        // init options
-        Object.keys(options).forEach(function (key) {
+        // init option
+        Object.keys(option).forEach(function (key) {
             if (key[0] !== "_") {
-                xhr[key] = options[key];
+                xhr[key] = option[key];
             }
         });
-        Object.assign(xhr, {
-            corsForwardProxyHost: xhr.corsForwardProxyHost || local2.corsForwardProxyHost,
-            headers: xhr.headers || {},
-            location: xhr.location || (local.isBrowser && location) || {},
-            method: xhr.method || "GET",
-            responseType: xhr.responseType || "",
-            timeout: xhr.timeout || local2.timeoutDefault || 30000
+        // init timeout
+        timeout = xhr.timeout || local2.timeoutDefault || 30000;
+        // init defaults
+        local.objectAssignDefault(xhr, {
+            corsForwardProxyHost: local2.corsForwardProxyHost,
+            headers: {},
+            location: (local.isBrowser && location) || {},
+            method: "GET",
+            responseType: ""
         });
+        // init headers
         Object.keys(xhr.headers).forEach(function (key) {
             xhr.headers[key.toLowerCase()] = xhr.headers[key];
         });
+        // coerce Uint8Array -> Buffer
+        if (
+            !local.isBrowser
+            && !Buffer.isBuffer(xhr.data)
+            && Object.prototype.toString.call(xhr.data)
+            === "[object Uint8Array]"
+        ) {
+            Object.setPrototypeOf(xhr.data, Buffer.prototype);
+        }
         // init misc
         local2._debugXhr = xhr;
         xhr.onEvent = onEvent;
@@ -4218,27 +4384,32 @@ local.ajax = function (options, onError) {
     // init xhr - XMLHttpRequest
     xhr = (
         local.isBrowser
-        && !options.httpRequest
-        && !(local2.serverLocalUrlTest && local2.serverLocalUrlTest(options.url))
+        && !option.httpRequest
+        && !(local2.serverLocalUrlTest && local2.serverLocalUrlTest(option.url))
         && new XMLHttpRequest()
     );
     // init xhr - http.request
     if (!xhr) {
-        xhr = local.functionOrNop(local2.urlParse || require("url").parse)(options.url);
+        xhr = local.identity(local2.urlParse || require("url").parse)(
+            option.url
+        );
         // init xhr
         xhrInit();
         // init xhr - http.request
-        xhr = local.functionOrNop(
-            options.httpRequest
+        xhr = local.identity(
+            option.httpRequest
             || (local.isBrowser && local2.http.request)
             || require(xhr.protocol.slice(0, -1)).request
         )(xhr, function (responseStream) {
         /*
-         * this function will read the responseStream
+         * this function will read <responseStream>
          */
             var chunkList;
             chunkList = [];
-            xhr.responseHeaders = responseStream.responseHeaders || responseStream.headers;
+            xhr.responseHeaders = (
+                responseStream.responseHeaders
+                || responseStream.headers
+            );
             xhr.responseStream = responseStream;
             xhr.statusCode = responseStream.statusCode;
             responseStream.dataLength = 0;
@@ -4251,7 +4422,10 @@ local.ajax = function (options, onError) {
                     ? chunkList[0]
                     : Buffer.concat(chunkList)
                 );
-                responseStream.dataLength = xhr.response.byteLength || xhr.response.length;
+                responseStream.dataLength = (
+                    xhr.response.byteLength
+                    || xhr.response.length
+                );
                 xhr.onEvent({
                     type: "load"
                 });
@@ -4260,7 +4434,7 @@ local.ajax = function (options, onError) {
         });
         xhr.abort = function () {
         /*
-         * this function will abort the xhr-request
+         * this function will abort xhr-request
          * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/abort
          */
             xhr.onEvent({
@@ -4280,13 +4454,13 @@ local.ajax = function (options, onError) {
     xhr.timerTimeout = setTimeout(function () {
         xhr.error = xhr.error || new Error(
             "onTimeout - timeout-error - "
-            + xhr.timeout + " ms - " + "ajax " + xhr.method + " " + xhr.url
+            + timeout + " ms - " + "ajax " + xhr.method + " " + xhr.url
         );
         xhr.abort();
         // cleanup requestStream and responseStream
         streamCleanup(xhr.requestStream);
         streamCleanup(xhr.responseStream);
-    }, xhr.timeout);
+    }, timeout);
     // increment ajaxProgressCounter
     local2.ajaxProgressCounter = local2.ajaxProgressCounter || 0;
     local2.ajaxProgressCounter += 1;
@@ -4301,9 +4475,12 @@ local.ajax = function (options, onError) {
         xhr.upload.addEventListener("progress", ajaxProgressUpdate);
     }
     // open url - corsForwardProxyHost
-    if (local2.corsForwardProxyHostIfNeeded && local2.corsForwardProxyHostIfNeeded(xhr)) {
+    if (local.functionOrNop(local2.corsForwardProxyHostIfNeeded)(xhr)) {
         xhr.open(xhr.method, local2.corsForwardProxyHostIfNeeded(xhr));
-        xhr.setRequestHeader("forward-proxy-headers", JSON.stringify(xhr.headers));
+        xhr.setRequestHeader(
+            "forward-proxy-headers",
+            JSON.stringify(xhr.headers)
+        );
         xhr.setRequestHeader("forward-proxy-url", xhr.url);
     // open url - default
     } else {
@@ -4313,11 +4490,15 @@ local.ajax = function (options, onError) {
     Object.keys(xhr.headers).forEach(function (key) {
         xhr.setRequestHeader(key, xhr.headers[key]);
     });
-    // send data - FormData
+    // send data
+    switch ((xhr.data && xhr.data.constructor) || true) {
+    // Blob
+    // https://developer.mozilla.org/en-US/docs/Web/API/Blob
+    case local2.Blob:
+    // FormData
     // https://developer.mozilla.org/en-US/docs/Web/API/FormData
-    if (local2.FormData && (xhr.data && xhr.data.constructor === local2.FormData)) {
-        // handle formData
-        xhr.data.read(function (error, data) {
+    case local2.FormData:
+        local2.blobRead(xhr.data, function (error, data) {
             if (error) {
                 xhr.onEvent(error);
                 return;
@@ -4325,15 +4506,14 @@ local.ajax = function (options, onError) {
             // send data
             xhr.send(data);
         });
-    // send data - default
-    } else {
-        // send data
+        break;
+    default:
         xhr.send(xhr.data);
     }
     return xhr;
 };
 
-local.cliRun = function (options) {
+local.cliRun = function (option) {
 /*
  * this function will run the cli
  */
@@ -4369,10 +4549,10 @@ local.cliRun = function (options) {
         file = __filename.replace((
             /.*\//
         ), "");
-        options = Object.assign({}, options);
+        option = Object.assign({}, option);
         packageJson = require("./package.json");
         // validate comment
-        options.rgxComment = options.rgxComment || (
+        option.rgxComment = option.rgxComment || (
             /\)\u0020\{\n(?:|\u0020{4})\/\*\n(?:\u0020|\u0020{5})\*((?:\u0020<[^>]*?>|\u0020\.\.\.)*?)\n(?:\u0020|\u0020{5})\*\u0020(will\u0020.*?\S)\n(?:\u0020|\u0020{5})\*\/\n(?:\u0020{4}|\u0020{8})\S/
         );
         textDict = {};
@@ -4391,7 +4571,7 @@ local.cliRun = function (options) {
                 return;
             }
             try {
-                commandList[ii] = options.rgxComment.exec(text);
+                commandList[ii] = option.rgxComment.exec(text);
                 commandList[ii] = {
                     argList: (commandList[ii][1] || "").trim(),
                     command: [key],
@@ -4400,21 +4580,21 @@ local.cliRun = function (options) {
             } catch (ignore) {
                 local.assertThrow(null, new Error(
                     "cliRun - cannot parse comment in COMMAND "
-                    + key + ":\nnew RegExp(" + JSON.stringify(options.rgxComment.source)
-                    + ").exec(" + JSON.stringify(text)
-                    .replace((
+                    + key + ":\nnew RegExp("
+                    + JSON.stringify(option.rgxComment.source)
+                    + ").exec(" + JSON.stringify(text).replace((
                         /\\\\/g
-                    ), "\u0000")
-                    .replace((
+                    ), "\u0000").replace((
                         /\\n/g
-                    ), "\\n\\\n")
-                    .replace((
+                    ), "\\n\\\n").replace((
                         /\u0000/g
                     ), "\\\\") + ");"
                 ));
             }
         });
-        console.log(packageJson.name + " (" + packageJson.version + ")\n\n" + commandList
+        text = "";
+        text += packageJson.name + " (" + packageJson.version + ")\n\n";
+        text += commandList
         .filter(function (element) {
             return element;
         })
@@ -4444,7 +4624,8 @@ local.cliRun = function (options) {
                 + element.argList.join("  ")
             );
         })
-        .join("\n\n"));
+        .join("\n\n");
+        console.log(text);
     };
     local.cliDict["--help"] = local.cliDict["--help"] || local.cliDict._help;
     local.cliDict["-h"] = local.cliDict["-h"] || local.cliDict._help;
@@ -4456,7 +4637,7 @@ local.cliRun = function (options) {
      * will start interactive-mode
      */
         globalThis.local = local;
-        local.functionOrNop(local.replStart || require("repl").start)({
+        local.identity(local.replStart || require("repl").start)({
             useGlobal: true
         });
     };
@@ -4472,7 +4653,10 @@ local.cliRun = function (options) {
      */
         console.log(require(__dirname + "/package.json").version);
     };
-    local.cliDict["--version"] = local.cliDict["--version"] || local.cliDict._version;
+    local.cliDict["--version"] = (
+        local.cliDict["--version"]
+        || local.cliDict._version
+    );
     local.cliDict["-v"] = local.cliDict["-v"] || local.cliDict._version;
     // default to --help command if no arguments are given
     if (process.argv.length <= 2) {
@@ -4525,21 +4709,21 @@ local.onErrorWithStack = function (onError) {
     return onError2;
 };
 
-local.onNext = function (options, onError) {
+local.onNext = function (option, onError) {
 /*
- * this function will wrap onError inside the recursive function options.onNext,
+ * this function will wrap onError inside recursive-function <option>.onNext,
  * and append the current stack to any error
  */
-    options.onNext = local.onErrorWithStack(function (error, data, meta) {
+    option.onNext = local.onErrorWithStack(function (error, data, meta) {
         try {
-            options.modeNext += (
-                (error && !options.modeErrorIgnore)
+            option.modeNext += (
+                (error && !option.modeErrorIgnore)
                 ? 1000
                 : 1
             );
-            if (options.modeDebug) {
+            if (option.modeDebug) {
                 console.error("onNext - " + JSON.stringify({
-                    modeNext: options.modeNext,
+                    modeNext: option.modeNext,
                     errorMessage: error && error.message
                 }));
                 if (error && error.stack) {
@@ -4549,14 +4733,14 @@ local.onNext = function (options, onError) {
             onError(error, data, meta);
         } catch (errorCaught) {
             // throw errorCaught to break infinite recursion-loop
-            if (options.errorCaught) {
-                local.assertThrow(null, options.errorCaught);
+            if (option.errorCaught) {
+                local.assertThrow(null, option.errorCaught);
             }
-            options.errorCaught = errorCaught;
-            options.onNext(errorCaught, data, meta);
+            option.errorCaught = errorCaught;
+            option.onNext(errorCaught, data, meta);
         }
     });
-    return options;
+    return option;
 };
 
 local.onParallel = function (onError, onEach, onRetry) {
@@ -4577,7 +4761,9 @@ local.onParallel = function (onError, onEach, onRetry) {
         onParallel.counter -= 1;
         // validate counter
         if (!(onParallel.counter >= 0 || error || onParallel.error)) {
-            error = new Error("invalid onParallel.counter = " + onParallel.counter);
+            error = new Error(
+                "invalid onParallel.counter = " + onParallel.counter
+            );
         // ensure onError is run only once
         } else if (onParallel.counter < 0) {
             return;
@@ -4601,37 +4787,37 @@ local.onParallel = function (onError, onEach, onRetry) {
     return onParallel;
 };
 
-local.onParallelList = function (options, onEach, onError) {
+local.onParallelList = function (option, onEach, onError) {
 /*
  * this function will
  * 1. async-run onEach in parallel,
- *    with the given options.rateLimit and options.retryLimit
- * 2. call onError when onParallel.ii + 1 === options.list.length
+ *    with given option.rateLimit and option.retryLimit
+ * 2. call onError when onParallel.ii + 1 === option.list.length
  */
     var isListEnd;
     var onEach2;
     var onParallel;
-    options.list = options.list || [];
+    option.list = option.list || [];
     onEach2 = function () {
         while (true) {
-            if (!(onParallel.ii + 1 < options.list.length)) {
+            if (!(onParallel.ii + 1 < option.list.length)) {
                 isListEnd = true;
                 return;
             }
-            if (!(onParallel.counter < options.rateLimit + 1)) {
+            if (!(onParallel.counter < option.rateLimit + 1)) {
                 return;
             }
             onParallel.ii += 1;
             onEach({
-                element: options.list[onParallel.ii],
+                element: option.list[onParallel.ii],
                 ii: onParallel.ii,
-                list: options.list,
+                list: option.list,
                 retry: 0
             }, onParallel);
         }
     };
     onParallel = local.onParallel(onError, onEach2, function (error, data) {
-        if (error && data && data.retry < options.retryLimit) {
+        if (error && data && data.retry < option.retryLimit) {
             local.onErrorDefault(error);
             data.retry += 1;
             setTimeout(function () {
@@ -4640,16 +4826,16 @@ local.onParallelList = function (options, onEach, onError) {
             }, 1000);
             return true;
         }
-        // restart if options.list has grown
-        if (isListEnd && (onParallel.ii + 1 < options.list.length)) {
+        // restart if option.list has grown
+        if (isListEnd && (onParallel.ii + 1 < option.list.length)) {
             isListEnd = null;
             onEach2();
         }
     });
     onParallel.ii = -1;
-    options.rateLimit = Number(options.rateLimit) || 6;
-    options.rateLimit = Math.max(options.rateLimit, 1);
-    options.retryLimit = Number(options.retryLimit) || 2;
+    option.rateLimit = Number(option.rateLimit) || 6;
+    option.rateLimit = Math.max(option.rateLimit, 1);
+    option.retryLimit = Number(option.retryLimit) || 2;
     onParallel.counter += 1;
     onEach2();
     onParallel();
@@ -4660,14 +4846,14 @@ local.onParallelList = function (options, onEach, onError) {
 
 // run shared js-env code - function
 (function () {
-local.githubCrudAjax = function (options, onError) {
+local.githubCrudAjax = function (option, onError) {
 /*
  * this function will make a low-level content-request to github
  * https://developer.github.com/v3/repos/contents/
  */
-    // init options
-    options = {
-        content: options.content,
+    // init option
+    option = {
+        content: option.content,
         headers: Object.assign({
             // github oauth authentication
             Authorization: "token " + (
@@ -4675,15 +4861,15 @@ local.githubCrudAjax = function (options, onError) {
             ),
             // bug-workaround - https://developer.github.com/v3/#user-agent-required
             "User-Agent": "undefined"
-        }, options.headers),
-        httpRequest: options.httpRequest,
-        message: options.message,
-        method: options.method || "GET",
+        }, option.headers),
+        httpRequest: option.httpRequest,
+        message: option.message,
+        method: option.method || "GET",
         responseJson: {},
-        sha: options.sha,
-        url: options.url
+        sha: option.sha,
+        url: option.url
     };
-    options.url = options.url
+    option.url = option.url
 /* jslint ignore:start */
 // parse https://github.com/:owner/:repo/blob/:branch/:path
 .replace(
@@ -4714,63 +4900,63 @@ local.githubCrudAjax = function (options, onError) {
     .replace((
         /\?branch=(.*)/
     ), function (match0, match1) {
-        options.branch = match1;
-        if (options.method === "GET") {
+        option.branch = match1;
+        if (option.method === "GET") {
             match0 = match0.replace("branch", "ref");
         }
         return match0;
     });
     if ((
         /^https:\/\/github\.com\/[^\/]+?\/[^\/]+?$/
-    ).test(options.url)) {
-        options.data = JSON.stringify({
-            name: options.url.split("/")[4]
+    ).test(option.url)) {
+        option.data = JSON.stringify({
+            name: option.url.split("/")[4]
         });
-        switch (options.method) {
+        switch (option.method) {
         case "DELETE":
-            options.url = (
+            option.url = (
                 "https://api.github.com/repos/"
-                + options.url.split("/").slice(3).join("/")
+                + option.url.split("/").slice(3).join("/")
             );
             break;
         case "POST_ORG":
-            options.url = (
+            option.url = (
                 "https://api.github.com/orgs/"
-                + options.url.split("/")[3] + "/repos"
+                + option.url.split("/")[3] + "/repos"
             );
             break;
         case "POST_USER":
-            options.url = "https://api.github.com/user/repos";
+            option.url = "https://api.github.com/user/repos";
             break;
         }
-        options.method = options.method.split("_")[0];
+        option.method = option.method.split("_")[0];
     } else {
-        if (options.url.indexOf("https://api.github.com/repos/") !== 0) {
-            console.error("githubCrud - invalid url " + options.url);
-            onError(new Error("invalid url " + options.url));
+        if (option.url.indexOf("https://api.github.com/repos/") !== 0) {
+            console.error("githubCrud - invalid url " + option.url);
+            onError(new Error("invalid url " + option.url));
             return;
         }
-        if (options.method !== "GET") {
-            options.message = (
-                options.message
-                || "[ci skip] " + options.method + " file "
-                + options.url.replace((
+        if (option.method !== "GET") {
+            option.message = (
+                option.message
+                || "[ci skip] " + option.method + " file "
+                + option.url.replace((
                     /\?.*/
                 ), "")
             );
-            options.url += "&message=" + encodeURIComponent(options.message);
-            if (options.sha) {
-                options.url += "&sha=" + options.sha;
+            option.url += "&message=" + encodeURIComponent(option.message);
+            if (option.sha) {
+                option.url += "&sha=" + option.sha;
             }
-            options.data = JSON.stringify({
-                branch: options.branch,
-                content: Buffer.from(options.content || "").toString("base64"),
-                message: options.message,
-                sha: options.sha
+            option.data = JSON.stringify({
+                branch: option.branch,
+                content: Buffer.from(option.content || "").toString("base64"),
+                message: option.message,
+                sha: option.sha
             });
         }
     }
-    local.ajax(options, function (error, xhr) {
+    local.ajax(option, function (error, xhr) {
         console.error("serverLog - " + JSON.stringify({
             time: new Date(xhr.timeStart).toISOString(),
             type: "githubCrudResponse",
@@ -4786,304 +4972,307 @@ local.githubCrudAjax = function (options, onError) {
             && ("githubCrud - " + xhr.responseText)
         );
         try {
-            options.responseJson = JSON.parse(xhr.responseText);
+            option.responseJson = JSON.parse(xhr.responseText);
         } catch (ignore) {}
         onError(
-            !(options.method === "DELETE" && xhr.statusCode === 404) && error,
-            options.responseJson
+            !(option.method === "DELETE" && xhr.statusCode === 404) && error,
+            option.responseJson
         );
     });
 };
 
-local.githubCrudContentDelete = function (options, onError) {
+local.githubCrudContentDelete = function (option, onError) {
 /*
- * this function will delete the github-file options.url
+ * this function will delete github-file <option>.url
  * https://developer.github.com/v3/repos/contents/#delete-a-file
  */
-    options = {
-        httpRequest: options.httpRequest,
-        message: options.message,
-        url: options.url
+    option = {
+        httpRequest: option.httpRequest,
+        message: option.message,
+        url: option.url
     };
-    local.onNext(options, function (error, data) {
-        switch (options.modeNext) {
+    local.onNext(option, function (error, data) {
+        switch (option.modeNext) {
         case 1:
             // get sha
             local.githubCrudAjax({
-                httpRequest: options.httpRequest,
-                url: options.url
-            }, options.onNext);
+                httpRequest: option.httpRequest,
+                url: option.url
+            }, option.onNext);
             break;
         case 2:
             // delete file with sha
             if (!error && data.sha) {
                 local.githubCrudAjax({
-                    httpRequest: options.httpRequest,
-                    message: options.message,
+                    httpRequest: option.httpRequest,
+                    message: option.message,
                     method: "DELETE",
                     sha: data.sha,
-                    url: options.url
-                }, options.onNext);
+                    url: option.url
+                }, option.onNext);
                 return;
             }
             // delete tree
             local.onParallelList({
                 list: data
-            }, function (options2, onParallel) {
+            }, function (option2, onParallel) {
                 onParallel.counter += 1;
                 // recurse
                 local.githubCrudContentDelete({
-                    httpRequest: options.httpRequest,
-                    message: options.message,
-                    url: options2.element.url
+                    httpRequest: option.httpRequest,
+                    message: option.message,
+                    url: option2.element.url
                 }, onParallel);
-            }, options.onNext);
+            }, option.onNext);
             break;
         default:
             onError(error, data);
         }
     });
-    options.modeNext = 0;
-    options.onNext();
+    option.modeNext = 0;
+    option.onNext();
 };
 
-local.githubCrudContentGet = function (options, onError) {
+local.githubCrudContentGet = function (option, onError) {
 /*
- * this function will get the github-file options.url
+ * this function will get github-file <option>.url
  * https://developer.github.com/v3/repos/contents/#get-contents
  */
-    options = {
-        httpRequest: options.httpRequest,
-        url: options.url
+    option = {
+        httpRequest: option.httpRequest,
+        url: option.url
     };
-    local.onNext(options, function (error, data) {
-        switch (options.modeNext) {
+    local.onNext(option, function (error, data) {
+        switch (option.modeNext) {
         case 1:
             local.githubCrudAjax({
-                httpRequest: options.httpRequest,
-                url: options.url
-            }, options.onNext);
+                httpRequest: option.httpRequest,
+                url: option.url
+            }, option.onNext);
             break;
         case 2:
-            options.onNext(null, Buffer.from(data.content || "", "base64"));
+            option.onNext(null, Buffer.from(data.content || "", "base64"));
             break;
         default:
             onError(error, !error && data);
         }
     });
-    options.modeNext = 0;
-    options.onNext();
+    option.modeNext = 0;
+    option.onNext();
 };
 
-local.githubCrudContentPut = function (options, onError) {
+local.githubCrudContentPut = function (option, onError) {
 /*
- * this function will put options.content to the github-file options.url
+ * this function will put <option>.content to github-file <option>.url
  * https://developer.github.com/v3/repos/contents/#create-a-file
  * https://developer.github.com/v3/repos/contents/#update-a-file
  */
-    options = {
-        content: options.content,
-        httpRequest: options.httpRequest,
-        message: options.message,
+    option = {
+        content: option.content,
+        httpRequest: option.httpRequest,
+        message: option.message,
         modeErrorIgnore: true,
-        url: options.url
+        url: option.url
     };
-    local.onNext(options, function (error, data) {
-        switch (options.modeNext) {
+    local.onNext(option, function (error, data) {
+        switch (option.modeNext) {
         case 1:
             // get sha
             local.githubCrudAjax({
-                httpRequest: options.httpRequest,
-                url: options.url
-            }, options.onNext);
+                httpRequest: option.httpRequest,
+                url: option.url
+            }, option.onNext);
             break;
         case 2:
             // put file with sha
             local.githubCrudAjax({
-                content: options.content,
-                httpRequest: options.httpRequest,
-                message: options.message,
+                content: option.content,
+                httpRequest: option.httpRequest,
+                message: option.message,
                 method: "PUT",
                 sha: data.sha,
-                url: options.url
-            }, options.onNext);
+                url: option.url
+            }, option.onNext);
             break;
         default:
             onError(error, data);
         }
     });
-    options.modeNext = 0;
-    options.onNext();
+    option.modeNext = 0;
+    option.onNext();
 };
 
-local.githubCrudContentPutFile = function (options, onError) {
+local.githubCrudContentPutFile = function (option, onError) {
 /*
- * this function will put options.file to the github-file options.url
+ * this function will put option.file to github-file <option>.url
  * https://developer.github.com/v3/repos/contents/#update-a-file
  */
-    options = {
-        file: options.file,
-        httpRequest: options.httpRequest,
-        message: options.message,
-        url: options.url
+    option = {
+        file: option.file,
+        httpRequest: option.httpRequest,
+        message: option.message,
+        url: option.url
     };
-    local.onNext(options, function (error, data) {
-        switch (options.modeNext) {
+    local.onNext(option, function (error, data) {
+        switch (option.modeNext) {
         case 1:
             // get file from url
             if ((
                 /^(?:http|https):\/\//
-            ).test(options.file)) {
+            ).test(option.file)) {
                 local.ajax({
-                    httpRequest: options.httpRequest,
-                    url: options.file
+                    httpRequest: option.httpRequest,
+                    url: option.file
                 }, function (error, response) {
-                    options.onNext(error, response && response.data);
+                    option.onNext(error, response && response.data);
                 });
                 return;
             }
             // get file
-            local.fs.readFile(options.file, options.onNext);
+            local.fs.readFile(option.file, option.onNext);
             break;
         case 2:
             local.githubCrudContentPut({
                 content: data,
-                httpRequest: options.httpRequest,
-                message: options.message,
+                httpRequest: option.httpRequest,
+                message: option.message,
                 // resolve file in url
                 url: (
-                    /\/$/
-                ).test(options.url)
-                ? options.url + local.path.basename(options.file)
-                : options.url
-            }, options.onNext);
+                    // ternary-condition
+                    (
+                        /\/$/
+                    ).test(option.url)
+                    ? option.url + local.path.basename(option.file)
+                    : option.url
+                )
+            }, option.onNext);
             break;
         default:
             onError(error, data);
         }
     });
-    options.modeNext = 0;
-    options.onNext();
+    option.modeNext = 0;
+    option.onNext();
 };
 
-local.githubCrudContentTouch = function (options, onError) {
+local.githubCrudContentTouch = function (option, onError) {
 /*
- * this function will touch the github-file options.url
+ * this function will touch github-file <option>.url
  * https://developer.github.com/v3/repos/contents/#update-a-file
  */
-    options = {
-        httpRequest: options.httpRequest,
-        message: options.message,
+    option = {
+        httpRequest: option.httpRequest,
+        message: option.message,
         modeErrorIgnore: true,
-        url: options.url
+        url: option.url
     };
-    local.onNext(options, function (error, data) {
-        switch (options.modeNext) {
+    local.onNext(option, function (error, data) {
+        switch (option.modeNext) {
         case 1:
             // get sha
             local.githubCrudAjax({
-                httpRequest: options.httpRequest,
-                url: options.url
-            }, options.onNext);
+                httpRequest: option.httpRequest,
+                url: option.url
+            }, option.onNext);
             break;
         case 2:
             // put file with sha
             local.githubCrudAjax({
                 content: Buffer.from(data.content || "", "base64"),
-                httpRequest: options.httpRequest,
-                message: options.message,
+                httpRequest: option.httpRequest,
+                message: option.message,
                 method: "PUT",
                 sha: data.sha,
-                url: options.url
-            }, options.onNext);
+                url: option.url
+            }, option.onNext);
             break;
         default:
             onError(error, data);
         }
     });
-    options.modeNext = 0;
-    options.onNext();
+    option.modeNext = 0;
+    option.onNext();
 };
 
-local.githubCrudContentTouchList = function (options, onError) {
+local.githubCrudContentTouchList = function (option, onError) {
 /*
- * this function will touch the github-files options.urlList in parallel
+ * this function will touch github-files <option>.urlList in parallel
  * https://developer.github.com/v3/repos/contents/#update-a-file
  */
     local.onParallelList({
-        list: options.urlList
-    }, function (options2, onParallel) {
+        list: option.urlList
+    }, function (option2, onParallel) {
         onParallel.counter += 1;
         local.githubCrudContentTouch({
-            httpRequest: options.httpRequest,
-            message: options.message,
-            url: options2.element
+            httpRequest: option.httpRequest,
+            message: option.message,
+            url: option2.element
         }, onParallel);
     }, onError);
 };
 
-local.githubCrudRepoCreate = function (options, onError) {
+local.githubCrudRepoCreate = function (option, onError) {
 /*
- * this function will create the github-repo options.url
+ * this function will create github-repo <option>.url
  * https://developer.github.com/v3/repos/#create
  */
     local.githubCrudAjax({
-        httpRequest: options.httpRequest,
+        httpRequest: option.httpRequest,
         method: "POST_ORG",
-        url: options.url
+        url: option.url
     }, function (error, data) {
         if (!(error && error.statusCode === 404)) {
             onError(error, data);
             return;
         }
         local.githubCrudAjax({
-            httpRequest: options.httpRequest,
+            httpRequest: option.httpRequest,
             method: "POST_USER",
-            url: options.url
+            url: option.url
         }, onError);
     });
 };
 
-local.githubCrudRepoCreateList = function (options, onError) {
+local.githubCrudRepoCreateList = function (option, onError) {
 /*
- * this function will create the github-repos options.urlList in parallel
+ * this function will create github-repos <option>.urlList in parallel
  * https://developer.github.com/v3/repos/#create
  */
     local.onParallelList({
-        list: options.urlList
-    }, function (options2, onParallel) {
+        list: option.urlList
+    }, function (option2, onParallel) {
         onParallel.counter += 1;
         local.githubCrudRepoCreate({
-            httpRequest: options.httpRequest,
-            url: options2.element
+            httpRequest: option.httpRequest,
+            url: option2.element
         }, onParallel);
     }, onError);
 };
 
-local.githubCrudRepoDelete = function (options, onError) {
+local.githubCrudRepoDelete = function (option, onError) {
 /*
- * this function will delete the github-repo options.url
+ * this function will delete github-repo <option>.url
  * https://developer.github.com/v3/repos/#delete-a-repository
  */
     local.githubCrudAjax({
-        httpRequest: options.httpRequest,
+        httpRequest: option.httpRequest,
         method: "DELETE",
-        url: options.url
+        url: option.url
     }, onError);
 };
 
-local.githubCrudRepoDeleteList = function (options, onError) {
+local.githubCrudRepoDeleteList = function (option, onError) {
 /*
- * this function will delete the github-repos options.urlList in parallel
+ * this function will delete github-repos <option>.urlList in parallel
  * https://developer.github.com/v3/repos/#delete-a-repository
  */
     local.onParallelList({
-        list: options.urlList
-    }, function (options2, onParallel) {
+        list: option.urlList
+    }, function (option2, onParallel) {
         onParallel.counter += 1;
         local.githubCrudRepoDelete({
-            httpRequest: options.httpRequest,
-            url: options2.element
+            httpRequest: option.httpRequest,
+            url: option2.element
         }, onParallel);
     }, onError);
 };
@@ -5132,7 +5321,7 @@ local.cliDict.get = function () {
 local.cliDict.put = function () {
 /*
  * <fileRemote> <fileLocal> <commitMessage>
- * will put on github <fileRemote>, <fileLocal>
+ * will put on github <fileRemote> to <fileLocal>
  */
     local.github_crud.githubCrudContentPutFile({
         message: process.argv[5],
@@ -5186,7 +5375,7 @@ local.cliDict.touch = function () {
     });
 };
 
-// run cli
+// run the cli
 if (module === require.main && !globalThis.utility2_rollup) {
     local.cliRun();
 }
@@ -5224,28 +5413,48 @@ if (module === require.main && !globalThis.utility2_rollup) {
         } catch (ignore) {}
     }());
     globalThis.globalThis = globalThis;
+    // init debug_inline
+    if (!globalThis["debug\u0049nline"]) {
+        consoleError = console.error;
+        globalThis["debug\u0049nline"] = function () {
+        /*
+         * this function will both print <arguments> to stderr
+         * and return <arguments>[0]
+         */
+            var argList;
+            argList = Array.from(arguments); // jslint ignore:line
+            // debug arguments
+            globalThis["debug\u0049nlineArguments"] = argList;
+            consoleError("\n\ndebug\u0049nline");
+            consoleError.apply(console, argList);
+            consoleError("\n");
+            // return arg0 for inspection
+            return argList[0];
+        };
+    }
     // init local
     local = {};
+    local.local = local;
+    globalThis.globalLocal = local;
     // init isBrowser
     local.isBrowser = (
         typeof window === "object"
         && window === globalThis
         && typeof window.XMLHttpRequest === "function"
         && window.document
-        && typeof window.document.querySelectorAll === "function"
+        && typeof window.document.querySelector === "function"
     );
-    globalThis.globalLocal = local;
     // init function
     local.assertThrow = function (passed, message) {
     /*
-     * this function will throw the error <message> if <passed> is falsy
+     * this function will throw error <message> if <passed> is falsy
      */
         var error;
         if (passed) {
             return;
         }
         error = (
-            // ternary-operator
+            // ternary-condition
             (
                 message
                 && typeof message.message === "string"
@@ -5283,24 +5492,53 @@ if (module === require.main && !globalThis.utility2_rollup) {
      */
         return;
     };
-    // init debug_inline
-    if (!globalThis["debug\u0049nline"]) {
-        consoleError = console.error;
-        globalThis["debug\u0049nline"] = function () {
-        /*
-         * this function will both print <arguments> to stderr
-         * and return <arguments>[0]
-         */
-            var argList;
-            argList = Array.from(arguments); // jslint ignore:line
-            // debug arguments
-            globalThis["debug\u0049nlineArguments"] = argList;
-            consoleError("\n\ndebug\u0049nline");
-            consoleError.apply(console, argList);
-            consoleError("\n");
-            // return arg0 for inspection
-            return argList[0];
-        };
+    local.objectAssignDefault = function (target, source) {
+    /*
+     * this function will if items from <target> are
+     * null, undefined, or empty-string,
+     * then overwrite them with items from <source>
+     */
+        target = target || {};
+        Object.keys(source || {}).forEach(function (key) {
+            if (
+                target[key] === null
+                || target[key] === undefined
+                || target[key] === ""
+            ) {
+                target[key] = target[key] || source[key];
+            }
+        });
+        return target;
+    };
+    // require builtin
+    if (!local.isBrowser) {
+        local.assert = require("assert");
+        local.buffer = require("buffer");
+        local.child_process = require("child_process");
+        local.cluster = require("cluster");
+        local.crypto = require("crypto");
+        local.dgram = require("dgram");
+        local.dns = require("dns");
+        local.domain = require("domain");
+        local.events = require("events");
+        local.fs = require("fs");
+        local.http = require("http");
+        local.https = require("https");
+        local.net = require("net");
+        local.os = require("os");
+        local.path = require("path");
+        local.querystring = require("querystring");
+        local.readline = require("readline");
+        local.repl = require("repl");
+        local.stream = require("stream");
+        local.string_decoder = require("string_decoder");
+        local.timers = require("timers");
+        local.tls = require("tls");
+        local.tty = require("tty");
+        local.url = require("url");
+        local.util = require("util");
+        local.vm = require("vm");
+        local.zlib = require("zlib");
     }
 }(this));
 
@@ -5325,39 +5563,10 @@ local = (
 if (local.isBrowser) {
     globalThis.utility2_istanbul = local;
 } else {
-    // require builtins
-    local.assert = require("assert");
-    local.buffer = require("buffer");
-    local.child_process = require("child_process");
-    local.cluster = require("cluster");
-    local.crypto = require("crypto");
-    local.dgram = require("dgram");
-    local.dns = require("dns");
-    local.domain = require("domain");
-    local.events = require("events");
-    local.fs = require("fs");
-    local.http = require("http");
-    local.https = require("https");
-    local.net = require("net");
-    local.os = require("os");
-    local.path = require("path");
-    local.querystring = require("querystring");
-    local.readline = require("readline");
-    local.repl = require("repl");
-    local.stream = require("stream");
-    local.string_decoder = require("string_decoder");
-    local.timers = require("timers");
-    local.tls = require("tls");
-    local.tty = require("tty");
-    local.url = require("url");
-    local.util = require("util");
-    local.vm = require("vm");
-    local.zlib = require("zlib");
     module.exports = local;
     module.exports.__dirname = __dirname;
 }
 // init lib main
-local.local = local;
 local.istanbul = local;
 
 
@@ -5370,7 +5579,7 @@ if (!local.isBrowser) {
     local.require = require;
 }
 
-local.cliRun = function (options) {
+local.cliRun = function (option) {
 /*
  * this function will run the cli
  */
@@ -5406,10 +5615,10 @@ local.cliRun = function (options) {
         file = __filename.replace((
             /.*\//
         ), "");
-        options = Object.assign({}, options);
+        option = Object.assign({}, option);
         packageJson = require("./package.json");
         // validate comment
-        options.rgxComment = options.rgxComment || (
+        option.rgxComment = option.rgxComment || (
             /\)\u0020\{\n(?:|\u0020{4})\/\*\n(?:\u0020|\u0020{5})\*((?:\u0020<[^>]*?>|\u0020\.\.\.)*?)\n(?:\u0020|\u0020{5})\*\u0020(will\u0020.*?\S)\n(?:\u0020|\u0020{5})\*\/\n(?:\u0020{4}|\u0020{8})\S/
         );
         textDict = {};
@@ -5428,7 +5637,7 @@ local.cliRun = function (options) {
                 return;
             }
             try {
-                commandList[ii] = options.rgxComment.exec(text);
+                commandList[ii] = option.rgxComment.exec(text);
                 commandList[ii] = {
                     argList: (commandList[ii][1] || "").trim(),
                     command: [key],
@@ -5437,21 +5646,21 @@ local.cliRun = function (options) {
             } catch (ignore) {
                 local.assertThrow(null, new Error(
                     "cliRun - cannot parse comment in COMMAND "
-                    + key + ":\nnew RegExp(" + JSON.stringify(options.rgxComment.source)
-                    + ").exec(" + JSON.stringify(text)
-                    .replace((
+                    + key + ":\nnew RegExp("
+                    + JSON.stringify(option.rgxComment.source)
+                    + ").exec(" + JSON.stringify(text).replace((
                         /\\\\/g
-                    ), "\u0000")
-                    .replace((
+                    ), "\u0000").replace((
                         /\\n/g
-                    ), "\\n\\\n")
-                    .replace((
+                    ), "\\n\\\n").replace((
                         /\u0000/g
                     ), "\\\\") + ");"
                 ));
             }
         });
-        console.log(packageJson.name + " (" + packageJson.version + ")\n\n" + commandList
+        text = "";
+        text += packageJson.name + " (" + packageJson.version + ")\n\n";
+        text += commandList
         .filter(function (element) {
             return element;
         })
@@ -5481,7 +5690,8 @@ local.cliRun = function (options) {
                 + element.argList.join("  ")
             );
         })
-        .join("\n\n"));
+        .join("\n\n");
+        console.log(text);
     };
     local.cliDict["--help"] = local.cliDict["--help"] || local.cliDict._help;
     local.cliDict["-h"] = local.cliDict["-h"] || local.cliDict._help;
@@ -5493,7 +5703,7 @@ local.cliRun = function (options) {
      * will start interactive-mode
      */
         globalThis.local = local;
-        local.functionOrNop(local.replStart || require("repl").start)({
+        local.identity(local.replStart || require("repl").start)({
             useGlobal: true
         });
     };
@@ -5509,7 +5719,10 @@ local.cliRun = function (options) {
      */
         console.log(require(__dirname + "/package.json").version);
     };
-    local.cliDict["--version"] = local.cliDict["--version"] || local.cliDict._version;
+    local.cliDict["--version"] = (
+        local.cliDict["--version"]
+        || local.cliDict._version
+    );
     local.cliDict["-v"] = local.cliDict["-v"] || local.cliDict._version;
     // default to --help command if no arguments are given
     if (process.argv.length <= 2) {
@@ -5525,9 +5738,16 @@ local.cliRun = function (options) {
 
 local.fsWriteFileWithMkdirpSync = function (file, data, mode) {
 /*
- * this function will synchronously 'mkdir -p' and write the data to file
+ * this function will synchronously "mkdir -p" and write the <data> to <file>
  */
-    if (mode === "noWrite") {
+    try {
+        if (
+            mode === "noWrite"
+            || typeof require("fs").writeFileSync !== "function"
+        ) {
+            return;
+        }
+    } catch (ignore) {
         return;
     }
     // try to write to file
@@ -5665,30 +5885,30 @@ local.coverageReportCreate = function () {
  * 2. write coverage in html-format to filesystem
  * 3. return coverage in html-format as single document
  */
-    var options;
+    var option;
     /* istanbul ignore next */
     if (!globalThis.__coverage__) {
         return "";
     }
-    options = {};
-    options.dir = process.cwd() + "/tmp/build/coverage.html";
+    option = {};
+    option.dir = process.cwd() + "/tmp/build/coverage.html";
     // merge previous coverage
     if (!local.isBrowser && process.env.npm_config_mode_coverage_merge) {
-        console.log("merging file " + options.dir + "/coverage.json to coverage");
+        console.log("merging file " + option.dir + "/coverage.json to coverage");
         try {
             local.coverageMerge(globalThis.__coverage__, JSON.parse(
-                local.fs.readFileSync(options.dir + "/coverage.json", "utf8")
+                local.fs.readFileSync(option.dir + "/coverage.json", "utf8")
             ));
         } catch (ignore) {}
         try {
-            options.coverageCodeDict = JSON.parse(local.fs.readFileSync(
-                options.dir + "/coverage.code-dict.json",
+            option.coverageCodeDict = JSON.parse(local.fs.readFileSync(
+                option.dir + "/coverage.code-dict.json",
                 "utf8"
             ));
-            Object.keys(options.coverageCodeDict).forEach(function (key) {
+            Object.keys(option.coverageCodeDict).forEach(function (key) {
                 globalThis.__coverageCodeDict__[key] = (
                     globalThis.__coverageCodeDict__[key]
-                    || options.coverageCodeDict[key]
+                    || option.coverageCodeDict[key]
                 );
             });
         } catch (ignore) {}
@@ -5702,49 +5922,49 @@ local.coverageReportCreate = function () {
         + "\">\n"
     );
     local.writerData = "";
-    options.sourceStore = {};
-    options.writer = local.writer;
+    option.sourceStore = {};
+    option.writer = local.writer;
     // 1. print coverage in text-format to stdout
-    new local.TextReport(options).writeReport(local.collector);
+    new local.TextReport(option).writeReport(local.collector);
     // 2. write coverage in html-format to filesystem
-    new local.HtmlReport(options).writeReport(local.collector);
+    new local.HtmlReport(option).writeReport(local.collector);
     local.writer.writeFile("", local.nop);
     if (!local.isBrowser) {
         // write coverage.json
         local.fsWriteFileWithMkdirpSync(
-            options.dir + "/coverage.json",
+            option.dir + "/coverage.json",
             JSON.stringify(globalThis.__coverage__)
         );
         // write coverage.code-dict.json
         local.fsWriteFileWithMkdirpSync(
-            options.dir + "/coverage.code-dict.json",
+            option.dir + "/coverage.code-dict.json",
             JSON.stringify(globalThis.__coverageCodeDict__)
         );
         // write coverage.badge.svg
-        options.pct = local.coverageReportSummary.root.metrics.lines.pct;
+        option.pct = local.coverageReportSummary.root.metrics.lines.pct;
         local.fsWriteFileWithMkdirpSync(
-            local._istanbul_path.dirname(options.dir) + "/coverage.badge.svg",
+            local._istanbul_path.dirname(option.dir) + "/coverage.badge.svg",
             local.templateCoverageBadgeSvg
             // edit coverage badge percent
             .replace((
                 /100.0/g
-            ), options.pct)
+            ), option.pct)
             // edit coverage badge color
             .replace((
                 /0d0/g
             ), (
-                ("0" + Math.round((100 - options.pct) * 2.21).toString(16)).slice(-2)
-                + ("0" + Math.round(options.pct * 2.21).toString(16)).slice(-2) + "00"
+                ("0" + Math.round((100 - option.pct) * 2.21).toString(16)).slice(-2)
+                + ("0" + Math.round(option.pct * 2.21).toString(16)).slice(-2) + "00"
             ))
         );
     }
-    console.log("created coverage file " + options.dir + "/index.html");
+    console.log("created coverage file " + option.dir + "/index.html");
     // 3. return coverage in html-format as a single document
     local.coverageReportHtml += "</div>\n</div>\n";
     // write coverage.rollup.html
     if (!local.isBrowser) {
         local.fsWriteFileWithMkdirpSync(
-            options.dir + "/coverage.rollup.html",
+            option.dir + "/coverage.rollup.html",
             local.coverageReportHtml
         );
     }
@@ -5759,21 +5979,24 @@ local.instrumentInPackage = function (code, file) {
  * exists in the code
  */
     return (
-        process.env.npm_config_mode_coverage
-        && code.indexOf("/* istanbul ignore all */\n") < 0 && (
-            process.env.npm_config_mode_coverage === "all"
-            || code.indexOf(
-                "/* istanbul instrument in package "
-                + process.env.npm_package_nameLib + " */\n"
-            ) >= 0
-            || code.indexOf(
-                "/* istanbul instrument in package "
-                + process.env.npm_config_mode_coverage + " */\n"
-            ) >= 0
+        // ternary-condition
+        (
+            process.env.npm_config_mode_coverage
+            && code.indexOf("/* istanbul ignore all */\n") < 0 && (
+                process.env.npm_config_mode_coverage === "all"
+                || code.indexOf(
+                    "/* istanbul instrument in package "
+                    + process.env.npm_package_nameLib + " */\n"
+                ) >= 0
+                || code.indexOf(
+                    "/* istanbul instrument in package "
+                    + process.env.npm_config_mode_coverage + " */\n"
+                ) >= 0
+            )
         )
-    )
-    ? local.instrumentSync(code, file)
-    : code;
+        ? local.instrumentSync(code, file)
+        : code
+    );
 };
 
 local.instrumentSync = function (code, file) {
@@ -7080,7 +7303,8 @@ curl https://raw.githubusercontent.com/components/handlebars.js/v1.2.1/handlebar
 local.handlebars = {};
 local.handlebars.compile = function (template) {
 /*
- * this function will return a function that will render the template with a given dict
+ * this function will return a function
+ * that will render <template> with given <dict>
  */
     return function (dict) {
         var result;
@@ -7162,7 +7386,7 @@ local.handlebars.registerHelper = function (key, helper) {
 
 local.handlebars.replace = function (template, dict, withPrefix) {
 /*
- * this function will replace the keys in the template with the dict's key / value
+ * this function will render <template> with given <dict>
  */
     var value;
     // search for keys in the template
@@ -7659,6 +7883,9 @@ local["head.txt"] = '\
     text-align: right;\n\
     width: 50px;\n\
 }\n\
+.x-istanbul .coverage .line-count a {\n\
+    text-decoration: none;\n\
+}\n\
 .x-istanbul .coverage .line-coverage {\n\
     border-left: 1px solid #666;\n\
     border-right: 1px solid #666;\n\
@@ -7933,7 +8160,9 @@ prototype={addFileCoverageSummary:function(e,t){this.summaryMap[e]=t},getTreeSum
 TreeSummary(this.summaryMap,e)}},module.exports=TreeSummarizer
 /* jslint ignore:end */
     local["../util/tree-summarizer"] = module.exports;
-    module.exports.prototype._getTreeSummary = module.exports.prototype.getTreeSummary;
+    module.exports.prototype._getTreeSummary = (
+        module.exports.prototype.getTreeSummary
+    );
     module.exports.prototype.getTreeSummary = function () {
         local.coverageReportSummary = this._getTreeSummary();
         return local.coverageReportSummary;
@@ -8012,7 +8241,7 @@ n+'px;"></span>'):""}),handlebars.registerHelper("show_ignores",function(e){var 
 e.statements.skipped,n=e.functions.skipped,r=e.branches.skipped,i;return t===0&&
 n===0&&r===0?'<span class="ignore-none">none</span>':(i=[],r>0&&i.push("branches: "+r),t>0&&i.push(
 "statements: "+t),n>0&&i.push("functions: "+n),i.join("<br>"))}),handlebars.registerHelper("show_lines",function(
-e){var t=Number(e.fn(this)),n,r=[];for(n=0;n<t;n+=1)r[n]=n+1;return r.join("\n")
+e){var t=Number(e.fn(this)),n,r="";for(n=1;n<=t;n+=1){r+='<a href="#L'+n+'" id="L'+n+'">'+n+'</a>\n';}return r
 }),handlebars.registerHelper("show_line_execution_counts",function(e,t){var n=e.
 l,r=Number(t.fn(this)),i,s,o=[],u,a="";for(i=0;i<r;i+=1)s=i+1,a="&nbsp;",u="neutral"
 ,n.hasOwnProperty(s)&&(n[s]>0?(u="yes",a=n[s]):u="no"),o.push('<span class="cline-any cline-'+
@@ -8110,6 +8339,7 @@ local.TextReport = module.exports; }());
 
 
 /*
+file badge.svg - coverage
 https://img.shields.io/badge/coverage-100.0%-00dd00.svg?style=flat
 */
 local.templateCoverageBadgeSvg =
@@ -8154,7 +8384,9 @@ local.cliDict.cover = function () {
         || "all"
     );
     // add coverage hook to require
-    local._istanbul_moduleExtensionsJs = local._istanbul_module._extensions[".js"];
+    local._istanbul_moduleExtensionsJs = (
+        local._istanbul_module._extensions[".js"]
+    );
     local._istanbul_module._extensions[".js"] = function (module, file) {
         if (typeof file === "string" && (
             file.indexOf(process.env.npm_config_mode_coverage_dir) === 0 || (
@@ -8215,7 +8447,7 @@ local.cliDict.test = function () {
     local._istanbul_module.runMain();
 };
 
-// run cli
+// run the cli
 if (module === require.main && !globalThis.utility2_rollup) {
     local.cliRun();
 }
@@ -8253,28 +8485,48 @@ if (module === require.main && !globalThis.utility2_rollup) {
         } catch (ignore) {}
     }());
     globalThis.globalThis = globalThis;
+    // init debug_inline
+    if (!globalThis["debug\u0049nline"]) {
+        consoleError = console.error;
+        globalThis["debug\u0049nline"] = function () {
+        /*
+         * this function will both print <arguments> to stderr
+         * and return <arguments>[0]
+         */
+            var argList;
+            argList = Array.from(arguments); // jslint ignore:line
+            // debug arguments
+            globalThis["debug\u0049nlineArguments"] = argList;
+            consoleError("\n\ndebug\u0049nline");
+            consoleError.apply(console, argList);
+            consoleError("\n");
+            // return arg0 for inspection
+            return argList[0];
+        };
+    }
     // init local
     local = {};
+    local.local = local;
+    globalThis.globalLocal = local;
     // init isBrowser
     local.isBrowser = (
         typeof window === "object"
         && window === globalThis
         && typeof window.XMLHttpRequest === "function"
         && window.document
-        && typeof window.document.querySelectorAll === "function"
+        && typeof window.document.querySelector === "function"
     );
-    globalThis.globalLocal = local;
     // init function
     local.assertThrow = function (passed, message) {
     /*
-     * this function will throw the error <message> if <passed> is falsy
+     * this function will throw error <message> if <passed> is falsy
      */
         var error;
         if (passed) {
             return;
         }
         error = (
-            // ternary-operator
+            // ternary-condition
             (
                 message
                 && typeof message.message === "string"
@@ -8312,24 +8564,53 @@ if (module === require.main && !globalThis.utility2_rollup) {
      */
         return;
     };
-    // init debug_inline
-    if (!globalThis["debug\u0049nline"]) {
-        consoleError = console.error;
-        globalThis["debug\u0049nline"] = function () {
-        /*
-         * this function will both print <arguments> to stderr
-         * and return <arguments>[0]
-         */
-            var argList;
-            argList = Array.from(arguments); // jslint ignore:line
-            // debug arguments
-            globalThis["debug\u0049nlineArguments"] = argList;
-            consoleError("\n\ndebug\u0049nline");
-            consoleError.apply(console, argList);
-            consoleError("\n");
-            // return arg0 for inspection
-            return argList[0];
-        };
+    local.objectAssignDefault = function (target, source) {
+    /*
+     * this function will if items from <target> are
+     * null, undefined, or empty-string,
+     * then overwrite them with items from <source>
+     */
+        target = target || {};
+        Object.keys(source || {}).forEach(function (key) {
+            if (
+                target[key] === null
+                || target[key] === undefined
+                || target[key] === ""
+            ) {
+                target[key] = target[key] || source[key];
+            }
+        });
+        return target;
+    };
+    // require builtin
+    if (!local.isBrowser) {
+        local.assert = require("assert");
+        local.buffer = require("buffer");
+        local.child_process = require("child_process");
+        local.cluster = require("cluster");
+        local.crypto = require("crypto");
+        local.dgram = require("dgram");
+        local.dns = require("dns");
+        local.domain = require("domain");
+        local.events = require("events");
+        local.fs = require("fs");
+        local.http = require("http");
+        local.https = require("https");
+        local.net = require("net");
+        local.os = require("os");
+        local.path = require("path");
+        local.querystring = require("querystring");
+        local.readline = require("readline");
+        local.repl = require("repl");
+        local.stream = require("stream");
+        local.string_decoder = require("string_decoder");
+        local.timers = require("timers");
+        local.tls = require("tls");
+        local.tty = require("tty");
+        local.url = require("url");
+        local.util = require("util");
+        local.vm = require("vm");
+        local.zlib = require("zlib");
     }
 }(this));
 
@@ -8354,45 +8635,16 @@ local = (
 if (local.isBrowser) {
     globalThis.utility2_jslint = local;
 } else {
-    // require builtins
-    local.assert = require("assert");
-    local.buffer = require("buffer");
-    local.child_process = require("child_process");
-    local.cluster = require("cluster");
-    local.crypto = require("crypto");
-    local.dgram = require("dgram");
-    local.dns = require("dns");
-    local.domain = require("domain");
-    local.events = require("events");
-    local.fs = require("fs");
-    local.http = require("http");
-    local.https = require("https");
-    local.net = require("net");
-    local.os = require("os");
-    local.path = require("path");
-    local.querystring = require("querystring");
-    local.readline = require("readline");
-    local.repl = require("repl");
-    local.stream = require("stream");
-    local.string_decoder = require("string_decoder");
-    local.timers = require("timers");
-    local.tls = require("tls");
-    local.tty = require("tty");
-    local.url = require("url");
-    local.util = require("util");
-    local.vm = require("vm");
-    local.zlib = require("zlib");
     module.exports = local;
     module.exports.__dirname = __dirname;
 }
 // init lib main
-local.local = local;
 local.jslint = local;
 
 
 
 /* validateLineSortedReset */
-local.cliRun = function (options) {
+local.cliRun = function (option) {
 /*
  * this function will run the cli
  */
@@ -8428,10 +8680,10 @@ local.cliRun = function (options) {
         file = __filename.replace((
             /.*\//
         ), "");
-        options = Object.assign({}, options);
+        option = Object.assign({}, option);
         packageJson = require("./package.json");
         // validate comment
-        options.rgxComment = options.rgxComment || (
+        option.rgxComment = option.rgxComment || (
             /\)\u0020\{\n(?:|\u0020{4})\/\*\n(?:\u0020|\u0020{5})\*((?:\u0020<[^>]*?>|\u0020\.\.\.)*?)\n(?:\u0020|\u0020{5})\*\u0020(will\u0020.*?\S)\n(?:\u0020|\u0020{5})\*\/\n(?:\u0020{4}|\u0020{8})\S/
         );
         textDict = {};
@@ -8450,7 +8702,7 @@ local.cliRun = function (options) {
                 return;
             }
             try {
-                commandList[ii] = options.rgxComment.exec(text);
+                commandList[ii] = option.rgxComment.exec(text);
                 commandList[ii] = {
                     argList: (commandList[ii][1] || "").trim(),
                     command: [key],
@@ -8459,21 +8711,21 @@ local.cliRun = function (options) {
             } catch (ignore) {
                 local.assertThrow(null, new Error(
                     "cliRun - cannot parse comment in COMMAND "
-                    + key + ":\nnew RegExp(" + JSON.stringify(options.rgxComment.source)
-                    + ").exec(" + JSON.stringify(text)
-                    .replace((
+                    + key + ":\nnew RegExp("
+                    + JSON.stringify(option.rgxComment.source)
+                    + ").exec(" + JSON.stringify(text).replace((
                         /\\\\/g
-                    ), "\u0000")
-                    .replace((
+                    ), "\u0000").replace((
                         /\\n/g
-                    ), "\\n\\\n")
-                    .replace((
+                    ), "\\n\\\n").replace((
                         /\u0000/g
                     ), "\\\\") + ");"
                 ));
             }
         });
-        console.log(packageJson.name + " (" + packageJson.version + ")\n\n" + commandList
+        text = "";
+        text += packageJson.name + " (" + packageJson.version + ")\n\n";
+        text += commandList
         .filter(function (element) {
             return element;
         })
@@ -8503,7 +8755,8 @@ local.cliRun = function (options) {
                 + element.argList.join("  ")
             );
         })
-        .join("\n\n"));
+        .join("\n\n");
+        console.log(text);
     };
     local.cliDict["--help"] = local.cliDict["--help"] || local.cliDict._help;
     local.cliDict["-h"] = local.cliDict["-h"] || local.cliDict._help;
@@ -8515,7 +8768,7 @@ local.cliRun = function (options) {
      * will start interactive-mode
      */
         globalThis.local = local;
-        local.functionOrNop(local.replStart || require("repl").start)({
+        local.identity(local.replStart || require("repl").start)({
             useGlobal: true
         });
     };
@@ -8531,7 +8784,10 @@ local.cliRun = function (options) {
      */
         console.log(require(__dirname + "/package.json").version);
     };
-    local.cliDict["--version"] = local.cliDict["--version"] || local.cliDict._version;
+    local.cliDict["--version"] = (
+        local.cliDict["--version"]
+        || local.cliDict._version
+    );
     local.cliDict["-v"] = local.cliDict["-v"] || local.cliDict._version;
     // default to --help command if no arguments are given
     if (process.argv.length <= 2) {
@@ -8586,33 +8842,100 @@ local.jsonStringifyOrdered = function (obj, replacer, space) {
             circularSet.delete(obj);
             return tmp;
         }
-        // if obj is not an array, then recurse its items with object-keys sorted
-        tmp = "{" + Object.keys(obj)
-        // sort object-keys
-        .sort()
-        .map(function (key) {
+        // if obj is not an array,
+        // then recurse its items with object-keys sorted
+        tmp = "{" + Object.keys(obj).sort().map(function (key) {
             // recurse
             tmp = stringify(obj[key]);
             if (typeof tmp === "string") {
                 return JSON.stringify(key) + ":" + tmp;
             }
-        })
-        .filter(function (obj) {
+        }).filter(function (obj) {
             return typeof obj === "string";
-        })
-        .join(",") + "}";
+        }).join(",") + "}";
         circularSet.delete(obj);
         return tmp;
     };
     circularSet = new Set();
-    return JSON.stringify(
+    return JSON.stringify((
         (typeof obj === "object" && obj)
         // recurse
         ? JSON.parse(stringify(obj))
-        : obj,
-        replacer,
-        space
-    );
+        : obj
+    ), replacer, space);
+};
+
+local.onErrorWithStack = function (onError) {
+/*
+ * this function will create a new callback that will call onError,
+ * and append the current stack to any error
+ */
+    var onError2;
+    var stack;
+    stack = new Error().stack.replace((
+        /(.*?)\n.*?$/m
+    ), "$1");
+    onError2 = function (error, data, meta) {
+        if (
+            error
+            && typeof error.stack === "string"
+            && error !== local.errorDefault
+            && String(error.stack).indexOf(stack.split("\n")[2]) < 0
+        ) {
+            // append the current stack to error.stack
+            error.stack += "\n" + stack;
+        }
+        onError(error, data, meta);
+    };
+    // debug onError
+    onError2.toString = function () {
+        return String(onError);
+    };
+    return onError2;
+};
+
+local.onParallel = function (onError, onEach, onRetry) {
+/*
+ * this function will create a function that will
+ * 1. run async tasks in parallel
+ * 2. if counter === 0 or error occurred, then call onError with error
+ */
+    var onParallel;
+    onError = local.onErrorWithStack(onError);
+    onEach = onEach || local.nop;
+    onRetry = onRetry || local.nop;
+    onParallel = function (error, data) {
+        if (onRetry(error, data)) {
+            return;
+        }
+        // decrement counter
+        onParallel.counter -= 1;
+        // validate counter
+        if (!(onParallel.counter >= 0 || error || onParallel.error)) {
+            error = new Error(
+                "invalid onParallel.counter = " + onParallel.counter
+            );
+        // ensure onError is run only once
+        } else if (onParallel.counter < 0) {
+            return;
+        }
+        // handle error
+        if (error) {
+            onParallel.error = error;
+            // ensure counter <= 0
+            onParallel.counter = -Math.abs(onParallel.counter);
+        }
+        // call onError when isDone
+        if (onParallel.counter <= 0) {
+            onError(error, data);
+            return;
+        }
+        onEach();
+    };
+    // init counter
+    onParallel.counter = 0;
+    // return callback
+    return onParallel;
 };
 }());
 
@@ -8623,8 +8946,8 @@ local.jsonStringifyOrdered = function (obj, replacer, space) {
 (function () {
 /*
 file CSSLint/csslint.js
-2016-12-06T08:50:07Z - shGithubDateCommitted https://github.com/CSSLint/csslint/commits/v1.0.5
 https://github.com/CSSLint/csslint/blob/v1.0.5/dist/csslint.js
+2016-12-06T08:50:07Z - shGithubDateCommitted https://github.com/CSSLint/csslint/commits/v1.0.5
 utility2-uglifyjs https://raw.githubusercontent.com/CSSLint/csslint/v1.0.5/dist/csslint.js > /tmp/aa.js
 */
 /* jslint ignore:start */
@@ -9148,7 +9471,7 @@ e){e+="}",this._tokenStream=new v(e,m),this._readDeclarations()}};for(t in n)Obj
 ,"list-style-type":"disc | circle | square | decimal | decimal-leading-zero | lower-roman | upper-roman | lower-greek | lower-latin | upper-latin | armenian | georgian | lower-alpha | upper-alpha | none"
 ,margin:"<margin-width>{1,4}","margin-bottom":"<margin-width>","margin-left":"<margin-width>"
 ,"margin-right":"<margin-width>","margin-top":"<margin-width>",mark:1,"mark-after"
-:1,"mark-before":1,marker:1,"marker-end":1,"marker-mid":1,"marker-start":1,marks
+:1,"mark-be":1,marker:1,"marker-end":1,"marker-mid":1,"marker-start":1,marks
 :1,"marquee-direction":1,"marquee-play-count":1,"marquee-speed":1,"marquee-style"
 :1,mask:1,"max-height":"<length> | <percentage> | <content-sizing> | none","max-width"
 :"<length> | <percentage> | <content-sizing> | none","min-height":"<length> | <percentage> | <content-sizing> | contain-floats | -moz-contain-floats | -webkit-contain-floats"
@@ -10046,14 +10369,14 @@ local.CSSLint = CSSLint;
 
 
 // jslint-hack - var
-var jslint;
+var jslint_extra;
 var jslint_result;
 var line_ignore;
 var lines_extra;
 /*
-file JSLint/jslint.js - es6
-2018-10-26T15:59:47Z - shGithubDateCommitted https://github.com/douglascrockford/JSLint/commits/813d1fb157076ef9df1d773a084c971705e57a84
-https://github.com/douglascrockford/JSLint/blob/813d1fb157076ef9df1d773a084c971705e57a84/jslint.js
+file JSLint/jslint.js
+https://github.com/douglascrockford/JSLint/blob/de413767154641f490d6e96185e525255cca5f7e/jslint.js
+2018-11-14T03:04:33Z - shGithubDateCommitted https://github.com/douglascrockford/JSLint/commits/de413767154641f490d6e96185e525255cca5f7e
 node -e '
 "use strict";
 process.argv[1].replace((
@@ -10131,39 +10454,45 @@ console.log(process.argv[2]);
 -        if (snippet === "//") {
 +        if (snippet === "//") {
 +            // jslint-hack - too_long
-+            regexp_seen = true;
++            if (option.utility2 && (
++                /^!!|^\u0020https:\/\//m
++            ).test(source_line)) {
++                regexp_seen = true;
++            }
 
 -                array.push(source_line);
 +                array.push(source_line);
 +                // jslint-hack - too_long
-+                regexp_seen = true;
++                if (option.utility2 && (
++                    /^\S|^\u0020{2}|\u0020https:\/\/|\u0020this\u0020.*?\u0020package\u0020will\u0020/m
++                ).test(source_line)) {
++                    regexp_seen = true;
++                }
 
 -        warn("unexpected_a", right);
 +        // jslint-hack - unexpected_a
 +        warn("unexpected_a", right, null, null, left, right);
 
--                const mislaid = (
--                    stack.length > 0
--                    ? stack[stack.length - 1].right
--                    : undefined
+-                warn(
+-                    (
+-                        (
+-                            thing.id === "(string)"
+-                            && thing.value === "use strict"
+-                        )
+-                        ? "unexpected_a"
+-                        : "unexpected_expression_a"
+-                    ),
+-                    thing
 -                );
--                if (!open && mislaid !== undefined) {
--                    warn(
--                        "expected_a_next_at_b",
--                        mislaid,
--                        artifact(mislaid.id),
--                        margin + 4 + fudge
--                    );
--                } else if (right.from !== margin + 8) {
--                    expected_at(margin + 8);
--                }
-+                // jslint-hack - expected_space_a_b
-+                warn(
-+                    "expected_space_a_b",
-+                    right,
-+                    artifact(left),
-+                    artifact(right)
-+                );
++                warn((
++                    // jslint-hack - ternary-condition
++                    (
++                        thing.id === "(string)"
++                        && thing.value === "use strict"
++                    )
++                    ? "unexpected_a"
++                    : "unexpected_expression_a"
++                ), thing);
 
 -                        margin += 4;
 +                        // jslint-hack - conditional-margin
@@ -10199,13 +10528,13 @@ console.log(process.argv[2]);
 +        e.early_stop = true;
 
 ' \
-"$(curl https://raw.githubusercontent.com/douglascrockford/JSLint/813d1fb157076ef9df1d773a084c971705e57a84/jslint.js)" > /tmp/aa.js; utility2-jslint autofix /tmp/aa.js
+"$(curl https://raw.githubusercontent.com/douglascrockford/JSLint/de413767154641f490d6e96185e525255cca5f7e/jslint.js)" > /tmp/aa.js; utility2-jslint autofix /tmp/aa.js
 */
 /* jslint utility2:true */
 var next_line_extra = null;
 var warn_at_extra = null;
 // jslint.js
-// 2018-10-26
+// 2018-11-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -10312,21 +10641,21 @@ var warn_at_extra = null;
     missing_m, module, multivar, naked_block, name, names, nested_comment, new,
     node, not_label_a, nr, nud, number_isNaN, ok, open, opening, option,
     out_of_scope_a, parameters, parent, pop, property, push, quote,
-    redefinition_a_b, replace, required_a_optional_b, reserved_a, right, role,
-    search, shebang, signature, single, slice, some, sort, split, startsWith,
-    statement, stop, strict, subscript_a, switch, test, this, thru, toString,
-    todo_comment, tokens, too_long, too_many_digits, tree, try, type, u,
-    unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
-    unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
-    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
-    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
-    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
-    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unreachable_a, unregistered_property_a, unsafe, unused_a, use_double,
-    use_open, use_spaces, use_strict, used, value, var_loop, var_switch,
-    variable, warning, warnings, weird_condition_a, weird_expression_a,
-    weird_loop, weird_relation_a, white, wrap_condition, wrap_immediate,
-    wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable, y
+    redefinition_a_b, replace, required_a_optional_b, reserved_a, role, search,
+    shebang, signature, single, slice, some, sort, split, startsWith, statement,
+    stop, strict, subscript_a, switch, test, this, thru, toString, todo_comment,
+    tokens, too_long, too_many_digits, tree, try, type, u, unclosed_comment,
+    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
+    unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
+    unexpected_char_a, unexpected_comment, unexpected_directive_a,
+    unexpected_expression_a, unexpected_label_a, unexpected_parens,
+    unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
+    unexpected_typeof_a, uninitialized_a, unreachable_a,
+    unregistered_property_a, unsafe, unused_a, use_double, use_open, use_spaces,
+    use_strict, used, value, var_loop, var_switch, variable, warning, warnings,
+    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
+    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
+    wrapped, writable, y
 */
 
 function empty() {
@@ -10855,7 +11184,7 @@ function tokenize(source) {
         var at;
         if (
             !option.long
-            //!! && whole_line.length > 80
+            && whole_line.length > 80
             // jslint-hack - 100
             && whole_line.length > (
                 option.utility2
@@ -11649,7 +11978,11 @@ function tokenize(source) {
 
         if (snippet === "//") {
             // jslint-hack - too_long
-            regexp_seen = true;
+            if (option.utility2 && (
+                /^!!|^\u0020https:\/\//m
+            ).test(source_line)) {
+                regexp_seen = true;
+            }
             snippet = source_line;
             source_line = "";
             the_token = comment(snippet);
@@ -11679,7 +12012,11 @@ function tokenize(source) {
                 }
                 array.push(source_line);
                 // jslint-hack - too_long
-                regexp_seen = true;
+                if (option.utility2 && (
+                    /^\S|^\u0020{2}|\u0020https:\/\/|\u0020this\u0020.*?\u0020package\u0020will\u0020/m
+                ).test(source_line)) {
+                    regexp_seen = true;
+                }
                 source_line = next_line();
                 if (source_line === undefined) {
                     return stop_at("unclosed_comment", line, column);
@@ -12586,6 +12923,9 @@ function ternary(id1, id2) {
         token.arity = "ternary";
         the_token.arity = "ternary";
         the_token.expression = [left, second, expression(10)];
+        if (next_token.id !== ")") {
+            warn("use_open", the_token);
+        }
         return the_token;
     };
     return the_symbol;
@@ -14042,12 +14382,15 @@ function walk_statement(thing) {
                 thing.arity !== "statement"
                 && thing.arity !== "assignment"
             ) {
-                warn(
-                    (thing.id === "(string)" && thing.value === "use strict")
+                warn((
+                    // jslint-hack - ternary-condition
+                    (
+                        thing.id === "(string)"
+                        && thing.value === "use strict"
+                    )
                     ? "unexpected_a"
-                    : "unexpected_expression_a",
-                    thing
-                );
+                    : "unexpected_expression_a"
+                ), thing);
             }
             walk_statement(thing.block);
             walk_statement(thing.else);
@@ -14840,7 +15183,7 @@ function whitage() {
     }
 
     function one_space() {
-        if (left.line === right.line) {
+        if (left.line === right.line || !open) {
             if (left.thru + 1 !== right.from && nr_comments_skipped === 0) {
                 warn(
                     "expected_space_a_b",
@@ -14850,19 +15193,9 @@ function whitage() {
                 );
             }
         } else {
-            if (free) {
-                // jslint-hack - expected_at
-                if (right.from !== margin) {
-                    expected_at(margin);
-                }
-            } else {
-                // jslint-hack - expected_space_a_b
-                warn(
-                    "expected_space_a_b",
-                    right,
-                    artifact(left),
-                    artifact(right)
-                );
+            // jslint-hack - expected_at
+            if (right.from !== margin) {
+                expected_at(margin);
             }
         }
     }
@@ -15210,7 +15543,7 @@ var jslint0 = Object.freeze(function (
     }
     return {
         directives,
-        edition: "2018-10-26",
+        edition: "2018-11-13",
         exports,
         froms,
         functions,
@@ -15239,68 +15572,42 @@ var jslint0 = Object.freeze(function (
 file none
 */
 // jslint-hack - extra
-jslint = function (source, option, global_array) {
+jslint_extra = function (source, option, global_array) {
 /*
  * this function will run with extra-features inside jslint-function jslint()
  */
-    var ii;
-    var jj;
-    var source0;
-    option = option || {};
-    // autofix
-    if (option.autofix && !option.autofix_subroutine) {
-        option.autofix_subroutine = true;
-        return jslint(source, option, global_array);
-    }
     // init
-    ii = 0;
-    source = source || "";
-    while (true) {
-        ii += 1;
-        line_ignore = null;
-        lines = (
-            Array.isArray(source)
-            ? source
-            : source.split(rx_crlf)
-        );
-        jj = 0;
-        lines_extra = [];
-        while (jj < lines.length) {
-            lines_extra.push({});
-            jj += 1;
-        }
-        jslint_result = jslint0(source, option, global_array);
-        source0 = source;
-        source = "";
-        jj = 0;
-        while (jj < lines.length) {
-            source += (lines_extra[jj].source_autofix || lines[jj]) + "\n";
-            jj += 1;
-        }
-        source = source.slice(0, -1)
-        // expected_space_a_b: "Expected one space between '{a}' and '{b}'.",
-        // unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
-        .replace((
-            /\s+?\u0000/g
-        ), "\u0000")
-        .replace((
-            /(\n\u0020+)(.*?)\n\u0020*?(\/\/.*?)\u0000/g
-        ), "$1$3$1$2\u0000")
-        .replace((
-            /\u0000expected_space_a_b\u0000/g
-        ), " ")
-        .replace((
-            /\u0000unexpected_space_a_b\u0000/g
-        ), "");
-        if (ii >= 10 || jslint_result.stop || source === source0) {
-            break;
-        }
-    }
+    line_ignore = null;
+    lines = (
+        // ternary-condition
+        Array.isArray(source)
+        ? source
+        : source.split(rx_crlf)
+    );
+    lines_extra = lines.map(function () {
+        return {};
+    });
+    // jslint
+    jslint_result = jslint0(lines, option, global_array);
+    // autofix
+    // expected_space_a_b: "Expected one space between '{a}' and '{b}'.",
+    // unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
+    source = lines_extra.map(function (element, ii) {
+        return element.source_autofix || lines[ii];
+    }).join("\n").replace((
+        /\s+?\u0000/g
+    ), "\u0000").replace((
+        /(\n\u0020+)(.*?)\n\u0020*?(\/\/.*?)\u0000/g
+    ), "$1$3$1$2\u0000").replace((
+        /\u0000expected_space_a_b\u0000/g
+    ), " ").replace((
+        /\u0000unexpected_space_a_b\u0000/g
+    ), "");
     jslint_result.lines_extra = lines_extra;
     jslint_result.source_autofix = source;
     return jslint_result;
 };
-local.jslintEs6 = jslint;
+local.jslint_extra = jslint_extra;
 next_line_extra = function (source_line, line) {
 /*
  * this function will run with extra-features inside jslint-function next_line()
@@ -15320,14 +15627,14 @@ next_line_extra = function (source_line, line) {
         )
     );
     switch (tmp && tmp[1]) {
-    case "ignore:start":
-        line_ignore = true;
-        break;
     case "ignore:end":
         line_ignore = null;
         break;
     case "ignore:line":
         line_ignore = "line";
+        break;
+    case "ignore:start":
+        line_ignore = true;
         break;
     case "utility2:true":
         option.bitwise = true;
@@ -15348,11 +15655,11 @@ next_line_extra = function (source_line, line) {
     }
     line_extra.ignore = line_ignore;
     switch (line_ignore) {
-    case true:
-        source_line = "";
-        break;
     case "line":
         line_ignore = null;
+        break;
+    case true:
+        source_line = "";
         break;
     }
     return source_line;
@@ -15435,9 +15742,13 @@ warn_at_extra = function (warning, warnings) {
         break;
     // expected_identifier_a: "Expected an identifier and instead saw '{a}'.",
     case "expected_identifier_a":
-        if (!((
-            /^\d+$/m
-        ).test(warning.a) && warning.source[warning.column + warning.a.length] === ":")) {
+        if (!(
+            // newline
+            (
+                /^\d+$/m
+            ).test(warning.a)
+            && warning.source[warning.column + warning.a.length] === ":"
+        )) {
             break;
         }
         lines_extra[warning.line].source_autofix = (
@@ -15450,8 +15761,8 @@ warn_at_extra = function (warning, warnings) {
     case "expected_space_a_b":
     case "unexpected_space_a_b":
         lines_extra[warning.line].source_autofix = (
-            warning.source.slice(0, warning.column) + "\u0000" + warning.code + "\u0000"
-            + warning.source.slice(warning.column)
+            warning.source.slice(0, warning.column) + "\u0000" + warning.code
+            + "\u0000" + warning.source.slice(warning.column)
         );
         break;
     // use_spaces: "Use spaces, not tabs.",
@@ -15479,7 +15790,8 @@ warn_at_extra = function (warning, warnings) {
             }
         });
         warning.source_autofix = (
-            lines_extra[warning.line] && lines_extra[warning.line].source_autofix
+            lines_extra[warning.line]
+            && lines_extra[warning.line].source_autofix
         );
         warning.stack = warning.stack || new Error().stack;
     }
@@ -15491,172 +15803,31 @@ warn_at_extra = function (warning, warnings) {
 
 // run shared js-env code - function
 (function () {
-var jslint;
-jslint = local.jslintEs6;
-
-
-
-local.csslintUtility2 = function (code) {
-/*
- * this function will csslint <code> with utility2-specific rules
- */
-    var current1;
-    var current2;
-    var ii;
-    var jj;
-    var message;
-    var previous1;
-    var previous2;
-    // ignore comments
-    code = code.replace((
-        /^\u0020*?\/\*[\S\s]*?\*\/\u0020*?$/gm
-    ), function (match0) {
-        if (match0 === "/* validateLineSortedReset */") {
-            return match0;
-        }
-        // preserve lineno
-        return match0.replace((
-            /^.*?$/gm
-        ), "");
-    });
-    ii = 0;
-    current1 = "";
-    current2 = "";
-    previous1 = "";
-    previous2 = "";
-    code.replace((
-        /^.*?$/gm
-    ), function (line) {
-        current1 = line;
-        ii += 1;
-        jj = 0;
-        message = "";
-        if (!current1) {
-            return;
-        }
-        // validate whitespace-before-comma
-        if ((
-            /\u0020,/
-        ).test(current1)) {
-            jj = jj || ((
-                /\u0020,/
-            ).exec(current1).index + 2);
-            message = message || "whitespace-before-comma";
-        }
-        // validate double-whitespace
-        if ((
-            /\S\u0020{2}/
-        ).test(current1)) {
-            jj = jj || ((
-                /\S\u0020{2}/
-            ).exec(current1).index + 2);
-            message = message || "double-whitespace";
-        }
-        // ignore indent
-        if (!message && current1[0] === " ") {
-            return;
-        }
-        // validate multi-line-statement
-        if ((
-            /[,;{}]./
-        ).test(current1)) {
-            jj = jj || ((
-                /[,;{}]./
-            ).exec(current1).index + 1);
-            message = message || "multi-line-statement";
-        }
-        // validateLineSortedReset
-        if (current1 === "/* validateLineSortedReset */") {
-            current1 = "";
-            current2 = "";
-            previous1 = "";
-            previous2 = "";
-            return;
-        }
-        // validate previous1 < current1
-        current1 = current1
-        .replace((
-            /^#/gm
-        ), "|")
-        .replace((
-            /,$/gm
-        ), "   ,")
-        .replace((
-            /\u0020\{$|:/gm
-        ), "  $&")
-        .replace((
-            /^[\w*@]|\u0020\w/gm
-        ), " $&");
-        if (!(previous1 < current1)) {
-            jj = jj || 1;
-            message = (
-                message
-                || ("lines not sorted\n" + previous1 + "\n" + current1)
-            );
-        }
-        previous1 = current1;
-        // validate previous2 < current2
-        current2 += current1 + "\n";
-        if (current1 === "}") {
-            current2 = current2.slice(0, -3);
-            if (!(previous2 < current2)) {
-                jj = jj || 1;
-                message = (
-                    message
-                    || ("lines not sorted\n" + previous2 + "\n" + current2)
-                    .replace((
-                        /\n\|/g
-                    ), "\n#")
-                );
-            }
-            previous1 = "";
-            previous2 = current2;
-            current2 = "";
-        }
-        if (!message) {
-            return;
-        }
-        local.jslintResult.errorList.push({
-            col: jj,
-            line: ii,
-            message: message.trim(),
-            value: line
-        });
-    });
-};
-
-local.jslintAndPrint = function (code, file, options) {
+local.jslintAndPrint = function (code, file, option) {
 /*
  * this function will jslint / csslint <code> and print any errors to stderr
  */
-    var code2;
-    var dataList;
-    var ii;
-    var jj;
-    var rgx1;
-    var rgx2;
     var tmp;
-    if (!(options && options.modeNext)) {
+    if (!(option && option.modeNext)) {
         local.jslintResult = {
             modeNext: 0
         };
     }
     code = code || "";
     file = file || "undefined";
-    options = Object.assign(local.jslintResult, options || {}, {
+    option = Object.assign(local.jslintResult, option || {}, {
         code: code,
         file: file
     });
-    options.modeNext += 1;
-    switch (options.modeNext) {
-    // jslint - all
+    option.modeNext += 1;
+    switch (option.modeNext) {
+    // jslint - init
     case 1:
-        options.modeNext = Infinity;
         // cleanup
-        options.errorList = [];
-        options.errorText = "";
+        option.errorList = [];
+        option.errorText = "";
         // fileType0
-        switch (options.fileType0) {
+        switch (option.fileType0) {
         case ".\\n\\":
             code = code.replace((
                 /\\n\\$|\\(.)/gm
@@ -15675,18 +15846,15 @@ local.jslintAndPrint = function (code, file, options) {
             break;
         }
         // init
-        options = Object.assign(options, {
+        option = Object.assign(option, {
             ".css": (
                 /^\/\*csslint\b|(^\/\*\u0020jslint\u0020utility2:true\u0020\*\/$)/m
             ),
             ".html": (
-                /(^<!--\u0020jslint\u0020utility2:true\u0020-->$)/m
+                /^\/\*csslint\b|(^\/\*\u0020jslint\u0020utility2:true\u0020\*\/$)/m
             ),
             ".js": (
                 /^\/\*jslint\b|(^\/\*\u0020jslint\u0020utility2:true\u0020\*\/$)/m
-            ),
-            ".json": (
-                /^(.)/
             ),
             ".md": (
                 /(^\/\*\u0020jslint\u0020utility2:true\u0020\*\/$)/m
@@ -15699,26 +15867,245 @@ local.jslintAndPrint = function (code, file, options) {
                 /\.\w+?$|$/m
             ).exec(file)[0]
         });
-        if (options.fileType === ".js" && (
-            /^\s*?[\[{]/
-        ).test(code)) {
-            options.fileType = ".json";
+        // jslint - .json
+        if (
+            code && (option.fileType === ".js" || option.fileType === ".json")
+            && !option.fileType0
+        ) {
+            try {
+                tmp = JSON.parse(code);
+                option.fileType = ".json";
+                if (option.autofix) {
+                    code = JSON.stringify(tmp, null, 4) + "\n";
+                    option.code0 = code;
+                }
+                option.modeNext = Infinity;
+                break;
+            } catch (errorCaught) {
+                if (option.fileType === ".json") {
+                    option.errorList.push({
+                        column: 0,
+                        evidence: code.slice(0, 100),
+                        line: 0,
+                        message: errorCaught.message
+                    });
+                    option.modeNext = Infinity;
+                    break;
+                }
+            }
         }
-        options.conditionalPassed = (
-            Object.prototype.toString.call(options[options.fileType]) === "[object RegExp]"
-            && options[options.fileType].exec(code)
-        );
-        options.utility2 = options.conditionalPassed && options.conditionalPassed[1];
-        if (options.conditional && (!options.conditionalPassed || options.coverage)) {
+        try {
+            option.conditionalPassed = option[option.fileType].exec(code);
+        } catch (ignore) {}
+        option.utility2 = (
+            option.conditionalPassed
+            && option.conditionalPassed[1]
+        ) || option.autofix;
+        if (
+            option.conditional
+            && (!option.conditionalPassed || option.coverage)
+        ) {
             break;
         }
-        options.modeNext = 10;
+        option.modeNext = 10;
         break;
-    // autofix - all
+    // jslint - autofix
     case 11:
-        if (!options.autofix) {
+        code = local.jslintAutofix(code, file, option);
+        local.jslintResult = option;
+        break;
+    // jslint - csslint and jslint
+    case 12:
+        // restore lineOffset
+        code = "\n".repeat(option.lineOffset | 0) + code;
+        switch (option.fileType) {
+        case ".css":
+            // csslint
+            Object.assign(option, local.CSSLint.verify(code));
+            // init errorList
+            option.errorList = option.messages.map(function (error) {
+                error.column = error.col;
+                error.message = (
+                    error.type + " - " + error.rule.id + " - " + error.message
+                    + "\n    " + error.rule.desc
+                );
+                return error;
+            });
+            break;
+        case ".html":
+        case ".md":
+        case ".sh":
+            break;
+        default:
+            // jslint - .js
+            Object.assign(option, local.jslint_extra(code, option));
+            code = option.source_autofix || code;
+            // prioritize fatal error
+            option.warnings.forEach(function (error, ii) {
+                if (error.early_stop) {
+                    error.message = (
+                        "[JSLint was unable to finish] - "
+                        + error.message
+                    );
+                    option.warnings.unshift(error);
+                    option.warnings.splice(ii, 1);
+                }
+            });
+            // init errorList
+            option.errorList = option.warnings.filter(function (error) {
+                return error && error.message;
+            }).map(function (error) {
+                error.column = error.column + 1;
+                error.evidence = error.source;
+                error.line = error.line + 1;
+                return error;
+            });
+        }
+        break;
+    // jslint - utility2
+    case 13:
+        local.jslintUtility2(code, file, option);
+        break;
+    // jslint - print
+    default:
+        switch (Boolean(option.fileType0) && option.fileType0) {
+        case ".\\n\\":
+            code = code.trim().replace((
+                /\\/g
+            ), "\\\\").replace((
+                /$/gm
+            ), "\\n\\").replace((
+                /'/g
+            ), "\\'") + "\n";
+            break;
+        case ".sh":
+            code = code.trim().replace((
+                /'/g
+            ), "'\"'\"'") + "\n";
+            break;
+        case false:
+            code = code.trimRight() + "\n";
+            break;
+        default:
+            code = code.trim() + "\n";
+        }
+        // autofix - save
+        if (
+            !local.isBrowser
+            && option.autofix
+            && !option.fileType0
+            && !option.stop
+            && code !== option.code0
+            && local.fs.existsSync(file)
+        ) {
+            local.fs.writeFileSync(file, code);
+            local.fs.writeFileSync(file + ".autofix.old", option.code0);
+            local.child_process.spawnSync(
+                "diff",
+                ["-u", file + ".autofix.old", file],
+                {
+                    stdio: ["ignore", 2, "ignore"]
+                }
+            );
+            local.fs.unlinkSync(file + ".autofix.old");
+            console.error(
+                "\u001b[1mjslint-autofix - modified and saved file " + file
+                + "\u001b[22m"
+            );
+        }
+        // print colorized error-messages to stderr
+        // https://github.com/kaizhu256/JSLint/blob/cli/cli.js#L99
+        option.errorList.filter(function (warning) {
+            return warning && warning.message;
+        // print only first 10 warnings
+        }).slice(0, 10).forEach(function (error, ii) {
+            option.errorText = (
+                option.errorText
+                || " \u001b[1mjslint " + file + "\u001b[22m\n"
+            );
+            option.errorText += (
+                ("  " + String(ii + 1)).slice(-3)
+                + " \u001b[31m" + error.message + "\u001b[39m"
+                + " \u001b[90m\/\/ line " + error.line + ", column "
+                + error.column
+                + "\u001b[39m\n"
+                + ("    " + String(error.evidence).trim()).slice(0, 80) + "\n"
+            );
+            if (!ii && error.stack && error.a !== "debug\u0049nline") {
+                tmp = error.stack;
+                error.stack = null;
+                option.errorText += (
+                    JSON.stringify(error, null, 4) + "\n" + tmp.trim() + "\n"
+                );
+            }
+        });
+        option.errorText = option.errorText.trim();
+        if (option.errorText) {
+            // debug jslintResult
+            local._debugJslintResult = local.jslintResult;
+            // print error to stderr
+            console.error(option.errorText);
+        }
+        return code;
+    }
+    // recurse
+    return local.jslintAndPrint(code, file, option);
+};
+
+local.jslintAndPrintDir = function (dir, option, onError) {
+/*
+ * this function will jslint files in shallow <dir>
+ */
+    var onParallel;
+    onParallel = local.onParallel(onError);
+    local.fs.readdirSync(dir).forEach(function (file) {
+        var timeStart;
+        file = process.cwd() + "/" + file;
+        switch ((
+            /\.\w+?$|$/m
+        ).exec(file)[0]) {
+        case ".css":
+        case ".html":
+        case ".js":
+        case ".json":
+        case ".md":
+        case ".sh":
+            if ((
+                /\b(?:assets\.app\.js|lock|min|raw|rollup)\b/
+            ).test(file)) {
+                return;
+            }
+            onParallel.counter += 1;
+            // jslint file
+            local.fs.readFile(file, "utf8", function (error, data) {
+                // validate no error occurred
+                local.assertThrow(!error, error);
+                timeStart = Date.now();
+                local.jslintAndPrint(data, file, option);
+                console.error(
+                    "jslint - " + (Date.now() - timeStart) + "ms " + file
+                );
+                onParallel();
+            });
             break;
         }
+    });
+};
+
+local.jslintAutofix = function (code, file, option) {
+/*
+ * this function will jslint-autofix <code>
+ */
+    var code0;
+    var code2;
+    var dataList;
+    var ignoreList;
+    var ii;
+    var rgx1;
+    var rgx2;
+    var tmp;
+    // jslintAutofix - all
+    if (option.autofix) {
         // autofix - local-function
         if (typeof(
             globalThis.utility2
@@ -15730,18 +16117,16 @@ local.jslintAndPrint = function (code, file, options) {
         code = code.replace((
             /\u0020+$/gm
         ), "");
-        // autofix - whitespace
-        code = code
         // autofix - whitespace - "\s*)]}"
-        .replace((
+        code = code.replace((
             /\n+?(\n\u0020*?[)\]}])/g
-        ), "$1")
+        ), "$1");
         // autofix - whitespace - "\n{2}"
-        .replace((
+        code = code.replace((
             /([^\n])\n{3}([^\n])/g
-        ), "$1\n\n$2")
+        ), "$1\n\n$2");
         // autofix - whitespace - "\n{4}"
-        .replace((
+        code = code.replace((
             /\n{5,}/g
         ), "\n\n\n\n");
         // autofix - recurse <script>...</script>, <style>...</style>
@@ -15755,47 +16140,73 @@ local.jslintAndPrint = function (code, file, options) {
                     ? ".<style>.css"
                     : ".<script>.js"
                 ),
-                Object.assign({}, options, {
+                Object.assign({}, option, {
                     fileType0: ".\\n\\",
-                    lineOffset: (options.lineOffset | 0) + code.slice(0, ii)
-                    .replace((
+                    lineOffset: (
+                        option.lineOffset | 0
+                    ) + code.slice(0, ii).replace((
                         /.+/g
                     ), "").length,
                     modeNext: 0
                 })
             ) + match2;
         });
-        local.jslintResult = options;
+    }
+    switch (option.autofix && option.fileType) {
+    // jslintAutofix - .css
+    case ".css":
         break;
-    // autofix - .css
-    case 12:
-        if (!options.autofix || options.fileType !== ".css") {
-            break;
-        }
+    // jslintAutofix - .html
+    case ".html":
+        // autofix - recurse <script>...</script>, <style>...</style>
+        code = code.replace((
+            /(^\/\*\u0020jslint\u0020utility2:true\u0020\*\/\n(?:^.*?\n)*?)(^<\/(?:script|style)>\n)/gm
+        ), function (ignore, match1, match2, ii) {
+            return local.jslintAndPrint(
+                match1,
+                file + (
+                    match2.indexOf("style") >= 0
+                    ? ".<style>.css"
+                    : ".<script>.js"
+                ),
+                local.objectAssignDefault({
+                    fileType0: option.fileType,
+                    lineOffset: (
+                        (option.lineOffset | 0)
+                        + code.slice(0, ii).replace((
+                            /.+/g
+                        ), "").length
+                    ),
+                    modeNext: 0
+                }, option)
+            ) + match2;
+        });
         break;
-    // autofix - .html
-    case 13:
-        if (!options.autofix || options.fileType !== ".html") {
-            break;
-        }
-        break;
-    // autofix - .js
-    case 14:
-        if (!options.autofix || options.fileType !== ".js") {
-            break;
-        }
+    // jslintAutofix - .js
+    case ".js":
+        // demux - code -> code, ignoreList
+        ignoreList = [];
+        code = code.replace((
+            /^\u0020*?\/\*\u0020jslint\u0020ignore:start\u0020\*\/$[\S\s]*?^\/\*\u0020jslint\u0020ignore:end\u0020\*\/$/gm
+        ), function (match0) {
+            ignoreList.push(match0);
+            return "/* jslint ignore:start:end */";
+        });
         // autofix - ascii
         code = code.replace((
             /[^\n\r\t\u0020-\u007e]/g
         ), function (match0) {
-            return "\\u" + ("0000" + match0.charCodeAt(0).toString(16)).slice(-4);
+            return "\\u" + (
+                "0000"
+                + match0.charCodeAt(0).toString(16)
+            ).slice(-4);
         });
         // demux - code -> code2, dataList
         code2 = "";
         dataList = [];
         ii = 0;
         rgx1 = (
-            /\\.|^\/\*\u0020jslint\u0020ignore:start\u0020\*\/$|^\/\*\u0020jslint\u0020ignore:end\u0020\*\/$|\/\*|\*\/|\/\/!!|\/\/|["'\/`]|$/gm
+            /\\.|\/\*|\*\/|\/\/!!|\/\/|["'\/`]|$/gm
         );
         // parse rgx
         // https://github.com/douglascrockford/JSLint/blob/557afd32bcaa35480d31a86f02d3a8c06a4e5b5c/jslint.js#L1383
@@ -15803,13 +16214,13 @@ local.jslintAndPrint = function (code, file, options) {
             /(?:[^.]\b(?:case|delete|in|instanceof|new|return|typeof|void|yield)|[!%&\u0028*+,\-:;<=>?\[\^{|}~])[\s\u0028]*?\/[^*\/]/g
         );
         tmp = "";
-        // shebang
+        // demux - shebang
         code.replace((
             /^#!.*/
         ), function (match0) {
             code2 += "#!";
             dataList.push({
-                data: match0,
+                code: match0,
                 type: "#_"
             });
             rgx1.lastIndex = match0.length;
@@ -15828,7 +16239,6 @@ local.jslintAndPrint = function (code, file, options) {
             case "\"":
             case "'":
             case "/*":
-            case "/* jslint ignore:start */":
             case "//!!":
             case "//":
             case "`":
@@ -15845,7 +16255,6 @@ local.jslintAndPrint = function (code, file, options) {
                     switch (tmp[0] + "_" + tmp[1]) {
                     case "\"_\"":
                     case "'_'":
-                    case "/* jslint ignore:start */_/* jslint ignore:end */":
                     case "/*_*/":
                     case "//!!_":
                     case "//_":
@@ -15854,7 +16263,7 @@ local.jslintAndPrint = function (code, file, options) {
                     case "`_`":
                         code2 += "_" + tmp[1];
                         dataList.push({
-                            data: tmp[0] + code.slice(ii, rgx1.lastIndex),
+                            code: tmp[0] + code.slice(ii, rgx1.lastIndex),
                             type: (tmp[0] + "_" + tmp[1]).replace("/_*/", "/_/")
                         });
                         ii = 0;
@@ -15876,16 +16285,14 @@ local.jslintAndPrint = function (code, file, options) {
             }
         }
         code2 += code.slice(ii);
-        code2 = code2.replace((
+        code = code2;
+        code = code.replace((
             /\/_\*\//g
         ), "/_/");
-        code2 = code2.replace((
-            /\/\*\u0020jslint\u0020ignore:start\u0020\*\/_\/\*\u0020jslint\u0020ignore:end\u0020\*\//g
-        ), "/* jslint ignore */");
-        options.codeDemux = code2;
+        option.codeDemux = code;
         // autofix - comment - left-align
         tmp = null;
-        code2 = code2.split("\n").reverse().map(function (line) {
+        code = code.split("\n").reverse().map(function (line) {
             if ((
                 /^\u0020+?\/\/_/
             ).test(line)) {
@@ -15902,31 +16309,31 @@ local.jslintAndPrint = function (code, file, options) {
         }).reverse().join("\n");
         // autofix - prefix-operator
         // https://stackoverflow.com/questions/12122293/list-of-all-binary-operators-in-javascript
-        code2 = code2
-        .replace((
+        code = code.replace((
             /(\S)\u0020+?(!=|!==|%|&|&&|-|:|<|<<|<=|==|===|>|>=|>>|>>>|\*|\+|\/|\?|\^|\||\|\|)((?:\s*?\/\*_\*\/|\s*?\/\/_)*)\s*?\n/g
         ), "$1$3\n$2");
         // autofix - braket
-        code2 = code2
         // autofix - braket - rgx
-        .replace((
+        code = code.replace((
             /\/_\/[\w\s]*(\S)/g
         ), function (match0, match1) {
-            return match1 === ")"
-            ? match0
-            : match0.replace((
-                /\/_\/\w*/
-            ), "($&)");
-        })
-        .replace((
+            return (
+                match1 === ")"
+                ? match0
+                : match0.replace((
+                    /\/_\/\w*/
+                ), "($&)")
+            );
+        });
+        code = code.replace((
             /\((\/_\/\w*)\)/g
-        ), "(\n$1\n)")
+        ), "(\n$1\n)");
         // autofix - braket - open-form
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators#Assignment
-        .replace((
+        code = code.replace((
             /\u0020(%=|&=|-=|<<=|=|>>=|>>>=|\*=|\*\*=|\+=|\/=|\^=|\|=)\n/g
-        ), " $1  \n")
-        .replace((
+        ), " $1  \n");
+        code = code.replace((
             /\u0020(%=|&=|-=|<<=|=|>>=|>>>=|\*=|\*\*=|\+=|\/=|\^=|\|=|return)\u0020([^\n;]*?[^\n(;\[{]\n[\S\s]*?);/g
         ), function (match0, match1, match2) {
             if (!(
@@ -15937,27 +16344,27 @@ local.jslintAndPrint = function (code, file, options) {
                 return match0;
             }
             return " " + match1 + " (\n    " + match2.trim() + "\n);";
-        })
-        .replace((
+        });
+        code = code.replace((
             /(\(\n)(\S)/g
-        ), "$1    $2")
+        ), "$1    $2");
         // autofix - braket - "\s{0}bra"
-        .replace((
+        code = code.replace((
             /\n+\s*?([(\[{])\n/g
-        ), "\u0000$1\n")
+        ), "\u0000$1\n");
         // autofix - braket - "//...\nbra"
-        .replace((
+        code = code.replace((
             /\/\*_\*\/\u0000|\/\/_\u0000/g
-        ), "$&\n")
-        .replace((
+        ), "$&\n");
+        code = code.replace((
             /\u0000/g
-        ), "")
+        ), "");
         // autofix - braket - "{\n    ..."
-        .replace((
-            /^(\u0020*)(.*?\{)(\S)/gm
-        ), "$1$2\n$1    $3")
+        code = code.replace((
+            /^(\u0020*)(.*?(?:\{|\.(?:closest|querySelector|querySelectorAll)\())(\S)/gm
+        ), "$1$2\n$1    $3");
         // autofix - braket - "{}"
-        .replace((
+        code = code.replace((
             /[(\[{]\s+[)\]}]/g
         ), "{}");
         // autofix - trailing-whitespace
@@ -15967,7 +16374,7 @@ local.jslintAndPrint = function (code, file, options) {
         // autofix - whitespace
         // autofix - whitespace - "^ {8,}"
         tmp = "";
-        code2 = code2.replace((
+        code = code.replace((
             /^\u0020+/gm
         ), function (match0) {
             if (match0.length > tmp.length + 4) {
@@ -15976,35 +16383,31 @@ local.jslintAndPrint = function (code, file, options) {
             tmp = match0;
             return match0;
         });
-        code2 = ("\n" + code2 + "\n")
+        code = ("\n" + code + "\n");
         // autofix - whitespace - "//...\n"
-        .replace((
+        code = code.replace((
             /\/\/_([^\n])/g
-        ), "//_\n$1")
+        ), "//_\n$1");
         // autofix - whitespace - "\n\n\n\n(function () {...}());"
-        .replace((
+        code = code.replace((
             /\n+((?:\/\*_\*\/\n|\/\/_\n)*?\(function\u0020.*?)\n+/g
-        ), "\n\n\n\n$1\n")
+        ), "\n\n\n\n$1\n");
         // autofix - whitespace - "...}());\n\n\n\n"
-        .replace((
+        code = code.replace((
             /\n+(\}\(.*\)\);)\n+/g
-        ), "\n$1\n\n\n\n")
+        ), "\n$1\n\n\n\n");
         // autofix - whitespace - "\S {1}"
-        .replace((
+        code = code.replace((
             /(\S\u0020)\u0020+/g
-        ), "$1")
-        // autofix - whitespace - "^/* jslint ignore */$"
-        .replace((
-            /^\u0020+(\/\*\u0020jslint\u0020ignore\u0020\*\/)$/gm
-        ), "$1")
-        .trim();
+        ), "$1");
+        code = code.trim();
         dataList.forEach(function (data) {
             switch (data.type) {
             case "'_'":
                 // autofix - single-quote -> double-quote
-                if (data.data[0] === "'") {
-                    data.data = (
-                        "\"" + data.data.slice(1, -1)
+                if (data.code[0] === "'") {
+                    data.code = (
+                        "\"" + data.code.slice(1, -1)
                         .replace((
                             /\\.|"/g
                         ), function (match0) {
@@ -16021,17 +16424,17 @@ local.jslintAndPrint = function (code, file, options) {
                 break;
             case "/*_*/":
                 // autofix - comment - "/*" -> "/\*"
-                data.data = "/*" + data.data.slice(2).replace((
+                data.code = "/*" + data.code.slice(2).replace((
                     /\/\*/g
                 ), "/\\*");
                 break;
             case "/_/":
                 // autofix - rgx - " " -> "\\u0020"
-                data.data = data.data.replace((
+                data.code = data.code.replace((
                     /\u0020/g
                 ), "\\u0020");
                 // autofix - rgx - "-]" -> "\-]"
-                data.data = data.data.replace((
+                data.code = data.code.replace((
                     /\\.|-\]/g
                 ), function (match0) {
                     return (
@@ -16042,422 +16445,432 @@ local.jslintAndPrint = function (code, file, options) {
                 });
                 break;
             }
-            if (data.type !== "/* jslint ignore:start */_/* jslint ignore:end */") {
-                // autofix - ascii
-                data.data = data.data.replace((
-                    /\r/g
-                ), "\\r").replace((
-                    /\t/g
-                ), "\\t");
-            }
+            // autofix - ascii
+            data.code = data.code.replace((
+                /\r/g
+            ), "\\r").replace((
+                /\t/g
+            ), "\\t");
         });
-        // mux - code2, dataList -> code2
-        code2 = code2
-        // shebang
-        .replace((
+        // mux - shebang
+        code = code.replace((
             /^#!/
         ), function () {
-            return dataList.shift().data;
-        })
-        .replace((
-            /"_"|'_'|\/\*\u0020jslint\u0020ignore\u0020\*\/|\/\*_\*\/|\/\/!!_|\/\/_|\/_\/|`_`/g
+            return dataList.shift().code;
+        });
+        // mux - code, dataList -> code
+        code = code.replace((
+            /"_"|'_'|\/\*_\*\/|\/\/!!_|\/\/_|\/_\/|`_`/g
         ), function (match0) {
-            // delay regexp
+            // mux - delay regexp
             if (match0 === "/_/") {
                 dataList.push(dataList.shift());
                 return "/\u0000/";
             }
-            return dataList.shift().data;
+            return dataList.shift().code;
         });
         // autofix - jslint
-        Object.assign(options, jslint(code2, options));
-        // mux - code2, dataList.</_/> -> code2
-        code2 = code2
-        .replace((
+        ii = 0;
+        while (true) {
+            ii += 1;
+            code0 = code;
+            Object.assign(option, local.jslint_extra(code, option));
+            code = option.source_autofix;
+            if (ii >= 10 || option.stop || code0 === code) {
+                break;
+            }
+        }
+        // mux - code, dataList.</_/> -> code
+        code = code.replace((
             /\/\u0000\//g
         ), function () {
-            return dataList.shift().data;
+            return dataList.shift().code;
         });
-        code = code2;
-        if (!options.utility2) {
-            break;
-        }
         // autofix - sort const, let, var
         code = code.replace((
             /(?:^\u0020*?(?:const|let|var)\u0020[\w$]*?;.*?\n)+/gm
         ), function (match0) {
             return match0.split("\n").slice(0, -1).sort().join("\n") + "\n";
         });
+        // mux - code, ignoreList -> code
+        code = code.replace((
+            /^\u0020*?\/\*\u0020jslint\u0020ignore:start:end\u0020\*\/$/gm
+        ), function () {
+            return ignoreList.shift().trimLeft();
+        });
         break;
-    // autofix - .json
-    case 15:
-        if (!options.autofix || options.fileType !== ".json") {
-            break;
-        }
-        try {
-            code = local.jsonStringifyOrdered(JSON.parse(code), null, 4);
-        } catch (ignore) {}
-        break;
-    // autofix - .md
-    case 16:
-        if (!options.autofix || options.fileType !== ".md") {
-            break;
-        }
+    // jslintAutofix - .md
+    case ".md":
         // autofix - recurse ```javascript...```
         code = code.replace((
-            /(```javascript\n)([\S\s]*?)(\n```)/g
-        ), function (ignore, match1, match2, match3, ii) {
+            /(```javascript\n)([\S\s]*?)\n```/g
+        ), function (ignore, match1, match2, ii) {
             return match1 + local.jslintAndPrint(
                 match2,
                 file + ".<```javascript>.js",
-                Object.assign({}, options, {
-                    fileType0: options.fileType,
+                Object.assign({}, option, {
+                    fileType0: option.fileType,
                     lineOffset: code.slice(0, ii).replace((
                         /.+/g
                     ), "").length + 1,
                     modeNext: 0
                 })
-            ) + match3;
+            ) + "```";
         });
-        local.jslintResult = options;
         break;
-    // autofix - .sh
-    case 17:
-        options.modeNext = 20;
-        if (!options.autofix || options.fileType !== ".sh") {
-            break;
-        }
+    // jslintAutofix - .sh
+    case ".sh":
         // autofix - recurse node -e '...'
         code = code.replace((
-            /(\bUTILITY2_MACRO_JS='\n|\bnode\u0020-e\u0020(?:"\$UTILITY2_MACRO_JS")?'\n)([\S\s]*?)(\n')/g
-        ), function (ignore, match1, match2, match3, ii) {
+            /(\bUTILITY2_MACRO_JS='\n|\bnode\u0020-e\u0020(?:"\$UTILITY2_MACRO_JS")?'\n)([\S\s]*?)\n'/g
+        ), function (ignore, match1, match2, ii) {
             return match1 + local.jslintAndPrint(
                 match2,
                 file + ".<node -e>.js",
-                Object.assign({}, options, {
-                    fileType0: options.fileType,
+                Object.assign({}, option, {
+                    fileType0: option.fileType,
                     lineOffset: code.slice(0, ii).replace((
                         /.+/g
                     ), "").length + 1,
                     modeNext: 0
                 })
-            ) + match3;
-        });
-        local.jslintResult = options;
-        break;
-    // jslint - all
-    case 21:
-        // lineOffset
-        code = "\n".repeat(options.lineOffset | 0) + code;
-        switch (options.fileType) {
-        case ".css":
-            // csslint
-            Object.assign(options, local.CSSLint.verify(code));
-            // init errorList
-            options.errorList = options.messages.map(function (error) {
-                error.message = (
-                    error.type + " - " + error.rule.id + " - " + error.message
-                    + "\n    " + error.rule.desc
-                );
-                return error;
-            });
-            break;
-        case ".html":
-        case ".md":
-        case ".sh":
-            break;
-        default:
-            // jslint
-            Object.assign(options, jslint(
-                code,
-                options.fileType === ".json"
-                ? {}
-                : options
-            ));
-            options.fileType = (
-                options.json
-                ? ".json"
-                : ".js"
-            );
-            code = options.source_autofix || code;
-            // prioritize fatal error
-            options.warnings.forEach(function (error, ii) {
-                if (error.early_stop) {
-                    error.message = "[JSLint was unable to finish] - " + error.message;
-                    options.warnings.unshift(error);
-                    options.warnings.splice(ii, 1);
-                }
-            });
-            // init errorList
-            options.errorList = options.warnings.filter(function (error) {
-                // bug-workaround - v8 tail-call issue
-                // https://bugs.chromium.org/p/v8/issues/detail?id=8234
-                if (options.json && (error && error.name === "RangeError")) {
-                    options.stop = false;
-                    return;
-                }
-                return error && error.message;
-            }).map(function (error) {
-                error.col = error.column + 1;
-                error.evidence = error.source;
-                error.line = error.line + 1;
-                return error;
-            });
-        }
-        break;
-    // jslint-utility2 - all
-    case 22:
-        if (options.fileType === ".json") {
-            break;
-        }
-        ii = 0;
-        code
-        // ignore text-block
-        .replace((
-            /^\/\*\u0020jslint\u0020ignore:start\u0020\*\/$[\S\s]+?^\/\*\u0020jslint\u0020ignore:end\u0020\*\/$/gm
-        ), function (match0) {
-            return match0.replace((
-                /^.*?$/gm
-            ), "");
-        })
-        .replace((
-            /^.*?$/gm
-        ), function (line) {
-            ii += 1;
-            jj = 0;
-            tmp = "";
-            // validate 4-space indent
-            if (
-                !(
-                    /^\u0020+(?:\*|\/\/!!)/
-                ).test(line)
-                && ((
-                    /^\u0020*/
-                ).exec(line)[0].length % 4 !== 0)
-            ) {
-                jj = jj || 1;
-                tmp = tmp || "non 4-space indent";
-            }
-            // validate tab
-            if (line.indexOf("\t") >= 0) {
-                jj = jj || (line.indexOf("\t") + 1);
-                tmp = tmp || "tab detected";
-            }
-            if (tmp) {
-                options.errorList.push({
-                    col: jj,
-                    line: ii,
-                    message: tmp,
-                    value: JSON.stringify(line)
-                });
-            }
+            ) + "'";
         });
         break;
-    // jslint-utility2 - .css
-    case 23:
-        if (!options.utility2 || options.fileType !== ".css") {
-            break;
-        }
-        local.csslintUtility2(code);
-        break;
-    // jslint-utility2 - .html
-    case 24:
-        if (!options.utility2 || options.fileType !== ".html") {
-            break;
-        }
-        break;
-    // jslint-utility2 - .js
-    case 25:
-        if (!options.utility2 || options.fileType !== ".js") {
-            break;
-        }
-        break;
-    // jslint-utility2 - .json
-    case 26:
-        if (!options.utility2 || options.fileType !== ".json") {
-            break;
-        }
-        break;
-    // jslint-utility2 - .sh
-    case 27:
-        if (!options.utility2 || options.fileType !== ".sh") {
-            break;
-        }
-        ii = 0;
-        tmp = "";
-        code.replace((
-            /^.*?$/gm
-        ), function (line) {
-            ii += 1;
-            if (!(
-                /^sh\w+?\u0020\(\)\u0020\{/
-            ).test(line)) {
-                return;
-            }
-            // validate tmp < line
-            if (!(tmp < line)) {
-                options.errorList.push({
-                    col: 0,
-                    line: ii,
-                    message: "lines not sorted\n" + tmp + "\n" + line,
-                    value: line
-                });
-            }
-            tmp = line;
-        });
-        break;
-    default:
-        // fileType0
-        if (options.fileType0) {
-            code = code.trim();
-        } else {
-            code = code.trimRight() + "\n";
-        }
-        switch (options.fileType0) {
-        case ".\\n\\":
-            code = code
-            .replace((
-                /\\/g
-            ), "\\\\")
-            .replace((
-                /$/gm
-            ), "\\n\\")
-            .replace((
-                /'/g
-            ), "\\'") + "\n";
-            break;
-        case ".sh":
-            code = code.replace((
-                /'/g
-            ), "'\"'\"'");
-            break;
-        }
-        // autofix - save
-        if (
-            !local.isBrowser
-            && options.autofix
-            && !options.fileType0
-            && !options.stop
-            && code !== options.code0
-            && local.fs.existsSync(file)
-        ) {
-            local.fs.writeFileSync(file, code);
-            local.fs.writeFileSync(file + ".autofix.old", options.code0);
-            local.child_process.spawnSync("diff", ["-u", file + ".autofix.old", file], {
-                stdio: ["ignore", 1, "ignore"]
-            });
-            local.fs.unlinkSync(file + ".autofix.old");
-            console.error(
-                "\u001b[1mjslint-autofix - modified and saved file " + file
-                + "\u001b[22m"
-            );
-        }
-        // print colorized error-messages to stderr
-        // https://github.com/kaizhu256/JSLint/blob/cli/cli.js#L99
-        options.errorList
-        .filter(function (warning) {
-            return warning && warning.message;
-        })
-        // print only first 10 warnings
-        .slice(0, 10)
-        .forEach(function (error, ii) {
-            options.errorText = (
-                options.errorText
-                || " \u001b[1mjslint " + file + "\u001b[22m\n"
-            );
-            options.errorText += (
-                ("  " + String(ii + 1)).slice(-3)
-                + " \u001b[31m" + error.message + "\u001b[39m"
-                + " \u001b[90m\/\/ line " + error.line + ", col " + error.col + "\u001b[39m\n"
-                + "    " + String(error.evidence).trim() + "\n"
-            );
-            if (!ii && error.stack && error.a !== "debug\u0049nline") {
-                tmp = error.stack;
-                error.stack = null;
-                options.errorText += (
-                    JSON.stringify(error, null, 4) + "\n" + tmp.trim() + "\n"
-                );
-            }
-        });
-        options.errorText = options.errorText.trim();
-        if (options.errorText) {
-            // debug jslintResult
-            local._debugJslintResult = local.jslintResult;
-            // print error to stderr
-            console.error(options.errorText);
-        }
-        return code;
     }
-    return local.jslintAndPrint(code, file, options);
+    return code;
 };
 
-local.jslintUtility2 = function (code) {
+local.jslintGetColumnLine = function (code, ii) {
+/*
+ * this function will transform <code> and <ii> -> {column, line, evidence}
+ */
+    var column;
+    var evidence;
+    var line;
+    evidence = code.slice(0, ii).split("\n");
+    line = evidence.length - 1;
+    column = evidence[line].length;
+    evidence = evidence[line] + code.slice(ii, ii + 100).split("\n")[0];
+    return {
+        column: column,
+        evidence: evidence,
+        line: line
+    };
+};
+
+local.jslintResult = {};
+
+local.jslintUtility2 = function (code, ignore, option) {
 /*
  * this function will jslint <code> with utiity2-specific rules
  */
-    var current;
-    var lineno;
+    var code2;
+    var error;
+    var indent;
     var previous;
-    var rgx;
-    var tmp;
-    lineno = 0;
-    rgx = (
-        /^\u0020*?\/\*\u0020validateLineSortedReset\u0020\*\/$|^\u0020{4}\/\/\u0020run\u0020.*?\bjs\\?-env\u0020code\b|^\/\/\u0020rollup-file\u0020/m
-    );
-    previous = "";
-    code.replace((
-        /^.*?$/gm
-    ), function (line) {
-        current = line.trim();
-        lineno += 1;
-        // validate <domElement>.classList sorted
-        tmp = (
-            /\bclass=\\?"([^"]+?)\\?"/gm
-        ).exec(current);
-        tmp = JSON.stringify((tmp && tmp[1].replace((
-            /^\u0020/
-        ), "zSpace").match(
-            /\u0020{2}|\u0020$|\w\S*?\{\{[^}]*?\}\}|\w\S*|\{\{[^}]*?\}\}/gm
-        )) || []);
-        if (JSON.stringify(JSON.parse(tmp).sort()) !== tmp) {
-            local.jslintResult.errorList.push({
-                col: 0,
-                line: lineno,
-                message: "<domElement>.classList not sorted - " + tmp,
-                value: line
+    // jslintUtility2 - all
+    if (option.utility2) {
+        code2 = code;
+        code2.replace((
+            /^\/\*\u0020jslint\u0020ignore:start\u0020\*\/$[\S\s]+?^\/\*\u0020jslint\u0020ignore:end\u0020\*\/$|^\u0020+?(?:\*|\/\/!!)|^\u0020+|[\r\t]/gm
+        ), function (match0, ii) {
+            switch (match0.slice(-1)) {
+            case " ":
+                if (match0.length % 4 === 0) {
+                    return;
+                }
+                error = {
+                    message: "non 4-space indent"
+                };
+                break;
+            case "\r":
+                error = {
+                    message: "unexpected \\r"
+                };
+                break;
+            case "\t":
+                error = {
+                    message: "unexpected \\t"
+                };
+                break;
+            default:
+                return;
+            }
+            Object.assign(error, local.jslintGetColumnLine(code2, ii));
+            option.errorList.push({
+                column: error.column + 1,
+                evidence: JSON.stringify(error.evidence),
+                line: error.line + 1,
+                message: error.message
             });
-        }
-        // validate line-sorted
-        if (rgx.test(line)) {
-            previous = "";
-            return;
-        }
-        if (
-            !(
-                /^(?:\u0020{4}|\u0020{8})local\.\S*?\u0020=(?:\u0020|$)/m
-            ).test(line) || (
-                /^local\.(?:local|tmp)\b|\\n\\$/
-            ).test(current)
-        ) {
-            return;
-        }
-        // validate previous < current
-        if (!(previous < current || (
-            /\u0020=$/
-        ).test(previous))) {
-            local.jslintResult.errorList.push({
-                col: 0,
-                line: lineno,
-                message: "lines not sorted\n" + previous + "\n" + current,
-                value: line
+        });
+    }
+    switch (option.utility2 && option.fileType) {
+    // jslintUtility2 - .css
+    case ".css":
+        // ignore comment
+        code2 = code2.replace((
+            /^\/\*\u0020csslint\u0020ignore:start\u0020\*\/$[\S\s]+?^\/\*\u0020csslint\u0020ignore:end\u0020\*\/$|^\u0020*?\/\*[\S\s]*?\*\/\u0020*?$/gm
+        ), function (match0) {
+            if (match0 === "/* validateLineSortedReset */") {
+                return match0;
+            }
+            // preserve lineno
+            return match0.replace((
+                /^.+?$/gm
+            ), "");
+        });
+        code2.replace((
+            /\S\u0020{2}|\u0020,|^\S.*?[,;{}]./gm
+        ), function (match0, ii) {
+            switch (match0.slice(-2)) {
+            case "  ":
+                error = {
+                    colOffset: 2,
+                    message: "unexpected multi-whitespace"
+                };
+                break;
+            case " ,":
+                error = {
+                    colOffset: 1,
+                    message: "unexpected whitespace before comma"
+                };
+                break;
+            default:
+                error = {
+                    colOffset: match0.length,
+                    message: "unexpected multiline-statement"
+                };
+            }
+            Object.assign(error, local.jslintGetColumnLine(code2, ii));
+            option.errorList.push({
+                column: error.column + error.colOffset,
+                evidence: JSON.stringify(error.evidence),
+                line: error.line + 1,
+                message: error.message
             });
-        }
-        previous = current;
-    });
+        });
+        // validate line-sorted - css-selector
+        previous = "";
+        code2 = code2.replace((
+            /^.|[#.>]|[,}]$|\u0020\{$|\b\w/gm
+        ), function (match0) {
+            switch (match0) {
+            case " ":
+                return match0;
+            case " {":
+                return "\u0001" + match0;
+            case "#":
+                return "\u0002" + match0;
+            case ",":
+                return "\u0000" + match0;
+            case ".":
+                return "\u0001" + match0;
+            case ">":
+                return "\u0003" + match0;
+            case "}":
+                return "";
+            default:
+                return "\u0000" + match0;
+            }
+        });
+        code2.replace((
+            /^.\/\*\u0020.validateLineSortedReset\u0020\*\/$|^(?:\S.*?\n)+/gm
+        ), function (match0, ii) {
+            error = null;
+            switch (match0[1]) {
+            case "/":
+                previous = "";
+                break;
+            default:
+                match0 = match0.trim();
+                if (!(previous < match0)) {
+                    error = {
+                        message: (
+                            "lines not sorted\n" + previous + "\n" + match0
+                        )
+                    };
+                } else if (
+                    match0.split("\n").sort().join("\n") !== match0
+                ) {
+                    error = {
+                        message: "lines not sorted\n" + match0
+                    };
+                }
+                previous = match0;
+            }
+            if (error) {
+                Object.assign(error, local.jslintGetColumnLine(code2, ii));
+                option.errorList.push({
+                    column: error.column + 1,
+                    evidence: error.evidence,
+                    line: error.line + 1,
+                    message: error.message.replace((
+                        /[\u0000-\u0007]/g
+                    ), "")
+                });
+            }
+        });
+        break;
+    // jslintUtility2 - .html
+    case ".html":
+        break;
+    // jslintUtility2 - .js
+    case ".js":
+        // validate line-sorted - "local.xxx = "
+        previous = "";
+        code2.replace((
+            /^\/\*\u0020validateLineSortedReset\u0020\*\/$|^\(function\u0020\(|(^local\.\S*?\u0020=\u0020.*?$)/gm
+        ), function (ignore, match1, ii) {
+            if (!match1) {
+                previous = "";
+                return;
+            }
+            if (match1.slice(-3) === "\\n\\") {
+                return;
+            }
+            if (!(previous < match1)) {
+                error = {
+                    message: "lines not sorted\n" + previous + "\n" + match1
+                };
+                Object.assign(error, local.jslintGetColumnLine(code2, ii));
+                option.errorList.push({
+                    column: error.column + 1,
+                    evidence: error.evidence,
+                    line: error.line + 1,
+                    message: error.message
+                });
+            }
+            previous = match1;
+        });
+        // validate line-sorted - switch-statement
+        previous = "";
+        code2.replace((
+            /^(\u0020+?)(\/\*\u0020validateLineSortedReset\u0020\*\/|switch\u0020.+?\u0020\{|\}|case\u0020.+?:(?:\n\u0020+?case\u0020.+?:)*|default:)$/gm
+        ), function (ignore, match1, match2, ii) {
+            error = null;
+            switch (match2.slice(-1)) {
+            case "/":
+                if (match1 === indent) {
+                    previous = "";
+                }
+                break;
+            case "{":
+                indent = indent || match1;
+                break;
+            case "}":
+                if (match1 === indent) {
+                    indent = "";
+                    previous = "";
+                }
+                break;
+            default:
+                if (match1 !== indent) {
+                    break;
+                }
+                match2 = match2.replace((
+                    /\d+?\b/g
+                ), function (match0) {
+                    return ("0000" + match0).slice(-4);
+                });
+                if (!(previous < match2)) {
+                    error = {
+                        message: (
+                            "lines not sorted\n" + previous + "\n" + match2
+                        )
+                    };
+                }
+                previous = match2;
+            }
+            if (error) {
+                Object.assign(error, local.jslintGetColumnLine(code2, ii));
+                option.errorList.push({
+                    column: error.column + 1,
+                    evidence: error.evidence,
+                    line: error.line + 1,
+                    message: error.message
+                });
+            }
+        });
+        break;
+    // jslintUtility2 - .md
+    case ".md":
+        break;
+    // jslintUtility2 - .sh
+    case ".sh":
+        previous = "";
+        code2.replace((
+            /(^sh\w+?\u0020\(\)\u0020\{)|^sh\w+?\u0020*?\(\)\u0020*?\{/gm
+        ), function (ignore, match1, ii) {
+            error = null;
+            if (!match1) {
+                error = {
+                    message: "invalid whitespace"
+                };
+            } else {
+                if (!(previous < match1)) {
+                    error = {
+                        message: (
+                            "lines not sorted\n" + previous + "\n" + match1
+                        )
+                    };
+                }
+                previous = match1;
+            }
+            if (error) {
+                Object.assign(error, local.jslintGetColumnLine(code2, ii));
+                option.errorList.push({
+                    column: error.column + 1,
+                    evidence: error.evidence,
+                    line: error.line + 1,
+                    message: error.message
+                });
+            }
+        });
+        // validate line-sorted - case-esac-statement
+        previous = "";
+        code2.replace((
+            /^(\u0020+?)(case\u0020.+?\u0020in|esac|[^\u0020()]+?\))$/gm
+        ), function (ignore, match1, match2, ii) {
+            error = null;
+            match2 = match2.replace("*", "~*");
+            switch (match2.slice(0, 5)) {
+            case "case ":
+                indent = indent || match1;
+                break;
+            case "esac":
+                if (match1 === indent) {
+                    indent = "";
+                    previous = "";
+                }
+                break;
+            default:
+                if (match1 !== indent) {
+                    break;
+                }
+                if (!(previous < match2)) {
+                    error = {
+                        message: (
+                            "lines not sorted\n" + previous + "\n" + match2
+                        )
+                    };
+                }
+                previous = match2;
+            }
+            if (error) {
+                Object.assign(error, local.jslintGetColumnLine(code2, ii));
+                option.errorList.push({
+                    column: error.column + 1,
+                    evidence: error.evidence,
+                    line: error.line + 1,
+                    message: error.message
+                });
+            }
+        });
+        break;
+    }
 };
-
-// run shared js-env code - init-after
-local.jslintResult = {};
 }());
 
 
@@ -16468,8 +16881,6 @@ local.jslintResult = {};
 if (local.isBrowser) {
     return;
 }
-
-
 
 local.cliDict = {};
 
@@ -16483,27 +16894,12 @@ local.cliDict._default = function () {
         if (file[0] === "-") {
             return;
         }
-        local.jslintAndPrint(local.fs.readFileSync(local.path.resolve(file), "utf8"), file);
-    });
-    // if error occurred, then exit with non-zero code
-    process.exit(Boolean(local.jslintResult.errorList.length));
-};
-
-local.cliDict.autofix = function () {
-/*
- * <file1> <file2> ...
- * will try to inplace autofix <file1> <file2> ...
- */
-    // jslint files
-    process.argv.slice(3).forEach(function (file) {
-        if (file[0] === "-") {
-            return;
-        }
         local.jslintAndPrint(
             local.fs.readFileSync(local.path.resolve(file), "utf8"),
             file,
             {
-                autofix: true
+                autofix: process.argv.indexOf("--autofix") >= 0,
+                conditional: process.argv.indexOf("--conditional") >= 0
             }
         );
     });
@@ -16511,7 +16907,18 @@ local.cliDict.autofix = function () {
     process.exit(Boolean(local.jslintResult.errorList.length));
 };
 
-// run cli
+local.cliDict.dir = function () {
+/*
+ * <dir>
+ * will jslint files in shallow <dir>
+ */
+    local.jslintAndPrintDir(process.argv[3], {
+        autofix: process.argv.indexOf("--autofix") >= 0,
+        conditional: process.argv.indexOf("--conditional") >= 0
+    }, process.exit);
+};
+
+// run the cli
 if (module === require.main && !globalThis.utility2_rollup) {
     local.cliRun();
 }
@@ -16543,28 +16950,48 @@ if (module === require.main && !globalThis.utility2_rollup) {
         } catch (ignore) {}
     }());
     globalThis.globalThis = globalThis;
+    // init debug_inline
+    if (!globalThis["debug\u0049nline"]) {
+        consoleError = console.error;
+        globalThis["debug\u0049nline"] = function () {
+        /*
+         * this function will both print <arguments> to stderr
+         * and return <arguments>[0]
+         */
+            var argList;
+            argList = Array.from(arguments); // jslint ignore:line
+            // debug arguments
+            globalThis["debug\u0049nlineArguments"] = argList;
+            consoleError("\n\ndebug\u0049nline");
+            consoleError.apply(console, argList);
+            consoleError("\n");
+            // return arg0 for inspection
+            return argList[0];
+        };
+    }
     // init local
     local = {};
+    local.local = local;
+    globalThis.globalLocal = local;
     // init isBrowser
     local.isBrowser = (
         typeof window === "object"
         && window === globalThis
         && typeof window.XMLHttpRequest === "function"
         && window.document
-        && typeof window.document.querySelectorAll === "function"
+        && typeof window.document.querySelector === "function"
     );
-    globalThis.globalLocal = local;
     // init function
     local.assertThrow = function (passed, message) {
     /*
-     * this function will throw the error <message> if <passed> is falsy
+     * this function will throw error <message> if <passed> is falsy
      */
         var error;
         if (passed) {
             return;
         }
         error = (
-            // ternary-operator
+            // ternary-condition
             (
                 message
                 && typeof message.message === "string"
@@ -16602,24 +17029,53 @@ if (module === require.main && !globalThis.utility2_rollup) {
      */
         return;
     };
-    // init debug_inline
-    if (!globalThis["debug\u0049nline"]) {
-        consoleError = console.error;
-        globalThis["debug\u0049nline"] = function () {
-        /*
-         * this function will both print <arguments> to stderr
-         * and return <arguments>[0]
-         */
-            var argList;
-            argList = Array.from(arguments); // jslint ignore:line
-            // debug arguments
-            globalThis["debug\u0049nlineArguments"] = argList;
-            consoleError("\n\ndebug\u0049nline");
-            consoleError.apply(console, argList);
-            consoleError("\n");
-            // return arg0 for inspection
-            return argList[0];
-        };
+    local.objectAssignDefault = function (target, source) {
+    /*
+     * this function will if items from <target> are
+     * null, undefined, or empty-string,
+     * then overwrite them with items from <source>
+     */
+        target = target || {};
+        Object.keys(source || {}).forEach(function (key) {
+            if (
+                target[key] === null
+                || target[key] === undefined
+                || target[key] === ""
+            ) {
+                target[key] = target[key] || source[key];
+            }
+        });
+        return target;
+    };
+    // require builtin
+    if (!local.isBrowser) {
+        local.assert = require("assert");
+        local.buffer = require("buffer");
+        local.child_process = require("child_process");
+        local.cluster = require("cluster");
+        local.crypto = require("crypto");
+        local.dgram = require("dgram");
+        local.dns = require("dns");
+        local.domain = require("domain");
+        local.events = require("events");
+        local.fs = require("fs");
+        local.http = require("http");
+        local.https = require("https");
+        local.net = require("net");
+        local.os = require("os");
+        local.path = require("path");
+        local.querystring = require("querystring");
+        local.readline = require("readline");
+        local.repl = require("repl");
+        local.stream = require("stream");
+        local.string_decoder = require("string_decoder");
+        local.timers = require("timers");
+        local.tls = require("tls");
+        local.tty = require("tty");
+        local.url = require("url");
+        local.util = require("util");
+        local.vm = require("vm");
+        local.zlib = require("zlib");
     }
 }(this));
 
@@ -16644,39 +17100,10 @@ local = (
 if (local.isBrowser) {
     globalThis.utility2_marked = local;
 } else {
-    // require builtins
-    local.assert = require("assert");
-    local.buffer = require("buffer");
-    local.child_process = require("child_process");
-    local.cluster = require("cluster");
-    local.crypto = require("crypto");
-    local.dgram = require("dgram");
-    local.dns = require("dns");
-    local.domain = require("domain");
-    local.events = require("events");
-    local.fs = require("fs");
-    local.http = require("http");
-    local.https = require("https");
-    local.net = require("net");
-    local.os = require("os");
-    local.path = require("path");
-    local.querystring = require("querystring");
-    local.readline = require("readline");
-    local.repl = require("repl");
-    local.stream = require("stream");
-    local.string_decoder = require("string_decoder");
-    local.timers = require("timers");
-    local.tls = require("tls");
-    local.tty = require("tty");
-    local.url = require("url");
-    local.util = require("util");
-    local.vm = require("vm");
-    local.zlib = require("zlib");
     module.exports = local;
     module.exports.__dirname = __dirname;
 }
 // init lib main
-local.local = local;
 local.marked = local;
 
 
@@ -16915,28 +17342,48 @@ if (local.isBrowser) {
         } catch (ignore) {}
     }());
     globalThis.globalThis = globalThis;
+    // init debug_inline
+    if (!globalThis["debug\u0049nline"]) {
+        consoleError = console.error;
+        globalThis["debug\u0049nline"] = function () {
+        /*
+         * this function will both print <arguments> to stderr
+         * and return <arguments>[0]
+         */
+            var argList;
+            argList = Array.from(arguments); // jslint ignore:line
+            // debug arguments
+            globalThis["debug\u0049nlineArguments"] = argList;
+            consoleError("\n\ndebug\u0049nline");
+            consoleError.apply(console, argList);
+            consoleError("\n");
+            // return arg0 for inspection
+            return argList[0];
+        };
+    }
     // init local
     local = {};
+    local.local = local;
+    globalThis.globalLocal = local;
     // init isBrowser
     local.isBrowser = (
         typeof window === "object"
         && window === globalThis
         && typeof window.XMLHttpRequest === "function"
         && window.document
-        && typeof window.document.querySelectorAll === "function"
+        && typeof window.document.querySelector === "function"
     );
-    globalThis.globalLocal = local;
     // init function
     local.assertThrow = function (passed, message) {
     /*
-     * this function will throw the error <message> if <passed> is falsy
+     * this function will throw error <message> if <passed> is falsy
      */
         var error;
         if (passed) {
             return;
         }
         error = (
-            // ternary-operator
+            // ternary-condition
             (
                 message
                 && typeof message.message === "string"
@@ -16974,24 +17421,53 @@ if (local.isBrowser) {
      */
         return;
     };
-    // init debug_inline
-    if (!globalThis["debug\u0049nline"]) {
-        consoleError = console.error;
-        globalThis["debug\u0049nline"] = function () {
-        /*
-         * this function will both print <arguments> to stderr
-         * and return <arguments>[0]
-         */
-            var argList;
-            argList = Array.from(arguments); // jslint ignore:line
-            // debug arguments
-            globalThis["debug\u0049nlineArguments"] = argList;
-            consoleError("\n\ndebug\u0049nline");
-            consoleError.apply(console, argList);
-            consoleError("\n");
-            // return arg0 for inspection
-            return argList[0];
-        };
+    local.objectAssignDefault = function (target, source) {
+    /*
+     * this function will if items from <target> are
+     * null, undefined, or empty-string,
+     * then overwrite them with items from <source>
+     */
+        target = target || {};
+        Object.keys(source || {}).forEach(function (key) {
+            if (
+                target[key] === null
+                || target[key] === undefined
+                || target[key] === ""
+            ) {
+                target[key] = target[key] || source[key];
+            }
+        });
+        return target;
+    };
+    // require builtin
+    if (!local.isBrowser) {
+        local.assert = require("assert");
+        local.buffer = require("buffer");
+        local.child_process = require("child_process");
+        local.cluster = require("cluster");
+        local.crypto = require("crypto");
+        local.dgram = require("dgram");
+        local.dns = require("dns");
+        local.domain = require("domain");
+        local.events = require("events");
+        local.fs = require("fs");
+        local.http = require("http");
+        local.https = require("https");
+        local.net = require("net");
+        local.os = require("os");
+        local.path = require("path");
+        local.querystring = require("querystring");
+        local.readline = require("readline");
+        local.repl = require("repl");
+        local.stream = require("stream");
+        local.string_decoder = require("string_decoder");
+        local.timers = require("timers");
+        local.tls = require("tls");
+        local.tty = require("tty");
+        local.url = require("url");
+        local.util = require("util");
+        local.vm = require("vm");
+        local.zlib = require("zlib");
     }
 }(this));
 
@@ -17016,39 +17492,10 @@ local = (
 if (local.isBrowser) {
     globalThis.utility2_sjcl = local;
 } else {
-    // require builtins
-    local.assert = require("assert");
-    local.buffer = require("buffer");
-    local.child_process = require("child_process");
-    local.cluster = require("cluster");
-    local.crypto = require("crypto");
-    local.dgram = require("dgram");
-    local.dns = require("dns");
-    local.domain = require("domain");
-    local.events = require("events");
-    local.fs = require("fs");
-    local.http = require("http");
-    local.https = require("https");
-    local.net = require("net");
-    local.os = require("os");
-    local.path = require("path");
-    local.querystring = require("querystring");
-    local.readline = require("readline");
-    local.repl = require("repl");
-    local.stream = require("stream");
-    local.string_decoder = require("string_decoder");
-    local.timers = require("timers");
-    local.tls = require("tls");
-    local.tty = require("tty");
-    local.url = require("url");
-    local.util = require("util");
-    local.vm = require("vm");
-    local.zlib = require("zlib");
     module.exports = local;
     module.exports.__dirname = __dirname;
 }
 // init lib main
-local.local = local;
 local.sjcl = local;
 
 
@@ -17516,28 +17963,48 @@ if (local.isBrowser) {
         } catch (ignore) {}
     }());
     globalThis.globalThis = globalThis;
+    // init debug_inline
+    if (!globalThis["debug\u0049nline"]) {
+        consoleError = console.error;
+        globalThis["debug\u0049nline"] = function () {
+        /*
+         * this function will both print <arguments> to stderr
+         * and return <arguments>[0]
+         */
+            var argList;
+            argList = Array.from(arguments); // jslint ignore:line
+            // debug arguments
+            globalThis["debug\u0049nlineArguments"] = argList;
+            consoleError("\n\ndebug\u0049nline");
+            consoleError.apply(console, argList);
+            consoleError("\n");
+            // return arg0 for inspection
+            return argList[0];
+        };
+    }
     // init local
     local = {};
+    local.local = local;
+    globalThis.globalLocal = local;
     // init isBrowser
     local.isBrowser = (
         typeof window === "object"
         && window === globalThis
         && typeof window.XMLHttpRequest === "function"
         && window.document
-        && typeof window.document.querySelectorAll === "function"
+        && typeof window.document.querySelector === "function"
     );
-    globalThis.globalLocal = local;
     // init function
     local.assertThrow = function (passed, message) {
     /*
-     * this function will throw the error <message> if <passed> is falsy
+     * this function will throw error <message> if <passed> is falsy
      */
         var error;
         if (passed) {
             return;
         }
         error = (
-            // ternary-operator
+            // ternary-condition
             (
                 message
                 && typeof message.message === "string"
@@ -17575,24 +18042,53 @@ if (local.isBrowser) {
      */
         return;
     };
-    // init debug_inline
-    if (!globalThis["debug\u0049nline"]) {
-        consoleError = console.error;
-        globalThis["debug\u0049nline"] = function () {
-        /*
-         * this function will both print <arguments> to stderr
-         * and return <arguments>[0]
-         */
-            var argList;
-            argList = Array.from(arguments); // jslint ignore:line
-            // debug arguments
-            globalThis["debug\u0049nlineArguments"] = argList;
-            consoleError("\n\ndebug\u0049nline");
-            consoleError.apply(console, argList);
-            consoleError("\n");
-            // return arg0 for inspection
-            return argList[0];
-        };
+    local.objectAssignDefault = function (target, source) {
+    /*
+     * this function will if items from <target> are
+     * null, undefined, or empty-string,
+     * then overwrite them with items from <source>
+     */
+        target = target || {};
+        Object.keys(source || {}).forEach(function (key) {
+            if (
+                target[key] === null
+                || target[key] === undefined
+                || target[key] === ""
+            ) {
+                target[key] = target[key] || source[key];
+            }
+        });
+        return target;
+    };
+    // require builtin
+    if (!local.isBrowser) {
+        local.assert = require("assert");
+        local.buffer = require("buffer");
+        local.child_process = require("child_process");
+        local.cluster = require("cluster");
+        local.crypto = require("crypto");
+        local.dgram = require("dgram");
+        local.dns = require("dns");
+        local.domain = require("domain");
+        local.events = require("events");
+        local.fs = require("fs");
+        local.http = require("http");
+        local.https = require("https");
+        local.net = require("net");
+        local.os = require("os");
+        local.path = require("path");
+        local.querystring = require("querystring");
+        local.readline = require("readline");
+        local.repl = require("repl");
+        local.stream = require("stream");
+        local.string_decoder = require("string_decoder");
+        local.timers = require("timers");
+        local.tls = require("tls");
+        local.tty = require("tty");
+        local.url = require("url");
+        local.util = require("util");
+        local.vm = require("vm");
+        local.zlib = require("zlib");
     }
 }(this));
 
@@ -17617,45 +18113,16 @@ local = (
 if (local.isBrowser) {
     globalThis.utility2_uglifyjs = local;
 } else {
-    // require builtins
-    local.assert = require("assert");
-    local.buffer = require("buffer");
-    local.child_process = require("child_process");
-    local.cluster = require("cluster");
-    local.crypto = require("crypto");
-    local.dgram = require("dgram");
-    local.dns = require("dns");
-    local.domain = require("domain");
-    local.events = require("events");
-    local.fs = require("fs");
-    local.http = require("http");
-    local.https = require("https");
-    local.net = require("net");
-    local.os = require("os");
-    local.path = require("path");
-    local.querystring = require("querystring");
-    local.readline = require("readline");
-    local.repl = require("repl");
-    local.stream = require("stream");
-    local.string_decoder = require("string_decoder");
-    local.timers = require("timers");
-    local.tls = require("tls");
-    local.tty = require("tty");
-    local.url = require("url");
-    local.util = require("util");
-    local.vm = require("vm");
-    local.zlib = require("zlib");
     module.exports = local;
     module.exports.__dirname = __dirname;
 }
 // init lib main
-local.local = local;
 local.uglifyjs = local;
 
 
 
 /* validateLineSortedReset */
-local.cliRun = function (options) {
+local.cliRun = function (option) {
 /*
  * this function will run the cli
  */
@@ -17691,10 +18158,10 @@ local.cliRun = function (options) {
         file = __filename.replace((
             /.*\//
         ), "");
-        options = Object.assign({}, options);
+        option = Object.assign({}, option);
         packageJson = require("./package.json");
         // validate comment
-        options.rgxComment = options.rgxComment || (
+        option.rgxComment = option.rgxComment || (
             /\)\u0020\{\n(?:|\u0020{4})\/\*\n(?:\u0020|\u0020{5})\*((?:\u0020<[^>]*?>|\u0020\.\.\.)*?)\n(?:\u0020|\u0020{5})\*\u0020(will\u0020.*?\S)\n(?:\u0020|\u0020{5})\*\/\n(?:\u0020{4}|\u0020{8})\S/
         );
         textDict = {};
@@ -17713,7 +18180,7 @@ local.cliRun = function (options) {
                 return;
             }
             try {
-                commandList[ii] = options.rgxComment.exec(text);
+                commandList[ii] = option.rgxComment.exec(text);
                 commandList[ii] = {
                     argList: (commandList[ii][1] || "").trim(),
                     command: [key],
@@ -17722,21 +18189,21 @@ local.cliRun = function (options) {
             } catch (ignore) {
                 local.assertThrow(null, new Error(
                     "cliRun - cannot parse comment in COMMAND "
-                    + key + ":\nnew RegExp(" + JSON.stringify(options.rgxComment.source)
-                    + ").exec(" + JSON.stringify(text)
-                    .replace((
+                    + key + ":\nnew RegExp("
+                    + JSON.stringify(option.rgxComment.source)
+                    + ").exec(" + JSON.stringify(text).replace((
                         /\\\\/g
-                    ), "\u0000")
-                    .replace((
+                    ), "\u0000").replace((
                         /\\n/g
-                    ), "\\n\\\n")
-                    .replace((
+                    ), "\\n\\\n").replace((
                         /\u0000/g
                     ), "\\\\") + ");"
                 ));
             }
         });
-        console.log(packageJson.name + " (" + packageJson.version + ")\n\n" + commandList
+        text = "";
+        text += packageJson.name + " (" + packageJson.version + ")\n\n";
+        text += commandList
         .filter(function (element) {
             return element;
         })
@@ -17766,7 +18233,8 @@ local.cliRun = function (options) {
                 + element.argList.join("  ")
             );
         })
-        .join("\n\n"));
+        .join("\n\n");
+        console.log(text);
     };
     local.cliDict["--help"] = local.cliDict["--help"] || local.cliDict._help;
     local.cliDict["-h"] = local.cliDict["-h"] || local.cliDict._help;
@@ -17778,7 +18246,7 @@ local.cliRun = function (options) {
      * will start interactive-mode
      */
         globalThis.local = local;
-        local.functionOrNop(local.replStart || require("repl").start)({
+        local.identity(local.replStart || require("repl").start)({
             useGlobal: true
         });
     };
@@ -17794,7 +18262,10 @@ local.cliRun = function (options) {
      */
         console.log(require(__dirname + "/package.json").version);
     };
-    local.cliDict["--version"] = local.cliDict["--version"] || local.cliDict._version;
+    local.cliDict["--version"] = (
+        local.cliDict["--version"]
+        || local.cliDict._version
+    );
     local.cliDict["-v"] = local.cliDict["-v"] || local.cliDict._version;
     // default to --help command if no arguments are given
     if (process.argv.length <= 2) {
@@ -18525,7 +18996,7 @@ local.cliDict._default = function () {
     }
 };
 
-// run cli
+// run the cli
 if (module === require.main && !globalThis.utility2_rollup) {
     local.cliRun();
 }
@@ -18541,7 +19012,7 @@ if (module === require.main && !globalThis.utility2_rollup) {
 /* script-begin /assets.utility2.js */
 // usr/bin/env node
 /*
- * lib.utility2.js (2018.11.14)
+ * lib.utility2.js (2018.12.31)
  * https://github.com/kaizhu256/node-utility2
  * the zero-dependency, swiss-army-knife utility for building, testing, and deploying webapps
  *
@@ -18563,28 +19034,48 @@ if (module === require.main && !globalThis.utility2_rollup) {
         } catch (ignore) {}
     }());
     globalThis.globalThis = globalThis;
+    // init debug_inline
+    if (!globalThis["debug\u0049nline"]) {
+        consoleError = console.error;
+        globalThis["debug\u0049nline"] = function () {
+        /*
+         * this function will both print <arguments> to stderr
+         * and return <arguments>[0]
+         */
+            var argList;
+            argList = Array.from(arguments); // jslint ignore:line
+            // debug arguments
+            globalThis["debug\u0049nlineArguments"] = argList;
+            consoleError("\n\ndebug\u0049nline");
+            consoleError.apply(console, argList);
+            consoleError("\n");
+            // return arg0 for inspection
+            return argList[0];
+        };
+    }
     // init local
     local = {};
+    local.local = local;
+    globalThis.globalLocal = local;
     // init isBrowser
     local.isBrowser = (
         typeof window === "object"
         && window === globalThis
         && typeof window.XMLHttpRequest === "function"
         && window.document
-        && typeof window.document.querySelectorAll === "function"
+        && typeof window.document.querySelector === "function"
     );
-    globalThis.globalLocal = local;
     // init function
     local.assertThrow = function (passed, message) {
     /*
-     * this function will throw the error <message> if <passed> is falsy
+     * this function will throw error <message> if <passed> is falsy
      */
         var error;
         if (passed) {
             return;
         }
         error = (
-            // ternary-operator
+            // ternary-condition
             (
                 message
                 && typeof message.message === "string"
@@ -18622,24 +19113,53 @@ if (module === require.main && !globalThis.utility2_rollup) {
      */
         return;
     };
-    // init debug_inline
-    if (!globalThis["debug\u0049nline"]) {
-        consoleError = console.error;
-        globalThis["debug\u0049nline"] = function () {
-        /*
-         * this function will both print <arguments> to stderr
-         * and return <arguments>[0]
-         */
-            var argList;
-            argList = Array.from(arguments); // jslint ignore:line
-            // debug arguments
-            globalThis["debug\u0049nlineArguments"] = argList;
-            consoleError("\n\ndebug\u0049nline");
-            consoleError.apply(console, argList);
-            consoleError("\n");
-            // return arg0 for inspection
-            return argList[0];
-        };
+    local.objectAssignDefault = function (target, source) {
+    /*
+     * this function will if items from <target> are
+     * null, undefined, or empty-string,
+     * then overwrite them with items from <source>
+     */
+        target = target || {};
+        Object.keys(source || {}).forEach(function (key) {
+            if (
+                target[key] === null
+                || target[key] === undefined
+                || target[key] === ""
+            ) {
+                target[key] = target[key] || source[key];
+            }
+        });
+        return target;
+    };
+    // require builtin
+    if (!local.isBrowser) {
+        local.assert = require("assert");
+        local.buffer = require("buffer");
+        local.child_process = require("child_process");
+        local.cluster = require("cluster");
+        local.crypto = require("crypto");
+        local.dgram = require("dgram");
+        local.dns = require("dns");
+        local.domain = require("domain");
+        local.events = require("events");
+        local.fs = require("fs");
+        local.http = require("http");
+        local.https = require("https");
+        local.net = require("net");
+        local.os = require("os");
+        local.path = require("path");
+        local.querystring = require("querystring");
+        local.readline = require("readline");
+        local.repl = require("repl");
+        local.stream = require("stream");
+        local.string_decoder = require("string_decoder");
+        local.timers = require("timers");
+        local.tls = require("tls");
+        local.tty = require("tty");
+        local.url = require("url");
+        local.util = require("util");
+        local.vm = require("vm");
+        local.zlib = require("zlib");
     }
 }(this));
 
@@ -18664,39 +19184,10 @@ local = (
 if (local.isBrowser) {
     globalThis.utility2_utility2 = local;
 } else {
-    // require builtins
-    local.assert = require("assert");
-    local.buffer = require("buffer");
-    local.child_process = require("child_process");
-    local.cluster = require("cluster");
-    local.crypto = require("crypto");
-    local.dgram = require("dgram");
-    local.dns = require("dns");
-    local.domain = require("domain");
-    local.events = require("events");
-    local.fs = require("fs");
-    local.http = require("http");
-    local.https = require("https");
-    local.net = require("net");
-    local.os = require("os");
-    local.path = require("path");
-    local.querystring = require("querystring");
-    local.readline = require("readline");
-    local.repl = require("repl");
-    local.stream = require("stream");
-    local.string_decoder = require("string_decoder");
-    local.timers = require("timers");
-    local.tls = require("tls");
-    local.tty = require("tty");
-    local.url = require("url");
-    local.util = require("util");
-    local.vm = require("vm");
-    local.zlib = require("zlib");
     module.exports = local;
     module.exports.__dirname = __dirname;
 }
 // init lib main
-local.local = local;
 local.utility2 = local;
 
 
@@ -18721,7 +19212,12 @@ globalThis.utility2 = local;
             ? globalThis["utility2_" + key]
             : require("./lib." + key + ".js")
         );
-    } catch (ignore) {}
+    } catch (errorCaught) {
+        local.assertThrow(
+            errorCaught.code === "MODULE_NOT_FOUND",
+            errorCaught
+        );
+    }
     local[key] = local[key] || {};
 });
 // init assets and templates
@@ -18775,19 +19271,21 @@ a {\n\
 body {\n\
     background: #eef;\n\
     font-family: Arial, Helvetica, sans-serif;\n\
+    font-size: small;\n\
     margin: 0 40px;\n\
 }\n\
 body > div,\n\
 body > form > div,\n\
 body > form > input,\n\
 body > form > pre,\n\
-body > form > textarea,\n\
 body > form > .button,\n\
+body > form > .textarea,\n\
 body > input,\n\
 body > pre,\n\
-body > textarea,\n\
-body > .button {\n\
+body > .button,\n\
+body > .textarea {\n\
     margin-bottom: 20px;\n\
+    margin-top: 0;\n\
 }\n\
 body > form > input,\n\
 body > form > .button,\n\
@@ -18795,27 +19293,23 @@ body > input,\n\
 body > .button {\n\
     width: 20rem;\n\
 }\n\
-body > form > textarea,\n\
-body > textarea {\n\
+body > form > .textarea,\n\
+body > .textarea {\n\
     height: 10rem;\n\
     width: 100%;\n\
 }\n\
-body > textarea[readonly] {\n\
+body > .readonly {\n\
     background: #ddd;\n\
 }\n\
 code,\n\
 pre,\n\
-textarea {\n\
+.textarea {\n\
     font-family: Consolas, Menlo, monospace;\n\
-    font-size: small;\n\
+    font-size: smaller;\n\
 }\n\
 pre {\n\
     overflow-wrap: break-word;\n\
     white-space: pre-wrap;\n\
-}\n\
-textarea {\n\
-    overflow: auto;\n\
-    white-space: pre;\n\
 }\n\
 .button {\n\
     background-color: #fff;\n\
@@ -18839,6 +19333,14 @@ textarea {\n\
 }\n\
 .colorError {\n\
     color: #d00;\n\
+}\n\
+.textarea {\n\
+    background: #fff;\n\
+    border: 1px solid #999;\n\
+    border-radius: 0;\n\
+    cursor: auto;\n\
+    overflow: auto;\n\
+    padding: 2px;\n\
 }\n\
 .uiAnimateShake {\n\
     animation-duration: 500ms;\n\
@@ -18864,13 +19366,13 @@ textarea {\n\
 <div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%; z-index: 1;"></div>\n\
 <div class="uiAnimateSpin" style="animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: none; height: 25px; vertical-align: middle; width: 25px;"></div>\n\
 <a class="zeroPixel" download="db.persistence.json" href="" id="dbExportA1"></a>\n\
-<input class="zeroPixel" id="dbImportInput1" type="file">\n\
+<input class="zeroPixel" data-onevent="onEventDomDb" data-onevent-db="dbImportInput" type="file">\n\
 <script>\n\
 /* jslint utility2:true */\n\
 // init domOnEventWindowOnloadTimeElapsed\n\
 (function () {\n\
 /*\n\
- * this function will measure and print the time-elapsed for window.onload\n\
+ * this function will measure and print time-elapsed for window.onload\n\
  */\n\
     "use strict";\n\
     if (window.domOnEventWindowOnloadTimeElapsed) {\n\
@@ -18893,11 +19395,104 @@ textarea {\n\
 \n\
 \n\
 \n\
+// init domOnEventDelegateDict\n\
+(function () {\n\
+/*\n\
+ * this function will handle delegated dom-event\n\
+ */\n\
+    "use strict";\n\
+    var timerTimeoutDict;\n\
+    if (window.domOnEventDelegateDict) {\n\
+        return;\n\
+    }\n\
+    window.domOnEventDelegateDict = {};\n\
+    timerTimeoutDict = {};\n\
+    window.domOnEventDelegateDict.domOnEventDelegate = function (event) {\n\
+        event.targetOnEvent = event.target.closest(\n\
+            "[data-onevent]"\n\
+        );\n\
+        if (\n\
+            !event.targetOnEvent\n\
+            || event.targetOnEvent.dataset.onevent === "domOnEventNop"\n\
+            || event.target.closest(\n\
+                ".disabled, .readonly"\n\
+            )\n\
+        ) {\n\
+            return;\n\
+        }\n\
+        // rate-limit high-frequency-event\n\
+        switch (event.type) {\n\
+        case "keydown":\n\
+        case "keyup":\n\
+            // filter non-input keyboard-event\n\
+            if (!event.target.closest(\n\
+                "input, option, select, textarea"\n\
+            )) {\n\
+                return;\n\
+            }\n\
+            if (timerTimeoutDict[event.type] !== true) {\n\
+                timerTimeoutDict[event.type] = timerTimeoutDict[\n\
+                    event.type\n\
+                ] || setTimeout(function () {\n\
+                    timerTimeoutDict[event.type] = true;\n\
+                    window.domOnEventDelegateDict.domOnEventDelegate(\n\
+                        event\n\
+                    );\n\
+                }, 50);\n\
+                return;\n\
+            }\n\
+            timerTimeoutDict[event.type] = null;\n\
+            break;\n\
+        }\n\
+        switch (event.targetOnEvent.tagName) {\n\
+        case "BUTTON":\n\
+        case "FORM":\n\
+            event.preventDefault();\n\
+            break;\n\
+        }\n\
+        event.stopPropagation();\n\
+        window.domOnEventDelegateDict[event.targetOnEvent.dataset.onevent](\n\
+            event\n\
+        );\n\
+    };\n\
+    window.domOnEventDelegateDict.domOnEventResetOutput = function () {\n\
+        Array.from(document.querySelectorAll(\n\
+            ".onevent-reset-output"\n\
+        )).forEach(function (element) {\n\
+            switch (element.tagName) {\n\
+            case "INPUT":\n\
+            case "TEXTAREA":\n\
+                element.value = "";\n\
+                break;\n\
+            case "PRE":\n\
+                element.textContent = "";\n\
+                break;\n\
+            default:\n\
+                element.innerHTML = "";\n\
+            }\n\
+        });\n\
+    };\n\
+    // init event-handling\n\
+    [\n\
+        "change",\n\
+        "click",\n\
+        "keydown",\n\
+        "submit"\n\
+    ].forEach(function (eventType) {\n\
+        document.addEventListener(\n\
+            eventType,\n\
+            window.domOnEventDelegateDict.domOnEventDelegate\n\
+        );\n\
+    });\n\
+}());\n\
+\n\
+\n\
+\n\
 // init timerIntervalAjaxProgressUpdate\n\
 (function () {\n\
 /*\n\
- * this function will increment the ajax-progress-bar\n\
- * until the webpage has loaded\n\
+ * this function will increment ajax-progress-bar\n\
+ * until webpage has loaded\n\
  */\n\
     "use strict";\n\
     var ajaxProgressDiv1;\n\
@@ -18905,11 +19500,15 @@ textarea {\n\
     var ajaxProgressUpdate;\n\
     if (\n\
         window.timerIntervalAjaxProgressUpdate\n\
-        || !document.querySelector("#ajaxProgressDiv1")\n\
+        || !document.querySelector(\n\
+            "#ajaxProgressDiv1"\n\
+        )\n\
     ) {\n\
         return;\n\
     }\n\
-    ajaxProgressDiv1 = document.querySelector("#ajaxProgressDiv1");\n\
+    ajaxProgressDiv1 = document.querySelector(\n\
+        "#ajaxProgressDiv1"\n\
+    );\n\
     setTimeout(function () {\n\
         ajaxProgressDiv1.style.width = "25%";\n\
     });\n\
@@ -18958,16 +19557,21 @@ textarea {\n\
             event\n\
             && event.key === "a"\n\
             && (event.ctrlKey || event.metaKey)\n\
-            && event.target.closest("pre")\n\
+            && event.target.closest(\n\
+                "pre"\n\
+            )\n\
         ) {\n\
             range = document.createRange();\n\
-            range.selectNodeContents(event.target.closest("pre"));\n\
+            range.selectNodeContents(event.target.closest(\n\
+                "pre"\n\
+            ));\n\
             selection = window.getSelection();\n\
             selection.removeAllRanges();\n\
             selection.addRange(range);\n\
             event.preventDefault();\n\
         }\n\
     };\n\
+    // init event-handling\n\
     document.addEventListener(\n\
         "keydown",\n\
         window.domOnEventSelectAllWithinPre\n\
@@ -18991,14 +19595,14 @@ utility2-comment -->\n\
 <h3>{{env.npm_package_description}}</h3>\n\
 <!-- utility2-comment\n\
 <a class="button" download href="assets.app.js">download standalone app</a><br>\n\
-<button class="button eventDelegateClick onreset" data-event="testRunBrowser" id="testRunButton1">run internal test</button><br>\n\
+<button class="button" data-onevent="testRunBrowser" id="testRunButton1">run internal test</button><br>\n\
 <div class="uiAnimateSlide" id="testReportDiv1" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>\n\
 utility2-comment -->\n\
 \n\
 \n\
 \n\
 <label>stderr and stdout</label>\n\
-<textarea class="resettable" id="outputStdoutTextarea1" readonly></textarea>\n\
+<pre class="onevent-reset-output readonly textarea" id="outputStdout1" tabIndex="0"></pre>\n\
 <!-- utility2-comment\n\
 {{#if isRollup}}\n\
 <script src="assets.app.js"></script>\n\
@@ -19032,10 +19636,6 @@ local.assetsDict["/assets.buildBadge.template.svg"] =
 
 
 
-local.assetsDict["/assets.example.html"] = "";
-
-
-
 local.assetsDict["/assets.example.begin.js"] = '\
 (function (globalThis) {\n\
     "use strict";\n\
@@ -19048,28 +19648,48 @@ local.assetsDict["/assets.example.begin.js"] = '\
         } catch (ignore) {}\n\
     }());\n\
     globalThis.globalThis = globalThis;\n\
+    // init debug_inline\n\
+    if (!globalThis["debug\\u0049nline"]) {\n\
+        consoleError = console.error;\n\
+        globalThis["debug\\u0049nline"] = function () {\n\
+        /*\n\
+         * this function will both print <arguments> to stderr\n\
+         * and return <arguments>[0]\n\
+         */\n\
+            var argList;\n\
+            argList = Array.from(arguments); // jslint ignore:line\n\
+            // debug arguments\n\
+            globalThis["debug\\u0049nlineArguments"] = argList;\n\
+            consoleError("\\n\\ndebug\\u0049nline");\n\
+            consoleError.apply(console, argList);\n\
+            consoleError("\\n");\n\
+            // return arg0 for inspection\n\
+            return argList[0];\n\
+        };\n\
+    }\n\
     // init local\n\
     local = {};\n\
+    local.local = local;\n\
+    globalThis.globalLocal = local;\n\
     // init isBrowser\n\
     local.isBrowser = (\n\
         typeof window === "object"\n\
         && window === globalThis\n\
         && typeof window.XMLHttpRequest === "function"\n\
         && window.document\n\
-        && typeof window.document.querySelectorAll === "function"\n\
+        && typeof window.document.querySelector === "function"\n\
     );\n\
-    globalThis.globalLocal = local;\n\
     // init function\n\
     local.assertThrow = function (passed, message) {\n\
     /*\n\
-     * this function will throw the error <message> if <passed> is falsy\n\
+     * this function will throw error <message> if <passed> is falsy\n\
      */\n\
         var error;\n\
         if (passed) {\n\
             return;\n\
         }\n\
         error = (\n\
-            // ternary-operator\n\
+            // ternary-condition\n\
             (\n\
                 message\n\
                 && typeof message.message === "string"\n\
@@ -19107,27 +19727,60 @@ local.assetsDict["/assets.example.begin.js"] = '\
      */\n\
         return;\n\
     };\n\
-    // init debug_inline\n\
-    if (!globalThis["debug\\u0049nline"]) {\n\
-        consoleError = console.error;\n\
-        globalThis["debug\\u0049nline"] = function () {\n\
-        /*\n\
-         * this function will both print <arguments> to stderr\n\
-         * and return <arguments>[0]\n\
-         */\n\
-            var argList;\n\
-            argList = Array.from(arguments); // jslint ignore:line\n\
-            // debug arguments\n\
-            globalThis["debug\\u0049nlineArguments"] = argList;\n\
-            consoleError("\\n\\ndebug\\u0049nline");\n\
-            consoleError.apply(console, argList);\n\
-            consoleError("\\n");\n\
-            // return arg0 for inspection\n\
-            return argList[0];\n\
-        };\n\
+    local.objectAssignDefault = function (target, source) {\n\
+    /*\n\
+     * this function will if items from <target> are\n\
+     * null, undefined, or empty-string,\n\
+     * then overwrite them with items from <source>\n\
+     */\n\
+        target = target || {};\n\
+        Object.keys(source || {}).forEach(function (key) {\n\
+            if (\n\
+                target[key] === null\n\
+                || target[key] === undefined\n\
+                || target[key] === ""\n\
+            ) {\n\
+                target[key] = target[key] || source[key];\n\
+            }\n\
+        });\n\
+        return target;\n\
+    };\n\
+    // require builtin\n\
+    if (!local.isBrowser) {\n\
+        local.assert = require("assert");\n\
+        local.buffer = require("buffer");\n\
+        local.child_process = require("child_process");\n\
+        local.cluster = require("cluster");\n\
+        local.crypto = require("crypto");\n\
+        local.dgram = require("dgram");\n\
+        local.dns = require("dns");\n\
+        local.domain = require("domain");\n\
+        local.events = require("events");\n\
+        local.fs = require("fs");\n\
+        local.http = require("http");\n\
+        local.https = require("https");\n\
+        local.net = require("net");\n\
+        local.os = require("os");\n\
+        local.path = require("path");\n\
+        local.querystring = require("querystring");\n\
+        local.readline = require("readline");\n\
+        local.repl = require("repl");\n\
+        local.stream = require("stream");\n\
+        local.string_decoder = require("string_decoder");\n\
+        local.timers = require("timers");\n\
+        local.tls = require("tls");\n\
+        local.tty = require("tty");\n\
+        local.url = require("url");\n\
+        local.util = require("util");\n\
+        local.vm = require("vm");\n\
+        local.zlib = require("zlib");\n\
     }\n\
 }(this));\n\
 '
+
+
+
+local.assetsDict["/assets.example.html"] = "";
 
 
 
@@ -19139,9 +19792,9 @@ this script will run a web-demo of my-app-lite\n\
 \n\
 instruction\n\
     1. save this script as example.js\n\
-    2. run the shell-command:\n\
+    2. run shell-command:\n\
         $ npm install my-app-lite && PORT=8081 node example.js\n\
-    3. open a browser to http://127.0.0.1:8081 and play with the web-demo\n\
+    3. open a browser to http://127.0.0.1:8081 and play with web-demo\n\
     4. edit this script to suit your needs\n\
 */\n\
 \n\
@@ -19159,7 +19812,7 @@ instruction\n\
 \n\
 \n\
 \n\
-// run shared js-env code - init-before\n\
+// run shared js\-env code - init-before\n\
 (function () {\n\
 // init local\n\
 local = (\n\
@@ -19174,119 +19827,28 @@ globalThis.local = local;\n\
 \n\
 \n\
 /* istanbul ignore next */\n\
-// run browser js-env code - init-test\n\
+// run browser js\-env code - init-test\n\
 (function () {\n\
 if (!local.isBrowser) {\n\
     return;\n\
 }\n\
-local.testRunBrowser = function (event) {\n\
-    if (!event || (\n\
-        event\n\
-        && event.currentTarget\n\
-        && event.currentTarget.className\n\
-        && event.currentTarget.className.includes\n\
-        && event.currentTarget.className.includes("onreset")\n\
-    )) {\n\
-        // reset output\n\
-        Array.from(document.querySelectorAll(\n\
-            "body > .resettable"\n\
-        )).forEach(function (element) {\n\
-            switch (element.tagName) {\n\
-            case "INPUT":\n\
-            case "TEXTAREA":\n\
-                element.value = "";\n\
-                break;\n\
-            default:\n\
-                element.textContent = "";\n\
-            }\n\
-        });\n\
-    }\n\
-    switch (event && event.currentTarget && event.currentTarget.id) {\n\
-    case "testRunButton1":\n\
-        // show tests\n\
-        if (document.querySelector("#testReportDiv1").style.maxHeight === "0px") {\n\
-            local.uiAnimateSlideDown(document.querySelector("#testReportDiv1"));\n\
-            document.querySelector("#testRunButton1").textContent = "hide internal test";\n\
-            local.modeTest = 1;\n\
-            local.testRunDefault(local);\n\
-        // hide tests\n\
-        } else {\n\
-            local.uiAnimateSlideUp(document.querySelector("#testReportDiv1"));\n\
-            document.querySelector("#testRunButton1").textContent = "run internal test";\n\
-        }\n\
-        break;\n\
-    // custom-case\n\
-    }\n\
-    if (document.querySelector("#inputTextareaEval1") && (!event || (\n\
-        event\n\
-        && event.currentTarget\n\
-        && event.currentTarget.className\n\
-        && event.currentTarget.className.includes\n\
-        && event.currentTarget.className.includes("oneval")\n\
-    ))) {\n\
-        // try to eval input-code\n\
-        try {\n\
-            eval( // jslint ignore:line\n\
-                document.querySelector("#inputTextareaEval1").value\n\
-            );\n\
-        } catch (errorCaught) {\n\
-            console.error(errorCaught);\n\
-        }\n\
-    }\n\
-};\n\
-\n\
-local.uiEventDelegate = local.uiEventDelegate || function (event) {\n\
-    // filter non-input keyup-event\n\
-    event.targetOnEvent = event.target.closest("[data-event]");\n\
-    if (!event.targetOnEvent) {\n\
+// log stderr and stdout to #outputStdout1\n\
+["error", "log"].forEach(function (key) {\n\
+    var argList;\n\
+    var element;\n\
+    var fnc;\n\
+    element = document.querySelector(\n\
+        "#outputStdout1"\n\
+    );\n\
+    if (!element) {\n\
         return;\n\
     }\n\
-    // rate-limit keyup\n\
-    if (event.type === "keyup") {\n\
-        local.uiEventDelegateKeyupEvent = event;\n\
-        if (local.uiEventDelegateKeyupTimerTimeout !== 2) {\n\
-            local.uiEventDelegateKeyupTimerTimeout = (\n\
-                local.uiEventDelegateKeyupTimerTimeout\n\
-                || setTimeout(function () {\n\
-                    local.uiEventDelegateKeyupTimerTimeout = 2;\n\
-                    local.uiEventDelegate(local.uiEventDelegateKeyupEvent);\n\
-                }, 100)\n\
-            );\n\
-            return;\n\
-        }\n\
-        local.uiEventDelegateKeyupTimerTimeout = null;\n\
-        if (!event.target.closest("input, option, select, textarea")) {\n\
-            return;\n\
-        }\n\
-    }\n\
-    switch (event.targetOnEvent.tagName) {\n\
-    case "BUTTON":\n\
-    case "FORM":\n\
-        event.preventDefault();\n\
-        break;\n\
-    }\n\
-    event.stopPropagation();\n\
-    local.uiEventListenerDict[event.targetOnEvent.dataset.event](event);\n\
-};\n\
-\n\
-local.uiEventListenerDict = local.uiEventListenerDict || {};\n\
-\n\
-local.uiEventListenerDict.testRunBrowser = local.testRunBrowser;\n\
-\n\
-// log stderr and stdout to #outputStdoutTextarea1\n\
-["error", "log"].forEach(function (key) {\n\
-    console[key + "_original"] = console[key + "_original"] || console[key];\n\
+    fnc = console[key];\n\
     console[key] = function () {\n\
-        var argList;\n\
-        var element;\n\
         argList = Array.from(arguments); // jslint ignore:line\n\
-        console[key + "_original"].apply(console, argList);\n\
-        element = document.querySelector("#outputStdoutTextarea1");\n\
-        if (!element) {\n\
-            return;\n\
-        }\n\
-        // append text to #outputStdoutTextarea1\n\
-        element.value += argList.map(function (arg) {\n\
+        fnc.apply(console, argList);\n\
+        // append text to #outputStdout1\n\
+        element.textContent += argList.map(function (arg) {\n\
             return (\n\
                 typeof arg === "string"\n\
                 ? arg\n\
@@ -19299,56 +19861,76 @@ local.uiEventListenerDict.testRunBrowser = local.testRunBrowser;\n\
         element.scrollTop = element.scrollHeight;\n\
     };\n\
 });\n\
-// init event-handling\n\
-["Change", "Click", "Keyup", "Submit"].forEach(function (eventType) {\n\
-    Array.from(document.querySelectorAll(\n\
-        ".eventDelegate" + eventType\n\
-    )).forEach(function (element) {\n\
-        element.addEventListener(eventType.toLowerCase(), local.uiEventDelegate);\n\
-    });\n\
+Object.assign(local, globalThis.domOnEventDelegateDict);\n\
+globalThis.domOnEventDelegateDict = local;\n\
+local.onEventDomDb = (\n\
+    local.db && local.db.onEventDomDb\n\
+);\n\
+local.testRunBrowser = function (event) {\n\
+/*\n\
+ * this function will run browser-tests\n\
+ */\n\
+    switch (\n\
+        !event.ctrlKey\n\
+        && !event.metaKey\n\
+        && (\n\
+            event.modeInit\n\
+            || (event.type + "." + (event.target && event.target.id))\n\
+        )\n\
+    ) {\n\
+    // custom-case\n\
+    case true:\n\
+        return;\n\
+    // run browser-tests\n\
+    default:\n\
+        if (\n\
+            (event.target && event.target.id) !== "testRunButton1"\n\
+            && !(event.modeInit && (\n\
+                /\\bmodeTest=1\\b/\n\
+            ).test(location.search))\n\
+        ) {\n\
+            return;\n\
+        }\n\
+        // show browser-tests\n\
+        if (document.querySelector(\n\
+            "#testReportDiv1"\n\
+        ).style.maxHeight === "0px") {\n\
+            globalThis.domOnEventDelegateDict.domOnEventResetOutput();\n\
+            local.uiAnimateSlideDown(document.querySelector(\n\
+                "#testReportDiv1"\n\
+            ));\n\
+            document.querySelector(\n\
+                "#testRunButton1"\n\
+            ).textContent = "hide internal test";\n\
+            local.modeTest = 1;\n\
+            local.testRunDefault(local);\n\
+            return;\n\
+        }\n\
+        // hide browser-tests\n\
+        local.uiAnimateSlideUp(document.querySelector(\n\
+            "#testReportDiv1"\n\
+        ));\n\
+        document.querySelector(\n\
+            "#testRunButton1"\n\
+        ).textContent = "run internal test";\n\
+    }\n\
+};\n\
+\n\
+local.testRunBrowser({\n\
+    modeInit: true\n\
 });\n\
-// run tests\n\
-local.testRunBrowser();\n\
 }());\n\
 \n\
 \n\
 \n\
 /* istanbul ignore next */\n\
-// run node js-env code - init-test\n\
+// run node js\-env code - init-test\n\
 (function () {\n\
 if (local.isBrowser) {\n\
     return;\n\
 }\n\
 // init exports\n\
 module.exports = local;\n\
-// require builtins\n\
-local.assert = require("assert");\n\
-local.buffer = require("buffer");\n\
-local.child_process = require("child_process");\n\
-local.cluster = require("cluster");\n\
-local.crypto = require("crypto");\n\
-local.dgram = require("dgram");\n\
-local.dns = require("dns");\n\
-local.domain = require("domain");\n\
-local.events = require("events");\n\
-local.fs = require("fs");\n\
-local.http = require("http");\n\
-local.https = require("https");\n\
-local.net = require("net");\n\
-local.os = require("os");\n\
-local.path = require("path");\n\
-local.querystring = require("querystring");\n\
-local.readline = require("readline");\n\
-local.repl = require("repl");\n\
-local.stream = require("stream");\n\
-local.string_decoder = require("string_decoder");\n\
-local.timers = require("timers");\n\
-local.tls = require("tls");\n\
-local.tty = require("tty");\n\
-local.url = require("url");\n\
-local.util = require("util");\n\
-local.vm = require("vm");\n\
-local.zlib = require("zlib");\n\
 /* validateLineSortedReset */\n\
 // init assets\n\
 local.assetsDict = local.assetsDict || {};\n\
@@ -19417,7 +19999,7 @@ if (globalThis.utility2_serverHttp1) {\n\
     return;\n\
 }\n\
 process.env.PORT = process.env.PORT || "8081";\n\
-console.error("server starting on port " + process.env.PORT);\n\
+console.error("http-server listening on port " + process.env.PORT);\n\
 local.http.createServer(function (request, response) {\n\
     request.urlParsed = local.url.parse(request.url);\n\
     if (local.assetsDict[request.urlParsed.pathname] !== undefined) {\n\
@@ -19473,39 +20055,10 @@ local = (\n\
 if (local.isBrowser) {\n\
     globalThis.utility2_my_app = local;\n\
 } else {\n\
-    // require builtins\n\
-    local.assert = require(\"assert\");\n\
-    local.buffer = require("buffer");\n\
-    local.child_process = require("child_process");\n\
-    local.cluster = require("cluster");\n\
-    local.crypto = require("crypto");\n\
-    local.dgram = require("dgram");\n\
-    local.dns = require("dns");\n\
-    local.domain = require("domain");\n\
-    local.events = require("events");\n\
-    local.fs = require("fs");\n\
-    local.http = require("http");\n\
-    local.https = require("https");\n\
-    local.net = require("net");\n\
-    local.os = require("os");\n\
-    local.path = require("path");\n\
-    local.querystring = require("querystring");\n\
-    local.readline = require("readline");\n\
-    local.repl = require("repl");\n\
-    local.stream = require("stream");\n\
-    local.string_decoder = require("string_decoder");\n\
-    local.timers = require("timers");\n\
-    local.tls = require("tls");\n\
-    local.tty = require("tty");\n\
-    local.url = require("url");\n\
-    local.util = require("util");\n\
-    local.vm = require("vm");\n\
-    local.zlib = require("zlib");\n\
     module.exports = local;\n\
     module.exports.__dirname = __dirname;\n\
 }\n\
 // init lib main\n\
-local.local = local;\n\
 local.my_app = local;\n\
 \n\
 \n\
@@ -19589,7 +20142,7 @@ the greatest app in the world!\n\
 \n\
 \n\
 # quickstart standalone app\n\
-#### to run this example, follow the instruction in the script below\n\
+#### to run this example, follow instruction in script below\n\
 - [assets.app.js](https://kaizhu256.github.io/node-my-app-lite/build..beta..travis-ci.org/app/assets.app.js)\n\
 ```shell\n\
 # example.sh\n\
@@ -19600,7 +20153,7 @@ the greatest app in the world!\n\
 curl -O https://kaizhu256.github.io/node-my-app-lite/build..beta..travis-ci.org/app/assets.app.js\n\
 # 2. run standalone app\n\
 PORT=8081 node ./assets.app.js\n\
-# 3. open a browser to http://127.0.0.1:8081 and play with the web-demo\n\
+# 3. open a browser to http://127.0.0.1:8081 and play with web-demo\n\
 # 4. edit file assets.app.js to suit your needs\n\
 ```\n\
 \n\
@@ -19615,7 +20168,7 @@ PORT=8081 node ./assets.app.js\n\
 # quickstart example.js\n\
 [![screenshot](https://kaizhu256.github.io/node-my-app-lite/build/screenshot.testExampleJs.browser.%252F.png)](https://kaizhu256.github.io/node-my-app-lite/build/app/assets.example.html)\n\
 \n\
-#### to run this example, follow the instruction in the script below\n\
+#### to run this example, follow instruction in script below\n\
 - [example.js](https://kaizhu256.github.io/node-my-app-lite/build..beta..travis-ci.org/example.js)\n\
 ```javascript\n' + local.assetsDict["/assets.example.template.js"] + '```\n\
 \n\
@@ -19676,7 +20229,7 @@ PORT=8081 node ./assets.app.js\n\
         "utility2": "kaizhu256/node-utility2#alpha"\n\
     },\n\
     "engines": {\n\
-        "node": ">=8.0"\n\
+        "node": ">=10.0"\n\
     },\n\
     "homepage": "https://github.com/kaizhu256/node-my-app-lite",\n\
     "keywords": [],\n\
@@ -19745,100 +20298,6 @@ shBuildCi\n\
 
 
 
-local.assetsDict["/assets.readmeCustomOrg.npmdoc.template.md"] = '\
-# npmdoc-{{env.npm_package_name}}\n\
-\n\
-#### basic api documentation for \
-{{#if env.npm_package_homepage}} \
-[{{env.npm_package_name}} ({{env.npm_package_version}})]({{env.npm_package_homepage}}) \
-{{#unless env.npm_package_homepage}} \
-{{env.npm_package_name}} ({{env.npm_package_version}}) \
-{{/if env.npm_package_homepage}} \
-[![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-{{env.npm_package_name}}.svg)](https://travis-ci.org/npmdoc/node-npmdoc-{{env.npm_package_name}})\n\
-\n\
-#### {{env.npm_package_description}}\n\
-\n\
-[![NPM](https://nodei.co/npm/{{env.npm_package_name}}.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/{{env.npm_package_name}})\n\
-\n\
-- [https://npmdoc.github.io/node-npmdoc-{{env.npm_package_name}}/build/apidoc.html](https://npmdoc.github.io/node-npmdoc-{{env.npm_package_name}}/build/apidoc.html)\n\
-\n\
-[![apidoc](https://npmdoc.github.io/node-npmdoc-{{env.npm_package_name}}/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://npmdoc.github.io/node-npmdoc-{{env.npm_package_name}}/build/apidoc.html)\n\
-\n\
-![npmPackageListing](https://npmdoc.github.io/node-npmdoc-{{env.npm_package_name}}/build/screenshot.npmPackageListing.svg)\n\
-\n\
-![npmPackageDependencyTree](https://npmdoc.github.io/node-npmdoc-{{env.npm_package_name}}/build/screenshot.npmPackageDependencyTree.svg)\n\
-\n\
-\n\
-\n\
-# package.json\n\
-\n\
-```json\n\
-\n\
-{{packageJson jsonStringify4 markdownSafe}}\n\
-```\n\
-\n\
-\n\
-\n\
-# misc\n\
-- this document was created with [utility2](https://github.com/kaizhu256/node-utility2)\n\
-';
-
-
-
-local.assetsDict["/assets.readmeCustomOrg.npmtest.template.md"] = '\
-# npmtest-{{env.npm_package_name}}\n\
-\n\
-#### basic test coverage for \
-{{#if env.npm_package_homepage}} \
-[{{env.npm_package_name}} ({{env.npm_package_version}})]({{env.npm_package_homepage}}) \
-{{#unless env.npm_package_homepage}} \
-{{env.npm_package_name}} ({{env.npm_package_version}}) \
-{{/if env.npm_package_homepage}} \
-[![travis-ci.org build-status](https://api.travis-ci.org/npmtest/node-npmtest-{{env.npm_package_name}}.svg)](https://travis-ci.org/npmtest/node-npmtest-{{env.npm_package_name}})\n\
-\n\
-#### {{env.npm_package_description}}\n\
-\n\
-[![NPM](https://nodei.co/npm/{{env.npm_package_name}}.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/{{env.npm_package_name}})\n\
-\n\
-| git-branch : | [alpha](https://github.com/npmtest/node-npmtest-{{env.npm_package_name}}/tree/alpha)|\n\
-|--:|:--|\n\
-| coverage : | [![coverage](https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/build/coverage.badge.svg)](https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/build/coverage.html/index.html)|\n\
-| test-report : | [![test-report](https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/build/test-report.badge.svg)](https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/build/test-report.html)|\n\
-| test-server-github : | [![github.com test-server](https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/GitHub-Mark-32px.png)](https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/build/app) || build-artifacts : | [![build-artifacts](https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/glyphicons_144_folder_open.png)](https://github.com/npmtest/node-npmtest-{{env.npm_package_name}}/tree/gh-pages/build)|\n\
-\n\
-- [https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/build/coverage.html/index.html](https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/build/coverage.html/index.html)\n\
-\n\
-[![coverage](https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fcoverage.lib.html.png)](https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/build/coverage.html/index.html)\n\
-\n\
-- [https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/build/test-report.html](https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/build/test-report.html)\n\
-\n\
-[![test-report](https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Ftest-report.html.png)](https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/build/test-report.html)\n\
-\n\
-- [https://npmdoc.github.io/node-npmdoc-{{env.npm_package_name}}/build/apidoc.html](https://npmdoc.github.io/node-npmdoc-{{env.npm_package_name}}/build/apidoc.html)\n\
-\n\
-[![apidoc](https://npmdoc.github.io/node-npmdoc-{{env.npm_package_name}}/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://npmdoc.github.io/node-npmdoc-{{env.npm_package_name}}/build/apidoc.html)\n\
-\n\
-![npmPackageListing](https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/build/screenshot.npmPackageListing.svg)\n\
-\n\
-![npmPackageDependencyTree](https://npmtest.github.io/node-npmtest-{{env.npm_package_name}}/build/screenshot.npmPackageDependencyTree.svg)\n\
-\n\
-\n\
-\n\
-# package.json\n\
-\n\
-```json\n\
-\n\
-{{packageJson jsonStringify4 markdownSafe}}\n\
-```\n\
-\n\
-\n\
-\n\
-# misc\n\
-- this document was created with [utility2](https://github.com/kaizhu256/node-utility2)\n\
-';
-
-
-
 local.assetsDict["/assets.test.template.js"] = '\
 /* istanbul instrument in package my_app */\n\
 /* istanbul ignore next */\n\
@@ -19855,7 +20314,9 @@ local.assetsDict["/assets.test.template.js"] = '\
 // run shared js\-env code - init-before\n\
 (function () {\n\
 // init local\n\
-local = (globalThis.utility2 || require("utility2")).requireReadme();\n\
+local = (\n\
+    globalThis.utility2 || require("utility2")\n\
+).requireReadme();\n\
 globalThis.local = local;\n\
 // init test\n\
 local.testRunDefault(local);\n\
@@ -19931,8 +20392,7 @@ local.assetsDict["/assets.testReport.template.html"] =
     background: #99f;\n\
 }\n\
 </style>\n\
-'.replace("<style>\n", ""))
-    .replace((/<\/script>[\S\s]*?<\/body>/), '\
+'.replace("<style>\n", "")).replace((/<\/script>[\S\s]*?<\/body>/), '\
 </script>\n\
 <div class="testReportDiv">\n\
 <h1>test-report for\n\
@@ -20085,22 +20545,10 @@ local.assetsDict["/favicon.ico"] = "";
 
 local.cliDict = {};
 
-local.cliDict["utility2.ajaxCrawl"] = function () {
-/*
- * <urlList>
- * will web-crawl in parallel, comma-separated <urlList>
- */
-    local.ajaxCrawl({
-        urlList: process.argv[3].split(
-            /[,\s]/g
-        ).filter(local.identity)
-    }, local.onErrorThrow);
-};
-
 local.cliDict["utility2.browserTest"] = function () {
 /*
  * <urlList> <mode>
- * will browser-test in parallel, comma-separated <urlList> with the given <mode>
+ * will browser-test in parallel, comma-separated <urlList> with given <mode>
  */
     process.argv[3].split(
         process.argv[3].indexOf("?") >= 0
@@ -20115,204 +20563,6 @@ local.cliDict["utility2.browserTest"] = function () {
             url: url
         }, local.onErrorDefault);
     });
-};
-
-local.cliDict["utility2.customOrgRepoCreate"] = function () {
-/*
- * <repoList>
- * will create in parallel, comma-separated <repoList> of travis-ci-enabled github-repos
- */
-    process.env.TRAVIS_DOMAIN = process.env.TRAVIS_DOMAIN || "travis-ci.org";
-    process.chdir("/tmp");
-    local.child_process.spawnSync([
-        "if [ ! -d /tmp/githubRepo/kaizhu256/base ]; then (",
-        "git clone https://github.com/kaizhu256/base /tmp/githubRepo/kaizhu256/base",
-        "cd /tmp/githubRepo/kaizhu256/base",
-        "git checkout -b alpha origin/alpha",
-        "git checkout -b beta origin/beta",
-        "git checkout -b gh-pages origin/gh-pages",
-        "git checkout -b master origin/master",
-        "git checkout -b publish origin/publish",
-        "git checkout alpha",
-        ") fi"
-    ].join("\n"), {
-        shell: true,
-        stdio: ["ignore", 1, 2]
-    });
-    local.onParallelList({
-        list: process.argv[3].split(
-            /[,\s]/g
-        ).filter(local.identity)
-    }, function (options2, onParallel) {
-        var options;
-        onParallel.counter += 1;
-        options = {};
-        local.onNext(options, function (error, data) {
-            switch (options.modeNext) {
-            case 1:
-                options2.onParallel2 = local.onParallel(options.onNext);
-                options2.shBuildPrintPrefix = (
-                    "\n\u001b[35m[MODE_BUILD=shCustomOrgRepoCreate]\u001b[0m - "
-                );
-                console.error(
-                    options2.shBuildPrintPrefix + new Date().toISOString()
-                    + options2.element + " - creating ..."
-                );
-                local.childProcessSpawnWithUtility2(
-                    "shGithubRepoBaseCreate " + options2.element,
-                    options.onNext
-                );
-                break;
-            case 2:
-                local.ajax({
-                    headers: {
-                        Authorization: "token " + process.env.TRAVIS_ACCESS_TOKEN
-                    },
-                    url: "https://api." + process.env.TRAVIS_DOMAIN + "/repos/" + options2.element
-                }, options.onNext);
-                break;
-            case 3:
-                options2.id = JSON.parse(data.responseText).id;
-                setTimeout(options.onNext, 5000);
-                break;
-            case 4:
-                local.ajax({
-                    data: "{\"hook\":{\"active\":true}}",
-                    headers: {
-                        Authorization: "token " + process.env.TRAVIS_ACCESS_TOKEN,
-                        "Content-Type": "application/json; charset=utf-8"
-                    },
-                    method: "PUT",
-                    url: (
-                        "https://api." + process.env.TRAVIS_DOMAIN + "/hooks/"
-                        + options2.id
-                    )
-                }, options.onNext);
-                break;
-            case 5:
-                setTimeout(options.onNext, 5000);
-                break;
-            case 6:
-                options2.onParallel2.counter += 1;
-                options2.onParallel2.counter += 1;
-                local.ajax({
-                    data: "{\"setting.value\":true}",
-                    headers: {
-                        Authorization: "token " + process.env.TRAVIS_ACCESS_TOKEN,
-                        "Content-Type": "application/json; charset=utf-8",
-                        "Travis-API-Version": 3
-                    },
-                    method: "PATCH",
-                    url: (
-                        "https://api." + process.env.TRAVIS_DOMAIN + "/repo/"
-                        + options2.id + "/setting/builds_only_with_travis_yml"
-                    )
-                }, options2.onParallel2);
-                options2.onParallel2.counter += 1;
-                local.ajax({
-                    data: "{\"setting.value\":true}",
-                    headers: {
-                        Authorization: "token " + process.env.TRAVIS_ACCESS_TOKEN,
-                        "Content-Type": "application/json; charset=utf-8",
-                        "Travis-API-Version": 3
-                    },
-                    method: "PATCH",
-                    url: (
-                        "https://api." + process.env.TRAVIS_DOMAIN + "/repo/"
-                        + options2.id + "/setting/auto_cancel_pushes"
-                    )
-                }, options2.onParallel2);
-                options2.onParallel2();
-                break;
-            case 7:
-                options2.onParallel2.counter += 1;
-                options2.onParallel2.counter += 1;
-                local.ajax({
-                    url: (
-                        "https://raw.githubusercontent.com"
-                        + "/kaizhu256/node-utility2/alpha/.gitignore"
-                    )
-                }, function (error, xhr) {
-                    local.assertThrow(!error, error);
-                    local.fs.writeFile(
-                        "/tmp/githubRepo/" + options2.element + "/.gitignore",
-                        xhr.responseText,
-                        options2.onParallel2
-                    );
-                });
-                options2.onParallel2.counter += 1;
-                local.ajax({
-                    url: (
-                        "https://raw.githubusercontent.com"
-                        + "/kaizhu256/node-utility2/alpha/.travis.yml"
-                    )
-                }, function (error, xhr) {
-                    local.assertThrow(!error, error);
-                    local.fs.writeFile(
-                        "/tmp/githubRepo/" + options2.element + "/.travis.yml",
-                        xhr.responseText,
-                        options2.onParallel2
-                    );
-                });
-                options2.onParallel2.counter += 1;
-                local.fs.open("README.md", "w", function (error, fd) {
-                    local.assertThrow(!error, error);
-                    local.fs.close(fd, options2.onParallel2);
-                });
-                options2.onParallel2.counter += 1;
-                local.fs.writeFile(
-                    "/tmp/githubRepo/" + options2.element + "/package.json",
-                    JSON.stringify({
-                        devDependencies: {
-                            "electron-lite": "kaizhu256/node-electron-lite#alpha",
-                            utility2: "kaizhu256/node-utility2#alpha"
-                        },
-                        name: options2.element.replace((
-                            /.+?\/node-|.+?\//
-                        ), ""),
-                        homepage: "https://github.com/" + options2.element,
-                        repository: {
-                            type: "git",
-                            url: "https://github.com/" + options2.element + ".git"
-                        },
-                        scripts: {
-                            "build-ci": "utility2 shBuildCi"
-                        },
-                        version: "0.0.1"
-                    }, null, 4),
-                    options2.onParallel2
-                );
-                options2.onParallel2();
-                break;
-            case 8:
-                local.childProcessSpawnWithUtility2([
-                    "cd /tmp/githubRepo/" + options2.element,
-                    "unset GITHUB_ORG",
-                    "unset GITHUB_REPO",
-                    "shBuildInit",
-                    "shCryptoTravisEncrypt > /dev/null",
-                    "git add -f . .gitignore .travis.yml",
-                    "git commit -am \"[npm publishAfterCommitAfterBuild]\"", (
-                        "shGitCommandWithGithubToken push https://github.com/"
-                        + options2.element + " -f" + " alpha"
-                    )
-                ].join(" &&\n"), options.onNext);
-                break;
-            default:
-                console.error(
-                    options2.shBuildPrintPrefix + new Date().toISOString()
-                    + options2.element + (
-                        error
-                        ? " - ... failed to create - modeNext = " + options.modeNext
-                        : " - ... created"
-                    )
-                );
-                onParallel(local.onErrorDefault(options.modeNext !== 1002 && error));
-            }
-        });
-        options.modeNext = 0;
-        options.onNext();
-    }, local.onErrorThrow);
 };
 
 local.cliDict["utility2.githubCrudContentDelete"] = function () {
@@ -20403,7 +20653,7 @@ local.cliDict["utility2.githubCrudRepoDelete"] = function () {
 local.cliDict["utility2.start"] = function () {
 /*
  * <port>
- * will start utility2 http-server on the given port (default 8081)
+ * will start utility2 http-server on given <port> (default 8081)
  */
     local.env.PORT = process.argv[3] || local.env.PORT;
     globalThis.local = local;
@@ -20431,9 +20681,13 @@ local.cliDict["utility2.testReportCreate"] = function () {
  *
  * will create test-report
  */
-    local.exit(local.testReportCreate(local.tryCatchOnError(function () {
-        return require(local.env.npm_config_dir_build + "/test-report.json");
-    }, local.onErrorDefault)).testsFailed);
+    local.exit(
+        local.testReportCreate(
+            JSON.parse(local.fs.readFileSync(
+                local.env.npm_config_dir_build + "/test-report.json"
+            ))
+        ).testsFailed
+    );
 };
 }());
 
@@ -20445,23 +20699,24 @@ local.cliDict["utility2.testReportCreate"] = function () {
 local.Blob = (
     local.isBrowser
     ? globalThis.Blob
-    : function (array, options) {
+    : function (array, option) {
         /*
          * this function will create a node-compatible Blob instance
          * https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob
          */
         this.bff = local.bufferConcat(array.map(function (element) {
             return (
-                // ternary-operator
+                // ternary-condition
                 (
                     typeof element === "string"
-                    || Object.prototype.toString.call(element) === "[object Uint8Array]"
+                    || Object.prototype.toString.call(element)
+                    === "[object Uint8Array]"
                 )
                 ? element
                 : String(element)
             );
         }));
-        this.type = options && options.type;
+        this.type = option && option.type;
     }
 );
 
@@ -20524,7 +20779,7 @@ local.FormData.prototype.read = function (onError) {
     var result;
     // handle null-case
     if (!this.entryList.length) {
-        onError(null, local.bufferCreate());
+        onError(null, "");
         return;
     }
     // init boundary
@@ -20533,13 +20788,13 @@ local.FormData.prototype.read = function (onError) {
     result = [];
     local.onParallelList({
         list: this.entryList
-    }, function (options2, onParallel) {
+    }, function (option2, onParallel) {
         var value;
-        value = options2.element.value;
+        value = option2.element.value;
         if (!(value && value.constructor === local.Blob)) {
-            result[options2.ii] = [(
+            result[option2.ii] = [(
                 boundary + "\r\nContent-Disposition: form-data; name=\""
-                + options2.element.name + "\"\r\n\r\n"
+                + option2.element.name + "\"\r\n\r\n"
             ), value, "\r\n"];
             onParallel.counter += 1;
             onParallel();
@@ -20547,10 +20802,10 @@ local.FormData.prototype.read = function (onError) {
         }
         // read from blob in parallel
         onParallel.counter += 1;
-        local.blobRead(value, "binary", function (error, data) {
-            result[options2.ii] = !error && [(
+        local.blobRead(value, function (error, data) {
+            result[option2.ii] = !error && [(
                 boundary + "\r\nContent-Disposition: form-data; name=\""
-                + options2.element.name + "\"" + (
+                + option2.element.name + "\"" + (
                     (value && value.name)
                     // read param filename
                     ? "; filename=\"" + value.name + "\""
@@ -20571,7 +20826,8 @@ local.FormData.prototype.read = function (onError) {
         onError(
             error,
             // flatten result
-            !error && local.bufferConcat(Array.prototype.concat.apply([], result))
+            !error
+            && local.bufferConcat(Array.prototype.concat.apply([], result))
         );
     });
 };
@@ -20583,7 +20839,8 @@ local._http = {};
 local._http.IncomingMessage = function (xhr) {
 /*
  * An IncomingMessage object is created by http.Server or http.ClientRequest
- * and passed as the first argument to the 'request' and 'response' event respectively.
+ * and passed as the first argument to the 'request' and 'response' event
+ * respectively.
  * It may be used to access response status, headers and data.
  * https://nodejs.org/dist/v0.12.18/docs/api/all.html#all_http_incomingmessage
  */
@@ -20744,7 +21001,9 @@ local._http.ServerResponse.prototype.addListener = (
  * Execute each of the listeners in order with the supplied arguments.
  * https://nodejs.org/dist/v0.12.18/docs/api/all.html#all_emitter_emit_event_arg1_arg2
  */
-local._http.ServerResponse.prototype.emit = local._http.IncomingMessage.prototype.emit;
+local._http.ServerResponse.prototype.emit = (
+    local._http.IncomingMessage.prototype.emit
+);
 
 local._http.ServerResponse.prototype.end = function (data) {
 /*
@@ -20773,17 +21032,21 @@ local._http.ServerResponse.prototype.end = function (data) {
 /*
  * Adds a listener to the end of the listeners array for the specified event.
  * No checks are made to see if the listener has already been added.
- * Multiple calls passing the same combination of event and listener will result
- * in the listener being added multiple times.
+ * Multiple calls passing the same combination of event and listener
+ * will result in the listener being added multiple times.
  * https://nodejs.org/dist/v0.12.18/docs/api/all.html#all_emitter_on_event_listener
  */
-local._http.ServerResponse.prototype.on = local._http.IncomingMessage.prototype.addListener;
+local._http.ServerResponse.prototype.on = (
+    local._http.IncomingMessage.prototype.addListener
+);
 
 local._http.ServerResponse.prototype.setHeader = function (key, value) {
 /*
- * Sets a single header value for implicit headers. If this header already exists
- * in the to-be-sent headers, its value will be replaced. Use an array of strings here
- * if you need to send multiple headers with the same name.
+ * Sets a single header value for implicit headers.
+ * If this header already exists in the to-be-sent headers,
+ * its value will be replaced.
+ * Use an array of strings here if you need to send multiple headers
+ * with the same name.
  * https://nodejs.org/dist/v0.12.18/docs/api/all.html#all_response_setheader_name_value
  */
     this.responseHeaders[key.toLowerCase()] = value;
@@ -20792,7 +21055,8 @@ local._http.ServerResponse.prototype.setHeader = function (key, value) {
 local._http.ServerResponse.prototype.write = function (data) {
 /*
  * This sends a chunk of the response body.
- * This method may be called multiple times to provide successive parts of the body.
+ * This method may be called multiple times
+ * to provide successive parts of the body.
  * https://nodejs.org/dist/v0.12.18/docs/api/all.html#all_response_write_chunk_encoding_callback
  */
     this.chunkList.push(data);
@@ -20805,12 +21069,13 @@ local._http.createServer = function () {
  */
     return {
         listen: function (port, onError) {
-    /*
-     * This will cause the server to accept connections on the specified handle,
-     * but it is presumed that the file descriptor or handle has already been bound
-     * to a port or domain socket.
-     * https://nodejs.org/dist/v0.12.18/docs/api/all.html#all_server_listen_handle_callback
-     */
+        /*
+         * This will cause the server to accept connections
+         * on the specified handle,
+         * but it is presumed that the file descriptor or handle
+         * has already been bound to a port or domain socket.
+         * https://nodejs.org/dist/v0.12.18/docs/api/all.html#all_server_listen_handle_callback
+         */
             onError(null, port);
         }
     };
@@ -20832,7 +21097,10 @@ local._http.request = function (xhr, onResponse) {
         xhr.serverRequest.data = data;
         // asynchronously send request from client -> server
         setTimeout(function () {
-            local.serverLocalRequestHandler(xhr.serverRequest, xhr.serverResponse);
+            local.serverLocalRequestHandler(
+                xhr.serverRequest,
+                xhr.serverResponse
+            );
         });
     };
     xhr.on = function () {
@@ -20843,83 +21111,71 @@ local._http.request = function (xhr, onResponse) {
     return xhr;
 };
 
-local._testCase_buildApidoc_default = function (options, onError) {
+local._testCase_buildApidoc_default = function (option, onError) {
 /*
  * this function will test buildApidoc's default handling-behavior
  */
     if (local.isBrowser) {
-        onError(null, options);
+        onError(null, option);
         return;
     }
-    return local.buildApidoc(options, onError);
+    return local.buildApidoc(option, onError);
 };
 
-local._testCase_buildApp_default = function (options, onError) {
+local._testCase_buildApp_default = function (option, onError) {
 /*
  * this function will test buildApp's default handling-behavior
  */
     if (local.isBrowser) {
-        onError(null, options);
+        onError(null, option);
         return;
     }
-    globalThis.local.testCase_buildReadme_default(options, local.onErrorThrow);
-    globalThis.local.testCase_buildLib_default(options, local.onErrorThrow);
-    globalThis.local.testCase_buildTest_default(options, local.onErrorThrow);
-    globalThis.local.testCase_buildCustomOrg_default(options, local.onErrorThrow);
-    local.buildApp(options, onError);
+    globalThis.local.testCase_buildReadme_default(option, local.onErrorThrow);
+    globalThis.local.testCase_buildLib_default(option, local.onErrorThrow);
+    globalThis.local.testCase_buildTest_default(option, local.onErrorThrow);
+    local.buildApp(option, onError);
 };
 
-local._testCase_buildCustomOrg_default = function (options, onError) {
-/*
- * this function will test buildCustomOrg's default handling-behavior
- */
-    if (local.isBrowser) {
-        onError(null, options);
-        return;
-    }
-    return local.buildCustomOrg({}, onError);
-};
-
-local._testCase_buildLib_default = function (options, onError) {
+local._testCase_buildLib_default = function (option, onError) {
 /*
  * this function will test buildLib's default handling-behavior
  */
     if (local.isBrowser) {
-        onError(null, options);
+        onError(null, option);
         return;
     }
     return local.buildLib({}, onError);
 };
 
-local._testCase_buildReadme_default = function (options, onError) {
+local._testCase_buildReadme_default = function (option, onError) {
 /*
  * this function will test buildReadme's default handling-behavior
  */
     if (local.isBrowser) {
-        onError(null, options);
+        onError(null, option);
         return;
     }
     return local.buildReadme({}, onError);
 };
 
-local._testCase_buildTest_default = function (options, onError) {
+local._testCase_buildTest_default = function (option, onError) {
 /*
  * this function will test buildTest's default handling-behavior
  */
     if (local.isBrowser) {
-        onError(null, options);
+        onError(null, option);
         return;
     }
     return local.buildTest({}, onError);
 };
 
-local._testCase_webpage_default = function (options, onError) {
+local._testCase_webpage_default = function (option, onError) {
 /*
  * this function will test webpage's default handling-behavior
  */
     local.domStyleValidate();
     if (local.isBrowser) {
-        onError(null, options);
+        onError(null, option);
         return;
     }
     local.browserTest({
@@ -20929,7 +21185,9 @@ local._testCase_webpage_default = function (options, onError) {
         ),
         modeCoverageMerge: true,
         url: (
-            local.assetsDict["/"].indexOf("<script src=\"assets.test.js\"></script>") >= 0
+            local.assetsDict["/"].indexOf(
+                "<script src=\"assets.test.js\"></script>"
+            ) >= 0
             ? local.serverLocalHost + "?modeTest=1&timeoutDefault="
             + local.timeoutDefault
             : local.serverLocalHost
@@ -20940,9 +21198,9 @@ local._testCase_webpage_default = function (options, onError) {
     }, onError);
 };
 
-local.ajax = function (options, onError) {
+local.ajax = function (option, onError) {
 /*
- * this function will send an ajax-request with the given options.url,
+ * this function will send an ajax-request with given <option>.url,
  * with error-handling and timeout
  * example usage:
     local.ajax({
@@ -20961,23 +21219,27 @@ local.ajax = function (options, onError) {
     var local2;
     var onEvent;
     var streamCleanup;
+    var timeout;
     var tmp;
     var xhr;
     var xhrInit;
     // init local2
-    local2 = local.utility2 || {};
+    local2 = option.local2 || local.utility2 || {};
     // init function
     ajaxProgressUpdate = local2.ajaxProgressUpdate || local.nop;
-    bufferValidateAndCoerce = local2.bufferValidateAndCoerce || function (bff, mode) {
+    bufferValidateAndCoerce = local2.bufferValidateAndCoerce || function (
+        bff,
+        mode
+    ) {
     /*
-     * this function will validate and coerce/convert
-     * ArrayBuffer, String, or Uint8Array -> Buffer or String
+     * this function will validate and coerce/convert <bff> -> Buffer
+     * (or String if <mode> = "string")
      */
         // coerce ArrayBuffer -> Buffer
         if (Object.prototype.toString.call(bff) === "[object ArrayBuffer]") {
             bff = new Uint8Array(bff);
         }
-        // convert Buffer -> String
+        // convert Buffer -> utf8
         if (mode === "string" && typeof bff !== "string") {
             bff = String(bff);
         }
@@ -21005,7 +21267,10 @@ local.ajax = function (options, onError) {
             }
             isDone = true;
             // decrement ajaxProgressCounter
-            local2.ajaxProgressCounter = Math.max(local2.ajaxProgressCounter - 1, 0);
+            local2.ajaxProgressCounter = Math.max(
+                local2.ajaxProgressCounter - 1,
+                0
+            );
             ajaxProgressUpdate();
             // handle abort or error event
             switch (!xhr.error && event.type) {
@@ -21015,15 +21280,18 @@ local.ajax = function (options, onError) {
                 break;
             case "load":
                 if (xhr.statusCode >= 400) {
-                    xhr.error = new Error("ajax - statusCode " + xhr.statusCode);
+                    xhr.error = new Error(
+                        "ajax - statusCode " + xhr.statusCode
+                    );
                 }
                 break;
             }
             // debug statusCode / method / url
             if (xhr.error) {
+                xhr.statusCode = xhr.statusCode || 500;
                 xhr.error.statusCode = xhr.statusCode;
                 tmp = (
-                    // ternary-operator
+                    // ternary-condition
                     (
                         local.isBrowser
                         ? "browser"
@@ -21046,8 +21314,9 @@ local.ajax = function (options, onError) {
             }
             // debug ajaxResponse
             xhr.responseContentLength = (
-                (xhr.response && (xhr.response.byteLength || xhr.response.length)) | 0
-            );
+                xhr.response
+                && (xhr.response.byteLength || xhr.response.length)
+            ) | 0;
             xhr.timeElapsed = Date.now() - xhr.timeStart;
             if (xhr.modeDebug) {
                 console.error("serverLog - " + JSON.stringify({
@@ -21071,7 +21340,10 @@ local.ajax = function (options, onError) {
                 if (typeof xhr.responseText === "string") {
                     break;
                 }
-                xhr.responseText = bufferValidateAndCoerce(xhr.response, "string");
+                xhr.responseText = bufferValidateAndCoerce(
+                    xhr.response,
+                    "string"
+                );
                 break;
             case "arraybuffer":
                 xhr.responseBuffer = bufferValidateAndCoerce(xhr.response);
@@ -21088,16 +21360,16 @@ local.ajax = function (options, onError) {
     };
     streamCleanup = function (stream) {
     /*
-     * this function will try to end or destroy the stream
+     * this function will try to end or destroy <stream>
      */
         var error;
-        // try to end the stream
+        // try to end stream
         try {
             stream.end();
         } catch (errorCaught) {
             error = errorCaught;
         }
-        // if error, then try to destroy the stream
+        // if error, then try to destroy stream
         if (error) {
             try {
                 stream.destroy();
@@ -21108,23 +21380,35 @@ local.ajax = function (options, onError) {
     /*
      * this function will init xhr
      */
-        // init options
-        Object.keys(options).forEach(function (key) {
+        // init option
+        Object.keys(option).forEach(function (key) {
             if (key[0] !== "_") {
-                xhr[key] = options[key];
+                xhr[key] = option[key];
             }
         });
-        Object.assign(xhr, {
-            corsForwardProxyHost: xhr.corsForwardProxyHost || local2.corsForwardProxyHost,
-            headers: xhr.headers || {},
-            location: xhr.location || (local.isBrowser && location) || {},
-            method: xhr.method || "GET",
-            responseType: xhr.responseType || "",
-            timeout: xhr.timeout || local2.timeoutDefault || 30000
+        // init timeout
+        timeout = xhr.timeout || local2.timeoutDefault || 30000;
+        // init defaults
+        local.objectAssignDefault(xhr, {
+            corsForwardProxyHost: local2.corsForwardProxyHost,
+            headers: {},
+            location: (local.isBrowser && location) || {},
+            method: "GET",
+            responseType: ""
         });
+        // init headers
         Object.keys(xhr.headers).forEach(function (key) {
             xhr.headers[key.toLowerCase()] = xhr.headers[key];
         });
+        // coerce Uint8Array -> Buffer
+        if (
+            !local.isBrowser
+            && !Buffer.isBuffer(xhr.data)
+            && Object.prototype.toString.call(xhr.data)
+            === "[object Uint8Array]"
+        ) {
+            Object.setPrototypeOf(xhr.data, Buffer.prototype);
+        }
         // init misc
         local2._debugXhr = xhr;
         xhr.onEvent = onEvent;
@@ -21138,27 +21422,32 @@ local.ajax = function (options, onError) {
     // init xhr - XMLHttpRequest
     xhr = (
         local.isBrowser
-        && !options.httpRequest
-        && !(local2.serverLocalUrlTest && local2.serverLocalUrlTest(options.url))
+        && !option.httpRequest
+        && !(local2.serverLocalUrlTest && local2.serverLocalUrlTest(option.url))
         && new XMLHttpRequest()
     );
     // init xhr - http.request
     if (!xhr) {
-        xhr = local.functionOrNop(local2.urlParse || require("url").parse)(options.url);
+        xhr = local.identity(local2.urlParse || require("url").parse)(
+            option.url
+        );
         // init xhr
         xhrInit();
         // init xhr - http.request
-        xhr = local.functionOrNop(
-            options.httpRequest
+        xhr = local.identity(
+            option.httpRequest
             || (local.isBrowser && local2.http.request)
             || require(xhr.protocol.slice(0, -1)).request
         )(xhr, function (responseStream) {
         /*
-         * this function will read the responseStream
+         * this function will read <responseStream>
          */
             var chunkList;
             chunkList = [];
-            xhr.responseHeaders = responseStream.responseHeaders || responseStream.headers;
+            xhr.responseHeaders = (
+                responseStream.responseHeaders
+                || responseStream.headers
+            );
             xhr.responseStream = responseStream;
             xhr.statusCode = responseStream.statusCode;
             responseStream.dataLength = 0;
@@ -21171,7 +21460,10 @@ local.ajax = function (options, onError) {
                     ? chunkList[0]
                     : Buffer.concat(chunkList)
                 );
-                responseStream.dataLength = xhr.response.byteLength || xhr.response.length;
+                responseStream.dataLength = (
+                    xhr.response.byteLength
+                    || xhr.response.length
+                );
                 xhr.onEvent({
                     type: "load"
                 });
@@ -21180,7 +21472,7 @@ local.ajax = function (options, onError) {
         });
         xhr.abort = function () {
         /*
-         * this function will abort the xhr-request
+         * this function will abort xhr-request
          * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/abort
          */
             xhr.onEvent({
@@ -21200,13 +21492,13 @@ local.ajax = function (options, onError) {
     xhr.timerTimeout = setTimeout(function () {
         xhr.error = xhr.error || new Error(
             "onTimeout - timeout-error - "
-            + xhr.timeout + " ms - " + "ajax " + xhr.method + " " + xhr.url
+            + timeout + " ms - " + "ajax " + xhr.method + " " + xhr.url
         );
         xhr.abort();
         // cleanup requestStream and responseStream
         streamCleanup(xhr.requestStream);
         streamCleanup(xhr.responseStream);
-    }, xhr.timeout);
+    }, timeout);
     // increment ajaxProgressCounter
     local2.ajaxProgressCounter = local2.ajaxProgressCounter || 0;
     local2.ajaxProgressCounter += 1;
@@ -21221,9 +21513,12 @@ local.ajax = function (options, onError) {
         xhr.upload.addEventListener("progress", ajaxProgressUpdate);
     }
     // open url - corsForwardProxyHost
-    if (local2.corsForwardProxyHostIfNeeded && local2.corsForwardProxyHostIfNeeded(xhr)) {
+    if (local.functionOrNop(local2.corsForwardProxyHostIfNeeded)(xhr)) {
         xhr.open(xhr.method, local2.corsForwardProxyHostIfNeeded(xhr));
-        xhr.setRequestHeader("forward-proxy-headers", JSON.stringify(xhr.headers));
+        xhr.setRequestHeader(
+            "forward-proxy-headers",
+            JSON.stringify(xhr.headers)
+        );
         xhr.setRequestHeader("forward-proxy-url", xhr.url);
     // open url - default
     } else {
@@ -21233,11 +21528,15 @@ local.ajax = function (options, onError) {
     Object.keys(xhr.headers).forEach(function (key) {
         xhr.setRequestHeader(key, xhr.headers[key]);
     });
-    // send data - FormData
+    // send data
+    switch ((xhr.data && xhr.data.constructor) || true) {
+    // Blob
+    // https://developer.mozilla.org/en-US/docs/Web/API/Blob
+    case local2.Blob:
+    // FormData
     // https://developer.mozilla.org/en-US/docs/Web/API/FormData
-    if (local2.FormData && (xhr.data && xhr.data.constructor === local2.FormData)) {
-        // handle formData
-        xhr.data.read(function (error, data) {
+    case local2.FormData:
+        local2.blobRead(xhr.data, function (error, data) {
             if (error) {
                 xhr.onEvent(error);
                 return;
@@ -21245,179 +21544,11 @@ local.ajax = function (options, onError) {
             // send data
             xhr.send(data);
         });
-    // send data - default
-    } else {
-        // send data
+        break;
+    default:
         xhr.send(xhr.data);
     }
     return xhr;
-};
-
-/* istanbul ignore next */
-local.ajaxCrawl = function (options, onError) {
-/*
- * this function will recursively web-crawl options.urlList to options.depthMax
- */
-    local.onNext(options, function (error) {
-        switch (options.modeNext) {
-        // onParallelList(options);
-        case 1:
-            options = local.objectSetDefault(options, {
-                depth: 0,
-                depthMax: 10,
-                dict: {},
-                dir: ".",
-                filter: local.identity,
-                list: [],
-                postProcess: local.identity,
-                rgxCrawl: (
-                    /<a\b[\S\s]*?href="(.*?)"/g
-                ),
-                rgxParent0: (
-                    /z^/m
-                ),
-                urlParsed0: {},
-                urlList: []
-            });
-            options.urlList.forEach(function (url) {
-                // recurse - push
-                local.ajaxCrawl(local.objectSetDefault({
-                    modeNext: 1,
-                    url: url
-                }, options));
-            });
-            local.onParallelList(options, function (options2, onParallel) {
-                onParallel.counter += 1;
-                options2.element.modeNext = 2;
-                // recurse - ajax
-                local.ajaxCrawl(
-                    local.objectSetDefault(
-                        local.objectSetOverride(options2.element, options2),
-                        options
-                    ),
-                    onParallel
-                );
-            }, onError);
-            break;
-        // options.list.push(options);
-        case 2:
-            options.url = local.urlJoin(options.urlParsed0.href, options.url);
-            // validate url
-            local.assertThrow((
-                /^https?:\/\//
-            ).test(options.url), options.url);
-            options.url = options.url
-            .replace((
-                /[?#].*?$/
-            ), "")
-            .replace((
-                /\/{2,}/g
-            ), "/")
-            .replace("/", "//");
-            options.file = (options.url + (
-                // ternary-operator
-                (
-                    /\.(?:html?|txt|xml)$/
-                ).test(options.url)
-                ? ""
-                : "/index.html"
-            ))
-            .replace((
-                /^https?:\/\//
-            ), options.dir + "/")
-            .replace((
-                /\/{2,}/g
-            ), "/");
-            // optimization - hasOwnProperty
-            if (options.dict.hasOwnProperty(options.file)) {
-                break;
-            }
-            options.dict[options.file] = true;
-            if ((
-                !options.depth
-                || (
-                    options.rgxParent0.test(options.url)
-                    && local.urlParse(options.url).host === options.urlParsed0.host
-                )
-            ) && options.filter(options) && !local.fs.existsSync(options.file)) {
-                options.modeNext = 2;
-                if (!options.depth) {
-                    options.rgxParent0 = new RegExp(
-                        options.rgxParent0.source + "|^"
-                        + local.stringRegexpEscape(options.url.replace((
-                            /\/[^\/]*$/
-                        ), "/"))
-                    );
-                }
-                options.list.push(options);
-            }
-            break;
-        // ajax(options);
-        case 3:
-            local.ajax(options, function (error, xhr) {
-                options.xhr = xhr;
-                // validate xhr
-                local.assertThrow(xhr, error);
-                // handle redirect
-                if (300 <= xhr.statusCode && xhr.statusCode < 400) {
-                    options.modeNext += 1000;
-                    // recurse - redirect
-                    local.ajaxCrawl(local.objectSetDefault({
-                        depth: options.depth,
-                        modeNext: 1,
-                        url: xhr.responseStream.headers.location,
-                        urlParsed0: options.xhr.urlParsed
-                    }, options), local.nop);
-                }
-                options.onNext();
-            });
-            break;
-        case 4:
-            // debug ajaxCrawl
-            console.error("serverLog - " + JSON.stringify({
-                time: new Date(options.xhr.timeStart).toISOString(),
-                type: "ajaxCrawl",
-                method: options.xhr.method,
-                url: options.xhr.url,
-                statusCode: options.xhr.statusCode,
-                timeElapsed: options.xhr.timeElapsed,
-                // extra
-                responseContentLength: options.xhr.responseContentLength,
-                depth: options.depth,
-                ii: options.ii,
-                listLength: options.list.length,
-                dictSize: Object.keys(options.dict).length,
-                rgxCrawlMatch1: options.rgxCrawlMatch1
-            }));
-            // save file
-            local.fsWriteFileWithMkdirpSync(
-                options.file,
-                options.postProcess(options.xhr.responseText.trim() + "\n")
-            );
-            // skip crawl
-            if (!(options.depth < options.depthMax)) {
-                options.onNext();
-                return;
-            }
-            // crawl file
-            options.xhr.responseText.replace(options.rgxCrawl, function (ignore, match1) {
-                // recurse - push
-                local.ajaxCrawl(local.objectSetDefault({
-                    depth: options.depth + 1,
-                    modeNext: 1,
-                    rgxCrawlMatch1: match1,
-                    url: match1,
-                    urlParsed0: options.xhr.urlParsed
-                }, options), local.nop);
-            });
-            options.onNext(error, options);
-            break;
-        default:
-            onError(error, options);
-        }
-    });
-    options.modeNext = options.modeNext || 0;
-    options.onNext();
 };
 
 local.ajaxProgressUpdate = function () {
@@ -21425,14 +21556,13 @@ local.ajaxProgressUpdate = function () {
  * this function will update ajaxProgress
  */
     var ajaxProgressDiv1;
-    ajaxProgressDiv1 = (
-        (local.isBrowser && document.querySelector("#ajaxProgressDiv1"))
-        || {
-            style: {
-                width: ""
-            }
+    ajaxProgressDiv1 = (local.isBrowser && document.querySelector(
+        "#ajaxProgressDiv1"
+    )) || {
+        style: {
+            width: ""
         }
-    );
+    };
     // init ajaxProgressDiv1StyleBackground
     local.ajaxProgressDiv1StyleBackground = (
         local.ajaxProgressDiv1StyleBackground
@@ -21442,8 +21572,16 @@ local.ajaxProgressUpdate = function () {
     ajaxProgressDiv1.style.background = local.ajaxProgressDiv1StyleBackground;
     // increment ajaxProgress
     if (local.ajaxProgressCounter > 0) {
-        // this algorithm will indefinitely increment the ajaxProgressBar
+        local.timerIntervalAjaxProgressHide = (
+            local.timerIntervalAjaxProgressHide
+            || setInterval(local.ajaxProgressUpdate, 2000)
+        );
+        // this algorithm will indefinitely increment ajaxProgressBar
         // with successively smaller increments without ever reaching 100%
+        if ((ajaxProgressDiv1.style.width.slice(0, -1) | 0) > 95) {
+            ajaxProgressDiv1.style.width = "0%";
+            local.ajaxProgressState = 0;
+        }
         local.ajaxProgressState += 1;
         ajaxProgressDiv1.style.width = Math.max(
             100 - 75 * Math.exp(-0.125 * local.ajaxProgressState),
@@ -21456,29 +21594,28 @@ local.ajaxProgressUpdate = function () {
     // cleanup timerTimeout
     clearTimeout(local.timerTimeoutAjaxProgressHide);
     // hide ajaxProgress
-    local.timerTimeoutAjaxProgressHide = setTimeout(
-        function () {
-            ajaxProgressDiv1.style.background = "transparent";
-            local.ajaxProgressCounter = 0;
-            local.ajaxProgressState = 0;
-            // reset ajaxProgress
-            setTimeout(function () {
-                if (!local.ajaxProgressState) {
-                    ajaxProgressDiv1.style.width = "0%";
-                }
-            }, 500);
-        },
-        (
-            local.ajaxProgressCounter > 0
-            ? local.timeoutDefault
-            : 1000
-        )
-    );
+    local.timerTimeoutAjaxProgressHide = setTimeout(function () {
+        ajaxProgressDiv1.style.background = "transparent";
+        local.ajaxProgressCounter = 0;
+        local.ajaxProgressState = 0;
+        // reset ajaxProgress
+        clearInterval(local.timerIntervalAjaxProgressHide);
+        local.timerIntervalAjaxProgressHide = null;
+        setTimeout(function () {
+            if (!local.ajaxProgressState) {
+                ajaxProgressDiv1.style.width = "0%";
+            }
+        }, 500);
+    }, (
+        local.ajaxProgressCounter > 0
+        ? local.timeoutDefault
+        : 1000
+    ));
 };
 
 local.assertJsonEqual = function (aa, bb, message) {
 /*
- * this function will assert jsonStringifyOrdered(aa) === JSON.stringify(bb)
+ * this function will assert jsonStringifyOrdered(<aa>) === JSON.stringify(<bb>)
  */
     aa = local.jsonStringifyOrdered(aa);
     bb = JSON.stringify(bb);
@@ -21487,7 +21624,7 @@ local.assertJsonEqual = function (aa, bb, message) {
 
 local.assertJsonNotEqual = function (aa, bb, message) {
 /*
- * this function will assert jsonStringifyOrdered(aa) !== JSON.stringify(bb)
+ * this function will assert jsonStringifyOrdered(<aa>) !== JSON.stringify(<bb>)
  */
     aa = local.jsonStringifyOrdered(aa);
     bb = JSON.stringify(bb);
@@ -21496,7 +21633,7 @@ local.assertJsonNotEqual = function (aa, bb, message) {
 
 local.base64FromBuffer = function (bff) {
 /*
- * this function will convert Uint8Array bff to base64
+ * this function will convert Uint8Array <bff> to base64
  * https://developer.mozilla.org/en-US/Add-ons/Code_snippets/StringView#The_code
  */
     var ii;
@@ -21504,13 +21641,9 @@ local.base64FromBuffer = function (bff) {
     var text;
     var uint24;
     var uint6ToB64;
-    // convert utf8-string bff to Uint8Array
+    // convert utf8 -> Uint8Array
     if (typeof bff === "string") {
-        bff = (
-            (typeof Buffer === "function" && typeof Buffer.isBuffer === "function")
-            ? Buffer.from(bff)
-            : new window.TextEncoder().encode(bff)
-        );
+        bff = new TextEncoder().encode(bff);
     }
     bff = bff || [];
     text = "";
@@ -21550,7 +21683,7 @@ local.base64FromBuffer = function (bff) {
 
 local.base64ToBuffer = function (b64, mode) {
 /*
- * this function will convert b64 to Uint8Array
+ * this function will convert <b64> to Uint8Array
  * https://gist.github.com/wang-bin/7332335
  */
     var bff;
@@ -21587,42 +21720,25 @@ local.base64ToBuffer = function (b64, mode) {
     return local.bufferValidateAndCoerce(bff, mode);
 };
 
-local.base64ToString = function (b64) {
+local.base64ToUtf8 = function (b64) {
 /*
- * this function will convert b64 to utf8-string
+ * this function will convert <b64> -> utf8
  */
     return local.base64ToBuffer(b64, "string");
 };
 
-local.blobRead = function (blob, encoding, onError) {
+local.blobRead = function (blob, onError) {
 /*
- * this function will read from the blob with the given encoding
- * possible encodings are:
- * - Uint8Array (default)
- * - dataURL
- * - text
+ * this function will read from <blob>
  */
-    var data;
     var isDone;
     var reader;
+    if (blob && blob.constructor && blob.constructor === local.FormData) {
+        blob.read(onError);
+        return;
+    }
     if (!local.isBrowser) {
-        switch (encoding) {
-        // readAsDataURL
-        case "dataURL":
-            data = (
-                "data:" + (blob.type || "application/octet-stream") + ";base64,"
-                + local.base64FromBuffer(blob.bff)
-            );
-            break;
-        // readAsText
-        case "text":
-            data = local.bufferToString(blob.bff);
-            break;
-        // readAsArrayBuffer
-        default:
-            data = local.bufferCreate(blob.bff);
-        }
-        onError(null, data);
+        onError(null, local.bufferValidateAndCoerce(blob.bff));
         return;
     }
     reader = new FileReader();
@@ -21639,9 +21755,10 @@ local.blobRead = function (blob, encoding, onError) {
         case "load":
             onError(
                 null,
-                Object.prototype.toString.call(reader.result) === "[object ArrayBuffer]"
-                // convert ArrayBuffer to Uint8Array
-                ? local.bufferCreate(reader.result)
+                Object.prototype.toString.call(reader.result)
+                === "[object ArrayBuffer]"
+                // convert ArrayBuffer -> Uint8Array
+                ? new Uint8Array(reader.result)
                 : reader.result
             );
             break;
@@ -21649,24 +21766,12 @@ local.blobRead = function (blob, encoding, onError) {
     };
     reader.onerror = reader.onabort;
     reader.onload = reader.onabort;
-    switch (encoding) {
-    // readAsDataURL
-    case "dataURL":
-        reader.readAsDataURL(blob);
-        break;
-    // readAsText
-    case "text":
-        reader.readAsText(blob);
-        break;
-    // readAsArrayBuffer
-    default:
-        reader.readAsArrayBuffer(blob);
-    }
+    reader.readAsArrayBuffer(blob);
 };
 
-local.browserTest = function (options, onError) {
+local.browserTest = function (option, onError) {
 /*
- * this function will spawn an electron process to test options.url
+ * this function will spawn an electron process to test <option.url>
  */
     var isDone;
     var isDoneHtml;
@@ -21674,7 +21779,7 @@ local.browserTest = function (options, onError) {
     var onParallel;
     var timerTimeout;
     var window;
-    window = options.window || globalThis;
+    window = option.window || globalThis;
     // init utility2_testReport
     window.utility2_testReport = window.utility2_testReport || {
         coverage: window.__coverage__,
@@ -21688,8 +21793,11 @@ local.browserTest = function (options, onError) {
             testCaseList: []
         }]
     };
-    window.utility2_testReportSave = window.utility2_testReportSave || local.nop;
-    if (options.modeTestReportCreate) {
+    window.utility2_testReportSave = (
+        window.utility2_testReportSave
+        || local.nop
+    );
+    if (option.modeTestReportCreate) {
         return;
     }
     onMessage = function (event, type, data) {
@@ -21699,8 +21807,8 @@ local.browserTest = function (options, onError) {
                 return;
             }
             isDoneHtml = true;
-            options.fs.writeFile(
-                options.fileScreenshot.replace((
+            option.fs.writeFile(
+                option.fileScreenshot.replace((
                     /\.\w+$/
                 ), ".html"),
                 data,
@@ -21708,28 +21816,30 @@ local.browserTest = function (options, onError) {
             );
             return;
         case "testReport":
-            if (options.isDoneTestReport || options.modeBrowserTest !== "test") {
+            if (option.isDoneTestReport || option.modeBrowserTest !== "test") {
                 return;
             }
-            options.isDoneTestReport = true;
+            option.isDoneTestReport = true;
             // save browser-coverage
             if (data.coverage) {
                 onParallel.counter += 1;
-                options.fs.writeFile(
-                    options.fileCoverage,
+                option.fs.writeFile(
+                    option.fileCoverage,
                     JSON.stringify(data.coverage),
                     onParallel
                 );
                 data.coverage = null;
             }
             // save browser-screenshot
-            data.testPlatformList[0].screenshot = options.fileScreenshot.replace((
-                /.*\//
-            ), "");
+            data.testPlatformList[0].screenshot = (
+                option.fileScreenshot.replace((
+                    /.*\//
+                ), "")
+            );
             // save browser-test-report
             onParallel.counter += 1;
-            options.fs.writeFile(
-                options.fileTestReport,
+            option.fs.writeFile(
+                option.fileTestReport,
                 JSON.stringify(data, null, 4),
                 onParallel
             );
@@ -21737,74 +21847,76 @@ local.browserTest = function (options, onError) {
             return;
         }
     };
-    local.onNext(options, function (error, data) {
-        switch (options.modeNext) {
+    local.onNext(option, function (error, data) {
+        switch (option.modeNext) {
         // node - init
         case 1:
             // init fileElectronHtml
-            options.fileElectronHtml = (
-                options.npm_config_dir_tmp + "/electron."
+            option.fileElectronHtml = (
+                option.npm_config_dir_tmp + "/electron."
                 + Date.now().toString(16) + Math.random().toString(16) + ".html"
             );
             // init url
             if (!(
                 /^\w+:\/\//
-            ).test(options.url)) {
-                options.url = local.path.resolve(process.cwd(), options.url);
+            ).test(option.url)) {
+                option.url = local.path.resolve(process.cwd(), option.url);
             }
-            options.urlParsed = local.urlParse(options.url);
+            option.urlParsed = local.urlParse(option.url);
             // init testName
-            options.testName = options.urlParsed.pathname;
-            if (options.testName.indexOf(process.cwd()) === 0) {
-                options.testName = options.testName.replace(process.cwd(), "");
+            option.testName = option.urlParsed.pathname;
+            if (option.testName.indexOf(process.cwd()) === 0) {
+                option.testName = option.testName.replace(process.cwd(), "");
             }
-            options.testName = (
-                options.MODE_BUILD + ".browser."
-                + encodeURIComponent(options.testName.replace(
-                    "/build.." + options.CI_BRANCH + ".." + options.CI_HOST,
+            option.testName = (
+                option.MODE_BUILD + ".browser."
+                + encodeURIComponent(option.testName.replace(
+                    "/build.." + option.CI_BRANCH + ".." + option.CI_HOST,
                     "/build"
                 ))
             );
-            local.objectSetDefault(options, {
+            local.objectSetDefault(option, {
                 fileCoverage: (
-                    options.npm_config_dir_tmp
-                    + "/coverage." + options.testName + ".json"
+                    option.npm_config_dir_tmp + "/coverage."
+                    + option.testName + ".json"
                 ),
                 fileScreenshot: (
-                    options.npm_config_dir_build
-                    + "/screenshot." + options.testName + ".png"
+                    option.npm_config_dir_build + "/screenshot."
+                    + option.testName + ".png"
                 ),
                 fileTestReport: (
-                    options.npm_config_dir_tmp
-                    + "/test-report." + options.testName + ".json"
+                    option.npm_config_dir_tmp + "/test-report."
+                    + option.testName + ".json"
                 ),
                 modeBrowserTest: "test",
-                timeExit: Date.now() + options.timeoutDefault,
-                timeoutScreenshot: options.timeoutScreenshot || 15000
+                timeExit: Date.now() + option.timeoutDefault,
+                timeoutScreenshot: option.timeoutScreenshot || 15000
             }, 1);
             // init timerTimeout
             timerTimeout = local.onTimeout(
-                options.onNext,
-                options.timeoutDefault,
-                options.testName
+                option.onNext,
+                option.timeoutDefault,
+                option.testName
             ).unref();
             data = {};
-            Object.keys(options).forEach(function (key) {
-                if (typeof options[key] !== "object") {
-                    data[key] = options[key];
+            Object.keys(option).forEach(function (key) {
+                if (typeof option[key] !== "object") {
+                    data[key] = option[key];
                 }
             });
             data.modeNext = 20;
             // init file fileElectronHtml
-            local.fsWriteFileWithMkdirpSync(options.fileElectronHtml, (
+            local.fsWriteFileWithMkdirpSync(option.fileElectronHtml, (
                 "//<body "
                 + "style=\"border:1px solid black;margin:0;padding:0;\">"
                 + "<webview "
-                + "preload=\"" + options.fileElectronHtml + "\" "
-                + "src=\"" + options.url.replace("{{timeExit}}", options.timeExit)
-                + "\" "
-                + "style=\"border:none;height:100%;margin:0;padding:0;width:100%;"
-                + "\">"
+                + "preload=\"" + option.fileElectronHtml
+                + "\" src=\"" + option.url.replace(
+                    "{{timeExit}}",
+                    option.timeExit
+                )
+                + "\" style="
+                + "\"border:none;height:100%;margin:0;padding:0;width:100%;\">"
                 + "</webview>"
                 + "<script>document.body.removeChild(document.body.firstChild);"
                 + "</script>"
@@ -21816,7 +21928,7 @@ local.browserTest = function (options, onError) {
                 + "local=globalThis.globalLocal;\n"
                 + "local.env={};\n"
                 + "local.isBrowser=true;\n"
-                + "var options=" + JSON.stringify(data) + ";\n"
+                + "var option=" + JSON.stringify(data) + ";\n"
                 + [
                     "browserTest",
                     "nop",
@@ -21833,42 +21945,90 @@ local.browserTest = function (options, onError) {
                         /\b__cov_.*?\+\+/g
                     ), "0") + ";\n";
                 }).join("")
-                + "local.browserTest(options,console.error);\n"
+                + "local.browserTest(option,console.error);\n"
                 + "}());\n"
                 + "//</textarea>\n"
             ));
             console.error(
                 "\nbrowserTest - created fileElectronHtml "
-                + options.fileElectronHtml + "\n"
+                + option.fileElectronHtml + "\n"
             );
             // spawn an electron process to test a url
-            options.npm_config_time_exit = options.timeExit;
+            option.npm_config_time_exit = option.timeExit;
             data.modeNext = 10;
             local.childProcessSpawnWithTimeout("electron", [
                 __filename,
                 "utility2.browserTest",
-                options.url,
+                option.url,
                 "--enable-logging"
             ], {
                 env: data,
-                stdio: (!options.modeDebug && options.modeSilent)
-                ? "ignore"
-                : ["ignore", 1, 2],
-                timeout: options.timeoutDefault
-            }).once("error", options.onNext).once("exit", options.onNext);
+                stdio: (
+                    (!option.modeDebug && option.modeSilent)
+                    ? "ignore"
+                    : ["ignore", 1, 2]
+                ),
+                timeout: option.timeoutDefault
+            }).once("error", option.onNext).once("exit", option.onNext);
+            return;
+        // node - after electron
+        case 2:
+            console.error(
+                "\nbrowserTest - exit-code " + error + " - " + option.url
+                + "\n"
+            );
+            if (option.modeBrowserTest !== "test") {
+                option.modeNext += 1000;
+                option.onNext();
+                return;
+            }
+            // merge browser coverage
+            data = (
+                option.modeCoverageMerge
+                && local.fsReadFileOrEmptyStringSync(
+                    option.fileCoverage,
+                    "json"
+                )
+            );
+            local.istanbulCoverageMerge(window.__coverage__, data);
+            console.error(
+                "\nbrowserTest - merged coverage from file "
+                + option.fileCoverage + "\n"
+            );
+            // merge browser test-report
+            data = local.fsReadFileOrEmptyStringSync(
+                option.fileTestReport,
+                "json"
+            );
+            local.testReportMerge(
+                window.utility2_testReport,
+                !option.modeSilent && data
+            );
+            console.error(
+                "\nbrowserTest - merged test-report from file "
+                + option.fileTestReport + "\n"
+            );
+            // create test-report.json
+            local.fs.writeFileSync(
+                local.env.npm_config_dir_build + "/test-report.json",
+                JSON.stringify(window.utility2_testReport)
+            );
+            option.onNext(
+                data && data.testsFailed && new Error(data.testsFailed)
+            );
             return;
         // node.electron - init
         case 11:
             // handle uncaughtException
-            window.process.once("uncaughtException", options.onNext);
+            window.process.once("uncaughtException", option.onNext);
             // wait for electron to init
-            options.electron.app.once("ready", function () {
-                options.onNext();
+            option.electron.app.once("ready", function () {
+                option.onNext();
             });
             return;
         // node.electron - after ready
         case 12:
-            Object.assign(options, {
+            Object.assign(option, {
                 frame: false,
                 height: 768,
                 // disable nodeIntegration
@@ -21879,32 +22039,63 @@ local.browserTest = function (options, onError) {
                 x: 0,
                 y: 0
             });
-            onParallel = local.onParallel(options.onNext);
+            onParallel = local.onParallel(option.onNext);
             // onParallel - html
             onParallel.counter += 1;
             // onParallel - test
-            if (options.modeBrowserTest === "test") {
+            if (option.modeBrowserTest === "test") {
                 onParallel.counter += 1;
             }
             // init event-handling - ipc
-            options.electron.ipcMain.on(options.fileElectronHtml, function (event, type, data) {
+            option.electron.ipcMain.on(option.fileElectronHtml, function (
+                event,
+                type,
+                data
+            ) {
                 try {
                     onMessage(event, type, data);
                 } catch (errorCaught) {
-                    options.onNext(errorCaught);
+                    option.onNext(errorCaught);
                 }
             }, false);
             // init browserWindow
-            options.browserWindow = new options.electron.BrowserWindow(options);
+            option.browserWindow = new option.electron.BrowserWindow(option);
             // load url in browserWindow
-            options.browserWindow.loadURL("file://" + options.fileElectronHtml);
+            option.browserWindow.loadURL("file://" + option.fileElectronHtml);
+            return;
+        // node.electron - screenshot
+        case 13:
+            option.browserWindow.capturePage(option, function (data) {
+                option.onNext(null, data);
+            });
+            return;
+        case 14:
+            option.fs.writeFile(
+                option.fileScreenshot,
+                data.toPNG(),
+                option.onNext
+            );
+            return;
+        case 15:
+            console.error(
+                "\nbrowserTest - created screenshot file "
+                + option.fileScreenshot + "\n"
+            );
+            console.error(
+                "browserTest - created screenshot file "
+                + option.fileScreenshot.replace((
+                    /\.\w+$/
+                ), ".html")
+            );
+            local.exit();
             return;
         // node.electron.browserWindow.webview.preload - init
         case 21:
             // init domOnEventWindowOnloadTimeElapsed
             (function () {
             /*
-             * this function will measure and print the time-elapsed for window.onload
+             * this function will measure and print time-elapsed
+             * for window.onload
              */
                 if (window.domOnEventWindowOnloadTimeElapsed) {
                     return;
@@ -21925,19 +22116,19 @@ local.browserTest = function (options, onError) {
             }());
             // init event-handling - load
             window.addEventListener("load", function () {
-                setTimeout(options.onNext, 5000);
+                setTimeout(option.onNext, 5000);
             });
             // wait for render before screenshot
-            setTimeout(options.onNext, options.timeoutScreenshot);
-            if (options.modeBrowserTest !== "test") {
+            setTimeout(option.onNext, option.timeoutScreenshot);
+            if (option.modeBrowserTest !== "test") {
                 return;
             }
             // init utility2_testReportSave
             window.utility2_testReportSave = function () {
                 window.utility2_testReportSave = local.nop;
                 window.utility2_testReport.coverage = window.__coverage__;
-                options.electron.ipcRenderer.send(
-                    options.fileElectronHtml,
+                option.electron.ipcRenderer.send(
+                    option.fileElectronHtml,
                     "testReport",
                     window.utility2_testReport
                 );
@@ -21946,76 +22137,21 @@ local.browserTest = function (options, onError) {
         // node.electron.browserWindow.webview.preload - screenshot
         case 22:
             // cleanup fileElectronHtml
-            options.fs.rename(
-                options.fileElectronHtml,
-                options.npm_config_dir_tmp + "/electron.html",
+            option.fs.rename(
+                option.fileElectronHtml,
+                option.npm_config_dir_tmp + "/electron.html",
                 console.error
             );
-            options.electron.ipcRenderer.send(
-                options.fileElectronHtml,
+            option.electron.ipcRenderer.send(
+                option.fileElectronHtml,
                 "html",
                 window.document.documentElement.outerHTML
             );
-            if (options.modeBrowserTest === "test" && !window.utility2_modeTest) {
+            if (
+                option.modeBrowserTest === "test" && !window.utility2_modeTest
+            ) {
                 window.utility2_testReportSave();
             }
-            return;
-        // node.electron - screenshot
-        case 13:
-            options.browserWindow.capturePage(options, function (data) {
-                options.onNext(null, data);
-            });
-            return;
-        case 14:
-            options.fs.writeFile(options.fileScreenshot, data.toPNG(), options.onNext);
-            return;
-        case 15:
-            console.error(
-                "\nbrowserTest - created screenshot file "
-                + options.fileScreenshot + "\n"
-            );
-            console.error(
-                "browserTest - created screenshot file "
-                + options.fileScreenshot.replace((
-                    /\.\w+$/
-                ), ".html")
-            );
-            local.exit();
-            return;
-        // node - after electron
-        case 2:
-            console.error(
-                "\nbrowserTest - exit-code " + error + " - " + options.url
-                + "\n"
-            );
-            if (options.modeBrowserTest !== "test") {
-                options.modeNext += 1000;
-                options.onNext();
-                return;
-            }
-            // merge browser coverage
-            data = (
-                options.modeCoverageMerge
-                && local.fsReadFileOrEmptyStringSync(options.fileCoverage, "json")
-            );
-            local.istanbulCoverageMerge(window.__coverage__, data);
-            console.error(
-                "\nbrowserTest - merged coverage from file "
-                + options.fileCoverage + "\n"
-            );
-            // merge browser test-report
-            data = local.fsReadFileOrEmptyStringSync(options.fileTestReport, "json");
-            local.testReportMerge(window.utility2_testReport, !options.modeSilent && data);
-            console.error(
-                "\nbrowserTest - merged test-report from file "
-                + options.fileTestReport + "\n"
-            );
-            // create test-report.json
-            local.fsWriteFileWithMkdirpSync(
-                options.npm_config_dir_build + "/test-report.json",
-                JSON.stringify(window.utility2_testReport)
-            );
-            options.onNext(data && data.testsFailed && new Error(data.testsFailed));
             return;
         default:
             if (isDone) {
@@ -22027,7 +22163,7 @@ local.browserTest = function (options, onError) {
             onError(error);
         }
     });
-    // init options
+    // init option
     [
         "CI_BRANCH",
         "CI_HOST",
@@ -22055,60 +22191,57 @@ local.browserTest = function (options, onError) {
         if (
             local.env
             && local.env[key] !== undefined
-            && typeof options[key] !== "number"
+            && typeof option[key] !== "number"
         ) {
-            options[key] = options[key] || local.env[key];
+            option[key] = option[key] || local.env[key];
         }
     });
-    options.modeNext = Number(options.modeNext) || 0;
-    options.timeoutDefault = Number(options.timeoutDefault) || Number(local.timeoutDefault);
-    if (10 <= options.modeNext) {
-        options.electron = options.electron || require("electron");
+    option.modeNext = Number(option.modeNext) || 0;
+    option.timeoutDefault = (
+        Number(option.timeoutDefault)
+        || Number(local.timeoutDefault)
+    );
+    if (10 <= option.modeNext) {
+        option.electron = option.electron || require("electron");
     }
-    options.fs = options.fs || require("fs");
-    options.onNext();
+    option.fs = option.fs || require("fs");
+    option.onNext();
 };
 
 local.bufferConcat = function (bffList) {
 /*
- * this function will emulate node's Buffer.concat for Uint8Array in the browser
+ * this function will emulate node's Buffer.concat for Uint8Array in browser
  */
     var byteLength;
     var ii;
-    var isBuffer;
+    var isString;
     var jj;
     var result;
+    isString = true;
     result = [""];
     byteLength = 0;
     bffList.forEach(function (bff) {
-        // validate data
-        local.assertThrow(typeof bff !== "number", bff);
-        if (!(bff && bff.length)) {
+        if (bff !== 0 && !(bff && bff.length)) {
             return;
         }
-        // validate data
-        local.assertThrow((
-            typeof bff === "string"
-            || Object.prototype.toString.call(bff) === "[object Uint8Array]"
-        ), bff);
-        isBuffer = isBuffer || typeof bff !== "string";
-        if (!isBuffer) {
+        // optimization - concat string
+        if (isString && typeof bff === "string") {
             result[0] += bff;
             return;
         }
-        if (typeof bff === "string") {
-            bff = local.bufferValidateAndCoerce(bff);
-        }
+        isString = null;
+        bff = local.bufferValidateAndCoerce(bff);
         byteLength += bff.byteLength;
         result.push(bff);
     });
     // optimization - return string
-    if (!isBuffer) {
+    if (isString) {
         return result[0];
     }
+    result[0] = local.bufferValidateAndCoerce(result[0]);
+    byteLength += result[0].byteLength;
     bffList = result;
-    bffList[0] = local.bufferValidateAndCoerce(bffList[0]);
-    result = new Uint8Array(bffList[0].byteLength + byteLength);
+    result = local.bufferValidateAndCoerce(new Uint8Array(byteLength));
     ii = 0;
     bffList.forEach(function (bff) {
         jj = 0;
@@ -22118,32 +22251,12 @@ local.bufferConcat = function (bffList) {
             jj += 1;
         }
     });
-    return local.bufferValidateAndCoerce(result);
-};
-
-local.bufferCreate = function (text) {
-/*
- * this function will create a Uint8Array from text,
- * with either 'utf8' (default) or 'base64' encoding
- */
-    return (
-        (typeof Buffer === "function" && typeof Buffer.isBuffer === "function")
-        ? (
-            (typeof text === "number" || !text)
-            ? Buffer.alloc(text | 0)
-            : Buffer.from(text)
-        )
-        : (
-            (typeof text === "string")
-            ? new window.TextEncoder().encode(text)
-            : new Uint8Array(text)
-        )
-    );
+    return result;
 };
 
 local.bufferIndexOfSubBuffer = function (bff, subBff, fromIndex) {
 /*
- * this function will search bff for the indexOf-like position of the subBff
+ * this function will search <bff> for <fromIndex> position of <subBff>
  */
     var ii;
     var jj;
@@ -22172,11 +22285,11 @@ local.bufferIndexOfSubBuffer = function (bff, subBff, fromIndex) {
 
 local.bufferRandomBytes = function (length) {
 /*
- * this function will return a Buffer with the given length,
+ * this function will return a Buffer with given <length>,
  * filled with cryptographically-strong random-values
  */
     return (
-        // ternary-operator
+        // ternary-condition
         (
             typeof window === "object"
             && window.crypto
@@ -22187,63 +22300,53 @@ local.bufferRandomBytes = function (length) {
     );
 };
 
-local.bufferToString = function (bff) {
+local.bufferToUtf8 = function (bff) {
 /*
- * this function will convert Uint8Array -> String
+ * this function will convert Uint8Array <bff> -> utf8
  */
     return local.bufferValidateAndCoerce(bff, "string");
 };
 
 local.bufferValidateAndCoerce = function (bff, mode) {
 /*
- * this function will validate and coerce/convert
- * ArrayBuffer, String, or Uint8Array -> Buffer or String
+ * this function will validate and coerce/convert <bff> -> Buffer
+ * (or String if <mode> = "string")
  */
-    var isBuffer;
-    // validate not typeof number
-    if (typeof bff === "number") {
-        throw new Error("bufferValidateAndCoerce - value cannot be typeof number");
+    // validate not 0
+    if (bff !== 0) {
+        bff = bff || "";
     }
-    bff = bff || "";
-    isBuffer = typeof Buffer === "function" && typeof Buffer.isBuffer === "function";
-    // convert String -> Buffer
+    if (typeof bff === "string" && mode === "string") {
+        return bff;
+    }
+    // convert utf8 -> Uint8Array
     if (typeof bff === "string") {
-        return (
-            mode === "string"
-            ? bff
-            : isBuffer
-            ? Buffer.from(bff)
-            : new window.TextEncoder().encode(bff)
+        bff = (
+            local.isBrowser
+            ? new TextEncoder().encode(bff)
+            : Buffer.from(bff)
         );
-    }
-    if (Object.prototype.toString.call(bff) === "[object ArrayBuffer]") {
-        bff = new Uint8Array(bff);
-    }
     // validate instanceof Uint8Array
-    if (Object.prototype.toString.call(bff) !== "[object Uint8Array]") {
+    } else if (Object.prototype.toString.call(bff) !== "[object Uint8Array]") {
         throw new Error(
             "bufferValidateAndCoerce - value is not instanceof "
             + "ArrayBuffer, String, or Uint8Array"
         );
     }
+    // convert Uint8Array -> utf8
+    if (mode === "string") {
+        return new TextDecoder().decode(bff);
+    }
     // coerce Uint8Array -> Buffer
-    if (isBuffer) {
+    if (!local.isBrowser && !Buffer.isBuffer(bff)) {
         Object.setPrototypeOf(bff, Buffer.prototype);
     }
-    if (mode !== "string") {
-        return bff;
-    }
-    // convert Buffer -> String
-    return (
-        isBuffer
-        ? String(bff)
-        : new window.TextDecoder().decode(bff)
-    );
+    return bff;
 };
 
-local.buildApidoc = function (options, onError) {
+local.buildApidoc = function (option, onError) {
 /*
- * this function will build the apidoc
+ * this function will build apidoc
  */
     var result;
     // optimization - do not run if $npm_config_mode_coverage = all
@@ -22251,39 +22354,31 @@ local.buildApidoc = function (options, onError) {
         onError();
         return;
     }
-    options = local.objectSetDefault(options, {
+    option = local.objectSetDefault(option, {
         blacklistDict: local,
         require: local.requireInSandbox
     });
-    if (local.env.npm_package_buildCustomOrg && !options.modeForce) {
-        onError();
-        return;
-    }
     // save apidoc.html
     result = (
         local.fsReadFileOrEmptyStringSync("apidoc.html", "utf8")
-        || local.apidocCreate(options)
+        || local.apidocCreate(option)
     );
-    local.fsWriteFileWithMkdirpSync(
-        local.env.npm_config_dir_build + "/apidoc.html",
-        result
-    );
+    local.fsWriteFileWithMkdirpSync("tmp/build/apidoc.html", result);
     console.error(
-        "created apidoc file " + local.env.npm_config_dir_build
-        + "/apidoc.html\n"
+        "created apidoc file " + process.cwd() + "/apidoc.html\n"
     );
     onError();
 };
 
-local.buildApp = function (options, onError) {
+local.buildApp = function (option, onError) {
 /*
- * this function will build the app
+ * this function will build app
  */
-    options = local.objectSetDefault(options, {
+    option = local.objectSetDefault(option, {
         assetsList: []
     });
     // build assets
-    local.fsRmrSync(local.env.npm_config_dir_build + "/app");
+    local.fsRmrSync("tmp/build/app");
     local.onParallelList({
         list: [{
             file: "/LICENSE",
@@ -22336,15 +22431,15 @@ local.buildApp = function (options, onError) {
         }, {
             file: "/jsonp.utility2.stateInit",
             url: "/jsonp.utility2.stateInit?callback=window.utility2.stateInit"
-        }].concat(options.assetsList)
-    }, function (options2, onParallel) {
-        options2 = options2.element;
+        }].concat(option.assetsList)
+    }, function (option2, onParallel) {
+        option2 = option2.element;
         onParallel.counter += 1;
-        local.ajax(options2, function (error, xhr) {
+        local.ajax(option2, function (error, xhr) {
             // validate no error occurred
             local.assertThrow(!error, error);
             // jslint file
-            local.jslintAndPrint(xhr.responseText, options2.file, {
+            local.jslintAndPrint(xhr.responseText, option2.file, {
                 conditional: true,
                 coverage: local.env.npm_config_mode_coverage
             });
@@ -22354,7 +22449,7 @@ local.buildApp = function (options, onError) {
                 local.jslint.jslintResult.errorText
             );
             local.fsWriteFileWithMkdirpSync(
-                local.env.npm_config_dir_build + "/app" + options2.file,
+                "tmp/build/app" + option2.file,
                 xhr.response
             );
             onParallel();
@@ -22371,13 +22466,13 @@ local.buildApp = function (options, onError) {
             cwd: "tmp/buildApp",
             env: {
                 PATH: local.env.PATH,
-                PORT: (local.env.PORT ^ (Math.random() * 0x10000)) | 0x8000,
+                PORT: (Math.random() * 0x10000) | 0x8000,
                 npm_config_timeout_exit: 5000
             },
-            stdio: ["ignore", 1, 2]
+            stdio: ["ignore", "ignore", 2]
         })
-        .once("error", onError)
-        .once("exit", function (exitCode) {
+        .on("error", onError)
+        .on("exit", function (exitCode) {
             // validate exitCode
             local.assertThrow(!exitCode, exitCode);
             onError();
@@ -22385,90 +22480,12 @@ local.buildApp = function (options, onError) {
     });
 };
 
-local.buildCustomOrg = function (options, onError) {
+local.buildLib = function (option, onError) {
 /*
- * this function will build the customOrg
- */
-    var isDone;
-    var onError2;
-    var onParallel;
-    if (!local.env.npm_package_buildCustomOrg && !options.modeForce) {
-        onError();
-        return;
-    }
-    onError2 = function (error) {
-        local.onErrorDefault(error);
-        if (isDone) {
-            return;
-        }
-        isDone = true;
-        // try to recover from error
-        setTimeout(onError, error && local.timeoutDefault);
-    };
-    // try to recover from uncaughtException
-    process.on("uncaughtException", onError2);
-    onParallel = local.onParallel(onError2);
-    onParallel.counter += 1;
-    // build package.json
-    options.packageJson = local.fsReadFileOrEmptyStringSync("package.json", "json");
-    onParallel.counter += 1;
-    local.buildReadme({
-        dataFrom: "\n# package.json\n```json\n" + JSON.stringify(options.packageJson) + "\n```\n",
-        modeForce: true
-    }, onParallel);
-    options.packageJson = local.fsReadFileOrEmptyStringSync("package.json", "json");
-    switch (local.env.GITHUB_ORG) {
-    case "npmdoc":
-        local.objectSetOverride(options, {
-            packageJson: {
-                keywords: ["documentation", local.env.npm_package_buildCustomOrg]
-            }
-        }, 2);
-        // build apidoc.html
-        onParallel.counter += 1;
-        local.buildApidoc({
-            dir: local.env.npm_package_buildCustomOrg,
-            modeForce: true,
-            modulePathList: options.modulePathList
-        }, onParallel);
-        break;
-    case "npmtest":
-        local.objectSetOverride(options, {
-            packageJson: {
-                keywords: ["coverage", "test", local.env.npm_package_buildCustomOrg]
-            }
-        }, 2);
-        break;
-    case "scrapeitall":
-        break;
-    }
-    // build README.md
-    options.readme = local.apidocCreate({
-        dir: local.env.npm_package_buildCustomOrg,
-        modeNoApidoc: true,
-        modulePathList: options.modulePathList,
-        require: local.requireInSandbox,
-        template: local.assetsDict[
-            "/assets.readmeCustomOrg." + local.env.GITHUB_ORG + ".template.md"
-        ]
-    });
-    local.fs.writeFileSync("README.md", options.readme);
-    console.error("created customOrg file " + process.cwd() + "/README.md\n");
-    // re-build package.json
-    options.packageJson.description = options.readme.split("\n")[2].trim();
-    local.fs.writeFileSync(
-        "package.json",
-        local.jsonStringifyOrdered(options.packageJson, null, 4) + "\n"
-    );
-    onParallel();
-};
-
-local.buildLib = function (options, onError) {
-/*
- * this function will build the lib
+ * this function will build lib
  */
     var result;
-    local.objectSetDefault(options, {
+    local.objectSetDefault(option, {
         customize: local.nop,
         dataFrom: local.fsReadFileOrEmptyStringSync(
             "lib." + local.env.npm_package_nameLib + ".js",
@@ -22476,7 +22493,7 @@ local.buildLib = function (options, onError) {
         ),
         dataTo: local.templateRenderMyApp(
             local.assetsDict["/assets.my_app.template.js"],
-            options
+            option
         )
     });
     // search-and-replace - customize dataTo
@@ -22490,48 +22507,45 @@ local.buildLib = function (options, onError) {
             /\n\/\*\u0020validateLineSortedReset\u0020\*\/\n[\S\s]*?$/
         )
     ].forEach(function (rgx) {
-        options.dataTo = local.stringMerge(options.dataTo, options.dataFrom, rgx);
+        option.dataTo = local.stringMerge(option.dataTo, option.dataFrom, rgx);
     });
     // customize local for assets.utility2.rollup.js
     if (
         local.fs.existsSync("./assets.utility2.rollup.js")
         && local.env.npm_package_nameLib !== "swgg"
     ) {
-        options.dataTo = options.dataTo
-        .replace(
+        option.dataTo = option.dataTo.replace(
             "    // || globalThis.utility2_rollup_old",
             "    || globalThis.utility2_rollup_old"
-        )
-        .replace(
+        ).replace(
             "    // || require(\"./assets.utility2.rollup.js\")",
             "    || require(\"./assets.utility2.rollup.js\")"
         );
     }
     // save lib
-    result = options.dataTo;
+    result = option.dataTo;
     local.fsWriteFileWithMkdirpSync(
         "lib." + local.env.npm_package_nameLib + ".js",
         result,
         local.env.npm_config_mode_coverage && local.identity("noWrite")
     );
-    options.customize(options);
+    option.customize(option);
     onError();
     return result;
 };
 
-local.buildReadme = function (options, onError) {
+local.buildReadme = function (option, onError) {
 /*
- * this function will build the readme in my-app-lite style
+ * this function will build readme with my-app-lite template
  */
     var result;
-    if (local.env.npm_package_buildCustomOrg && !options.modeForce) {
-        onError();
-        return;
-    }
-    local.objectSetDefault(options, {
+    local.objectSetDefault(option, {
         customize: local.nop,
         // reset toc
-        dataFrom: local.fsReadFileOrEmptyStringSync("README.md", "utf8").replace((
+        dataFrom: local.fsReadFileOrEmptyStringSync(
+            "README.md",
+            "utf8"
+        ).replace((
             /\n#\u0020table\u0020of\u0020contents$[\S\s]*?\n\n\n\n/m
         ), "\n# table of contents\n\n\n\n"),
         packageJsonRgx: (
@@ -22539,42 +22553,45 @@ local.buildReadme = function (options, onError) {
         )
     });
     // render dataTo
-    options.dataTo = local.templateRenderMyApp(
+    option.dataTo = local.templateRenderMyApp(
         local.assetsDict["/assets.readme.template.md"],
-        options
+        option
     );
     // init package.json
-    options.dataFrom.replace(options.packageJsonRgx, function (match0, match1) {
+    option.dataFrom.replace(option.packageJsonRgx, function (match0, match1) {
         // remove null-items from package.json
-        options.packageJson = JSON.parse(match1.replace((
+        option.packageJson = JSON.parse(match1.replace((
             /\u0020{4}".*?":\u0020null,?$/gm
         ), ""));
-        options.packageJson.description = options.dataFrom.split("\n")[1];
+        option.packageJson.description = option.dataFrom.split("\n")[1];
         local.tryCatchOnError(function () {
-            local.objectSetDefault(options.packageJson, {
-                nameLib: local.fsReadFileOrEmptyStringSync("./package.json", "json").nameLib
+            local.objectSetDefault(option.packageJson, {
+                nameLib: local.fsReadFileOrEmptyStringSync(
+                    "./package.json",
+                    "json"
+                ).nameLib
             });
         }, local.nop);
-        options.packageJson = local.objectSetDefault(options.packageJson, {
-            nameLib: options.packageJson.name.replace((
+        option.packageJson = local.objectSetDefault(option.packageJson, {
+            nameLib: option.packageJson.name.replace((
                 /\W/g
             ), "_"),
-            nameOriginal: options.packageJson.name
+            nameOriginal: option.packageJson.name
         });
-        options.packageJson = local.objectSetDefault(
-            options.packageJson,
+        option.packageJson = local.objectSetDefault(
+            option.packageJson,
             JSON.parse(local.templateRenderMyApp(
-                options.packageJsonRgx.exec(
+                option.packageJsonRgx.exec(
                     local.assetsDict["/assets.readme.template.md"]
                 )[1],
-                options
+                option
             )),
             2
         );
         // avoid npm-installing that
-        delete options.packageJson.devDependencies[options.packageJson.name];
+        delete option.packageJson.devDependencies[option.packageJson.name];
         // reset scripts
-        options.packageJson.scripts = {
+        option.packageJson.scripts = {
             "build-ci": "./npm_scripts.sh",
             env: "env",
             eval: "./npm_scripts.sh",
@@ -22587,16 +22604,19 @@ local.buildReadme = function (options, onError) {
         // save package.json
         local.fsWriteFileWithMkdirpSync(
             "package.json",
-            local.jsonStringifyOrdered(options.packageJson, null, 4) + "\n"
+            local.jsonStringifyOrdered(option.packageJson, null, 4) + "\n"
         );
         // re-render dataTo
-        options.dataTo = local.templateRenderMyApp(
+        option.dataTo = local.templateRenderMyApp(
             local.assetsDict["/assets.readme.template.md"],
-            options
+            option
         );
-        options.dataTo = options.dataTo.replace(
-            options.packageJsonRgx,
-            match0.replace(match1, local.jsonStringifyOrdered(options.packageJson, null, 4))
+        option.dataTo = option.dataTo.replace(
+            option.packageJsonRgx,
+            match0.replace(
+                match1,
+                local.jsonStringifyOrdered(option.packageJson, null, 4)
+            )
         );
     });
     // search-and-replace - customize dataTo
@@ -22609,7 +22629,7 @@ local.buildReadme = function (options, onError) {
         (
             /\n#\u0020cdn\u0020download\n[\S\s]*?\n\n\n\n/
         ),
-        // customize live web demo
+        // customize live-web-demo
         (
             /\n#\u0020live\u0020web\u0020demo\n[\S\s]*?\n\n\n\n/
         ),
@@ -22617,33 +22637,33 @@ local.buildReadme = function (options, onError) {
         (
             /\n####\u0020todo\n[\S\s]*?\n\n\n\n/
         ),
-        // customize quickstart-example-js
+        // customize example.js - shared js-env code - init-before
         (
             /\nglobalThis\.local\u0020=\u0020local;\n[^`]*?\n\/\/\u0020run\u0020browser\u0020js\-env\u0020code\u0020-\u0020init-test\n/
-        ), (
-            /\nlocal\.testRunBrowser\u0020=\u0020function\u0020\(event\)\u0020\{\n[^`]*?^\u0020{4}if\u0020\(!event\u0020\|\|\u0020\(event\u0020&&\n/m
-        ), (
-            /\n\u0020{4}\/\/\u0020custom-case\n[^`]*?\n\u0020{4}\}\n/
         ),
-        // customize quickstart-html-body
+        // customize example.js - html-body
         (
             /\nutility2-comment\u0020-->(?:\\n\\\n){4}[^`]*?^<!--\u0020utility2-comment\\n\\\n/m
         ),
-        // customize build script
+        // customize example.js - testRunBrowser
         (
-            /\n#\u0020internal\u0020build\u0020script\n[\S\s]*?^-\u0020build_ci\.sh\n/m
-        ), (
+            /\n\u0020{4}\/\/\u0020custom-case\n[^`]*?\n\u0020{4}\/\/\u0020run\u0020browser-tests\n/
+        ),
+        // customize build_ci - shBuildCiAfter
+        (
             /\nshBuildCiAfter\u0020\(\)\u0020\{\(set\u0020-e\n[\S\s]*?\n\)\}\n/
-        ), (
+        ),
+        // customize build_ci - shBuildCiBefore
+        (
             /\nshBuildCiBefore\u0020\(\)\u0020\{\(set\u0020-e\n[\S\s]*?\n\)\}\n/
         )
     ].forEach(function (rgx) {
-        options.dataTo = local.stringMerge(options.dataTo, options.dataFrom, rgx);
+        option.dataTo = local.stringMerge(option.dataTo, option.dataFrom, rgx);
     });
     // customize private-repository
     if (local.env.npm_package_private) {
-        options.dataTo = (
-            options.dataTo
+        option.dataTo = (
+            option.dataTo
             .replace((
                 /\n\[!\[NPM\]\(https:\/\/nodei.co\/npm\/.*?\n/
             ), "\n")
@@ -22660,9 +22680,9 @@ local.buildReadme = function (options, onError) {
     }
     // customize version
     ["dataFrom", "dataTo"].forEach(function (element) {
-        options[element] = options[element].replace((
+        option[element] = option[element].replace((
             /\n(####\u0020changelog\u0020|-\u0020npm\u0020publish\u0020)\d+?\.\d+?\.\d+?.*?\n/g
-        ), "\n$1" + options.packageJson.version + "\n");
+        ), "\n$1" + option.packageJson.version + "\n");
     });
     // customize swaggerdoc
     if (
@@ -22672,65 +22692,70 @@ local.buildReadme = function (options, onError) {
         ).test(local.assetsDict["/index.html"])
         || local.env.npm_package_name === "utility2"
     ) {
-        options.dataTo = options.dataTo.replace((
+        option.dataTo = option.dataTo.replace((
             /\n####\u0020swagger\u0020doc\n[\S\s]*?\n####\u0020/
         ), "\n#### ");
     }
     // customize example.js
     if (
-        local.assetsDict["/index.html"]
-        .indexOf("<script src=\"assets.example.js\"></script>") < 0
+        local.assetsDict["/index.html"].indexOf(
+            "<script src=\"assets.example.js\"></script>"
+        ) < 0
     ) {
-        options.dataTo = options.dataTo.replace((
+        option.dataTo = option.dataTo.replace((
             /\nif\u0020\(!local.isBrowser\)\u0020\{\n[\S\s]*?\n\}\(\)\);\n/g
         ), "\nif (!local.isBrowser) {\n    return;\n}\n}());\n");
     }
     // customize comment
-    options.dataFrom.replace((
+    option.dataFrom.replace((
         /^(\u0020*?)(?:#\!\!\u0020|#\/\/\u0020|\/\/\!\!\u0020|<!--\u0020)(.*?)(?:\u0020-->)?$/gm
     ), function (match0, match1, match2) {
-        options.dataTo = options.dataTo.replace(
+        option.dataTo = option.dataTo.replace(
             "\n" + match1 + match2 + "\n",
             "\n" + match0 + "\n"
         );
     });
     // customize - user-defined
-    options.customize(options);
+    option.customize(option);
     // customize assets.index.template.html
     if (local.assetsDict["/assets.index.template.html"].indexOf(
         "\"assets.utility2.template.html\""
     ) < 0) {
-        options.dataTo = options.dataTo.replace((
+        option.dataTo = option.dataTo.replace((
             /\n\/\*\u0020jslint\u0020ignore:start\u0020\*\/\nlocal.assetsDict\["\/assets.index.template.html"\]\u0020=\u0020'\\\n[\S\s]*?\n\/\*\u0020jslint\u0020ignore:end\u0020\*\/\n/
         ), "\n");
     }
     // customize shDeployCustom
-    if (options.dataFrom.indexOf("    shDeployCustom\n") >= 0) {
+    if (option.dataFrom.indexOf("    shDeployCustom\n") >= 0) {
         [
-            // customize quickstart
+            // customize example.sh
             (
                 /\n####\u0020changelog\u0020[\S\s]*\n#\u0020quickstart\u0020example.js\n/
             ), (
-                options.dataFrom.indexOf("\"assets.utility2.template.html\"") < 0
+                option.dataFrom.indexOf("\"assets.utility2.template.html\"") < 0
                 && local.identity(
                     /\n#\u0020quickstart\u0020[\S\s]*?\n#\u0020extra\u0020screenshots\n/
                 )
             )
         ].forEach(function (rgx) {
-            options.dataTo = local.stringMerge(options.dataTo, options.dataFrom, rgx);
+            option.dataTo = local.stringMerge(
+                option.dataTo,
+                option.dataFrom,
+                rgx
+            );
         });
         // customize screenshot
-        options.dataTo = options.dataTo.replace((
+        option.dataTo = option.dataTo.replace((
             /^1\.\u0020.*?screenshot\.(?:npmTest|testExampleJs|testExampleSh).*?\.png[\S\s]*?\n\n/gm
         ), "");
     }
     // customize shNpmTestPublished
-    options.dataTo = options.dataTo.replace(
+    option.dataTo = option.dataTo.replace(
         "$ npm install " + local.env.GITHUB_REPO + "#alpha",
         "$ npm install " + local.env.npm_package_name
     );
-    if (options.dataFrom.indexOf("    shNpmTestPublished\n") < 0) {
-        options.dataTo = options.dataTo.replace(
+    if (option.dataFrom.indexOf("    shNpmTestPublished\n") < 0) {
+        option.dataTo = option.dataTo.replace(
             "$ npm install " + local.env.npm_package_name,
             "$ npm install " + local.env.GITHUB_REPO + "#alpha"
         );
@@ -22739,7 +22764,7 @@ local.buildReadme = function (options, onError) {
         ), (
             /\n.*?npmPackageDependencyTree.*?\n/
         )].forEach(function (rgx) {
-            options.dataTo = options.dataTo.replace(rgx, "");
+            option.dataTo = option.dataTo.replace(rgx, "");
         });
     }
     // customize shBuildCiAfter and shBuildCiBefore
@@ -22757,11 +22782,11 @@ local.buildReadme = function (options, onError) {
             /.*?\/screenshot\.testExampleSh.*?\n/g
         )]
     ].forEach(function (element) {
-        if (options.dataFrom.indexOf("    " + element[0] + "\n") >= 0) {
+        if (option.dataFrom.indexOf("    " + element[0] + "\n") >= 0) {
             return;
         }
         // customize test-server
-        options.dataTo = options.dataTo.replace(
+        option.dataTo = option.dataTo.replace(
             new RegExp(
                 "\\n\\| test-server-"
                 + element[0].replace("shDeploy", "").toLowerCase()
@@ -22770,67 +22795,74 @@ local.buildReadme = function (options, onError) {
             "\n"
         );
         // customize screenshot
-        options.dataTo = options.dataTo.replace(element[1], "");
+        option.dataTo = option.dataTo.replace(element[1], "");
     });
-    options.dataTo = local.templateRenderMyApp(options.dataTo, options);
+    option.dataTo = local.templateRenderMyApp(option.dataTo, option);
     // customize toc
-    options.toc = "\n# table of contents\n";
-    options.dataTo.replace((
+    option.toc = "\n# table of contents\n";
+    option.dataTo.replace((
         /\n\n\n\n#\u0020(.*)/g
     ), function (ignore, match1) {
         if (match1 === "table of contents") {
             return;
         }
-        options.toc += "1. [" + match1 + "](#" + match1.toLowerCase()
+        option.toc += "1. [" + match1 + "](#" + match1.toLowerCase()
         .replace((
             /[^\u0020\-0-9A-Z_a-z]/g
         ), "").replace((
             /\u0020/g
         ), "-") + ")\n";
     });
-    options.dataTo = options.dataTo.replace("\n# table of contents\n", options.toc);
+    option.dataTo = option.dataTo.replace(
+        "\n# table of contents\n",
+        option.toc
+    );
+    // customize whitespace
+    option.dataTo = option.dataTo.replace((
+        /\n{5,}/g
+    ), "\n\n\n\n");
     // save README.md
-    result = options.dataTo;
-    local.fsWriteFileWithMkdirpSync("README.md", result);
+    result = option.dataTo;
+    local.fs.writeFileSync("README.md", result);
     // customize assets.swgg.swagger.json
-    options.swaggerJson = local.swgg.normalizeSwaggerJson(
+    option.swaggerJson = local.swgg.normalizeSwaggerJson(
         local.fsReadFileOrEmptyStringSync("assets.swgg.swagger.json", "json")
     );
-    local.objectSetOverride(options.swaggerJson, {
+    local.objectSetOverride(option.swaggerJson, {
         info: {
-            title: options.packageJson.name,
-            version: options.packageJson.version,
-            "x-swgg-description": options.packageJson.description,
-            "x-swgg-homepage": options.packageJson.homepage
+            title: option.packageJson.name,
+            version: option.packageJson.version,
+            "x-swgg-description": option.packageJson.description,
+            "x-swgg-homepage": option.packageJson.homepage
         }
     }, 2);
-    options.dataTo.replace((
+    option.dataTo.replace((
         /\bhttps:\/\/.*?\/assets\.app\.js/
     ), function (match0) {
-        options.swaggerJson["x-swgg-downloadStandaloneApp"] = (
+        option.swaggerJson["x-swgg-downloadStandaloneApp"] = (
             !local.env.npm_package_private && match0
         );
     });
     local.fsWriteFileWithMkdirpSync(
         "assets.swgg.swagger.json",
-        local.jsonStringifyOrdered(options.swaggerJson, null, 4) + "\n",
-        !options.swaggerJson.swagger && local.identity("noWrite")
+        local.jsonStringifyOrdered(option.swaggerJson, null, 4) + "\n",
+        !option.swaggerJson.swagger && local.identity("noWrite")
     );
     onError();
     return result;
 };
 
-local.buildTest = function (options, onError) {
+local.buildTest = function (option, onError) {
 /*
- * this function will build the test
+ * this function will build test
  */
     var result;
-    local.objectSetDefault(options, {
+    local.objectSetDefault(option, {
         customize: local.nop,
         dataFrom: local.fsReadFileOrEmptyStringSync("test.js", "utf8"),
         dataTo: local.templateRenderMyApp(
             local.assetsDict["/assets.test.template.js"],
-            options
+            option
         )
     });
     // search-and-replace - customize dataTo
@@ -22840,7 +22872,7 @@ local.buildTest = function (options, onError) {
             /\n\}\(\)\);\n\n\n\n\/\/\u0020run\u0020shared\u0020js\-env\u0020code\u0020-\u0020function\n[\S\s]*?$/
         )
     ].forEach(function (rgx) {
-        options.dataTo = local.stringMerge(options.dataTo, options.dataFrom, rgx);
+        option.dataTo = local.stringMerge(option.dataTo, option.dataFrom, rgx);
     });
     // customize require("utility2")
     [
@@ -22848,21 +22880,21 @@ local.buildTest = function (options, onError) {
         "./lib.utility2.js"
     ].forEach(function (file) {
         if (local.fs.existsSync(file)) {
-            options.dataTo = options.dataTo.replace(
+            option.dataTo = option.dataTo.replace(
                 "require(\"utility2\")",
                 "require(\"" + file + "\")"
             );
         }
     });
-    options.customize(options);
+    option.customize(option);
     // save test.js
-    result = options.dataTo;
+    result = option.dataTo;
     local.fs.writeFileSync("test.js", result);
     onError();
     return result;
 };
 
-local.childProcessSpawnWithTimeout = function (command, args, options) {
+local.childProcessSpawnWithTimeout = function (command, args, option) {
 /*
  * this function will run like child_process.spawn,
  * but with auto-timeout after timeout milliseconds
@@ -22882,7 +22914,7 @@ local.childProcessSpawnWithTimeout = function (command, args, options) {
     var timerTimeout;
     child_process = require("child_process");
     // spawn child
-    child = child_process.spawn(command, args, options)
+    child = child_process.spawn(command, args, option)
     .on("exit", function () {
         // cleanup timerTimeout
         try {
@@ -22892,9 +22924,12 @@ local.childProcessSpawnWithTimeout = function (command, args, options) {
     // init timerTimeout
     timerTimeout = child_process.spawn(
         // convert timeout to integer seconds with 2 second delay
-        "sleep " + Math.floor(
-            0.001 * (Number(options && options.timeout) || local.timeoutDefault) + 2
-        ) + "; kill -9 " + child.pid + " 2>/dev/null",
+        "sleep "
+        + Math.floor(
+            0.001 * (Number(option && option.timeout) || local.timeoutDefault)
+            + 2
+        )
+        + "; kill -9 " + child.pid + " 2>/dev/null",
         {
             shell: true,
             stdio: "ignore"
@@ -22908,7 +22943,8 @@ local.childProcessSpawnWithUtility2 = function (script, onError) {
  * this function will run child_process.spawn, with lib.utility2.sh sourced
  */
     require("child_process").spawn(
-        ". " + (process.env.npm_config_dir_utility2 || __dirname) + "/lib.utility2.sh; " + script,
+        ". " + (process.env.npm_config_dir_utility2 || __dirname)
+        + "/lib.utility2.sh; " + script,
         {
             shell: true,
             stdio: ["ignore", 1, 2]
@@ -22920,7 +22956,7 @@ local.childProcessSpawnWithUtility2 = function (script, onError) {
     });
 };
 
-local.cliRun = function (options) {
+local.cliRun = function (option) {
 /*
  * this function will run the cli
  */
@@ -22956,10 +22992,10 @@ local.cliRun = function (options) {
         file = __filename.replace((
             /.*\//
         ), "");
-        options = Object.assign({}, options);
+        option = Object.assign({}, option);
         packageJson = require("./package.json");
         // validate comment
-        options.rgxComment = options.rgxComment || (
+        option.rgxComment = option.rgxComment || (
             /\)\u0020\{\n(?:|\u0020{4})\/\*\n(?:\u0020|\u0020{5})\*((?:\u0020<[^>]*?>|\u0020\.\.\.)*?)\n(?:\u0020|\u0020{5})\*\u0020(will\u0020.*?\S)\n(?:\u0020|\u0020{5})\*\/\n(?:\u0020{4}|\u0020{8})\S/
         );
         textDict = {};
@@ -22978,7 +23014,7 @@ local.cliRun = function (options) {
                 return;
             }
             try {
-                commandList[ii] = options.rgxComment.exec(text);
+                commandList[ii] = option.rgxComment.exec(text);
                 commandList[ii] = {
                     argList: (commandList[ii][1] || "").trim(),
                     command: [key],
@@ -22987,21 +23023,21 @@ local.cliRun = function (options) {
             } catch (ignore) {
                 local.assertThrow(null, new Error(
                     "cliRun - cannot parse comment in COMMAND "
-                    + key + ":\nnew RegExp(" + JSON.stringify(options.rgxComment.source)
-                    + ").exec(" + JSON.stringify(text)
-                    .replace((
+                    + key + ":\nnew RegExp("
+                    + JSON.stringify(option.rgxComment.source)
+                    + ").exec(" + JSON.stringify(text).replace((
                         /\\\\/g
-                    ), "\u0000")
-                    .replace((
+                    ), "\u0000").replace((
                         /\\n/g
-                    ), "\\n\\\n")
-                    .replace((
+                    ), "\\n\\\n").replace((
                         /\u0000/g
                     ), "\\\\") + ");"
                 ));
             }
         });
-        console.log(packageJson.name + " (" + packageJson.version + ")\n\n" + commandList
+        text = "";
+        text += packageJson.name + " (" + packageJson.version + ")\n\n";
+        text += commandList
         .filter(function (element) {
             return element;
         })
@@ -23031,7 +23067,8 @@ local.cliRun = function (options) {
                 + element.argList.join("  ")
             );
         })
-        .join("\n\n"));
+        .join("\n\n");
+        console.log(text);
     };
     local.cliDict["--help"] = local.cliDict["--help"] || local.cliDict._help;
     local.cliDict["-h"] = local.cliDict["-h"] || local.cliDict._help;
@@ -23043,7 +23080,7 @@ local.cliRun = function (options) {
      * will start interactive-mode
      */
         globalThis.local = local;
-        local.functionOrNop(local.replStart || require("repl").start)({
+        local.identity(local.replStart || require("repl").start)({
             useGlobal: true
         });
     };
@@ -23059,7 +23096,10 @@ local.cliRun = function (options) {
      */
         console.log(require(__dirname + "/package.json").version);
     };
-    local.cliDict["--version"] = local.cliDict["--version"] || local.cliDict._version;
+    local.cliDict["--version"] = (
+        local.cliDict["--version"]
+        || local.cliDict._version
+    );
     local.cliDict["-v"] = local.cliDict["-v"] || local.cliDict._version;
     // default to --help command if no arguments are given
     if (process.argv.length <= 2) {
@@ -23073,11 +23113,15 @@ local.cliRun = function (options) {
     local.cliDict._default();
 };
 
-local.corsBackendHostInject = function (url, backendHost, rgxInject, location) {
+local.corsBackendHostInject = function (url, backendHost, rgx, location) {
 /*
- * this function will inject backendHost into the url, if location.host is a github site
+ * this function will if <location>.host is a github site,
+ * inject <backendHost> into <url> with given <rgx>
  */
-    location = location || (typeof window === "object" && window && window.location);
+    location = (
+        location
+        || (typeof window === "object" && window && window.location)
+    );
     if (!(backendHost && location && (
         /\bgithub.io$/
     ).test(location.host))) {
@@ -23089,7 +23133,7 @@ local.corsBackendHostInject = function (url, backendHost, rgxInject, location) {
     ), function (ignore, match1) {
         backendHost = backendHost.replace("-alpha.", "-" + match1 + ".");
     });
-    return url.replace(rgxInject || (
+    return url.replace(rgx || (
         /.*?($)/m
     ), backendHost + "$1");
 };
@@ -23104,7 +23148,8 @@ local.corsForwardProxyHostIfNeeded = function (xhr) {
         && (
             /^https?:\/\//
         ).test(xhr.url)
-        && xhr.url.indexOf(xhr.location.protocol + "//" + xhr.location.host) !== 0
+        && xhr.url.indexOf(xhr.location.protocol + "//" + xhr.location.host)
+        !== 0
         && (
             /\.github\.io$/
         ).test(xhr.location.host)
@@ -23114,9 +23159,9 @@ local.corsForwardProxyHostIfNeeded = function (xhr) {
 };
 
 /* istanbul ignore next */
-local.cryptoAesXxxCbcRawDecrypt = function (options, onError) {
+local.cryptoAesXxxCbcRawDecrypt = function (option, onError) {
 /*
- * this function will aes-xxx-cbc decrypt with the given options
+ * this function will aes-xxx-cbc decrypt with given <option>
  * example usage:
     data = new Uint8Array([1,2,3]);
     key = '0123456789abcdef0123456789abcdef';
@@ -23136,15 +23181,15 @@ local.cryptoAesXxxCbcRawDecrypt = function (options, onError) {
     var iv;
     var key;
     // init key
-    key = new Uint8Array(0.5 * options.key.length);
+    key = new Uint8Array(0.5 * option.key.length);
     ii = 0;
     while (ii < key.byteLength) {
-        key[ii] = parseInt(options.key.slice(2 * ii, 2 * ii + 2), 16);
+        key[ii] = parseInt(option.key.slice(2 * ii, 2 * ii + 2), 16);
         ii += 2;
     }
-    data = options.data;
+    data = option.data;
     // base64
-    if (options.mode === "base64") {
+    if (option.mode === "base64") {
         data = local.base64ToBuffer(data);
     }
     // normalize data
@@ -23155,8 +23200,8 @@ local.cryptoAesXxxCbcRawDecrypt = function (options, onError) {
     iv = data.subarray(0, 16);
     // optimization - create resized-view of data
     data = data.subarray(16);
-    crypto = typeof window === "object" && window.crypto;
-    if (!(crypto && crypto.subtle && typeof crypto.subtle.importKey === "function")) {
+    crypto = globalThis.crypto;
+    if (!local.isBrowser) {
         setTimeout(function () {
             crypto = require("crypto");
             cipher = crypto.createDecipheriv(
@@ -23181,9 +23226,9 @@ local.cryptoAesXxxCbcRawDecrypt = function (options, onError) {
 };
 
 /* istanbul ignore next */
-local.cryptoAesXxxCbcRawEncrypt = function (options, onError) {
+local.cryptoAesXxxCbcRawEncrypt = function (option, onError) {
 /*
- * this function will aes-xxx-cbc encrypt with the given options
+ * this function will aes-xxx-cbc encrypt with given <option>
  * example usage:
     data = new Uint8Array([1,2,3]);
     key = '0123456789abcdef0123456789abcdef';
@@ -23203,17 +23248,17 @@ local.cryptoAesXxxCbcRawEncrypt = function (options, onError) {
     var iv;
     var key;
     // init key
-    key = new Uint8Array(0.5 * options.key.length);
+    key = new Uint8Array(0.5 * option.key.length);
     ii = 0;
     while (ii < key.byteLength) {
-        key[ii] = parseInt(options.key.slice(2 * ii, 2 * ii + 2), 16);
+        key[ii] = parseInt(option.key.slice(2 * ii, 2 * ii + 2), 16);
         ii += 2;
     }
-    data = options.data;
+    data = option.data;
     // init iv
     iv = new Uint8Array((((data.byteLength) >> 4) << 4) + 32);
-    crypto = typeof window === "object" && window.crypto;
-    if (!(crypto && crypto.subtle && typeof crypto.subtle.importKey === "function")) {
+    crypto = globalThis.crypto;
+    if (!local.isBrowser) {
         setTimeout(function () {
             crypto = require("crypto");
             // init iv
@@ -23226,7 +23271,7 @@ local.cryptoAesXxxCbcRawEncrypt = function (options, onError) {
             data = cipher.update(data);
             iv.set(data, 16);
             iv.set(cipher.final(), 16 + data.byteLength);
-            if (options.mode === "base64") {
+            if (option.mode === "base64") {
                 iv = local.base64FromBuffer(iv);
                 iv += "\n";
             }
@@ -23245,7 +23290,7 @@ local.cryptoAesXxxCbcRawEncrypt = function (options, onError) {
         }, key, data).then(function (data) {
             iv.set(new Uint8Array(data), 16);
             // base64
-            if (options.mode === "base64") {
+            if (option.mode === "base64") {
                 iv = local.base64FromBuffer(iv);
                 iv += "\n";
             }
@@ -23254,9 +23299,74 @@ local.cryptoAesXxxCbcRawEncrypt = function (options, onError) {
     }).catch(onError);
 };
 
+local.dateGetWeek = function (date) {
+/*
+ * this function will return sunday-based week-of-month from <date>
+ */
+    date = new Date(date.slice(0, 10) + "T00:00:00Z");
+    return Math.ceil((date.getUTCDate() + new Date(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        1
+    ).getUTCDay()) / 7) - 1;
+};
+
+local.dateUtcFromLocal = function (date, timezoneOffset) {
+/*
+ * this function will convert local-<date> to utc-date
+ */
+    if (!date) {
+        return "";
+    }
+    local.assertThrow((
+        /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+?)?$/
+    ).test(date), "invalid local-date " + date);
+    if (!timezoneOffset) {
+        return new Date(date).toISOString();
+    }
+    return new Date(
+        new Date(date + "Z").getTime() + timezoneOffset * 60000
+    ).toISOString();
+};
+
+local.dateUtcToLocal = function (date, timezoneOffset) {
+/*
+ * this function will convert utc-<date> to local-date
+ */
+    if (!date) {
+        return "";
+    }
+    local.assertThrow((
+        /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+?)?Z$/
+    ).test(date), "invalid utc-date " + date);
+    timezoneOffset = timezoneOffset || new Date(date).getTimezoneOffset();
+    return new Date(
+        new Date(date).getTime() - timezoneOffset * 60000
+    ).toISOString();
+};
+
+local.domDatasetDecode = function (element) {
+/*
+ * this function will decodeURIComponent <element>.dataset.valueEncoded
+ */
+    try {
+        return JSON.parse(decodeURIComponent(element.dataset.valueEncoded));
+    } catch (ignore) {}
+};
+
+local.domDatasetEncode = function (element, val) {
+/*
+ * this function will encodeURIComponent <val> to <element>.dataset.valueEncoded
+ */
+    try {
+        element.dataset.valueEncoded = encodeURIComponent(JSON.stringify(val));
+    } catch (ignore) {}
+};
+
 local.domElementRender = function (template, dict) {
 /*
- * this function will return a dom-fragment rendered from the givent template and dict
+ * this function will return dom-element
+ * rendered from <template> with given <dict>
  */
     var tmp;
     tmp = document.createElement("template");
@@ -23264,36 +23374,40 @@ local.domElementRender = function (template, dict) {
     return tmp.content;
 };
 
-local.domQuerySelectorAllTagNameAndPrint = function (selector) {
+local.domQuerySelectorAllTagName = function (selector) {
 /*
- * this function will print all tagName's that match the selector
+ * this function will return all tagName that match <selector>
  */
-    var dict;
-    dict = {};
-    Array.from(document.querySelectorAll(selector)).forEach(function (element) {
-        dict[element.tagName.toLowerCase()] = true;
+    var set;
+    set = new Set();
+    Array.from(document.querySelectorAll(
+        selector
+    )).forEach(function (element) {
+        set.add(element.tagName);
     });
-    console.log(Object.keys(dict).sort().join("\n"));
+    return Array.from(set).sort();
 };
 
 local.domStyleValidate = function () {
 /*
- * this function will validate the document's style
+ * this function will validate <style> tags
  */
     var rgx;
     var tmp;
     rgx = (
-        /^0\u0020(?:(body\u0020>\u0020)?(?:form\u0020>\u0020)?(?:\.testReportDiv\u0020.+|\.x-istanbul\u0020.+|\.button|\.colorError|\.uiAnimateShake|\.uiAnimateSlide|a|body|code|div|input|pre|textarea)(?:\[readonly\])?(?:,|\u0020\{))/
+        /^0\u0020(?:(body\u0020>\u0020)?(?:form\u0020>\u0020)?(?:\.testReportDiv\u0020.+|\.x-istanbul\u0020.+|\.button|\.colorError|\.readonly|\.textarea|\.uiAnimateShake|\.uiAnimateSlide|a|body|code|div|input|pre|textarea)(?:,|\u0020\{))|^[1-9]\d*?\u0020#/m
     );
     tmp = [];
     Array.from(
-        // ternary-operator
+        // ternary-condition
         (
             typeof document === "object"
             && document
-            && typeof document.querySelectorAll === "function"
+            && typeof document.querySelector === "function"
         )
-        ? document.querySelectorAll("style")
+        ? document.querySelectorAll(
+            "style"
+        )
         : []
     ).map(function (element, ii) {
         element.innerHTML
@@ -23303,7 +23417,9 @@ local.domStyleValidate = function () {
         .replace((
             /^([^\n\u0020@].*?)[,{:].*?$/gm
         ), function (match0, match1) {
-            ii = document.querySelectorAll(match1).length;
+            ii = document.querySelectorAll(
+                match1
+            ).length;
             if (!(ii > 1)) {
                 tmp.push(ii + " " + match0);
             }
@@ -23315,14 +23431,16 @@ local.domStyleValidate = function () {
     })
     .sort()
     .reverse()
-    .forEach(function (element, ii) {
-        console.error("domStyleValidateUnmatched " + ii + ". " + element);
+    .forEach(function (element, ii, list) {
+        console.error(
+            "domStyleValidateUnmatched " + (list.length - ii) + ". " + element
+        );
     });
 };
 
 local.errorMessagePrepend = function (error, message) {
 /*
- * this function will prepend the message to error.message and error.stack
+ * this function will prepend message to error.message and error.stack
  */
     if (error === local.errorDefault) {
         return;
@@ -23334,7 +23452,7 @@ local.errorMessagePrepend = function (error, message) {
 
 local.exit = function (exitCode, testReport) {
 /*
- * this function will exit the current process with the given exitCode
+ * this function will exit current process with given <exitCode>
  */
     local.onErrorDefault(typeof exitCode !== "number" && exitCode);
     exitCode = (
@@ -23350,27 +23468,29 @@ local.exit = function (exitCode, testReport) {
         return;
     }
     // update coverage
-    (document.querySelector("#coverageReportDiv1") || {}).innerHTML = (
+    (document.querySelector(
+        "#coverageReportDiv1"
+    ) || {}).innerHTML = (
         local.istanbulCoverageReportCreate()
     );
     // save testReport
     globalThis.utility2_testReportSave();
 };
 
-local.fsReadFileOrEmptyStringSync = function (file, options) {
+local.fsReadFileOrEmptyStringSync = function (file, option) {
 /*
- * this function will try to read the file or return empty-string
- * if options === 'json', then try to JSON.parse the file or return null
+ * this function will try to read file or return empty-string, or
+ * if option === "json", then try to JSON.parse file or return null
  */
     try {
         return (
-            options === "json"
+            option === "json"
             ? JSON.parse(local.fs.readFileSync(file, "utf8"))
-            : local.fs.readFileSync(file, options)
+            : local.fs.readFileSync(file, option)
         );
     } catch (ignore) {
         return (
-            options === "json"
+            option === "json"
             ? {}
             : ""
         );
@@ -23379,7 +23499,7 @@ local.fsReadFileOrEmptyStringSync = function (file, options) {
 
 local.fsRmrSync = function (dir) {
 /*
- * this function will synchronously 'rm -fr' the dir
+ * this function will synchronously "rm -fr" dir
  */
     local.child_process.execFileSync(
         "rm",
@@ -23392,9 +23512,16 @@ local.fsRmrSync = function (dir) {
 
 local.fsWriteFileWithMkdirpSync = function (file, data, mode) {
 /*
- * this function will synchronously 'mkdir -p' and write the data to file
+ * this function will synchronously "mkdir -p" and write the <data> to <file>
  */
-    if (mode === "noWrite") {
+    try {
+        if (
+            mode === "noWrite"
+            || typeof require("fs").writeFileSync !== "function"
+        ) {
+            return;
+        }
+    } catch (ignore) {
         return;
     }
     // try to write to file
@@ -23428,7 +23555,8 @@ local.jslintAutofixLocalFunction = function (code, file) {
     var code2;
     var dictFnc;
     var dictProp;
-    if (local.isBrowser || !local.functionAllDict) {
+    var tmp;
+    if (local.isBrowser) {
         return code;
     }
     file = file.replace(process.cwd() + "/", "");
@@ -23451,11 +23579,11 @@ local.jslintAutofixLocalFunction = function (code, file) {
     default:
         return code;
     }
-    // assets.example.begin.js
+    // autofix - assets.example.begin.js
     code = code.replace((
         /^\(function\u0020\(globalThis\)\u0020\{\n[\S\s]*?\n\}\(this\)\);\n/m
     ), local.assetsDict["/assets.example.begin.js"]);
-    // assets.my_app.template.js
+    // autofix - assets.my_app.template.js
     code = local.stringMerge(
         code,
         local.assetsDict["/assets.my_app.template.js"].replace((
@@ -23465,7 +23593,54 @@ local.jslintAutofixLocalFunction = function (code, file) {
             /\n\/\*\u0020istanbul\u0020instrument\u0020in\u0020package\u0020[\S\s]*?\n\/\*\u0020validateLineSortedReset\u0020\*\/\n/
         )
     );
-    // local-function
+    // customize local for assets.utility2.rollup.js
+    if (
+        file === "lib." + process.env.npm_package_nameLib + ".js"
+        && local.fs.existsSync("./assets.utility2.rollup.js")
+        && local.env.npm_package_nameLib !== "swgg"
+    ) {
+        code = code.replace(
+            "    // || globalThis.utility2_rollup_old",
+            "    || globalThis.utility2_rollup_old"
+        ).replace(
+            "    // || require(\"./assets.utility2.rollup.js\")",
+            "    || require(\"./assets.utility2.rollup.js\")"
+        );
+    }
+    // init functionAllDict and functionBaseDict
+    [
+        ["utility2", "swgg"],
+        ["utility2", "apidoc", "db", "github_crud", "swgg"]
+    ].forEach(function (dictList, ii) {
+        tmp = (
+            ii
+            ? "functionAllDict"
+            : "functionBaseDict"
+        );
+        if (local[tmp]) {
+            return;
+        }
+        local[tmp] = {};
+        dictList.forEach(function (dict) {
+            dict = local[dict];
+            Object.keys(dict).forEach(function (key) {
+                if (
+                    !(
+                        /^[A-Z_]|^testCase_/m
+                    ).test(key)
+                    && typeof dict[key] === "function"
+                ) {
+                    local[tmp][key] = local[tmp][key] || String(dict[key]);
+                }
+            });
+        });
+        Object.keys(local[tmp]).forEach(function (key) {
+            if (process.binding("natives")[key]) {
+                local[tmp][key] = undefined;
+            }
+        });
+    });
+    // autofix - local-function
     dictFnc = {};
     dictProp = {};
     code = code.replace((
@@ -23494,8 +23669,7 @@ local.jslintAutofixLocalFunction = function (code, file) {
     });
     // comment
     code2 = code;
-    code2 = code2
-    .replace((
+    code2 = code2.replace((
         /^\u0020*?\/\*[\S\s]*?\*\/|^\u0020*?(?:\/\/.*?|.*?\\)$/gm
     ), "");
     // local-function - update dictFnc and dictProp
@@ -23525,7 +23699,8 @@ local.jslintAutofixLocalFunction = function (code, file) {
         "assertThrow",
         "functionOrNop",
         "identity",
-        "nop"
+        "nop",
+        "objectAssignDefault"
     ].forEach(function (key) {
         dictFnc[key] = true;
         dictProp[key] = true;
@@ -23541,7 +23716,9 @@ local.jslintAutofixLocalFunction = function (code, file) {
     default:
         Object.keys(dictProp).forEach(function (key) {
             if (dictProp[key] && !dictFnc[key]) {
-                console.error("local-function - missing (" + file + ") local." + key);
+                console.error(
+                    "local-function - missing (" + file + ") local." + key
+                );
             }
         });
     }
@@ -23554,7 +23731,9 @@ local.jslintAutofixLocalFunction = function (code, file) {
     default:
         Object.keys(dictFnc).forEach(function (key) {
             if (!dictProp.hasOwnProperty(key)) {
-                console.error("local-function - unused (" + file + ") local." + key);
+                console.error(
+                    "local-function - unused (" + file + ") local." + key
+                );
             }
         });
     }
@@ -23613,39 +23792,33 @@ local.jsonStringifyOrdered = function (obj, replacer, space) {
             circularSet.delete(obj);
             return tmp;
         }
-        // if obj is not an array, then recurse its items with object-keys sorted
-        tmp = "{" + Object.keys(obj)
-        // sort object-keys
-        .sort()
-        .map(function (key) {
+        // if obj is not an array,
+        // then recurse its items with object-keys sorted
+        tmp = "{" + Object.keys(obj).sort().map(function (key) {
             // recurse
             tmp = stringify(obj[key]);
             if (typeof tmp === "string") {
                 return JSON.stringify(key) + ":" + tmp;
             }
-        })
-        .filter(function (obj) {
+        }).filter(function (obj) {
             return typeof obj === "string";
-        })
-        .join(",") + "}";
+        }).join(",") + "}";
         circularSet.delete(obj);
         return tmp;
     };
     circularSet = new Set();
-    return JSON.stringify(
+    return JSON.stringify((
         (typeof obj === "object" && obj)
         // recurse
         ? JSON.parse(stringify(obj))
-        : obj,
-        replacer,
-        space
-    );
+        : obj
+    ), replacer, space);
 };
 
 local.jwtAes256GcmDecrypt = function (token, key) {
 /*
  * this function will use json-web-encryption to
- * aes-256-gcm-decrypt the token with the given base64url-encoded key
+ * aes-256-gcm-decrypt the token with given base64url-encoded <key>
  * https://tools.ietf.org/html/rfc7516
  */
     return local.tryCatchOnError(function () {
@@ -23674,7 +23847,7 @@ local.jwtAes256GcmDecrypt = function (token, key) {
 local.jwtAes256GcmEncrypt = function (data, key) {
 /*
  * this function will use json-web-encryption to
- * aes-256-gcm-encrypt the data with the given base64url-encoded key
+ * aes-256-gcm-encrypt the data with given base64url-encoded <key>
  * https://tools.ietf.org/html/rfc7516
  */
     var adata;
@@ -23719,7 +23892,7 @@ local.jwtAes256KeyInit = function (key) {
 
 local.jwtHs256Decode = function (token, key) {
 /*
- * this function will decode the json-web-token with the given base64-encoded key
+ * this function will decode the json-web-token with given base64-encoded <key>
  * https://jwt.io/
  */
     var Hmac;
@@ -23730,7 +23903,10 @@ local.jwtHs256Decode = function (token, key) {
     return local.tryCatchOnError(function () {
         token = token.split(".");
         // validate header
-        local.assertThrow(token[0] === "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9", token);
+        local.assertThrow(
+            token[0] === "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+            token
+        );
         // validate signature
         local.assertThrow(local.sjcl.codec.base64url.fromBits(
             new Hmac(local.sjcl.codec.base64url.toBits(
@@ -23738,7 +23914,7 @@ local.jwtHs256Decode = function (token, key) {
             )).encrypt(token[0] + "." + token[1])
         ) === token[2]);
         // return decoded data
-        token = JSON.parse(local.base64ToString(token[1]));
+        token = JSON.parse(local.base64ToUtf8(token[1]));
         // https://tools.ietf.org/html/rfc7519#section-4.1
         // validate jwt-registered-headers
         local.assertThrow(!token.exp || token.exp >= timeNow);
@@ -23750,14 +23926,16 @@ local.jwtHs256Decode = function (token, key) {
 local.jwtHs256Encode = function (data, key) {
 /*
  * this function will encode the data into a json-web-token
- * with the given base64-encoded key
+ * with given base64-encoded <key>
  * https://jwt.io/
  */
     var Hmac;
     Hmac = local.sjcl.misc.hmac;
     data = (
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
-        + local.normalizeJwtBase64Url(local.base64FromBuffer(JSON.stringify(data)))
+        + local.normalizeJwtBase64Url(
+            local.base64FromBuffer(JSON.stringify(data))
+        )
     );
     return data + "." + local.sjcl.codec.base64url.fromBits(
         new Hmac(local.sjcl.codec.base64url.toBits(
@@ -23808,15 +23986,17 @@ local.middlewareAssetsCached = function (request, response, nextMiddleware) {
 /*
  * this function will run the middleware that will serve cached-assets
  */
-    var options;
-    options = {};
-    local.onNext(options, function (error, data) {
-        options.result = options.result || local.assetsDict[request.urlParsed.pathname];
-        if (options.result === undefined) {
+    var option;
+    option = {};
+    local.onNext(option, function (error, data) {
+        option.result = (
+            option.result || local.assetsDict[request.urlParsed.pathname]
+        );
+        if (option.result === undefined) {
             nextMiddleware(error);
             return;
         }
-        switch (options.modeNext) {
+        switch (option.modeNext) {
         case 1:
             // skip gzip
             if (
@@ -23825,8 +24005,8 @@ local.middlewareAssetsCached = function (request, response, nextMiddleware) {
                     /\bgzip\b/
                 ).test(request.headers["accept-encoding"])
             ) {
-                options.modeNext += 1;
-                options.onNext();
+                option.modeNext += 1;
+                option.onNext();
                 return;
             }
             // gzip and cache result
@@ -23834,28 +24014,32 @@ local.middlewareAssetsCached = function (request, response, nextMiddleware) {
                 cacheDict: "middlewareAssetsCachedGzip",
                 key: request.urlParsed.pathname
             }, function (onError) {
-                local.zlib.gzip(options.result, function (error, data) {
+                local.zlib.gzip(option.result, function (error, data) {
                     onError(error, !error && data.toString("base64"));
                 });
-            }, options.onNext);
+            }, option.onNext);
             break;
         case 2:
             // set gzip header
-            options.result = local.base64ToBuffer(data);
+            option.result = local.base64ToBuffer(data);
             response.setHeader("Content-Encoding", "gzip");
-            response.setHeader("Content-Length", options.result.length);
-            options.onNext();
+            response.setHeader("Content-Length", option.result.length);
+            option.onNext();
             break;
         case 3:
-            local.middlewareCacheControlLastModified(request, response, options.onNext);
+            local.middlewareCacheControlLastModified(
+                request,
+                response,
+                option.onNext
+            );
             break;
         case 4:
-            response.end(options.result);
+            response.end(option.result);
             break;
         }
     });
-    options.modeNext = 0;
-    options.onNext();
+    option.modeNext = 0;
+    option.onNext();
 };
 
 local.middlewareBodyRead = function (request, ignore, nextMiddleware) {
@@ -23874,9 +24058,14 @@ local.middlewareBodyRead = function (request, ignore, nextMiddleware) {
     });
 };
 
-local.middlewareCacheControlLastModified = function (request, response, nextMiddleware) {
+local.middlewareCacheControlLastModified = function (
+    request,
+    response,
+    nextMiddleware
+) {
 /*
- * this function will run the middleware that will update the response-header Last-Modified
+ * this function will run the middleware
+ * that will update the response-header Last-Modified
  */
     // do not cache if headers already sent or url has '?' search indicator
     if (response.headersSent || request.url.indexOf("?") >= 0) {
@@ -23920,14 +24109,11 @@ local.middlewareError = function (error, request, response) {
         local.swgg.serverRespondJsonapi(request, response, error);
     }
     // statusCode [400, 600)
-    local.serverRespondDefault(
-        request,
-        response,
+    local.serverRespondDefault(request, response, (
         (error.statusCode >= 400 && error.statusCode < 600)
         ? error.statusCode
-        : 500,
-        error
-    );
+        : 500
+    ), error);
 };
 
 local.middlewareFileServer = function (request, response, nextMiddleware) {
@@ -23980,7 +24166,7 @@ local.middlewareForwardProxy = function (request, response, nextMiddleware) {
  */
     var isDone;
     var onError;
-    var options;
+    var option;
     var timerTimeout;
     // handle preflight-cors
     if (request.method === "OPTIONS" && (
@@ -24006,56 +24192,56 @@ local.middlewareForwardProxy = function (request, response, nextMiddleware) {
         clearTimeout(timerTimeout);
         // debug middlewareForwardProxy
         console.error("serverLog - " + JSON.stringify({
-            time: new Date(options.timeStart).toISOString(),
+            time: new Date(option.timeStart).toISOString(),
             type: "middlewareForwardProxyResponse",
-            method: options.method,
-            url: options.url,
+            method: option.method,
+            url: option.url,
             statusCode: response.statusCode | 0,
-            timeElapsed: Date.now() - options.timeStart,
+            timeElapsed: Date.now() - option.timeStart,
             // extra
-            headers: options.headers
+            headers: option.headers
         }));
         if (!error) {
             return;
         }
         // cleanup clientRequest and clientResponse
-        local.streamCleanup(options.clientRequest);
-        local.streamCleanup(options.clientResponse);
+        local.streamCleanup(option.clientRequest);
+        local.streamCleanup(option.clientResponse);
         nextMiddleware(error);
     };
-    // init options
-    options = local.urlParse(request.headers["forward-proxy-url"]);
-    options.method = request.method;
-    options.url = request.headers["forward-proxy-url"];
+    // init option
+    option = local.urlParse(request.headers["forward-proxy-url"]);
+    option.method = request.method;
+    option.url = request.headers["forward-proxy-url"];
     // init timerTimeout
     timerTimeout = local.onTimeout(
         onError,
         local.timeoutDefault,
-        "forward-proxy " + options.method + " " + options.url
+        "forward-proxy " + option.method + " " + option.url
     );
     // parse headers
-    options.headers = {};
+    option.headers = {};
     local.tryCatchOnError(function () {
-        options.headers = JSON.parse(request.headers["forward-proxy-headers"]);
+        option.headers = JSON.parse(request.headers["forward-proxy-headers"]);
     }, local.nop);
-    // debug options
-    local._debugForwardProxy = options;
-    options.clientRequest = (
-        options.protocol === "https:"
+    // debug option
+    local._debugForwardProxy = option;
+    option.clientRequest = (
+        option.protocol === "https:"
         ? local.https
         : local.http
-    ).request(options, function (clientResponse) {
-        options.clientResponse = clientResponse.on("error", onError);
-        response.statusCode = options.clientResponse.statusCode;
+    ).request(option, function (clientResponse) {
+        option.clientResponse = clientResponse.on("error", onError);
+        response.statusCode = option.clientResponse.statusCode;
         // pipe clientResponse to serverResponse
-        options.clientResponse.pipe(response);
+        option.clientResponse.pipe(response);
     }).on("error", onError);
-    options.timeStart = Date.now();
+    option.timeStart = Date.now();
     // init event-handling
     request.on("error", onError);
     response.on("finish", onError).on("error", onError);
     // pipe serverRequest to clientRequest
-    request.pipe(options.clientRequest);
+    request.pipe(option.clientRequest);
 };
 
 local.middlewareInit = function (request, response, nextMiddleware) {
@@ -24093,7 +24279,7 @@ local.middlewareInit = function (request, response, nextMiddleware) {
 local.middlewareJsonpStateInit = function (request, response, nextMiddleware) {
 /*
  * this function will run the middleware that will
- * serve the browser-state wrapped in the given jsonp-callback
+ * serve the browser-state wrapped in given jsonp-callback
  */
     var state;
     if (!(request.stateInit || (
@@ -24106,11 +24292,14 @@ local.middlewareJsonpStateInit = function (request, response, nextMiddleware) {
     state = {
         utility2: {
             assetsDict: {
-                "/assets.example.html": local.assetsDict["/assets.example.html"],
+                "/assets.example.html":
+                local.assetsDict["/assets.example.html"],
                 "/assets.example.js": local.assetsDict["/assets.example.js"],
-                "/assets.swgg.swagger.json": local.assetsDict["/assets.swgg.swagger.json"],
+                "/assets.swgg.swagger.json":
+                local.assetsDict["/assets.swgg.swagger.json"],
                 "/assets.test.js": local.assetsDict["/assets.test.js"],
-                "/assets.utility2.base.html": local.assetsDict["/assets.utility2.base.rollup.html"],
+                "/assets.utility2.base.html":
+                local.assetsDict["/assets.utility2.base.rollup.html"],
                 "/index.rollup.html": local.assetsDict["/index.rollup.html"]
             },
             env: {
@@ -24125,7 +24314,9 @@ local.middlewareJsonpStateInit = function (request, response, nextMiddleware) {
             }
         }
     };
-    (local.env.npm_package_assetsList || "").split(" ").forEach(function (file) {
+    (local.env.npm_package_assetsList || "").split(" ").forEach(function (
+        file
+    ) {
         local.assetsDict["/" + file] = (
             local.assetsDict["/" + file]
             || local.fsReadFileOrEmptyStringSync(file, "utf8")
@@ -24135,7 +24326,9 @@ local.middlewareJsonpStateInit = function (request, response, nextMiddleware) {
     if (request.stateInit) {
         return state;
     }
-    response.end(request.urlParsed.query.callback + "(" + JSON.stringify(state) + ");");
+    response.end(
+        request.urlParsed.query.callback + "(" + JSON.stringify(state) + ");"
+    );
 };
 
 local.moduleDirname = function (module, modulePathList) {
@@ -24154,7 +24347,10 @@ local.moduleDirname = function (module, modulePathList) {
     .concat([process.env.HOME + "/node_modules", "/usr/local/lib/node_modules"])
     .some(function (modulePath) {
         try {
-            result = require("path").resolve(process.cwd(), modulePath + "/" + module);
+            result = require("path").resolve(
+                process.cwd(),
+                modulePath + "/" + module
+            );
             result = require("fs").statSync(result).isDirectory() && result;
             return result;
         } catch (ignore) {
@@ -24189,7 +24385,7 @@ local.normalizeJwt = function (data) {
 
 local.normalizeJwtBase64Url = function (b64) {
 /*
- * this function will normlize b64 to base64url format
+ * this function will normlize <b64> to base64url format
  */
     return b64
     .replace((
@@ -24227,24 +24423,6 @@ local.numberToRomanNumerals = function (num) {
     return new Array(Number(digits.join("") + 1)).join("M") + roman;
 };
 
-local.objectLiteralize = function (dict) {
-/*
- * this function will traverse dict, and replace every encounter of the magical key '$[]'
- * with its object literal [key, value]
- */
-    local.objectTraverse(dict, function (element) {
-        if (typeof element === "object" && element && !Array.isArray(element)) {
-            Object.keys(element).forEach(function (key) {
-                if (key.indexOf("$[]") === 0) {
-                    element[element[key][0]] = element[key][1];
-                    delete element[key];
-                }
-            });
-        }
-    });
-    return dict;
-};
-
 local.objectSetDefault = function (dict, defaults, depth) {
 /*
  * this function will recursively set defaults for undefined-items in dict
@@ -24277,7 +24455,8 @@ local.objectSetDefault = function (dict, defaults, depth) {
             // dict2 is a non-null and non-array object
             && typeof dict2 === "object" && dict2 && !Array.isArray(dict2)
             // defaults2 is a non-null and non-array object
-            && typeof defaults2 === "object" && defaults2 && !Array.isArray(defaults2)
+            && typeof defaults2 === "object" && defaults2
+            && !Array.isArray(defaults2)
         ) {
             // recurse
             local.objectSetDefault(dict2, defaults2, depth - 1);
@@ -24322,22 +24501,6 @@ local.objectSetOverride = function (dict, overrides, depth, env) {
             : overrides2
         );
     });
-    return dict;
-};
-
-local.objectTraverse = function (dict, onSelf, circularList) {
-/*
- * this function will recursively traverse dict, and run onSelf with dict's properties
- */
-    onSelf(dict);
-    circularList = circularList || [];
-    if (dict && typeof dict === "object" && circularList.indexOf(dict) < 0) {
-        circularList.push(dict);
-        Object.keys(dict).forEach(function (key) {
-            // recurse with dict[key]
-            local.objectTraverse(dict[key], onSelf, circularList);
-        });
-    }
     return dict;
 };
 
@@ -24413,21 +24576,21 @@ local.onFileModifiedRestart = function (file) {
     }
 };
 
-local.onNext = function (options, onError) {
+local.onNext = function (option, onError) {
 /*
- * this function will wrap onError inside the recursive function options.onNext,
+ * this function will wrap onError inside recursive-function <option>.onNext,
  * and append the current stack to any error
  */
-    options.onNext = local.onErrorWithStack(function (error, data, meta) {
+    option.onNext = local.onErrorWithStack(function (error, data, meta) {
         try {
-            options.modeNext += (
-                (error && !options.modeErrorIgnore)
+            option.modeNext += (
+                (error && !option.modeErrorIgnore)
                 ? 1000
                 : 1
             );
-            if (options.modeDebug) {
+            if (option.modeDebug) {
                 console.error("onNext - " + JSON.stringify({
-                    modeNext: options.modeNext,
+                    modeNext: option.modeNext,
                     errorMessage: error && error.message
                 }));
                 if (error && error.stack) {
@@ -24437,14 +24600,14 @@ local.onNext = function (options, onError) {
             onError(error, data, meta);
         } catch (errorCaught) {
             // throw errorCaught to break infinite recursion-loop
-            if (options.errorCaught) {
-                local.assertThrow(null, options.errorCaught);
+            if (option.errorCaught) {
+                local.assertThrow(null, option.errorCaught);
             }
-            options.errorCaught = errorCaught;
-            options.onNext(errorCaught, data, meta);
+            option.errorCaught = errorCaught;
+            option.onNext(errorCaught, data, meta);
         }
     });
-    return options;
+    return option;
 };
 
 local.onParallel = function (onError, onEach, onRetry) {
@@ -24465,7 +24628,9 @@ local.onParallel = function (onError, onEach, onRetry) {
         onParallel.counter -= 1;
         // validate counter
         if (!(onParallel.counter >= 0 || error || onParallel.error)) {
-            error = new Error("invalid onParallel.counter = " + onParallel.counter);
+            error = new Error(
+                "invalid onParallel.counter = " + onParallel.counter
+            );
         // ensure onError is run only once
         } else if (onParallel.counter < 0) {
             return;
@@ -24489,37 +24654,37 @@ local.onParallel = function (onError, onEach, onRetry) {
     return onParallel;
 };
 
-local.onParallelList = function (options, onEach, onError) {
+local.onParallelList = function (option, onEach, onError) {
 /*
  * this function will
  * 1. async-run onEach in parallel,
- *    with the given options.rateLimit and options.retryLimit
- * 2. call onError when onParallel.ii + 1 === options.list.length
+ *    with given option.rateLimit and option.retryLimit
+ * 2. call onError when onParallel.ii + 1 === option.list.length
  */
     var isListEnd;
     var onEach2;
     var onParallel;
-    options.list = options.list || [];
+    option.list = option.list || [];
     onEach2 = function () {
         while (true) {
-            if (!(onParallel.ii + 1 < options.list.length)) {
+            if (!(onParallel.ii + 1 < option.list.length)) {
                 isListEnd = true;
                 return;
             }
-            if (!(onParallel.counter < options.rateLimit + 1)) {
+            if (!(onParallel.counter < option.rateLimit + 1)) {
                 return;
             }
             onParallel.ii += 1;
             onEach({
-                element: options.list[onParallel.ii],
+                element: option.list[onParallel.ii],
                 ii: onParallel.ii,
-                list: options.list,
+                list: option.list,
                 retry: 0
             }, onParallel);
         }
     };
     onParallel = local.onParallel(onError, onEach2, function (error, data) {
-        if (error && data && data.retry < options.retryLimit) {
+        if (error && data && data.retry < option.retryLimit) {
             local.onErrorDefault(error);
             data.retry += 1;
             setTimeout(function () {
@@ -24528,16 +24693,16 @@ local.onParallelList = function (options, onEach, onError) {
             }, 1000);
             return true;
         }
-        // restart if options.list has grown
-        if (isListEnd && (onParallel.ii + 1 < options.list.length)) {
+        // restart if option.list has grown
+        if (isListEnd && (onParallel.ii + 1 < option.list.length)) {
             isListEnd = null;
             onEach2();
         }
     });
     onParallel.ii = -1;
-    options.rateLimit = Number(options.rateLimit) || 6;
-    options.rateLimit = Math.max(options.rateLimit, 1);
-    options.retryLimit = Number(options.retryLimit) || 2;
+    option.rateLimit = Number(option.rateLimit) || 6;
+    option.rateLimit = Math.max(option.rateLimit, 1);
+    option.retryLimit = Number(option.retryLimit) || 2;
     onParallel.counter += 1;
     onEach2();
     onParallel();
@@ -24560,20 +24725,22 @@ local.onTimeout = function (onError, timeout, message) {
 
 local.profile = function (fnc, onError) {
 /*
- * this function will profile the async fnc in milliseconds with the callback onError
+ * this function will profile async <fnc> in milliseconds
+ * with callback <onError>
  */
     var timeStart;
     timeStart = Date.now();
     // run async fnc
     fnc(function (error) {
-        // call onError with difference in milliseconds between Date.now() and timeStart
+        // call onError with difference in milliseconds
+        // between Date.now() and timeStart
         onError(error, Date.now() - timeStart);
     });
 };
 
 local.profileSync = function (fnc) {
 /*
- * this function will profile the sync fnc in milliseconds
+ * this function will profile sync <fnc> in milliseconds
  */
     var timeStart;
     timeStart = Date.now();
@@ -24588,46 +24755,52 @@ local.replStart = function () {
  * this function will start the repl-debugger
  */
     var that;
-    if (globalThis.utility2_serverRepl1) {
+    if (globalThis.utility2_repl1) {
         return;
     }
-    // start replServer
+    // start repl
     that = require("repl").start({
         useGlobal: true
     });
-    globalThis.utility2_serverRepl1 = that;
+    globalThis.utility2_repl1 = that;
     that.onError = function (error) {
     /*
-     * this function will debug any repl-error
+     * this function will debug repl-error
      */
-        // debug error
         globalThis.utility2_debugReplError = error;
         console.error(error);
     };
-    // save repl eval function
+    // save eval-function
     that.evalDefault = that.eval;
-    // hook custom repl eval function
+    // hook custom-eval-function
     that.eval = function (script, context, file, onError) {
         var onError2;
         onError2 = function (error, data) {
             // debug error
-            globalThis.utility2_debugReplError = error || globalThis.utility2_debugReplError;
+            globalThis.utility2_debugReplError = (
+                error
+                || globalThis.utility2_debugReplError
+            );
             onError(error, data);
         };
         script.replace((
             /^(\S+)\u0020(.*?)\n/
         ), function (ignore, match1, match2) {
             switch (match1) {
-            // syntax-sugar to run async shell-command
+            // syntax-sugar - run async shell-command
             case "$":
                 switch (match2) {
-                // syntax-sugar to run git diff
+                // syntax-sugar - run git diff
                 case "git diff":
                     match2 = "git diff --color | cat";
                     break;
-                // syntax-sugar to run git log
+                // syntax-sugar - run git log
                 case "git log":
                     match2 = "git log -n 4 | cat";
+                    break;
+                // syntax-sugar - run git log
+                case "ll":
+                    match2 = "ls -Fal";
                     break;
                 }
                 // source lib.utility2.sh
@@ -24641,9 +24814,8 @@ local.replStart = function () {
                 require("child_process").spawn(match2, {
                     shell: true,
                     stdio: ["ignore", 1, 2]
-                })
                 // on shell exit, print return prompt
-                .on("exit", function (exitCode) {
+                }).on("exit", function (exitCode) {
                     console.error("exit-code " + exitCode);
                     that.evalDefault(
                         "\n",
@@ -24654,21 +24826,24 @@ local.replStart = function () {
                 });
                 script = "\n";
                 break;
-            // syntax-sugar to map text with charCodeAt
+            // syntax-sugar - map text with charCodeAt
             case "charCode":
-                script = "console.error(" + JSON.stringify(
+                console.error(
                     match2.split("").map(function (chr) {
-                        return "\\u" + chr.charCodeAt(0).toString(16).padStart(4, 0);
+                        return (
+                            "\\u"
+                            + chr.charCodeAt(0).toString(16).padStart(4, 0)
+                        );
                     }).join("")
-                ) + ")\n";
+                );
+                script = "\n";
                 break;
-            // syntax-sugar to sort chr
+            // syntax-sugar - sort chr
             case "charSort":
-                script = "console.error(" + JSON.stringify(
-                    match2.split("").sort().join("")
-                ) + ")\n";
+                console.error(JSON.stringify(match2.split("").sort().join("")));
+                script = "\n";
                 break;
-            // syntax-sugar to grep current dir
+            // syntax-sugar - grep current dir
             case "grep":
                 // run async shell-command
                 require("child_process").spawn((
@@ -24711,28 +24886,31 @@ vendor)s{0,1}(\\b|_)\
                 });
                 script = "\n";
                 break;
-            // syntax-sugar to list object's keys, sorted by item-type
-            // console.log(Object.keys(globalThis).map(function(key){return(typeof window[key]==='object'&&window[key]&&window[key]===globalThis[key]?'globalThis':typeof window[key])+' '+key;}).sort().join('\n'))
+            // syntax-sugar - list object's keys, sorted by item-type
+            // console.error(Object.keys(global).map(function(key){return(typeof global[key]==='object'&&global[key]&&global[key]===global[key]?'global':typeof global[key])+' '+key;}).sort().join('\n')) // jslint ignore:line
             case "keys":
                 script = (
-                    "console.log(Object.keys(" + match2 + ").map(function(key){return("
+                    "console.error(Object.keys(" + match2
+                    + ").map(function(key){return("
                     + "typeof " + match2 + "[key]==='object'&&"
                     + match2 + "[key]&&"
-                    + match2 + "[key]===globalThis[key]"
-                    + "?'globalThis'"
+                    + match2 + "[key]===global[key]"
+                    + "?'global'"
                     + ":typeof " + match2 + "[key]"
                     + ")+' '+key;"
                     + "}).sort().join('\\n'))\n"
                 );
                 break;
-            // syntax-sugar to print stringified arg
+            // syntax-sugar - print stringified arg
             case "print":
                 script = "console.error(String(" + match2 + "))\n";
                 break;
-            // syntax-sugar to read file
+            // syntax-sugar - read file
             case "readFile":
                 try {
-                    globalThis.readFileData = require("fs").readFileSync(match2, "utf8");
+                    console.error(JSON.stringify(
+                        require("fs").readFileSync(match2, "utf8")
+                    ));
                 } catch (errorCaught) {
                     console.error(errorCaught);
                 }
@@ -24760,8 +24938,10 @@ vendor)s{0,1}(\\b|_)\
             that.socket.write(chunk, encoding);
         }()));
     };
-    // start tcp-server
-    globalThis.utility2_serverReplTcp1 = require("net").createServer(function (socket) {
+    // start serverRepl1
+    globalThis.utility2_serverRepl1 = require("net").createServer(function (
+        socket
+    ) {
         // init socket
         that.socket = socket;
         that.socket.on("data", that.write.bind(that));
@@ -24770,8 +24950,10 @@ vendor)s{0,1}(\\b|_)\
     });
     // coverage-hack - ignore else-statement
     local.nop(process.env.PORT_REPL && (function () {
-        console.error("repl-server listening on tcp-port " + process.env.PORT_REPL);
-        globalThis.utility2_serverReplTcp1.listen(process.env.PORT_REPL);
+        console.error(
+            "repl-server listening on port " + process.env.PORT_REPL
+        );
+        globalThis.utility2_serverRepl1.listen(process.env.PORT_REPL);
     }()));
 };
 
@@ -24849,6 +25031,17 @@ local.requireReadme = function () {
     // start repl-debugger
     local.replStart();
     // debug dir
+    [
+        __dirname + "/lib.jslint.js",
+        __filename,
+        "undefined"
+    ].forEach(function (file) {
+        local.fs.exists(file, function (exists) {
+            if (exists) {
+                local.onFileModifiedRestart(file);
+            }
+        });
+    });
     local.fs.readdirSync(process.cwd()).forEach(function (file) {
         file = process.cwd() + "/" + file;
         // if the file is modified, then restart the process
@@ -24865,61 +25058,22 @@ local.requireReadme = function () {
             });
             break;
         }
-        switch ((
-            /\.\w+?$|$/m
-        ).exec(file)[0]) {
-        case ".css":
-        case ".html":
-        case ".js":
-        case ".json":
-        case ".md":
-        case ".sh":
-            if ((
-                /\b(?:assets\.app\.js|lock|raw|rollup)\b/
-            ).test(file) || local.env.npm_config_mode_test) {
-                return;
-            }
-            // jslint file
-            local.fs.readFile(file, "utf8", function (error, data) {
-                local.jslintAndPrint(!error && data, file, {
-                    autofix: true,
-                    conditional: true,
-                    coverage: globalThis.__coverage__
-                });
-            });
-            break;
-        }
     });
-    // init functionAllDict and functionBaseDict
-    [
-        ["utility2", "swgg"],
-        ["utility2", "apidoc", "db", "github_crud", "swgg"]
-    ].forEach(function (dictList, ii) {
-        tmp = (
-            ii
-            ? "functionAllDict"
-            : "functionBaseDict"
-        );
-        local[tmp] = {};
-        dictList.forEach(function (dict) {
-            dict = local[dict];
-            Object.keys(dict).forEach(function (key) {
-                if (
-                    !(
-                        /^[A-Z_]|^testCase_/m
-                    ).test(key)
-                    && typeof dict[key] === "function"
-                ) {
-                    local[tmp][key] = local[tmp][key] || String(dict[key]);
-                }
-            });
+    // jslint process.cwd()
+    if (!local.env.npm_config_mode_library) {
+        local.child_process.spawn("node", ["-e", (
+            "require("
+            + JSON.stringify(__filename)
+            + ").jslint.jslintAndPrintDir("
+            + JSON.stringify(process.cwd())
+            + ", {autofix:true,conditional:true}, process.exit);"
+        )], {
+            env: local.objectAssignDefault({
+                npm_config_mode_library: "1"
+            }, local.env),
+            stdio: ["ignore", "ignore", 2]
         });
-        Object.keys(local[tmp]).forEach(function (key) {
-            if (process.binding("natives")[key]) {
-                local[tmp][key] = undefined;
-            }
-        });
-    });
+    }
     if (globalThis.utility2_rollup || local.env.npm_config_mode_start) {
         // init assets
         local.assetsDict["/index.html"] = (
@@ -24927,8 +25081,10 @@ local.requireReadme = function () {
             || local.assetsDict["/index.rollup.html"] || ""
         );
         local.assetsDict["/"] = local.assetsDict["/index.html"];
-        local.assetsDict["/assets.app.js"] = local.fs.readFileSync(__filename, "utf8")
-        .replace((
+        local.assetsDict["/assets.app.js"] = local.fs.readFileSync(
+            __filename,
+            "utf8"
+        ).replace((
             /^#!\//
         ), "// ");
         // init exports
@@ -24942,15 +25098,15 @@ local.requireReadme = function () {
     );
     globalThis.utility2_moduleExports.globalThis = globalThis;
     // read code from README.md
-    code = local.templateRenderMyApp(local.assetsDict["/assets.example.template.js"], {});
+    code = local.templateRenderMyApp(
+        local.assetsDict["/assets.example.template.js"],
+        {}
+    );
     local.tryCatchOnError(function () {
         tmp = (
-            !local.env.npm_package_buildCustomOrg
-            && (
-                /```\w*?(\n[\W\s]*?example\.js[\n"][\S\s]*?)\n```/
-            ).exec(
-                local.fs.readFileSync("README.md", "utf8")
-            )
+            /```\w*?(\n[\W\s]*?example\.js[\n"][\S\s]*?)\n```/
+        ).exec(
+            local.fs.readFileSync("README.md", "utf8")
         );
         code = tmp.input.slice(0, tmp.index).replace((
             /.+/g
@@ -24979,7 +25135,9 @@ local.requireReadme = function () {
     module._compile(code, tmp);
     // init exports
     module.exports.utility2 = local;
-    module.exports[local.env.npm_package_nameLib] = globalThis.utility2_moduleExports;
+    module.exports[local.env.npm_package_nameLib] = (
+        globalThis.utility2_moduleExports
+    );
     // init assets
     tmp = process.cwd() + "/" + local.env.npm_package_main;
     local.assetsDict["/assets." + local.env.npm_package_nameLib + ".js"] = (
@@ -24990,7 +25148,9 @@ local.requireReadme = function () {
     local.objectSetOverride(local.assetsDict, module.exports.assetsDict);
     local.assetsDict["/assets." + local.env.npm_package_nameLib + ".js"] = (
         local.istanbulInstrumentInPackage(
-            local.assetsDict["/assets." + local.env.npm_package_nameLib + ".js"],
+            local.assetsDict[
+                "/assets." + local.env.npm_package_nameLib + ".js"
+            ],
             tmp
         )
     );
@@ -25008,7 +25168,10 @@ local.requireReadme = function () {
                 local.fsReadFileOrEmptyStringSync(tmp, "utf8")
                 || local.assetsDict["/" + tmp]
             );
-            file = file.replace("utility2", "assets.utility2.base") + isRollup + ".html";
+            file = (
+                file.replace("utility2", "assets.utility2.base") + isRollup
+                + ".html"
+            );
             local.assetsDict["/" + file] = local.fsReadFileOrEmptyStringSync(
                 file,
                 "utf8"
@@ -25067,14 +25230,12 @@ instruction\n\
             code.splice(
                 1,
                 0,
-                "local.assetsDict[\"" + tmp + "\"] = " + JSON.stringify(local.assetsDict[tmp])
-                .replace((
+                "local.assetsDict[\"" + tmp + "\"] = "
+                + JSON.stringify(local.assetsDict[tmp]).replace((
                     /\\\\/g
-                ), "\u0000")
-                .replace((
+                ), "\u0000").replace((
                     /\\n/g
-                ), "\\n\\\n")
-                .replace((
+                ), "\\n\\\n").replace((
                     /\u0000/g
                 ), "\\\\")
             );
@@ -25120,7 +25281,9 @@ instruction\n\
             key.indexOf("_testCase_build") === 0
             || key === "_testCase_webpage_default"
         ) {
-            module.exports[key.slice(1)] = module.exports[key.slice(1)] || local[key];
+            module.exports[key.slice(1)] = (
+                module.exports[key.slice(1)] || local[key]
+            );
         }
     });
     return module.exports;
@@ -25158,8 +25321,10 @@ local.serverRespondCors = function (request, response) {
  * http://en.wikipedia.org/wiki/Cross-origin_resource_sharing
  */
     local.serverRespondHeadSet(request, response, null, local.jsonCopy({
-        "access-control-allow-headers": request.headers["access-control-request-headers"],
-        "access-control-allow-methods": request.headers["access-control-request-method"],
+        "access-control-allow-headers":
+        request.headers["access-control-request-headers"],
+        "access-control-allow-methods":
+        request.headers["access-control-request-method"],
         "access-control-allow-origin": "*"
     }));
 };
@@ -25167,7 +25332,7 @@ local.serverRespondCors = function (request, response) {
 local.serverRespondDefault = function (request, response, statusCode, error) {
 /*
  * this function will respond with a default message,
- * or error.stack for the given statusCode
+ * or error.stack for given statusCode
  */
     // init statusCode and contentType
     local.serverRespondHeadSet(
@@ -25182,7 +25347,8 @@ local.serverRespondDefault = function (request, response, statusCode, error) {
         // debug statusCode / method / url
         local.errorMessagePrepend(
             error,
-            response.statusCode + " " + request.method + " " + request.url + "\n"
+            response.statusCode + " " + request.method + " " + request.url
+            + "\n"
         );
         // print error.stack to stderr
         local.onErrorDefault(error);
@@ -25251,7 +25417,8 @@ local.serverRespondTimeoutDefault = function (request, response, timeout) {
             // extra
             requestContentLength: request.dataLength || 0,
             responseContentLength: response.contentLength,
-            requestHeaderXForwardedFor: request.headers["x-forwarded-for"] || "",
+            requestHeaderXForwardedFor:
+            request.headers["x-forwarded-for"] || "",
             requestHeaderOrigin: request.headers.origin || "",
             requestHeaderReferer: request.headers.referer || "",
             requestHeaderUserAgent: request.headers["user-agent"]
@@ -25297,32 +25464,32 @@ local.setTimeoutOnError = function (onError, timeout, error, data) {
     return data;
 };
 
-local.sjclHashScryptCreate = function (password, options) {
+local.sjclHashScryptCreate = function (password, option) {
 /*
  * this function will create a scrypt-hash of the password
- * with the given options (default = $s0$10801)
+ * with given option (default = $s0$10801)
  * e.g. $s0$e0801$epIxT/h6HbbwHaehFnh/bw==$7H0vsXlY8UxxyW/BWx/9GuY7jEvGjT71GFd6O4SZND0=
  * https://github.com/wg/scrypt
  */
-    // init options
-    options = (options || "$s0$10801").split("$");
+    // init option
+    option = (option || "$s0$10801").split("$");
     // init salt
-    if (!options[3]) {
-        options[3] = local.sjcl.codec.base64.fromBits(
+    if (!option[3]) {
+        option[3] = local.sjcl.codec.base64.fromBits(
             local.sjcl.random.randomWords(4, 0)
         );
     }
     // init hash
-    options[4] = local.sjcl.codec.base64.fromBits(
+    option[4] = local.sjcl.codec.base64.fromBits(
         local.sjcl.misc.scrypt(
             password || "",
-            local.sjcl.codec.base64.toBits(options[3]),
-            Math.pow(2, parseInt(options[2].slice(0, 1), 16)),
-            parseInt(options[2].slice(1, 2), 16),
-            parseInt(options[2].slice(3, 4), 16)
+            local.sjcl.codec.base64.toBits(option[3]),
+            Math.pow(2, parseInt(option[2].slice(0, 1), 16)),
+            parseInt(option[2].slice(1, 2), 16),
+            parseInt(option[2].slice(3, 4), 16)
         )
     );
-    return options.slice(0, 5).join("$");
+    return option.slice(0, 5).join("$");
 };
 
 local.sjclHashScryptValidate = function (password, hash) {
@@ -25377,11 +25544,11 @@ local.sjclHmacSha256Create = function (key, data) {
     );
 };
 
-local.stateInit = function (options) {
+local.stateInit = function (option) {
 /*
- * this function will init the state-options
+ * this function will init state <option>
  */
-    local.objectSetOverride(local, options, 10);
+    local.objectSetOverride(local, option, 10);
     // init swgg
     local.swgg.apiUpdate(local.swgg.swaggerJson);
 };
@@ -25504,7 +25671,7 @@ local.stringRegexpEscape = function (text) {
 
 local.stringTruncate = function (text, maxLength) {
 /*
- * this function will truncate text to the given maxLength
+ * this function will truncate text to given maxLength
  */
     return (
         text.length > maxLength
@@ -25515,7 +25682,7 @@ local.stringTruncate = function (text, maxLength) {
 
 local.stringUniqueKey = function (text) {
 /*
- * this function will return a string-key that is unique in the given text
+ * this function will return a string-key that is unique in given text
  */
     var key;
     // seed the key with the least frequent letters in the english-language
@@ -25527,20 +25694,20 @@ local.stringUniqueKey = function (text) {
     return key;
 };
 
-local.taskCreate = function (options, onTask, onError) {
+local.taskCreate = function (option, onTask, onError) {
 /*
- * this function will create the task onTask named options.key, if it does not exist,
+ * this function will create the task onTask named <option>.key, if it does not exist,
  * and push onError to its onErrorList
  */
     var task;
     // init task
-    local.taskOnTaskDict[options.key] = (
-        local.taskOnTaskDict[options.key]
+    local.taskOnTaskDict[option.key] = (
+        local.taskOnTaskDict[option.key]
         || {
             onErrorList: []
         }
     );
-    task = local.taskOnTaskDict[options.key];
+    task = local.taskOnTaskDict[option.key];
     // push callback onError to the task
     if (onError) {
         onError = local.onErrorWithStack(onError);
@@ -25559,19 +25726,17 @@ local.taskCreate = function (options, onTask, onError) {
         // cleanup timerTimeout
         clearTimeout(task.timerTimeout);
         // cleanup task
-        delete local.taskOnTaskDict[options.key];
+        delete local.taskOnTaskDict[option.key];
         // preserve error.message and error.stack
-        task.result = JSON.stringify([
+        task.result = JSON.stringify([(
             (error && error.stack)
             ? Object.assign(local.jsonCopy(error), {
                 message: error.message,
                 name: error.name,
                 stack: error.stack
             })
-            : error,
-            data,
-            meta
-        ]);
+            : error
+        ), data, meta]);
         // pass result to callbacks in onErrorList
         task.onErrorList.forEach(function (onError) {
             onError.apply(null, JSON.parse(task.result));
@@ -25580,8 +25745,8 @@ local.taskCreate = function (options, onTask, onError) {
     // init timerTimeout
     task.timerTimeout = local.onTimeout(
         task.onDone,
-        options.timeout || local.timeoutDefault,
-        "taskCreate " + options.key
+        option.timeout || local.timeoutDefault,
+        "taskCreate " + option.key
     );
     task.onTask = onTask;
     // run onTask
@@ -25589,7 +25754,7 @@ local.taskCreate = function (options, onTask, onError) {
     return task;
 };
 
-local.taskCreateCached = function (options, onTask, onError) {
+local.taskCreateCached = function (option, onTask, onError) {
 /*
  * this function will
  * 1. if cache-hit, then call onError with cacheValue
@@ -25597,52 +25762,52 @@ local.taskCreateCached = function (options, onTask, onError) {
  * 3. save onTask's result to cache
  * 4. if cache-miss, then call onError with onTask's result
  */
-    local.onNext(options, function (error, data) {
-        switch (options.modeNext) {
+    local.onNext(option, function (error, data) {
+        switch (option.modeNext) {
         // 1. if cache-hit, then call onError with cacheValue
         case 1:
             // read cacheValue from memory-cache
-            local.cacheDict[options.cacheDict] = (
-                local.cacheDict[options.cacheDict]
+            local.cacheDict[option.cacheDict] = (
+                local.cacheDict[option.cacheDict]
                 || {}
             );
-            options.cacheValue = local.cacheDict[options.cacheDict][options.key];
-            if (options.cacheValue) {
+            option.cacheValue = local.cacheDict[option.cacheDict][option.key];
+            if (option.cacheValue) {
                 // call onError with cacheValue
-                options.modeCacheHit = true;
-                onError(null, JSON.parse(options.cacheValue));
-                if (!options.modeCacheUpdate) {
+                option.modeCacheHit = true;
+                onError(null, JSON.parse(option.cacheValue));
+                if (!option.modeCacheUpdate) {
                     break;
                 }
             }
             // run background-task with lower priority for cache-hit
-            setTimeout(options.onNext, options.modeCacheHit && options.cacheTtl);
+            setTimeout(option.onNext, option.modeCacheHit && option.cacheTtl);
             break;
         // 2. run onTask in background to update cache
         case 2:
-            local.taskCreate(options, onTask, options.onNext);
+            local.taskCreate(option, onTask, option.onNext);
             break;
         default:
             // 3. save onTask's result to cache
             // JSON.stringify data to prevent side-effects on cache
-            options.cacheValue = JSON.stringify(data);
-            if (!error && options.cacheValue) {
-                local.cacheDict[options.cacheDict][options.key] = options.cacheValue;
+            option.cacheValue = JSON.stringify(data);
+            if (!error && option.cacheValue) {
+                local.cacheDict[option.cacheDict][option.key] = option.cacheValue;
             }
             // 4. if cache-miss, then call onError with onTask's result
-            if (!options.modeCacheHit) {
-                onError(error, options.cacheValue && JSON.parse(options.cacheValue));
+            if (!option.modeCacheHit) {
+                onError(error, option.cacheValue && JSON.parse(option.cacheValue));
             }
-            local.functionOrNop(options.onCacheWrite)();
+            local.functionOrNop(option.onCacheWrite)();
         }
     });
-    options.modeNext = 0;
-    options.onNext();
+    option.modeNext = 0;
+    option.onNext();
 };
 
-local.templateRender = function (template, dict, options) {
+local.templateRender = function (template, dict, option) {
 /*
- * this function will render the template with the given dict
+ * this function will render the template with given dict
  */
     var argList;
     var getValue;
@@ -25652,7 +25817,7 @@ local.templateRender = function (template, dict, options) {
     var skip;
     var value;
     dict = dict || {};
-    options = options || {};
+    option = option || {};
     getValue = function (key) {
         argList = key.split(" ");
         value = dict;
@@ -25674,7 +25839,7 @@ local.templateRender = function (template, dict, options) {
                 Array.isArray(value)
                 ? value.map(function (dict) {
                     // recurse with partial
-                    return local.templateRender(partial, dict, options);
+                    return local.templateRender(partial, dict, option);
                 }).join("")
                 : ""
             );
@@ -25694,17 +25859,21 @@ local.templateRender = function (template, dict, options) {
                 : partial.slice(1).join("{{#unless " + key + "}}")
             );
             // recurse with partial
-            return local.templateRender(partial, dict, options);
+            return local.templateRender(partial, dict, option);
         case "unless":
             return (
                 getValue(key)
                 ? ""
                 // recurse with partial
-                : local.templateRender(partial, dict, options)
+                : local.templateRender(partial, dict, option)
             );
         default:
             // recurse with partial
-            return match0[0] + local.templateRender(match0.slice(1), dict, options);
+            return match0[0] + local.templateRender(
+                match0.slice(1),
+                dict,
+                option
+            );
         }
     };
     // render partials
@@ -25731,7 +25900,7 @@ local.templateRender = function (template, dict, options) {
     ), function (match0) {
         var markdownToHtml;
         var notHtmlSafe;
-        notHtmlSafe = options.notHtmlSafe;
+        notHtmlSafe = option.notHtmlSafe;
         try {
             getValue(match0.slice(2, -2));
             if (value === undefined) {
@@ -25767,15 +25936,32 @@ local.templateRender = function (template, dict, options) {
                 case "notHtmlSafe":
                     notHtmlSafe = true;
                     break;
+                case "padEnd":
+                    skip = ii + 2;
+                    value = String(value).padEnd(
+                        list[skip - 1],
+                        list[skip]
+                    );
+                    break;
+                case "padStart":
+                    skip = ii + 2;
+                    value = String(value).padStart(
+                        list[skip - 1],
+                        list[skip]
+                    );
+                    break;
                 case "truncate":
                     skip = ii + 1;
                     if (value.length > list[skip]) {
-                        value = value.slice(0, list[skip] - 3).trimRight() + "...";
+                        value = value.slice(
+                            0,
+                            Math.max(list[skip] - 3, 0)
+                        ).trimRight() + "...";
                     }
                     break;
                 // default to String.prototype[arg0]()
                 default:
-                    if (ii === skip) {
+                    if (ii <= skip) {
                         break;
                     }
                     value = value[arg0]();
@@ -25825,57 +26011,57 @@ local.templateRender = function (template, dict, options) {
     });
 };
 
-local.templateRenderMyApp = function (template, options) {
+local.templateRenderMyApp = function (template, option) {
 /*
- * this function will render the my-app-lite template with the given options.packageJson
+ * this function will render the my-app-lite template with given <option>.packageJson
  */
-    options.packageJson = local.fsReadFileOrEmptyStringSync("package.json", "json");
-    local.objectSetDefault(options.packageJson, {
-        nameLib: options.packageJson.name.replace((
+    option.packageJson = local.fsReadFileOrEmptyStringSync("package.json", "json");
+    local.objectSetDefault(option.packageJson, {
+        nameLib: option.packageJson.name.replace((
             /\W/g
         ), "_"),
         repository: {
-            url: "https://github.com/kaizhu256/node-" + options.packageJson.name + ".git"
+            url: "https://github.com/kaizhu256/node-" + option.packageJson.name + ".git"
         }
     }, 2);
-    options.githubRepo = options.packageJson.repository.url
+    option.githubRepo = option.packageJson.repository.url
     .replace((
         /\.git$/
     ), "").split("/").slice(-2);
     template = template.replace((
         /kaizhu256(\.github\.io\/|%252F|\/)/g
-    ), options.githubRepo[0] + ("$1"));
+    ), option.githubRepo[0] + ("$1"));
     template = template.replace((
         /node-my-app-lite/g
-    ), options.githubRepo[1]);
+    ), option.githubRepo[1]);
     template = template.replace((
         /\bh1-my-app\b/g
     ), (
-        options.packageJson.nameHeroku
-        || ("h1-" + options.packageJson.nameLib.replace((
+        option.packageJson.nameHeroku
+        || ("h1-" + option.packageJson.nameLib.replace((
             /_/g
         ), "-"))
     ));
     template = template.replace((
         /my-app-lite/g
-    ), options.packageJson.name);
+    ), option.packageJson.name);
     template = template.replace((
         /my_app/g
-    ), options.packageJson.nameLib);
+    ), option.packageJson.nameLib);
     template = template.replace((
         /\{\{packageJson\.(\S+)\}\}/g
     ), function (ignore, match1) {
-        return options.packageJson[match1];
+        return option.packageJson[match1];
     });
     return template;
 };
 
-local.testCase_nop_default = function (options, onError) {
+local.testCase_nop_default = function (option, onError) {
 /*
  * this function will test nop's default handling-behavior
  */
     local.nop();
-    onError(null, options);
+    onError(null, option);
 };
 
 local.testMock = function (mockList, onTestCase, onError) {
@@ -25906,13 +26092,16 @@ local.testMock = function (mockList, onTestCase, onError) {
         // backup mock[0] into mock[2]
         Object.keys(mock[1]).forEach(function (key) {
             mock[2][key] = (
-                typeof process === "object"
-                && process.env === mock[0]
-                && mock[0][key] === undefined
-            )
-            // handle process.env
-            ? ""
-            : mock[0][key];
+                // ternary-condition
+                (
+                    typeof process === "object"
+                    && process.env === mock[0]
+                    && mock[0][key] === undefined
+                )
+                // handle process.env
+                ? ""
+                : mock[0][key]
+            );
         });
         // override mock[0] with mock[1]
         Object.keys(mock[1]).forEach(function (key) {
@@ -25953,12 +26142,12 @@ local.testReportCreate = function (testReport) {
     .join("\n") + "\n");
     // create test-report.html
     local.fs.writeFileSync(
-        local.env.npm_config_dir_build + "/test-report.html",
+        "tmp/build/test-report.html",
         local.testReportMerge(testReport, {})
     );
     // create build.badge.svg
     local.fs.writeFileSync(
-        local.env.npm_config_dir_build + "/build.badge.svg",
+        "tmp/build/build.badge.svg",
         local.assetsDict["/assets.buildBadge.template.svg"].replace((
             /0000-00-00\u002000:00:00\u0020UTC\u0020-\u0020master\u0020-\u0020aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/g
         ), (
@@ -25968,7 +26157,7 @@ local.testReportCreate = function (testReport) {
     );
     // create test-report.badge.svg
     local.fs.writeFileSync(
-        local.env.npm_config_dir_build + "/test-report.badge.svg",
+        "tmp/build/test-report.badge.svg",
         local.assetsDict["/assets.testReportBadge.template.svg"]
         // edit number of tests failed
         .replace((
@@ -25984,8 +26173,8 @@ local.testReportCreate = function (testReport) {
         ))
     );
     console.error(
-        "created test-report file " + local.env.npm_config_dir_build
-        + "/test-report.html\n"
+        "created test-report file "
+        + process.cwd() + "/tmp/build/test-report.html\n"
     );
     // if any test failed, then exit with non-zero exit-code
     console.error(
@@ -26203,20 +26392,24 @@ local.testReportMerge = function (testReport1, testReport2) {
                             )
                         }, 8);
                     }),
-                    preClass: errorStackList.length
-                    ? ""
-                    : "displayNone",
+                    preClass: (
+                        errorStackList.length
+                        ? ""
+                        : "displayNone"
+                    ),
                     testPlatformNumber: ii + 1
                 });
             }, 8),
-            testStatusClass: testReport.testsFailed
-            ? "testFailed"
-            : "testPassed"
+            testStatusClass: (
+                testReport.testsFailed
+                ? "testFailed"
+                : "testPassed"
+            )
         }, 8)
     );
 };
 
-local.testRunDefault = function (options) {
+local.testRunDefault = function (option) {
 /*
  * this function will run the tests in testPlatform.testCaseList
  */
@@ -26227,33 +26420,27 @@ local.testRunDefault = function (options) {
     var timerInterval;
     // run-server
     if (!local.isBrowser) {
-        local.testRunServer(options);
+        local.testRunServer(option);
     }
     globalThis.utility2_modeTest = Number(
         globalThis.utility2_modeTest
-        || options.modeTest
+        || option.modeTest
         || local.modeTest
         || local.env.npm_config_mode_test
     );
     switch (globalThis.utility2_modeTest) {
-    // init-pre
+    // init
     case 1:
-        globalThis.utility2_modeTest += 1;
-        // click #testRunButton1
-        if (local.isBrowser && document.querySelector("#testRunButton1")) {
-            document.querySelector("#testRunButton1").click();
-        }
-        local.testRunDefault(options);
-        return;
-    // init-after
-    case 2:
         globalThis.utility2_modeTest += 1;
         // reset db
         if (local.db && typeof local.db.dbReset === "function") {
-            local.db.dbReset(globalThis.utility2_dbSeedList, local.onErrorThrow);
+            local.db.dbReset(
+                globalThis.utility2_dbSeedList,
+                local.onErrorThrow
+            );
         }
         globalThis.utility2_onReadyAfter(function () {
-            local.testRunDefault(options);
+            local.testRunDefault(option);
         });
         return;
     // test-run
@@ -26262,12 +26449,12 @@ local.testRunDefault = function (options) {
         if (
             globalThis.utility2_onReadyBefore.counter
             || !globalThis.utility2_modeTest
-            || globalThis.utility2_modeTest > 3
+            || globalThis.utility2_modeTest > 2
         ) {
             return;
         }
+        // test-run
         globalThis.utility2_modeTest += 1;
-    // test-run
     }
     // visual notification - testRun
     local.ajaxProgressUpdate();
@@ -26290,7 +26477,10 @@ local.testRunDefault = function (options) {
         process.exit = local.nop;
     }
     // init modeTestCase
-    local.modeTestCase = local.modeTestCase || local.env.npm_config_mode_test_case || "";
+    local.modeTestCase = (
+        local.modeTestCase
+        || local.env.npm_config_mode_test_case || ""
+    );
     // init testReport
     testReport = globalThis.utility2_testReport;
     // init testReport timer
@@ -26302,10 +26492,10 @@ local.testRunDefault = function (options) {
     // reset testPlatform.testCaseList
     testPlatform.testCaseList.length = 0;
     // add tests into testPlatform.testCaseList
-    Object.keys(options).forEach(function (key) {
-        // add testCase options[key] to testPlatform.testCaseList
+    Object.keys(option).forEach(function (key) {
+        // add testCase option[key] to testPlatform.testCaseList
         if (
-            typeof options[key] === "function" && (
+            typeof option[key] === "function" && (
                 local.modeTestCase
                 ? local.modeTestCase.split(
                     /[,\s]/g
@@ -26317,14 +26507,16 @@ local.testRunDefault = function (options) {
                 isBrowser: local.isBrowser,
                 name: key,
                 status: "pending",
-                onTestCase: options[key]
+                onTestCase: option[key]
             });
         }
     });
     // visual notification - update test-progress until isDone
     // init testReportDiv1 element
     if (local.isBrowser) {
-        testReportDiv1 = document.querySelector("#testReportDiv1");
+        testReportDiv1 = document.querySelector(
+            "#testReportDiv1"
+        );
     }
     testReportDiv1 = testReportDiv1 || {
         style: {}
@@ -26370,7 +26562,8 @@ local.testRunDefault = function (options) {
             local.timeElapsedPoll(testPlatform);
             // cleanup timerTimeout
             clearTimeout(timerTimeout);
-            // if testCase isDone, then fail testCase with error for ending again
+            // if testCase isDone,
+            // then fail testCase with error for ending again
             if (testCase.isDone) {
                 error = error || new Error(
                     "callback in testCase "
@@ -26424,7 +26617,11 @@ local.testRunDefault = function (options) {
         };
         testCase = testCase.element;
         // init timerTimeout
-        timerTimeout = local.onTimeout(onError, local.timeoutDefault, testCase.name);
+        timerTimeout = local.onTimeout(
+            onError,
+            local.timeoutDefault,
+            testCase.name
+        );
         // increment number of tests remaining
         onParallel.counter += 1;
         // try to run testCase
@@ -26450,13 +26647,11 @@ local.testRunDefault = function (options) {
         // finalize testReport
         local.testReportMerge(testReport, {});
         // create test-report.json
-        if (!local.isBrowser) {
-            testReport.coverage = null;
-            local.fs.writeFileSync(
-                local.env.npm_config_dir_build + "/test-report.json",
-                JSON.stringify(testReport, null, 4)
-            );
-        }
+        delete testReport.coverage;
+        local.fsWriteFileWithMkdirpSync(
+            local.env.npm_config_dir_build + "/test-report.json",
+            JSON.stringify(testReport, null, 4)
+        );
         setTimeout(function () {
             // restore console.log
             console.error = local._testRunConsoleError;
@@ -26473,7 +26668,7 @@ local.testRunDefault = function (options) {
     });
 };
 
-local.testRunServer = function (options) {
+local.testRunServer = function (option) {
 /*
  * this function will
  * 1. create server from local.middlewareList
@@ -26510,14 +26705,18 @@ local.testRunServer = function (options) {
         local.serverLocalRequestHandler
     );
     // 2. start server on local.env.PORT
-    console.error("server listening on http-port " + local.env.PORT);
+    if (local.env.npm_config_mode_library) {
+        globalThis.utility2_onReadyBefore();
+        return;
+    }
+    console.error("http-server listening on port " + local.env.PORT);
     globalThis.utility2_onReadyBefore.counter += 1;
     globalThis.utility2_serverHttp1.listen(
         local.env.PORT,
         globalThis.utility2_onReadyBefore
     );
     // 3. run tests
-    local.testRunDefault(options);
+    local.testRunDefault(option);
     globalThis.utility2_onReadyBefore();
 };
 
@@ -26528,22 +26727,22 @@ local.throwError = function () {
     throw new Error();
 };
 
-local.timeElapsedPoll = function (options) {
+local.timeElapsedPoll = function (option) {
 /*
- * this function will poll options.timeElapsed
+ * this function will poll <option>.timeElapsed
  */
-    options = local.timeElapsedStart(options);
-    options.timeElapsed = Date.now() - options.timeStart;
-    return options;
+    option = local.timeElapsedStart(option);
+    option.timeElapsed = Date.now() - option.timeStart;
+    return option;
 };
 
-local.timeElapsedStart = function (options, timeStart) {
+local.timeElapsedStart = function (option, timeStart) {
 /*
- * this function will start options.timeElapsed
+ * this function will start <option>.timeElapsed
  */
-    options = options || {};
-    options.timeStart = timeStart || options.timeStart || Date.now();
-    return options;
+    option = option || {};
+    option.timeStart = timeStart || option.timeStart || Date.now();
+    return option;
 };
 
 local.tryCatchOnError = function (fnc, onError) {
@@ -26926,7 +27125,8 @@ local.regexpValidateUuid = (
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 );
 local.stringCharsetAscii = (
-    "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\t\n\u000b\f\r\u000e\u000f"
+    "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
+    + "\b\t\n\u000b\f\r\u000e\u000f"
     + "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017"
     + "\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f"
     + " !\"#$%&'()*+,-./0123456789:;<=>?"
@@ -27004,7 +27204,7 @@ if (local.isBrowser) {
 }
 local.Module = require("module");
 // init env
-local.objectSetDefault(local.env, {
+local.objectAssignDefault(local.env, {
     npm_config_dir_build: process.cwd() + "/tmp/build",
     npm_config_dir_tmp: process.cwd() + "/tmp"
 });
@@ -27112,9 +27312,12 @@ if (globalThis.utility2_rollup) {
                     .replace(
                         "<script src=\"assets.app.js\"></script>\n",
                         (
-                            "<script src=\"assets.utility2.rollup.js\"></script>\n"
-                            + "<script src=\"assets.utility2.example.js\"></script>\n"
-                            + "<script src=\"assets.utility2.test.js\"></script>\n"
+                            "<script "
+                            + "src=\"assets.utility2.rollup.js\"></script>\n"
+                            + "<script "
+                            + "src=\"assets.utility2.example.js\"></script>\n"
+                            + "<script "
+                            + "src=\"assets.utility2.test.js\"></script>\n"
                         )
                     )
                     .replace("assets.example.js", "assets.utility2.example.js")
@@ -27152,12 +27355,14 @@ if (globalThis.utility2_rollup) {
         ), "// ");
         break;
     default:
-        local.assetsDict["/assets.utility2." + key] = local.fsReadFileOrEmptyStringSync(
-            __dirname + "/" + key,
-            "utf8"
-        ).replace((
-            /^#!\//
-        ), "// ");
+        local.assetsDict["/assets.utility2." + key] = (
+            local.fsReadFileOrEmptyStringSync(
+                __dirname + "/" + key,
+                "utf8"
+            ).replace((
+                /^#!\//
+            ), "// ")
+        );
     }
 });
 local.assetsDict["/assets.utility2.rollup.js"] = [
@@ -27180,20 +27385,6 @@ local.assetsDict["/assets.utility2.rollup.js"] = [
 ].map(function (key) {
     var script;
     switch (key) {
-    case "header":
-        return (
-            "/* this rollup was created with utility2 "
-            + "(https://github.com/kaizhu256/node-utility2) */\n"
-        );
-    case "/assets.utility2.rollup.begin.js":
-    case "/assets.utility2.rollup.end.js":
-        script = local.assetsDict[key];
-        break;
-    case "lib.utility2.js":
-    case "lib.swgg.js":
-        key = "/assets." + key.replace("lib.", "");
-        script = local.assetsDict[key];
-        break;
     case "/assets.utility2.example.js":
     case "/assets.utility2.html":
     case "/assets.utility2.test.js":
@@ -27212,6 +27403,20 @@ local.assetsDict["/assets.utility2.rollup.js"] = [
         ), "\\\\"));
         script = script.join("");
         script += "\n";
+        break;
+    case "/assets.utility2.rollup.begin.js":
+    case "/assets.utility2.rollup.end.js":
+        script = local.assetsDict[key];
+        break;
+    case "header":
+        return (
+            "/* this rollup was created with utility2 "
+            + "(https://github.com/kaizhu256/node-utility2) */\n"
+        );
+    case "lib.swgg.js":
+    case "lib.utility2.js":
+        key = "/assets." + key.replace("lib.", "");
+        script = local.assetsDict[key];
         break;
     default:
         key = "/assets.utility2." + key;
@@ -27245,7 +27450,7 @@ local.assetsDict["/assets.utility2.rollup.js"] = [
 /* script-begin /assets.swgg.js */
 // usr/bin/env node
 /*
- * lib.swgg.js (2018.11.14)
+ * lib.swgg.js (2019.2.20)
  * https://github.com/kaizhu256/node-swgg
  * this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend), with a working web-demo
  *
@@ -27267,28 +27472,48 @@ local.assetsDict["/assets.utility2.rollup.js"] = [
         } catch (ignore) {}
     }());
     globalThis.globalThis = globalThis;
+    // init debug_inline
+    if (!globalThis["debug\u0049nline"]) {
+        consoleError = console.error;
+        globalThis["debug\u0049nline"] = function () {
+        /*
+         * this function will both print <arguments> to stderr
+         * and return <arguments>[0]
+         */
+            var argList;
+            argList = Array.from(arguments); // jslint ignore:line
+            // debug arguments
+            globalThis["debug\u0049nlineArguments"] = argList;
+            consoleError("\n\ndebug\u0049nline");
+            consoleError.apply(console, argList);
+            consoleError("\n");
+            // return arg0 for inspection
+            return argList[0];
+        };
+    }
     // init local
     local = {};
+    local.local = local;
+    globalThis.globalLocal = local;
     // init isBrowser
     local.isBrowser = (
         typeof window === "object"
         && window === globalThis
         && typeof window.XMLHttpRequest === "function"
         && window.document
-        && typeof window.document.querySelectorAll === "function"
+        && typeof window.document.querySelector === "function"
     );
-    globalThis.globalLocal = local;
     // init function
     local.assertThrow = function (passed, message) {
     /*
-     * this function will throw the error <message> if <passed> is falsy
+     * this function will throw error <message> if <passed> is falsy
      */
         var error;
         if (passed) {
             return;
         }
         error = (
-            // ternary-operator
+            // ternary-condition
             (
                 message
                 && typeof message.message === "string"
@@ -27326,24 +27551,53 @@ local.assetsDict["/assets.utility2.rollup.js"] = [
      */
         return;
     };
-    // init debug_inline
-    if (!globalThis["debug\u0049nline"]) {
-        consoleError = console.error;
-        globalThis["debug\u0049nline"] = function () {
-        /*
-         * this function will both print <arguments> to stderr
-         * and return <arguments>[0]
-         */
-            var argList;
-            argList = Array.from(arguments); // jslint ignore:line
-            // debug arguments
-            globalThis["debug\u0049nlineArguments"] = argList;
-            consoleError("\n\ndebug\u0049nline");
-            consoleError.apply(console, argList);
-            consoleError("\n");
-            // return arg0 for inspection
-            return argList[0];
-        };
+    local.objectAssignDefault = function (target, source) {
+    /*
+     * this function will if items from <target> are
+     * null, undefined, or empty-string,
+     * then overwrite them with items from <source>
+     */
+        target = target || {};
+        Object.keys(source || {}).forEach(function (key) {
+            if (
+                target[key] === null
+                || target[key] === undefined
+                || target[key] === ""
+            ) {
+                target[key] = target[key] || source[key];
+            }
+        });
+        return target;
+    };
+    // require builtin
+    if (!local.isBrowser) {
+        local.assert = require("assert");
+        local.buffer = require("buffer");
+        local.child_process = require("child_process");
+        local.cluster = require("cluster");
+        local.crypto = require("crypto");
+        local.dgram = require("dgram");
+        local.dns = require("dns");
+        local.domain = require("domain");
+        local.events = require("events");
+        local.fs = require("fs");
+        local.http = require("http");
+        local.https = require("https");
+        local.net = require("net");
+        local.os = require("os");
+        local.path = require("path");
+        local.querystring = require("querystring");
+        local.readline = require("readline");
+        local.repl = require("repl");
+        local.stream = require("stream");
+        local.string_decoder = require("string_decoder");
+        local.timers = require("timers");
+        local.tls = require("tls");
+        local.tty = require("tty");
+        local.url = require("url");
+        local.util = require("util");
+        local.vm = require("vm");
+        local.zlib = require("zlib");
     }
 }(this));
 
@@ -27368,39 +27622,10 @@ local = (
 if (local.isBrowser) {
     globalThis.utility2_swgg = local;
 } else {
-    // require builtins
-    local.assert = require("assert");
-    local.buffer = require("buffer");
-    local.child_process = require("child_process");
-    local.cluster = require("cluster");
-    local.crypto = require("crypto");
-    local.dgram = require("dgram");
-    local.dns = require("dns");
-    local.domain = require("domain");
-    local.events = require("events");
-    local.fs = require("fs");
-    local.http = require("http");
-    local.https = require("https");
-    local.net = require("net");
-    local.os = require("os");
-    local.path = require("path");
-    local.querystring = require("querystring");
-    local.readline = require("readline");
-    local.repl = require("repl");
-    local.stream = require("stream");
-    local.string_decoder = require("string_decoder");
-    local.timers = require("timers");
-    local.tls = require("tls");
-    local.tty = require("tty");
-    local.url = require("url");
-    local.util = require("util");
-    local.vm = require("vm");
-    local.zlib = require("zlib");
     module.exports = local;
     module.exports.__dirname = __dirname;
 }
 // init lib main
-local.local = local;
 local.swgg = local;
 
 
@@ -28225,7 +28450,7 @@ awoDQjHSelX8hQEoIrAq8p/mgC88HOS1YCl/BRgAmiD/1gn6Nu8AAAAASUVORK5CYII=\
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/main.handlebars
 local.templateUiMain = '\
 <!-- <div class="swggUiContainer"> -->\n\
-<h2 class="eventDelegateSubmit hXxx thead" data-event="onEventUiReload">\n\
+<h2 class="eventDelegateSubmit hXxx thead" data-onevent="onEventUiReload">\n\
     <a class="td td1" href="https://github.com/kaizhu256/node-swgg" target="_blank">swgg</a>\n\
     <input\n\
         class="td td2"\n\
@@ -28240,9 +28465,9 @@ local.templateUiMain = '\
         type="text"\n\
         value="{{apiKeyValue}}"\n\
     >\n\
-    <button class="button eventDelegateClick td td4" data-event="onEventUiReload">explore</button>\n\
+    <button class="button eventDelegateClick td td4" data-onevent="onEventUiReload">explore</button>\n\
     <button\n\
-        class="button eventDelegateClick td td5" data-event="onEventUiReload"\n\
+        class="button eventDelegateClick td td5" data-onevent="onEventUiReload"\n\
         id="swggApiKeyClearButton1"\n\
     >\n\
         clear api-keys\n\
@@ -28274,15 +28499,9 @@ local.templateUiMain = '\
     </a><br>\n\
     {{/if x-swgg-downloadStandaloneApp}}\n\
     {{#if x-swgg-onEventDomDb}}\n\
-    <button class="button" data-event="onEventDomDb" data-on-event-dom-db="dbResetButton1">\n\
-        reset database\n\
-    </button><br>\n\
-    <button class="button" data-event="onEventDomDb" data-on-event-dom-db="dbExportButton1">\n\
-        export database -&gt; file\n\
-    </button><br>\n\
-    <button class="button" data-event="onEventDomDb" data-on-event-dom-db="dbImportButton1">\n\
-        import database &lt;- file\n\
-    </button><br>\n\
+    <button class="button" data-onevent="onEventDomDb" data-onevent-db="dbReset">reset database</button><br>\n\
+    <button class="button" data-onevent="onEventDomDb" data-onevent-db="dbExport">export database -&gt; file</button><br>\n\
+    <button class="button" data-onevent="onEventDomDb" data-onevent-db="dbImport">import database &lt;- file</button><br>\n\
     {{/if x-swgg-onEventDomDb}}\n\
     <ul>\n\
         {{#if externalDocs.url}}\n\
@@ -28362,7 +28581,7 @@ console.log("initialized nodejs swgg-client");\n\
 // https://github.com/swagger-api/swagger-ui/blob/v2.1.3/src/main/template/operation.handlebars
 local.templateUiOperation = '\
 <div class="operation" data-_method-path="{{_methodPath}}" id="{{id}}">\n\
-<div class="thead" data-event="onEventOperationDisplayShow" tabindex="0">\n\
+<div class="thead" data-onevent="onEventOperationDisplayShow" tabindex="0">\n\
     <span class="td td1"></span>\n\
     <span class="method{{_method}} td td2">{{_method}}</span>\n\
     <span\n\
@@ -28407,7 +28626,7 @@ local.templateUiOperation = '\
         <span class="markdown td td2">{{value.description markdownToHtml}}</span>\n\
     </div>\n\
     {{/each responseList}}\n\
-    <button class="button" data-event="onEventOperationAjax">try it out!</button>\n\
+    <button class="button" data-onevent="onEventOperationAjax">try it out!</button>\n\
     <h4 class="label">nodejs request</h4>\n\
     <pre class="requestJavascript" tabIndex="0"></pre>\n\
     <h4 class="label">curl request</h4>\n\
@@ -28437,12 +28656,12 @@ local.templateUiParameter = '\
     {{/if description}}\n\
 </span>\n\
 <span class="td td2">{{type2}}{{#if format2}}<br>({{format2}}){{/if format2}}</span>\n\
-<span class="td td3" data-event="onEventInputValidateAndAjax">\n\
+<span class="td td3" data-onevent="onEventInputValidateAndAjax">\n\
     {{#if isTextarea}}\n\
     <div class="multilinePlaceholderContainer">\n\
         <pre class="multilinePlaceholderPre">{{placeholder}}</pre>\n\
         <textarea\n\
-            class="input multilinePlaceholderTextarea" data-event="onEventInputTextareaChange"\n\
+            class="input multilinePlaceholderTextarea textarea" data-onevent="onEventInputTextareaChange"\n\
             data-value-text="{{valueText encodeURIComponent notHtmlSafe}}"\n\
         ></textarea>\n\
     </div>\n\
@@ -28460,6 +28679,14 @@ local.templateUiParameter = '\
         {{/each selectOptionList}}\n\
     </select>\n\
     {{/if enum2}}\n\
+    {{#if isInputNumber}}\n\
+    <input\n\
+        class="input"\n\
+        data-value-text="{{valueText encodeURIComponent notHtmlSafe}}"\n\
+        placeholder="{{placeholder}}"\n\
+        type="number"\n\
+    >\n\
+    {{/if isInputNumber}}\n\
     {{#if isInputText}}\n\
     <input\n\
         class="input"\n\
@@ -28480,11 +28707,11 @@ local.templateUiParameter = '\
 
 local.templateUiRequestJavascript = '\
 /*\n\
- * reproduce api-call {{options.api._methodPath jsonStringify}}\n\
+ * reproduce api-call {{option.api._methodPath jsonStringify}}\n\
  * 1. initialize nodejs swgg-client from previous step\n\
  * 2. run code below to reproduce api-call\n\
  */\n\
-swgg.apiDict[{{options.api._methodPath jsonStringify}}].ajax({{optionsJson}}, \
+swgg.apiDict[{{option.api._methodPath jsonStringify}}].ajax({{optionJson}}, \
 function (error, data) {\n\
     if (error) {\n\
         console.error(error);\n\
@@ -28505,10 +28732,10 @@ local.templateUiResource = '\
     id="{{id}}"\n\
 >\n\
 <h3 class="thead">\n\
-    <span class="td td1 textOverflowEllipsis" data-event="onEventResourceDisplayAction" tabindex="0">\n\
+    <span class="td td1 textOverflowEllipsis" data-onevent="onEventResourceDisplayAction" tabindex="0">\n\
         {{name}}:&nbsp;&nbsp;{{summary}}\n\
     </span>\n\
-    <span class="td td2" data-event="onEventResourceDisplayAction" tabindex="0">\n\
+    <span class="td td2" data-onevent="onEventResourceDisplayAction" tabindex="0">\n\
     expand / collapse operations\n\
     </span>\n\
 </h3>\n\
@@ -28923,9 +29150,11 @@ local.assetsDict["/assets.swgg.html"] = local.assetsDict["/assets.utility2.templ
 // init domOnEventMediaHotkeys\n\
 (function () {\n\
 /*\n\
- * this function will add media-hotkeys to elements with class=".domOnEventMediaHotkeysInit"\n\
+ * this function will add media-hotkeys to elements\n\
+ * with class=".domOnEventMediaHotkeysInit"\n\
  */\n\
     "use strict";\n\
+    var currentTarget;\n\
     var identity;\n\
     var input;\n\
     var onEvent;\n\
@@ -28953,28 +29182,36 @@ local.assetsDict["/assets.swgg.html"] = local.assetsDict["/assets.utility2.templ
             return;\n\
         }\n\
         if (event.currentTarget.classList.contains("domOnEventMediaHotkeys")) {\n\
-            window.domOnEventMediaHotkeysMedia1 = event.currentTarget;\n\
-            window.domOnEventMediaHotkeysInput.focus();\n\
+            currentTarget = event.currentTarget;\n\
+            input.focus();\n\
             return;\n\
         }\n\
-        media = window.domOnEventMediaHotkeysMedia1;\n\
+        media = currentTarget;\n\
         try {\n\
             switch (event.key || event.type) {\n\
             case ",":\n\
             case ".":\n\
-                media.currentTime += (event.key === "," && identity(-0.03125)) || 0.03125;\n\
+                media.currentTime += (\n\
+                    event.key === "," && identity(-0.03125)\n\
+                ) || 0.03125;\n\
                 break;\n\
             case "<":\n\
             case ">":\n\
-                media.playbackRate *= (event.key === "<" && identity(0.5)) || 2;\n\
+                media.playbackRate *= (\n\
+                    event.key === "<" && identity(0.5)\n\
+                ) || 2;\n\
                 break;\n\
             case "ArrowDown":\n\
             case "ArrowUp":\n\
-                media.volume += (event.key === "ArrowDown" && identity(-0.05)) || 0.05;\n\
+                media.volume += (\n\
+                    event.key === "ArrowDown" && identity(-0.05)\n\
+                ) || 0.05;\n\
                 break;\n\
             case "ArrowLeft":\n\
             case "ArrowRight":\n\
-                media.currentTime += (event.key === "ArrowLeft" && identity(-5)) || 5;\n\
+                media.currentTime += (\n\
+                    event.key === "ArrowLeft" && identity(-5)\n\
+                ) || 5;\n\
                 break;\n\
             case "j":\n\
             case "l":\n\
@@ -29003,8 +29240,10 @@ local.assetsDict["/assets.swgg.html"] = local.assetsDict["/assets.utility2.templ
     };\n\
     onEvent = window.domOnEventMediaHotkeys;\n\
     input = document.createElement("button");\n\
-    window.domOnEventMediaHotkeysInput = input;\n\
-    input.style = "border:0;height:0;margin:0;padding:0;position:fixed;width:0;z-index:-1;";\n\
+    input.style = (\n\
+        "border:0;height:0;margin:0;padding:0;position:fixed;width:0;"\n\
+        + "z-index:-1;"\n\
+    );\n\
     input.addEventListener("click", onEvent);\n\
     input.addEventListener("keydown", onEvent);\n\
     document.body.appendChild(input);\n\
@@ -29013,15 +29252,19 @@ local.assetsDict["/assets.swgg.html"] = local.assetsDict["/assets.utility2.templ
 \n\
 \n\
 \n\
-document.querySelector(".swggUiContainer > .thead > .td2").value = ((\n\
+document.querySelector(\n\
+    ".swggUiContainer > .thead > .td2"\n\
+).value = ((\n\
     /\\bmodeSwaggerJsonUrl=([^&]+)|$/gm\n\
 ).exec(location.search)[1] || "assets.swgg.swagger.json");\n\
 </script>\n\
 <script src="assets.utility2.rollup.js"></script>\n\
 <script>\n\
-/*jslint browser: true*/\n\
+/* jslint utility2:true */\n\
 window.local = window.local || window.swgg;\n\
-window.swgg.uiEventListenerDict.onEventUiReload({swggInit: true});\n\
+window.swgg.uiEventListenerDict.onEventUiReload({\n\
+    swggInit: true\n\
+});\n\
 </script>\n\
 <!-- swgg-script-extra-begin -->\n\
 <!-- swgg-script-extra-end -->\n\
@@ -29047,38 +29290,41 @@ local.swaggerSchemaJson = JSON.parse(local.assetsDict["/assets.swgg.swagger.sche
 
 // run shared js-env code - function
 (function () {
-local.apiAjax = function (that, options, onError) {
+local.apiAjax = function (that, option, onError) {
 /*
  * this function will send a swagger-api ajax-request with the operation that
  */
     var tmp;
-    local.objectSetDefault(options, {
+    local.objectSetDefault(option, {
         data: "",
         operation: that,
         paramDict: {},
         url: ""
     });
-    if (options.modeDefault) {
-        local.normalizeSwaggerParamDict(options);
+    if (option.modeDefault) {
+        local.normalizeSwaggerParamDict(option);
     }
     // try to validate paramDict
-    options.error = local.swaggerValidateDataParameters({
+    option.error = local.swaggerValidateDataParameters({
         // normalize paramDict
         data: local.normalizeSwaggerParamDict({
-            modeNoDefault: options.modeNoDefault,
+            modeNoDefault: option.modeNoDefault,
             operation: that,
-            paramDict: local.jsonCopy(options.paramDict)
+            paramDict: local.jsonCopy(option.paramDict)
         }).paramDict,
-        dataReadonlyRemove: options.paramDict,
+        dataReadonlyRemove: option.paramDict,
         prefix: ["operation", that._methodPath],
         parameters: that.parameters,
         swaggerJson: local.swaggerJson
     })[0];
-    // init options-defaults
-    local.objectSetDefault(options, {
-        inForm: that._consumes0 === "multipart/form-data"
-        ? new local.FormData()
-        : "",
+    // init option-defaults
+    local.objectSetDefault(option, {
+        inForm: (
+            // ternary-condition
+            that._consumes0 === "multipart/form-data"
+            ? new local.FormData()
+            : ""
+        ),
         inHeader: {},
         inPath: that._path.replace((
             /#.*?$/
@@ -29086,13 +29332,16 @@ local.apiAjax = function (that, options, onError) {
         inQuery: "",
         headers: {},
         method: that._method,
-        responseType: that._consumes0.indexOf("application/octet-stream") === 0
-        ? "arraybuffer"
-        : ""
+        responseType: (
+            // ternary-condition
+            that._consumes0.indexOf("application/octet-stream") === 0
+            ? "arraybuffer"
+            : ""
+        )
     });
     // init paramDict
     that.parameters.forEach(function (schemaP) {
-        tmp = options.paramDict[schemaP.name];
+        tmp = option.paramDict[schemaP.name];
         if (local.isNullOrUndefined(tmp)) {
             return;
         }
@@ -29104,14 +29353,18 @@ local.apiAjax = function (that, options, onError) {
                 break;
             case "multi":
                 tmp.forEach(function (value) {
-                    options[
+                    option[(
+                        // ternary-condition
                         schemaP.in === "formData"
                         ? "inForm"
                         : "inQuery"
-                    ] += "&" + encodeURIComponent(schemaP.name) + "=" + encodeURIComponent(
-                        local.schemaPItemsType(schemaP) === "string"
-                        ? value
-                        : JSON.stringify(value)
+                    )] += (
+                        "&" + encodeURIComponent(schemaP.name) + "="
+                        + encodeURIComponent(
+                            local.schemaPItemsType(schemaP) === "string"
+                            ? value
+                            : JSON.stringify(value)
+                        )
                     );
                 });
                 return;
@@ -29133,84 +29386,84 @@ local.apiAjax = function (that, options, onError) {
         }
         switch (schemaP.in) {
         case "body":
-            options.inBody = tmp;
+            option.inBody = tmp;
             break;
         case "formData":
             switch (that._consumes0) {
-            case "multipart/form-data":
-                options.inForm.append(schemaP.name, tmp, tmp && tmp.name);
-                break;
             case "application/xml":
                 // init xml header
-                if (!options.inForm) {
-                    options.inForm += "<?xml version=\"1.0\"?>";
+                if (!option.inForm) {
+                    option.inForm += "<?xml version=\"1.0\"?>";
                 }
-                options.inForm += (
+                option.inForm += (
                     "\n<" + schemaP.name + ">" + "<![CDATA["
                     + tmp.replace((
                         /\]\]>/g
                     ), "]]&#x3e;") + "]]></" + schemaP.name + ">"
                 );
                 break;
+            case "multipart/form-data":
+                option.inForm.append(schemaP.name, tmp, tmp && tmp.name);
+                break;
             default:
-                if (options.inForm) {
-                    options.inForm += "&";
+                if (option.inForm) {
+                    option.inForm += "&";
                 }
-                options.inForm += (
+                option.inForm += (
                     encodeURIComponent(schemaP.name) + "="
                     + encodeURIComponent(tmp)
                 );
             }
             break;
         case "header":
-            options.inHeader[encodeURIComponent(schemaP.name.toLowerCase())] = tmp;
+            option.inHeader[encodeURIComponent(schemaP.name.toLowerCase())] = tmp;
+            break;
+        case "path":
+            option.inPath = option.inPath
+            .replace("{" + schemaP.name + "}", encodeURIComponent(tmp));
             break;
         case "query":
-            options.inQuery += (
+            option.inQuery += (
                 "&" + encodeURIComponent(schemaP.name) + "="
                 + encodeURIComponent(tmp)
             );
             break;
-        case "path":
-            options.inPath = options.inPath
-            .replace("{" + schemaP.name + "}", encodeURIComponent(tmp));
-            break;
         }
     });
     // init data
-    options.data = options.inBody || options.inForm;
+    option.data = option.inBody || option.inForm;
     // init headers
-    local.objectSetOverride(options.headers, options.inHeader);
+    local.objectSetOverride(option.headers, option.inHeader);
     // init headers - Content-Type
-    options.headers["Content-Type"] = that._consumes0;
+    option.headers["Content-Type"] = that._consumes0;
     // init headers - Authorization
-    options.jwtEncrypted = options.jwtEncrypted || local.userJwtEncrypted;
-    if (options.jwtEncrypted) {
-        options.headers.Authorization = (
-            options.headers.Authorization
-            || "Bearer " + options.jwtEncrypted
+    option.jwtEncrypted = option.jwtEncrypted || local.userJwtEncrypted;
+    if (option.jwtEncrypted) {
+        option.headers.Authorization = (
+            option.headers.Authorization
+            || "Bearer " + option.jwtEncrypted
         );
     }
     // init url
-    options.url = "";
-    options.url += (
+    option.url = "";
+    option.url += (
         local.identity(that["x-swgg-schemes"] || local.swaggerJson.schemes || [])[0]
         || local.urlParse("").protocol.slice(0, -1)
     );
-    options.url += "://";
-    options.url += that["x-swgg-host"] || local.swaggerJson.host || local.urlParse("").host;
-    options.url += local.swaggerJsonBasePath;
-    options.url += options.inPath + "?" + options.inQuery.slice(1);
-    options.url = options.url.replace((
+    option.url += "://";
+    option.url += that["x-swgg-host"] || local.swaggerJson.host || local.urlParse("").host;
+    option.url += local.swaggerJsonBasePath;
+    option.url += option.inPath + "?" + option.inQuery.slice(1);
+    option.url = option.url.replace((
         /\?$/
     ), "");
-    if (options.modeAjax === "validate" || (options.error && options.modeAjax !== "ajax")) {
-        onError(options.error);
+    if (option.modeAjax === "validate" || (option.error && option.modeAjax !== "ajax")) {
+        onError(option.error);
         return;
     }
-    options.error = null;
+    option.error = null;
     // send ajax-request
-    return local.ajax(options, function (error, xhr) {
+    return local.ajax(option, function (error, xhr) {
         // try to init responseJson
         local.tryCatchOnError(function () {
             xhr.responseJson = JSON.parse(xhr.responseText);
@@ -29228,6 +29481,7 @@ local.apiUpdate = function (swaggerJson) {
 /*
  * this function will update the swagger-api dict of api-calls
  */
+    var pathDict;
     var tmp;
     swaggerJson = swaggerJson || {};
     // normalize swaggerJson
@@ -29585,13 +29839,12 @@ local.apiUpdate = function (swaggerJson) {
             }
         });
         // update paths
-        local.objectSetOverride(swaggerJson, local.objectLiteralize({
-            paths: {
-                "$[]": [that._path, {
-                    "$[]": [that._method.toLowerCase(), tmp]
-                }]
-            }
-        }), 3);
+        pathDict = {};
+        pathDict[that._path] = {};
+        pathDict[that._path][that._method.toLowerCase()] = tmp;
+        local.objectSetOverride(swaggerJson, {
+            paths: pathDict
+        }, 3);
     });
     // normalize swaggerJson
     local.swaggerJson = JSON.parse(local.jsonStringifyOrdered(swaggerJson));
@@ -29610,9 +29863,9 @@ local.apiUpdate = function (swaggerJson) {
     );
 };
 
-local.dbFieldRandomCreate = function (options) {
+local.dbFieldRandomCreate = function (option) {
 /*
- * this function will create a random dbField from options.schemaP
+ * this function will create a random dbField from <option>.schemaP
  */
     var depth;
     var ii;
@@ -29621,23 +29874,23 @@ local.dbFieldRandomCreate = function (options) {
     var schemaP;
     var value;
     depth = (
-        Number.isFinite(options.depth)
-        ? options.depth
+        Number.isFinite(option.depth)
+        ? option.depth
         : 3
     );
-    schemaP = options.schemaP;
+    schemaP = option.schemaP;
     schemaP = schemaP.schema || schemaP;
     if (schemaP.readOnly) {
         return;
     }
     // init default-value
-    if (options.modeNotRandom && !local.isNullOrUndefined(schemaP.default)) {
+    if (option.modeNotRandom && !local.isNullOrUndefined(schemaP.default)) {
         return local.jsonCopy(schemaP.default);
     }
     // init enum-value
     if (schemaP.enum) {
         value = (
-            options.modeNotRandom
+            option.modeNotRandom
             ? schemaP.enum[0]
             : local.listGetElementRandom(schemaP.enum)
         );
@@ -29650,9 +29903,35 @@ local.dbFieldRandomCreate = function (options) {
     // init default-value
     value = null;
     switch (local.schemaPType(schemaP)) {
+    // 5.3. Validation keywords for arrays
+    case "array":
+        if (depth <= 0) {
+            break;
+        }
+        value = [];
+        ii = 0;
+        while (ii < Math.min(
+            // 5.3.2. maxItems
+            schemaP.maxItems || 2,
+            // 5.3.3. minItems
+            schemaP.minItems || 2,
+            // 5.3.4. uniqueItems
+            schemaP.uniqueItems
+            ? 2
+            : 1
+        )) {
+            // recurse dbFieldRandomCreate
+            value.push(local.dbFieldRandomCreate({
+                depth: depth - 1,
+                modeNotRandom: option.modeNotRandom,
+                schemaP: local.schemaPItems(schemaP)
+            }));
+            ii += 1;
+        }
+        break;
     case "boolean":
         value = (
-            options.modeNotRandom
+            option.modeNotRandom
             ? false
             : Boolean(Math.random() > 0.5)
         );
@@ -29662,7 +29941,7 @@ local.dbFieldRandomCreate = function (options) {
     case "number":
         max = schemaP.maximum;
         min = schemaP.minimum;
-        if (options.modeNotRandom) {
+        if (option.modeNotRandom) {
             value = (
                 !(0 < min || max < 0)
                 ? 0
@@ -29706,7 +29985,7 @@ local.dbFieldRandomCreate = function (options) {
     // 5.2. Validation keywords for strings
     case "string":
         value = (
-            options.modeNotRandom
+            option.modeNotRandom
             ? "abcd1234"
             : ((1 + Math.random()) * 0x10000000000000).toString(36).slice(1)
         );
@@ -29728,7 +30007,7 @@ local.dbFieldRandomCreate = function (options) {
             break;
         case "phone":
             value = (
-                options.modeNotRandom
+                option.modeNotRandom
                 ? "+123 (1234) 1234-1234"
                 : "+" + Math.random().toString().slice(-3)
                 + " (" + Math.random().toString().slice(-4) + ") "
@@ -29742,32 +30021,6 @@ local.dbFieldRandomCreate = function (options) {
         }
         value = value.slice(0, schemaP.maxLength || Infinity);
         break;
-    // 5.3. Validation keywords for arrays
-    case "array":
-        if (depth <= 0) {
-            break;
-        }
-        value = [];
-        ii = 0;
-        while (ii < Math.min(
-            // 5.3.2. maxItems
-            schemaP.maxItems || 2,
-            // 5.3.3. minItems
-            schemaP.minItems || 2,
-            // 5.3.4. uniqueItems
-            schemaP.uniqueItems
-            ? 2
-            : 1
-        )) {
-            // recurse dbFieldRandomCreate
-            value.push(local.dbFieldRandomCreate({
-                depth: depth - 1,
-                modeNotRandom: options.modeNotRandom,
-                schemaP: local.schemaPItems(schemaP)
-            }));
-            ii += 1;
-        }
-        break;
     // 5.4. Validation keywords for objects
     default:
         if (depth <= 0) {
@@ -29776,7 +30029,7 @@ local.dbFieldRandomCreate = function (options) {
         // recurse dbRowRandomCreate
         value = local.dbRowRandomCreate({
             depth: depth - 1,
-            modeNotRandom: options.modeNotRandom,
+            modeNotRandom: option.modeNotRandom,
             prefix: ["schema<" + JSON.stringify(schemaP) + ">"],
             schema: schemaP
         });
@@ -29784,41 +30037,41 @@ local.dbFieldRandomCreate = function (options) {
     return value;
 };
 
-local.dbRowListRandomCreate = function (options) {
+local.dbRowListRandomCreate = function (option) {
 /*
- * this function will create a dbRowList of options.length random dbRow's
+ * this function will create a dbRowList of option.length random dbRow's
  */
     var ii;
     ii = 0;
-    while (ii < options.length) {
-        options.dbRowList.push(local.dbRowRandomCreate(options));
+    while (ii < option.length) {
+        option.dbRowList.push(local.dbRowRandomCreate(option));
         ii += 1;
     }
-    return options.dbRowList;
+    return option.dbRowList;
 };
 
-local.dbRowRandomCreate = function (options) {
+local.dbRowRandomCreate = function (option) {
 /*
- * this function will create a random dbRow from options.properties
+ * this function will create a random dbRow from option.properties
  */
     var dbRow;
     var ii;
     var properties;
     dbRow = {};
-    options = local.objectSetDefault(options, {
+    option = local.objectSetDefault(option, {
         override: local.nop,
         prefix: ["dbRow"]
     });
     properties = local.swaggerValidateDataSchema({
         // dereference property
         modeDereference: true,
-        prefix: options.prefix,
-        schema: options.schema,
+        prefix: option.prefix,
+        schema: option.schema,
         swaggerJson: local.swaggerJson
     });
     properties = local.jsonCopy((properties && properties.properties) || {});
     ii = Object.keys(properties).length;
-    while (ii < (options.schema && options.schema.minProperties)) {
+    while (ii < (option.schema && option.schema.minProperties)) {
         properties["property" + ii] = {
             type: "string"
         };
@@ -29826,24 +30079,24 @@ local.dbRowRandomCreate = function (options) {
     }
     Object.keys(properties).forEach(function (key) {
         dbRow[key] = local.dbFieldRandomCreate({
-            depth: options.depth,
-            modeNotRandom: options.modeNotRandom,
+            depth: option.depth,
+            modeNotRandom: option.modeNotRandom,
             schemaP: local.swaggerValidateDataSchema({
                 // dereference property
                 modeDereference: true,
-                prefix: options.prefix.concat([key]),
+                prefix: option.prefix.concat([key]),
                 schema: properties[key],
                 swaggerJson: local.swaggerJson
             })
         });
     });
-    dbRow = local.jsonCopy(local.objectSetOverride(dbRow, options.override(options)));
+    dbRow = local.jsonCopy(local.objectSetOverride(dbRow, option.override(option)));
     // try to validate data
     local.tryCatchOnError(function () {
         local.swaggerValidateDataSchema({
             data: dbRow,
-            prefix: options.prefix,
-            schema: options.schema,
+            prefix: option.prefix,
+            schema: option.schema,
             swaggerJson: local.swaggerJson
         });
     }, local.onErrorDefault);
@@ -29863,28 +30116,28 @@ local.idDomElementCreate = function (seed) {
     ), "_");
 };
 
-local.idNameInit = function (options) {
+local.idNameInit = function (option) {
 /*
- * this function will init options.idBackend, options.idName, and options.queryById
+ * this function will init option.idBackend, option.idName, and option.queryById
  */
     var idBackend;
     var idName;
     // init idName
-    idName = options.crudType[1] || "id";
-    options.idName = idName;
+    idName = option.crudType[1] || "id";
+    option.idName = idName;
     // init idBackend
-    idBackend = options.crudType[2] || options.idName;
-    options.idBackend = idBackend;
+    idBackend = option.crudType[2] || option.idName;
+    option.idBackend = idBackend;
     // invert queryById
-    if (options.modeQueryByIdInvert) {
-        idBackend = options.idName;
-        idName = options.idBackend;
+    if (option.modeQueryByIdInvert) {
+        idBackend = option.idName;
+        idName = option.idBackend;
     }
     // init queryById
-    options.idValue = (options.data && options.data[idBackend]) || options.idValue;
-    options.queryById = {};
-    options.queryById[idName] = options.idValue;
-    return options;
+    option.idValue = (option.data && option.data[idBackend]) || option.idValue;
+    option.queryById = {};
+    option.queryById[idName] = option.idValue;
+    return option;
 };
 
 local.middlewareBodyParse = function (request, response, nextMiddleware) {
@@ -29904,7 +30157,7 @@ local.middlewareBodyParse = function (request, response, nextMiddleware) {
         return;
     }
     headerParse = function () {
-        local.bufferToString(request.bodyRaw.slice(ii, ii + 1024)).replace((
+        local.bufferToUtf8(request.bodyRaw.slice(ii, ii + 1024)).replace((
             /^content-disposition:\u0020?form-data;(.+?)\r\n(?:content-type:\u0020?(.*?)$)?/im
         ), function (ignore, match1, match2) {
             data = {
@@ -29924,12 +30177,12 @@ local.middlewareBodyParse = function (request, response, nextMiddleware) {
     // parse application/x-www-form-urlencoded, e.g.
     // aa=hello%20world&bb=bye%20world
     case "application/x-www-form-urlencoded":
-        request.swgg.bodyParsed = local.bufferToString(request.bodyRaw);
+        request.swgg.bodyParsed = local.bufferToUtf8(request.bodyRaw);
         request.swgg.bodyParsed = local.urlParse("?" + request.swgg.bodyParsed, true).query;
         break;
     case "application/xml":
         request.swgg.bodyParsed = {};
-        local.bufferToString(request.bodyRaw).replace((
+        local.bufferToUtf8(request.bodyRaw).replace((
             /<(.+?)><!\[CDATA\[([\S\s]+?)\]\]>/g
         ), function (name, match1, value) {
             name = match1;
@@ -29963,7 +30216,7 @@ local.middlewareBodyParse = function (request, response, nextMiddleware) {
     case "multipart/form-data":
         request.swgg.bodyParsed = {};
         request.swgg.bodyMeta = {};
-        crlf = local.bufferCreate([0x0d, 0x0a]);
+        crlf = new Uint8Array([0x0d, 0x0a]);
         // init boundary
         ii = 0;
         jj = local.bufferIndexOfSubBuffer(request.bodyRaw, crlf, ii);
@@ -29993,7 +30246,7 @@ local.middlewareBodyParse = function (request, response, nextMiddleware) {
         }
         break;
     default:
-        request.swgg.bodyParsed = local.bufferToString(request.bodyRaw);
+        request.swgg.bodyParsed = local.bufferToUtf8(request.bodyRaw);
         // try to JSON.parse the string
         local.tryCatchOnError(function () {
             request.swgg.bodyParsed = JSON.parse(request.swgg.bodyParsed);
@@ -30009,35 +30262,35 @@ local.middlewareCrudBuiltin = function (request, response, nextMiddleware) {
  */
     var crud;
     var onParallel;
-    var options;
+    var option;
     var tmp;
     var user;
-    options = {};
-    local.onNext(options, function (error, data, meta) {
-        switch (options.modeNext) {
+    option = {};
+    local.onNext(option, function (error, data, meta) {
+        switch (option.modeNext) {
         case 1:
             crud = request.swgg.crud;
             user = request.swgg.user;
             switch (crud.crudType[0]) {
             case "crudCountManyByQuery":
-                crud.dbTable.crudCountManyByQuery(crud.queryWhere, options.onNext);
+                crud.dbTable.crudCountManyByQuery(crud.queryWhere, option.onNext);
                 break;
             case "crudSetManyById":
-                crud.dbTable.crudSetManyById(crud.body, options.onNext);
+                crud.dbTable.crudSetManyById(crud.body, option.onNext);
                 break;
             case "crudSetOneById":
                 // replace idName with idBackend in body
                 delete crud.body.id;
                 delete crud.body[crud.idName];
                 crud.body[crud.idBackend] = crud.data[crud.idName];
-                crud.dbTable.crudSetOneById(crud.body, options.onNext);
+                crud.dbTable.crudSetOneById(crud.body, option.onNext);
                 break;
             case "crudUpdateOneById":
                 // replace idName with idBackend in body
                 delete crud.body.id;
                 delete crud.body[crud.idName];
                 crud.body[crud.idBackend] = crud.data[crud.idName];
-                crud.dbTable.crudUpdateOneById(crud.body, options.onNext);
+                crud.dbTable.crudUpdateOneById(crud.body, option.onNext);
                 break;
             // coverage-hack - test error handling-behavior
             case "crudErrorDelete":
@@ -30047,10 +30300,10 @@ local.middlewareCrudBuiltin = function (request, response, nextMiddleware) {
             case "crudErrorPatch":
             case "crudErrorPost":
             case "crudErrorPut":
-                options.onNext(local.errorDefault);
+                option.onNext(local.errorDefault);
                 break;
             case "crudGetManyByQuery":
-                onParallel = local.onParallel(options.onNext);
+                onParallel = local.onParallel(option.onNext);
                 onParallel.counter += 1;
                 crud.dbTable.crudGetManyByQuery({
                     fieldList: crud.queryFields,
@@ -30069,12 +30322,12 @@ local.middlewareCrudBuiltin = function (request, response, nextMiddleware) {
                 });
                 break;
             case "crudGetOneById":
-                crud.dbTable.crudGetOneById(crud.queryById, options.onNext);
+                crud.dbTable.crudGetOneById(crud.queryById, option.onNext);
                 break;
             case "crudGetOneByQuery":
                 crud.dbTable.crudGetOneByQuery({
                     query: crud.queryWhere
-                }, options.onNext);
+                }, option.onNext);
                 break;
             case "crudNullDelete":
             case "crudNullGet":
@@ -30083,19 +30336,19 @@ local.middlewareCrudBuiltin = function (request, response, nextMiddleware) {
             case "crudNullPatch":
             case "crudNullPost":
             case "crudNullPut":
-                options.onNext();
+                option.onNext();
                 break;
             case "crudRemoveManyByQuery":
-                crud.dbTable.crudRemoveManyByQuery(crud.queryWhere, options.onNext);
+                crud.dbTable.crudRemoveManyByQuery(crud.queryWhere, option.onNext);
                 break;
             case "crudRemoveOneById":
-                crud.dbTable.crudRemoveOneById(crud.queryById, options.onNext);
+                crud.dbTable.crudRemoveOneById(crud.queryById, option.onNext);
                 break;
             case "fileGetOneById":
                 local.dbTableFile = local.db.dbTableCreateOne({
                     name: "File"
                 });
-                crud.dbTable.crudGetOneById(crud.queryById, options.onNext);
+                crud.dbTable.crudGetOneById(crud.queryById, option.onNext);
                 break;
             case "fileUploadManyByForm":
                 local.dbTableFile = local.db.dbTableCreateOne({
@@ -30104,7 +30357,7 @@ local.middlewareCrudBuiltin = function (request, response, nextMiddleware) {
                 request.swgg.paramDict = {};
                 Object.keys(request.swgg.bodyMeta).forEach(function (key) {
                     if (typeof request.swgg.bodyMeta[key].filename !== "string") {
-                        request.swgg.paramDict[key] = local.bufferToString(
+                        request.swgg.paramDict[key] = local.bufferToUtf8(
                             request.swgg.bodyParsed[key]
                         );
                     }
@@ -30131,7 +30384,7 @@ local.middlewareCrudBuiltin = function (request, response, nextMiddleware) {
                     });
                     return tmp;
                 });
-                local.dbTableFile.crudSetManyById(crud.body, options.onNext);
+                local.dbTableFile.crudSetManyById(crud.body, option.onNext);
                 break;
             case "userLoginByPassword":
             case "userLogout":
@@ -30139,36 +30392,36 @@ local.middlewareCrudBuiltin = function (request, response, nextMiddleware) {
                 if (!user.isAuthenticated) {
                     local.serverRespondHeadSet(request, response, 401, {});
                     request.swgg.crud.endArgList = [request, response];
-                    options.modeNext = Infinity;
-                    options.onNext();
+                    option.modeNext = Infinity;
+                    option.onNext();
                     return;
                 }
-                options.onNext();
+                option.onNext();
                 break;
             default:
-                options.modeNext = Infinity;
-                options.onNext();
+                option.modeNext = Infinity;
+                option.onNext();
             }
             break;
         case 2:
             switch (crud.crudType[0]) {
             case "crudSetOneById":
             case "crudUpdateOneById":
-                options.onNext(null, data);
+                option.onNext(null, data);
                 break;
             case "crudGetManyByQuery":
-                options.onNext(null, crud.queryData, {
+                option.onNext(null, crud.queryData, {
                     paginationCountTotal: crud.paginationCountTotal
                 });
                 break;
             case "fileUploadManyByForm":
-                options.onNext(null, data.map(function (element) {
+                option.onNext(null, data.map(function (element) {
                     delete element.fileBlob;
                     return element;
                 }));
                 break;
             case "userLoginByPassword":
-                options.onNext(null, {
+                option.onNext(null, {
                     jwtEncrypted: user.jwtEncrypted
                 });
                 break;
@@ -30176,10 +30429,10 @@ local.middlewareCrudBuiltin = function (request, response, nextMiddleware) {
                 crud.dbTable.crudUpdateOneById({
                     jwtEncrypted: null,
                     username: user.username
-                }, options.onNext);
+                }, option.onNext);
                 break;
             default:
-                options.onNext(null, data, meta);
+                option.onNext(null, data, meta);
             }
             break;
         case 3:
@@ -30195,22 +30448,22 @@ local.middlewareCrudBuiltin = function (request, response, nextMiddleware) {
                 response.end(local.base64ToBuffer(data.fileBlob));
                 break;
             case "userLogout":
-                options.onNext();
+                option.onNext();
                 break;
             default:
-                options.onNext(null, data, meta);
+                option.onNext(null, data, meta);
             }
             break;
         case 4:
             request.swgg.crud.endArgList = [request, response, null, data, meta];
-            options.onNext();
+            option.onNext();
             break;
         default:
             nextMiddleware(error);
         }
     });
-    options.modeNext = 0;
-    options.onNext();
+    option.modeNext = 0;
+    option.onNext();
 };
 
 local.middlewareCrudEnd = function (request, response, nextMiddleware) {
@@ -30280,11 +30533,11 @@ local.middlewareUserLogin = function (request, response, nextMiddleware) {
  * this function will run the middleware that will handle user login
  */
     var crud;
-    var options;
+    var option;
     var user;
-    options = {};
-    local.onNext(options, function (error, data) {
-        switch (options.modeNext) {
+    option = {};
+    local.onNext(option, function (error, data) {
+        switch (option.modeNext) {
         case 1:
             local.dbTableUser = local.db.dbTableCreateOne({
                 name: "User"
@@ -30300,7 +30553,7 @@ local.middlewareUserLogin = function (request, response, nextMiddleware) {
             switch (crud.crudType[0]) {
             // coverage-hack - test error handling-behavior
             case "crudErrorLogin":
-                options.onNext(local.errorDefault);
+                option.onNext(local.errorDefault);
                 return;
             case "userLoginByPassword":
                 user.password = request.urlParsed.query.password;
@@ -30308,7 +30561,7 @@ local.middlewareUserLogin = function (request, response, nextMiddleware) {
                 if (user.password && user.username) {
                     local.dbTableUser.crudGetOneById({
                         username: user.username
-                    }, options.onNext);
+                    }, option.onNext);
                     return;
                 }
                 break;
@@ -30318,12 +30571,12 @@ local.middlewareUserLogin = function (request, response, nextMiddleware) {
                     user.username = user.jwtDecrypted.sub;
                     local.dbTableUser.crudGetOneById({
                         username: user.username
-                    }, options.onNext);
+                    }, option.onNext);
                     return;
                 }
             }
-            options.modeNext = Infinity;
-            options.onNext();
+            option.modeNext = Infinity;
+            option.onNext();
             break;
         case 2:
             switch (crud.crudType[0]) {
@@ -30333,8 +30586,8 @@ local.middlewareUserLogin = function (request, response, nextMiddleware) {
                     user.password,
                     user.data && user.data.password
                 )) {
-                    options.modeNext = Infinity;
-                    options.onNext();
+                    option.modeNext = Infinity;
+                    option.onNext();
                     return;
                 }
                 // init isAuthenticated
@@ -30352,7 +30605,7 @@ local.middlewareUserLogin = function (request, response, nextMiddleware) {
                 local.dbTableUser.crudUpdateOneById({
                     jwtEncrypted: user.jwtEncrypted,
                     username: user.jwtDecrypted.sub
-                }, options.onNext);
+                }, option.onNext);
                 return;
             default:
                 data = data || {};
@@ -30370,14 +30623,14 @@ local.middlewareUserLogin = function (request, response, nextMiddleware) {
                     }
                 }
             }
-            options.onNext();
+            option.onNext();
             break;
         default:
             nextMiddleware(error);
         }
     });
-    options.modeNext = 0;
-    options.onNext();
+    option.modeNext = 0;
+    option.onNext();
 };
 
 local.middlewareValidate = function (request, response, nextMiddleware) {
@@ -30385,15 +30638,15 @@ local.middlewareValidate = function (request, response, nextMiddleware) {
  * this function will run the middleware that will validate the swagger-request
  */
     var crud;
-    var options;
+    var option;
     var tmp;
-    options = {};
-    local.onNext(options, function (error) {
-        switch (options.modeNext) {
+    option = {};
+    local.onNext(option, function (error) {
+        switch (option.modeNext) {
         case 1:
             if (!request.swgg.operation) {
-                options.modeNext = Infinity;
-                options.onNext();
+                option.modeNext = Infinity;
+                option.onNext();
                 return;
             }
             // init paramDict
@@ -30477,7 +30730,7 @@ local.middlewareValidate = function (request, response, nextMiddleware) {
                 parameters: request.swgg.operation.parameters,
                 swaggerJson: local.swaggerJson
             })[0];
-            options.onNext(error);
+            option.onNext(error);
             break;
         case 2:
             // init crud
@@ -30564,17 +30817,17 @@ local.middlewareValidate = function (request, response, nextMiddleware) {
             nextMiddleware(error, request, response);
         }
     });
-    options.modeNext = 0;
-    options.onNext();
+    option.modeNext = 0;
+    option.onNext();
 };
 
-local.normalizeSwaggerJson = function (swaggerJson, options) {
+local.normalizeSwaggerJson = function (swaggerJson, option) {
 /*
  * this function will normalize swaggerJson and filter $npm_package_swggTags0
  */
     var pathDict;
     var tmp;
-    options = local.objectSetDefault(options, {
+    option = local.objectSetDefault(option, {
         objectSetDescription: function (dict) {
             if (
                 dict
@@ -30639,12 +30892,12 @@ local.normalizeSwaggerJson = function (swaggerJson, options) {
             tag.description = tmp.description;
             tag["x-swgg-descriptionLineList"] = tmp["x-swgg-descriptionLineList"];
             // objectSetDescription
-            options.objectSetDescription(tmp);
-            options.objectSetDescription(tag);
+            option.objectSetDescription(tmp);
+            option.objectSetDescription(tag);
         });
     }
-    // apply options.objectSetDescription
-    [swaggerJson.externalDocs, swaggerJson.info].forEach(options.objectSetDescription);
+    // apply option.objectSetDescription
+    [swaggerJson.externalDocs, swaggerJson.info].forEach(option.objectSetDescription);
     [
         swaggerJson.definitions,
         swaggerJson.parameters,
@@ -30655,20 +30908,20 @@ local.normalizeSwaggerJson = function (swaggerJson, options) {
             if (dict === swaggerJson.definitions) {
                 tmp = tmp.properties || {};
                 Object.keys(tmp).forEach(function (key) {
-                    options.objectSetDescription(tmp[key]);
+                    option.objectSetDescription(tmp[key]);
                 });
                 return;
             }
-            options.objectSetDescription(tmp);
+            option.objectSetDescription(tmp);
         });
     });
     Object.keys(swaggerJson.paths).forEach(function (path) {
         Object.keys(swaggerJson.paths[path]).forEach(function (method) {
             tmp = swaggerJson.paths[path][method];
-            options.objectSetDescription(tmp);
-            (tmp.parameters || []).forEach(options.objectSetDescription);
+            option.objectSetDescription(tmp);
+            (tmp.parameters || []).forEach(option.objectSetDescription);
             Object.keys(tmp.responses || {}).forEach(function (key) {
-                options.objectSetDescription(tmp.responses[key]);
+                option.objectSetDescription(tmp.responses[key]);
             });
         });
     });
@@ -30722,22 +30975,22 @@ local.normalizeSwaggerJson = function (swaggerJson, options) {
     return swaggerJson;
 };
 
-local.normalizeSwaggerParamDict = function (options) {
+local.normalizeSwaggerParamDict = function (option) {
 /*
- * this function will parse the options according to options.operation.parameters
+ * this function will parse the option according to option.operation.parameters
  */
     var tmp;
-    options.operation.parameters.forEach(function (schemaP) {
-        tmp = options.paramDict[schemaP.name];
+    option.operation.parameters.forEach(function (schemaP) {
+        tmp = option.paramDict[schemaP.name];
         // init default value
         if (
-            !options.modeNoDefault
-            && (options.modeDefault || schemaP.required)
+            !option.modeNoDefault
+            && (option.modeDefault || schemaP.required)
             && local.isNullOrUndefined(tmp)
         ) {
             tmp = local.jsonCopy(schemaP.default);
         }
-        if (options.modeDefault && local.isNullOrUndefined(tmp)) {
+        if (option.modeDefault && local.isNullOrUndefined(tmp)) {
             tmp = local.dbFieldRandomCreate({
                 modeNotRandom: true,
                 schemaP: schemaP
@@ -30751,7 +31004,7 @@ local.normalizeSwaggerParamDict = function (options) {
                     local.tryCatchOnError(function () {
                         tmp = JSON.parse(tmp);
                     }, local.nop);
-                    options.paramDict[schemaP.name] = tmp;
+                    option.paramDict[schemaP.name] = tmp;
                     return;
                 case "multi":
                     tmp = local.urlParse("?" + tmp, true).query[schemaP.name];
@@ -30792,12 +31045,12 @@ local.normalizeSwaggerParamDict = function (options) {
         ) {
             // try to JSON.parse the string
             local.tryCatchOnError(function () {
-                tmp = JSON.parse(local.bufferToString(tmp));
+                tmp = JSON.parse(local.bufferToUtf8(tmp));
             }, local.nop);
         }
-        options.paramDict[schemaP.name] = tmp;
+        option.paramDict[schemaP.name] = tmp;
     });
-    return options;
+    return option;
 };
 
 local.onErrorJsonapi = function (onError) {
@@ -30872,15 +31125,15 @@ local.onErrorJsonapi = function (onError) {
     };
 };
 
-local.operationIdFromAjax = function (options) {
+local.operationIdFromAjax = function (option) {
 /*
  * this function will create a sortable operationId
- * from the given ajax-options
+ * from given ajax-option
  */
     var urlParsed;
-    urlParsed = local.urlParseWithBraket(options.url);
+    urlParsed = local.urlParseWithBraket(option.url);
     return encodeURIComponent(
-        urlParsed.pathname + urlParsed.hash + " " + options.method.toUpperCase()
+        urlParsed.pathname + urlParsed.hash + " " + option.method.toUpperCase()
     ).replace((
         /[^\w\-.]/g
     ), "_");
@@ -30933,14 +31186,15 @@ local.serverRespondJsonapi = function (request, response, error, data, meta) {
     })(error, data, meta);
 };
 
-local.swaggerJsonFromAjax = function (swaggerJson, options) {
+local.swaggerJsonFromAjax = function (swaggerJson, option) {
 /*
  * this function will update swaggerJson
- * with definitions and paths created from the given ajax-options
+ * with definitions and paths created from given ajax-option
  */
     var data;
     var isArray;
     var operation;
+    var pathDict;
     var type;
     var upsertSchemaP;
     var urlParsed;
@@ -30969,42 +31223,43 @@ local.swaggerJsonFromAjax = function (swaggerJson, options) {
         paths: {},
         swagger: "2.0"
     });
-    // init options
-    options = local.objectSetDefault(options, {
+    // init option
+    option = local.objectSetDefault(option, {
         headers: {},
         method: "GET"
     });
     // init urlParsed
-    urlParsed = local.urlParseWithBraket(options.url);
+    urlParsed = local.urlParseWithBraket(option.url);
     // init operation
     operation = {
-        operationId: options.operationId || local.operationIdFromAjax(options),
+        operationId: option.operationId || local.operationIdFromAjax(option),
         parameters: [],
         responses: {
             default: {
                 description: "default response"
             }
         },
-        tags: options.tags || ["undefined"],
-        "x-swgg-tags0": options["x-swgg-tags0"]
+        tags: option.tags || ["undefined"],
+        "x-swgg-tags0": option["x-swgg-tags0"]
     };
     if ((
         /^(?:http|https):\/\//
-    ).test(options.url)) {
+    ).test(option.url)) {
         operation["x-swgg-host"] = urlParsed.host;
         operation["x-swgg-schemes"] = [urlParsed.protocol.slice(0, -1)];
     }
-    local.objectSetDefault(swaggerJson, local.objectLiteralize({
-        paths: {
-            "$[]": [urlParsed.pathname + urlParsed.hash, {
-                "$[]": [options.method.toLowerCase(), operation]
-            }]
-        }
-    }), 4);
+    pathDict = {};
+    pathDict[urlParsed.pathname + urlParsed.hash] = {};
+    pathDict[urlParsed.pathname + urlParsed.hash][
+        option.method.toLowerCase()
+    ] = operation;
+    local.objectSetDefault(swaggerJson, {
+        paths: pathDict
+    }, 3);
     // init param in header
-    Object.keys(options.headers).forEach(function (key) {
+    Object.keys(option.headers).forEach(function (key) {
         upsertSchemaP({
-            default: options.headers[key],
+            default: option.headers[key],
             in: "header",
             name: key,
             type: "string"
@@ -31032,7 +31287,7 @@ local.swaggerJsonFromAjax = function (swaggerJson, options) {
             type: "string"
         });
     });
-    data = options.data;
+    data = option.data;
     if (!data) {
         return swaggerJson;
     }
@@ -31053,23 +31308,29 @@ local.swaggerJsonFromAjax = function (swaggerJson, options) {
     // init param in body - json-data
     isArray = Array.isArray(data);
     type = local.swaggerJsonFromPostBody(swaggerJson, {
-        data: isArray
-        ? data[0]
-        : data,
+        data: (
+            // ternary-condition
+            isArray
+            ? data[0]
+            : data
+        ),
         depth: 2,
         key: "body",
         prefix: operation.operationId,
-        "x-swgg-tags0": options["x-swgg-tags0"]
+        "x-swgg-tags0": option["x-swgg-tags0"]
     });
     upsertSchemaP({
         in: "body",
         name: "body",
-        schema: isArray
-        ? {
-            items: type,
-            type: "array"
-        }
-        : type
+        schema: (
+            // ternary-condition
+            isArray
+            ? {
+                items: type,
+                type: "array"
+            }
+            : type
+        )
     });
     return swaggerJson;
 };
@@ -31077,12 +31338,12 @@ local.swaggerJsonFromAjax = function (swaggerJson, options) {
 local.swaggerJsonFromCurl = function (swaggerJson, text) {
 /*
  * this function will update swaggerJson
- * with definitions and paths created from the given curl-command-text
+ * with definitions and paths created from given curl-command-text
  */
     var arg;
     var argList;
     var doubleBackslash;
-    var options;
+    var option;
     var quote;
     arg = "";
     argList = [];
@@ -31112,19 +31373,19 @@ local.swaggerJsonFromCurl = function (swaggerJson, text) {
             }
             if (!quote || quote === quote2) {
                 switch (quote) {
+                // parse escapes in single-quotes
+                case "'":
+                    arg = arg.replace((
+                        /'"'"'/g
+                    ), "'");
+                    arg = arg.slice(1, -1);
+                    break;
                 // parse escapes in double-quotes
                 // https://www.gnu.org/software/bash/manual/html_node/Double-Quotes.html
                 case "\"":
                     arg = arg.replace((
                         /\\([$`"\n])/g
                     ), "$1");
-                    arg = arg.slice(1, -1);
-                    break;
-                // parse escapes in single-quotes
-                case "'":
-                    arg = arg.replace((
-                        /'"'"'/g
-                    ), "'");
                     arg = arg.slice(1, -1);
                     break;
                 }
@@ -31146,25 +31407,25 @@ local.swaggerJsonFromCurl = function (swaggerJson, text) {
         case "--data-binary":
         case "--data-raw":
         case "-d":
-            options.data = arg;
-            return;
-        case "--request":
-        case "-X":
-            options.method = arg;
+            option.data = arg;
             return;
         case "--header":
         case "-H":
             arg = arg.split(":");
             arg[1] = arg.slice(1).join(":").trim();
-            options.headers[arg[0].toLowerCase()] = arg[1];
+            option.headers[arg[0].toLowerCase()] = arg[1];
+            return;
+        case "--request":
+        case "-X":
+            option.method = arg;
             return;
         }
         if (arg === "curl") {
-            if (options) {
-                options.url = options.url || argList[ii - 1];
-                swaggerJson = local.swaggerJsonFromAjax(swaggerJson, options);
+            if (option) {
+                option.url = option.url || argList[ii - 1];
+                swaggerJson = local.swaggerJsonFromAjax(swaggerJson, option);
             }
-            options = {
+            option = {
                 headers: {},
                 method: "GET"
             };
@@ -31172,13 +31433,13 @@ local.swaggerJsonFromCurl = function (swaggerJson, text) {
         if ((
             /^(?:http|https):\/\//
         ).test(arg)) {
-            options.url = arg;
+            option.url = arg;
         }
     });
     return swaggerJson;
 };
 
-local.swaggerJsonFromPostBody = function (swaggerJson, options) {
+local.swaggerJsonFromPostBody = function (swaggerJson, option) {
 /*
  * this function will update swaggerJson
  * with definitions created from the post-body-data
@@ -31189,14 +31450,14 @@ local.swaggerJsonFromPostBody = function (swaggerJson, options) {
     var schemaP;
     var type;
     var value;
-    prefix = options.prefix + "." + encodeURIComponent(options.key);
+    prefix = option.prefix + "." + encodeURIComponent(option.key);
     definition = {
         properties: {},
-        "x-swgg-tags0": options["x-swgg-tags0"]
+        "x-swgg-tags0": option["x-swgg-tags0"]
     };
     swaggerJson.definitions[prefix] = definition;
-    Object.keys(options.data).forEach(function (key) {
-        value = options.data[key];
+    Object.keys(option.data).forEach(function (key) {
+        value = option.data[key];
         isArray = Array.isArray(value);
         if (isArray) {
             value = value[0];
@@ -31209,7 +31470,7 @@ local.swaggerJsonFromPostBody = function (swaggerJson, options) {
         schemaP = (
             isArray
             ? {
-                default: options.data[key],
+                default: option.data[key],
                 items: {
                     type: type
                 },
@@ -31221,16 +31482,16 @@ local.swaggerJsonFromPostBody = function (swaggerJson, options) {
             }
         );
         definition.properties[key] = schemaP;
-        if (!(type === "object" && options.depth > 1)) {
+        if (!(type === "object" && option.depth > 1)) {
             return;
         }
         // recurse
         type = local.swaggerJsonFromPostBody(swaggerJson, {
             data: value,
-            depth: options.depth - 1,
+            depth: option.depth - 1,
             key: key,
             prefix: prefix,
-            "x-swgg-tags0": options["x-swgg-tags0"]
+            "x-swgg-tags0": option["x-swgg-tags0"]
         });
         if (isArray) {
             schemaP.items = type;
@@ -31457,23 +31718,23 @@ local.swaggerValidate = function (swaggerJson) {
     });
 };
 
-local.swaggerValidateDataParameters = function (options) {
+local.swaggerValidateDataParameters = function (option) {
 /*
- * this function will validate the items in options.paramDict
- * against the schemaP's in options.parameters
+ * this function will validate the items in option.paramDict
+ * against the schemaP's in option.parameters
  */
     var errorList;
     errorList = [];
-    options.parameters.forEach(function (schemaP) {
+    option.parameters.forEach(function (schemaP) {
         local.tryCatchOnError(function () {
             local.swaggerValidateDataSchema({
-                data: options.data[schemaP.name],
+                data: option.data[schemaP.name],
                 dataReadonlyRemove: [
-                    options.dataReadonlyRemove || {},
+                    option.dataReadonlyRemove || {},
                     schemaP.name,
-                    options.dataReadonlyRemove && options.dataReadonlyRemove[schemaP.name]
+                    option.dataReadonlyRemove && option.dataReadonlyRemove[schemaP.name]
                 ],
-                prefix: options.prefix.concat([schemaP.name]),
+                prefix: option.prefix.concat([schemaP.name]),
                 schema: schemaP,
                 swaggerJson: local.swaggerJson
             });
@@ -31486,13 +31747,13 @@ local.swaggerValidateDataParameters = function (options) {
     return errorList;
 };
 
-local.swaggerValidateDataSchema = function (options) {
+local.swaggerValidateDataSchema = function (option) {
 /*
- * this function will validate options.data against the swagger options.schema
+ * this function will validate option.data against the swagger option.schema
  * http://json-schema.org/draft-04/json-schema-validation.html#rfc.section.5
  */
     var $ref;
-    var circularList;
+    var circularSet;
     var data;
     var dataReadonlyRemove2;
     var ii;
@@ -31501,14 +31762,14 @@ local.swaggerValidateDataSchema = function (options) {
     var schema;
     var test;
     var tmp;
-    if (!options.schema) {
+    if (!option.schema) {
         return;
     }
-    data = options.data;
-    options.dataReadonlyRemove = options.dataReadonlyRemove || [{}, "", null];
-    dataReadonlyRemove2 = options.dataReadonlyRemove[2] || {};
-    schema = options.schema;
-    circularList = [];
+    data = option.data;
+    option.dataReadonlyRemove = option.dataReadonlyRemove || [{}, "", null];
+    dataReadonlyRemove2 = option.dataReadonlyRemove[2] || {};
+    schema = option.schema;
+    circularSet = new Set();
     while (true) {
         // dereference schema.schema
         while (schema.schema) {
@@ -31547,14 +31808,14 @@ local.swaggerValidateDataSchema = function (options) {
         if (!$ref) {
             break;
         }
-        test = circularList.indexOf($ref) < 0;
+        test = !circularSet.has($ref);
         local.throwSwaggerError(!test && {
             data: data,
             errorType: "schemaDereferenceCircular",
-            prefix: options.prefix,
+            prefix: option.prefix,
             schema: schema
         });
-        circularList.push($ref);
+        circularSet.add($ref);
         // validate semanticWalker6
         test = (
             $ref.indexOf("#/") === 0
@@ -31563,30 +31824,30 @@ local.swaggerValidateDataSchema = function (options) {
         local.throwSwaggerError(!test && {
             data: $ref,
             errorType: "semanticWalker6",
-            prefix: options.prefix.concat(["$ref"])
+            prefix: option.prefix.concat(["$ref"])
         });
-        switch (options.modeSchema && $ref) {
+        switch (option.modeSchema && $ref) {
         case "http://json-schema.org/draft-04/schema#/definitions/parameter":
             // validate semanticFormData1
             test = data.in !== "formdata";
             local.throwSwaggerError(!test && {
                 data: data.in,
                 errorType: "semanticFormData1",
-                prefix: options.prefix.concat(["in"])
+                prefix: option.prefix.concat(["in"])
             });
             // validate semanticFormData3
             test = data.type !== "file" || data.in === "formData";
             local.throwSwaggerError(!test && {
                 data: data,
                 errorType: "semanticFormData3",
-                prefix: options.prefix
+                prefix: option.prefix
             });
             // validate semanticParameters2
             test = data.in === "body" || !local.isNullOrUndefined(data.type);
             local.throwSwaggerError(!test && {
                 data: data,
                 errorType: "semanticParameters2",
-                prefix: options.prefix
+                prefix: option.prefix
             });
             break;
         case "http://json-schema.org/draft-04/schema#/definitions/schema":
@@ -31603,7 +31864,7 @@ local.swaggerValidateDataSchema = function (options) {
                 local.throwSwaggerError(!test && {
                     data: data.properties[tmp],
                     errorType: "semanticSchema1",
-                    prefix: options.prefix.concat(["properties", tmp])
+                    prefix: option.prefix.concat(["properties", tmp])
                 });
                 ii += 1;
             }
@@ -31612,28 +31873,28 @@ local.swaggerValidateDataSchema = function (options) {
             local.throwSwaggerError(!test && {
                 data: data.type,
                 errorType: "semanticWalker1",
-                prefix: options.prefix.concat(["type"])
+                prefix: option.prefix.concat(["type"])
             });
             // validate semanticWalker2
             test = !(data.maximum < data.minimum);
             local.throwSwaggerError(!test && {
                 data: data,
                 errorType: "semanticWalker2",
-                prefix: options.prefix
+                prefix: option.prefix
             });
             // validate semanticWalker3
             test = !(data.maxProperties < data.minProperties);
             local.throwSwaggerError(!test && {
                 data: data,
                 errorType: "semanticWalker3",
-                prefix: options.prefix
+                prefix: option.prefix
             });
             // validate semanticWalker4
             test = !(data.maxLength < data.minLength);
             local.throwSwaggerError(!test && {
                 data: data,
                 errorType: "semanticWalker4",
-                prefix: options.prefix,
+                prefix: option.prefix,
                 schema: schema
             });
             break;
@@ -31642,40 +31903,40 @@ local.swaggerValidateDataSchema = function (options) {
         schema = (
             $ref.indexOf("http://json-schema.org/draft-04/schema#/") === 0
             ? local.swaggerSchemaJson[tmp[0]]
-            : options.swaggerJson[tmp[0]]
+            : option.swaggerJson[tmp[0]]
         );
         schema = schema && schema[tmp[1]];
         test = schema;
         local.throwSwaggerError(!test && {
             data: data,
             errorType: "schemaDereference",
-            prefix: options.prefix,
-            schema: options.schema
+            prefix: option.prefix,
+            schema: option.schema
         });
     }
-    if (options.modeDereference) {
-        if (options.modeDereferenceDepth > 1) {
+    if (option.modeDereference) {
+        if (option.modeDereferenceDepth > 1) {
             schema = local.jsonCopy(schema);
             Object.keys(schema.properties || {}).forEach(function (key) {
                 schema.properties[key] = local.swaggerValidateDataSchema({
                     // dereference property
                     modeDereference: true,
-                    modeDereferenceDepth: options.modeDereferenceDepth - 1,
-                    prefix: options.prefix.concat(["properties", key]),
+                    modeDereferenceDepth: option.modeDereferenceDepth - 1,
+                    prefix: option.prefix.concat(["properties", key]),
                     schema: schema.properties[key],
-                    swaggerJson: options.swaggerJson
+                    swaggerJson: option.swaggerJson
                 });
             });
         }
         return schema;
     }
     // validate schema.default
-    if (options.modeDefault) {
+    if (option.modeDefault) {
         data = schema.default;
     }
     // validate schema.required
     test = (
-        options.modeDefault
+        option.modeDefault
         || !local.isNullOrUndefined(data)
         || schema.required !== true
         || schema["x-swgg-notRequired"]
@@ -31683,7 +31944,7 @@ local.swaggerValidateDataSchema = function (options) {
     local.throwSwaggerError(!test && {
         data: data,
         errorType: "objectRequired",
-        prefix: options.prefix,
+        prefix: option.prefix,
         schema: schema
     });
     if (local.isNullOrUndefined(data)) {
@@ -31691,17 +31952,17 @@ local.swaggerValidateDataSchema = function (options) {
     }
     // validate semanticItemsRequiredForArrayObjects1
     test = (
-        !options.modeSchema || local.schemaPType(data) !== "array"
+        !option.modeSchema || local.schemaPType(data) !== "array"
         || (typeof local.schemaPItems(data) === "object" && local.schemaPItems(data))
     );
     local.throwSwaggerError(!test && {
         errorType: "semanticItemsRequiredForArrayObjects1",
-        prefix: options.prefix,
+        prefix: option.prefix,
         schema: data
     });
     // remove readOnly property
     if (schema.readOnly) {
-        delete options.dataReadonlyRemove[0][options.dataReadonlyRemove[1]];
+        delete option.dataReadonlyRemove[0][option.dataReadonlyRemove[1]];
     }
     // optimization - validate schema.type first
     // 5.5.2. type
@@ -31715,7 +31976,7 @@ local.swaggerValidateDataSchema = function (options) {
         test = typeof data === "boolean";
         break;
     case "file":
-        test = !options.modeSchema;
+        test = !option.modeSchema;
         break;
     case "integer":
         test = Number.isInteger(data);
@@ -31738,9 +31999,9 @@ local.swaggerValidateDataSchema = function (options) {
     case "string":
         test = (
             typeof data === "string"
-            || (!options.modeSchema && schema.format === "binary")
+            || (!option.modeSchema && schema.format === "binary")
         );
-        switch (test && !options.modeSchema && schema.format) {
+        switch (test && !option.modeSchema && schema.format) {
         // Clarify 'byte' format #50
         // https://github.com/swagger-api/swagger-spec/issues/50
         case "byte":
@@ -31767,12 +32028,12 @@ local.swaggerValidateDataSchema = function (options) {
         }
         break;
     default:
-        test = options.modeSchema || typeof data === "object";
+        test = option.modeSchema || typeof data === "object";
     }
     local.throwSwaggerError(!test && {
         data: data,
         errorType: "itemType",
-        prefix: options.prefix,
+        prefix: option.prefix,
         schema: schema,
         typeof: typeof data
     });
@@ -31781,72 +32042,6 @@ local.swaggerValidateDataSchema = function (options) {
         tmp = "array";
     }
     switch (tmp) {
-    // 5.1. Validation keywords for numeric instances (number and integer)
-    case "number":
-        // 5.1.1. multipleOf
-        test = typeof schema.multipleOf !== "number" || data % schema.multipleOf === 0;
-        local.throwSwaggerError(!test && {
-            data: data,
-            errorType: "numberMultipleOf",
-            prefix: options.prefix,
-            schema: schema
-        });
-        // 5.1.2. maximum and exclusiveMaximum
-        test = typeof schema.maximum !== "number" || (
-            schema.exclusiveMaximum
-            ? data < schema.maximum
-            : data <= schema.maximum
-        );
-        local.throwSwaggerError(!test && {
-            data: data,
-            errorType: schema.exclusiveMaximum
-            ? "numberExclusiveMaximum"
-            : "numberMaximum",
-            prefix: options.prefix,
-            schema: schema
-        });
-        // 5.1.3. minimum and exclusiveMinimum
-        test = typeof schema.minimum !== "number" || (
-            schema.exclusiveMinimum
-            ? data > schema.minimum
-            : data >= schema.minimum
-        );
-        local.throwSwaggerError(!test && {
-            data: data,
-            errorType: schema.exclusiveMinimum
-            ? "numberExclusiveMinimum"
-            : "numberMinimum",
-            prefix: options.prefix,
-            schema: schema
-        });
-        break;
-    // 5.2. Validation keywords for strings
-    case "string":
-        // 5.2.1. maxLength
-        test = typeof schema.maxLength !== "number" || data.length <= schema.maxLength;
-        local.throwSwaggerError(!test && {
-            data: data,
-            errorType: "stringMaxLength",
-            prefix: options.prefix,
-            schema: schema
-        });
-        // 5.2.2. minLength
-        test = typeof schema.minLength !== "number" || data.length >= schema.minLength;
-        local.throwSwaggerError(!test && {
-            data: data,
-            errorType: "stringMinLength",
-            prefix: options.prefix,
-            schema: schema
-        });
-        // 5.2.3. pattern
-        test = !schema.pattern || new RegExp(schema.pattern).test(data);
-        local.throwSwaggerError(!test && {
-            data: data,
-            errorType: "stringPattern",
-            prefix: options.prefix,
-            schema: schema
-        });
-        break;
     // 5.3. Validation keywords for arrays
     case "array":
         // 5.3.1. additionalItems and items
@@ -31856,10 +32051,10 @@ local.swaggerValidateDataSchema = function (options) {
             local.swaggerValidateDataSchema({
                 data: element,
                 dataReadonlyRemove: [dataReadonlyRemove2, ii, dataReadonlyRemove2[ii]],
-                modeSchema: options.modeSchema,
-                prefix: options.prefix.concat([ii]),
+                modeSchema: option.modeSchema,
+                prefix: option.prefix.concat([ii]),
                 schema: local.schemaPItems(schema) || schema.additionalItems,
-                swaggerJson: options.swaggerJson
+                swaggerJson: option.swaggerJson
             });
         });
         // 5.3.2. maxItems
@@ -31867,7 +32062,7 @@ local.swaggerValidateDataSchema = function (options) {
         local.throwSwaggerError(!test && {
             data: data,
             errorType: "arrayMaxItems",
-            prefix: options.prefix,
+            prefix: option.prefix,
             schema: schema
         });
         // 5.3.3. minItems
@@ -31875,7 +32070,7 @@ local.swaggerValidateDataSchema = function (options) {
         local.throwSwaggerError(!test && {
             data: data,
             errorType: "arrayMinItems",
-            prefix: options.prefix,
+            prefix: option.prefix,
             schema: schema
         });
         // 5.3.4. uniqueItems
@@ -31886,9 +32081,54 @@ local.swaggerValidateDataSchema = function (options) {
         local.throwSwaggerError(!test && {
             data: data,
             errorType: "arrayUniqueItems",
-            prefix: options.prefix,
+            prefix: option.prefix,
             schema: schema,
             tmp: tmp
+        });
+        break;
+    // 5.1. Validation keywords for numeric instances (number and integer)
+    case "number":
+        // 5.1.1. multipleOf
+        test = typeof schema.multipleOf !== "number" || data % schema.multipleOf === 0;
+        local.throwSwaggerError(!test && {
+            data: data,
+            errorType: "numberMultipleOf",
+            prefix: option.prefix,
+            schema: schema
+        });
+        // 5.1.2. maximum and exclusiveMaximum
+        test = typeof schema.maximum !== "number" || (
+            schema.exclusiveMaximum
+            ? data < schema.maximum
+            : data <= schema.maximum
+        );
+        local.throwSwaggerError(!test && {
+            data: data,
+            errorType: (
+                // ternary-condition
+                schema.exclusiveMaximum
+                ? "numberExclusiveMaximum"
+                : "numberMaximum"
+            ),
+            prefix: option.prefix,
+            schema: schema
+        });
+        // 5.1.3. minimum and exclusiveMinimum
+        test = typeof schema.minimum !== "number" || (
+            schema.exclusiveMinimum
+            ? data > schema.minimum
+            : data >= schema.minimum
+        );
+        local.throwSwaggerError(!test && {
+            data: data,
+            errorType: (
+                // ternary-condition
+                schema.exclusiveMinimum
+                ? "numberExclusiveMinimum"
+                : "numberMinimum"
+            ),
+            prefix: option.prefix,
+            schema: schema
         });
         break;
     // 5.4. Validation keywords for objects
@@ -31901,7 +32141,7 @@ local.swaggerValidateDataSchema = function (options) {
         local.throwSwaggerError(!test && {
             data: data,
             errorType: "objectMaxProperties",
-            prefix: options.prefix,
+            prefix: option.prefix,
             schema: schema
         });
         // 5.4.2. minProperties
@@ -31912,7 +32152,7 @@ local.swaggerValidateDataSchema = function (options) {
         local.throwSwaggerError(!test && {
             data: data,
             errorType: "objectMinProperties",
-            prefix: options.prefix,
+            prefix: option.prefix,
             schema: schema
         });
         // 5.4.3. required
@@ -31923,7 +32163,7 @@ local.swaggerValidateDataSchema = function (options) {
                 data: data,
                 errorType: "semanticItemsRequiredForArrayObjects2",
                 key: key,
-                prefix: options.prefix,
+                prefix: option.prefix,
                 schema: schema
             });
         });
@@ -31940,10 +32180,10 @@ local.swaggerValidateDataSchema = function (options) {
                         key,
                         dataReadonlyRemove2[key]
                     ],
-                    modeSchema: options.modeSchema,
-                    prefix: options.prefix.concat([key]),
+                    modeSchema: option.modeSchema,
+                    prefix: option.prefix.concat([key]),
                     schema: schema.properties[key],
-                    swaggerJson: options.swaggerJson
+                    swaggerJson: option.swaggerJson
                 });
             }
             Object.keys(schema.patternProperties || {}).forEach(function (rgx) {
@@ -31952,10 +32192,10 @@ local.swaggerValidateDataSchema = function (options) {
                     // recurse - schema.patternProperties
                     local.swaggerValidateDataSchema({
                         data: data[key],
-                        modeSchema: options.modeSchema,
-                        prefix: options.prefix.concat([key]),
+                        modeSchema: option.modeSchema,
+                        prefix: option.prefix.concat([key]),
                         schema: schema.patternProperties[rgx],
-                        swaggerJson: options.swaggerJson
+                        swaggerJson: option.swaggerJson
                     });
                 }
             });
@@ -31986,16 +32226,16 @@ local.swaggerValidateDataSchema = function (options) {
                 data: data,
                 errorType: "objectAdditionalProperties",
                 key: key,
-                prefix: options.prefix,
+                prefix: option.prefix,
                 schema: schema
             });
             // recurse - schema.additionalProperties
             local.swaggerValidateDataSchema({
                 data: data[key],
-                modeSchema: options.modeSchema,
-                prefix: options.prefix.concat([key]),
+                modeSchema: option.modeSchema,
+                prefix: option.prefix.concat([key]),
                 schema: schema.additionalProperties,
-                swaggerJson: options.swaggerJson
+                swaggerJson: option.swaggerJson
             });
         });
         // 5.4.5. dependencies
@@ -32007,10 +32247,10 @@ local.swaggerValidateDataSchema = function (options) {
             // recurse - schema.dependencies
             local.swaggerValidateDataSchema({
                 data: data[key],
-                modeSchema: options.modeSchema,
-                prefix: options.prefix.concat([key]),
+                modeSchema: option.modeSchema,
+                prefix: option.prefix.concat([key]),
                 schema: schema.dependencies[key],
-                swaggerJson: options.swaggerJson
+                swaggerJson: option.swaggerJson
             });
             // 5.4.5.2.2. Property dependencies
             schema.dependencies[key].every(function (key2) {
@@ -32020,16 +32260,43 @@ local.swaggerValidateDataSchema = function (options) {
                     errorType: "objectDependencies",
                     key: key,
                     key2: key2,
-                    prefix: options.prefix,
+                    prefix: option.prefix,
                     schema: schema
                 });
             });
         });
         break;
+    // 5.2. Validation keywords for strings
+    case "string":
+        // 5.2.1. maxLength
+        test = typeof schema.maxLength !== "number" || data.length <= schema.maxLength;
+        local.throwSwaggerError(!test && {
+            data: data,
+            errorType: "stringMaxLength",
+            prefix: option.prefix,
+            schema: schema
+        });
+        // 5.2.2. minLength
+        test = typeof schema.minLength !== "number" || data.length >= schema.minLength;
+        local.throwSwaggerError(!test && {
+            data: data,
+            errorType: "stringMinLength",
+            prefix: option.prefix,
+            schema: schema
+        });
+        // 5.2.3. pattern
+        test = !schema.pattern || new RegExp(schema.pattern).test(data);
+        local.throwSwaggerError(!test && {
+            data: data,
+            errorType: "stringPattern",
+            prefix: option.prefix,
+            schema: schema
+        });
+        break;
     }
     // 5.5. Validation keywords for any instance type
     // 5.5.1. enum
-    tmp = schema.enum || (!options.modeSchema && (local.schemaPItems(schema) || {}).enum);
+    tmp = schema.enum || (!option.modeSchema && (local.schemaPItems(schema) || {}).enum);
     test = !tmp || (
         Array.isArray(data)
         ? data
@@ -32040,7 +32307,7 @@ local.swaggerValidateDataSchema = function (options) {
     local.throwSwaggerError(!test && {
         data: data,
         errorType: "itemEnum",
-        prefix: options.prefix,
+        prefix: option.prefix,
         schema: schema,
         tmp: tmp
     });
@@ -32051,10 +32318,10 @@ local.swaggerValidateDataSchema = function (options) {
         // recurse - schema.allOf
         local.swaggerValidateDataSchema({
             data: data,
-            prefix: options.prefix,
-            modeSchema: options.modeSchema,
+            prefix: option.prefix,
+            modeSchema: option.modeSchema,
             schema: element,
-            swaggerJson: options.swaggerJson
+            swaggerJson: option.swaggerJson
         });
     });
     // 5.5.4. anyOf
@@ -32064,10 +32331,10 @@ local.swaggerValidateDataSchema = function (options) {
             // recurse - schema.anyOf
             local.swaggerValidateDataSchema({
                 data: data,
-                modeSchema: options.modeSchema,
-                prefix: options.prefix,
+                modeSchema: option.modeSchema,
+                prefix: option.prefix,
                 schema: element,
-                swaggerJson: options.swaggerJson
+                swaggerJson: option.swaggerJson
             });
             return true;
         }, local.nop);
@@ -32077,7 +32344,7 @@ local.swaggerValidateDataSchema = function (options) {
     local.throwSwaggerError(!test && {
         data: data,
         errorType: "itemOneOf",
-        prefix: options.prefix,
+        prefix: option.prefix,
         schema: schema,
         tmp: tmp
     });
@@ -32092,10 +32359,10 @@ local.swaggerValidateDataSchema = function (options) {
             // recurse - schema.oneOf
             local.swaggerValidateDataSchema({
                 data: data,
-                modeSchema: options.modeSchema,
-                prefix: options.prefix,
+                modeSchema: option.modeSchema,
+                prefix: option.prefix,
                 schema: element,
-                swaggerJson: options.swaggerJson
+                swaggerJson: option.swaggerJson
             });
             tmp += 1;
         }, local.nop);
@@ -32105,7 +32372,7 @@ local.swaggerValidateDataSchema = function (options) {
     local.throwSwaggerError(!test && {
         data: data,
         errorType: "itemOneOf",
-        prefix: options.prefix,
+        prefix: option.prefix,
         schema: schema,
         tmp: tmp
     });
@@ -32114,17 +32381,17 @@ local.swaggerValidateDataSchema = function (options) {
         // recurse - schema.not
         local.swaggerValidateDataSchema({
             data: data,
-            modeSchema: options.modeSchema,
-            prefix: options.prefix,
+            modeSchema: option.modeSchema,
+            prefix: option.prefix,
             schema: schema.not,
-            swaggerJson: options.swaggerJson
+            swaggerJson: option.swaggerJson
         });
         return true;
     }, local.nop);
     local.throwSwaggerError(!test && {
         data: data,
         errorType: "itemNot",
-        prefix: options.prefix,
+        prefix: option.prefix,
         schema: schema
     });
     // 5.5.7. definitions
@@ -32133,43 +32400,43 @@ local.swaggerValidateDataSchema = function (options) {
     if (schema === local.swaggerSchemaJson.definitions.jsonReference) {
         local.swaggerValidateDataSchema({
             modeDereference: true,
-            modeSchema: options.modeSchema,
-            prefix: options.prefix,
+            modeSchema: option.modeSchema,
+            prefix: option.prefix,
             schema: data,
-            swaggerJson: options.swaggerJson
+            swaggerJson: option.swaggerJson
         });
     }
     return schema;
 };
 
-local.swaggerValidateFile = function (options, onError) {
+local.swaggerValidateFile = function (option, onError) {
 /*
- * this function will validate the json-file options.file
+ * this function will validate the json-file option.file
  */
-    local.onNext(options, function (error, data) {
-        switch (options.modeNext) {
+    local.onNext(option, function (error, data) {
+        switch (option.modeNext) {
         case 1:
-            if (typeof options.data === "string") {
-                options.onNext(null, options.data);
+            if (typeof option.data === "string") {
+                option.onNext(null, option.data);
                 return;
             }
             // fetch url
             if ((
                 /^(?:http|https):\/\//
-            ).test(options.file)) {
+            ).test(option.file)) {
                 local.ajax({
-                    url: options.file
+                    url: option.file
                 }, function (error, xhr) {
-                    options.onNext(error, xhr && xhr.responseText);
+                    option.onNext(error, xhr && xhr.responseText);
                 });
                 return;
             }
             // read file
-            local.fs.readFile(options.file, "utf8", options.onNext);
+            local.fs.readFile(option.file, "utf8", option.onNext);
             break;
         case 2:
             // jslint
-            local.jslint.jslintAndPrint(data, options.file);
+            local.jslint.jslintAndPrint(data, option.file);
             local.assertThrow(
                 !local.jslint.jslintResult.errorText,
                 local.jslint.jslintResult.errorText.replace((
@@ -32178,71 +32445,73 @@ local.swaggerValidateFile = function (options, onError) {
             );
             // validate
             local.swgg.swaggerValidate(JSON.parse(data));
-            options.onNext();
+            option.onNext();
             break;
         default:
             console.error(
                 error
-                ? "\u001b[31mswagger-validate - failed - " + options.file + "\n"
+                ? "\u001b[31mswagger-validate - failed - " + option.file + "\n"
                 + error.message + "\u001b[39m"
-                : "swagger-validate - passed - " + options.file
+                : "swagger-validate - passed - " + option.file
             );
             onError(error);
         }
     });
-    options.modeNext = 0;
-    options.onNext();
+    option.modeNext = 0;
+    option.onNext();
 };
 
-local.throwSwaggerError = function (options) {
+local.throwSwaggerError = function (option) {
 /*
- * this function will throw a swaggerError with the given options.errorType
+ * this function will throw a swaggerError with given option.errorType
  */
     var error;
-    if (!options) {
+    if (!option) {
         return;
     }
     [0, 2].forEach(function (ii) {
-        options["prefix" + ii] = options.prefix[ii] + options.prefix.slice(
+        option["prefix" + ii] = option.prefix[ii] + option.prefix.slice(
             ii + 1
         ).map(function (element) {
             return "[" + JSON.stringify(element) + "]";
         }).join("");
     });
-    options.prefix0 += " = " + local.stringTruncate(
-        JSON.stringify(options.data) || "undefined",
+    option.prefix0 += " = " + local.stringTruncate(
+        JSON.stringify(option.data) || "undefined",
         100
     );
-    options.schema2 = local.stringTruncate(
-        JSON.stringify(options.schema) || "undefined",
+    option.schema2 = local.stringTruncate(
+        JSON.stringify(option.schema) || "undefined",
         500
     );
-    options.type2 = (options.schema && local.schemaPType(options.schema)) || "object";
-    if (options.schema && options.schema.format) {
-        options.type2 += " (" + options.schema.format + ")";
+    option.type2 = (option.schema && local.schemaPType(option.schema)) || "object";
+    if (option.schema && option.schema.format) {
+        option.type2 += " (" + option.schema.format + ")";
     }
-    error = new Error("error." + options.errorType + " - " + local.templateRender(
-        local.swaggerErrorTypeDict[options.errorType],
-        options,
+    error = new Error("error." + option.errorType + " - " + local.templateRender(
+        local.swaggerErrorTypeDict[option.errorType],
+        option,
         {
             notHtmlSafe: true
         }
     ));
     error.messageShort = local.templateRender(
-        local.swaggerErrorTypeDict[options.errorType].replace("{{prefix0}}", "{{prefix2}}"),
-        options,
+        local.swaggerErrorTypeDict[option.errorType].replace("{{prefix0}}", "{{prefix2}}"),
+        option,
         {
             notHtmlSafe: true
         }
     );
-    error.options = options;
+    error.option = option;
     error.statusCode = 400;
     throw error;
 };
 
 local.uiEventDelegate = function (event) {
     // filter non-input keyup-event
-    event.targetOnEvent = event.target.closest("[data-event]");
+    event.targetOnEvent = event.target.closest(
+        "[data-onevent]"
+    );
     if (!event.targetOnEvent) {
         return;
     }
@@ -32260,7 +32529,9 @@ local.uiEventDelegate = function (event) {
             return;
         }
         local.uiEventDelegateKeyupTimerTimeout = null;
-        if (!event.target.closest("input, option, select, textarea")) {
+        if (!event.target.closest(
+            "input, option, select, textarea"
+        )) {
             return;
         }
     }
@@ -32271,10 +32542,12 @@ local.uiEventDelegate = function (event) {
         break;
     }
     event.stopPropagation();
-    local.uiEventListenerDict[event.targetOnEvent.dataset.event](event);
+    local.uiEventListenerDict[event.targetOnEvent.dataset.onevent](event);
 };
 
-local.uiEventListenerDict = {};
+local.uiEventListenerDict = local.objectAssignDefault(
+    globalThis.domOnEventDelegateDict
+);
 
 local.uiEventListenerDict.onEventDomDb = local.db.onEventDomDb;
 
@@ -32297,10 +32570,10 @@ local.uiEventListenerDict.onEventInputTextareaChange = function (event) {
     });
 };
 
-local.uiEventListenerDict.onEventInputValidateAndAjax = function (options, onError) {
+local.uiEventListenerDict.onEventInputValidateAndAjax = function (option, onError) {
 /*
  * this function will validate the input parameters
- * against the schemas in options.parameters
+ * against the schemas in option.parameters
  */
     var errorDict;
     var jsonParse;
@@ -32315,15 +32588,18 @@ local.uiEventListenerDict.onEventInputValidateAndAjax = function (options, onErr
             return text;
         });
     };
-    options.targetOnEvent = options.targetOnEvent.closest(".operation");
-    options.api = local.apiDict[options.targetOnEvent.dataset._methodPath];
-    options.headers = {};
-    options.modeAjax = options.modeAjax || "validate";
-    options.modeNoDefault = true;
-    options.paramDict = {};
-    options.url = "";
-    options.api.parameters.forEach(function (schemaP) {
-        tmp = options.targetOnEvent.querySelector(
+    // jslint-hack
+    option.targetOnEvent = option.targetOnEvent.closest(
+        ".operation"
+    );
+    option.api = local.apiDict[option.targetOnEvent.dataset._methodPath];
+    option.headers = {};
+    option.modeAjax = option.modeAjax || "validate";
+    option.modeNoDefault = true;
+    option.paramDict = {};
+    option.url = "";
+    option.api.parameters.forEach(function (schemaP) {
+        tmp = option.targetOnEvent.querySelector(
             ".schemaP[data-name=" + JSON.stringify(schemaP.name) + "] .input"
         );
         switch (tmp.tagName) {
@@ -32390,21 +32666,25 @@ local.uiEventListenerDict.onEventInputValidateAndAjax = function (options, onErr
             });
             break;
         }
-        options.paramDict[schemaP.name] = tmp;
+        option.paramDict[schemaP.name] = tmp;
     });
-    options.api.ajax(options, onError || local.nop);
+    option.api.ajax(option, onError || local.nop);
     // init errorDict
     errorDict = {};
-    ((options.error && options.error.errorList) || []).forEach(function (error) {
-        errorDict[error.options.prefix[2]] = error;
+    ((option.error && option.error.errorList) || []).forEach(function (error) {
+        errorDict[error.option.prefix[2]] = error;
     });
     // shake input on error
-    Array.from(options.targetOnEvent.querySelectorAll(
+    Array.from(option.targetOnEvent.querySelectorAll(
         ".schemaP[data-name]"
     )).forEach(function (element) {
         tmp = errorDict[element.dataset.name];
-        local.uiAnimateShakeIfError(tmp, element.querySelector(".input"));
-        element.querySelector(".colorError").textContent = (
+        local.uiAnimateShakeIfError(tmp, element.querySelector(
+            ".input"
+        ));
+        element.querySelector(
+            ".colorError"
+        ).textContent = (
             tmp
             ? tmp.messageShort
             : ""
@@ -32412,36 +32692,42 @@ local.uiEventListenerDict.onEventInputValidateAndAjax = function (options, onErr
     });
     // shake submit-button on error
     local.uiAnimateShakeIfError(
-        options.error,
-        options.targetOnEvent.querySelector(".onEventOperationAjax")
+        option.error,
+        option.targetOnEvent.querySelector(
+            ".onEventOperationAjax"
+        )
     );
     // init requestCurl
-    tmp = options.data;
+    tmp = option.data;
     local.tryCatchOnError(function () {
-        tmp = JSON.stringify(JSON.parse(options.data), null, 4);
+        tmp = JSON.stringify(JSON.parse(option.data), null, 4);
     }, local.nop);
     tmp = (
-        "curl \\\n" + "--request " + options.api._method + " \\\n"
-        + Object.keys(options.headers).map(function (key) {
-            return "--header '" + key + ": " + options.headers[key] + "' \\\n";
+        "curl \\\n" + "--request " + option.api._method + " \\\n"
+        + Object.keys(option.headers).map(function (key) {
+            return "--header '" + key + ": " + option.headers[key] + "' \\\n";
         }).join("") + "--data-binary " + (
             typeof tmp === "string"
             ? "'" + tmp.replace((
                 /'/g
             ), "'\"'\"'") + "'"
             : "<blob>"
-        ) + " \\\n\"" + options.url.replace((
+        ) + " \\\n\"" + option.url.replace((
             /&/g
         ), "&\\\n") + "\""
     );
-    options.targetOnEvent.querySelector(".requestCurl").textContent = tmp;
+    option.targetOnEvent.querySelector(
+        ".requestCurl"
+    ).textContent = tmp;
     // init requestJavascript
-    options.targetOnEvent.querySelector(".requestJavascript").textContent = local.templateRender(
+    option.targetOnEvent.querySelector(
+        ".requestJavascript"
+    ).textContent = local.templateRender(
         local.templateUiRequestJavascript,
         {
-            options: options,
-            optionsJson: JSON.stringify({
-                paramDict: options.paramDict
+            option: option,
+            optionJson: JSON.stringify({
+                paramDict: option.paramDict
             }, null, 4)
         },
         {
@@ -32450,34 +32736,40 @@ local.uiEventListenerDict.onEventInputValidateAndAjax = function (options, onErr
     );
 };
 
-local.uiEventListenerDict.onEventOperationAjax = function (options) {
+local.uiEventListenerDict.onEventOperationAjax = function (option) {
 /*
  * this function will submit the operation to the backend
  */
-    // ensure options is stateless
-    options = {
-        targetOnEvent: options.targetOnEvent.closest(".operation")
+    // ensure option is stateless
+    option = {
+        targetOnEvent: option.targetOnEvent.closest(
+            ".operation"
+        )
     };
-    local.onNext(options, function (error, data) {
-        switch (options.modeNext) {
+    local.onNext(option, function (error, data) {
+        switch (option.modeNext) {
         case 1:
             // force ajax
-            options.modeAjax = "ajax";
+            option.modeAjax = "ajax";
             // validate input
             local.uiEventListenerDict.onEventInputValidateAndAjax(
-                options,
-                options.onNext
+                option,
+                option.onNext
             );
             // reset response output
-            Array.from(options.targetOnEvent.querySelectorAll(
+            Array.from(option.targetOnEvent.querySelectorAll(
                 ".responseBody, .responseHeaders, .responseStatusCode"
             )).forEach(function (element) {
                 element.classList.remove("hasError");
                 element.textContent = "loading ...";
             });
-            options.targetOnEvent.querySelector(".responseMedia").innerHTML = "";
+            option.targetOnEvent.querySelector(
+                ".responseMedia"
+            ).innerHTML = "";
             // scrollTo response
-            options.targetOnEvent.querySelector(".responseStatusCode").focus();
+            option.targetOnEvent.querySelector(
+                ".responseStatusCode"
+            ).focus();
             break;
         default:
             local.onErrorDefault(error);
@@ -32486,17 +32778,23 @@ local.uiEventListenerDict.onEventOperationAjax = function (options) {
                 statusCode: "undefined"
             });
             // init responseStatusCode
-            options.targetOnEvent.querySelector(".responseStatusCode").textContent = (
+            option.targetOnEvent.querySelector(
+                ".responseStatusCode"
+            ).textContent = (
                 data.statusCode
             );
             // init responseHeaders
-            options.targetOnEvent.querySelector(".responseHeaders").textContent = Object.keys(
+            option.targetOnEvent.querySelector(
+                ".responseHeaders"
+            ).textContent = Object.keys(
                 data.responseHeaders
             ).map(function (key) {
                 return key + ": " + data.responseHeaders[key] + "\r\n";
             }).join("");
             // init responseBody
-            options.targetOnEvent.querySelector(".responseHeaders").textContent.replace((
+            option.targetOnEvent.querySelector(
+                ".responseHeaders"
+            ).textContent.replace((
                 /^content-type:(.*?)$/im
             ), function (ignore, match1) {
                 data.contentType = match1.trim();
@@ -32506,10 +32804,14 @@ local.uiEventListenerDict.onEventOperationAjax = function (options) {
             case "audio":
             case "img":
             case "video":
-                options.targetOnEvent.querySelector(".responseBody").textContent = (
+                option.targetOnEvent.querySelector(
+                    ".responseBody"
+                ).textContent = (
                     data.contentType
                 );
-                options.targetOnEvent.querySelector(".responseMedia").innerHTML = (
+                option.targetOnEvent.querySelector(
+                    ".responseMedia"
+                ).innerHTML = (
                     "<" + data.mediaType
                     + " class=\"domOnEventMediaHotkeysInit\" controls src=\"data:"
                     + data.contentType
@@ -32519,22 +32821,24 @@ local.uiEventListenerDict.onEventOperationAjax = function (options) {
                 globalThis.domOnEventMediaHotkeys("init");
                 break;
             default:
-                options.targetOnEvent.querySelector(".responseBody").textContent = (
+                option.targetOnEvent.querySelector(
+                    ".responseBody"
+                ).textContent = (
                     data.responseJson
                     ? JSON.stringify(data.responseJson, null, 4)
                     : data.response
                 );
             }
             // shake response on error
-            Array.from(options.targetOnEvent.querySelectorAll(
+            Array.from(option.targetOnEvent.querySelectorAll(
                 ".responseBody, .responseHeaders, .responseStatusCode"
             )).forEach(function (element) {
                 local.uiAnimateShakeIfError(data.statusCode >= 400, element);
             });
         }
     });
-    options.modeNext = 0;
-    options.onNext();
+    option.modeNext = 0;
+    option.onNext();
 };
 
 local.uiEventListenerDict.onEventOperationDisplayShow = function (event, onError) {
@@ -32543,19 +32847,39 @@ local.uiEventListenerDict.onEventOperationDisplayShow = function (event, onError
  */
     var element;
     element = event.targetOnEvent;
-    element = element.querySelector(".operation") || element.closest(".operation");
+    element = element.querySelector(
+        ".operation"
+    ) || element.closest(
+        ".operation"
+    );
     location.hash = "!" + element.id;
-    element.closest(".resource").classList.remove("expanded");
+    element.closest(
+        ".resource"
+    ).classList.remove("expanded");
     // show parent resource
-    local.uiAnimateSlideDown(element.closest(".resource").querySelector(".operationList"));
+    local.uiAnimateSlideDown(element.closest(
+        ".resource"
+    ).querySelector(
+        ".operationList"
+    ));
     // show the operation, but hide all other operations
     local.uiAnimateSlideAccordian(
-        element.querySelector(".operation > form"),
-        Array.from(element.closest(".operationList").querySelectorAll(".operation > form")),
+        element.querySelector(
+            ".operation > form"
+        ),
+        Array.from(element.closest(
+            ".operationList"
+        ).querySelectorAll(
+            ".operation > form"
+        )),
         function () {
             // scrollTo operation
-            element.querySelector("[tabIndex]").blur();
-            element.querySelector("[tabIndex]").focus();
+            element.querySelector(
+                "[tabIndex]"
+            ).blur();
+            element.querySelector(
+                "[tabIndex]"
+            ).focus();
             // validate input
             local.uiEventListenerDict.onEventInputValidateAndAjax({
                 targetOnEvent: element
@@ -32575,21 +32899,31 @@ local.uiEventListenerDict.onEventResourceDisplayAction = function (event) {
         case "td1":
             // show the resource, but hide all other resources
             local.uiAnimateSlideAccordian(
-                event.currentTarget.querySelector(".operationList"),
-                Array.from(document.querySelectorAll(".swggUiContainer .operationList"))
+                event.currentTarget.querySelector(
+                    ".operationList"
+                ),
+                Array.from(document.querySelectorAll(
+                    ".swggUiContainer .operationList"
+                ))
             );
             // show at least one operation in the resource
             local.uiEventListenerDict.onEventOperationDisplayShow({
                 targetOnEvent: event.currentTarget.querySelector(
                     ".operation .uiAnimateSlide[style*=\"max-height: 100%\"]"
-                ) || event.currentTarget.querySelector(".operation")
+                ) || event.currentTarget.querySelector(
+                    ".operation"
+                )
             });
             return true;
         case "td2":
             // show the resource, but hide all other resources
             local.uiAnimateSlideAccordian(
-                event.currentTarget.querySelector(".operationList"),
-                Array.from(document.querySelectorAll(".swggUiContainer .operationList"))
+                event.currentTarget.querySelector(
+                    ".operationList"
+                ),
+                Array.from(document.querySelectorAll(
+                    ".swggUiContainer .operationList"
+                ))
             );
             // collapse all operations in the resource
             if (event.currentTarget.classList.contains("expanded")) {
@@ -32617,22 +32951,35 @@ local.uiEventListenerDict.onEventResourceDisplayAction = function (event) {
     });
 };
 
-local.uiEventListenerDict.onEventUiReload = function (options, onError) {
+local.uiEventListenerDict.onEventUiReload = function (option, onError) {
 /*
  * this function will reload the ui
  */
     var resource;
     var swaggerJson;
-    options = options || {};
-    swaggerJson = options;
-    local.onNext(options, function (error, data) {
-        switch (options.modeNext) {
+    option = option || {};
+    swaggerJson = option;
+    local.onNext(option, function (error, data) {
+        switch (option.modeNext) {
         case 1:
-            options.inputUrl = document.querySelector(".swggUiContainer > .thead > .td2");
+            if (
+                event
+                && event.targetOnEvent
+                && !event.targetOnEvent.classList.contains(
+                    "eventDelegate"
+                    + event.type[0].toUpperCase()
+                    + event.type.slice(1)
+                )
+            ) {
+                return;
+            }
+            option.inputUrl = document.querySelector(
+                ".swggUiContainer > .thead > .td2"
+            );
             // clear all apiKeyValue's from localStorage
             if (
-                options.targetOnEvent
-                && options.targetOnEvent.id === "swggApiKeyClearButton1"
+                option.targetOnEvent
+                && option.targetOnEvent.id === "swggApiKeyClearButton1"
             ) {
                 local.apiKeyValue = "";
                 Object.keys(localStorage).forEach(function (key) {
@@ -32641,57 +32988,63 @@ local.uiEventListenerDict.onEventUiReload = function (options, onError) {
                     }
                 });
             // restore apiKeyValue
-            } else if (options.swggInit) {
+            } else if (option.swggInit) {
                 local.apiKeyKey = "utility2_swgg_apiKeyKey_" + encodeURIComponent(
-                    local.urlParse(options.inputUrl.value.replace((
+                    local.urlParse(option.inputUrl.value.replace((
                         /^\//
                     ), "")).href
                 );
                 local.apiKeyValue = localStorage.getItem(local.apiKeyKey) || "";
             // save apiKeyValue
             } else {
-                local.apiKeyValue = document.querySelector("#swggApiKeyInput1").value;
+                local.apiKeyValue = document.querySelector(
+                    "#swggApiKeyInput1"
+                ).value;
                 local.localStorageSetItemOrClear(local.apiKeyKey, local.apiKeyValue);
             }
             // if keyup-event is not return-key, then return
             if (
-                (options.type === "keyup" && options.code !== "Enter")
+                (option.type === "keyup" && option.code !== "Enter")
                 // do not reload ui during test
                 || globalThis.utility2_modeTest >= 4
             ) {
-                options.modeNext = Infinity;
-                options.onNext();
+                option.modeNext = Infinity;
+                option.onNext();
                 return;
             }
             // reset ui
-            document.querySelector("#swggUiReloadErrorDiv1").textContent = "";
+            document.querySelector(
+                "#swggUiReloadErrorDiv1"
+            ).textContent = "";
             Array.from(document.querySelectorAll(
                 ".swggUiContainer > .reset"
             )).forEach(function (element) {
                 element.remove();
             });
             // normalize swaggerJsonUrl
-            options.inputUrl.value = local.urlParse(
-                options.inputUrl.value.replace((
+            option.inputUrl.value = local.urlParse(
+                option.inputUrl.value.replace((
                     /^\//
                 ), "")
             ).href;
-            document.querySelector("#swggAjaxProgressDiv1 span").innerHTML = (
+            document.querySelector(
+                "#swggAjaxProgressDiv1 span"
+            ).innerHTML = (
                 "loading swagger.json"
             );
-            options.onNext();
+            option.onNext();
             break;
         case 2:
             // fetch swagger.json file
             local.ajax({
-                url: options.inputUrl.value
-            }, options.onNext);
+                url: option.inputUrl.value
+            }, option.onNext);
             break;
         case 3:
             // JSON.parse swagger.json string
             local.tryCatchOnError(function () {
-                options.onNext(null, JSON.parse(data.responseText));
-            }, options.onNext);
+                option.onNext(null, JSON.parse(data.responseText));
+            }, option.onNext);
             break;
         case 4:
             // reset state
@@ -32706,27 +33059,36 @@ local.uiEventListenerDict.onEventUiReload = function (options, onError) {
             // init apiKeyValue
             swaggerJson.apiKeyValue = local.apiKeyValue;
             // templateRender title
-            document.querySelector("head > title").textContent = local.templateRender(
+            document.querySelector(
+                "head > title"
+            ).textContent = local.templateRender(
                 local.templateUiTitle,
                 swaggerJson
             ).trim();
             // init urlSwaggerJson
-            swaggerJson.urlSwaggerJson = options.inputUrl.value;
+            swaggerJson.urlSwaggerJson = option.inputUrl.value;
             // templateRender main
-            document.querySelector(".swggUiContainer").innerHTML = local.templateRender(
+            document.querySelector(
+                ".swggUiContainer"
+            ).innerHTML = local.templateRender(
                 local.templateUiMain,
                 swaggerJson
             );
             setTimeout(function () {
                 // recurse - render .resourceList
-                local.uiEventListenerDict.onEventUiReload(swaggerJson, options.onNext);
+                local.uiEventListenerDict.onEventUiReload(
+                    swaggerJson,
+                    option.onNext
+                );
             }, 100);
             break;
         default:
             local.onErrorDefault(error);
             // debug error
             local._debugOnEventUiReload = error || local._debugOnEventUiReload;
-            document.querySelector("#swggUiReloadErrorDiv1").textContent = (
+            document.querySelector(
+                "#swggUiReloadErrorDiv1"
+            ).textContent = (
                 (error || {
                     message: ""
                 }).message
@@ -32736,8 +33098,8 @@ local.uiEventListenerDict.onEventUiReload = function (options, onError) {
     });
     // optimization - render .swggUiContainer first
     if (!swaggerJson.swagger) {
-        options.modeNext = 0;
-        options.onNext();
+        option.modeNext = 0;
+        option.onNext();
         return;
     }
     // optimization - render .resourceList in separate event-loop
@@ -32815,7 +33177,9 @@ local.uiEventListenerDict.onEventUiReload = function (options, onError) {
             ), "");
             operation.parameters.forEach(local.uiRenderSchemaP);
             // templateRender operation
-            swaggerJson.uiFragment.querySelector("#" + resource.id + " .operationList")
+            swaggerJson.uiFragment.querySelector(
+                "#" + resource.id + " .operationList"
+            )
             .appendChild(local.domElementRender(local.templateUiOperation, operation));
         });
     });
@@ -32830,8 +33194,12 @@ local.uiEventListenerDict.onEventUiReload = function (options, onError) {
         });
     });
     // append uiFragment to swggUiContainer
-    document.querySelector("#swggAjaxProgressDiv1").style.display = "none";
-    document.querySelector(".swggUiContainer .resourceList").appendChild(
+    document.querySelector(
+        "#swggAjaxProgressDiv1"
+    ).style.display = "none";
+    document.querySelector(
+        ".swggUiContainer .resourceList"
+    ).appendChild(
         swaggerJson.uiFragment
     );
     Array.from(document.querySelectorAll(
@@ -32852,14 +33220,21 @@ local.uiEventListenerDict.onEventUiReload = function (options, onError) {
         Array.from(document.querySelectorAll(
             ".eventDelegate" + eventType
         )).forEach(function (element) {
-            element.addEventListener(eventType.toLowerCase(), local.uiEventDelegate);
+            element.addEventListener(
+                eventType.toLowerCase(),
+                local.uiEventDelegate
+            );
         });
     });
     // scrollTo location.hash
     local.uiEventListenerDict.onEventOperationDisplayShow({
         targetOnEvent: (
-            document.querySelector("#" + (location.hash.slice(2) || "undefined"))
-            || document.querySelector(".swggUiContainer .operation")
+            document.querySelector(
+                "#" + (location.hash.slice(2) || "undefined")
+            )
+            || document.querySelector(
+                ".swggUiContainer .operation"
+            )
         )
     });
     local.setTimeoutOnError(onError);
@@ -32903,13 +33278,22 @@ local.uiRenderSchemaP = function (schemaP) {
             );
             return {
                 id: local.idDomElementCreate("swgg_id_" + schemaP.name),
-                selected: schemaP.enumDefault.indexOf(element) >= 0
-                ? "selected"
-                : "",
-                type: local.schemaPItemsType(schemaP) || local.schemaPType(schemaP),
-                placeholder: typeof element === "string"
-                ? element
-                : JSON.stringify(element),
+                selected: (
+                    // ternary-condition
+                    schemaP.enumDefault.indexOf(element) >= 0
+                    ? "selected"
+                    : ""
+                ),
+                type: (
+                    local.schemaPItemsType(schemaP)
+                    || local.schemaPType(schemaP)
+                ),
+                placeholder: (
+                    // ternary-condition
+                    typeof element === "string"
+                    ? element
+                    : JSON.stringify(element)
+                ),
                 valueSelectOption: element
             };
         });
@@ -32939,6 +33323,9 @@ local.uiRenderSchemaP = function (schemaP) {
         && local.schemaPType(schemaP) === "string"
     )) {
         schemaP.isTextarea = true;
+    // init input - number
+    } else if (schemaP.type === "integer" || schemaP.type === "number") {
+        schemaP.isInputNumber = true;
     // init input - text
     } else {
         schemaP.isInputText = true;
@@ -32970,13 +33357,12 @@ local.uiRenderSchemaP = function (schemaP) {
         return schemaP.schema2.properties;
     });
     if (schemaP.schema2.properties) {
-        schemaP.schemaText = JSON.stringify(
+        schemaP.schemaText = JSON.stringify((
+            // ternary-condition
             schemaP.type2 === "array"
             ? [schemaP.schema2.properties]
-            : schemaP.schema2.properties,
-            null,
-            4
-        );
+            : schemaP.schema2.properties
+        ), null, 4);
     }
     // init placeholder
     schemaP.placeholder = (
@@ -33033,23 +33419,23 @@ local.urlParseWithBraket = function (url) {
     ).replace(new RegExp(tmp + 1, "g"), "{").replace(new RegExp(tmp + 2, "g"), "}"));
 };
 
-local.userLoginByPassword = function (options, onError) {
+local.userLoginByPassword = function (option, onError) {
 /*
  * this function will send a login-by-password request
  */
     local.apiDict["GET /user/userLoginByPassword"].ajax({
         paramDict: {
-            password: options.password,
-            username: options.username
+            password: option.password,
+            username: option.username
         }
     }, onError);
 };
 
-local.userLogout = function (options, onError) {
+local.userLogout = function (option, onError) {
 /*
  * this function will send a logout request
  */
-    local.apiDict["GET /user/userLogout"].ajax(options, onError);
+    local.apiDict["GET /user/userLogout"].ajax(option, onError);
 };
 }());
 
@@ -33085,7 +33471,973 @@ local.swgg.apiUpdate(
 (function (local) {
     "use strict";
 /* jslint ignore:start */
-local.assetsDict["/assets.utility2.example.js"] = "\n\
+local.assetsDict["/assets.utility2.example.js"] = "/*\n\
+example.js\n\
+\n\
+this script will demo automated browser-tests with coverage (via electron and istanbul)\n\
+\n\
+instruction\n\
+    1. save this script as example.js\n\
+    2. run the shell-command:\n\
+        $ npm install kaizhu256/node-utility2#alpha electron-lite && \\\n\
+            PATH=\"$(pwd)/node_modules/.bin:$PATH\" \\\n\
+            PORT=8081 \\\n\
+            npm_config_mode_coverage=utility2 \\\n\
+            node_modules/.bin/utility2 test example.js\n\
+    3. view test-report in ./tmp/build/test-report.html\n\
+    4. view coverage in ./tmp/build/coverage.html/index.html\n\
+*/\n\
+\n\
+\n\
+\n\
+/* istanbul instrument in package utility2 */\n\
+/* istanbul ignore next */\n\
+/* jslint utility2:true */\n\
+(function (globalThis) {\n\
+    \"use strict\";\n\
+    var consoleError;\n\
+    var local;\n\
+    // init globalThis\n\
+    (function () {\n\
+        try {\n\
+            globalThis = Function(\"return this\")(); // jslint ignore:line\n\
+        } catch (ignore) {}\n\
+    }());\n\
+    globalThis.globalThis = globalThis;\n\
+    // init debug_inline\n\
+    if (!globalThis[\"debug\\u0049nline\"]) {\n\
+        consoleError = console.error;\n\
+        globalThis[\"debug\\u0049nline\"] = function () {\n\
+        /*\n\
+         * this function will both print <arguments> to stderr\n\
+         * and return <arguments>[0]\n\
+         */\n\
+            var argList;\n\
+            argList = Array.from(arguments); // jslint ignore:line\n\
+            // debug arguments\n\
+            globalThis[\"debug\\u0049nlineArguments\"] = argList;\n\
+            consoleError(\"\\n\\ndebug\\u0049nline\");\n\
+            consoleError.apply(console, argList);\n\
+            consoleError(\"\\n\");\n\
+            // return arg0 for inspection\n\
+            return argList[0];\n\
+        };\n\
+    }\n\
+    // init local\n\
+    local = {};\n\
+    local.local = local;\n\
+    globalThis.globalLocal = local;\n\
+    // init isBrowser\n\
+    local.isBrowser = (\n\
+        typeof window === \"object\"\n\
+        && window === globalThis\n\
+        && typeof window.XMLHttpRequest === \"function\"\n\
+        && window.document\n\
+        && typeof window.document.querySelector === \"function\"\n\
+    );\n\
+    // init function\n\
+    local.assertThrow = function (passed, message) {\n\
+    /*\n\
+     * this function will throw error <message> if <passed> is falsy\n\
+     */\n\
+        var error;\n\
+        if (passed) {\n\
+            return;\n\
+        }\n\
+        error = (\n\
+            // ternary-condition\n\
+            (\n\
+                message\n\
+                && typeof message.message === \"string\"\n\
+                && typeof message.stack === \"string\"\n\
+            )\n\
+            // if message is an error-object, then leave it as is\n\
+            ? message\n\
+            : new Error(\n\
+                typeof message === \"string\"\n\
+                // if message is a string, then leave it as is\n\
+                ? message\n\
+                // else JSON.stringify message\n\
+                : JSON.stringify(message, null, 4)\n\
+            )\n\
+        );\n\
+        throw error;\n\
+    };\n\
+    local.functionOrNop = function (fnc) {\n\
+    /*\n\
+     * this function will if <fnc> exists,\n\
+     * them return <fnc>,\n\
+     * else return <nop>\n\
+     */\n\
+        return fnc || local.nop;\n\
+    };\n\
+    local.identity = function (value) {\n\
+    /*\n\
+     * this function will return <value>\n\
+     */\n\
+        return value;\n\
+    };\n\
+    local.nop = function () {\n\
+    /*\n\
+     * this function will do nothing\n\
+     */\n\
+        return;\n\
+    };\n\
+    local.objectAssignDefault = function (target, source) {\n\
+    /*\n\
+     * this function will if items from <target> are\n\
+     * null, undefined, or empty-string,\n\
+     * then overwrite them with items from <source>\n\
+     */\n\
+        target = target || {};\n\
+        Object.keys(source || {}).forEach(function (key) {\n\
+            if (\n\
+                target[key] === null\n\
+                || target[key] === undefined\n\
+                || target[key] === \"\"\n\
+            ) {\n\
+                target[key] = target[key] || source[key];\n\
+            }\n\
+        });\n\
+        return target;\n\
+    };\n\
+    // require builtin\n\
+    if (!local.isBrowser) {\n\
+        local.assert = require(\"assert\");\n\
+        local.buffer = require(\"buffer\");\n\
+        local.child_process = require(\"child_process\");\n\
+        local.cluster = require(\"cluster\");\n\
+        local.crypto = require(\"crypto\");\n\
+        local.dgram = require(\"dgram\");\n\
+        local.dns = require(\"dns\");\n\
+        local.domain = require(\"domain\");\n\
+        local.events = require(\"events\");\n\
+        local.fs = require(\"fs\");\n\
+        local.http = require(\"http\");\n\
+        local.https = require(\"https\");\n\
+        local.net = require(\"net\");\n\
+        local.os = require(\"os\");\n\
+        local.path = require(\"path\");\n\
+        local.querystring = require(\"querystring\");\n\
+        local.readline = require(\"readline\");\n\
+        local.repl = require(\"repl\");\n\
+        local.stream = require(\"stream\");\n\
+        local.string_decoder = require(\"string_decoder\");\n\
+        local.timers = require(\"timers\");\n\
+        local.tls = require(\"tls\");\n\
+        local.tty = require(\"tty\");\n\
+        local.url = require(\"url\");\n\
+        local.util = require(\"util\");\n\
+        local.vm = require(\"vm\");\n\
+        local.zlib = require(\"zlib\");\n\
+    }\n\
+}(this));\n\
+\n\
+\n\
+\n\
+(function (local) {\n\
+\"use strict\";\n\
+\n\
+\n\
+\n\
+// run shared js-env code - init-before\n\
+(function () {\n\
+// init local\n\
+local = (\n\
+    globalThis.utility2_rollup\n\
+    || globalThis.utility2_utility2\n\
+    || require(\"utility2\")\n\
+);\n\
+// init exports\n\
+globalThis.local = local;\n\
+// run test-server\n\
+local.testRunServer(local);\n\
+// init assets\n\
+local.assetsDict[\"/assets.hello.txt\"] = \"hello \\ud83d\\ude01\\n\";\n\
+local.assetsDict[\"/assets.index.template.html\"] = \"\";\n\
+}());\n\
+\n\
+\n\
+\n\
+// run shared js-env code - function\n\
+(function () {\n\
+local.testCase_ajax_200 = function (option, onError) {\n\
+/*\n\
+ * this function will test ajax's \"200 ok\" handling-behavior\n\
+ */\n\
+    if (!local.isBrowser) {\n\
+        onError(null, option);\n\
+        return;\n\
+    }\n\
+    option = {};\n\
+    // test ajax-path \"assets.hello.txt\"\n\
+    local.ajax({\n\
+        url: \"assets.hello.txt\"\n\
+    }, function (error, xhr) {\n\
+        local.tryCatchOnError(function () {\n\
+            // validate no error occurred\n\
+            local.assertThrow(!error, error);\n\
+            // validate data\n\
+            option.data = xhr.responseText;\n\
+            local.assertThrow(option.data === \"hello \\ud83d\\ude01\\n\", option.data);\n\
+            onError();\n\
+        }, onError);\n\
+    });\n\
+};\n\
+\n\
+local.testCase_ajax_404 = function (option, onError) {\n\
+/*\n\
+ * this function will test ajax's \"404 not found\" handling-behavior\n\
+ */\n\
+    if (!local.isBrowser) {\n\
+        onError(null, option);\n\
+        return;\n\
+    }\n\
+    option = {};\n\
+    // test ajax-path \"/undefined\"\n\
+    local.ajax({\n\
+        url: \"/undefined\"\n\
+    }, function (error) {\n\
+        local.tryCatchOnError(function () {\n\
+            // validate error occurred\n\
+            local.assertThrow(error, error);\n\
+            option.statusCode = error.statusCode;\n\
+            // validate 404 http statusCode\n\
+            local.assertThrow(option.statusCode === 404, option.statusCode);\n\
+            onError();\n\
+        }, onError);\n\
+    });\n\
+};\n\
+\n\
+local.testCase_webpage_default = function (option, onError) {\n\
+/*\n\
+ * this function will test webpage's default handling-behavior\n\
+ */\n\
+    if (local.isBrowser) {\n\
+        onError(null, option);\n\
+        return;\n\
+    }\n\
+    option = {\n\
+        modeCoverageMerge: true,\n\
+        url: local.serverLocalHost + \"?modeTest=1\"\n\
+    };\n\
+    local.browserTest(option, onError);\n\
+};\n\
+}());\n\
+\n\
+\n\
+\n\
+/* istanbul ignore next */\n\
+// run browser js-env code - init-test\n\
+(function () {\n\
+if (!local.isBrowser) {\n\
+    return;\n\
+}\n\
+// log stderr and stdout to #outputStdout1\n\
+[\"error\", \"log\"].forEach(function (key) {\n\
+    var argList;\n\
+    var element;\n\
+    var fnc;\n\
+    element = document.querySelector(\n\
+        \"#outputStdout1\"\n\
+    );\n\
+    if (!element) {\n\
+        return;\n\
+    }\n\
+    fnc = console[key];\n\
+    console[key] = function () {\n\
+        argList = Array.from(arguments); // jslint ignore:line\n\
+        fnc.apply(console, argList);\n\
+        // append text to #outputStdout1\n\
+        element.textContent += argList.map(function (arg) {\n\
+            return (\n\
+                typeof arg === \"string\"\n\
+                ? arg\n\
+                : JSON.stringify(arg, null, 4)\n\
+            );\n\
+        }).join(\" \").replace((\n\
+            /\\u001b\\[\\d*m/g\n\
+        ), \"\") + \"\\n\";\n\
+        // scroll textarea to bottom\n\
+        element.scrollTop = element.scrollHeight;\n\
+    };\n\
+});\n\
+Object.assign(local, globalThis.domOnEventDelegateDict);\n\
+globalThis.domOnEventDelegateDict = local;\n\
+local.onEventDomDb = (\n\
+    local.db && local.db.onEventDomDb\n\
+);\n\
+local.testRunBrowser = function (event) {\n\
+/*\n\
+ * this function will run browser-tests\n\
+ */\n\
+    switch (\n\
+        !event.ctrlKey\n\
+        && !event.metaKey\n\
+        && (\n\
+            event.modeInit\n\
+            || (event.type + \".\" + (event.target && event.target.id))\n\
+        )\n\
+    ) {\n\
+    // custom-case\n\
+    case \"click.jslintAutofixButton1\":\n\
+    case \"keydown.inputEval1\":\n\
+    case true:\n\
+        globalThis.domOnEventDelegateDict.domOnEventResetOutput();\n\
+        // jslint #inputEval1\n\
+        local.jslint.jslintAndPrint(\n\
+            document.querySelector(\n\
+                \"#inputEval1\"\n\
+            ).value,\n\
+            \"inputEval1.js\",\n\
+            {\n\
+                autofix: (\n\
+                    event\n\
+                    && event.currentTarget\n\
+                    && event.currentTarget.id === \"jslintAutofixButton1\"\n\
+                ),\n\
+                conditional: true\n\
+            }\n\
+        );\n\
+        if (local.jslint.jslintResult.autofix) {\n\
+            document.querySelector(\n\
+                \"#inputEval1\"\n\
+            ).value = (\n\
+                local.jslint.jslintResult.code\n\
+            );\n\
+        }\n\
+        document.querySelector(\n\
+            \"#outputJslintPre1\"\n\
+        ).textContent = (\n\
+            local.jslint.jslintResult.errorText\n\
+        ).replace((\n\
+            /\\u001b\\[\\d*m/g\n\
+        ), \"\").trim();\n\
+        // try to cleanup __coverage__\n\
+        try {\n\
+            delete globalThis.__coverage__[\"/inputEval1.js\"];\n\
+        } catch (ignore) {}\n\
+        // try to cover and eval input-code\n\
+        try {\n\
+            document.querySelector(\n\
+                \"#outputCode1\"\n\
+            ).textContent = (\n\
+                local.istanbul.instrumentSync(\n\
+                    document.querySelector(\n\
+                        \"#inputEval1\"\n\
+                    ).value,\n\
+                    \"/inputEval1.js\"\n\
+                )\n\
+            );\n\
+            eval( // jslint ignore:line\n\
+                document.querySelector(\n\
+                    \"#outputCode1\"\n\
+                ).textContent.replace((\n\
+                    /^#!\\//\n\
+                ), \"// \")\n\
+            );\n\
+            document.querySelector(\n\
+                \"#coverageReportDiv1\"\n\
+            ).innerHTML = (\n\
+                local.istanbul.coverageReportCreate({\n\
+                    coverage: window.__coverage__\n\
+                })\n\
+            );\n\
+        } catch (errorCaught2) {\n\
+            console.error(errorCaught2);\n\
+        }\n\
+        return;\n\
+    case \"click.testRunButton1\":\n\
+        local.modeTest = 1;\n\
+        local.testRunDefault(local);\n\
+        return;\n\
+    // run browser-tests\n\
+    default:\n\
+        if (\n\
+            (event.target && event.target.id) !== \"testRunButton1\"\n\
+            && !(event.modeInit && (\n\
+                /\\bmodeTest=1\\b/\n\
+            ).test(location.search))\n\
+        ) {\n\
+            return;\n\
+        }\n\
+        // show browser-tests\n\
+        if (document.querySelector(\n\
+            \"#testReportDiv1\"\n\
+        ).style.maxHeight === \"0px\") {\n\
+            globalThis.domOnEventDelegateDict.domOnEventResetOutput();\n\
+            local.uiAnimateSlideDown(document.querySelector(\n\
+                \"#testReportDiv1\"\n\
+            ));\n\
+            document.querySelector(\n\
+                \"#testRunButton1\"\n\
+            ).textContent = \"hide internal test\";\n\
+            local.modeTest = 1;\n\
+            local.testRunDefault(local);\n\
+            return;\n\
+        }\n\
+        // hide browser-tests\n\
+        local.uiAnimateSlideUp(document.querySelector(\n\
+            \"#testReportDiv1\"\n\
+        ));\n\
+        document.querySelector(\n\
+            \"#testRunButton1\"\n\
+        ).textContent = \"run internal test\";\n\
+    }\n\
+};\n\
+\n\
+local.testRunBrowser({\n\
+    modeInit: true\n\
+});\n\
+}());\n\
+\n\
+\n\
+\n\
+/* istanbul ignore next */\n\
+// run node js-env code - init-test\n\
+(function () {\n\
+if (local.isBrowser) {\n\
+    return;\n\
+}\n\
+// init exports\n\
+module.exports = local;\n\
+/* validateLineSortedReset */\n\
+// init assets\n\
+local.assetsDict = local.assetsDict || {};\n\
+[\n\
+    \"assets.index.template.html\",\n\
+    \"assets.swgg.swagger.json\",\n\
+    \"assets.swgg.swagger.server.json\"\n\
+].forEach(function (file) {\n\
+    file = \"/\" + file;\n\
+    local.assetsDict[file] = local.assetsDict[file] || \"\";\n\
+    if (local.fs.existsSync(local.__dirname + file)) {\n\
+        local.assetsDict[file] = local.fs.readFileSync(\n\
+            local.__dirname + file,\n\
+            \"utf8\"\n\
+        );\n\
+    }\n\
+});\n\
+/* jslint ignore:start */\n\
+local.assetsDict[\"/assets.index.template.html\"] = '\\\n\
+<!doctype html>\\n\\\n\
+<html lang=\"en\">\\n\\\n\
+<head>\\n\\\n\
+<meta charset=\"utf-8\">\\n\\\n\
+<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\\n\\\n\
+<!-- \"assets.utility2.template.html\" -->\\n\\\n\
+<title>{{env.npm_package_name}} ({{env.npm_package_version}})</title>\\n\\\n\
+<style>\\n\\\n\
+/* jslint utility2:true */\\n\\\n\
+/*csslint\\n\\\n\
+*/\\n\\\n\
+/* csslint ignore:start */\\n\\\n\
+*,\\n\\\n\
+*:after,\\n\\\n\
+*:before {\\n\\\n\
+    box-sizing: border-box;\\n\\\n\
+}\\n\\\n\
+/* csslint ignore:end */\\n\\\n\
+@keyframes uiAnimateShake {\\n\\\n\
+    0%, 50% {\\n\\\n\
+        transform: translateX(10px);\\n\\\n\
+    }\\n\\\n\
+    25%, 75% {\\n\\\n\
+        transform: translateX(-10px);\\n\\\n\
+    }\\n\\\n\
+    100% {\\n\\\n\
+        transform: translateX(0);\\n\\\n\
+    }\\n\\\n\
+}\\n\\\n\
+@keyframes uiAnimateSpin {\\n\\\n\
+    0% {\\n\\\n\
+        transform: rotate(0deg);\\n\\\n\
+    }\\n\\\n\
+    100% {\\n\\\n\
+        transform: rotate(360deg);\\n\\\n\
+    }\\n\\\n\
+}\\n\\\n\
+a {\\n\\\n\
+    overflow-wrap: break-word;\\n\\\n\
+}\\n\\\n\
+body {\\n\\\n\
+    background: #eef;\\n\\\n\
+    font-family: Arial, Helvetica, sans-serif;\\n\\\n\
+    font-size: small;\\n\\\n\
+    margin: 0 40px;\\n\\\n\
+}\\n\\\n\
+body > div,\\n\\\n\
+body > form > div,\\n\\\n\
+body > form > input,\\n\\\n\
+body > form > pre,\\n\\\n\
+body > form > .button,\\n\\\n\
+body > form > .textarea,\\n\\\n\
+body > input,\\n\\\n\
+body > pre,\\n\\\n\
+body > .button,\\n\\\n\
+body > .textarea {\\n\\\n\
+    margin-bottom: 20px;\\n\\\n\
+    margin-top: 0;\\n\\\n\
+}\\n\\\n\
+body > form > input,\\n\\\n\
+body > form > .button,\\n\\\n\
+body > input,\\n\\\n\
+body > .button {\\n\\\n\
+    width: 20rem;\\n\\\n\
+}\\n\\\n\
+body > form > .textarea,\\n\\\n\
+body > .textarea {\\n\\\n\
+    height: 10rem;\\n\\\n\
+    width: 100%;\\n\\\n\
+}\\n\\\n\
+body > .readonly {\\n\\\n\
+    background: #ddd;\\n\\\n\
+}\\n\\\n\
+code,\\n\\\n\
+pre,\\n\\\n\
+.textarea {\\n\\\n\
+    font-family: Consolas, Menlo, monospace;\\n\\\n\
+    font-size: smaller;\\n\\\n\
+}\\n\\\n\
+pre {\\n\\\n\
+    overflow-wrap: break-word;\\n\\\n\
+    white-space: pre-wrap;\\n\\\n\
+}\\n\\\n\
+.button {\\n\\\n\
+    background-color: #fff;\\n\\\n\
+    border: 1px solid;\\n\\\n\
+    border-bottom-color: rgb(186, 186, 186);\\n\\\n\
+    border-left-color: rgb(209, 209, 209);\\n\\\n\
+    border-radius: 4px;\\n\\\n\
+    border-right-color: rgb(209, 209, 209);\\n\\\n\
+    border-top-color: rgb(216, 216, 216);\\n\\\n\
+    color: #00d;\\n\\\n\
+    cursor: pointer;\\n\\\n\
+    display: inline-block;\\n\\\n\
+    font-family: Arial, Helvetica, sans-serif;\\n\\\n\
+    font-size: 12px;\\n\\\n\
+    font-style: normal;\\n\\\n\
+    font-weight: normal;\\n\\\n\
+    margin: 0;\\n\\\n\
+    padding: 2px 7px 3px 7px;\\n\\\n\
+    text-align: center;\\n\\\n\
+    text-decoration: underline;\\n\\\n\
+}\\n\\\n\
+.colorError {\\n\\\n\
+    color: #d00;\\n\\\n\
+}\\n\\\n\
+.textarea {\\n\\\n\
+    background: #fff;\\n\\\n\
+    border: 1px solid #999;\\n\\\n\
+    border-radius: 0;\\n\\\n\
+    cursor: auto;\\n\\\n\
+    overflow: auto;\\n\\\n\
+    padding: 2px;\\n\\\n\
+}\\n\\\n\
+.uiAnimateShake {\\n\\\n\
+    animation-duration: 500ms;\\n\\\n\
+    animation-name: uiAnimateShake;\\n\\\n\
+}\\n\\\n\
+.uiAnimateSlide {\\n\\\n\
+    overflow-y: hidden;\\n\\\n\
+    transition: max-height ease-in 250ms, min-height ease-in 250ms, padding-bottom ease-in 250ms, padding-top ease-in 250ms;\\n\\\n\
+}\\n\\\n\
+.utility2FooterDiv {\\n\\\n\
+    text-align: center;\\n\\\n\
+}\\n\\\n\
+.zeroPixel {\\n\\\n\
+    border: 0;\\n\\\n\
+    height: 0;\\n\\\n\
+    margin: 0;\\n\\\n\
+    padding: 0;\\n\\\n\
+    width: 0;\\n\\\n\
+}\\n\\\n\
+</style>\\n\\\n\
+</head>\\n\\\n\
+<body>\\n\\\n\
+<div id=\"ajaxProgressDiv1\" style=\"background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%; z-index: 1;\"></div>\\n\\\n\
+<div class=\"uiAnimateSpin\" style=\"animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: none; height: 25px; vertical-align: middle; width: 25px;\"></div>\\n\\\n\
+<a class=\"zeroPixel\" download=\"db.persistence.json\" href=\"\" id=\"dbExportA1\"></a>\\n\\\n\
+<input class=\"zeroPixel\" data-onevent=\"onEventDomDb\" data-onevent-db=\"dbImportInput\" type=\"file\">\\n\\\n\
+<script>\\n\\\n\
+/* jslint utility2:true */\\n\\\n\
+// init domOnEventWindowOnloadTimeElapsed\\n\\\n\
+(function () {\\n\\\n\
+/*\\n\\\n\
+ * this function will measure and print time-elapsed for window.onload\\n\\\n\
+ */\\n\\\n\
+    \"use strict\";\\n\\\n\
+    if (window.domOnEventWindowOnloadTimeElapsed) {\\n\\\n\
+        return;\\n\\\n\
+    }\\n\\\n\
+    window.domOnEventWindowOnloadTimeElapsed = Date.now() + 100;\\n\\\n\
+    window.addEventListener(\"load\", function () {\\n\\\n\
+        setTimeout(function () {\\n\\\n\
+            window.domOnEventWindowOnloadTimeElapsed = (\\n\\\n\
+                Date.now()\\n\\\n\
+                - window.domOnEventWindowOnloadTimeElapsed\\n\\\n\
+            );\\n\\\n\
+            console.error(\\n\\\n\
+                \"domOnEventWindowOnloadTimeElapsed = \"\\n\\\n\
+                + window.domOnEventWindowOnloadTimeElapsed\\n\\\n\
+            );\\n\\\n\
+        }, 100);\\n\\\n\
+    });\\n\\\n\
+}());\\n\\\n\
+\\n\\\n\
+\\n\\\n\
+\\n\\\n\
+// init domOnEventDelegateDict\\n\\\n\
+(function () {\\n\\\n\
+/*\\n\\\n\
+ * this function will handle delegated dom-event\\n\\\n\
+ */\\n\\\n\
+    \"use strict\";\\n\\\n\
+    var timerTimeoutDict;\\n\\\n\
+    if (window.domOnEventDelegateDict) {\\n\\\n\
+        return;\\n\\\n\
+    }\\n\\\n\
+    window.domOnEventDelegateDict = {};\\n\\\n\
+    timerTimeoutDict = {};\\n\\\n\
+    window.domOnEventDelegateDict.domOnEventDelegate = function (event) {\\n\\\n\
+        event.targetOnEvent = event.target.closest(\\n\\\n\
+            \"[data-onevent]\"\\n\\\n\
+        );\\n\\\n\
+        if (\\n\\\n\
+            !event.targetOnEvent\\n\\\n\
+            || event.targetOnEvent.dataset.onevent === \"domOnEventNop\"\\n\\\n\
+            || event.target.closest(\\n\\\n\
+                \".disabled, .readonly\"\\n\\\n\
+            )\\n\\\n\
+        ) {\\n\\\n\
+            return;\\n\\\n\
+        }\\n\\\n\
+        // rate-limit high-frequency-event\\n\\\n\
+        switch (event.type) {\\n\\\n\
+        case \"keydown\":\\n\\\n\
+        case \"keyup\":\\n\\\n\
+            // filter non-input keyboard-event\\n\\\n\
+            if (!event.target.closest(\\n\\\n\
+                \"input, option, select, textarea\"\\n\\\n\
+            )) {\\n\\\n\
+                return;\\n\\\n\
+            }\\n\\\n\
+            if (timerTimeoutDict[event.type] !== true) {\\n\\\n\
+                timerTimeoutDict[event.type] = timerTimeoutDict[\\n\\\n\
+                    event.type\\n\\\n\
+                ] || setTimeout(function () {\\n\\\n\
+                    timerTimeoutDict[event.type] = true;\\n\\\n\
+                    window.domOnEventDelegateDict.domOnEventDelegate(\\n\\\n\
+                        event\\n\\\n\
+                    );\\n\\\n\
+                }, 50);\\n\\\n\
+                return;\\n\\\n\
+            }\\n\\\n\
+            timerTimeoutDict[event.type] = null;\\n\\\n\
+            break;\\n\\\n\
+        }\\n\\\n\
+        switch (event.targetOnEvent.tagName) {\\n\\\n\
+        case \"BUTTON\":\\n\\\n\
+        case \"FORM\":\\n\\\n\
+            event.preventDefault();\\n\\\n\
+            break;\\n\\\n\
+        }\\n\\\n\
+        event.stopPropagation();\\n\\\n\
+        window.domOnEventDelegateDict[event.targetOnEvent.dataset.onevent](\\n\\\n\
+            event\\n\\\n\
+        );\\n\\\n\
+    };\\n\\\n\
+    window.domOnEventDelegateDict.domOnEventResetOutput = function () {\\n\\\n\
+        Array.from(document.querySelectorAll(\\n\\\n\
+            \".onevent-reset-output\"\\n\\\n\
+        )).forEach(function (element) {\\n\\\n\
+            switch (element.tagName) {\\n\\\n\
+            case \"INPUT\":\\n\\\n\
+            case \"TEXTAREA\":\\n\\\n\
+                element.value = \"\";\\n\\\n\
+                break;\\n\\\n\
+            case \"PRE\":\\n\\\n\
+                element.textContent = \"\";\\n\\\n\
+                break;\\n\\\n\
+            default:\\n\\\n\
+                element.innerHTML = \"\";\\n\\\n\
+            }\\n\\\n\
+        });\\n\\\n\
+    };\\n\\\n\
+    // init event-handling\\n\\\n\
+    [\\n\\\n\
+        \"change\",\\n\\\n\
+        \"click\",\\n\\\n\
+        \"keydown\",\\n\\\n\
+        \"submit\"\\n\\\n\
+    ].forEach(function (eventType) {\\n\\\n\
+        document.addEventListener(\\n\\\n\
+            eventType,\\n\\\n\
+            window.domOnEventDelegateDict.domOnEventDelegate\\n\\\n\
+        );\\n\\\n\
+    });\\n\\\n\
+}());\\n\\\n\
+\\n\\\n\
+\\n\\\n\
+\\n\\\n\
+// init timerIntervalAjaxProgressUpdate\\n\\\n\
+(function () {\\n\\\n\
+/*\\n\\\n\
+ * this function will increment ajax-progress-bar\\n\\\n\
+ * until webpage has loaded\\n\\\n\
+ */\\n\\\n\
+    \"use strict\";\\n\\\n\
+    var ajaxProgressDiv1;\\n\\\n\
+    var ajaxProgressState;\\n\\\n\
+    var ajaxProgressUpdate;\\n\\\n\
+    if (\\n\\\n\
+        window.timerIntervalAjaxProgressUpdate\\n\\\n\
+        || !document.querySelector(\\n\\\n\
+            \"#ajaxProgressDiv1\"\\n\\\n\
+        )\\n\\\n\
+    ) {\\n\\\n\
+        return;\\n\\\n\
+    }\\n\\\n\
+    ajaxProgressDiv1 = document.querySelector(\\n\\\n\
+        \"#ajaxProgressDiv1\"\\n\\\n\
+    );\\n\\\n\
+    setTimeout(function () {\\n\\\n\
+        ajaxProgressDiv1.style.width = \"25%\";\\n\\\n\
+    });\\n\\\n\
+    ajaxProgressState = 0;\\n\\\n\
+    ajaxProgressUpdate = (\\n\\\n\
+        window.local\\n\\\n\
+        && window.local.ajaxProgressUpdate\\n\\\n\
+    ) || function () {\\n\\\n\
+        ajaxProgressDiv1.style.width = \"100%\";\\n\\\n\
+        setTimeout(function () {\\n\\\n\
+            ajaxProgressDiv1.style.background = \"transparent\";\\n\\\n\
+            setTimeout(function () {\\n\\\n\
+                ajaxProgressDiv1.style.width = \"0%\";\\n\\\n\
+            }, 500);\\n\\\n\
+        }, 1000);\\n\\\n\
+    };\\n\\\n\
+    window.timerIntervalAjaxProgressUpdate = setInterval(function () {\\n\\\n\
+        ajaxProgressState += 1;\\n\\\n\
+        ajaxProgressDiv1.style.width = Math.max(\\n\\\n\
+            100 - 75 * Math.exp(-0.125 * ajaxProgressState),\\n\\\n\
+            ajaxProgressDiv1.style.width.slice(0, -1) | 0\\n\\\n\
+        ) + \"%\";\\n\\\n\
+    }, 1000);\\n\\\n\
+    window.addEventListener(\"load\", function () {\\n\\\n\
+        clearInterval(window.timerIntervalAjaxProgressUpdate);\\n\\\n\
+        ajaxProgressUpdate();\\n\\\n\
+    });\\n\\\n\
+}());\\n\\\n\
+\\n\\\n\
+\\n\\\n\
+\\n\\\n\
+// init domOnEventSelectAllWithinPre\\n\\\n\
+(function () {\\n\\\n\
+/*\\n\\\n\
+ * this function will limit select-all within <pre tabIndex=\"0\"> elements\\n\\\n\
+ * https://stackoverflow.com/questions/985272/selecting-text-in-an-element-akin-to-highlighting-with-your-mouse\\n\\\n\
+ */\\n\\\n\
+    \"use strict\";\\n\\\n\
+    if (window.domOnEventSelectAllWithinPre) {\\n\\\n\
+        return;\\n\\\n\
+    }\\n\\\n\
+    window.domOnEventSelectAllWithinPre = function (event) {\\n\\\n\
+        var range;\\n\\\n\
+        var selection;\\n\\\n\
+        if (\\n\\\n\
+            event\\n\\\n\
+            && event.key === \"a\"\\n\\\n\
+            && (event.ctrlKey || event.metaKey)\\n\\\n\
+            && event.target.closest(\\n\\\n\
+                \"pre\"\\n\\\n\
+            )\\n\\\n\
+        ) {\\n\\\n\
+            range = document.createRange();\\n\\\n\
+            range.selectNodeContents(event.target.closest(\\n\\\n\
+                \"pre\"\\n\\\n\
+            ));\\n\\\n\
+            selection = window.getSelection();\\n\\\n\
+            selection.removeAllRanges();\\n\\\n\
+            selection.addRange(range);\\n\\\n\
+            event.preventDefault();\\n\\\n\
+        }\\n\\\n\
+    };\\n\\\n\
+    // init event-handling\\n\\\n\
+    document.addEventListener(\\n\\\n\
+        \"keydown\",\\n\\\n\
+        window.domOnEventSelectAllWithinPre\\n\\\n\
+    );\\n\\\n\
+}());\\n\\\n\
+</script>\\n\\\n\
+<h1>\\n\\\n\
+<!-- utility2-comment\\n\\\n\
+    <a\\n\\\n\
+        {{#if env.npm_package_homepage}}\\n\\\n\
+        href=\"{{env.npm_package_homepage}}\"\\n\\\n\
+        {{/if env.npm_package_homepage}}\\n\\\n\
+        target=\"_blank\"\\n\\\n\
+    >\\n\\\n\
+utility2-comment -->\\n\\\n\
+        {{env.npm_package_name}} ({{env.npm_package_version}})\\n\\\n\
+<!-- utility2-comment\\n\\\n\
+    </a>\\n\\\n\
+utility2-comment -->\\n\\\n\
+</h1>\\n\\\n\
+<h3>{{env.npm_package_description}}</h3>\\n\\\n\
+<!-- utility2-comment\\n\\\n\
+<a class=\"button\" download href=\"assets.app.js\">download standalone app</a><br>\\n\\\n\
+<button class=\"button\" data-onevent=\"testRunBrowser\" id=\"testRunButton1\">run internal test</button><br>\\n\\\n\
+utility2-comment -->\\n\\\n\
+\\n\\\n\
+\\n\\\n\
+\\n\\\n\
+<label>edit or paste script below to cover and test</label>\\n\\\n\
+<textarea class=\"textarea\" data-onevent=\"testRunBrowser\" id=\"inputEval1\">\\n\\\n\
+// remove comment below to disable jslint\\n\\\n\
+/*jslint browser, devel*/\\n\\\n\
+/*global window*/\\n\\\n\
+(function () {\\n\\\n\
+    \"use strict\";\\n\\\n\
+    var testCaseDict;\\n\\\n\
+    testCaseDict = {};\\n\\\n\
+    testCaseDict.modeTest = 1;\\n\\\n\
+\\n\\\n\
+    // comment this testCase to disable the failed error demo\\n\\\n\
+    testCaseDict.testCase_failed_error_demo = function (option, onError) {\\n\\\n\
+    /*\\n\\\n\
+     * this function will demo a failed error test\\n\\\n\
+     */\\n\\\n\
+        // jslint-hack\\n\\\n\
+        window.utility2.nop(option);\\n\\\n\
+        onError(new Error(\"this is a failed error demo\"));\\n\\\n\
+    };\\n\\\n\
+\\n\\\n\
+    testCaseDict.testCase_passed_ajax_demo = function (option, onError) {\\n\\\n\
+    /*\\n\\\n\
+     * this function will demo a passed ajax test\\n\\\n\
+     */\\n\\\n\
+        var data;\\n\\\n\
+        option = {url: \"/\"};\\n\\\n\
+        // test ajax request for main-page \"/\"\\n\\\n\
+        window.utility2.ajax(option, function (error, xhr) {\\n\\\n\
+            try {\\n\\\n\
+                // validate no error occurred\\n\\\n\
+                console.assert(!error, error);\\n\\\n\
+                // validate \"200 ok\" status\\n\\\n\
+                console.assert(xhr.statusCode === 200, xhr.statusCode);\\n\\\n\
+                // validate non-empty data\\n\\\n\
+                data = xhr.responseText;\\n\\\n\
+                console.assert(data && data.length > 0, data);\\n\\\n\
+                onError();\\n\\\n\
+            } catch (errorCaught) {\\n\\\n\
+                onError(errorCaught);\\n\\\n\
+            }\\n\\\n\
+        });\\n\\\n\
+    };\\n\\\n\
+\\n\\\n\
+    window.utility2.testRunDefault(testCaseDict);\\n\\\n\
+}());\\n\\\n\
+</textarea>\\n\\\n\
+<button class=\"button\" data-onevent=\"testRunBrowser\" id=\"jslintAutofixButton1\">jslint autofix</button><br>\\n\\\n\
+<pre class= \"colorError\" id=\"outputJslintPre1\" tabindex=\"0\"></pre>\\n\\\n\
+<label>instrumented-code</label>\\n\\\n\
+<pre class=\"readonly textarea\" id=\"outputCode1\" tabindex=\"0\"></pre>\\n\\\n\
+<label>stderr and stdout</label>\\n\\\n\
+<pre class=\"onevent-reset-output readonly textarea\" id=\"outputStdout1\" tabindex=\"0\"></pre>\\n\\\n\
+<div id=\"testReportDiv1\"></div>\\n\\\n\
+<div id=\"coverageReportDiv1\"></div>\\n\\\n\
+<!-- utility2-comment\\n\\\n\
+{{#if isRollup}}\\n\\\n\
+<script src=\"assets.app.js\"></script>\\n\\\n\
+{{#unless isRollup}}\\n\\\n\
+utility2-comment -->\\n\\\n\
+<script src=\"assets.utility2.lib.istanbul.js\"></script>\\n\\\n\
+<script src=\"assets.utility2.lib.jslint.js\"></script>\\n\\\n\
+<script src=\"assets.utility2.lib.db.js\"></script>\\n\\\n\
+<script src=\"assets.utility2.lib.marked.js\"></script>\\n\\\n\
+<script src=\"assets.utility2.lib.sjcl.js\"></script>\\n\\\n\
+<script src=\"assets.utility2.lib.uglifyjs.js\"></script>\\n\\\n\
+<script src=\"assets.utility2.js\"></script>\\n\\\n\
+<script>window.utility2_onReadyBefore.counter += 1;</script>\\n\\\n\
+<script src=\"jsonp.utility2.stateInit?callback=window.utility2.stateInit\"></script>\\n\\\n\
+<script src=\"assets.example.js\"></script>\\n\\\n\
+<script src=\"assets.test.js\"></script>\\n\\\n\
+<script>window.utility2_onReadyBefore();</script>\\n\\\n\
+<!-- utility2-comment\\n\\\n\
+{{/if isRollup}}\\n\\\n\
+utility2-comment -->\\n\\\n\
+<div class=\"utility2FooterDiv\">\\n\\\n\
+    [ this app was created with\\n\\\n\
+    <a href=\"https://github.com/kaizhu256/node-utility2\" target=\"_blank\">utility2</a>\\n\\\n\
+    ]\\n\\\n\
+</div>\\n\\\n\
+</body>\\n\\\n\
+</html>\\n\\\n\
+';\n\
+/* jslint ignore:end */\n\
+/* validateLineSortedReset */\n\
+/* jslint ignore:start */\n\
+local.assetsDict[\"/assets.utility2.js\"] =\n\
+    local.assetsDict[\"/assets.utility2.js\"] ||\n\
+    local.fs.readFileSync(local.__dirname + \"/lib.utility2.js\", \"utf8\"\n\
+).replace((/^#!\\//), \"// \");\n\
+/* jslint ignore:end */\n\
+/* validateLineSortedReset */\n\
+local.assetsDict[\"/\"] = local.assetsDict[\"/assets.index.template.html\"]\n\
+.replace((\n\
+    /\\{\\{env\\.(\\w+?)\\}\\}/g\n\
+), function (match0, match1) {\n\
+    switch (match1) {\n\
+    case \"npm_package_description\":\n\
+        return \"the greatest app in the world!\";\n\
+    case \"npm_package_name\":\n\
+        return \"utility2\";\n\
+    case \"npm_package_nameLib\":\n\
+        return \"utility2\";\n\
+    case \"npm_package_version\":\n\
+        return \"0.0.1\";\n\
+    default:\n\
+        return match0;\n\
+    }\n\
+});\n\
+local.assetsDict[\"/assets.example.html\"] = local.assetsDict[\"/\"];\n\
+local.assetsDict[\"/index.html\"] = local.assetsDict[\"/\"];\n\
+// init cli\n\
+if (module !== require.main || globalThis.utility2_rollup) {\n\
+    return;\n\
+}\n\
+/* validateLineSortedReset */\n\
+local.assetsDict[\"/assets.example.js\"] = (\n\
+    local.assetsDict[\"/assets.example.js\"]\n\
+    || local.fs.readFileSync(__filename, \"utf8\")\n\
+);\n\
+local.assetsDict[\"/favicon.ico\"] = local.assetsDict[\"/favicon.ico\"] || \"\";\n\
+// if $npm_config_timeout_exit exists,\n\
+// then exit this process after $npm_config_timeout_exit ms\n\
+if (Number(process.env.npm_config_timeout_exit)) {\n\
+    setTimeout(process.exit, Number(process.env.npm_config_timeout_exit));\n\
+}\n\
+// start server\n\
+if (globalThis.utility2_serverHttp1) {\n\
+    return;\n\
+}\n\
+process.env.PORT = process.env.PORT || \"8081\";\n\
+console.error(\"http-server listening on port \" + process.env.PORT);\n\
+local.http.createServer(function (request, response) {\n\
+    request.urlParsed = local.url.parse(request.url);\n\
+    if (local.assetsDict[request.urlParsed.pathname] !== undefined) {\n\
+        response.end(local.assetsDict[request.urlParsed.pathname]);\n\
+        return;\n\
+    }\n\
+    response.statusCode = 404;\n\
+    response.end();\n\
+}).listen(process.env.PORT);\n\
+}());\n\
+\n\
+\n\
+\n\
+}());\n\
 "
 /* jslint ignore:end */
     return local;
@@ -33141,19 +34493,21 @@ a {\n\
 body {\n\
     background: #eef;\n\
     font-family: Arial, Helvetica, sans-serif;\n\
+    font-size: small;\n\
     margin: 0 40px;\n\
 }\n\
 body > div,\n\
 body > form > div,\n\
 body > form > input,\n\
 body > form > pre,\n\
-body > form > textarea,\n\
 body > form > .button,\n\
+body > form > .textarea,\n\
 body > input,\n\
 body > pre,\n\
-body > textarea,\n\
-body > .button {\n\
+body > .button,\n\
+body > .textarea {\n\
     margin-bottom: 20px;\n\
+    margin-top: 0;\n\
 }\n\
 body > form > input,\n\
 body > form > .button,\n\
@@ -33161,27 +34515,23 @@ body > input,\n\
 body > .button {\n\
     width: 20rem;\n\
 }\n\
-body > form > textarea,\n\
-body > textarea {\n\
+body > form > .textarea,\n\
+body > .textarea {\n\
     height: 10rem;\n\
     width: 100%;\n\
 }\n\
-body > textarea[readonly] {\n\
+body > .readonly {\n\
     background: #ddd;\n\
 }\n\
 code,\n\
 pre,\n\
-textarea {\n\
+.textarea {\n\
     font-family: Consolas, Menlo, monospace;\n\
-    font-size: small;\n\
+    font-size: smaller;\n\
 }\n\
 pre {\n\
     overflow-wrap: break-word;\n\
     white-space: pre-wrap;\n\
-}\n\
-textarea {\n\
-    overflow: auto;\n\
-    white-space: pre;\n\
 }\n\
 .button {\n\
     background-color: #fff;\n\
@@ -33205,6 +34555,14 @@ textarea {\n\
 }\n\
 .colorError {\n\
     color: #d00;\n\
+}\n\
+.textarea {\n\
+    background: #fff;\n\
+    border: 1px solid #999;\n\
+    border-radius: 0;\n\
+    cursor: auto;\n\
+    overflow: auto;\n\
+    padding: 2px;\n\
 }\n\
 .uiAnimateShake {\n\
     animation-duration: 500ms;\n\
@@ -33230,13 +34588,13 @@ textarea {\n\
 <div id=\"ajaxProgressDiv1\" style=\"background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%; z-index: 1;\"></div>\n\
 <div class=\"uiAnimateSpin\" style=\"animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: none; height: 25px; vertical-align: middle; width: 25px;\"></div>\n\
 <a class=\"zeroPixel\" download=\"db.persistence.json\" href=\"\" id=\"dbExportA1\"></a>\n\
-<input class=\"zeroPixel\" id=\"dbImportInput1\" type=\"file\">\n\
+<input class=\"zeroPixel\" data-onevent=\"onEventDomDb\" data-onevent-db=\"dbImportInput\" type=\"file\">\n\
 <script>\n\
 /* jslint utility2:true */\n\
 // init domOnEventWindowOnloadTimeElapsed\n\
 (function () {\n\
 /*\n\
- * this function will measure and print the time-elapsed for window.onload\n\
+ * this function will measure and print time-elapsed for window.onload\n\
  */\n\
     \"use strict\";\n\
     if (window.domOnEventWindowOnloadTimeElapsed) {\n\
@@ -33259,11 +34617,104 @@ textarea {\n\
 \n\
 \n\
 \n\
+// init domOnEventDelegateDict\n\
+(function () {\n\
+/*\n\
+ * this function will handle delegated dom-event\n\
+ */\n\
+    \"use strict\";\n\
+    var timerTimeoutDict;\n\
+    if (window.domOnEventDelegateDict) {\n\
+        return;\n\
+    }\n\
+    window.domOnEventDelegateDict = {};\n\
+    timerTimeoutDict = {};\n\
+    window.domOnEventDelegateDict.domOnEventDelegate = function (event) {\n\
+        event.targetOnEvent = event.target.closest(\n\
+            \"[data-onevent]\"\n\
+        );\n\
+        if (\n\
+            !event.targetOnEvent\n\
+            || event.targetOnEvent.dataset.onevent === \"domOnEventNop\"\n\
+            || event.target.closest(\n\
+                \".disabled, .readonly\"\n\
+            )\n\
+        ) {\n\
+            return;\n\
+        }\n\
+        // rate-limit high-frequency-event\n\
+        switch (event.type) {\n\
+        case \"keydown\":\n\
+        case \"keyup\":\n\
+            // filter non-input keyboard-event\n\
+            if (!event.target.closest(\n\
+                \"input, option, select, textarea\"\n\
+            )) {\n\
+                return;\n\
+            }\n\
+            if (timerTimeoutDict[event.type] !== true) {\n\
+                timerTimeoutDict[event.type] = timerTimeoutDict[\n\
+                    event.type\n\
+                ] || setTimeout(function () {\n\
+                    timerTimeoutDict[event.type] = true;\n\
+                    window.domOnEventDelegateDict.domOnEventDelegate(\n\
+                        event\n\
+                    );\n\
+                }, 50);\n\
+                return;\n\
+            }\n\
+            timerTimeoutDict[event.type] = null;\n\
+            break;\n\
+        }\n\
+        switch (event.targetOnEvent.tagName) {\n\
+        case \"BUTTON\":\n\
+        case \"FORM\":\n\
+            event.preventDefault();\n\
+            break;\n\
+        }\n\
+        event.stopPropagation();\n\
+        window.domOnEventDelegateDict[event.targetOnEvent.dataset.onevent](\n\
+            event\n\
+        );\n\
+    };\n\
+    window.domOnEventDelegateDict.domOnEventResetOutput = function () {\n\
+        Array.from(document.querySelectorAll(\n\
+            \".onevent-reset-output\"\n\
+        )).forEach(function (element) {\n\
+            switch (element.tagName) {\n\
+            case \"INPUT\":\n\
+            case \"TEXTAREA\":\n\
+                element.value = \"\";\n\
+                break;\n\
+            case \"PRE\":\n\
+                element.textContent = \"\";\n\
+                break;\n\
+            default:\n\
+                element.innerHTML = \"\";\n\
+            }\n\
+        });\n\
+    };\n\
+    // init event-handling\n\
+    [\n\
+        \"change\",\n\
+        \"click\",\n\
+        \"keydown\",\n\
+        \"submit\"\n\
+    ].forEach(function (eventType) {\n\
+        document.addEventListener(\n\
+            eventType,\n\
+            window.domOnEventDelegateDict.domOnEventDelegate\n\
+        );\n\
+    });\n\
+}());\n\
+\n\
+\n\
+\n\
 // init timerIntervalAjaxProgressUpdate\n\
 (function () {\n\
 /*\n\
- * this function will increment the ajax-progress-bar\n\
- * until the webpage has loaded\n\
+ * this function will increment ajax-progress-bar\n\
+ * until webpage has loaded\n\
  */\n\
     \"use strict\";\n\
     var ajaxProgressDiv1;\n\
@@ -33271,11 +34722,15 @@ textarea {\n\
     var ajaxProgressUpdate;\n\
     if (\n\
         window.timerIntervalAjaxProgressUpdate\n\
-        || !document.querySelector(\"#ajaxProgressDiv1\")\n\
+        || !document.querySelector(\n\
+            \"#ajaxProgressDiv1\"\n\
+        )\n\
     ) {\n\
         return;\n\
     }\n\
-    ajaxProgressDiv1 = document.querySelector(\"#ajaxProgressDiv1\");\n\
+    ajaxProgressDiv1 = document.querySelector(\n\
+        \"#ajaxProgressDiv1\"\n\
+    );\n\
     setTimeout(function () {\n\
         ajaxProgressDiv1.style.width = \"25%\";\n\
     });\n\
@@ -33324,16 +34779,21 @@ textarea {\n\
             event\n\
             && event.key === \"a\"\n\
             && (event.ctrlKey || event.metaKey)\n\
-            && event.target.closest(\"pre\")\n\
+            && event.target.closest(\n\
+                \"pre\"\n\
+            )\n\
         ) {\n\
             range = document.createRange();\n\
-            range.selectNodeContents(event.target.closest(\"pre\"));\n\
+            range.selectNodeContents(event.target.closest(\n\
+                \"pre\"\n\
+            ));\n\
             selection = window.getSelection();\n\
             selection.removeAllRanges();\n\
             selection.addRange(range);\n\
             event.preventDefault();\n\
         }\n\
     };\n\
+    // init event-handling\n\
     document.addEventListener(\n\
         \"keydown\",\n\
         window.domOnEventSelectAllWithinPre\n\
@@ -33357,14 +34817,13 @@ textarea {\n\
 <h3>the zero-dependency, swiss-army-knife utility for building, testing, and deploying webapps</h3>\n\
 \n\
 <a class=\"button\" download href=\"assets.app.js\">download standalone app</a><br>\n\
-<button id=\"testRunButton1\" style=\"display: none;\"></button>\n\
-<button class=\"button eventDelegateClick onreset\" data-event=\"testRunBrowser\" id=\"testRunButton2\">run internal test</button><br>\n\
+<button class=\"button\" data-onevent=\"testRunBrowser\" id=\"testRunButton1\">run internal test</button><br>\n\
 \n\
 \n\
 \n\
 \n\
 <label>edit or paste script below to cover and test</label>\n\
-<textarea class=\"eventDelegateKeyup onreset\" data-event=\"testRunBrowser\" id=\"inputTextareaEval1\">\n\
+<textarea class=\"textarea\" data-onevent=\"testRunBrowser\" id=\"inputEval1\">\n\
 // remove comment below to disable jslint\n\
 /*jslint browser, devel*/\n\
 /*global window*/\n\
@@ -33375,23 +34834,23 @@ textarea {\n\
     testCaseDict.modeTest = 1;\n\
 \n\
     // comment this testCase to disable the failed error demo\n\
-    testCaseDict.testCase_failed_error_demo = function (options, onError) {\n\
+    testCaseDict.testCase_failed_error_demo = function (option, onError) {\n\
     /*\n\
      * this function will demo a failed error test\n\
      */\n\
         // jslint-hack\n\
-        window.utility2.nop(options);\n\
+        window.utility2.nop(option);\n\
         onError(new Error(\"this is a failed error demo\"));\n\
     };\n\
 \n\
-    testCaseDict.testCase_passed_ajax_demo = function (options, onError) {\n\
+    testCaseDict.testCase_passed_ajax_demo = function (option, onError) {\n\
     /*\n\
      * this function will demo a passed ajax test\n\
      */\n\
         var data;\n\
-        options = {url: \"/\"};\n\
+        option = {url: \"/\"};\n\
         // test ajax request for main-page \"/\"\n\
-        window.utility2.ajax(options, function (error, xhr) {\n\
+        window.utility2.ajax(option, function (error, xhr) {\n\
             try {\n\
                 // validate no error occurred\n\
                 console.assert(!error, error);\n\
@@ -33410,14 +34869,14 @@ textarea {\n\
     window.utility2.testRunDefault(testCaseDict);\n\
 }());\n\
 </textarea>\n\
-<button class=\"button eventDelegateClick onreset\" data-event=\"testRunBrowser\" id=\"jslintAutofixButton1\">jslint autofix</button><br>\n\
+<button class=\"button\" data-onevent=\"testRunBrowser\" id=\"jslintAutofixButton1\">jslint autofix</button><br>\n\
 <pre class= \"colorError\" id=\"outputJslintPre1\" tabindex=\"0\"></pre>\n\
 <label>instrumented-code</label>\n\
-<textarea class=\"resettable\" id=\"outputTextarea1\" readonly></textarea>\n\
+<pre class=\"readonly textarea\" id=\"outputCode1\" tabindex=\"0\"></pre>\n\
 <label>stderr and stdout</label>\n\
-<textarea class=\"resettable\" id=\"outputStdoutTextarea1\" readonly></textarea>\n\
-<div class=\"resettable\" id=\"testReportDiv1\"></div>\n\
-<div class=\"resettable\" id=\"coverageReportDiv1\"></div>\n\
+<pre class=\"onevent-reset-output readonly textarea\" id=\"outputStdout1\" tabindex=\"0\"></pre>\n\
+<div id=\"testReportDiv1\"></div>\n\
+<div id=\"coverageReportDiv1\"></div>\n\
 \n\
 \n\
 <script src=\"assets.utility2.rollup.js\"></script>\n\
@@ -33458,28 +34917,48 @@ local.assetsDict["/assets.utility2.test.js"] = "/* istanbul instrument in packag
         } catch (ignore) {}\n\
     }());\n\
     globalThis.globalThis = globalThis;\n\
+    // init debug_inline\n\
+    if (!globalThis[\"debug\\u0049nline\"]) {\n\
+        consoleError = console.error;\n\
+        globalThis[\"debug\\u0049nline\"] = function () {\n\
+        /*\n\
+         * this function will both print <arguments> to stderr\n\
+         * and return <arguments>[0]\n\
+         */\n\
+            var argList;\n\
+            argList = Array.from(arguments); // jslint ignore:line\n\
+            // debug arguments\n\
+            globalThis[\"debug\\u0049nlineArguments\"] = argList;\n\
+            consoleError(\"\\n\\ndebug\\u0049nline\");\n\
+            consoleError.apply(console, argList);\n\
+            consoleError(\"\\n\");\n\
+            // return arg0 for inspection\n\
+            return argList[0];\n\
+        };\n\
+    }\n\
     // init local\n\
     local = {};\n\
+    local.local = local;\n\
+    globalThis.globalLocal = local;\n\
     // init isBrowser\n\
     local.isBrowser = (\n\
         typeof window === \"object\"\n\
         && window === globalThis\n\
         && typeof window.XMLHttpRequest === \"function\"\n\
         && window.document\n\
-        && typeof window.document.querySelectorAll === \"function\"\n\
+        && typeof window.document.querySelector === \"function\"\n\
     );\n\
-    globalThis.globalLocal = local;\n\
     // init function\n\
     local.assertThrow = function (passed, message) {\n\
     /*\n\
-     * this function will throw the error <message> if <passed> is falsy\n\
+     * this function will throw error <message> if <passed> is falsy\n\
      */\n\
         var error;\n\
         if (passed) {\n\
             return;\n\
         }\n\
         error = (\n\
-            // ternary-operator\n\
+            // ternary-condition\n\
             (\n\
                 message\n\
                 && typeof message.message === \"string\"\n\
@@ -33517,24 +34996,53 @@ local.assetsDict["/assets.utility2.test.js"] = "/* istanbul instrument in packag
      */\n\
         return;\n\
     };\n\
-    // init debug_inline\n\
-    if (!globalThis[\"debug\\u0049nline\"]) {\n\
-        consoleError = console.error;\n\
-        globalThis[\"debug\\u0049nline\"] = function () {\n\
-        /*\n\
-         * this function will both print <arguments> to stderr\n\
-         * and return <arguments>[0]\n\
-         */\n\
-            var argList;\n\
-            argList = Array.from(arguments); // jslint ignore:line\n\
-            // debug arguments\n\
-            globalThis[\"debug\\u0049nlineArguments\"] = argList;\n\
-            consoleError(\"\\n\\ndebug\\u0049nline\");\n\
-            consoleError.apply(console, argList);\n\
-            consoleError(\"\\n\");\n\
-            // return arg0 for inspection\n\
-            return argList[0];\n\
-        };\n\
+    local.objectAssignDefault = function (target, source) {\n\
+    /*\n\
+     * this function will if items from <target> are\n\
+     * null, undefined, or empty-string,\n\
+     * then overwrite them with items from <source>\n\
+     */\n\
+        target = target || {};\n\
+        Object.keys(source || {}).forEach(function (key) {\n\
+            if (\n\
+                target[key] === null\n\
+                || target[key] === undefined\n\
+                || target[key] === \"\"\n\
+            ) {\n\
+                target[key] = target[key] || source[key];\n\
+            }\n\
+        });\n\
+        return target;\n\
+    };\n\
+    // require builtin\n\
+    if (!local.isBrowser) {\n\
+        local.assert = require(\"assert\");\n\
+        local.buffer = require(\"buffer\");\n\
+        local.child_process = require(\"child_process\");\n\
+        local.cluster = require(\"cluster\");\n\
+        local.crypto = require(\"crypto\");\n\
+        local.dgram = require(\"dgram\");\n\
+        local.dns = require(\"dns\");\n\
+        local.domain = require(\"domain\");\n\
+        local.events = require(\"events\");\n\
+        local.fs = require(\"fs\");\n\
+        local.http = require(\"http\");\n\
+        local.https = require(\"https\");\n\
+        local.net = require(\"net\");\n\
+        local.os = require(\"os\");\n\
+        local.path = require(\"path\");\n\
+        local.querystring = require(\"querystring\");\n\
+        local.readline = require(\"readline\");\n\
+        local.repl = require(\"repl\");\n\
+        local.stream = require(\"stream\");\n\
+        local.string_decoder = require(\"string_decoder\");\n\
+        local.timers = require(\"timers\");\n\
+        local.tls = require(\"tls\");\n\
+        local.tty = require(\"tty\");\n\
+        local.url = require(\"url\");\n\
+        local.util = require(\"util\");\n\
+        local.vm = require(\"vm\");\n\
+        local.zlib = require(\"zlib\");\n\
     }\n\
 }(this));\n\
 \n\
@@ -33548,7 +35056,9 @@ local.assetsDict["/assets.utility2.test.js"] = "/* istanbul instrument in packag
 // run shared js-env code - init-before\n\
 (function () {\n\
 // init local\n\
-local = (globalThis.utility2 || require(\"./lib.utility2.js\")).requireReadme();\n\
+local = (\n\
+    globalThis.utility2 || require(\"./lib.utility2.js\")\n\
+).requireReadme();\n\
 globalThis.local = local;\n\
 // init test\n\
 local.testRunDefault(local);\n\
@@ -33558,14 +35068,14 @@ local.testRunDefault(local);\n\
 \n\
 // run shared js-env code - function\n\
 (function () {\n\
-local._testCase_testRunDefault_failure = function (options, onError) {\n\
+local._testCase_testRunDefault_failure = function (option, onError) {\n\
 /*\n\
  * this function will test testRunDefault's failure handling-behavior\n\
  */\n\
     // test failure from callback handling-behavior\n\
     onError(local.errorDefault);\n\
     // test failure from multiple-callback handling-behavior\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
     // test failure from ajax handling-behavior\n\
     local.ajax({\n\
         url: \"/undefined\"\n\
@@ -33579,30 +35089,30 @@ local._testCase_testRunDefault_failure = function (options, onError) {\n\
         }]\n\
     ], function (onError) {\n\
         console.error();\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     }, local.onErrorThrow);\n\
     // test failure from thrown error handling-behavior\n\
     throw local.errorDefault;\n\
 };\n\
 \n\
-local.testCase_FormData_default = function (options, onError) {\n\
+local.testCase_FormData_default = function (option, onError) {\n\
 /*\n\
  * this function will test FormData's default handling-behavior\n\
  */\n\
-    options = {};\n\
-    options.blob1 = new local.Blob([\"aa\", \"bb\", local.stringHelloEmoji, 0]);\n\
-    options.blob2 = new local.Blob([\"aa\", \"bb\", local.stringHelloEmoji, 0], {\n\
+    option = {};\n\
+    option.blob1 = new local.Blob([\"aa\", \"bb\", local.stringHelloEmoji, 0]);\n\
+    option.blob2 = new local.Blob([\"aa\", \"bb\", local.stringHelloEmoji, 0], {\n\
         type: \"text/plain; charset=utf-8\"\n\
     });\n\
-    options.data = new local.FormData();\n\
-    options.data.append(\"text1\", \"aabb\" + local.stringHelloEmoji + \"0\");\n\
+    option.data = new local.FormData();\n\
+    option.data.append(\"text1\", \"aabb\" + local.stringHelloEmoji + \"0\");\n\
     // test file-upload handling-behavior\n\
-    options.data.append(\"file1\", options.blob1);\n\
+    option.data.append(\"file1\", option.blob1);\n\
     // test file-upload and filename handling-behavior\n\
-    options.data.append(\"file2\", options.blob2, \"filename2.txt\");\n\
-    options.method = \"POST\";\n\
-    options.url = \"/test.echo\";\n\
-    local.ajax(options, function (error, xhr) {\n\
+    option.data.append(\"file2\", option.blob2, \"filename2.txt\");\n\
+    option.method = \"POST\";\n\
+    option.url = \"/test.echo\";\n\
+    local.ajax(option, function (error, xhr) {\n\
         // validate no error occurred\n\
         local.assertThrow(!error, error);\n\
         // validate responseText\n\
@@ -33619,11 +35129,11 @@ local.testCase_FormData_default = function (options, onError) {\n\
             + \"filename=\\\"filename2.txt\\\"\\r\\nContent-Type: text/plain; \"\n\
             + \"charset=utf-8\\r\\n\\r\\naabbhello \\ud83d\\ude01\\n0\\r\\n\"\n\
         ) >= 0, xhr.responseText);\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     });\n\
 };\n\
 \n\
-local.testCase_FormData_error = function (options, onError) {\n\
+local.testCase_FormData_error = function (option, onError) {\n\
 /*\n\
  * this function will test FormData's error handling-behavior\n\
  */\n\
@@ -33641,12 +35151,12 @@ local.testCase_FormData_error = function (options, onError) {\n\
         }, function (error) {\n\
             // validate error occurred\n\
             local.assertThrow(error, error);\n\
-            onError(null, options);\n\
+            onError(null, option);\n\
         });\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_FormData_nullCase = function (options, onError) {\n\
+local.testCase_FormData_nullCase = function (option, onError) {\n\
 /*\n\
  * this function will test FormData's null-case handling-behavior\n\
  */\n\
@@ -33661,15 +35171,15 @@ local.testCase_FormData_nullCase = function (options, onError) {\n\
         local.assertThrow((\n\
             /\\r\\n\\r\\n$/\n\
         ).test(xhr.responseText), xhr.responseText);\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     });\n\
 };\n\
 \n\
-local.testCase_ajaxProgressUpdate_default = function (options, onError) {\n\
+local.testCase_ajaxProgressUpdate_default = function (option, onError) {\n\
 /*\n\
  * this function will test ajaxProgressUpdate's default handling-behavior\n\
  */\n\
-    options = 0;\n\
+    option = 0;\n\
     local.testMock([\n\
         [local, {\n\
             ajaxProgressCounter: 0,\n\
@@ -33677,8 +35187,8 @@ local.testCase_ajaxProgressUpdate_default = function (options, onError) {\n\
         }],\n\
         [globalThis, {\n\
             setTimeout: function (fnc) {\n\
-                options += 1;\n\
-                local.ajaxProgressState = options % 3;\n\
+                option += 1;\n\
+                local.ajaxProgressState = option % 3;\n\
                 fnc();\n\
             }\n\
         }]\n\
@@ -33698,45 +35208,26 @@ local.testCase_ajaxProgressUpdate_default = function (options, onError) {\n\
         // validate data\n\
         local.assertJsonEqual(local.ajaxProgressCounter, 0);\n\
         local.assertJsonEqual(local.ajaxProgressState, 0);\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_ajax_abort = function (options, onError) {\n\
-/*\n\
- * this function will test ajax's abort handling-behavior\n\
- */\n\
-    options = local.ajax({\n\
-        url: \"/test.timeout\"\n\
-    }, function (error) {\n\
-        // validate error occurred\n\
-        local.assertThrow(error, error);\n\
-        onError(null, options);\n\
-    });\n\
-    // test multiple-callback handling-behavior\n\
-    options.onEvent({\n\
-        type: \"abort\"\n\
-    });\n\
-    options.abort();\n\
-    options.abort();\n\
-};\n\
-\n\
-local.testCase_ajax_cache = function (options, onError) {\n\
+local.testCase_ajax_cache = function (option, onError) {\n\
 /*\n\
  * this function will test ajax's cache handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
-    options = {};\n\
-    local.onNext(options, function (error, data) {\n\
-        switch (options.modeNext) {\n\
+    option = {};\n\
+    local.onNext(option, function (error, data) {\n\
+        switch (option.modeNext) {\n\
         case 1:\n\
             // test http GET handling-behavior\n\
             local.ajax({\n\
                 url: \"assets.hello.txt\"\n\
-            }, options.onNext);\n\
+            }, option.onNext);\n\
             break;\n\
         case 2:\n\
             // validate responseText\n\
@@ -33747,27 +35238,115 @@ local.testCase_ajax_cache = function (options, onError) {\n\
                     \"If-Modified-Since\": new Date(Date.now() + 0xffff).toUTCString()\n\
                 },\n\
                 url: \"assets.hello.txt\"\n\
-            }, options.onNext);\n\
+            }, option.onNext);\n\
             break;\n\
         case 3:\n\
             // validate statusCode\n\
             local.assertJsonEqual(data.statusCode, 304);\n\
-            options.onNext();\n\
+            option.onNext();\n\
             break;\n\
         default:\n\
-            onError(error, options);\n\
+            onError(error, option);\n\
         }\n\
     });\n\
-    options.modeNext = 0;\n\
-    options.onNext();\n\
+    option.modeNext = 0;\n\
+    option.onNext();\n\
 };\n\
 \n\
-local.testCase_ajax_echo = function (options, onError) {\n\
-    // test /test.echo handling-behavior\n\
+local.testCase_ajax_default = function (option, onError) {\n\
+/*\n\
+ * this function will test ajax's default handling-behavior\n\
+ */\n\
+    var onParallel;\n\
+    onParallel = local.onParallel(onError);\n\
+    onParallel.counter += 1;\n\
+\n\
+    // test ajax's abort handling-behavior\n\
+    onParallel.counter += 1;\n\
+    local.onParallelList({\n\
+        list: [\n\
+            \"\",\n\
+            \"arraybuffer\",\n\
+            \"blob\",\n\
+            \"text\"\n\
+        ]\n\
+    }, function (responseType, onParallel) {\n\
+        responseType = responseType.element;\n\
+        onParallel.counter += 1;\n\
+        local.ajax({\n\
+            data: (\n\
+                responseType === \"arraybuffer\"\n\
+                // test POST buffer-data handling-behavior\n\
+                ? new TextEncoder().encode(local.stringHelloEmoji)\n\
+                : responseType === \"blob\"\n\
+                // test POST blob-data handling-behavior\n\
+                ? new local.Blob([\n\
+                    \"\",\n\
+                    new Uint8Array(0),\n\
+                    local.stringHelloEmoji\n\
+                ])\n\
+                // test POST string-data handling-behavior\n\
+                : local.stringHelloEmoji\n\
+            ),\n\
+            method: \"POST\",\n\
+            // test nodejs response handling-behavior\n\
+            responseType: responseType.replace(\"blob\", \"arraybuffer\"),\n\
+            url: \"/test.body\"\n\
+        }, function (error, xhr) {\n\
+            // validate no error occurred\n\
+            local.assertThrow(!error, error);\n\
+            // validate statusCode\n\
+            local.assertJsonEqual(xhr.statusCode, 200);\n\
+            // validate responseText\n\
+            switch (responseType) {\n\
+            case \"arraybuffer\":\n\
+            case \"blob\":\n\
+                local.assertJsonEqual(xhr.responseBuffer.byteLength, 11);\n\
+                local.assertJsonEqual(Array.from(xhr.responseBuffer), [\n\
+                    0x68,\n\
+                    0x65,\n\
+                    0x6c,\n\
+                    0x6c,\n\
+                    0x6f,\n\
+                    0x20,\n\
+                    0xf0,\n\
+                    0x9f,\n\
+                    0x98,\n\
+                    0x81,\n\
+                    0x0a\n\
+                ]);\n\
+                break;\n\
+            default:\n\
+                local.assertJsonEqual(xhr.responseText, local.stringHelloEmoji);\n\
+            }\n\
+            onParallel(null, option);\n\
+        });\n\
+    }, onParallel);\n\
+\n\
+    // test ajax's data handling-behavior\n\
+    onParallel.counter += 1;\n\
+    option = local.ajax({\n\
+        url: \"/test.timeout\"\n\
+    }, function (error, xhr) {\n\
+        // validate error occurred\n\
+        local.assertThrow(error, error);\n\
+        // validate statusCode\n\
+        local.assertJsonEqual(xhr.statusCode, 500);\n\
+        onParallel(null, option);\n\
+    });\n\
+    // test multiple-callback handling-behavior\n\
+    option.onEvent({\n\
+        type: \"abort\"\n\
+    });\n\
+    option.abort();\n\
+    option.abort();\n\
+\n\
+    // test ajax's echo handling-behavior\n\
+    onParallel.counter += 1;\n\
     local.ajax({\n\
         _aa: \"aa\",\n\
         aa: \"aa\",\n\
-        data: \"aa\",\n\
+        data: local.stringHelloEmoji,\n\
         // test request-header handling-behavior\n\
         headers: {\n\
             \"X-Request-Header-Test\": \"aa\"\n\
@@ -33781,26 +35360,26 @@ local.testCase_ajax_echo = function (options, onError) {\n\
         local.assertThrow(!error, error);\n\
         // validate statusCode\n\
         local.assertJsonEqual(xhr.statusCode, 200);\n\
-        // validate response\n\
+        // validate responseHeaders\n\
+        local.assertJsonEqual(\n\
+            xhr.responseHeaders[\"x-response-header-test\"],\n\
+            \"bb\"\n\
+        );\n\
+        // validate responseText\n\
         local.assertThrow((\n\
-            /\\r\\naa$/\n\
+            /\\r\\nhello\\u0020\\ud83d\\ude01\\n$/\n\
         ).test(xhr.responseText), xhr.responseText);\n\
         local.assertThrow((\n\
             /\\r\\nx-request-header-test:\\u0020aa\\r\\n/\n\
         ).test(xhr.responseText), xhr.responseText);\n\
-        // validate responseHeaders\n\
-        local.assertJsonEqual(xhr.responseHeaders[\"x-response-header-test\"], \"bb\");\n\
         // validate properties\n\
         local.assertJsonEqual(xhr._aa, undefined);\n\
         local.assertJsonEqual(xhr.aa, \"aa\");\n\
-        onError(null, options);\n\
+        onParallel(null, option);\n\
     });\n\
-};\n\
 \n\
-local.testCase_ajax_error = function (options, onError) {\n\
-/*\n\
- * this function will test ajax's error handling-behavior\n\
- */\n\
+    // test ajax's error handling-behavior\n\
+    onParallel.counter += 1;\n\
     local.onParallelList({\n\
         list: [{\n\
             // test 404-not-found-error handling-behavior\n\
@@ -33821,20 +35400,17 @@ local.testCase_ajax_error = function (options, onError) {\n\
             // test undefined-https-url handling-behavior\n\
             url: \"https://undefined:0\"\n\
         }]\n\
-    }, function (options2, onParallel) {\n\
+    }, function (option2, onParallel) {\n\
         onParallel.counter += 1;\n\
-        local.ajax(options2.element, function (error) {\n\
+        local.ajax(option2.element, function (error) {\n\
             // validate error occurred\n\
             local.assertThrow(error, error);\n\
-            onParallel(null, options);\n\
+            onParallel(null, option);\n\
         });\n\
-    }, onError);\n\
-};\n\
+    }, onParallel);\n\
 \n\
-local.testCase_ajax_file = function (options, onError) {\n\
-/*\n\
- * this function will test ajax's file handling-behavior\n\
- */\n\
+    // test ajax's file handling-behavior\n\
+    onParallel.counter += 1;\n\
     local.ajax({\n\
         url: \"LICENSE\"\n\
     }, function (error, xhr) {\n\
@@ -33842,100 +35418,14 @@ local.testCase_ajax_file = function (options, onError) {\n\
         local.assertThrow(!error, error);\n\
         // validate statusCode\n\
         local.assertJsonEqual(xhr.statusCode, 200);\n\
-        onError(null, options);\n\
+        // validate responseText\n\
+        local.assertThrow(xhr.responseText.indexOf(\n\
+            \"MIT License (https://opensource.org/licenses/MIT)\\n\\n\"\n\
+        ) === 0, xhr.data);\n\
+        onParallel(null, option);\n\
     });\n\
-};\n\
 \n\
-local.testCase_ajax_post = function (options, onError) {\n\
-/*\n\
- * this function will test ajax's POST handling-behavior\n\
- */\n\
-    // test /test.body handling-behavior\n\
-    local.onParallelList({\n\
-        list: [\n\
-            \"\",\n\
-            \"arraybuffer\",\n\
-            \"text\"\n\
-        ]\n\
-    }, function (responseType, onParallel) {\n\
-        responseType = responseType.element;\n\
-        onParallel.counter += 1;\n\
-        local.ajax({\n\
-            data: responseType === \"arraybuffer\"\n\
-            // test POST buffer-data handling-behavior\n\
-            ? local.bufferCreate(\"aa\")\n\
-            // test POST string-data handling-behavior\n\
-            : \"aa\",\n\
-            method: \"POST\",\n\
-            // test nodejs response handling-behavior\n\
-            responseType: responseType,\n\
-            url: \"/test.body\"\n\
-        }, function (error, xhr) {\n\
-            // validate no error occurred\n\
-            local.assertThrow(!error, error);\n\
-            // validate statusCode\n\
-            local.assertJsonEqual(xhr.statusCode, 200);\n\
-            // validate responseText\n\
-            switch (responseType) {\n\
-            case \"arraybuffer\":\n\
-                local.assertJsonEqual(xhr.responseBuffer.byteLength, 2);\n\
-                local.assertJsonEqual(xhr.responseBuffer[0], 97);\n\
-                local.assertJsonEqual(xhr.responseBuffer[1], 97);\n\
-                break;\n\
-            default:\n\
-                local.assertJsonEqual(xhr.responseText, \"aa\");\n\
-            }\n\
-            onParallel(null, options);\n\
-        });\n\
-    }, onError);\n\
-};\n\
-\n\
-local.testCase_ajax_responseType = function (options, onError) {\n\
-/*\n\
- * this function will test ajax's responseType handling-behavior\n\
- */\n\
-    // test /test.body handling-behavior\n\
-    local.onParallelList({\n\
-        list: [\n\
-            \"\",\n\
-            \"arraybuffer\",\n\
-            \"text\"\n\
-        ]\n\
-    }, function (responseType, onParallel) {\n\
-        responseType = responseType.element;\n\
-        onParallel.counter += 1;\n\
-        local.ajax({\n\
-            // test nodejs response handling-behavior\n\
-            responseType: responseType,\n\
-            url: \"assets.hello.txt\"\n\
-        }, function (error, xhr) {\n\
-            // validate no error occurred\n\
-            local.assertThrow(!error, error);\n\
-            // validate statusCode\n\
-            local.assertJsonEqual(xhr.statusCode, 200);\n\
-            // validate responseText\n\
-            switch (responseType) {\n\
-            case \"arraybuffer\":\n\
-                local.assertJsonEqual(xhr.responseBuffer.byteLength, 11);\n\
-                local.assertJsonEqual(\n\
-                    Array.from(xhr.responseBuffer),\n\
-                    [0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0xf0, 0x9f, 0x98, 0x81, 0x0a]\n\
-                );\n\
-                break;\n\
-            default:\n\
-                local.assertJsonEqual(xhr.responseText, local.stringHelloEmoji);\n\
-            }\n\
-            onParallel(null, options);\n\
-        });\n\
-    }, onError);\n\
-};\n\
-\n\
-local.testCase_ajax_standalone = function (options, onError) {\n\
-/*\n\
- * this function will test ajax's standalone handling-behavior\n\
- */\n\
-    var onParallel;\n\
-    onParallel = local.onParallel(onError);\n\
+    // test ajax's standalone handling-behavior\n\
     onParallel.counter += 1;\n\
     local.testMock([\n\
         [local, {\n\
@@ -33947,14 +35437,16 @@ local.testCase_ajax_standalone = function (options, onError) {\n\
             onParallel.counter += 1;\n\
             local.ajax({\n\
                 responseType: responseType,\n\
-                url: local.isBrowser\n\
-                ? location.href\n\
-                : local.serverLocalHost\n\
+                url: (\n\
+                    local.isBrowser\n\
+                    ? location.href\n\
+                    : local.serverLocalHost\n\
+                )\n\
             }, function (error, xhr) {\n\
-                // validate statusCode\n\
-                local.assertJsonEqual(xhr.statusCode, 200);\n\
                 // validate no error occurred\n\
                 local.assertThrow(!error, error);\n\
+                // validate statusCode\n\
+                local.assertJsonEqual(xhr.statusCode, 200);\n\
                 onParallel();\n\
             });\n\
             // test error handling-behavior\n\
@@ -33970,34 +35462,34 @@ local.testCase_ajax_standalone = function (options, onError) {\n\
                     : local.serverLocalHost\n\
                 ) + \"/undefined\"\n\
             }, function (error, xhr) {\n\
-                // validate statusCode\n\
-                local.assertJsonEqual(xhr.statusCode, 404);\n\
                 // validate error occurred\n\
                 local.assertThrow(error, error);\n\
+                // validate statusCode\n\
+                local.assertJsonEqual(xhr.statusCode, 404);\n\
                 onParallel();\n\
             });\n\
         });\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     }, onParallel);\n\
-};\n\
+    onParallel();\n\
 \n\
-local.testCase_ajax_timeout = function (options, onError) {\n\
-/*\n\
- * this function will test ajax's timeout handling-behavior\n\
- */\n\
+    // test ajax's timeout handling-behavior\n\
+    onParallel.counter += 1;\n\
     setTimeout(function () {\n\
         local.ajax({\n\
             timeout: 1,\n\
             url: \"/test.timeout\"\n\
-        }, function (error) {\n\
+        }, function (error, xhr) {\n\
             // validate error occurred\n\
             local.assertThrow(error, error);\n\
-            onError(null, options);\n\
+            // validate statusCode\n\
+            local.assertJsonEqual(xhr.statusCode, 500);\n\
+            onParallel(null, option);\n\
         });\n\
     }, 1000);\n\
 };\n\
 \n\
-local.testCase_assertXxx_default = function (options, onError) {\n\
+local.testCase_assertXxx_default = function (option, onError) {\n\
 /*\n\
  * this function will test assertXxx's default handling-behavior\n\
  */\n\
@@ -34050,92 +35542,66 @@ local.testCase_assertXxx_default = function (options, onError) {\n\
             }\n\
         });\n\
     });\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_base64Xxx_default = function (options, onError) {\n\
+local.testCase_base64Xxx_default = function (option, onError) {\n\
 /*\n\
  * this function will test base64Xxx's default handling-behavior\n\
  */\n\
-    options = {};\n\
-    options.base64 = local.base64FromBuffer(\n\
+    option = {};\n\
+    option.base64 = local.base64FromBuffer(\n\
         local.stringCharsetAscii + local.stringHelloEmoji\n\
     );\n\
     // test null-case handling-behavior\n\
     local.assertJsonEqual(local.base64FromBuffer(), \"\");\n\
-    local.assertJsonEqual(local.bufferToString(local.base64ToBuffer()), \"\");\n\
-    local.assertJsonEqual(local.base64ToString(), \"\");\n\
+    local.assertJsonEqual(local.bufferToUtf8(local.base64ToBuffer()), \"\");\n\
+    local.assertJsonEqual(local.base64ToUtf8(), \"\");\n\
     local.assertJsonEqual(local.base64FromBuffer(local.base64ToBuffer()), \"\");\n\
-    local.assertJsonEqual(local.base64FromBuffer(local.base64ToString()), \"\");\n\
+    local.assertJsonEqual(local.base64FromBuffer(local.base64ToUtf8()), \"\");\n\
     // test identity handling-behavior\n\
     local.assertJsonEqual(\n\
-        local.base64FromBuffer(local.base64ToBuffer(options.base64)),\n\
-        options.base64\n\
+        local.base64FromBuffer(local.base64ToBuffer(option.base64)),\n\
+        option.base64\n\
     );\n\
     local.assertJsonEqual(\n\
-        local.base64FromBuffer(local.base64ToString(options.base64)),\n\
-        options.base64\n\
+        local.base64FromBuffer(local.base64ToUtf8(option.base64)),\n\
+        option.base64\n\
     );\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_blobRead_default = function (options, onError) {\n\
+local.testCase_blobRead_default = function (option, onError) {\n\
 /*\n\
  * this function will test blobRead's default handling-behavior\n\
  */\n\
-    local.onParallelList({\n\
-        list: [\n\
-            new local.Blob([\"aa\", \"bb\", local.stringHelloEmoji, 0]),\n\
-            new local.Blob([\"aa\", \"bb\", local.stringHelloEmoji, 0], {\n\
-                type: \"text/plain; charset=utf-8\"\n\
-            })\n\
-        ]\n\
-    }, function (options2, onParallel) {\n\
-        onParallel.counter += 1;\n\
-        [null, \"dataURL\", \"text\"].forEach(function (encoding) {\n\
-            onParallel.counter += 1;\n\
-            local.blobRead(options2.element, encoding, function (error, data) {\n\
-                // validate no error occurred\n\
-                local.assertThrow(!error, error);\n\
-                // validate data\n\
-                switch (encoding) {\n\
-                case \"dataURL\":\n\
-                    if (options2.ii === 0) {\n\
-                        local.assertThrow(\n\
-                            data.indexOf(\";base64,YWFiYmhlbGxvIPCfmIEKMA==\") >= 0,\n\
-                            data\n\
-                        );\n\
-                        break;\n\
-                    }\n\
-                    local.assertJsonEqual(\n\
-                        data,\n\
-                        \"data:text/plain; charset=utf-8;base64,YWFiYmhlbGxvIPCfmIEKMA==\"\n\
-                    );\n\
-                    break;\n\
-                case \"text\":\n\
-                    local.assertJsonEqual(data, \"aabbhello \\ud83d\\ude01\\n0\");\n\
-                    break;\n\
-                default:\n\
-                    local.assertJsonEqual(\n\
-                        local.bufferToString(data),\n\
-                        \"aabbhello \\ud83d\\ude01\\n0\"\n\
-                    );\n\
-                }\n\
-                onParallel(null, options);\n\
-            });\n\
-        });\n\
-        onParallel(null, options);\n\
-    }, onError);\n\
-};\n\
-\n\
-local.testCase_blobRead_error = function (options, onError) {\n\
-/*\n\
- * this function will test blobRead's error handling-behavior\n\
- */\n\
+    var onParallel;\n\
+    onParallel = local.onParallel(onError);\n\
+    onParallel.counter += 1;\n\
+    // test data handling-behavior\n\
+    onParallel.counter += 1;\n\
+    local.blobRead(new local.Blob([\n\
+        \"\",\n\
+        \"aa\",\n\
+        \"bb\",\n\
+        new Uint8Array(0),\n\
+        local.stringHelloEmoji\n\
+    ]), function (error, data) {\n\
+        // validate no error occurred\n\
+        local.assertThrow(!error, error);\n\
+        // validate data\n\
+        local.assertJsonEqual(\n\
+            local.bufferToUtf8(data),\n\
+            \"aabbhello \\ud83d\\ude01\\n\"\n\
+        );\n\
+        onParallel(null, option);\n\
+    });\n\
     if (!local.isBrowser) {\n\
-        onError(null, options);\n\
+        onParallel(null, option);\n\
         return;\n\
     }\n\
+    // test error handling-behavior\n\
+    onParallel.counter += 1;\n\
     local.testMock([\n\
         [FileReader.prototype, {\n\
             readAsArrayBuffer: function () {\n\
@@ -34148,27 +35614,28 @@ local.testCase_blobRead_error = function (options, onError) {\n\
             }\n\
         }]\n\
     ], function (onError) {\n\
-        local.blobRead(null, null, function (error) {\n\
+        local.blobRead(null, function (error) {\n\
             // validate error occurred\n\
             local.assertThrow(error, error);\n\
         });\n\
-        onError(null, options);\n\
-    }, onError);\n\
+        onError(null, option);\n\
+    }, onParallel);\n\
+    onParallel();\n\
 };\n\
 \n\
-local.testCase_browserTest_electron = function (options, onError) {\n\
+local.testCase_browserTest_electron = function (option, onError) {\n\
 /*\n\
  * this function will test browserTest's electron handling-behavior\n\
  */\n\
-    options = function (aa, bb, cc) {\n\
+    option = function (aa, bb, cc) {\n\
         [aa, bb, cc].forEach(function (fnc, ii) {\n\
             if (typeof fnc === \"function\") {\n\
-                fnc(ii && options);\n\
-                options.onNext(null, options);\n\
-                options.utility2_testReportSave();\n\
+                fnc(ii && option);\n\
+                option.onNext(null, option);\n\
+                option.utility2_testReportSave();\n\
             }\n\
         });\n\
-        return options;\n\
+        return option;\n\
     };\n\
     [\n\
         \"BrowserWindow\",\n\
@@ -34198,13 +35665,13 @@ local.testCase_browserTest_electron = function (options, onError) {\n\
         \"window\",\n\
         \"writeFile\"\n\
     ].forEach(function (key) {\n\
-        options[key] = (\n\
+        option[key] = (\n\
             key.indexOf(\"file\") === 0\n\
             ? \"undefined\"\n\
-            : options\n\
+            : option\n\
         );\n\
     });\n\
-    options.ipcMain = {\n\
+    option.ipcMain = {\n\
         on: function (_, fnc) {\n\
             [\"html\", \"testReport\", \"undefined\"].forEach(function (type) {\n\
                 [\n\
@@ -34217,54 +35684,54 @@ local.testCase_browserTest_electron = function (options, onError) {\n\
                         testPlatformList: [{}]\n\
                     }\n\
                 ].forEach(function (data) {\n\
-                    options.isDoneTestReport = null;\n\
+                    option.isDoneTestReport = null;\n\
                     fnc(_, type, data);\n\
                 });\n\
             });\n\
         }\n\
     };\n\
-    options.utility2_testReportSave = local.nop;\n\
+    option.utility2_testReportSave = local.nop;\n\
     local.testMock([\n\
         [globalThis, {\n\
-            setTimeout: options,\n\
+            setTimeout: option,\n\
             utility2_testReport: null\n\
         }],\n\
         [local, {\n\
-            fs: options,\n\
+            fs: option,\n\
             fsReadFileOrEmptyStringSync: function () {\n\
                 return \"\";\n\
             },\n\
-            fsWriteFileWithMkdirpSync: options,\n\
-            onParallel: options\n\
+            fsWriteFileWithMkdirpSync: option,\n\
+            onParallel: option\n\
         }]\n\
     ], function (onError) {\n\
         [\"test\", \"undefined\"].forEach(function (modeBrowserTest) {\n\
             [1, 10, 11, 20, 100].forEach(function (modeNext) {\n\
-                options.modeBrowserTest = modeBrowserTest;\n\
-                options.modeNext = modeNext;\n\
+                option.modeBrowserTest = modeBrowserTest;\n\
+                option.modeNext = modeNext;\n\
                 switch (modeNext) {\n\
                 case 100:\n\
                     local.tryCatchOnError(function () {\n\
                         local.browserTest({\n\
                             modeNext: modeNext\n\
-                        }, options);\n\
+                        }, option);\n\
                     }, local.nop);\n\
                     break;\n\
                 default:\n\
-                    local.browserTest(options, options);\n\
+                    local.browserTest(option, option);\n\
                 }\n\
             });\n\
         });\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_browserTest_screenshot = function (options, onError) {\n\
+local.testCase_browserTest_screenshot = function (option, onError) {\n\
 /*\n\
  * this function will test browserTest's screenshot handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     local.browserTest({\n\
@@ -34274,30 +35741,7 @@ local.testCase_browserTest_screenshot = function (options, onError) {\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_bufferCreate_default = function (options, onError) {\n\
-/*\n\
- * this function will test bufferCreate's default handling-behavior\n\
- */\n\
-    options = {};\n\
-    options.text1 = \"\";\n\
-    options.ii = 0;\n\
-    while (options.ii < 0x10000) {\n\
-        options.text1 += String.fromCodePoint(options.ii);\n\
-        options.ii += 1;\n\
-    }\n\
-    options.ii = 0x100000;\n\
-    while (options.ii < 0x110000) {\n\
-        options.text1 += String.fromCodePoint(options.ii);\n\
-        options.ii += 0x100;\n\
-    }\n\
-    // test utf8 handling-behavior\n\
-    options.bff1 = local.bufferCreate(options.text1);\n\
-    options.text2 = local.bufferToString(options.bff1);\n\
-    local.assertJsonEqual(options.text2, local.bufferToString(options.text2));\n\
-    onError(null, options);\n\
-};\n\
-\n\
-local.testCase_bufferIndexOfSubBuffer_default = function (options, onError) {\n\
+local.testCase_bufferIndexOfSubBuffer_default = function (option, onError) {\n\
 /*\n\
  * this function will test bufferIndexOfSubBuffer's default handling-behavior\n\
  */\n\
@@ -34345,39 +35789,39 @@ local.testCase_bufferIndexOfSubBuffer_default = function (options, onError) {\n\
         buffer: \"aabbaa\",\n\
         subBuffer: \"ba\",\n\
         validate: 3\n\
-    }].forEach(function (options) {\n\
+    }].forEach(function (option) {\n\
         local.assertJsonEqual(local.bufferIndexOfSubBuffer(\n\
-            local.bufferCreate(options.buffer),\n\
-            local.bufferCreate(options.subBuffer),\n\
-            options.fromIndex\n\
-        ), options.validate);\n\
+            new TextEncoder().encode(option.buffer),\n\
+            new TextEncoder().encode(option.subBuffer),\n\
+            option.fromIndex\n\
+        ), option.validate);\n\
     });\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_bufferValidateAndCoerce_error = function (options, onError) {\n\
+local.testCase_bufferValidateAndCoerce_error = function (option, onError) {\n\
 /*\n\
  * this function will test bufferValidateAndCoerce's error handling-behavior\n\
  */\n\
-    local.tryCatchOnError(function () {\n\
-        local.bufferValidateAndCoerce(0);\n\
-    }, local.nop);\n\
-    // validate error occurred\n\
-    local.assertThrow(local._debugTryCatchError, local._debugTryCatchError);\n\
-    local.tryCatchOnError(function () {\n\
-        local.bufferValidateAndCoerce({});\n\
-    }, local.nop);\n\
-    // validate error occurred\n\
-    local.assertThrow(local._debugTryCatchError, local._debugTryCatchError);\n\
-    onError(null, options);\n\
+    [[], 0, {}].forEach(function (element) {\n\
+        option = null;\n\
+        try {\n\
+            local.bufferValidateAndCoerce(element);\n\
+        } catch (errorCaught) {\n\
+            option = errorCaught;\n\
+        }\n\
+        // validate error occurred\n\
+        local.assertThrow(option, element);\n\
+    });\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_buildApidoc_default = function (options, onError) {\n\
+local.testCase_buildApidoc_default = function (option, onError) {\n\
 /*\n\
  * this function will test buildApidoc's default handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     // test $npm_config_mode_coverage=all handling-behavior\n\
@@ -34388,30 +35832,22 @@ local.testCase_buildApidoc_default = function (options, onError) {\n\
     ], function (onError) {\n\
         local.buildApidoc(null, onError);\n\
     }, local.onErrorThrow);\n\
-    // test $npm_package_buildCustomOrg handling-behavior\n\
-    local.testMock([\n\
-        [local.env, {\n\
-            npm_package_buildCustomOrg: \"electron-lite\"\n\
-        }]\n\
-    ], function (onError) {\n\
-        local.buildApidoc({}, onError);\n\
-    }, local.onErrorThrow);\n\
     local.buildApidoc({\n\
         blacklistDict: {}\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_buildApp_default = function (options, onError) {\n\
+local.testCase_buildApp_default = function (option, onError) {\n\
 /*\n\
  * this function will test buildApp's default handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
-    local.testCase_buildReadme_default(options, local.onErrorThrow);\n\
-    local.testCase_buildLib_default(options, local.onErrorThrow);\n\
-    local.testCase_buildTest_default(options, local.onErrorThrow);\n\
+    local.testCase_buildReadme_default(option, local.onErrorThrow);\n\
+    local.testCase_buildLib_default(option, local.onErrorThrow);\n\
+    local.testCase_buildTest_default(option, local.onErrorThrow);\n\
     local.buildApp({\n\
         assetsList: [{\n\
             file: \"/assets.hello.txt\",\n\
@@ -34444,54 +35880,12 @@ local.testCase_buildApp_default = function (options, onError) {\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_buildCustomOrg_default = function (options, onError) {\n\
-/*\n\
- * this function will test buildCustomOrg's default handling-behavior\n\
- */\n\
-    if (local.isBrowser) {\n\
-        onError(null, options);\n\
-        return;\n\
-    }\n\
-    local.testMock([\n\
-        [local.env, {\n\
-            GITHUB_ORG: \"\",\n\
-            npm_package_buildCustomOrg: \"electron-lite\"\n\
-        }],\n\
-        [local.fs, {\n\
-            writeFileSync: local.nop\n\
-        }],\n\
-        [globalThis, {\n\
-            setTimeout: function (onError) {\n\
-                onError(null, options);\n\
-            }\n\
-        }],\n\
-        [process, {\n\
-            on: function (options, onError) {\n\
-                // test error handling-behavior\n\
-                onError(local.errorDefault, options);\n\
-            }\n\
-        }]\n\
-    ], function (onError) {\n\
-        // test npmdoc handling-behavior\n\
-        local.env.GITHUB_ORG = \"npmdoc\";\n\
-        local.buildCustomOrg({}, local.onErrorThrow);\n\
-        // test npmtest handling-behavior\n\
-        local.env.GITHUB_ORG = \"npmtest\";\n\
-        local.buildCustomOrg({}, local.onErrorThrow);\n\
-        // test scrapeitall handling-behavior\n\
-        local.env.GITHUB_ORG = \"scrapeitall\";\n\
-        local.buildCustomOrg({}, local.onErrorThrow);\n\
-        onError(null, options);\n\
-    }, local.onErrorThrow);\n\
-    local.buildCustomOrg({}, onError);\n\
-};\n\
-\n\
-local.testCase_buildLib_default = function (options, onError) {\n\
+local.testCase_buildLib_default = function (option, onError) {\n\
 /*\n\
  * this function will test buildLib's default handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     local.testMock([\n\
@@ -34530,56 +35924,23 @@ local.testCase_buildLib_default = function (options, onError) {\n\
     local.buildLib({}, onError);\n\
 };\n\
 \n\
-local.testCase_buildReadme_default = function (options, onError) {\n\
+local.testCase_buildReadme_default = function (option, onError) {\n\
 /*\n\
  * this function will test buildReadme's default handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
-    options = {};\n\
-    options.customize = function () {\n\
-        options.dataFrom = options.dataFrom\n\
-        // test shDeployCustom handling-behavior\n\
-        .replace(\"# shDeployCustom\", \"  shDeployCustom\")\n\
-        // test no-assets.index.template.html handling-behavior\n\
-        .replace(\"assets.utility2.template.html\", \"\");\n\
-        local.env.npm_package_private = \"\";\n\
-    };\n\
+    option = {};\n\
     // test shNpmTestPublished handling-behavior\n\
-    options.dataFrom = local.fs.readFileSync(\"README.md\", \"utf8\")\n\
+    option.dataFrom = local.fs.readFileSync(\"README.md\", \"utf8\")\n\
     .replace(\"#\\u0021! shNpmTestPublished\", \"shNpmTestPublished\");\n\
-    local.testMock([\n\
-        [local, {\n\
-            fsWriteFileWithMkdirpSync: local.nop\n\
-        }],\n\
-        [local.env, {\n\
-            npm_package_buildCustomOrg: \"\",\n\
-            npm_package_private: \"1\",\n\
-            npm_package_name: \"undefined\"\n\
-        }],\n\
-        [local.assetsDict, {\n\
-            // test no-assets.utility2.template.html handling-behavior\n\
-            \"/assets.index.template.html\": \"\",\n\
-            // test customize example.js handling-behavior\n\
-            \"/index.html\": \"\"\n\
-        }]\n\
-    ], function (onError) {\n\
-        local.buildReadme(options, onError);\n\
-        // test $npm_package_buildCustomOrg handling-behavior\n\
-        local.env.npm_package_buildCustomOrg = \"aa\";\n\
-        options.dataFrom = options.dataFrom\n\
-        // test no-shNpmTestPublished handling-behavior\n\
-        .replace(\"  shNpmTestPublished\", \"# shNpmTestPublished\");\n\
-        local.buildReadme(options, onError);\n\
-        onError(null, options);\n\
-    }, local.onErrorThrow);\n\
-    options = {};\n\
-    options.customize = function () {\n\
+    option = {};\n\
+    option.customize = function () {\n\
         // search-and-replace - customize dataTo\n\
         [\n\
-            // customize quickstart example.js\n\
+            // customize quickstart-example-js\n\
             (\n\
                 /#\\u0020quickstart\\u0020example.js[\\S\\s]*?istanbul\\u0020instrument\\u0020in\\u0020package/\n\
             ),\n\
@@ -34591,18 +35952,18 @@ local.testCase_buildReadme_default = function (options, onError) {\n\
             ),\n\
             // customize build-script\n\
             (\n\
-                /#\\u0020run\\u0020shBuildCi[^`]*?```/\n\
+                /\\n#\\u0020internal\\u0020build\\u0020script\\n[\\S\\s]*?\\nshBuildCi\\n/\n\
             )\n\
         ].forEach(function (rgx) {\n\
-            options.dataFrom.replace(rgx, function (match0) {\n\
-                options.dataTo = options.dataTo.replace(rgx, match0);\n\
+            option.dataFrom.replace(rgx, function (match0) {\n\
+                option.dataTo = option.dataTo.replace(rgx, match0);\n\
             });\n\
         });\n\
     };\n\
-    local.buildReadme(options, onError);\n\
+    local.buildReadme(option, onError);\n\
 };\n\
 \n\
-local.testCase_buildXxx_default = function (options, onError) {\n\
+local.testCase_buildXxx_default = function (option, onError) {\n\
 /*\n\
  * this function will test buildXxx's default handling-behavior\n\
  */\n\
@@ -34613,39 +35974,36 @@ local.testCase_buildXxx_default = function (options, onError) {\n\
             },\n\
             browserTest: local.nop,\n\
             buildApidoc: local.nop,\n\
-            buildCustomOrg: local.nop,\n\
             buildLib: local.nop,\n\
             buildReadme: local.nop,\n\
             buildTest: local.nop,\n\
             testCase_buildReadme_default: local.nop,\n\
             testCase_buildLib_default: local.nop,\n\
-            testCase_buildTest_default: local.nop,\n\
-            testCase_buildCustomOrg_default: local.nop\n\
+            testCase_buildTest_default: local.nop\n\
         }]\n\
     ], function (onError) {\n\
         local._testCase_buildApidoc_default(null, local.nop);\n\
         local._testCase_buildApp_default(null, local.nop);\n\
-        local._testCase_buildCustomOrg_default(null, local.nop);\n\
         local._testCase_buildLib_default(null, local.nop);\n\
         local._testCase_buildReadme_default(null, local.nop);\n\
         local._testCase_buildTest_default(null, local.nop);\n\
         local._testCase_webpage_default(null, local.nop);\n\
         local.assetsDict[\"/\"] = \"<script src=\\\"assets.test.js\\\"></script>\";\n\
         local._testCase_webpage_default(null, local.nop);\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_childProcessSpawnWithTimeout_default = function (options, onError) {\n\
+local.testCase_childProcessSpawnWithTimeout_default = function (option, onError) {\n\
 /*\n\
  * this function will test childProcessSpawnWithTimeout's default handling-behavior\n\
  */\n\
     var onParallel;\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
-    options = {};\n\
+    option = {};\n\
     onParallel = local.onParallel(onError);\n\
     onParallel.counter += 1;\n\
     // test default handling-behavior\n\
@@ -34657,7 +36015,7 @@ local.testCase_childProcessSpawnWithTimeout_default = function (options, onError
         local.assertJsonEqual(exitCode, 0);\n\
         // validate signal\n\
         local.assertJsonEqual(signal, null);\n\
-        onParallel(null, options);\n\
+        onParallel(null, option);\n\
     });\n\
     // test timeout handling-behavior\n\
     onParallel.counter += 1;\n\
@@ -34666,27 +36024,27 @@ local.testCase_childProcessSpawnWithTimeout_default = function (options, onError
             timeoutDefault: 1000\n\
         }]\n\
     ], function (onError) {\n\
-        options.childProcess = local.childProcessSpawnWithTimeout(\"sleep\", [5000]);\n\
-        onError(null, options);\n\
+        option.childProcess = local.childProcessSpawnWithTimeout(\"sleep\", [5000]);\n\
+        onError(null, option);\n\
     }, local.onErrorThrow);\n\
-    options.childProcess\n\
+    option.childProcess\n\
     .on(\"error\", onParallel)\n\
     .on(\"exit\", function (exitCode, signal) {\n\
         // validate exitCode\n\
         local.assertJsonEqual(exitCode, null);\n\
         // validate signal\n\
         local.assertJsonEqual(signal, \"SIGKILL\");\n\
-        onParallel(null, options);\n\
+        onParallel(null, option);\n\
     });\n\
-    onParallel(null, options);\n\
+    onParallel(null, option);\n\
 };\n\
 \n\
-local.testCase_childProcessSpawnWithUtility2_error = function (options, onError) {\n\
+local.testCase_childProcessSpawnWithUtility2_error = function (option, onError) {\n\
 /*\n\
  * this function will test childProcessSpawnWithTimeout's error handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     local.testMock([\n\
@@ -34699,16 +36057,16 @@ local.testCase_childProcessSpawnWithUtility2_error = function (options, onError)
             // validate error occurred\n\
             local.assertThrow(error, error);\n\
         });\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_cliRun_default = function (options, onError) {\n\
+local.testCase_cliRun_default = function (option, onError) {\n\
 /*\n\
  * this function will test cliRun's default handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     local.testMock([\n\
@@ -34750,11 +36108,11 @@ local.testCase_cliRun_default = function (options, onError) {\n\
         local.cliDict._default = null;\n\
         local.cliDict._help = null;\n\
         local.tryCatchOnError(local.cliRun, local.nop);\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_corsBackendHostInject_default = function (options, onError) {\n\
+local.testCase_corsBackendHostInject_default = function (option, onError) {\n\
 /*\n\
  * this function will corsBackendHostInject's default handling-behavior\n\
  */\n\
@@ -34782,15 +36140,15 @@ local.testCase_corsBackendHostInject_default = function (options, onError) {\n\
             pathname: \"/build..beta..travis-ci.org/\"\n\
         }\n\
     ), \"aa-beta.bb.com/cc/dd\");\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_corsForwardProxyHostIfNeeded_default = function (options, onError) {\n\
+local.testCase_corsForwardProxyHostIfNeeded_default = function (option, onError) {\n\
 /*\n\
  * this function will corsForwardProxyHostIfNeeded's default handling-behavior\n\
  */\n\
     if (!local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     local.assertThrow(local.corsForwardProxyHostIfNeeded({\n\
@@ -34799,105 +36157,93 @@ local.testCase_corsForwardProxyHostIfNeeded_default = function (options, onError
         },\n\
         url: \"https://example.com\"\n\
     }).indexOf(\".herokuapp.com\") >= 0);\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
 /* istanbul ignore next */\n\
-local.testCase_cryptoAesXxxCbcRawXxx_default = function (options, onError) {\n\
+local.testCase_cryptoAesXxxCbcRawXxx_default = function (option, onError) {\n\
 /*\n\
  * this function will cryptoAesXxxCbcRawXxx's default handling-behavior\n\
  */\n\
     if (!local.nop()) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
-    options = {};\n\
-    local.onNext(options, function (error, data) {\n\
-        switch (options.modeNext) {\n\
+    option = {};\n\
+    local.onNext(option, function (error, data) {\n\
+        switch (option.modeNext) {\n\
         case 1:\n\
             // encrypt data\n\
-            options.data = local.bufferCreate(\"aa\");\n\
-            options.key = \"0123456789abcdef0123456789abcdef\";\n\
-            options.mode = null;\n\
-            local.cryptoAesXxxCbcRawEncrypt(options, options.onNext);\n\
+            option.data = new TextEncoder().encode(\"aa\");\n\
+            option.key = \"0123456789abcdef0123456789abcdef\";\n\
+            option.mode = null;\n\
+            local.cryptoAesXxxCbcRawEncrypt(option, option.onNext);\n\
             break;\n\
         case 2:\n\
             // decrypt data\n\
-            options.data = data.buffer;\n\
-            local.cryptoAesXxxCbcRawDecrypt(options, options.onNext);\n\
+            option.data = data.buffer;\n\
+            local.cryptoAesXxxCbcRawDecrypt(option, option.onNext);\n\
             break;\n\
         case 3:\n\
             // validate data\n\
-            local.assertJsonEqual(local.bufferToString(data), \"aa\");\n\
-            options.onNext();\n\
+            local.assertJsonEqual(local.bufferToUtf8(data), \"aa\");\n\
+            option.onNext();\n\
             break;\n\
         case 4:\n\
             // encrypt data - base64\n\
-            options.data = local.bufferCreate(\"aa\");\n\
-            options.key = (\n\
+            option.data = new TextEncoder().encode(\"aa\");\n\
+            option.key = (\n\
                 \"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\"\n\
             );\n\
-            options.mode = \"base64\";\n\
-            local.cryptoAesXxxCbcRawEncrypt(options, options.onNext);\n\
+            option.mode = \"base64\";\n\
+            local.cryptoAesXxxCbcRawEncrypt(option, option.onNext);\n\
             break;\n\
         case 5:\n\
             // decrypt data - base64\n\
-            options.data = data;\n\
-            local.cryptoAesXxxCbcRawDecrypt(options, options.onNext);\n\
+            option.data = data;\n\
+            local.cryptoAesXxxCbcRawDecrypt(option, option.onNext);\n\
             break;\n\
         case 6:\n\
             // validate data\n\
-            local.assertJsonEqual(local.bufferToString(data), \"aa\");\n\
-            options.onNext();\n\
+            local.assertJsonEqual(local.bufferToUtf8(data), \"aa\");\n\
+            option.onNext();\n\
             break;\n\
         default:\n\
-            onError(error, options);\n\
+            onError(error, option);\n\
         }\n\
     });\n\
-    options.modeNext = 0;\n\
-    options.onNext();\n\
+    option.modeNext = 0;\n\
+    option.onNext();\n\
 };\n\
 \n\
-local.testCase_domElementRender_default = function (options, onError) {\n\
+local.testCase_domElementRender_default = function (option, onError) {\n\
 /*\n\
  * this function will test domElementRender's default handling-behavior\n\
  */\n\
     if (!local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     local.assertJsonEqual(local.domElementRender(\"<div>{{value}}</div>\", {\n\
         value: \"aa\"\n\
     }).children[0].outerHTML, \"<div>aa</div>\");\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_domQuerySelectorAllTagNameAndPrint_default = function (options, onError) {\n\
-/*\n\
- * this function will test domQuerySelectorAllTagNameAndPrint's default handling-behavior\n\
- */\n\
-    if (!local.isBrowser) {\n\
-        onError(null, options);\n\
-        return;\n\
-    }\n\
-    local.domQuerySelectorAllTagNameAndPrint(\"body\");\n\
-    onError(null, options);\n\
-};\n\
-\n\
-local.testCase_exit_error = function (options, onError) {\n\
+local.testCase_exit_error = function (option, onError) {\n\
 /*\n\
  * this function will exit's error handling-behavior\n\
  */\n\
     local.exit(\"invalid-exitCode\");\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_fsWriteFileWithMkdirpSync_default = function (options, onError) {\n\
+local.testCase_fsWriteFileWithMkdirpSync_default = function (option, onError) {\n\
 /*\n\
  * this function will test fsWriteFileWithMkdirpSync's default handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     local.fsRmrSync(\"tmp/build/testCase_fsWriteFileWithMkdirpSync_default\");\n\
@@ -34915,10 +36261,10 @@ local.testCase_fsWriteFileWithMkdirpSync_default = function (options, onError) {
         \"tmp/build/testCase_fsWriteFileWithMkdirpSync_default/aa.txt\",\n\
         \"utf8\"\n\
     ), \"aa\");\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_isNullOrUndefined_default = function (options, onError) {\n\
+local.testCase_isNullOrUndefined_default = function (option, onError) {\n\
 /*\n\
  * this function will test isNullOrUndefined's default handling-behavior\n\
  */\n\
@@ -34928,10 +36274,10 @@ local.testCase_isNullOrUndefined_default = function (options, onError) {\n\
     local.assertJsonEqual(local.isNullOrUndefined(undefined), true);\n\
     // validate data\n\
     local.assertJsonEqual(local.isNullOrUndefined(false), false);\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_jsonCopy_default = function (options, onError) {\n\
+local.testCase_jsonCopy_default = function (option, onError) {\n\
 /*\n\
  * this function will test jsonCopy's default handling-behavior\n\
  */\n\
@@ -34939,10 +36285,10 @@ local.testCase_jsonCopy_default = function (options, onError) {\n\
     [undefined, null, false, true, 0, 1, 1.5, \"a\"].forEach(function (element) {\n\
         local.assertJsonEqual(local.jsonCopy(element), element);\n\
     });\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_jsonStringifyOrdered_default = function (options, onError) {\n\
+local.testCase_jsonStringifyOrdered_default = function (option, onError) {\n\
 /*\n\
  * this function will test jsonStringifyOrdered's default handling-behavior\n\
  */\n\
@@ -34951,7 +36297,7 @@ local.testCase_jsonStringifyOrdered_default = function (options, onError) {\n\
         local.assertJsonEqual(local.jsonStringifyOrdered(data), JSON.stringify(data));\n\
     });\n\
     // test data-ordering handling-behavior\n\
-    options = {\n\
+    option = {\n\
         // test nested dict handling-behavior\n\
         ff: {\n\
             hh: 2,\n\
@@ -34965,9 +36311,9 @@ local.testCase_jsonStringifyOrdered_default = function (options, onError) {\n\
         aa: 1\n\
     };\n\
     // test circular-reference handling-behavior\n\
-    options.zz = options;\n\
+    option.zz = option;\n\
     local.assertJsonEqual(\n\
-        options,\n\
+        option,\n\
         {\n\
             aa: 1,\n\
             bb: null,\n\
@@ -34978,49 +36324,49 @@ local.testCase_jsonStringifyOrdered_default = function (options, onError) {\n\
             }\n\
         }\n\
     );\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_jwtAes256GcmXxx_default = function (options, onError) {\n\
+local.testCase_jwtAes256GcmXxx_default = function (option, onError) {\n\
 /*\n\
  * this function will test jwtAes256GcmXxx's default handling-behavior\n\
  */\n\
-    options = {};\n\
-    options.key = local.jwtAes256KeyCreate();\n\
+    option = {};\n\
+    option.key = local.jwtAes256KeyCreate();\n\
     // use canonical example at https://jwt.io/\n\
-    options.data = JSON.parse(local.jsonStringifyOrdered(local.normalizeJwt({\n\
+    option.data = JSON.parse(local.jsonStringifyOrdered(local.normalizeJwt({\n\
         sub: \"1234567890\",\n\
         name: \"John Doe\",\n\
         admin: true\n\
     })));\n\
     // encrypt token\n\
-    options.token = local.jwtAes256GcmEncrypt(options.data, options.key);\n\
+    option.token = local.jwtAes256GcmEncrypt(option.data, option.key);\n\
     // validate encrypted-token\n\
     local.assertJsonEqual(\n\
-        local.jwtAes256GcmDecrypt(options.token, options.key),\n\
-        options.data\n\
+        local.jwtAes256GcmDecrypt(option.token, option.key),\n\
+        option.data\n\
     );\n\
     // test decryption-failed handling-behavior\n\
-    local.assertJsonEqual(local.jwtAes256GcmDecrypt(options.token, null), {});\n\
-    onError(null, options);\n\
+    local.assertJsonEqual(local.jwtAes256GcmDecrypt(option.token, null), {});\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_jwtHs256Xxx_default = function (options, onError) {\n\
+local.testCase_jwtHs256Xxx_default = function (option, onError) {\n\
 /*\n\
  * this function will test jwtHs256Xxx's default handling-behavior\n\
  */\n\
-    options = {};\n\
-    options.key = local.normalizeJwtBase64Url(local.base64FromBuffer(\"secret\"));\n\
+    option = {};\n\
+    option.key = local.normalizeJwtBase64Url(local.base64FromBuffer(\"secret\"));\n\
     // use canonical example at https://jwt.io/\n\
-    options.data = {\n\
+    option.data = {\n\
         sub: \"1234567890\",\n\
         name: \"John Doe\",\n\
         admin: true\n\
     };\n\
-    options.token = local.jwtHs256Encode(options.data, options.key);\n\
+    option.token = local.jwtHs256Encode(option.data, option.key);\n\
     // validate encoded-token\n\
     local.assertJsonEqual(\n\
-        options.token,\n\
+        option.token,\n\
         (\n\
             \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\"\n\
             + \".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9\"\n\
@@ -35029,7 +36375,7 @@ local.testCase_jwtHs256Xxx_default = function (options, onError) {\n\
     );\n\
     // validate decoded-data\n\
     local.assertJsonEqual(\n\
-        local.jwtHs256Decode(options.token, options.key),\n\
+        local.jwtHs256Decode(option.token, option.key),\n\
         {\n\
             admin: true,\n\
             name: \"John Doe\",\n\
@@ -35037,16 +36383,16 @@ local.testCase_jwtHs256Xxx_default = function (options, onError) {\n\
         }\n\
     );\n\
     // test decoding-failed handling-behavior\n\
-    local.assertJsonEqual(local.jwtHs256Decode(options.token, \"undefined\"), {});\n\
-    onError(null, options);\n\
+    local.assertJsonEqual(local.jwtHs256Decode(option.token, \"undefined\"), {});\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_libUtility2Js_standalone = function (options, onError) {\n\
+local.testCase_libUtility2Js_standalone = function (option, onError) {\n\
 /*\n\
  * this function will test lib.utility2.js's standalone handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     local.fs.writeFileSync(\"tmp/lib.utility2.js\", local.fs.readFileSync(\n\
@@ -35054,58 +36400,58 @@ local.testCase_libUtility2Js_standalone = function (options, onError) {\n\
         \"utf8\"\n\
     ).replace(\"/* istanbul instrument in package utility2 */\", \"\"));\n\
     require(\"./tmp/lib.utility2.js\");\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_listGetElementRandom_default = function (options, onError) {\n\
+local.testCase_listGetElementRandom_default = function (option, onError) {\n\
 /*\n\
  * this function will test listGetRandom's default handling-behavior\n\
  */\n\
-    options = {};\n\
+    option = {};\n\
     // init list\n\
-    options.list = [\"aa\", \"bb\", \"cc\", \"dd\"];\n\
-    options.elementDict = {};\n\
+    option.list = [\"aa\", \"bb\", \"cc\", \"dd\"];\n\
+    option.elementDict = {};\n\
     // get 1000 random elements from list\n\
-    options.ii = 0;\n\
-    while (options.ii < 1000) {\n\
-        options.elementDict[local.listGetElementRandom(options.list)] = true;\n\
-        options.ii += 1;\n\
+    option.ii = 0;\n\
+    while (option.ii < 1000) {\n\
+        option.elementDict[local.listGetElementRandom(option.list)] = true;\n\
+        option.ii += 1;\n\
     }\n\
     // validate all elements were retrieved from list\n\
     local.assertJsonEqual(\n\
-        Object.keys(options.elementDict).sort(),\n\
+        Object.keys(option.elementDict).sort(),\n\
         [\"aa\", \"bb\", \"cc\", \"dd\"]\n\
     );\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_listShuffle_default = function (options, onError) {\n\
+local.testCase_listShuffle_default = function (option, onError) {\n\
 /*\n\
  * this function will test listShuffle's default handling-behavior\n\
  */\n\
-    options = {};\n\
+    option = {};\n\
     // init list\n\
-    options.list = \"[0,1]\";\n\
+    option.list = \"[0,1]\";\n\
     // shuffle list 100 times\n\
-    options.ii = 0;\n\
-    while (options.ii < 100) {\n\
-        options.listShuffled = JSON.stringify(local.listShuffle(JSON.parse(options.list)));\n\
+    option.ii = 0;\n\
+    while (option.ii < 100) {\n\
+        option.listShuffled = JSON.stringify(local.listShuffle(JSON.parse(option.list)));\n\
         // validate shuffled list\n\
-        local.assertJsonEqual(options.listShuffled.length, options.list.length);\n\
-        options.changed = options.changed || options.listShuffled !== options.list;\n\
-        options.ii += 1;\n\
+        local.assertJsonEqual(option.listShuffled.length, option.list.length);\n\
+        option.changed = option.changed || option.listShuffled !== option.list;\n\
+        option.ii += 1;\n\
     }\n\
     // validate list changed at least once during the shuffle\n\
-    local.assertThrow(options.changed, options);\n\
-    onError(null, options);\n\
+    local.assertThrow(option.changed, option);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_localStorageSetItemOrClear_default = function (options, onError) {\n\
+local.testCase_localStorageSetItemOrClear_default = function (option, onError) {\n\
 /*\n\
  * this function will localStorageSetItemOrClear's default handling-behavior\n\
  */\n\
     if (!local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     local.localStorageSetItemOrClear(\n\
@@ -35132,13 +36478,13 @@ local.testCase_localStorageSetItemOrClear_default = function (options, onError) 
     }, onError);\n\
 };\n\
 \n\
-local.testCase_middlewareForwardProxy_default = function (options, onError) {\n\
+local.testCase_middlewareForwardProxy_default = function (option, onError) {\n\
 /*\n\
  * this function will test middlewareForwardProxy's default handling-behavior\n\
  */\n\
     var onParallel;\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     onParallel = local.onParallel(onError);\n\
@@ -35164,7 +36510,7 @@ local.testCase_middlewareForwardProxy_default = function (options, onError) {\n\
         local.assertThrow(!error, error);\n\
         // validate responseText\n\
         local.assertJsonEqual(xhr.responseText, local.stringHelloEmoji);\n\
-        onParallel(null, options, xhr);\n\
+        onParallel(null, option, xhr);\n\
     });\n\
     // test error handling-behavior\n\
     onParallel.counter += 1;\n\
@@ -35176,12 +36522,12 @@ local.testCase_middlewareForwardProxy_default = function (options, onError) {\n\
     }, function (error) {\n\
         // validate error occurred\n\
         local.assertThrow(error, error);\n\
-        onParallel(null, options);\n\
+        onParallel(null, option);\n\
     });\n\
-    onParallel(null, options);\n\
+    onParallel(null, option);\n\
 };\n\
 \n\
-local.testCase_middlewareJsonpStateInit_assetsList = function (options, onError) {\n\
+local.testCase_middlewareJsonpStateInit_assetsList = function (option, onError) {\n\
 /*\n\
  * this function will middlewareJsonpStateInit's assetsList handling-behavior\n\
  */\n\
@@ -35198,16 +36544,16 @@ local.testCase_middlewareJsonpStateInit_assetsList = function (options, onError)
         });\n\
         // validate data\n\
         local.assertJsonEqual(local.assetsDict[\"/undefined\"], \"\");\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_moduleDirname_default = function (options, onError) {\n\
+local.testCase_moduleDirname_default = function (option, onError) {\n\
 /*\n\
  * this function will test moduleDirname's default handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     // test null-case handling-behavior\n\
@@ -35216,53 +36562,35 @@ local.testCase_moduleDirname_default = function (options, onError) {\n\
     local.assertJsonEqual(local.moduleDirname(\".\", module.paths), process.cwd());\n\
     local.assertJsonEqual(local.moduleDirname(\"./\", module.paths), process.cwd());\n\
     // test module-exists handling-behavior\n\
-    options = local.moduleDirname(\"electron-lite\", module.paths);\n\
+    option = local.moduleDirname(\"electron-lite\", module.paths);\n\
     local.assertThrow((\n\
         /\\/electron-lite$/\n\
-    ).test(options), options);\n\
+    ).test(option), option);\n\
     // test module-does-not-exist handling-behavior\n\
     local.assertJsonEqual(local.moduleDirname(\"syntax error\", module.paths), \"\");\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_numberToRomanNumerals_default = function (options, onError) {\n\
+local.testCase_numberToRomanNumerals_default = function (option, onError) {\n\
 /*\n\
  * this function will test numberToRomanNumerals's default handling-behavior\n\
  */\n\
-    options = {};\n\
-    options.list = [\n\
+    option = {};\n\
+    option.list = [\n\
 \"\",\"I\",\"II\",\"III\",\"IV\",\"V\",\"VI\",\"VII\",\"VIII\",\"IX\",\"X\",\"XI\",\"XII\",\"XIII\",\"XIV\",\"XV\",\"XVI\",\"XVII\",\"XVIII\",\"XIX\",\"XX\",\"XXI\",\"XXII\",\"XXIII\",\"XXIV\",\"XXV\",\"XXVI\",\"XXVII\",\"XXVIII\",\"XXIX\",\"XXX\",\"XXXI\",\"XXXII\",\"XXXIII\",\"XXXIV\",\"XXXV\",\"XXXVI\",\"XXXVII\",\"XXXVIII\",\"XXXIX\",\"XL\",\"XLI\",\"XLII\",\"XLIII\",\"XLIV\",\"XLV\",\"XLVI\",\"XLVII\",\"XLVIII\",\"XLIX\",\"L\",\"LI\",\"LII\",\"LIII\",\"LIV\",\"LV\",\"LVI\",\"LVII\",\"LVIII\",\"LIX\",\"LX\",\"LXI\",\"LXII\",\"LXIII\",\"LXIV\",\"LXV\",\"LXVI\",\"LXVII\",\"LXVIII\",\"LXIX\",\"LXX\",\"LXXI\",\"LXXII\",\"LXXIII\",\"LXXIV\",\"LXXV\",\"LXXVI\",\"LXXVII\",\"LXXVIII\",\"LXXIX\",\"LXXX\",\"LXXXI\",\"LXXXII\",\"LXXXIII\",\"LXXXIV\",\"LXXXV\",\"LXXXVI\",\"LXXXVII\",\"LXXXVIII\",\"LXXXIX\",\"XC\",\"XCI\",\"XCII\",\"XCIII\",\"XCIV\",\"XCV\",\"XCVI\",\"XCVII\",\"XCVIII\",\"XCIX\",\"C\" // jslint ignore:line\n\
     ];\n\
-    options.ii = 0;\n\
-    while (options.ii < 10) {\n\
+    option.ii = 0;\n\
+    while (option.ii < 10) {\n\
         local.assertJsonEqual(\n\
-            local.numberToRomanNumerals(options.ii),\n\
-            options.list[options.ii]\n\
+            local.numberToRomanNumerals(option.ii),\n\
+            option.list[option.ii]\n\
         );\n\
-        options.ii += 1;\n\
+        option.ii += 1;\n\
     }\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_objectLiteralize_default = function (options, onError) {\n\
-/*\n\
- * this function will test objectLiteralize's default handling-behavior\n\
- */\n\
-    local.assertJsonEqual(local.objectLiteralize({\n\
-        \"\": \"$[]\",\n\
-        \"$[]1\": [1, {\n\
-            \"$[]2\": [2, 3]\n\
-        }]\n\
-    }), {\n\
-        \"1\": {\n\
-            \"2\": 3\n\
-        },\n\
-        \"\": \"$[]\"\n\
-    });\n\
-    onError(null, options);\n\
-};\n\
-\n\
-local.testCase_objectSetDefault_default = function (options, onError) {\n\
+local.testCase_objectSetDefault_default = function (option, onError) {\n\
 /*\n\
  * this function will test objectSetDefault's default handling-behavior\n\
  */\n\
@@ -35359,10 +36687,10 @@ local.testCase_objectSetDefault_default = function (options, onError) {\n\
         dd: [1, 1],\n\
         ee: [1, 1]\n\
     });\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_objectSetOverride_default = function (options, onError) {\n\
+local.testCase_objectSetOverride_default = function (option, onError) {\n\
 /*\n\
  * this function will test objectSetOverride's default handling-behavior\n\
  */\n\
@@ -35470,53 +36798,17 @@ local.testCase_objectSetOverride_default = function (options, onError) {\n\
         null,\n\
         local.env\n\
     ).emptyString, \"\");\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_objectTraverse_default = function (options, onError) {\n\
-/*\n\
- * this function will test objectTraverse's default handling-behavior\n\
- */\n\
-    options = {\n\
-        aa: null,\n\
-        bb: 2,\n\
-        cc: {\n\
-            dd: 4,\n\
-            ee: [5, 6, 7]\n\
-        }\n\
-    };\n\
-    // test circular-reference handling-behavior\n\
-    options.data = options;\n\
-    local.objectTraverse(options, function (element) {\n\
-        if (typeof element === \"object\" && element && !Array.isArray(element)) {\n\
-            element.zz = true;\n\
-        }\n\
-    });\n\
-    // validate options\n\
-    local.assertJsonEqual(\n\
-        options,\n\
-        {\n\
-            aa: null,\n\
-            bb: 2,\n\
-            cc: {\n\
-                dd: 4,\n\
-                ee: [5, 6, 7],\n\
-                zz: true\n\
-            },\n\
-            zz: true\n\
-        }\n\
-    );\n\
-    onError(null, options);\n\
-};\n\
-\n\
-local.testCase_onErrorDefault_default = function (options, onError) {\n\
+local.testCase_onErrorDefault_default = function (option, onError) {\n\
 /*\n\
  * this function will test onErrorDefault's default handling-behavior\n\
  */\n\
     local.testMock([\n\
         [console, {\n\
             error: function (arg) {\n\
-                options = arg;\n\
+                option = arg;\n\
             }\n\
         }],\n\
         [globalThis, {\n\
@@ -35525,17 +36817,17 @@ local.testCase_onErrorDefault_default = function (options, onError) {\n\
     ], function (onError) {\n\
         // test no error handling-behavior\n\
         local.onErrorDefault();\n\
-        // validate options\n\
-        local.assertThrow(!options, options);\n\
+        // validate option\n\
+        local.assertThrow(!option, option);\n\
         // test error handling-behavior\n\
         local.onErrorDefault(local.errorDefault);\n\
-        // validate options\n\
-        local.assertThrow(options, options);\n\
-        onError(null, options);\n\
+        // validate option\n\
+        local.assertThrow(option, option);\n\
+        onError(null, option);\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_onErrorThrow_error = function (options, onError) {\n\
+local.testCase_onErrorThrow_error = function (option, onError) {\n\
 /*\n\
  * this function will test onErrorThrow's error handling-behavior\n\
  */\n\
@@ -35544,25 +36836,25 @@ local.testCase_onErrorThrow_error = function (options, onError) {\n\
     }, function (error) {\n\
         // validate error occurred\n\
         local.assertThrow(error, error);\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     });\n\
 };\n\
 \n\
-local.testCase_onErrorWithStack_toString = function (options, onError) {\n\
+local.testCase_onErrorWithStack_toString = function (option, onError) {\n\
 /*\n\
  * this function will test onErrorWithStack's toString handling-behavior\n\
  */\n\
     local.assertJsonEqual(String(local.onErrorWithStack(local.nop)), String(local.nop));\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_onFileModifiedRestart_watchFile = function (options, onError) {\n\
+local.testCase_onFileModifiedRestart_watchFile = function (option, onError) {\n\
 /*\n\
  * this function will test onFileModifiedRestart's watchFile handling-behavior\n\
  */\n\
     var onParallel;\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     onParallel = local.onParallel(onError);\n\
@@ -35576,116 +36868,116 @@ local.testCase_onFileModifiedRestart_watchFile = function (options, onError) {\n
         setTimeout(function () {\n\
             local.fs.utimes(__filename, stat.atime, stat.mtime, onParallel);\n\
         }, 1000);\n\
-        onParallel(error, options);\n\
+        onParallel(error, option);\n\
     });\n\
 };\n\
 \n\
-local.testCase_onNext_error = function (options, onError) {\n\
+local.testCase_onNext_error = function (option, onError) {\n\
 /*\n\
  * this function will test onNext's error handling-behavior\n\
  */\n\
 \n\
-    options = {};\n\
-    options.modeDebug = true;\n\
-    local.onNext(options, function () {\n\
+    option = {};\n\
+    option.modeDebug = true;\n\
+    local.onNext(option, function () {\n\
         throw local.errorDefault;\n\
     });\n\
-    options.modeNext = 0;\n\
+    option.modeNext = 0;\n\
     local.tryCatchOnError(function () {\n\
-        options.onNext();\n\
+        option.onNext();\n\
     }, function (error) {\n\
         // validate error occurred\n\
         local.assertThrow(error, error);\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     });\n\
 };\n\
 \n\
-local.testCase_onParallelList_default = function (options, onError) {\n\
+local.testCase_onParallelList_default = function (option, onError) {\n\
 /*\n\
  * this function will test onParallelList's default handling-behavior\n\
  */\n\
-    options = {};\n\
-    local.onNext(options, function (error) {\n\
-        switch (options.modeNext) {\n\
+    option = {};\n\
+    local.onNext(option, function (error) {\n\
+        switch (option.modeNext) {\n\
         case 1:\n\
             // test null-case handling-behavior\n\
-            local.onParallelList({}, local.onErrorThrow, options.onNext);\n\
+            local.onParallelList({}, local.onErrorThrow, option.onNext);\n\
             break;\n\
         case 2:\n\
-            options.list = [null];\n\
+            option.list = [null];\n\
             // test retryLimit handling-behavior\n\
-            options.retryLimit = 1;\n\
-            local.onParallelList(options, function (options2, onParallel) {\n\
+            option.retryLimit = 1;\n\
+            local.onParallelList(option, function (option2, onParallel) {\n\
                 onParallel.counter += 1;\n\
                 // test error handling-behavior\n\
-                onParallel(local.errorDefault, options2);\n\
+                onParallel(local.errorDefault, option2);\n\
                 // test multiple-callback handling-behavior\n\
                 setTimeout(onParallel, 5000);\n\
             }, function (error) {\n\
                 // validate error occurred\n\
                 local.assertThrow(error, error);\n\
-                options.onNext();\n\
+                option.onNext();\n\
             });\n\
             break;\n\
         case 3:\n\
-            options.data = [];\n\
+            option.data = [];\n\
             // test rateLimit handling-behavior\n\
-            options.rateLimit = 3;\n\
-            options.rateMax = 0;\n\
+            option.rateLimit = 3;\n\
+            option.rateMax = 0;\n\
             // test retryLimit handling-behavior\n\
-            options.retryLimit = 1;\n\
+            option.retryLimit = 1;\n\
             local.onParallelList({\n\
                 list: [1, 2, 3, 4],\n\
-                rateLimit: options.rateLimit\n\
-            }, function (options2, onParallel) {\n\
+                rateLimit: option.rateLimit\n\
+            }, function (option2, onParallel) {\n\
                 onParallel.counter += 1;\n\
-                options.rateMax = Math.max(onParallel.counter - 1, options.rateMax);\n\
+                option.rateMax = Math.max(onParallel.counter - 1, option.rateMax);\n\
                 // test async handling-behavior\n\
                 setTimeout(function () {\n\
                     // test list-growth handling-behavior\n\
-                    if (options2.ii === 3) {\n\
-                        options2.list.push(5);\n\
+                    if (option2.ii === 3) {\n\
+                        option2.list.push(5);\n\
                     }\n\
-                    options.data[options2.ii] = options2.element;\n\
+                    option.data[option2.ii] = option2.element;\n\
                     // test retry handling-behavior\n\
-                    local.assertThrow(options2.retry < 1);\n\
-                    onParallel(null, options2);\n\
+                    local.assertThrow(option2.retry < 1);\n\
+                    onParallel(null, option2);\n\
                 });\n\
-            }, options.onNext, options.rateLimit);\n\
+            }, option.onNext, option.rateLimit);\n\
             break;\n\
         case 4:\n\
             // validate data\n\
-            local.assertJsonEqual(options.data, [1, 2, 3, 4, 5]);\n\
-            local.assertJsonEqual(options.rateMax, 3);\n\
-            options.data = [];\n\
-            options.rateLimit = \"syntax error\";\n\
-            options.rateMax = 0;\n\
+            local.assertJsonEqual(option.data, [1, 2, 3, 4, 5]);\n\
+            local.assertJsonEqual(option.rateMax, 3);\n\
+            option.data = [];\n\
+            option.rateLimit = \"syntax error\";\n\
+            option.rateMax = 0;\n\
             local.onParallelList({\n\
                 list: [1, 2, 3, 4, 5],\n\
-                rateLimit: options.rateLimit\n\
-            }, function (options2, onParallel) {\n\
+                rateLimit: option.rateLimit\n\
+            }, function (option2, onParallel) {\n\
                 // test sync handling-behavior\n\
                 onParallel.counter += 1;\n\
-                options.rateMax = Math.max(onParallel.counter, options.rateMax);\n\
-                options.data[options2.ii] = options2.element;\n\
-                onParallel(null, options);\n\
-            }, options.onNext);\n\
+                option.rateMax = Math.max(onParallel.counter, option.rateMax);\n\
+                option.data[option2.ii] = option2.element;\n\
+                onParallel(null, option);\n\
+            }, option.onNext);\n\
             break;\n\
         case 5:\n\
             // validate data\n\
-            local.assertJsonEqual(options.data, [1, 2, 3, 4, 5]);\n\
-            local.assertJsonEqual(options.rateMax, 2);\n\
-            options.onNext();\n\
+            local.assertJsonEqual(option.data, [1, 2, 3, 4, 5]);\n\
+            local.assertJsonEqual(option.rateMax, 2);\n\
+            option.onNext();\n\
             break;\n\
         default:\n\
-            onError(error, options);\n\
+            onError(error, option);\n\
         }\n\
     });\n\
-    options.modeNext = 0;\n\
-    options.onNext();\n\
+    option.modeNext = 0;\n\
+    option.onNext();\n\
 };\n\
 \n\
-local.testCase_onParallel_default = function (options, onError) {\n\
+local.testCase_onParallel_default = function (option, onError) {\n\
 /*\n\
  * this function will test onParallel's default handling-behavior\n\
  */\n\
@@ -35715,14 +37007,14 @@ local.testCase_onParallel_default = function (options, onError) {\n\
         onParallelError();\n\
     });\n\
     // test default handling-behavior\n\
-    onParallel(null, options);\n\
+    onParallel(null, option);\n\
 };\n\
 \n\
-local.testCase_onTimeout_timeout = function (options, onError) {\n\
+local.testCase_onTimeout_timeout = function (option, onError) {\n\
 /*\n\
  * this function will test onTimeout's timeout handling-behavior\n\
  */\n\
-    options = local.timeElapsedStart();\n\
+    option = local.timeElapsedStart();\n\
     local.onTimeout(function (error) {\n\
         // validate error occurred\n\
         local.assertThrow(error, error);\n\
@@ -35732,26 +37024,26 @@ local.testCase_onTimeout_timeout = function (options, onError) {\n\
             error\n\
         );\n\
         // poll timeElapsed\n\
-        local.timeElapsedPoll(options);\n\
+        local.timeElapsedPoll(option);\n\
         // validate timeElapsed passed is greater than timeout\n\
-        local.assertThrow(options.timeElapsed >= 1000, options);\n\
-        onError(null, options);\n\
+        local.assertThrow(option.timeElapsed >= 1000, option);\n\
+        onError(null, option);\n\
     }, 1000, \"testCase_onTimeout_timeout\");\n\
 };\n\
 \n\
-local.testCase_profileXxx_default = function (options, onError) {\n\
+local.testCase_profileXxx_default = function (option, onError) {\n\
 /*\n\
  * this function will test profileXxx's default handling-behavior\n\
  */\n\
-    options = {};\n\
+    option = {};\n\
     // test profileSync's handling-behavior\n\
-    options.timeElapsed = local.profileSync(function () {\n\
+    option.timeElapsed = local.profileSync(function () {\n\
         return;\n\
     });\n\
     // validate timeElapsed\n\
     local.assertThrow(\n\
-        0 <= options.timeElapsed && options.timeElapsed < 1000,\n\
-        options.timeElapsed\n\
+        0 <= option.timeElapsed && option.timeElapsed < 1000,\n\
+        option.timeElapsed\n\
     );\n\
     // test profile's async handling-behavior\n\
     local.profile(function (onError) {\n\
@@ -35759,22 +37051,22 @@ local.testCase_profileXxx_default = function (options, onError) {\n\
     }, function (error, timeElapsed) {\n\
         // validate no error occurred\n\
         local.assertThrow(!error, error);\n\
-        options.timeElapsed = timeElapsed;\n\
+        option.timeElapsed = timeElapsed;\n\
         // validate timeElapsed\n\
         local.assertThrow((\n\
-            0 <= options.timeElapsed\n\
-            && options.timeElapsed < local.timeoutDefault\n\
-        ), options.timeElapsed);\n\
-        onError(null, options);\n\
+            0 <= option.timeElapsed\n\
+            && option.timeElapsed < local.timeoutDefault\n\
+        ), option.timeElapsed);\n\
+        onError(null, option);\n\
     });\n\
 };\n\
 \n\
-local.testCase_replStart_default = function (options, onError) {\n\
+local.testCase_replStart_default = function (option, onError) {\n\
 /*\n\
  * this function will test replStart's default handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     local.replStart();\n\
@@ -35817,52 +37109,52 @@ local.testCase_replStart_default = function (options, onError) {\n\
             // test error handling-behavior\n\
             \"undefined()\\n\"\n\
         ].forEach(function (script) {\n\
-            globalThis.utility2_serverRepl1.eval(script, null, \"repl\", local.nop);\n\
+            globalThis.utility2_repl1.eval(script, null, \"repl\", local.nop);\n\
         });\n\
         // test error handling-behavior\n\
-        globalThis.utility2_serverRepl1.onError(local.errorDefault);\n\
-        onError(null, options);\n\
+        globalThis.utility2_repl1.onError(local.errorDefault);\n\
+        onError(null, option);\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_replStart_tcp = function (options, onError) {\n\
+local.testCase_replStart_tcp = function (option, onError) {\n\
 /*\n\
  * this function will test replStart's tcp handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
-    options = {};\n\
-    options.data = \"\";\n\
-    options.input = Math.random();\n\
-    options.socket = local.net.createConnection(local.env.PORT_REPL);\n\
-    options.socket.on(\"data\", function (data) {\n\
+    option = {};\n\
+    option.data = \"\";\n\
+    option.input = Math.random();\n\
+    option.socket = local.net.createConnection(local.env.PORT_REPL);\n\
+    option.socket.on(\"data\", function (data) {\n\
     /*\n\
-     * this function will concat data to options.data\n\
+     * this function will concat data to option.data\n\
      */\n\
-        options.data += data;\n\
+        option.data += data;\n\
     });\n\
-    options.socket.setEncoding(\"utf8\");\n\
-    options.socket.on(\"end\", function () {\n\
+    option.socket.setEncoding(\"utf8\");\n\
+    option.socket.on(\"end\", function () {\n\
         // validate data\n\
         local.assertThrow(\n\
-            options.data.indexOf(options.input) >= 0,\n\
-            JSON.stringify([options.data, options.input])\n\
+            option.data.indexOf(option.input) >= 0,\n\
+            JSON.stringify([option.data, option.input])\n\
         );\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     });\n\
-    options.socket.write(options.input + \"\\n\");\n\
+    option.socket.write(option.input + \"\\n\");\n\
     // test error handling-behavior\n\
-    options.socket.end(\"undefined()\\n\");\n\
+    option.socket.end(\"undefined()\\n\");\n\
 };\n\
 \n\
-local.testCase_requireReadme_start = function (options, onError) {\n\
+local.testCase_requireReadme_start = function (option, onError) {\n\
 /*\n\
  * this function will test requireReadme's start handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     local.testMock([\n\
@@ -35875,8 +37167,8 @@ local.testCase_requireReadme_start = function (options, onError) {\n\
             npm_package_nameLib: \"_testCase_requireReadme_start\"\n\
         }],\n\
         [local.fs, {\n\
-            readFile: function (file, options, onError) {\n\
-                onError(null, \"{}\", file, options);\n\
+            readFile: function (file, option, onError) {\n\
+                onError(null, \"{}\", file, option);\n\
             },\n\
             readdirSync: function () {\n\
                 // test jslintAndPrint.conditional handling-behavior\n\
@@ -35894,23 +37186,23 @@ local.testCase_requireReadme_start = function (options, onError) {\n\
         // validate data\n\
         local.requireReadme();\n\
         local.assertThrow(local._testCase_requireReadme_start === local);\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_semverCompare_default = function (options, onError) {\n\
+local.testCase_semverCompare_default = function (option, onError) {\n\
 /*\n\
  * this function will test semverCompare's default handling-behavior\n\
  */\n\
     var aa;\n\
     // test aa = bb\n\
-    options = [\n\
+    option = [\n\
         \"1.2.3\",\n\
         \"1.2.3-\",\n\
         \"1.2.3-alpha.beta\",\n\
         \"1.2.3-alpha.beta\"\n\
     ];\n\
-    options.forEach(function (bb, ii) {\n\
+    option.forEach(function (bb, ii) {\n\
         if (Boolean(ii & 1)) {\n\
             local.assertThrow(\n\
                 local.semverCompare(aa, bb) === 0,\n\
@@ -35919,7 +37211,7 @@ local.testCase_semverCompare_default = function (options, onError) {\n\
         }\n\
         aa = bb;\n\
     });\n\
-    options = [\n\
+    option = [\n\
         \"1.2.3-a\",\n\
         \"1.2.3-a.2\",\n\
         \"1.2.3-a.10\",\n\
@@ -35928,7 +37220,7 @@ local.testCase_semverCompare_default = function (options, onError) {\n\
         \"1.2.10\"\n\
     ];\n\
     // test aa < bb\n\
-    options.reduce(function (aa, bb) {\n\
+    option.reduce(function (aa, bb) {\n\
         local.assertThrow(\n\
             local.semverCompare(aa, bb) === -1,\n\
             [local.semverCompare(aa, bb), aa, bb]\n\
@@ -35936,21 +37228,21 @@ local.testCase_semverCompare_default = function (options, onError) {\n\
         return bb;\n\
     });\n\
     // test aa > bb\n\
-    options.reverse().reduce(function (aa, bb) {\n\
+    option.reverse().reduce(function (aa, bb) {\n\
         local.assertThrow(\n\
             local.semverCompare(aa, bb) === 1,\n\
             [local.semverCompare(aa, bb), aa, bb]\n\
         );\n\
         return bb;\n\
     });\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_serverRespondTimeoutDefault_timeout = function (options, onError) {\n\
+local.testCase_serverRespondTimeoutDefault_timeout = function (option, onError) {\n\
 /*\n\
  * this function will test serverRespondTimeoutDefault's timeout handling-behavior\n\
  */\n\
-    options = function (fnc1, fnc2) {\n\
+    option = function (fnc1, fnc2) {\n\
         [fnc1, fnc2].forEach(function (fnc) {\n\
             if (typeof fnc === \"function\") {\n\
                 fnc();\n\
@@ -35959,31 +37251,31 @@ local.testCase_serverRespondTimeoutDefault_timeout = function (options, onError)
     };\n\
     local.testMock([\n\
         [local, {\n\
-            onTimeout: options,\n\
+            onTimeout: option,\n\
             serverRespondDefault: local.nop,\n\
-            setTimeout: options\n\
+            setTimeout: option\n\
         }]\n\
     ], function (onError) {\n\
         local.serverRespondTimeoutDefault({\n\
             headers: {}\n\
         }, {\n\
-            on: options\n\
+            on: option\n\
         });\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_setTimeoutOnError_default = function (options, onError) {\n\
+local.testCase_setTimeoutOnError_default = function (option, onError) {\n\
 /*\n\
  * this function will test setTimeoutOnError's default handling-behavior\n\
  */\n\
     // test null-case handling-behavior\n\
     local.assertJsonEqual(local.setTimeoutOnError(), undefined);\n\
     // test onError handling-behavior\n\
-    local.assertJsonEqual(local.setTimeoutOnError(onError, 0, null, {}, options), {});\n\
+    local.assertJsonEqual(local.setTimeoutOnError(onError, 0, null, {}, option), {});\n\
 };\n\
 \n\
-local.testCase_sjclHashScryptXxx_default = function (options, onError) {\n\
+local.testCase_sjclHashScryptXxx_default = function (option, onError) {\n\
 /*\n\
  * this function will test sjclHashScryptXxx's default handling-behavior\n\
  */\n\
@@ -36004,10 +37296,10 @@ local.testCase_sjclHashScryptXxx_default = function (options, onError) {\n\
         \"$s0$80801$epIxT/h6HbbwHaehFnh/bw==\"\n\
         + \"$l/guDhz2Q0v/D93gq0K0qtSX6FWP8pH5maAJkbIcRaE=\"\n\
     )), true);\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_sjclHashShaXxxCreate_default = function (options, onError) {\n\
+local.testCase_sjclHashShaXxxCreate_default = function (option, onError) {\n\
 /*\n\
  * this function will test sjclHashShaXxxCreate's default handling-behavior\n\
  */\n\
@@ -36019,10 +37311,10 @@ local.testCase_sjclHashShaXxxCreate_default = function (options, onError) {\n\
         local.sjclHashSha256Create(\"aa\"),\n\
         \"lhtt0+3jy47LqsvWjeBAzXjrLtWIkTDM60xJJo6k1QY=\"\n\
     );\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_sjclHmacShaXxx_default = function (options, onError) {\n\
+local.testCase_sjclHmacShaXxx_default = function (option, onError) {\n\
 /*\n\
  * this function will test sjclHmacShaXxx's default handling-behavior\n\
  */\n\
@@ -36034,10 +37326,10 @@ local.testCase_sjclHmacShaXxx_default = function (options, onError) {\n\
         local.sjclHmacSha256Create(\"aa\", \"bb\"),\n\
         \"94Xv3VdPHA+ohKyjkM1pb0W5ZVAuMVcmIAAI2AqNRCQ=\"\n\
     );\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_stringHtmlSafe_default = function (options, onError) {\n\
+local.testCase_stringHtmlSafe_default = function (option, onError) {\n\
 /*\n\
  * this function will test stringHtmlSafe's default handling-behavior\n\
  */\n\
@@ -36048,10 +37340,10 @@ local.testCase_stringHtmlSafe_default = function (options, onError) {\n\
             + \"ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\"\n\
         )\n\
     );\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_stringQuotedToAscii_default = function (options, onError) {\n\
+local.testCase_stringQuotedToAscii_default = function (option, onError) {\n\
 /*\n\
  * this function will test stringQuotedToAscii's default handling-behavior\n\
  */\n\
@@ -36059,10 +37351,10 @@ local.testCase_stringQuotedToAscii_default = function (options, onError) {\n\
         local.stringQuotedToAscii(local.stringHelloEmoji),\n\
         \"hello \\\\ud83d\\\\ude01\\n\"\n\
     );\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_stringRegexpEscape_default = function (options, onError) {\n\
+local.testCase_stringRegexpEscape_default = function (option, onError) {\n\
 /*\n\
  * this function will test stringRegexpEscape's default handling-behavior\n\
  */\n\
@@ -36079,146 +37371,146 @@ local.testCase_stringRegexpEscape_default = function (options, onError) {\n\
             + \"\\u007f\"\n\
         )\n\
     );\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_stringTruncate_default = function (options, onError) {\n\
+local.testCase_stringTruncate_default = function (option, onError) {\n\
 /*\n\
  * this function will test stringTruncate's default handling-behavior\n\
  */\n\
     local.assertJsonEqual(local.stringTruncate(\"aa\"), \"aa\");\n\
     local.assertJsonEqual(local.stringTruncate(\"aa\", 1), \"...\");\n\
     local.assertJsonEqual(local.stringTruncate(\"aa\", 2), \"aa\");\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_stringUniqueKey_default = function (options, onError) {\n\
+local.testCase_stringUniqueKey_default = function (option, onError) {\n\
 /*\n\
  * this function will test stringUniqueKey's default handling-behavior\n\
  */\n\
     local.assertThrow((\"zqxj\").indexOf(local.stringUniqueKey(\"zqxj\") < 0));\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_taskCreateCached_default = function (options, onError) {\n\
+local.testCase_taskCreateCached_default = function (option, onError) {\n\
 /*\n\
  * this function will test taskCreateCached's default handling-behavior\n\
  */\n\
     var cacheValue;\n\
     var onTask;\n\
-    var options2;\n\
-    options = {};\n\
-    local.onNext(options, function (error, data) {\n\
-        switch (options.modeNext) {\n\
+    var option2;\n\
+    option = {};\n\
+    local.onNext(option, function (error, data) {\n\
+        switch (option.modeNext) {\n\
         // test no cache handling-behavior\n\
         case 1:\n\
             onTask = function (onError) {\n\
                 onError(null, cacheValue);\n\
             };\n\
-            options.cacheDict = \"testCase_taskCreateCached_default\";\n\
-            options.key = \"memory\";\n\
+            option.cacheDict = \"testCase_taskCreateCached_default\";\n\
+            option.key = \"memory\";\n\
             // cleanup memory-cache\n\
-            local.cacheDict[options.cacheDict] = null;\n\
+            local.cacheDict[option.cacheDict] = null;\n\
             cacheValue = \"aa\";\n\
-            options2 = {\n\
-                cacheDict: options.cacheDict,\n\
-                key: options.key,\n\
+            option2 = {\n\
+                cacheDict: option.cacheDict,\n\
+                key: option.key,\n\
                 // test onCacheWrite handling-behavior\n\
-                onCacheWrite: options.onNext\n\
+                onCacheWrite: option.onNext\n\
             };\n\
-            local.taskCreateCached(options2, onTask, options.onNext);\n\
+            local.taskCreateCached(option2, onTask, option.onNext);\n\
             break;\n\
         case 2:\n\
             // validate data\n\
             local.assertJsonEqual(data, \"aa\");\n\
             // validate no cache-hit\n\
-            local.assertThrow(!options2.modeCacheHit, options2.modeCacheHit);\n\
+            local.assertThrow(!option2.modeCacheHit, option2.modeCacheHit);\n\
             break;\n\
         // test cache with update handling-behavior\n\
         case 3:\n\
             cacheValue = \"bb\";\n\
-            options2 = {\n\
-                cacheDict: options.cacheDict,\n\
-                key: options.key,\n\
+            option2 = {\n\
+                cacheDict: option.cacheDict,\n\
+                key: option.key,\n\
                 // test modeCacheUpdate handling-behavior\n\
                 modeCacheUpdate: true,\n\
                 // test onCacheWrite handling-behavior\n\
-                onCacheWrite: options.onNext\n\
+                onCacheWrite: option.onNext\n\
             };\n\
-            local.taskCreateCached(options2, onTask, options.onNext);\n\
+            local.taskCreateCached(option2, onTask, option.onNext);\n\
             break;\n\
         case 4:\n\
             // validate data\n\
             local.assertJsonEqual(data, \"aa\");\n\
             // validate modeCacheHit\n\
-            local.assertJsonEqual(options2.modeCacheHit, true);\n\
+            local.assertJsonEqual(option2.modeCacheHit, true);\n\
             break;\n\
         // test cache handling-behavior\n\
         case 5:\n\
-            options2 = {\n\
-                cacheDict: options.cacheDict,\n\
-                key: options.key\n\
+            option2 = {\n\
+                cacheDict: option.cacheDict,\n\
+                key: option.key\n\
             };\n\
-            local.taskCreateCached(options2, onTask, options.onNext);\n\
+            local.taskCreateCached(option2, onTask, option.onNext);\n\
             break;\n\
         case 6:\n\
             // validate data\n\
             local.assertJsonEqual(data, \"bb\");\n\
             // validate modeCacheHit\n\
-            local.assertJsonEqual(options2.modeCacheHit, true);\n\
-            options.onNext();\n\
+            local.assertJsonEqual(option2.modeCacheHit, true);\n\
+            option.onNext();\n\
             break;\n\
         default:\n\
-            onError(error, options);\n\
+            onError(error, option);\n\
         }\n\
     });\n\
-    options.modeNext = 0;\n\
-    options.onNext();\n\
+    option.modeNext = 0;\n\
+    option.onNext();\n\
 };\n\
 \n\
-local.testCase_taskCreate_multipleCallback = function (options, onError) {\n\
+local.testCase_taskCreate_multipleCallback = function (option, onError) {\n\
 /*\n\
  * this function will test taskCreate's multiple-callback handling-behavior\n\
  */\n\
-    options = {\n\
+    option = {\n\
         counter: 0,\n\
         key: \"testCase_taskCreate_multiCallback\"\n\
     };\n\
-    local.taskCreate(options, function (onError) {\n\
-        onError(null, options);\n\
+    local.taskCreate(option, function (onError) {\n\
+        onError(null, option);\n\
         // test multiple-callback handling-behavior\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     }, function () {\n\
-        options.counter += 1;\n\
+        option.counter += 1;\n\
     });\n\
     // validate counter incremented once\n\
-    local.assertJsonEqual(options.counter, 1);\n\
-    onError(null, options);\n\
+    local.assertJsonEqual(option.counter, 1);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_taskCreate_upsert = function (options, onError) {\n\
+local.testCase_taskCreate_upsert = function (option, onError) {\n\
 /*\n\
  * this function will test taskCreate's upsert handling-behavior\n\
  */\n\
-    options = {\n\
+    option = {\n\
         counter: 0,\n\
         key: \"testCase_taskCreate_upsert\"\n\
     };\n\
     // test upsert handling-behavior\n\
     [null, null].forEach(function () {\n\
-        local.taskCreate(options, function (onError) {\n\
-            options.counter += 1;\n\
+        local.taskCreate(option, function (onError) {\n\
+            option.counter += 1;\n\
             setTimeout(onError);\n\
         });\n\
     });\n\
     // validate counter incremented once\n\
     setTimeout(function () {\n\
-        local.assertJsonEqual(options.counter, 1);\n\
-        onError(null, options);\n\
+        local.assertJsonEqual(option.counter, 1);\n\
+        onError(null, option);\n\
     });\n\
 };\n\
 \n\
-local.testCase_templateRender_default = function (options, onError) {\n\
+local.testCase_templateRender_default = function (option, onError) {\n\
 /*\n\
  * this function will test templateRender's default handling-behavior\n\
  */\n\
@@ -36346,15 +37638,15 @@ local.testCase_templateRender_default = function (options, onError) {\n\
     }, local.nop);\n\
     // validate error occurred\n\
     local.assertThrow(local._debugTryCatchError, local._debugTryCatchError);\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_testReportCreate_default = function (options, onError) {\n\
+local.testCase_testReportCreate_default = function (option, onError) {\n\
 /*\n\
  * this function will test testReport's default handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     local.testMock([], function (onError) {\n\
@@ -36370,11 +37662,11 @@ local.testCase_testReportCreate_default = function (options, onError) {\n\
                 }]\n\
             }]\n\
         });\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_throwError_default = function (options, onError) {\n\
+local.testCase_throwError_default = function (option, onError) {\n\
 /*\n\
  * this function will test throwError's default handling-behavior\n\
  */\n\
@@ -36383,11 +37675,11 @@ local.testCase_throwError_default = function (options, onError) {\n\
     }, function (error) {\n\
         // validate error occurred\n\
         local.assertThrow(error, error);\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     });\n\
 };\n\
 \n\
-local.testCase_uglify_default = function (options, onError) {\n\
+local.testCase_uglify_default = function (option, onError) {\n\
 /*\n\
  * this function will test uglify's default handling-behavior\n\
  */\n\
@@ -36398,46 +37690,46 @@ local.testCase_uglify_default = function (options, onError) {\n\
         local.uglify(\"aa = 'hello \\ud83d\\ude01\\\\n'\", \"aa.js\"),\n\
         \"aa=\\\"hello \\\\ud83d\\\\ude01\\\\n\\\"\"\n\
     );\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_uiAnimateXxx_default = function (options, onError) {\n\
+local.testCase_uiAnimateXxx_default = function (option, onError) {\n\
 /*\n\
  * this function will test uiAnimateXxx's default handling-behavior\n\
  */\n\
     if (!local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
-    options = document.createElement(\"div\");\n\
+    option = document.createElement(\"div\");\n\
     // test uiAnimateShake handling-behavior\n\
     local.uiAnimateShake();\n\
-    local.uiAnimateShake(options);\n\
-    local.assertThrow(options.classList.contains(\"uiAnimateShake\"), options.classList);\n\
-    local.uiAnimateShake(options);\n\
-    local.assertThrow(options.classList.contains(\"uiAnimateShake\"), options.classList);\n\
+    local.uiAnimateShake(option);\n\
+    local.assertThrow(option.classList.contains(\"uiAnimateShake\"), option.classList);\n\
+    local.uiAnimateShake(option);\n\
+    local.assertThrow(option.classList.contains(\"uiAnimateShake\"), option.classList);\n\
     // test uiAnimateShakeIfError handling-behavior\n\
     local.uiAnimateShakeIfError();\n\
-    local.uiAnimateShakeIfError(null, options);\n\
-    local.assertThrow(!options.classList.contains(\"hasError\"), options.classList);\n\
-    local.uiAnimateShakeIfError(true, options);\n\
-    local.assertThrow(options.classList.contains(\"hasError\"), options.classList);\n\
-    local.uiAnimateShakeIfError(null, options);\n\
-    local.assertThrow(!options.classList.contains(\"hasError\"), options.classList);\n\
+    local.uiAnimateShakeIfError(null, option);\n\
+    local.assertThrow(!option.classList.contains(\"hasError\"), option.classList);\n\
+    local.uiAnimateShakeIfError(true, option);\n\
+    local.assertThrow(option.classList.contains(\"hasError\"), option.classList);\n\
+    local.uiAnimateShakeIfError(null, option);\n\
+    local.assertThrow(!option.classList.contains(\"hasError\"), option.classList);\n\
     // test uiAnimateSlideXxx handling-behavior\n\
     local.uiAnimateSlideDown();\n\
     local.uiAnimateSlideUp();\n\
-    options.classList.add(\"uiAnimateSlide\");\n\
-    local.uiAnimateSlideDown(options);\n\
-    local.assertThrow(options.style.maxHeight.indexOf(\"px\") >= 0, options.style.maxHeight);\n\
-    local.uiAnimateSlideUp(options);\n\
-    local.assertJsonEqual(options.style.maxHeight, \"0px\");\n\
+    option.classList.add(\"uiAnimateSlide\");\n\
+    local.uiAnimateSlideDown(option);\n\
+    local.assertThrow(option.style.maxHeight.indexOf(\"px\") >= 0, option.style.maxHeight);\n\
+    local.uiAnimateSlideUp(option);\n\
+    local.assertJsonEqual(option.style.maxHeight, \"0px\");\n\
     // test uiAnimateSlideAccordian handling-behavior\n\
-    local.uiAnimateSlideAccordian(options, [options, document.createElement(\"div\")]);\n\
-    onError(null, options);\n\
+    local.uiAnimateSlideAccordian(option, [option, document.createElement(\"div\")]);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_urlJoin_default = function (options, onError) {\n\
+local.testCase_urlJoin_default = function (option, onError) {\n\
 /*\n\
  * this function will test urlJoin's default handling-behavior\n\
  */\n\
@@ -36447,10 +37739,10 @@ local.testCase_urlJoin_default = function (options, onError) {\n\
     local.assertJsonEqual(local.urlJoin(\"http://aa/bb/\", \"/zz\"), \"http://aa/zz\");\n\
     local.assertJsonEqual(local.urlJoin(\"http://aa/bb/\", \"//zz\"), \"http://zz\");\n\
     local.assertJsonEqual(local.urlJoin(\"http://aa/bb/\", \"http://zz\"), \"http://zz\");\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_urlParse_default = function (options, onError) {\n\
+local.testCase_urlParse_default = function (option, onError) {\n\
 /*\n\
  * this function will test urlParse's default handling-behavior\n\
  */\n\
@@ -36495,31 +37787,31 @@ local.testCase_urlParse_default = function (options, onError) {\n\
             query: {},\n\
             search: \"\"\n\
         });\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     }, onError);\n\
 };\n\
 \n\
-local.testCase_uuid4Create_default = function (options, onError) {\n\
+local.testCase_uuid4Create_default = function (option, onError) {\n\
 /*\n\
  * this function will test uuid4Create's default handling-behavior\n\
  */\n\
     local.assertThrow((local.regexpValidateUuid).test(local.uuid4Create()), local.uuid4Create());\n\
-    onError(null, options);\n\
+    onError(null, option);\n\
 };\n\
 \n\
-local.testCase_webpage_error = function (options, onError) {\n\
+local.testCase_webpage_error = function (option, onError) {\n\
 /*\n\
  * this function will test webpage's error handling-behavior\n\
  */\n\
     if (local.isBrowser) {\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
         return;\n\
     }\n\
     local.browserTest({\n\
         modeCoverageMerge: true,\n\
         modeSilent: true,\n\
         timeoutDefault: local.timeoutDefault - 5000,\n\
-        // /assets.script_only.html?modeTest=1&modeTestCase=_testCase_testRunDefault_failure&timeExit=\n\
+        // https://localhost:8080/assets.script_only.html?modeTest=1&modeTestCase=_testCase_testRunDefault_failure&timeExit=\n\
         url: (\n\
             local.serverLocalHost\n\
             // test script_only handling-behavior\n\
@@ -36535,7 +37827,7 @@ local.testCase_webpage_error = function (options, onError) {\n\
     }, function (error) {\n\
         // validate error occurred\n\
         local.assertThrow(error, error);\n\
-        onError(null, options);\n\
+        onError(null, option);\n\
     });\n\
 };\n\
 \n\
@@ -36571,14 +37863,6 @@ local.middlewareList.push(function (request, response, nextMiddleware) {\n\
  */\n\
     switch (request.urlParsed.pathname) {\n\
     // test http POST handling-behavior\n\
-    case \"/test.echo\":\n\
-        // test response header handling-behavior\n\
-        local.serverRespondHeadSet(request, response, null, {\n\
-            \"X-Response-Header-Test\": \"bb\"\n\
-        });\n\
-        local.serverRespondEcho(request, response);\n\
-        break;\n\
-    // test http POST handling-behavior\n\
     case \"/test.body\":\n\
         // test request-body-read handling-behavior\n\
         local.middlewareBodyRead(request, response, function () {\n\
@@ -36588,6 +37872,14 @@ local.middlewareList.push(function (request, response, nextMiddleware) {\n\
                 response.end();\n\
             });\n\
         });\n\
+        break;\n\
+    // test http POST handling-behavior\n\
+    case \"/test.echo\":\n\
+        // test response header handling-behavior\n\
+        local.serverRespondHeadSet(request, response, null, {\n\
+            \"X-Response-Header-Test\": \"bb\"\n\
+        });\n\
+        local.serverRespondEcho(request, response);\n\
         break;\n\
     // test 500-internal-server-error handling-behavior\n\
     case \"/test.error-500\":\n\

@@ -58,6 +58,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 #### todo
+- add input-type=date and input-type=time
 - update function swaggerJsonFromAjax to inline definitions
 - add swagger.json editor
 - allow parsing of default path-argument, e.g. /aa/{bb=1}/{cc=2}
@@ -70,25 +71,14 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog 2018.11.14
-- npm publish 2018.11.14
-- refactor files with new jslint (v2018.10.26)
-- jslint - replace ",$s/^ *".*"\n *+ ".*"\(\n *+ ".*"\)*/(&)/gc"
-- jslint - unexpected_a \(
-- jslint - replace instanceof -> Object.prototype.toString.call
-- jslint - replace var self -> that
-- jslint - unconst and unlet
-- jslint - prioritize fatal jslint-errors
-- jslint - merge function jslintAndPrintConditional -> jslintAndPrint
-- jslint-autofix - braket
-- jslint-autofix - parenthesize open-statements
-- jslint-autofix - prefix-operator
-- jslint-autofix - parenthesize rgx
-- jslint-autofix - local-function
-- jslint-autofix - add autofix button to live web-demo
-- jslint-autofix - embedded ```javascript```, <\script\>, <\style\>
-- jslint-autofix - tweak to run before JSLint in function jslintAndPrint
-- update function uiEventDelegate to use dom-property data-event
+#### changelog 2019.2.20
+- npm publish 2019.2.20
+- split function domOnEventDelegate into domOnEventDelegate, domOnEventResetOutput
+- add input-type=number
+- revamp ui event-handling with window.domOnEventDelegateDict
+- split function jslintAndPrint -> jslintAndPrint, jslintAutofix, jslintUtility2
+- add function local.objectAssignDefault
+- upgrade to jslint commit-de413767154641f490d6e96185e525255cca5f7e (v2018.11.14)
 - none
 
 #### this package requires
@@ -103,7 +93,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 
 # quickstart standalone app
-#### to run this example, follow the instruction in the script below
+#### to run this example, follow instruction in script below
 - [assets.app.js](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js)
 ```shell
 # example.sh
@@ -114,7 +104,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 curl -O https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/app/assets.app.js
 # 2. run standalone app
 PORT=8081 node ./assets.app.js
-# 3. open a browser to http://127.0.0.1:8081 and play with the web-demo
+# 3. open a browser to http://127.0.0.1:8081 and play with web-demo
 # 4. edit file assets.app.js to suit your needs
 ```
 
@@ -129,7 +119,7 @@ PORT=8081 node ./assets.app.js
 # quickstart example.js
 [![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.testExampleJs.browser.%252F.png)](https://kaizhu256.github.io/node-swgg/build/app/assets.example.html)
 
-#### to run this example, follow the instruction in the script below
+#### to run this example, follow instruction in script below
 - [example.js](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/example.js)
 ```javascript
 /*
@@ -139,9 +129,9 @@ this script will run a web-demo of swgg
 
 instruction
     1. save this script as example.js
-    2. run the shell-command:
+    2. run shell-command:
         $ npm install swgg && PORT=8081 node example.js
-    3. open a browser to http://127.0.0.1:8081 and play with the web-demo
+    3. open a browser to http://127.0.0.1:8081 and play with web-demo
     4. edit this script to suit your needs
 */
 
@@ -161,28 +151,48 @@ instruction
         } catch (ignore) {}
     }());
     globalThis.globalThis = globalThis;
+    // init debug_inline
+    if (!globalThis["debug\u0049nline"]) {
+        consoleError = console.error;
+        globalThis["debug\u0049nline"] = function () {
+        /*
+         * this function will both print <arguments> to stderr
+         * and return <arguments>[0]
+         */
+            var argList;
+            argList = Array.from(arguments); // jslint ignore:line
+            // debug arguments
+            globalThis["debug\u0049nlineArguments"] = argList;
+            consoleError("\n\ndebug\u0049nline");
+            consoleError.apply(console, argList);
+            consoleError("\n");
+            // return arg0 for inspection
+            return argList[0];
+        };
+    }
     // init local
     local = {};
+    local.local = local;
+    globalThis.globalLocal = local;
     // init isBrowser
     local.isBrowser = (
         typeof window === "object"
         && window === globalThis
         && typeof window.XMLHttpRequest === "function"
         && window.document
-        && typeof window.document.querySelectorAll === "function"
+        && typeof window.document.querySelector === "function"
     );
-    globalThis.globalLocal = local;
     // init function
     local.assertThrow = function (passed, message) {
     /*
-     * this function will throw the error <message> if <passed> is falsy
+     * this function will throw error <message> if <passed> is falsy
      */
         var error;
         if (passed) {
             return;
         }
         error = (
-            // ternary-operator
+            // ternary-condition
             (
                 message
                 && typeof message.message === "string"
@@ -220,24 +230,53 @@ instruction
      */
         return;
     };
-    // init debug_inline
-    if (!globalThis["debug\u0049nline"]) {
-        consoleError = console.error;
-        globalThis["debug\u0049nline"] = function () {
-        /*
-         * this function will both print <arguments> to stderr
-         * and return <arguments>[0]
-         */
-            var argList;
-            argList = Array.from(arguments); // jslint ignore:line
-            // debug arguments
-            globalThis["debug\u0049nlineArguments"] = argList;
-            consoleError("\n\ndebug\u0049nline");
-            consoleError.apply(console, argList);
-            consoleError("\n");
-            // return arg0 for inspection
-            return argList[0];
-        };
+    local.objectAssignDefault = function (target, source) {
+    /*
+     * this function will if items from <target> are
+     * null, undefined, or empty-string,
+     * then overwrite them with items from <source>
+     */
+        target = target || {};
+        Object.keys(source || {}).forEach(function (key) {
+            if (
+                target[key] === null
+                || target[key] === undefined
+                || target[key] === ""
+            ) {
+                target[key] = target[key] || source[key];
+            }
+        });
+        return target;
+    };
+    // require builtin
+    if (!local.isBrowser) {
+        local.assert = require("assert");
+        local.buffer = require("buffer");
+        local.child_process = require("child_process");
+        local.cluster = require("cluster");
+        local.crypto = require("crypto");
+        local.dgram = require("dgram");
+        local.dns = require("dns");
+        local.domain = require("domain");
+        local.events = require("events");
+        local.fs = require("fs");
+        local.http = require("http");
+        local.https = require("https");
+        local.net = require("net");
+        local.os = require("os");
+        local.path = require("path");
+        local.querystring = require("querystring");
+        local.readline = require("readline");
+        local.repl = require("repl");
+        local.stream = require("stream");
+        local.string_decoder = require("string_decoder");
+        local.timers = require("timers");
+        local.tls = require("tls");
+        local.tty = require("tty");
+        local.url = require("url");
+        local.util = require("util");
+        local.vm = require("vm");
+        local.zlib = require("zlib");
     }
 }(this));
 
@@ -277,27 +316,27 @@ local.middlewareCrudCustom = function (request, response, nextMiddleware) {
  * this function will run the middleware that will run custom-crud-operations
  */
     var crud;
-    var options;
+    var option;
     var result;
-    options = {};
-    local.onNext(options, function (error, data) {
-        switch (options.modeNext) {
+    option = {};
+    local.onNext(option, function (error, data) {
+        switch (option.modeNext) {
         case 1:
             crud = request.swgg.crud;
             switch (crud.crudType[0]) {
             // coverage-hack - test error handling-behavior
             case "crudErrorPre":
-                options.onNext(local.errorDefault);
+                option.onNext(local.errorDefault);
                 return;
             case "getInventory":
                 crud.dbTable.crudGetManyByQuery({
                     query: {},
                     projection: ["status"]
-                }, options.onNext);
+                }, option.onNext);
                 break;
             default:
-                options.modeNext = Infinity;
-                options.onNext();
+                option.modeNext = Infinity;
+                option.onNext();
             }
             break;
         case 2:
@@ -308,7 +347,7 @@ local.middlewareCrudCustom = function (request, response, nextMiddleware) {
                     result[element.status] = result[element.status] || 0;
                     result[element.status] += 1;
                 });
-                options.onNext(null, result);
+                option.onNext(null, result);
                 break;
             }
             break;
@@ -319,8 +358,8 @@ local.middlewareCrudCustom = function (request, response, nextMiddleware) {
             nextMiddleware(error, data);
         }
     });
-    options.modeNext = 0;
-    options.onNext();
+    option.modeNext = 0;
+    option.onNext();
 };
 
 local.middlewareInitCustom = function (request, response, nextMiddleware) {
@@ -362,14 +401,15 @@ local.assetsDict['/assets.index.template.html'] = local.assetsDict['/assets.swgg
 </h1>\n\
 <h3>{{env.npm_package_description}}</h3>\n\
 <a class="button" download href="assets.app.js">download standalone app</a><br>\n\
-<button class="button onreset" id="testRunButton1">run internal test</button><br>\n\
+<button class="button" data-onevent="testRunBrowser" data-onevent-reset-output="1" id="testRunButton1">run internal test</button><br>\n\
 <div class="uiAnimateSlide" id="testReportDiv1" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>\n\
 \n\
 \n\
 \n\
-<button class="button onclick" id="dbResetButton1">reset database</button><br>\n\
-<button class="button onclick" id="dbExportButton1">export database -&gt; file</button><br>\n\
-<button class="button onclick" id="dbImportButton1">import database &lt;- file</button><br>\n\
+<button class="button" data-onevent="onEventDomDb" data-onevent-db="dbReset">reset database</button><br>\n\
+<button class="button" data-onevent="onEventDomDb" data-onevent-db="dbExport">export database -&gt; file</button><br>\n\
+<button class="button" data-onevent="onEventDomDb" data-onevent-db="dbImport">import database &lt;- file</button><br>\n\
+</button><br>\n\
 <input class="onchange zeroPixel" type="file" id="dbImportInput1">\n\
 ')
             .replace('assets.swgg.swagger.json', 'assets.swgg.swagger.server.json')
@@ -416,6 +456,7 @@ local.middlewareList = [
 local.utility2.middlewareList = local.middlewareList;
 // run test-server
 local.testRunServer(local);
+/* validateLineSortedReset */
 // init petstore-api - frontend
 local.tmp = JSON.parse(local.assetsDict["/assets.swgg.swagger.petstore.json"]);
 delete local.tmp.basePath;
@@ -426,36 +467,88 @@ local.swgg.apiUpdate(local.tmp);
 local.swgg.apiUpdate({
     definitions: {
         File: {
-            allOf: [{$ref: "#/definitions/BuiltinFile"}]
+            allOf: [{
+                $ref: "#/definitions/BuiltinFile"
+            }]
         },
         Pet: {
             properties: {
-                _id: {readOnly: true, type: "string"},
-                _timeCreated: {format: "date-time", readOnly: true, type: "string"},
-                _timeUpdated: {format: "date-time", readOnly: true, type: "string"},
-                id: {default: 1, minimum: 1}
+                _id: {
+                    readOnly: true,
+                    type: "string"
+                },
+                _timeCreated: {
+                    format: "date-time",
+                    readOnly: true,
+                    type: "string"
+                },
+                _timeUpdated: {
+                    format: "date-time",
+                    readOnly: true,
+                    type: "string"
+                },
+                id: {
+                    default: 1,
+                    minimum: 1
+                }
             }
         },
         Order: {
             properties: {
-                _id: {readOnly: true, type: "string"},
-                _timeCreated: {format: "date-time", readOnly: true, type: "string"},
-                _timeUpdated: {format: "date-time", readOnly: true, type: "string"},
-                id: {default: 1, minimum: 1}
+                _id: {
+                    readOnly: true,
+                    type: "string"
+                },
+                _timeCreated: {
+                    format: "date-time",
+                    readOnly: true,
+                    type: "string"
+                },
+                _timeUpdated: {
+                    format: "date-time",
+                    readOnly: true,
+                    type: "string"
+                },
+                id: {
+                    default: 1,
+                    minimum: 1
+                }
             }
         },
         User: {
-            allOf: [{$ref: "#/definitions/BuiltinUser"}],
+            allOf: [{
+                $ref: "#/definitions/BuiltinUser"
+            }],
             properties: {
-                _id: {readOnly: true, type: "string"},
-                _timeCreated: {format: "date-time", readOnly: true, type: "string"},
-                _timeUpdated: {format: "date-time", readOnly: true, type: "string"},
-                email: {default: "a@a.com", format: "email"},
-                id: {default: 1, minimum: 1}
+                _id: {
+                    readOnly: true,
+                    type: "string"
+                },
+                _timeCreated: {
+                    format: "date-time",
+                    readOnly: true,
+                    type: "string"
+                },
+                _timeUpdated: {
+                    format: "date-time",
+                    readOnly: true,
+                    type: "string"
+                },
+                email: {
+                    default: "a@a.com",
+                    format: "email"
+                },
+                id: {
+                    default: 1,
+                    minimum: 1
+                }
             }
         }
     },
-    tags: [{description: "builtin-file model", name: "file"}],
+    tags: [{
+        description: "builtin-file model",
+        name: "file"
+    }],
     "x-swgg-apiDict": {
         "operationId.file.crudCountManyByQuery": {
             _schemaName: "File"
@@ -612,31 +705,37 @@ globalThis.utility2_dbSeedList = [{
             name: "birdie",
             photoUrls: [],
             status: "available",
-            tags: [{name: "bird"}]
+            tags: [{
+                name: "bird"
+            }]
         }, {
             id: 1,
             name: "doggie",
             status: "pending",
             photoUrls: [],
-            tags: [{name: "dog"}]
+            tags: [{
+                name: "dog"
+            }]
         }, {
             id: 2,
             name: "fishie",
             photoUrls: [],
             status: "sold",
-            tags: [{name: "fish"}]
+            tags: [{
+                name: "fish"
+            }]
         }],
         // init 100 extra random pets
         length: 100,
-        override: function (options) {
+        override: function (option) {
             return {
-                id: options.ii + 100,
+                id: option.ii + 100,
                 name: local.listGetElementRandom(
                     ["birdie", "doggie", "fishie"]
-                ) + "-" + (options.ii + 100),
-                tags: [
-                    {name: local.listGetElementRandom(["female", "male"])}
-                ]
+                ) + "-" + (option.ii + 100),
+                tags: [{
+                    name: local.listGetElementRandom(["female", "male"])
+                }]
             };
         },
         schema: local.swgg.swaggerJson.definitions.Pet
@@ -663,10 +762,10 @@ globalThis.utility2_dbSeedList = [{
         }],
         // init 100 extra random orders
         length: 100,
-        override: function (options) {
+        override: function (option) {
             return {
-                id: options.ii + 100,
-                petId: options.ii + 100
+                id: option.ii + 100,
+                petId: option.ii + 100
             };
         },
         schema: local.swgg.swaggerJson.definitions.Order
@@ -705,18 +804,19 @@ globalThis.utility2_dbSeedList = [{
         }],
         // init 100 extra random users
         length: 100,
-        override: function (options) {
+        override: function (option) {
             return {
                 firstName: local.listGetElementRandom(
                     ["alice", "bob", "jane", "john"]
-                ) + "-" + (options.ii + 100),
-                id: options.ii + 100,
-                lastName: local.listGetElementRandom(["doe", "smith"]) + "-" + (options.ii + 100),
+                ) + "-" + (option.ii + 100),
+                id: option.ii + 100,
+                lastName: local.listGetElementRandom(["doe", "smith"]) + "-" + (option.ii + 100),
                 password: local.sjclHashScryptCreate("secret"),
-                tags: [
-                    {name: local.listGetElementRandom(["female", "male"])},
-                    {name: Math.random().toString(36).slice(2)}
-                ]
+                tags: [{
+                    name: local.listGetElementRandom(["female", "male"])
+                }, {
+                    name: Math.random().toString(36).slice(2)
+                }]
             };
         },
         schema: local.swgg.swaggerJson.definitions.User
@@ -754,118 +854,23 @@ local.utility2.serverLocalUrlTest = function (url) {
 if (!local.isBrowser) {
     return;
 }
-local.testRunBrowser = function (event) {
-    if (!event || (
-        event
-        && event.currentTarget
-        && event.currentTarget.className
-        && event.currentTarget.className.includes
-        && event.currentTarget.className.includes("onreset")
-    )) {
-        // reset output
-        Array.from(document.querySelectorAll(
-            "body > .resettable"
-        )).forEach(function (element) {
-            switch (element.tagName) {
-            case "INPUT":
-            case "TEXTAREA":
-                element.value = "";
-                break;
-            default:
-                element.textContent = "";
-            }
-        });
-    }
-    switch (event && event.currentTarget && event.currentTarget.id) {
-    case "testRunButton1":
-        // show tests
-        if (document.querySelector("#testReportDiv1").style.maxHeight === "0px") {
-            local.uiAnimateSlideDown(document.querySelector("#testReportDiv1"));
-            document.querySelector("#testRunButton1").textContent = "hide internal test";
-            local.modeTest = 1;
-            local.testRunDefault(local);
-        // hide tests
-        } else {
-            local.uiAnimateSlideUp(document.querySelector("#testReportDiv1"));
-            document.querySelector("#testRunButton1").textContent = "run internal test";
-        }
-        break;
-    // custom-case
-    case "dbExportButton1":
-    case "dbImportButton1":
-    case "dbImportInput1":
-    case "dbResetButton1":
-        local.db.onEventDomDb(event);
-        break;
-    case undefined:
-        // init ui
-        globalThis.utility2_onReadyBefore.counter += 1;
-        local.swgg.uiEventListenerDict.onEventUiReload(
-            null,
-            globalThis.utility2_onReadyBefore
-        );
-        // coverage-hack - ignore else-statement
-        local.nop(local.modeTest && (function () {
-            document.querySelector("#testRunButton1").textContent = (
-                "hide internal test"
-            );
-        }()));
-        break;
-    }
-};
-
-local.uiEventDelegate = local.uiEventDelegate || function (event) {
-    // filter non-input keyup-event
-    event.targetOnEvent = event.target.closest("[data-event]");
-    if (!event.targetOnEvent) {
+// log stderr and stdout to #outputStdout1
+["error", "log"].forEach(function (key) {
+    var argList;
+    var element;
+    var fnc;
+    element = document.querySelector(
+        "#outputStdout1"
+    );
+    if (!element) {
         return;
     }
-    // rate-limit keyup
-    if (event.type === "keyup") {
-        local.uiEventDelegateKeyupEvent = event;
-        if (local.uiEventDelegateKeyupTimerTimeout !== 2) {
-            local.uiEventDelegateKeyupTimerTimeout = (
-                local.uiEventDelegateKeyupTimerTimeout
-                || setTimeout(function () {
-                    local.uiEventDelegateKeyupTimerTimeout = 2;
-                    local.uiEventDelegate(local.uiEventDelegateKeyupEvent);
-                }, 100)
-            );
-            return;
-        }
-        local.uiEventDelegateKeyupTimerTimeout = null;
-        if (!event.target.closest("input, option, select, textarea")) {
-            return;
-        }
-    }
-    switch (event.targetOnEvent.tagName) {
-    case "BUTTON":
-    case "FORM":
-        event.preventDefault();
-        break;
-    }
-    event.stopPropagation();
-    local.uiEventListenerDict[event.targetOnEvent.dataset.event](event);
-};
-
-local.uiEventListenerDict = local.uiEventListenerDict || {};
-
-local.uiEventListenerDict.testRunBrowser = local.testRunBrowser;
-
-// log stderr and stdout to #outputStdoutTextarea1
-["error", "log"].forEach(function (key) {
-    console[key + "_original"] = console[key + "_original"] || console[key];
+    fnc = console[key];
     console[key] = function () {
-        var argList;
-        var element;
         argList = Array.from(arguments); // jslint ignore:line
-        console[key + "_original"].apply(console, argList);
-        element = document.querySelector("#outputStdoutTextarea1");
-        if (!element) {
-            return;
-        }
-        // append text to #outputStdoutTextarea1
-        element.value += argList.map(function (arg) {
+        fnc.apply(console, argList);
+        // append text to #outputStdout1
+        element.textContent += argList.map(function (arg) {
             return (
                 typeof arg === "string"
                 ? arg
@@ -878,16 +883,70 @@ local.uiEventListenerDict.testRunBrowser = local.testRunBrowser;
         element.scrollTop = element.scrollHeight;
     };
 });
-// init event-handling
-["Change", "Click", "Keyup", "Submit"].forEach(function (eventType) {
-    Array.from(document.querySelectorAll(
-        ".eventDelegate" + eventType
-    )).forEach(function (element) {
-        element.addEventListener(eventType.toLowerCase(), local.uiEventDelegate);
-    });
+Object.assign(local, globalThis.domOnEventDelegateDict);
+globalThis.domOnEventDelegateDict = local;
+local.onEventDomDb = (
+    local.db && local.db.onEventDomDb
+);
+local.testRunBrowser = function (event) {
+/*
+ * this function will run browser-tests
+ */
+    switch (
+        !event.ctrlKey
+        && !event.metaKey
+        && (
+            event.modeInit
+            || (event.type + "." + (event.target && event.target.id))
+        )
+    ) {
+    // custom-case
+    case true:
+        // init ui
+        globalThis.utility2_onReadyBefore.counter += 1;
+        local.swgg.uiEventListenerDict.onEventUiReload(
+            null,
+            globalThis.utility2_onReadyBefore
+        );
+        return;
+    // run browser-tests
+    default:
+        if (
+            (event.target && event.target.id) !== "testRunButton1"
+            && !(event.modeInit && (
+                /\bmodeTest=1\b/
+            ).test(location.search))
+        ) {
+            return;
+        }
+        // show browser-tests
+        if (document.querySelector(
+            "#testReportDiv1"
+        ).style.maxHeight === "0px") {
+            globalThis.domOnEventDelegateDict.domOnEventResetOutput();
+            local.uiAnimateSlideDown(document.querySelector(
+                "#testReportDiv1"
+            ));
+            document.querySelector(
+                "#testRunButton1"
+            ).textContent = "hide internal test";
+            local.modeTest = 1;
+            local.testRunDefault(local);
+            return;
+        }
+        // hide browser-tests
+        local.uiAnimateSlideUp(document.querySelector(
+            "#testReportDiv1"
+        ));
+        document.querySelector(
+            "#testRunButton1"
+        ).textContent = "run internal test";
+    }
+};
+
+local.testRunBrowser({
+    modeInit: true
 });
-// run tests
-local.testRunBrowser();
 }());
 
 
@@ -900,34 +959,6 @@ if (local.isBrowser) {
 }
 // init exports
 module.exports = local;
-// require builtins
-local.assert = require("assert");
-local.buffer = require("buffer");
-local.child_process = require("child_process");
-local.cluster = require("cluster");
-local.crypto = require("crypto");
-local.dgram = require("dgram");
-local.dns = require("dns");
-local.domain = require("domain");
-local.events = require("events");
-local.fs = require("fs");
-local.http = require("http");
-local.https = require("https");
-local.net = require("net");
-local.os = require("os");
-local.path = require("path");
-local.querystring = require("querystring");
-local.readline = require("readline");
-local.repl = require("repl");
-local.stream = require("stream");
-local.string_decoder = require("string_decoder");
-local.timers = require("timers");
-local.tls = require("tls");
-local.tty = require("tty");
-local.url = require("url");
-local.util = require("util");
-local.vm = require("vm");
-local.zlib = require("zlib");
 /* validateLineSortedReset */
 // init assets
 local.assetsDict = local.assetsDict || {};
@@ -992,7 +1023,7 @@ if (globalThis.utility2_serverHttp1) {
     return;
 }
 process.env.PORT = process.env.PORT || "8081";
-console.error("server starting on port " + process.env.PORT);
+console.error("http-server listening on port " + process.env.PORT);
 local.http.createServer(function (request, response) {
     request.urlParsed = local.url.parse(request.url);
     if (local.assetsDict[request.urlParsed.pathname] !== undefined) {
@@ -1066,7 +1097,7 @@ local.http.createServer(function (request, response) {
         "utility2": "kaizhu256/node-utility2#alpha"
     },
     "engines": {
-        "node": ">=8.0"
+        "node": ">=10.0"
     },
     "githubRepoAlias": "swgg-io/node-swgg",
     "homepage": "https://github.com/kaizhu256/node-swgg",
@@ -1099,7 +1130,7 @@ local.http.createServer(function (request, response) {
         "test": "./npm_scripts.sh",
         "utility2": "./npm_scripts.sh"
     },
-    "version": "2018.11.14"
+    "version": "2019.2.20"
 }
 ```
 
