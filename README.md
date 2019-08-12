@@ -71,14 +71,12 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog 2019.2.20
-- npm publish 2019.2.20
-- split function domOnEventDelegate into domOnEventDelegate, domOnEventResetOutput
-- add input-type=number
-- revamp ui event-handling with window.domOnEventDelegateDict
-- split function jslintAndPrint -> jslintAndPrint, jslintAutofix, jslintUtility2
-- add function local.objectAssignDefault
-- upgrade to jslint commit-de413767154641f490d6e96185e525255cca5f7e (v2018.11.14)
+#### changelog 2019.8.1
+- npm publish 2019.8.1
+- shorten name event to evt
+- jslint - refactor files to 80 chr column-limit
+- rename function local.domElementRender to local.domFragmentRender
+- shorten name element to elem, option to opt, error to err, request to req, response to res
 - none
 
 #### this package requires
@@ -185,30 +183,30 @@ instruction
     // init function
     local.assertThrow = function (passed, message) {
     /*
-     * this function will throw error <message> if <passed> is falsy
+     * this function will throw err.<message> if <passed> is falsy
      */
-        var error;
+        var err;
         if (passed) {
             return;
         }
-        error = (
-            // ternary-condition
+        err = (
+            // ternary-operator
             (
                 message
                 && typeof message.message === "string"
                 && typeof message.stack === "string"
             )
-            // if message is an error-object, then leave it as is
+            // if message is errObj, then leave as is
             ? message
             : new Error(
                 typeof message === "string"
-                // if message is a string, then leave it as is
+                // if message is a string, then leave as is
                 ? message
                 // else JSON.stringify message
                 : JSON.stringify(message, null, 4)
             )
         );
-        throw error;
+        throw err;
     };
     local.functionOrNop = function (fnc) {
     /*
@@ -311,32 +309,34 @@ local.db.dbLoad(function () {
 
 // run shared js-env code - function
 (function () {
-local.middlewareCrudCustom = function (request, response, nextMiddleware) {
+local.middlewareCrudCustom = function (req, response, nextMiddleware) {
 /*
  * this function will run the middleware that will run custom-crud-operations
  */
     var crud;
-    var option;
+    var opt;
     var result;
-    option = {};
-    local.onNext(option, function (error, data) {
-        switch (option.modeNext) {
+    opt = {};
+    local.onNext(opt, function (err, data) {
+        switch (opt.modeNext) {
         case 1:
-            crud = request.swgg.crud;
+            crud = req.swgg.crud;
             switch (crud.crudType[0]) {
-            // coverage-hack - test error handling-behavior
+            // coverage-hack - test err handling-behavior
             case "crudErrorPre":
-                option.onNext(local.errorDefault);
+                opt.onNext(local.errDefault);
                 return;
             case "getInventory":
                 crud.dbTable.crudGetManyByQuery({
                     query: {},
-                    projection: ["status"]
-                }, option.onNext);
+                    projection: [
+                        "status"
+                    ]
+                }, opt.onNext);
                 break;
             default:
-                option.modeNext = Infinity;
-                option.onNext();
+                opt.modeNext = Infinity;
+                opt.onNext();
             }
             break;
         case 2:
@@ -347,24 +347,24 @@ local.middlewareCrudCustom = function (request, response, nextMiddleware) {
                     result[element.status] = result[element.status] || 0;
                     result[element.status] += 1;
                 });
-                option.onNext(null, result);
+                opt.onNext(null, result);
                 break;
             }
             break;
         case 3:
-            local.swgg.serverRespondJsonapi(request, response, error, data);
+            local.swgg.serverRespondJsonapi(req, response, err, data);
             break;
         default:
-            nextMiddleware(error, data);
+            nextMiddleware(err, data);
         }
     });
-    option.modeNext = 0;
-    option.onNext();
+    opt.modeNext = 0;
+    opt.onNext();
 };
 
-local.middlewareInitCustom = function (request, response, nextMiddleware) {
+local.middlewareInitCustom = function (req, response, nextMiddleware) {
 /*
- * this function will run the middleware that will custom-init the request and response
+ * this function will run the middleware that will custom-init <req> and <res>
  */
     // enable cors
     // https://en.wikipedia.org/wiki/Cross-origin_resource_sharing
@@ -376,8 +376,8 @@ local.middlewareInitCustom = function (request, response, nextMiddleware) {
     // init content-type
     response.setHeader("Content-Type", "application/json; charset=UTF-8");
     // ignore .map files
-    if (request.urlParsed.pathname.slice(-4) === ".map") {
-        local.serverRespondDefault(request, response, 404);
+    if (req.urlParsed.pathname.slice(-4) === ".map") {
+        local.serverRespondDefault(req, response, 404);
         return;
     }
     nextMiddleware();
@@ -467,9 +467,11 @@ local.swgg.apiUpdate(local.tmp);
 local.swgg.apiUpdate({
     definitions: {
         File: {
-            allOf: [{
-                $ref: "#/definitions/BuiltinFile"
-            }]
+            allOf: [
+                {
+                    $ref: "#/definitions/BuiltinFile"
+                }
+            ]
         },
         Pet: {
             properties: {
@@ -516,9 +518,11 @@ local.swgg.apiUpdate({
             }
         },
         User: {
-            allOf: [{
-                $ref: "#/definitions/BuiltinUser"
-            }],
+            allOf: [
+                {
+                    $ref: "#/definitions/BuiltinUser"
+                }
+            ],
             properties: {
                 _id: {
                     readOnly: true,
@@ -545,10 +549,12 @@ local.swgg.apiUpdate({
             }
         }
     },
-    tags: [{
-        description: "builtin-file model",
-        name: "file"
-    }],
+    tags: [
+        {
+            description: "builtin-file model",
+            name: "file"
+        }
+    ],
     "x-swgg-apiDict": {
         "operationId.file.crudCountManyByQuery": {
             _schemaName: "File"
@@ -572,40 +578,56 @@ local.swgg.apiUpdate({
             _schemaName: "File"
         },
         "operationId.addPet": {
-            _crudType: ["crudSetOneById", "petId", "id"],
+            _crudType: [
+                "crudSetOneById", "petId", "id"
+            ],
             _schemaName: "Pet"
         },
         "operationId.pet.crudGetManyByQuery": {
             _schemaName: "Pet"
         },
         "operationId.deletePet": {
-            _crudType: ["crudRemoveOneById", "petId", "id"],
+            _crudType: [
+                "crudRemoveOneById", "petId", "id"
+            ],
             _schemaName: "Pet"
         },
         "operationId.findPetsByStatus": {
-            _crudType: ["crudGetManyByQuery"],
+            _crudType: [
+                "crudGetManyByQuery"
+            ],
             _queryWhere: "{\"status\":{\"$in\":{{status jsonStringify}}}}",
             _schemaName: "Pet"
         },
         "operationId.findPetsByTags": {
-            _crudType: ["crudGetManyByQuery"],
+            _crudType: [
+                "crudGetManyByQuery"
+            ],
             _queryWhere: "{\"tags.name\":{\"$in\":{{tags jsonStringify}}}}",
             _schemaName: "Pet"
         },
         "operationId.getPetById": {
-            _crudType: ["crudGetOneById", "petId", "id"],
+            _crudType: [
+                "crudGetOneById", "petId", "id"
+            ],
             _schemaName: "Pet"
         },
         "operationId.updatePet": {
-            _crudType: ["crudUpdateOneById", "petId", "id"],
+            _crudType: [
+                "crudUpdateOneById", "petId", "id"
+            ],
             _schemaName: "Pet"
         },
         "operationId.updatePetWithForm": {
-            _crudType: ["crudUpdateOneById", "petId", "id"],
+            _crudType: [
+                "crudUpdateOneById", "petId", "id"
+            ],
             _schemaName: "Pet"
         },
         "operationId.uploadFile": {
-            _crudType: ["fileUploadManyByForm"],
+            _crudType: [
+                "fileUploadManyByForm"
+            ],
             _schemaName: "User"
         },
         "operationId.store.crudGetManyByQuery": {
@@ -615,30 +637,42 @@ local.swgg.apiUpdate({
             _schemaName: "Order"
         },
         "operationId.deleteOrder": {
-            _crudType: ["crudRemoveOneById", "orderId", "id"],
+            _crudType: [
+                "crudRemoveOneById", "orderId", "id"
+            ],
             _schemaName: "Order"
         },
         "operationId.getInventory": {
             _schemaName: "Order"
         },
         "operationId.getOrderById": {
-            _crudType: ["crudGetOneById", "orderId", "id"],
+            _crudType: [
+                "crudGetOneById", "orderId", "id"
+            ],
             _schemaName: "Order"
         },
         "operationId.placeOrder": {
-            _crudType: ["crudSetOneById", "orderId", "id"],
+            _crudType: [
+                "crudSetOneById", "orderId", "id"
+            ],
             _schemaName: "Order"
         },
         "operationId.createUser": {
-            _crudType: ["crudSetOneById", "username", "username"],
+            _crudType: [
+                "crudSetOneById", "username", "username"
+            ],
             _schemaName: "User"
         },
         "operationId.createUsersWithArrayInput": {
-            _crudType: ["crudSetManyById"],
+            _crudType: [
+                "crudSetManyById"
+            ],
             _schemaName: "User"
         },
         "operationId.createUsersWithListInput": {
-            _crudType: ["crudSetManyById"],
+            _crudType: [
+                "crudSetManyById"
+            ],
             _schemaName: "User"
         },
         "operationId.user.crudCountManyByQuery": {
@@ -657,23 +691,33 @@ local.swgg.apiUpdate({
             _schemaName: "User"
         },
         "operationId.deleteUser": {
-            _crudType: ["crudRemoveOneById", "username", "username"],
+            _crudType: [
+                "crudRemoveOneById", "username", "username"
+            ],
             _schemaName: "User"
         },
         "operationId.getUserByName": {
-            _crudType: ["crudGetOneById", "username", "username"],
+            _crudType: [
+                "crudGetOneById", "username", "username"
+            ],
             _schemaName: "User"
         },
         "operationId.loginUser": {
-            _crudType: ["userLoginByPassword"],
+            _crudType: [
+                "userLoginByPassword"
+            ],
             _schemaName: "User"
         },
         "operationId.logoutUser": {
-            _crudType: ["userLogout"],
+            _crudType: [
+                "userLogout"
+            ],
             _schemaName: "User"
         },
         "operationId.updateUser": {
-            _crudType: ["crudUpdateOneById", "username", "username"],
+            _crudType: [
+                "crudUpdateOneById", "username", "username"
+            ],
             _schemaName: "User"
         },
         "operationId.user.userLoginByPassword": {
@@ -687,148 +731,180 @@ local.swgg.apiUpdate({
 /* validateLineSortedReset */
 // init db
 globalThis.utility2_dbSeedList = [{
-    dbRowList: [{
-        id: "testCase_swaggerUiLogoSmall",
-        fileBlob: local.swgg.templateSwaggerUiLogoSmallBase64,
-        fileContentType: "image/png",
-        fileDescription: "swagger-ui logo",
-        fileFilename: "swaggerUiLogoSmall.png"
-    }],
-    idIndexCreateList: [{
-        name: "id"
-    }],
+    dbRowList: [
+        {
+            id: "testCase_swaggerUiLogoSmall",
+            fileBlob: local.swgg.templateSwaggerUiLogoSmallBase64,
+            fileContentType: "image/png",
+            fileDescription: "swagger-ui logo",
+            fileFilename: "swaggerUiLogoSmall.png"
+        }
+    ],
+    idIndexCreateList: [
+        {
+            name: "id"
+        }
+    ],
     name: "File"
 }, {
     dbRowList: local.swgg.dbRowListRandomCreate({
-        dbRowList: [{
-            id: 0,
-            name: "birdie",
-            photoUrls: [],
-            status: "available",
-            tags: [{
-                name: "bird"
-            }]
-        }, {
-            id: 1,
-            name: "doggie",
-            status: "pending",
-            photoUrls: [],
-            tags: [{
-                name: "dog"
-            }]
-        }, {
-            id: 2,
-            name: "fishie",
-            photoUrls: [],
-            status: "sold",
-            tags: [{
-                name: "fish"
-            }]
-        }],
+        dbRowList: [
+            {
+                id: 0,
+                name: "birdie",
+                photoUrls: [],
+                status: "available",
+                tags: [
+                    {
+                        name: "bird"
+                    }
+                ]
+            }, {
+                id: 1,
+                name: "doggie",
+                status: "pending",
+                photoUrls: [],
+                tags: [
+                    {
+                        name: "dog"
+                    }
+                ]
+            }, {
+                id: 2,
+                name: "fishie",
+                photoUrls: [],
+                status: "sold",
+                tags: [
+                    {
+                        name: "fish"
+                    }
+                ]
+            }
+        ],
         // init 100 extra random pets
         length: 100,
-        override: function (option) {
+        override: function (opt) {
             return {
-                id: option.ii + 100,
-                name: local.listGetElementRandom(
-                    ["birdie", "doggie", "fishie"]
-                ) + "-" + (option.ii + 100),
-                tags: [{
-                    name: local.listGetElementRandom(["female", "male"])
-                }]
+                id: opt.ii + 100,
+                name: local.listGetElementRandom([
+                    "birdie", "doggie", "fishie"
+                ]) + "-" + (opt.ii + 100),
+                tags: [
+                    {
+                        name: local.listGetElementRandom([
+                            "female", "male"
+                        ])
+                    }
+                ]
             };
         },
         schema: local.swgg.swaggerJson.definitions.Pet
     }),
-    idIndexCreateList: [{
-        isInteger: true,
-        name: "id"
-    }],
+    idIndexCreateList: [
+        {
+            isInteger: true,
+            name: "id"
+        }
+    ],
     name: "Pet"
 }, {
     dbRowList: local.swgg.dbRowListRandomCreate({
-        dbRowList: [{
-            id: 0,
-            petId: 0,
-            status: "available"
-        }, {
-            id: 1,
-            petId: 1,
-            status: "pending"
-        }, {
-            id: 2,
-            petId: 2,
-            status: "sold"
-        }],
+        dbRowList: [
+            {
+                id: 0,
+                petId: 0,
+                status: "available"
+            }, {
+                id: 1,
+                petId: 1,
+                status: "pending"
+            }, {
+                id: 2,
+                petId: 2,
+                status: "sold"
+            }
+        ],
         // init 100 extra random orders
         length: 100,
-        override: function (option) {
+        override: function (opt) {
             return {
-                id: option.ii + 100,
-                petId: option.ii + 100
+                id: opt.ii + 100,
+                petId: opt.ii + 100
             };
         },
         schema: local.swgg.swaggerJson.definitions.Order
     }),
-    idIndexCreateList: [{
-        isInteger: true,
-        name: "id"
-    }],
+    idIndexCreateList: [
+        {
+            isInteger: true,
+            name: "id"
+        }
+    ],
     name: "Order"
 }, {
     dbRowList: local.swgg.dbRowListRandomCreate({
-        dbRowList: [{
-            email: "admin@admin.com",
-            firstName: "admin",
-            id: 0,
-            lastName: "",
-            password: local.sjclHashScryptCreate("secret"),
-            phone: "1234-5678",
-            username: "admin"
-        }, {
-            email: "jane@doe.com",
-            firstName: "jane",
-            id: 1,
-            lastName: "doe",
-            password: local.sjclHashScryptCreate("secret"),
-            phone: "1234-5678",
-            username: "jane.doe"
-        }, {
-            email: "john@doe.com",
-            firstName: "john",
-            id: 2,
-            lastName: "doe",
-            password: local.sjclHashScryptCreate("secret"),
-            phone: "1234-5678",
-            username: "john.doe"
-        }],
+        dbRowList: [
+            {
+                email: "admin@admin.com",
+                firstName: "admin",
+                id: 0,
+                lastName: "",
+                password: local.sjclHashScryptCreate("secret"),
+                phone: "1234-5678",
+                username: "admin"
+            }, {
+                email: "jane@doe.com",
+                firstName: "jane",
+                id: 1,
+                lastName: "doe",
+                password: local.sjclHashScryptCreate("secret"),
+                phone: "1234-5678",
+                username: "jane.doe"
+            }, {
+                email: "john@doe.com",
+                firstName: "john",
+                id: 2,
+                lastName: "doe",
+                password: local.sjclHashScryptCreate("secret"),
+                phone: "1234-5678",
+                username: "john.doe"
+            }
+        ],
         // init 100 extra random users
         length: 100,
-        override: function (option) {
+        override: function (opt) {
             return {
-                firstName: local.listGetElementRandom(
-                    ["alice", "bob", "jane", "john"]
-                ) + "-" + (option.ii + 100),
-                id: option.ii + 100,
-                lastName: local.listGetElementRandom(["doe", "smith"]) + "-" + (option.ii + 100),
+                firstName: local.listGetElementRandom([
+                    "alice", "bob", "jane", "john"
+                ]) + "-" + (opt.ii + 100),
+                id: opt.ii + 100,
+                lastName: local.listGetElementRandom([
+                    "doe", "smith"
+                ]) + "-" + (opt.ii + 100),
                 password: local.sjclHashScryptCreate("secret"),
-                tags: [{
-                    name: local.listGetElementRandom(["female", "male"])
-                }, {
-                    name: Math.random().toString(36).slice(2)
-                }]
+                tags: [
+                    {
+                        name: local.listGetElementRandom([
+                            "female", "male"
+                        ])
+                    }, {
+                        name: Math.random().toString(36).slice(2)
+                    }
+                ]
             };
         },
         schema: local.swgg.swaggerJson.definitions.User
     }),
-    idIndexCreateList: [{
-        name: "email"
-    }, {
-        name: "id",
-        isInteger: true
-    }, {
-        name: "username"
-    }],
+    idIndexCreateList: [
+        {
+            name: "email"
+        }, {
+            name: "id",
+            isInteger: true
+        }, {
+            name: "username"
+        }
+    ],
     name: "User"
 }];
 // seed db
@@ -857,12 +933,12 @@ if (!local.isBrowser) {
 // log stderr and stdout to #outputStdout1
 ["error", "log"].forEach(function (key) {
     var argList;
-    var element;
+    var elem;
     var fnc;
-    element = document.querySelector(
+    elem = document.querySelector(
         "#outputStdout1"
     );
-    if (!element) {
+    if (!elem) {
         return;
     }
     fnc = console[key];
@@ -870,7 +946,7 @@ if (!local.isBrowser) {
         argList = Array.from(arguments); // jslint ignore:line
         fnc.apply(console, argList);
         // append text to #outputStdout1
-        element.textContent += argList.map(function (arg) {
+        elem.textContent += argList.map(function (arg) {
             return (
                 typeof arg === "string"
                 ? arg
@@ -880,7 +956,7 @@ if (!local.isBrowser) {
             /\u001b\[\d*m/g
         ), "") + "\n";
         // scroll textarea to bottom
-        element.scrollTop = element.scrollHeight;
+        elem.scrollTop = elem.scrollHeight;
     };
 });
 Object.assign(local, globalThis.domOnEventDelegateDict);
@@ -888,16 +964,16 @@ globalThis.domOnEventDelegateDict = local;
 local.onEventDomDb = (
     local.db && local.db.onEventDomDb
 );
-local.testRunBrowser = function (event) {
+local.testRunBrowser = function (evt) {
 /*
  * this function will run browser-tests
  */
     switch (
-        !event.ctrlKey
-        && !event.metaKey
+        !evt.ctrlKey
+        && !evt.metaKey
         && (
-            event.modeInit
-            || (event.type + "." + (event.target && event.target.id))
+            evt.modeInit
+            || (evt.type + "." + (evt.target && evt.target.id))
         )
     ) {
     // custom-case
@@ -912,8 +988,8 @@ local.testRunBrowser = function (event) {
     // run browser-tests
     default:
         if (
-            (event.target && event.target.id) !== "testRunButton1"
-            && !(event.modeInit && (
+            (evt.target && evt.target.id) !== "testRunButton1"
+            && !(evt.modeInit && (
                 /\bmodeTest=1\b/
             ).test(location.search))
         ) {
@@ -1024,14 +1100,14 @@ if (globalThis.utility2_serverHttp1) {
 }
 process.env.PORT = process.env.PORT || "8081";
 console.error("http-server listening on port " + process.env.PORT);
-local.http.createServer(function (request, response) {
-    request.urlParsed = local.url.parse(request.url);
-    if (local.assetsDict[request.urlParsed.pathname] !== undefined) {
-        response.end(local.assetsDict[request.urlParsed.pathname]);
+local.http.createServer(function (req, res) {
+    req.urlParsed = local.url.parse(req.url);
+    if (local.assetsDict[req.urlParsed.pathname] !== undefined) {
+        res.end(local.assetsDict[req.urlParsed.pathname]);
         return;
     }
-    response.statusCode = 404;
-    response.end();
+    res.statusCode = 404;
+    res.end();
 }).listen(process.env.PORT);
 }());
 
@@ -1121,16 +1197,16 @@ local.http.createServer(function (request, response) {
         "url": "https://github.com/kaizhu256/node-swgg.git"
     },
     "scripts": {
-        "build-ci": "./npm_scripts.sh",
+        "build-ci": "sh ./npm_scripts.sh",
         "env": "env",
-        "eval": "./npm_scripts.sh",
-        "heroku-postbuild": "./npm_scripts.sh",
-        "postinstall": "./npm_scripts.sh",
-        "start": "./npm_scripts.sh",
-        "test": "./npm_scripts.sh",
-        "utility2": "./npm_scripts.sh"
+        "eval": "sh ./npm_scripts.sh",
+        "heroku-postbuild": "sh ./npm_scripts.sh",
+        "postinstall": "sh ./npm_scripts.sh",
+        "start": "sh ./npm_scripts.sh",
+        "test": "sh ./npm_scripts.sh",
+        "utility2": "sh ./npm_scripts.sh"
     },
-    "version": "2019.2.20"
+    "version": "2019.8.1"
 }
 ```
 
