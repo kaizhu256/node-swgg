@@ -304,15 +304,15 @@ local.testCase_crudCountManyByQuery_default = function (opt, onError) {
     opt = local.crudOptionsSetDefault(opt, {
         idValue: "testCase_crudCountManyByQuery_default"
     });
-    local.onNext(opt, function (err, data) {
-        switch (opt.modeNext) {
+    local.gotoNext(opt, function (err, data) {
+        switch (opt.gotoState) {
         case 1:
             // ajax - crudCountManyByQuery
             opt.crudCountManyByQuery.ajax({
                 paramDict: {
                     _queryWhere: JSON.stringify(opt.queryById)
                 }
-            }, opt.onNext);
+            }, opt.gotoNext);
             break;
         case 2:
             // validate data
@@ -321,14 +321,14 @@ local.testCase_crudCountManyByQuery_default = function (opt, onError) {
                 data.responseJson.data[0] === 1,
                 data.responseJson
             );
-            opt.onNext();
+            opt.gotoNext();
             break;
         default:
             onError(err, data);
         }
     });
-    opt.modeNext = 0;
-    opt.onNext();
+    opt.gotoState = 0;
+    opt.gotoNext();
 };
 
 local.testCase_crudCreateReplaceUpdateRemoveMany_default = function (
@@ -420,30 +420,30 @@ local.testCase_crudCreateReplaceUpdateRemoveOne_default = function (
     opt = local.crudOptionsSetDefault(opt, {
         data: {}
     });
-    local.onNext(opt, function (err, data) {
-        switch (opt.modeNext) {
+    local.gotoNext(opt, function (err, data) {
+        switch (opt.gotoState) {
         case 1:
             // test crudSetOneById's create handling-behavior
-            local.testCase_crudSetOneById_default(opt, opt.onNext);
+            local.testCase_crudSetOneById_default(opt, opt.gotoNext);
             break;
         case 2:
             // test crudSetOneById's replace handling-behavior
-            local.testCase_crudSetOneById_default(opt, opt.onNext);
+            local.testCase_crudSetOneById_default(opt, opt.gotoNext);
             break;
         case 3:
             // test crudUpdateOneById's default handling-behavior
-            local.testCase_crudUpdateOneById_default(opt, opt.onNext);
+            local.testCase_crudUpdateOneById_default(opt, opt.gotoNext);
             break;
         case 4:
             // test crudRemoveOneById's default handling-behavior
-            local.testCase_crudRemoveOneById_default(opt, opt.onNext);
+            local.testCase_crudRemoveOneById_default(opt, opt.gotoNext);
             break;
         default:
             onError(err, data);
         }
     });
-    opt.modeNext = 0;
-    opt.onNext();
+    opt.gotoState = 0;
+    opt.gotoNext();
 };
 
 local.testCase_crudErrorXxx_default = function (opt, onError) {
@@ -483,15 +483,15 @@ local.testCase_crudGetManyByQuery_default = function (opt, onError) {
     opt = local.crudOptionsSetDefault(opt, {
         idValue: "testCase_crudGetManyByQuery_default"
     });
-    local.onNext(opt, function (err, data) {
-        switch (opt.modeNext) {
+    local.gotoNext(opt, function (err, data) {
+        switch (opt.gotoState) {
         case 1:
             // ajax - crudGetManyByQuery
             opt.crudGetManyByQuery.ajax({
                 paramDict: {
                     _queryWhere: JSON.stringify(opt.queryById)
                 }
-            }, opt.onNext);
+            }, opt.gotoNext);
             break;
         case 2:
             // validate data
@@ -500,14 +500,14 @@ local.testCase_crudGetManyByQuery_default = function (opt, onError) {
                 data.responseJson.data[0][opt.idBackend] === opt.idValue,
                 data.responseJson
             );
-            opt.onNext();
+            opt.gotoNext();
             break;
         default:
             onError(err, data);
         }
     });
-    opt.modeNext = 0;
-    opt.onNext();
+    opt.gotoState = 0;
+    opt.gotoNext();
 };
 
 local.testCase_crudGetOneById_default = function (opt, onError) {
@@ -518,13 +518,13 @@ local.testCase_crudGetOneById_default = function (opt, onError) {
         dataValidate: {},
         idValue: "testCase_crudGetOneById_default"
     });
-    local.onNext(opt, function (err, data) {
-        switch (opt.modeNext) {
+    local.gotoNext(opt, function (err, data) {
+        switch (opt.gotoState) {
         case 1:
             // ajax - crudGetOneById
             opt.crudGetOneById.ajax({
                 paramDict: opt.queryById
-            }, opt.onNext);
+            }, opt.gotoNext);
             break;
         case 2:
             // validate data
@@ -546,14 +546,14 @@ local.testCase_crudGetOneById_default = function (opt, onError) {
             });
             // cleanup dataValidate
             opt.dataValidate = {};
-            opt.onNext(null, data);
+            opt.gotoNext(null, data);
             break;
         default:
             onError(err, data);
         }
     });
-    opt.modeNext = 0;
-    opt.onNext();
+    opt.gotoState = 0;
+    opt.gotoNext();
 };
 
 local.testCase_crudGetOneByQuery_default = function (opt, onError) {
@@ -563,15 +563,15 @@ local.testCase_crudGetOneByQuery_default = function (opt, onError) {
     opt = local.crudOptionsSetDefault(opt, {
         idValue: "testCase_crudGetOneByQuery_default"
     });
-    local.onNext(opt, function (err, data) {
-        switch (opt.modeNext) {
+    local.gotoNext(opt, function (err, data) {
+        switch (opt.gotoState) {
         case 1:
             // ajax - crudGetOneByQuery
             opt.crudGetOneByQuery.ajax({
                 paramDict: {
                     _queryWhere: JSON.stringify(opt.queryById)
                 }
-            }, opt.onNext);
+            }, opt.gotoNext);
             break;
         case 2:
             // validate data
@@ -580,14 +580,14 @@ local.testCase_crudGetOneByQuery_default = function (opt, onError) {
                 data.responseJson.data[0][opt.idBackend] === opt.idValue,
                 data.responseJson
             );
-            opt.onNext();
+            opt.gotoNext();
             break;
         default:
             onError(err, data);
         }
     });
-    opt.modeNext = 0;
-    opt.onNext();
+    opt.gotoState = 0;
+    opt.gotoNext();
 };
 
 local.testCase_crudNullXxx_default = function (opt, onError) {
@@ -619,8 +619,8 @@ local.testCase_crudRemoveManyByQuery_default = function (opt, onError) {
     opt = local.crudOptionsSetDefault(opt, {
         idValue: "testCase_crudRemoveManyByQuery_default"
     });
-    local.onNext(opt, function (err, data) {
-        switch (opt.modeNext) {
+    local.gotoNext(opt, function (err, data) {
+        switch (opt.gotoState) {
         case 1:
             // ajax - crudSetOneById
             opt.crudSetOneById.ajax({
@@ -630,7 +630,7 @@ local.testCase_crudRemoveManyByQuery_default = function (opt, onError) {
                         typeBooleanRequired: true
                     }
                 }
-            }, opt.onNext);
+            }, opt.gotoNext);
             break;
         case 2:
             // ajax - crudRemoveManyByQuery
@@ -638,13 +638,13 @@ local.testCase_crudRemoveManyByQuery_default = function (opt, onError) {
                 paramDict: {
                     _queryWhere: JSON.stringify(opt.queryById)
                 }
-            }, opt.onNext);
+            }, opt.gotoNext);
             break;
         case 3:
             // ajax - crudGetOneById
             opt.crudGetOneById.ajax({
                 paramDict: opt.queryById
-            }, opt.onNext);
+            }, opt.gotoNext);
             break;
         case 4:
             // validate data was removed
@@ -653,14 +653,14 @@ local.testCase_crudRemoveManyByQuery_default = function (opt, onError) {
                 data.responseJson.data[0] === null,
                 data.responseJson
             );
-            opt.onNext();
+            opt.gotoNext();
             break;
         default:
             onError(err, data);
         }
     });
-    opt.modeNext = 0;
-    opt.onNext();
+    opt.gotoState = 0;
+    opt.gotoNext();
 };
 
 local.testCase_crudRemoveOneById_default = function (opt, onError) {
@@ -670,8 +670,8 @@ local.testCase_crudRemoveOneById_default = function (opt, onError) {
     opt = local.crudOptionsSetDefault(opt, {
         idValue: "testCase_crudRemoveOneById_default"
     });
-    local.onNext(opt, function (err, data) {
-        switch (opt.modeNext) {
+    local.gotoNext(opt, function (err, data) {
+        switch (opt.gotoState) {
         case 1:
             if (opt.idValue === "testCase_crudRemoveOneById_default") {
                 // ajax - crudSetOneById
@@ -682,22 +682,22 @@ local.testCase_crudRemoveOneById_default = function (opt, onError) {
                             typeBooleanRequired: true
                         }
                     }
-                }, opt.onNext);
+                }, opt.gotoNext);
                 return;
             }
-            opt.onNext();
+            opt.gotoNext();
             break;
         case 2:
             // ajax - crudRemoveOneById
             opt.crudRemoveOneById.ajax({
                 paramDict: opt.queryById
-            }, opt.onNext);
+            }, opt.gotoNext);
             break;
         case 3:
             // ajax - crudGetOneById
             opt.crudGetOneById.ajax({
                 paramDict: opt.queryById
-            }, opt.onNext);
+            }, opt.gotoNext);
             break;
         case 4:
             // validate data was removed
@@ -706,14 +706,14 @@ local.testCase_crudRemoveOneById_default = function (opt, onError) {
                 data.responseJson.data[0] === null,
                 data.responseJson
             );
-            opt.onNext();
+            opt.gotoNext();
             break;
         default:
             onError(err, data);
         }
     });
-    opt.modeNext = 0;
-    opt.onNext();
+    opt.gotoState = 0;
+    opt.gotoNext();
 };
 
 local.testCase_crudSetManyById_default = function (opt, onError) {
@@ -732,18 +732,18 @@ local.testCase_crudSetManyById_default = function (opt, onError) {
             }
         ]
     });
-    local.onNext(opt, function (err, data) {
-        switch (opt.modeNext) {
+    local.gotoNext(opt, function (err, data) {
+        switch (opt.gotoState) {
         case 1:
             // ajax - crudSetManyById
             opt.crudSetManyById.ajax({
                 paramDict: {
                     body: opt.data
                 }
-            }, opt.onNext);
+            }, opt.gotoNext);
             break;
         case 2:
-            onParallel = local.onParallel(opt.onNext);
+            onParallel = local.onParallel(opt.gotoNext);
             onParallel.counter += 1;
             opt.data.forEach(function (elem) {
                 onParallel.counter += 1;
@@ -758,8 +758,8 @@ local.testCase_crudSetManyById_default = function (opt, onError) {
             onError(err, data);
         }
     });
-    opt.modeNext = 0;
-    opt.onNext();
+    opt.gotoState = 0;
+    opt.gotoNext();
 };
 
 local.testCase_crudSetOneById_default = function (opt, onError) {
@@ -778,8 +778,8 @@ local.testCase_crudSetOneById_default = function (opt, onError) {
             typeBooleanRequired: true
         }
     });
-    local.onNext(opt, function (err, data) {
-        switch (opt.modeNext) {
+    local.gotoNext(opt, function (err, data) {
+        switch (opt.gotoState) {
         case 1:
             // init paramDict
             paramDict = {};
@@ -790,7 +790,7 @@ local.testCase_crudSetOneById_default = function (opt, onError) {
             // ajax - crudSetOneById
             opt.crudSetOneById.ajax({
                 paramDict
-            }, opt.onNext);
+            }, opt.gotoNext);
             break;
         case 2:
             // init id
@@ -819,14 +819,14 @@ local.testCase_crudSetOneById_default = function (opt, onError) {
             );
             // test crudGetOneById's default handling-behavior
             opt.dataValidate = opt.dataValidateReplace;
-            local.testCase_crudGetOneById_default(opt, opt.onNext);
+            local.testCase_crudGetOneById_default(opt, opt.gotoNext);
             break;
         default:
             onError(err, data);
         }
     });
-    opt.modeNext = 0;
-    opt.onNext();
+    opt.gotoState = 0;
+    opt.gotoNext();
 };
 
 local.testCase_crudUpdateOneById_default = function (opt, onError) {
@@ -845,8 +845,8 @@ local.testCase_crudUpdateOneById_default = function (opt, onError) {
             typeBooleanRequired: false
         }
     });
-    local.onNext(opt, function (err, data) {
-        switch (opt.modeNext) {
+    local.gotoNext(opt, function (err, data) {
+        switch (opt.gotoState) {
         case 1:
             // test crudGetOneById's default handling-behavior
             opt.dataValidate = opt.dataValidateUpdate1;
@@ -859,13 +859,13 @@ local.testCase_crudUpdateOneById_default = function (opt, onError) {
                             typeBooleanRequired: true
                         }
                     }
-                }, opt.onNext);
+                }, opt.gotoNext);
                 return;
             }
-            opt.onNext();
+            opt.gotoNext();
             break;
         case 2:
-            local.testCase_crudGetOneById_default(opt, opt.onNext);
+            local.testCase_crudGetOneById_default(opt, opt.gotoNext);
             break;
         case 3:
             opt._timeCreated = data.responseJson.data[0]._timeCreated;
@@ -881,7 +881,7 @@ local.testCase_crudUpdateOneById_default = function (opt, onError) {
             // ajax - crudUpdateOneById
             opt.crudUpdateOneById.ajax({
                 paramDict
-            }, opt.onNext);
+            }, opt.gotoNext);
             break;
         case 4:
             // validate time _timeCreated
@@ -909,14 +909,14 @@ local.testCase_crudUpdateOneById_default = function (opt, onError) {
                 local.jsonCopy(opt.dataValidateUpdate1),
                 opt.dataValidateUpdate2
             );
-            local.testCase_crudGetOneById_default(opt, opt.onNext);
+            local.testCase_crudGetOneById_default(opt, opt.gotoNext);
             break;
         default:
             onError(err, data);
         }
     });
-    opt.modeNext = 0;
-    opt.onNext();
+    opt.gotoState = 0;
+    opt.gotoNext();
 };
 
 local.testCase_domAnimateShake_default = function (opt, onError) {
@@ -937,12 +937,12 @@ local.testCase_fileGetOneById_default = function (opt, onError) {
 /*
  * this function will test fileGetOneById's default handling-behavior
  */
-    var modeNext;
-    var onNext;
-    modeNext = 0;
-    onNext = function (err, data) {
-        modeNext += 1;
-        switch (modeNext) {
+    var gotoNext;
+    var gotoState;
+    gotoState = 0;
+    gotoNext = function (err, data) {
+        gotoState += 1;
+        switch (gotoState) {
         case 1:
             opt = local.crudOptionsSetDefault(opt, {
                 idValue: "testCase_fileGetOneById_default"
@@ -950,7 +950,7 @@ local.testCase_fileGetOneById_default = function (opt, onError) {
             // ajax - fileGetOneById
             local.apiDict["operationId.file.fileGetOneById.id.id"].ajax({
                 paramDict: opt.queryById
-            }, onNext);
+            }, gotoNext);
             break;
         case 2:
             // validate no err occurred
@@ -969,20 +969,20 @@ local.testCase_fileGetOneById_default = function (opt, onError) {
                 paramDict: {
                     id: "testCase_fileGetOneById_default_undefined"
                 }
-            }, onNext);
+            }, gotoNext);
             break;
         case 3:
             // validate err occurred
             local.assertThrow(err, err);
             // validate statusCode
             local.assertJsonEqual(data.statusCode, 404);
-            onNext();
+            gotoNext();
             break;
         default:
             onError(err, data);
         }
     };
-    onNext();
+    gotoNext();
 };
 
 local.testCase_fileUploadManyByForm_default = function (opt, onError) {
@@ -990,8 +990,8 @@ local.testCase_fileUploadManyByForm_default = function (opt, onError) {
  * this function will test fileUploadManyByForm's default handling-behavior
  */
     opt = {};
-    local.onNext(opt, function (err, data) {
-        switch (opt.modeNext) {
+    local.gotoNext(opt, function (err, data) {
+        switch (opt.gotoState) {
         case 1:
             opt.blob = new local.Blob([
                 local.base64ToBuffer(local.templateSwaggerUiLogoSmallBase64)
@@ -1007,7 +1007,7 @@ local.testCase_fileUploadManyByForm_default = function (opt, onError) {
                     file2: opt.blob,
                     file3: opt.blob
                 }
-            }, opt.onNext);
+            }, opt.gotoNext);
             break;
         case 2:
             // validate data
@@ -1020,18 +1020,18 @@ local.testCase_fileUploadManyByForm_default = function (opt, onError) {
                 idValue: data.responseJson.data[0].id
             });
             // test fileGetOneById's default handling-behavior
-            local.testCase_fileGetOneById_default(opt, opt.onNext);
+            local.testCase_fileGetOneById_default(opt, opt.gotoNext);
             break;
         case 3:
             // test crudRemoveOneById's default handling-behavior
-            local.testCase_crudRemoveOneById_default(opt, opt.onNext);
+            local.testCase_crudRemoveOneById_default(opt, opt.gotoNext);
             break;
         default:
             onError(err);
         }
     });
-    opt.modeNext = 0;
-    opt.onNext();
+    opt.gotoState = 0;
+    opt.gotoNext();
 };
 
 local.testCase_fileUploadManyByForm_nullCase = function (opt, onError) {
@@ -1039,26 +1039,26 @@ local.testCase_fileUploadManyByForm_nullCase = function (opt, onError) {
  * this function will test fileUploadManyByForm's null-case handling-behavior
  */
     opt = {};
-    local.onNext(opt, function (err, data) {
-        switch (opt.modeNext) {
+    local.gotoNext(opt, function (err, data) {
+        switch (opt.gotoState) {
         case 1:
             // ajax - fileUploadManyByForm
             local.apiDict["operationId.file.fileUploadManyByForm.2"].ajax(
                 opt,
-                opt.onNext
+                opt.gotoNext
             );
             break;
         case 2:
             // validate data
             local.assertJsonEqual(data.responseJson.data.length, 0);
-            opt.onNext();
+            opt.gotoNext();
             break;
         default:
             onError(err);
         }
     });
-    opt.modeNext = 0;
-    opt.onNext();
+    opt.gotoState = 0;
+    opt.gotoNext();
 };
 
 local.testCase_onErrorJsonapi_default = function (opt, onError) {
@@ -1189,23 +1189,23 @@ local.testCase_petstoreStoreGetInventory_default = function (opt, onError) {
  * this function will test petstoreStoreGetInventory's default handling-behavior
  */
     opt = {};
-    local.onNext(opt, function (err, data) {
-        switch (opt.modeNext) {
+    local.gotoNext(opt, function (err, data) {
+        switch (opt.gotoState) {
         case 1:
-            local.apiDict["operationId.getInventory"].ajax(opt, opt.onNext);
+            local.apiDict["operationId.getInventory"].ajax(opt, opt.gotoNext);
             break;
         case 2:
             // validate data
             local.assertJsonEqual(data.responseJson.data.length, 1);
             local.assertThrow(data.responseJson.data[0]);
-            opt.onNext();
+            opt.gotoNext();
             break;
         default:
             onError(err);
         }
     });
-    opt.modeNext = 0;
-    opt.onNext();
+    opt.gotoState = 0;
+    opt.gotoNext();
 };
 
 local.testCase_swaggerJsonFromCurl_default = function (opt, onError) {
@@ -2692,17 +2692,17 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
 /*
  * this function will test userLoginXxx's default handling-behavior
  */
-    var modeNext;
-    var onNext;
-    modeNext = 0;
-    onNext = function (err, data) {
-        modeNext += 1;
-        switch (modeNext) {
+    var gotoNext;
+    var gotoState;
+    gotoState = 0;
+    gotoNext = function (err, data) {
+        gotoState += 1;
+        switch (gotoState) {
         case 1:
             // cleanup userJwtEncrypted
             delete local.userJwtEncrypted;
             // test userLogout's default handling-behavior
-            local.userLogout({}, onNext);
+            local.userLogout({}, gotoNext);
             break;
         case 2:
             // validate err occurred
@@ -2711,7 +2711,7 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
             local.userLoginByPassword({
                 password: "undefined",
                 username: "undefined"
-            }, onNext);
+            }, gotoNext);
             break;
         case 3:
             // validate err occurred
@@ -2721,7 +2721,7 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
             // validate userJwtEncrypted does not exist
             local.assertThrow(!local.userJwtEncrypted, local.userJwtEncrypted);
             // test userLogout's 401 handling-behavior
-            local.userLogout({}, onNext);
+            local.userLogout({}, gotoNext);
             break;
         case 4:
             // validate err occurred
@@ -2734,7 +2734,7 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
             local.userLoginByPassword({
                 password: "secret",
                 username: "admin"
-            }, onNext);
+            }, gotoNext);
             break;
         case 5:
             // validate no err occurred
@@ -2744,7 +2744,7 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
             // validate userJwtEncrypted exists
             local.assertThrow(local.userJwtEncrypted, local.userJwtEncrypted);
             // test persistent-session handling-behavior
-            local.apiDict["operationId.x-test.crudNullGet"].ajax({}, onNext);
+            local.apiDict["operationId.x-test.crudNullGet"].ajax({}, gotoNext);
             break;
         case 6:
             // validate no err occurred
@@ -2759,7 +2759,7 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
                 jwtEncrypted: local.jwtAes256GcmEncrypt({
                     sub: "admin"
                 })
-            }, onNext);
+            }, gotoNext);
             break;
         case 7:
             // validate no err occurred
@@ -2769,7 +2769,7 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
             // validate userJwtEncrypted exists
             local.assertThrow(local.userJwtEncrypted, local.userJwtEncrypted);
             // test userLogout's 401 handling-behavior
-            local.userLogout({}, onNext);
+            local.userLogout({}, gotoNext);
             break;
         case 8:
             // validate err occurred
@@ -2779,7 +2779,7 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
             // test userLoginByPassword's 400 handling-behavior
             local.ajax({
                 url: "/api/v0/user/userLoginByPassword?password=1"
-            }, onNext);
+            }, gotoNext);
             break;
         case 9:
             // validate err occurred
@@ -2791,7 +2791,7 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
                 jwtEncrypted: local.jwtAes256GcmEncrypt({
                     sub: "undefined"
                 })
-            }, onNext);
+            }, gotoNext);
             break;
         case 10:
             // validate err occurred
@@ -2802,7 +2802,7 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
             break;
         }
     };
-    onNext();
+    gotoNext();
 };
 }());
 
@@ -5385,7 +5385,4 @@ local.db.dbSeed(globalThis.utility2_dbSeedList, local.onErrorThrow);
 // local.testCase_swaggerValidateDataParameters_err(null, local.onErrorDefault);
 // }, local.onErrorDefault);
 }());
-
-
-
 }());

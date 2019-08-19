@@ -73,10 +73,9 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 #### changelog 2019.8.1
 - npm publish 2019.8.1
-- shorten name event to evt
-- jslint - refactor files to 80 chr column-limit
-- rename function local.domElementRender to local.domFragmentRender
-- shorten name element to elem, option to opt, error to err, request to req, response to res
+- jslint - upgrade to jslint edition 2019.8.3
+- rename coverage-hack to hack-istanbul, gotoNext to gotoNext, gotoState to gotoState, jslint-hack to hack-jslint
+- istanbul - switch parser from esprima to acorn v6.3.0
 - none
 
 #### this package requires
@@ -317,14 +316,14 @@ local.middlewareCrudCustom = function (req, response, nextMiddleware) {
     var opt;
     var result;
     opt = {};
-    local.onNext(opt, function (err, data) {
-        switch (opt.modeNext) {
+    local.gotoNext(opt, function (err, data) {
+        switch (opt.gotoState) {
         case 1:
             crud = req.swgg.crud;
             switch (crud.crudType[0]) {
-            // coverage-hack - test err handling-behavior
+            // hack-istanbul - test err handling-behavior
             case "crudErrorPre":
-                opt.onNext(local.errDefault);
+                opt.gotoNext(local.errDefault);
                 return;
             case "getInventory":
                 crud.dbTable.crudGetManyByQuery({
@@ -332,11 +331,11 @@ local.middlewareCrudCustom = function (req, response, nextMiddleware) {
                     projection: [
                         "status"
                     ]
-                }, opt.onNext);
+                }, opt.gotoNext);
                 break;
             default:
-                opt.modeNext = Infinity;
-                opt.onNext();
+                opt.gotoState = Infinity;
+                opt.gotoNext();
             }
             break;
         case 2:
@@ -347,7 +346,7 @@ local.middlewareCrudCustom = function (req, response, nextMiddleware) {
                     result[element.status] = result[element.status] || 0;
                     result[element.status] += 1;
                 });
-                opt.onNext(null, result);
+                opt.gotoNext(null, result);
                 break;
             }
             break;
@@ -358,8 +357,8 @@ local.middlewareCrudCustom = function (req, response, nextMiddleware) {
             nextMiddleware(err, data);
         }
     });
-    opt.modeNext = 0;
-    opt.onNext();
+    opt.gotoState = 0;
+    opt.gotoNext();
 };
 
 local.middlewareInitCustom = function (req, response, nextMiddleware) {
@@ -1110,9 +1109,6 @@ local.http.createServer(function (req, res) {
     res.end();
 }).listen(process.env.PORT);
 }());
-
-
-
 }());
 ```
 
@@ -1197,14 +1193,14 @@ local.http.createServer(function (req, res) {
         "url": "https://github.com/kaizhu256/node-swgg.git"
     },
     "scripts": {
-        "build-ci": "sh ./npm_scripts.sh",
+        "build-ci": "./npm_scripts.sh",
         "env": "env",
-        "eval": "sh ./npm_scripts.sh",
-        "heroku-postbuild": "sh ./npm_scripts.sh",
-        "postinstall": "sh ./npm_scripts.sh",
-        "start": "sh ./npm_scripts.sh",
-        "test": "sh ./npm_scripts.sh",
-        "utility2": "sh ./npm_scripts.sh"
+        "eval": "./npm_scripts.sh",
+        "heroku-postbuild": "./npm_scripts.sh",
+        "postinstall": "./npm_scripts.sh",
+        "start": "./npm_scripts.sh",
+        "test": "./npm_scripts.sh",
+        "utility2": "./npm_scripts.sh"
     },
     "version": "2019.8.1"
 }
