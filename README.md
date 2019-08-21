@@ -73,6 +73,7 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 #### changelog 2019.8.1
 - npm publish 2019.8.1
+- jslint - remove allow-method-chain-newline hack
 - jslint - upgrade to jslint edition 2019.8.3
 - rename coverage-hack to hack-istanbul, gotoNext to gotoNext, gotoState to gotoState, jslint-hack to hack-jslint
 - istanbul - switch parser from esprima to acorn v6.3.0
@@ -1059,8 +1060,9 @@ local.assetsDict["/assets.swgg.js"] =
 ).replace((/^#!\//), "// ");
 /* jslint ignore:end */
 /* validateLineSortedReset */
-local.assetsDict["/"] = local.assetsDict["/assets.index.template.html"]
-.replace((
+local.assetsDict["/"] = local.assetsDict[
+    "/assets.index.template.html"
+].replace((
     /\{\{env\.(\w+?)\}\}/g
 ), function (match0, match1) {
     switch (match1) {

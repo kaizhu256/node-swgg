@@ -3613,17 +3613,14 @@ Object.keys(
         key,
         local.assetsDict["/assets.swgg.swagger.test.json"].parameters[key].name
     );
-    local.assetsDict["/assets.swgg.swagger.test.json"]
-    .paths["/x-test/parametersDefault/{typeStringInPath}"]
-    .post
-    .parameters
-    .push({
+    local.assetsDict["/assets.swgg.swagger.test.json"].paths[
+        "/x-test/parametersDefault/{typeStringInPath}"
+    ].post.parameters.push({
         $ref: "#/parameters/" + key
     });
-    local.assetsDict["/assets.swgg.swagger.test.json"]
-    .definitions
-    .TestCrud
-    .properties[key] = {
+    local.assetsDict[
+        "/assets.swgg.swagger.test.json"
+    ].definitions.TestCrud.properties[key] = {
         $ref: "#/parameters/" + key
     };
 });
