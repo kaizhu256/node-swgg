@@ -49,13 +49,13 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 
 # documentation
-#### cli help
-![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.npmPackageCliHelp.svg)
-
 #### api doc
 - [https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
 
 [![apidoc](https://kaizhu256.github.io/node-swgg/build/screenshot.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://kaizhu256.github.io/node-swgg/build..beta..travis-ci.org/apidoc.html)
+
+#### cli help
+![screenshot](https://kaizhu256.github.io/node-swgg/build/screenshot.npmPackageCliHelp.svg)
 
 #### todo
 - add input-type=date and input-type=time
@@ -73,6 +73,12 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 
 #### changelog 2019.8.1
 - npm publish 2019.8.1
+- jslint - remove unexpected_a hacks
+- jslint - migrate from let-declaration to var-declaration
+- inline lib.puppeteer.js into assets.app.js
+- remove electron dependency
+- revamp function local.ajaxProgressUpdate with window.domElementAjaxProgress1
+- jslint - remove ternary-operator/newline comment preceding bra
 - jslint - remove allow-method-chain-newline hack
 - jslint - upgrade to jslint edition 2019.8.3
 - rename coverage-hack to hack-istanbul, gotoNext to gotoNext, gotoState to gotoState, jslint-hack to hack-jslint
@@ -128,7 +134,8 @@ this script will run a web-demo of swgg
 instruction
     1. save this script as example.js
     2. run shell-command:
-        $ npm install swgg && PORT=8081 node example.js
+        $ npm install swgg && \
+            PORT=8081 node example.js
     3. open a browser to http://127.0.0.1:8081 and play with web-demo
     4. edit this script to suit your needs
 */
@@ -140,27 +147,20 @@ instruction
 /* jslint utility2:true */
 (function (globalThis) {
     "use strict";
-    var consoleError;
-    var local;
+    let consoleError;
+    let local;
     // init globalThis
-    (function () {
-        try {
-            globalThis = Function("return this")(); // jslint ignore:line
-        } catch (ignore) {}
-    }());
-    globalThis.globalThis = globalThis;
+    globalThis.globalThis = globalThis.globalThis || globalThis;
     // init debug_inline
     if (!globalThis["debug\u0049nline"]) {
         consoleError = console.error;
-        globalThis["debug\u0049nline"] = function () {
+        globalThis["debug\u0049nline"] = function (...argList) {
         /*
-         * this function will both print <arguments> to stderr
-         * and return <arguments>[0]
+         * this function will both print <argList> to stderr
+         * and return <argList>[0]
          */
-            var argList;
-            argList = Array.from(arguments); // jslint ignore:line
-            // debug arguments
-            globalThis["debug\u0049nlineArguments"] = argList;
+            // debug argList
+            globalThis["debug\u0049nlineArgList"] = argList;
             consoleError("\n\ndebug\u0049nline");
             consoleError.apply(console, argList);
             consoleError("\n");
@@ -174,23 +174,20 @@ instruction
     globalThis.globalLocal = local;
     // init isBrowser
     local.isBrowser = (
-        typeof window === "object"
-        && window === globalThis
-        && typeof window.XMLHttpRequest === "function"
-        && window.document
-        && typeof window.document.querySelector === "function"
+        typeof globalThis.XMLHttpRequest === "function"
+        && globalThis.navigator
+        && typeof globalThis.navigator.userAgent === "string"
     );
     // init function
-    local.assertThrow = function (passed, message) {
+    local.assertOrThrow = function (passed, message) {
     /*
      * this function will throw err.<message> if <passed> is falsy
      */
-        var err;
+        let err;
         if (passed) {
             return;
         }
         err = (
-            // ternary-operator
             (
                 message
                 && typeof message.message === "string"
@@ -208,19 +205,61 @@ instruction
         );
         throw err;
     };
+    local.fsRmrfSync = function (dir) {
+    /*
+     * this function will sync "rm -rf" <dir>
+     */
+        let child_process;
+        try {
+            child_process = require("child_process");
+        } catch (ignore) {
+            return;
+        }
+        child_process.spawnSync("rm", [
+            "-rf", dir
+        ], {
+            stdio: [
+                "ignore", 1, 2
+            ]
+        });
+    };
+    local.fsWriteFileWithMkdirpSync = function (file, data) {
+    /*
+     * this function will sync write <data> to <file> with "mkdir -p"
+     */
+        let fs;
+        try {
+            fs = require("fs");
+        } catch (ignore) {
+            return;
+        }
+        // try to write file
+        try {
+            fs.writeFileSync(file, data);
+        } catch (ignore) {
+            // mkdir -p
+            require("child_process").spawnSync(
+                "mkdir",
+                [
+                    "-p", require("path").dirname(file)
+                ],
+                {
+                    stdio: [
+                        "ignore", 1, 2
+                    ]
+                }
+            );
+            // rewrite file
+            fs.writeFileSync(file, data);
+        }
+    };
     local.functionOrNop = function (fnc) {
     /*
      * this function will if <fnc> exists,
-     * them return <fnc>,
+     * return <fnc>,
      * else return <nop>
      */
         return fnc || local.nop;
-    };
-    local.identity = function (value) {
-    /*
-     * this function will return <value>
-     */
-        return value;
     };
     local.nop = function () {
     /*
@@ -245,6 +284,30 @@ instruction
             }
         });
         return target;
+    };
+    local.value = function (val) {
+    /*
+     * this function will return <val>
+     */
+        return val;
+    };
+    local.valueOrEmptyList = function (val) {
+    /*
+     * this function will return <val> or []
+     */
+        return val || [];
+    };
+    local.valueOrEmptyObject = function (val) {
+    /*
+     * this function will return <val> or {}
+     */
+        return val || {};
+    };
+    local.valueOrEmptyString = function (val) {
+    /*
+     * this function will return <val> or ""
+     */
+        return val || "";
     };
     // require builtin
     if (!local.isBrowser) {
@@ -276,7 +339,9 @@ instruction
         local.vm = require("vm");
         local.zlib = require("zlib");
     }
-}(this));
+}((typeof globalThis === "object" && globalThis) || (function () {
+    return Function("return this")(); // jslint ignore:line
+}())));
 
 
 
@@ -311,11 +376,11 @@ local.db.dbLoad(function () {
 (function () {
 local.middlewareCrudCustom = function (req, response, nextMiddleware) {
 /*
- * this function will run the middleware that will run custom-crud-operations
+ * this function will run the middleware to run custom-crud-operations
  */
-    var crud;
-    var opt;
-    var result;
+    let crud;
+    let opt;
+    let result;
     opt = {};
     local.gotoNext(opt, function (err, data) {
         switch (opt.gotoState) {
@@ -364,7 +429,7 @@ local.middlewareCrudCustom = function (req, response, nextMiddleware) {
 
 local.middlewareInitCustom = function (req, response, nextMiddleware) {
 /*
- * this function will run the middleware that will custom-init <req> and <res>
+ * this function will run the middleware to custom-init <req> and <res>
  */
     // enable cors
     // https://en.wikipedia.org/wiki/Cross-origin_resource_sharing
@@ -401,8 +466,8 @@ local.assetsDict['/assets.index.template.html'] = local.assetsDict['/assets.swgg
 </h1>\n\
 <h3>{{env.npm_package_description}}</h3>\n\
 <a class="button" download href="assets.app.js">download standalone app</a><br>\n\
-<button class="button" data-onevent="testRunBrowser" data-onevent-reset-output="1" id="testRunButton1">run internal test</button><br>\n\
-<div class="uiAnimateSlide" id="testReportDiv1" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>\n\
+<button class="button" data-onevent="testRunBrowser" data-onevent-reset-output="1" id="buttonTestRun1">run internal test</button><br>\n\
+<div class="uiAnimateSlide" id="htmlTestReport1" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>\n\
 \n\
 \n\
 \n\
@@ -932,9 +997,8 @@ if (!local.isBrowser) {
 }
 // log stderr and stdout to #outputStdout1
 ["error", "log"].forEach(function (key) {
-    var argList;
-    var elem;
-    var fnc;
+    let elem;
+    let fnc;
     elem = document.querySelector(
         "#outputStdout1"
     );
@@ -942,8 +1006,7 @@ if (!local.isBrowser) {
         return;
     }
     fnc = console[key];
-    console[key] = function () {
-        argList = Array.from(arguments); // jslint ignore:line
+    console[key] = function (...argList) {
         fnc.apply(console, argList);
         // append text to #outputStdout1
         elem.textContent += argList.map(function (arg) {
@@ -959,11 +1022,9 @@ if (!local.isBrowser) {
         elem.scrollTop = elem.scrollHeight;
     };
 });
-Object.assign(local, globalThis.domOnEventDelegateDict);
+local.objectAssignDefault(local, globalThis.domOnEventDelegateDict);
 globalThis.domOnEventDelegateDict = local;
-local.onEventDomDb = (
-    local.db && local.db.onEventDomDb
-);
+local.onEventDomDb = local.db && local.db.onEventDomDb;
 local.testRunBrowser = function (evt) {
 /*
  * this function will run browser-tests
@@ -988,7 +1049,7 @@ local.testRunBrowser = function (evt) {
     // run browser-tests
     default:
         if (
-            (evt.target && evt.target.id) !== "testRunButton1"
+            (evt.target && evt.target.id) !== "buttonTestRun1"
             && !(evt.modeInit && (
                 /\bmodeTest=1\b/
             ).test(location.search))
@@ -997,14 +1058,14 @@ local.testRunBrowser = function (evt) {
         }
         // show browser-tests
         if (document.querySelector(
-            "#testReportDiv1"
+            "#htmlTestReport1"
         ).style.maxHeight === "0px") {
             globalThis.domOnEventDelegateDict.domOnEventResetOutput();
             local.uiAnimateSlideDown(document.querySelector(
-                "#testReportDiv1"
+                "#htmlTestReport1"
             ));
             document.querySelector(
-                "#testRunButton1"
+                "#buttonTestRun1"
             ).textContent = "hide internal test";
             local.modeTest = 1;
             local.testRunDefault(local);
@@ -1012,10 +1073,10 @@ local.testRunBrowser = function (evt) {
         }
         // hide browser-tests
         local.uiAnimateSlideUp(document.querySelector(
-            "#testReportDiv1"
+            "#htmlTestReport1"
         ));
         document.querySelector(
-            "#testRunButton1"
+            "#buttonTestRun1"
         ).textContent = "run internal test";
     }
 };
@@ -1167,7 +1228,6 @@ local.http.createServer(function (req, res) {
     "author": "kai zhu <kaizhu256@gmail.com>",
     "description": "this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend), with a working web-demo",
     "devDependencies": {
-        "electron-lite": "kaizhu256/node-electron-lite#alpha",
         "utility2": "kaizhu256/node-utility2#alpha"
     },
     "engines": {

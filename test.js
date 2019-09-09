@@ -3,27 +3,20 @@
 /* jslint utility2:true */
 (function (globalThis) {
     "use strict";
-    var consoleError;
-    var local;
+    let consoleError;
+    let local;
     // init globalThis
-    (function () {
-        try {
-            globalThis = Function("return this")(); // jslint ignore:line
-        } catch (ignore) {}
-    }());
-    globalThis.globalThis = globalThis;
+    globalThis.globalThis = globalThis.globalThis || globalThis;
     // init debug_inline
     if (!globalThis["debug\u0049nline"]) {
         consoleError = console.error;
-        globalThis["debug\u0049nline"] = function () {
+        globalThis["debug\u0049nline"] = function (...argList) {
         /*
-         * this function will both print <arguments> to stderr
-         * and return <arguments>[0]
+         * this function will both print <argList> to stderr
+         * and return <argList>[0]
          */
-            var argList;
-            argList = Array.from(arguments); // jslint ignore:line
-            // debug arguments
-            globalThis["debug\u0049nlineArguments"] = argList;
+            // debug argList
+            globalThis["debug\u0049nlineArgList"] = argList;
             consoleError("\n\ndebug\u0049nline");
             consoleError.apply(console, argList);
             consoleError("\n");
@@ -37,23 +30,20 @@
     globalThis.globalLocal = local;
     // init isBrowser
     local.isBrowser = (
-        typeof window === "object"
-        && window === globalThis
-        && typeof window.XMLHttpRequest === "function"
-        && window.document
-        && typeof window.document.querySelector === "function"
+        typeof globalThis.XMLHttpRequest === "function"
+        && globalThis.navigator
+        && typeof globalThis.navigator.userAgent === "string"
     );
     // init function
-    local.assertThrow = function (passed, message) {
+    local.assertOrThrow = function (passed, message) {
     /*
      * this function will throw err.<message> if <passed> is falsy
      */
-        var err;
+        let err;
         if (passed) {
             return;
         }
         err = (
-            // ternary-operator
             (
                 message
                 && typeof message.message === "string"
@@ -71,19 +61,61 @@
         );
         throw err;
     };
+    local.fsRmrfSync = function (dir) {
+    /*
+     * this function will sync "rm -rf" <dir>
+     */
+        let child_process;
+        try {
+            child_process = require("child_process");
+        } catch (ignore) {
+            return;
+        }
+        child_process.spawnSync("rm", [
+            "-rf", dir
+        ], {
+            stdio: [
+                "ignore", 1, 2
+            ]
+        });
+    };
+    local.fsWriteFileWithMkdirpSync = function (file, data) {
+    /*
+     * this function will sync write <data> to <file> with "mkdir -p"
+     */
+        let fs;
+        try {
+            fs = require("fs");
+        } catch (ignore) {
+            return;
+        }
+        // try to write file
+        try {
+            fs.writeFileSync(file, data);
+        } catch (ignore) {
+            // mkdir -p
+            require("child_process").spawnSync(
+                "mkdir",
+                [
+                    "-p", require("path").dirname(file)
+                ],
+                {
+                    stdio: [
+                        "ignore", 1, 2
+                    ]
+                }
+            );
+            // rewrite file
+            fs.writeFileSync(file, data);
+        }
+    };
     local.functionOrNop = function (fnc) {
     /*
      * this function will if <fnc> exists,
-     * them return <fnc>,
+     * return <fnc>,
      * else return <nop>
      */
         return fnc || local.nop;
-    };
-    local.identity = function (value) {
-    /*
-     * this function will return <value>
-     */
-        return value;
     };
     local.nop = function () {
     /*
@@ -108,6 +140,30 @@
             }
         });
         return target;
+    };
+    local.value = function (val) {
+    /*
+     * this function will return <val>
+     */
+        return val;
+    };
+    local.valueOrEmptyList = function (val) {
+    /*
+     * this function will return <val> or []
+     */
+        return val || [];
+    };
+    local.valueOrEmptyObject = function (val) {
+    /*
+     * this function will return <val> or {}
+     */
+        return val || {};
+    };
+    local.valueOrEmptyString = function (val) {
+    /*
+     * this function will return <val> or ""
+     */
+        return val || "";
     };
     // require builtin
     if (!local.isBrowser) {
@@ -139,7 +195,9 @@
         local.vm = require("vm");
         local.zlib = require("zlib");
     }
-}(this));
+}((typeof globalThis === "object" && globalThis) || (function () {
+    return Function("return this")(); // jslint ignore:line
+}())));
 
 
 
@@ -151,7 +209,7 @@
 // run shared js-env code - init-before
 (function () {
 // init local
-local = (
+local = globalThis.globalLocal.value(
     globalThis.utility2 || require("./assets.utility2.rollup.js")
 ).requireReadme();
 globalThis.local = local;
@@ -227,7 +285,7 @@ local.testCase_ajax_err = function (opt, onError) {
 /*
  * this function will test ajax's err handling-behavior
  */
-    var onParallel;
+    let onParallel;
     onParallel = local.onParallel(onError);
     onParallel.counter += 1;
     [
@@ -256,7 +314,7 @@ local.testCase_ajax_err = function (opt, onError) {
         onParallel.counter += 1;
         local.ajax(opt, function (err, xhr) {
             // validate err occurred
-            local.assertThrow(err, opt);
+            local.assertOrThrow(err, opt);
             // validate statusCode
             local.assertJsonEqual(err.statusCode, opt.statusCode);
             // validate err is in jsonapi-format
@@ -265,7 +323,7 @@ local.testCase_ajax_err = function (opt, onError) {
                 + "?typeStringFormatJson=syntax%20error"
             ) {
                 err = JSON.parse(xhr.responseText);
-                local.assertThrow(err.errors[0], err);
+                local.assertOrThrow(err.errors[0], err);
             }
             onParallel();
         });
@@ -317,7 +375,7 @@ local.testCase_crudCountManyByQuery_default = function (opt, onError) {
         case 2:
             // validate data
             local.assertJsonEqual(data.responseJson.data.length, 1);
-            local.assertThrow(
+            local.assertOrThrow(
                 data.responseJson.data[0] === 1,
                 data.responseJson
             );
@@ -339,7 +397,7 @@ local.testCase_crudCreateReplaceUpdateRemoveMany_default = function (
  * this function will test
  * crudCreateReplaceUpdateRemoveMany's default handling-behavior
  */
-    var onParallel;
+    let onParallel;
     onParallel = local.onParallel(onError);
     onParallel.counter += 1;
     [
@@ -450,7 +508,7 @@ local.testCase_crudErrorXxx_default = function (opt, onError) {
 /*
  * this function will test crudErrorXxx's default handling-behavior
  */
-    var onParallel;
+    let onParallel;
     onParallel = local.onParallel(onError);
     onParallel.counter += 1;
     [
@@ -467,7 +525,7 @@ local.testCase_crudErrorXxx_default = function (opt, onError) {
         onParallel.counter += 1;
         local.apiDict[key].ajax({}, function (err, data) {
             // validate err occurred
-            local.assertThrow(err, err);
+            local.assertOrThrow(err, err);
             // validate statusCode
             local.assertJsonEqual(data.statusCode, 500);
             onParallel();
@@ -496,7 +554,7 @@ local.testCase_crudGetManyByQuery_default = function (opt, onError) {
         case 2:
             // validate data
             local.assertJsonEqual(data.responseJson.data.length, 1);
-            local.assertThrow(
+            local.assertOrThrow(
                 data.responseJson.data[0][opt.idBackend] === opt.idValue,
                 data.responseJson
             );
@@ -529,13 +587,13 @@ local.testCase_crudGetOneById_default = function (opt, onError) {
         case 2:
             // validate data
             local.assertJsonEqual(data.responseJson.data.length, 1);
-            local.assertThrow(
+            local.assertOrThrow(
                 data.responseJson.data[0][opt.idBackend] === opt.idValue,
                 data.responseJson
             );
             // validate dataValidate
             Object.keys(opt.dataValidate).forEach(function (key) {
-                local.assertThrow(
+                local.assertOrThrow(
                     data.responseJson.data[0][key] === opt.dataValidate[key],
                     [
                         key,
@@ -576,7 +634,7 @@ local.testCase_crudGetOneByQuery_default = function (opt, onError) {
         case 2:
             // validate data
             local.assertJsonEqual(data.responseJson.data.length, 1);
-            local.assertThrow(
+            local.assertOrThrow(
                 data.responseJson.data[0][opt.idBackend] === opt.idValue,
                 data.responseJson
             );
@@ -594,7 +652,7 @@ local.testCase_crudNullXxx_default = function (opt, onError) {
 /*
  * this function will test crudNullXxx's default handling-behavior
  */
-    var onParallel;
+    let onParallel;
     onParallel = local.onParallel(onError);
     onParallel.counter += 1;
     [
@@ -649,7 +707,7 @@ local.testCase_crudRemoveManyByQuery_default = function (opt, onError) {
         case 4:
             // validate data was removed
             local.assertJsonEqual(data.responseJson.data.length, 1);
-            local.assertThrow(
+            local.assertOrThrow(
                 data.responseJson.data[0] === null,
                 data.responseJson
             );
@@ -702,7 +760,7 @@ local.testCase_crudRemoveOneById_default = function (opt, onError) {
         case 4:
             // validate data was removed
             local.assertJsonEqual(data.responseJson.data.length, 1);
-            local.assertThrow(
+            local.assertOrThrow(
                 data.responseJson.data[0] === null,
                 data.responseJson
             );
@@ -720,7 +778,7 @@ local.testCase_crudSetManyById_default = function (opt, onError) {
 /*
  * this function will test crudSetManyById's default handling-behavior
  */
-    var onParallel;
+    let onParallel;
     opt = local.crudOptionsSetDefault(opt, {
         data: [
             {
@@ -766,7 +824,7 @@ local.testCase_crudSetOneById_default = function (opt, onError) {
 /*
  * this function will test crudSetOneById's default handling-behavior
  */
-    var paramDict;
+    let paramDict;
     opt = local.crudOptionsSetDefault(opt, {
         data: {
             // test dataReadonlyRemove handling-behavior
@@ -796,23 +854,23 @@ local.testCase_crudSetOneById_default = function (opt, onError) {
             // init id
             opt.data.id = data.responseJson.data[0].id;
             // validate time _timeCreated
-            local.assertThrow(
+            local.assertOrThrow(
                 data.responseJson.data[0]._timeCreated
                 > "1970-01-01T00:00:00.000Z",
                 data.responseJson
             );
-            local.assertThrow(
+            local.assertOrThrow(
                 data.responseJson.data[0]._timeCreated
                 < new Date().toISOString(),
                 data.responseJson
             );
             // validate time _timeUpdated
-            local.assertThrow(
+            local.assertOrThrow(
                 data.responseJson.data[0]._timeUpdated
                 > "1970-01-01T00:00:00.000Z",
                 data.responseJson
             );
-            local.assertThrow(
+            local.assertOrThrow(
                 data.responseJson.data[0]._timeUpdated
                 < new Date().toISOString(),
                 data.responseJson
@@ -833,7 +891,7 @@ local.testCase_crudUpdateOneById_default = function (opt, onError) {
 /*
  * this function will test crudUpdateOneById's default handling-behavior
  */
-    var paramDict;
+    let paramDict;
     opt = local.crudOptionsSetDefault(opt, {
         data: {
             id: "testCase_crudUpdateOneById_default"
@@ -885,21 +943,21 @@ local.testCase_crudUpdateOneById_default = function (opt, onError) {
             break;
         case 4:
             // validate time _timeCreated
-            local.assertThrow(
+            local.assertOrThrow(
                 data.responseJson.data[0]._timeCreated === opt._timeCreated,
                 data.responseJson
             );
-            local.assertThrow(
+            local.assertOrThrow(
                 data.responseJson.data[0]._timeCreated
                 < new Date().toISOString(),
                 data.responseJson
             );
             // validate time _timeUpdated
-            local.assertThrow(
+            local.assertOrThrow(
                 data.responseJson.data[0]._timeUpdated > opt._timeUpdated,
                 data.responseJson
             );
-            local.assertThrow(
+            local.assertOrThrow(
                 data.responseJson.data[0]._timeUpdated
                 < new Date().toISOString(),
                 data.responseJson
@@ -937,8 +995,8 @@ local.testCase_fileGetOneById_default = function (opt, onError) {
 /*
  * this function will test fileGetOneById's default handling-behavior
  */
-    var gotoNext;
-    var gotoState;
+    let gotoNext;
+    let gotoState;
     gotoState = 0;
     gotoNext = function (err, data) {
         gotoState += 1;
@@ -954,7 +1012,7 @@ local.testCase_fileGetOneById_default = function (opt, onError) {
             break;
         case 2:
             // validate no err occurred
-            local.assertThrow(!err, err);
+            local.assertOrThrow(!err, err);
             // validate Content-Type
             opt.data = data.resHeaders["content-type"];
             local.assertJsonEqual(opt.data, "image/png");
@@ -973,7 +1031,7 @@ local.testCase_fileGetOneById_default = function (opt, onError) {
             break;
         case 3:
             // validate err occurred
-            local.assertThrow(err, err);
+            local.assertOrThrow(err, err);
             // validate statusCode
             local.assertJsonEqual(data.statusCode, 404);
             gotoNext();
@@ -1065,7 +1123,7 @@ local.testCase_onErrorJsonapi_default = function (opt, onError) {
 /*
  * this function will test onErrorJsonapi's default handling-behavior
  */
-    var onParallel;
+    let onParallel;
     onParallel = local.onParallel(onError);
     onParallel.counter += 1;
     [
@@ -1087,7 +1145,7 @@ local.testCase_onErrorJsonapi_default = function (opt, onError) {
             }
         }, function (err, data) {
             // validate no err occurred
-            local.assertThrow(!err, err);
+            local.assertOrThrow(!err, err);
             // validate data
             local.assertJsonEqual(data.responseJson.data[0], "hello");
             onParallel();
@@ -1100,7 +1158,7 @@ local.testCase_onErrorJsonapi_emptyArray = function (opt, onError) {
 /*
  * this function will test onErrorJsonapi's empty-array handling-behavior
  */
-    var onParallel;
+    let onParallel;
     onParallel = local.onParallel(onError);
     onParallel.counter += 1;
     onParallel.counter += 1;
@@ -1113,7 +1171,7 @@ local.testCase_onErrorJsonapi_emptyArray = function (opt, onError) {
         data
     ) {
         // validate no err occurred
-        local.assertThrow(!err, err);
+        local.assertOrThrow(!err, err);
         // validate data
         local.assertJsonEqual(data.responseJson.data[0], undefined);
         onParallel();
@@ -1128,9 +1186,12 @@ local.testCase_onErrorJsonapi_emptyArray = function (opt, onError) {
         data
     ) {
         // validate err occurred
-        local.assertThrow(err, err);
+        local.assertOrThrow(err, err);
         // validate err
-        local.assertThrow(data.responseJson.errors[0].message === "null", err);
+        local.assertOrThrow(
+            data.responseJson.errors[0].message === "null",
+            err
+        );
         onParallel();
     });
     onParallel(null, opt);
@@ -1140,7 +1201,7 @@ local.testCase_onErrorJsonapi_err = function (opt, onError) {
 /*
  * this function will test onErrorJsonapi's err handling-behavior
  */
-    var onParallel;
+    let onParallel;
     onParallel = local.onParallel(onError);
     onParallel.counter += 1;
     [
@@ -1172,9 +1233,9 @@ local.testCase_onErrorJsonapi_err = function (opt, onError) {
             data
         ) {
             // validate err occurred
-            local.assertThrow(err, err);
+            local.assertOrThrow(err, err);
             // validate err
-            local.assertThrow(
+            local.assertOrThrow(
                 data.responseJson.errors[0].message === "hello",
                 err
             );
@@ -1197,7 +1258,7 @@ local.testCase_petstoreStoreGetInventory_default = function (opt, onError) {
         case 2:
             // validate data
             local.assertJsonEqual(data.responseJson.data.length, 1);
-            local.assertThrow(data.responseJson.data[0]);
+            local.assertOrThrow(data.responseJson.data[0]);
             opt.gotoNext();
             break;
         default:
@@ -1453,7 +1514,7 @@ local.testCase_swaggerValidateDataParameters_default = function (opt, onError) {
  * this function will test
  * swaggerValidateDataParameters's default handling-behavior
  */
-    var onParallel;
+    let onParallel;
     onParallel = local.onParallel(onError);
     onParallel.counter += 1;
     Object.keys(local.apiDict).forEach(function (key) {
@@ -1464,7 +1525,7 @@ local.testCase_swaggerValidateDataParameters_default = function (opt, onError) {
         onParallel.counter += 1;
         local.apiDict[key].ajax({}, function (err, data) {
             // validate no err occurred
-            local.assertThrow(!err, data);
+            local.assertOrThrow(!err, data);
             onParallel(null, opt);
         });
         onParallel.counter += 1;
@@ -1472,12 +1533,12 @@ local.testCase_swaggerValidateDataParameters_default = function (opt, onError) {
             modeDefault: true
         }, function (err, data) {
             // validate no err occurred
-            local.assertThrow(!err, [
+            local.assertOrThrow(!err, [
                 err, key
             ]);
             // validate data
             data = data.paramDict;
-            local.assertThrow(data, [
+            local.assertOrThrow(data, [
                 data, key
             ]);
             onParallel(null, opt);
@@ -1490,7 +1551,7 @@ local.testCase_swaggerValidateDataParameters_err = function (opt, onError) {
 /*
  * this function will test swaggerValidateDataParameters's err handling-behavior
  */
-    var onParallel;
+    let onParallel;
     onParallel = local.onParallel(onError);
     onParallel.counter += 1;
     [
@@ -1585,7 +1646,7 @@ local.testCase_swaggerValidateDataParameters_err = function (opt, onError) {
             paramDict: local.jsonCopy(paramDict)
         }, function (err) {
             // validate err occurred
-            local.assertThrow(err, JSON.stringify(paramDict));
+            local.assertOrThrow(err, JSON.stringify(paramDict));
             // validate statusCode
             local.assertJsonEqual(err.statusCode, 400);
             // validate x-errorType
@@ -1637,7 +1698,7 @@ local.testCase_swaggerValidateDataParameters_err = function (opt, onError) {
             paramDict: local.jsonCopy(paramDict)
         }, function (err) {
             // validate err occurred
-            local.assertThrow(err, JSON.stringify(paramDict));
+            local.assertOrThrow(err, JSON.stringify(paramDict));
             // validate statusCode
             local.assertJsonEqual(err.statusCode, 400);
             // validate x-errorType
@@ -1677,11 +1738,11 @@ local.testCase_swaggerValidateFile_default = function (opt, onError) {
                 + "/assets.swgg.swagger.petstore.json"
             }
         ]
-    }, function (option2, onParallel) {
+    }, function (opt2, onParallel) {
         onParallel.counter += 1;
-        local.swgg.swaggerValidateFile(option2.elem, function (err) {
+        local.swgg.swaggerValidateFile(opt2.elem, function (err) {
             // validate no err occurred
-            local.assertThrow(!err || option2.elem.file === "error.json", err);
+            local.assertOrThrow(!err || opt2.elem.file === "error.json", err);
             onParallel(null, opt);
         });
     }, onError);
@@ -1691,7 +1752,7 @@ local.testCase_swaggerValidate_default = function (opt, onError) {
 /*
  * this function will test swaggerValidate's default handling-behavior
  */
-    var err;
+    let err;
     // test default handling-behavior
     local.swaggerValidate({
         info: {
@@ -2635,7 +2696,7 @@ local.testCase_swaggerValidate_default = function (opt, onError) {
         }, local.nop);
         err = local.utility2._debugTryCatchError;
         // validate err occurred
-        local.assertThrow(err, elem);
+        local.assertOrThrow(err, elem);
         // validate x-errorType
         if (elem && elem["x-errorType"]) {
             local.assertJsonEqual(elem["x-errorType"], err.opt.errorType, err);
@@ -2692,8 +2753,8 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
 /*
  * this function will test userLoginXxx's default handling-behavior
  */
-    var gotoNext;
-    var gotoState;
+    let gotoNext;
+    let gotoState;
     gotoState = 0;
     gotoNext = function (err, data) {
         gotoState += 1;
@@ -2706,7 +2767,7 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
             break;
         case 2:
             // validate err occurred
-            local.assertThrow(err, err);
+            local.assertOrThrow(err, err);
             // test userLoginByPassword's 401 handling-behavior
             local.userLoginByPassword({
                 password: "undefined",
@@ -2715,21 +2776,27 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
             break;
         case 3:
             // validate err occurred
-            local.assertThrow(err, err);
+            local.assertOrThrow(err, err);
             // validate statusCode
             local.assertJsonEqual(data.statusCode, 401);
             // validate userJwtEncrypted does not exist
-            local.assertThrow(!local.userJwtEncrypted, local.userJwtEncrypted);
+            local.assertOrThrow(
+                !local.userJwtEncrypted,
+                local.userJwtEncrypted
+            );
             // test userLogout's 401 handling-behavior
             local.userLogout({}, gotoNext);
             break;
         case 4:
             // validate err occurred
-            local.assertThrow(err, err);
+            local.assertOrThrow(err, err);
             // validate statusCode
             local.assertJsonEqual(data.statusCode, 401);
             // validate userJwtEncrypted does not exist
-            local.assertThrow(!local.userJwtEncrypted, local.userJwtEncrypted);
+            local.assertOrThrow(
+                !local.userJwtEncrypted,
+                local.userJwtEncrypted
+            );
             // test userLoginByPassword's 200 handling-behavior
             local.userLoginByPassword({
                 password: "secret",
@@ -2738,21 +2805,21 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
             break;
         case 5:
             // validate no err occurred
-            local.assertThrow(!err, err);
+            local.assertOrThrow(!err, err);
             // validate statusCode
             local.assertJsonEqual(data.statusCode, 200);
             // validate userJwtEncrypted exists
-            local.assertThrow(local.userJwtEncrypted, local.userJwtEncrypted);
+            local.assertOrThrow(local.userJwtEncrypted, local.userJwtEncrypted);
             // test persistent-session handling-behavior
             local.apiDict["operationId.x-test.crudNullGet"].ajax({}, gotoNext);
             break;
         case 6:
             // validate no err occurred
-            local.assertThrow(!err, err);
+            local.assertOrThrow(!err, err);
             // validate statusCode
             local.assertJsonEqual(data.statusCode, 200);
             // validate userJwtEncrypted exists
-            local.assertThrow(local.userJwtEncrypted, local.userJwtEncrypted);
+            local.assertOrThrow(local.userJwtEncrypted, local.userJwtEncrypted);
             // test userLogout's 200 handling-behavior
             // test jwtEncoded's update handling-behavior
             local.userLogout({
@@ -2763,17 +2830,17 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
             break;
         case 7:
             // validate no err occurred
-            local.assertThrow(!err, err);
+            local.assertOrThrow(!err, err);
             // validate statusCode
             local.assertJsonEqual(data.statusCode, 200);
             // validate userJwtEncrypted exists
-            local.assertThrow(local.userJwtEncrypted, local.userJwtEncrypted);
+            local.assertOrThrow(local.userJwtEncrypted, local.userJwtEncrypted);
             // test userLogout's 401 handling-behavior
             local.userLogout({}, gotoNext);
             break;
         case 8:
             // validate err occurred
-            local.assertThrow(err, err);
+            local.assertOrThrow(err, err);
             // validate statusCode
             local.assertJsonEqual(data.statusCode, 401);
             // test userLoginByPassword's 400 handling-behavior
@@ -2783,7 +2850,7 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
             break;
         case 9:
             // validate err occurred
-            local.assertThrow(err, err);
+            local.assertOrThrow(err, err);
             // validate statusCode
             local.assertJsonEqual(data.statusCode, 400);
             // test userLogout's invalid-username handling-behavior
@@ -2795,7 +2862,7 @@ local.testCase_userLoginXxx_default = function (opt, onError) {
             break;
         case 10:
             // validate err occurred
-            local.assertThrow(err, err);
+            local.assertOrThrow(err, err);
             // validate statusCode
             local.assertJsonEqual(data.statusCode, 401);
             onError(null, opt);
