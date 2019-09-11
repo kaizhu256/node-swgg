@@ -763,17 +763,29 @@ pre {
 }());
 </script>
 <h1>
-    <a href="https://github.com/kaizhu256/node-swgg" target="_blank">
-        swgg (v2019.8.1)
-    </a>
+
+<a
+    
+    href="https://github.com/kaizhu256/node-swgg"
+    
+    target="_blank"
+>
+
+    swgg (2019.8.1)
+
+</a>
+
 </h1>
 <h3>this zero-dependency package will run a virtual swagger-ui server with persistent-storage in the browser, that your webapp can use (in-place of a real backend), with a working web-demo</h3>
+
 <a class="button" download href="assets.app.js">download standalone app</a><br>
-<button class="button" data-onevent="testRunBrowser" data-onevent-reset-output="1" id="buttonTestRun1">run internal test</button><br>
+<button class="button" data-onevent="testRunBrowser" id="buttonTestRun1">run internal test</button><br>
 <div class="uiAnimateSlide" id="htmlTestReport1" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>
 
 
 
+
+<!-- custom-html-start -->
 <button class="button" data-onevent="onEventDomDb" data-onevent-db="dbReset">reset database</button><br>
 <button class="button" data-onevent="onEventDomDb" data-onevent-db="dbExport">export database -&gt; file</button><br>
 <button class="button" data-onevent="onEventDomDb" data-onevent-db="dbImport">import database &lt;- file</button><br>
@@ -943,12 +955,16 @@ document.querySelector(
     /\bmodeSwaggerJsonUrl=([^&]+)|$/gm
 ).exec(location.search)[1] || "assets.swgg.swagger.server.json");
 </script>
+<!-- custom-html-end -->
+
+
 
 
 
 <script src="assets.utility2.rollup.js"></script>
 <script>window.utility2_onReadyBefore.counter += 1;</script>
 <script src="jsonp.utility2.stateInit?callback=window.utility2.stateInit"></script>
+
 <script src="assets.swgg.js"></script>
 <script src="assets.example.js"></script>
 <script src="assets.test.js"></script>
@@ -956,5 +972,25 @@ document.querySelector(
 
 
 
+<script>
+/* jslint utility2:true */
+(function () {
+"use strict";
+let htmlTestReport1;
+let local;
+htmlTestReport1 = document.querySelector("#htmlTestReport1");
+local = window.utility2;
+if (!(htmlTestReport1 && local)) {
+    return;
+}
+local.on("utility2.testRunProgressUpdate", function (testReport) {
+    htmlTestReport1.innerHTML = local.testReportMerge(testReport, {});
+});
+local.on("utility2.testRunStart", function (testReport) {
+    local.uiAnimateSlideDown(htmlTestReport1);
+    htmlTestReport1.innerHTML = local.testReportMerge(testReport, {});
+});
+}());
+</script>
 </body>
 </html>

@@ -328,7 +328,19 @@ local.middlewareInitCustom = function (req, response, nextMiddleware) {
 // init assets
 /* jslint ignore:start */
 local.assetsDict['/assets.index.template.html'] = local.assetsDict['/assets.swgg.html']
-    .replace((/\n<\/script>\n/), '\n</script>\n<h1>\n    <a href="{{env.npm_package_homepage}}" target="_blank">\n        {{env.npm_package_name}} (v{{env.npm_package_version}})\n    </a>\n</h1>\n<h3>{{env.npm_package_description}}</h3>\n<a class="button" download href="assets.app.js">download standalone app</a><br>\n<button class="button" data-onevent="testRunBrowser" data-onevent-reset-output="1" id="buttonTestRun1">run internal test</button><br>\n<div class="uiAnimateSlide" id="htmlTestReport1" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>\n\n\n\n<button class="button" data-onevent="onEventDomDb" data-onevent-db="dbReset">reset database</button><br>\n<button class="button" data-onevent="onEventDomDb" data-onevent-db="dbExport">export database -&gt; file</button><br>\n<button class="button" data-onevent="onEventDomDb" data-onevent-db="dbImport">import database &lt;- file</button><br>\n</button><br>\n<input class="onchange zeroPixel" type="file" id="dbImportInput1">\n')
+    .replace((/\n<\/script>\n/), '\n</script>\n<h1>\n<!-- utility2-comment\n<a\n    {{#if env.npm_package_homepage}}\n    href="{{env.npm_package_homepage}}"\n    {{/if env.npm_package_homepage}}\n    target="_blank"\n>\nutility2-comment -->\n    {{env.npm_package_name}} ({{env.npm_package_version}})\n<!-- utility2-comment\n</a>\nutility2-comment -->\n</h1>\n<h3>{{env.npm_package_description}}</h3>\n<!-- utility2-comment\n<a class="button" download href="assets.app.js">download standalone app</a><br>\n<button class="button" data-onevent="testRunBrowser" id="buttonTestRun1">run internal test</button><br>\n<div class="uiAnimateSlide" id="htmlTestReport1" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"></div>\nutility2-comment -->\n\n\n\n<!-- custom-html-start -->\n<button class="button" data-onevent="onEventDomDb" data-onevent-db="dbReset">reset database</button><br>\n<button class="button" data-onevent="onEventDomDb" data-onevent-db="dbExport">export database -&gt; file</button><br>\n<button class="button" data-onevent="onEventDomDb" data-onevent-db="dbImport">import database &lt;- file</button><br>\n</button><br>\n<input class="onchange zeroPixel" type="file" id="dbImportInput1">\n')
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -350,7 +362,31 @@ local.assetsDict['/assets.index.template.html'] = local.assetsDict['/assets.swgg
 
 
             .replace('assets.swgg.swagger.json', 'assets.swgg.swagger.server.json')
-            .replace((/\n<script src=[\S\s]*\n<\/html>\n/), '\n<!-- utility2-comment\n{{#if isRollup}}\n<script src="assets.app.js"></script>\n{{#unless isRollup}}\nutility2-comment -->\n<script src="assets.utility2.rollup.js"></script>\n<script>window.utility2_onReadyBefore.counter += 1;</script>\n<script src="jsonp.utility2.stateInit?callback=window.utility2.stateInit"></script>\n<script src="assets.swgg.js"></script>\n<script src="assets.example.js"></script>\n<script src="assets.test.js"></script>\n<script>window.utility2_onReadyBefore();</script>\n<!-- utility2-comment\n{{/if isRollup}}\nutility2-comment -->\n</body>\n</html>\n');
+            .replace((/\n<script src=[\S\s]*\n<\/html>\n/), '\n<!-- custom-html-end -->\n\n\n\n<!-- utility2-comment\n{{#if isRollup}}\n<script src="assets.app.js"></script>\n{{#unless isRollup}}\n<script src="assets.utility2.rollup.js"></script>\n<script>window.utility2_onReadyBefore.counter += 1;</script>\n<script src="jsonp.utility2.stateInit?callback=window.utility2.stateInit"></script>\nutility2-comment -->\n<script src="assets.swgg.js"></script>\n<script src="assets.example.js"></script>\n<script src="assets.test.js"></script>\n<script>window.utility2_onReadyBefore();</script>\n<!-- utility2-comment\n{{/if isRollup}}\nutility2-comment -->\n<script>\n/* jslint utility2:true */\n(function () {\n"use strict";\nlet htmlTestReport1;\nlet local;\nhtmlTestReport1 = document.querySelector("#htmlTestReport1");\nlocal = window.utility2;\nif (!(htmlTestReport1 && local)) {\n    return;\n}\nlocal.on("utility2.testRunProgressUpdate", function (testReport) {\n    htmlTestReport1.innerHTML = local.testReportMerge(testReport, {});\n});\nlocal.on("utility2.testRunStart", function (testReport) {\n    local.uiAnimateSlideDown(htmlTestReport1);\n    htmlTestReport1.innerHTML = local.testReportMerge(testReport, {});\n});\n}());\n</script>\n</body>\n</html>\n');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -50661,12 +50661,10 @@ utility2-comment -->\n\
 \n\
 \n\
 \n\
+<!-- utility2-comment\n\
 {{#if isRollup}}\n\
-<!-- utility2-comment\n\
 <script src="assets.app.js"></script>\n\
-utility2-comment -->\n\
 {{#unless isRollup}}\n\
-<!-- utility2-comment\n\
 <script src="assets.utility2.rollup.js"></script>\n\
 <script>window.utility2_onReadyBefore.counter += 1;</script>\n\
 <script src="jsonp.utility2.stateInit?callback=window.utility2.stateInit"></script>\n\
@@ -50674,12 +50672,10 @@ utility2-comment -->\n\
 <script src="assets.{{packageJson.nameLib}}.js"></script>\n\
 <script src="assets.example.js"></script>\n\
 <script src="assets.test.js"></script>\n\
-<script>\n\
-if(window.utility2_onReadyBefore) {\n\
-    window.utility2_onReadyBefore();\n\
-}\n\
-</script>\n\
+<!-- utility2-comment\n\
+<script>window.utility2_onReadyBefore();</script>\n\
 {{/if isRollup}}\n\
+utility2-comment -->\n\
 <script>\n\
 /* jslint utility2:true */\n\
 (function () {\n\
@@ -52197,17 +52193,18 @@ local._http.createServer = function () {
 
 local._http.request = function (xhr, onResponse) {
     let chunkList;
+    let data;
     let handler;
     let isDone;
     let req;
     let res;
     xhr = {
-        end: function (data) {
+        end: function (_data) {
             if (isDone) {
                 return;
             }
             isDone = true;
-            req.data = data;
+            data = _data;
             // async send req from client -> server
             setTimeout(function () {
                 local.serverLocalReqHandler(req, res);
@@ -52238,7 +52235,7 @@ local._http.request = function (xhr, onResponse) {
             });
             if (req.readable && type === "end") {
                 req.readable = null;
-                req.emit("data", req.data);
+                req.emit("data", data);
                 req.emit("end");
             }
             return req;
@@ -53083,6 +53080,9 @@ local.bufferConcat = function (bffList) {
     ];
     byteLength = 0;
     bffList.forEach(function (bff) {
+        if (bff === 0) {
+            globalThis.debugInline(new Error().stack);
+        }
         if (bff !== 0 && !(bff && bff.length)) {
             return;
         }
@@ -65686,10 +65686,9 @@ window.addEventListener(\"load\", function () {\\n\\\n\
 \\n\\\n\
 \\n\\\n\
 \\n\\\n\
-{{#if isRollup}}\\n\\\n\
 <!-- utility2-comment\\n\\\n\
+{{#if isRollup}}\\n\\\n\
 <script src=\"assets.app.js\"></script>\\n\\\n\
-utility2-comment -->\\n\\\n\
 {{#unless isRollup}}\\n\\\n\
 <script src=\"assets.utility2.lib.istanbul.js\"></script>\\n\\\n\
 <script src=\"assets.utility2.lib.jslint.js\"></script>\\n\\\n\
@@ -65707,6 +65706,7 @@ if(window.utility2_onReadyBefore) {\\n\\\n\
 }\\n\\\n\
 </script>\\n\\\n\
 {{/if isRollup}}\\n\\\n\
+utility2-comment -->\\n\\\n\
 <script>\\n\\\n\
 /* jslint utility2:true */\\n\\\n\
 (function () {\\n\\\n\

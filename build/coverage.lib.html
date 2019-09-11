@@ -1478,6 +1478,42 @@
 <a href="#L1172" id="L1172">1172</a>
 <a href="#L1173" id="L1173">1173</a>
 <a href="#L1174" id="L1174">1174</a>
+<a href="#L1175" id="L1175">1175</a>
+<a href="#L1176" id="L1176">1176</a>
+<a href="#L1177" id="L1177">1177</a>
+<a href="#L1178" id="L1178">1178</a>
+<a href="#L1179" id="L1179">1179</a>
+<a href="#L1180" id="L1180">1180</a>
+<a href="#L1181" id="L1181">1181</a>
+<a href="#L1182" id="L1182">1182</a>
+<a href="#L1183" id="L1183">1183</a>
+<a href="#L1184" id="L1184">1184</a>
+<a href="#L1185" id="L1185">1185</a>
+<a href="#L1186" id="L1186">1186</a>
+<a href="#L1187" id="L1187">1187</a>
+<a href="#L1188" id="L1188">1188</a>
+<a href="#L1189" id="L1189">1189</a>
+<a href="#L1190" id="L1190">1190</a>
+<a href="#L1191" id="L1191">1191</a>
+<a href="#L1192" id="L1192">1192</a>
+<a href="#L1193" id="L1193">1193</a>
+<a href="#L1194" id="L1194">1194</a>
+<a href="#L1195" id="L1195">1195</a>
+<a href="#L1196" id="L1196">1196</a>
+<a href="#L1197" id="L1197">1197</a>
+<a href="#L1198" id="L1198">1198</a>
+<a href="#L1199" id="L1199">1199</a>
+<a href="#L1200" id="L1200">1200</a>
+<a href="#L1201" id="L1201">1201</a>
+<a href="#L1202" id="L1202">1202</a>
+<a href="#L1203" id="L1203">1203</a>
+<a href="#L1204" id="L1204">1204</a>
+<a href="#L1205" id="L1205">1205</a>
+<a href="#L1206" id="L1206">1206</a>
+<a href="#L1207" id="L1207">1207</a>
+<a href="#L1208" id="L1208">1208</a>
+<a href="#L1209" id="L1209">1209</a>
+<a href="#L1210" id="L1210">1210</a>
 </td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1934,6 +1970,42 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -3111,17 +3183,29 @@ local.assetsDict['/assets.index.template.html'] = local.assetsDict['/assets.swgg
 \n\
 &lt;/script&gt;\n\
 &lt;h1&gt;\n\
-    &lt;a href="{{env.npm_package_homepage}}" target="_blank"&gt;\n\
-        {{env.npm_package_name}} (v{{env.npm_package_version}})\n\
-    &lt;/a&gt;\n\
+&lt;!-- utility2-comment\n\
+&lt;a\n\
+    {{#if env.npm_package_homepage}}\n\
+    href="{{env.npm_package_homepage}}"\n\
+    {{/if env.npm_package_homepage}}\n\
+    target="_blank"\n\
+&gt;\n\
+utility2-comment --&gt;\n\
+    {{env.npm_package_name}} ({{env.npm_package_version}})\n\
+&lt;!-- utility2-comment\n\
+&lt;/a&gt;\n\
+utility2-comment --&gt;\n\
 &lt;/h1&gt;\n\
 &lt;h3&gt;{{env.npm_package_description}}&lt;/h3&gt;\n\
+&lt;!-- utility2-comment\n\
 &lt;a class="button" download href="assets.app.js"&gt;download standalone app&lt;/a&gt;&lt;br&gt;\n\
-&lt;button class="button" data-onevent="testRunBrowser" data-onevent-reset-output="1" id="buttonTestRun1"&gt;run internal test&lt;/button&gt;&lt;br&gt;\n\
+&lt;button class="button" data-onevent="testRunBrowser" id="buttonTestRun1"&gt;run internal test&lt;/button&gt;&lt;br&gt;\n\
 &lt;div class="uiAnimateSlide" id="htmlTestReport1" style="border-bottom: 0; border-top: 0; margin-bottom: 0; margin-top: 0; max-height: 0; padding-bottom: 0; padding-top: 0;"&gt;&lt;/div&gt;\n\
+utility2-comment --&gt;\n\
 \n\
 \n\
 \n\
+&lt;!-- custom-html-start --&gt;\n\
 &lt;button class="button" data-onevent="onEventDomDb" data-onevent-db="dbReset"&gt;reset database&lt;/button&gt;&lt;br&gt;\n\
 &lt;button class="button" data-onevent="onEventDomDb" data-onevent-db="dbExport"&gt;export database -&amp;gt; file&lt;/button&gt;&lt;br&gt;\n\
 &lt;button class="button" data-onevent="onEventDomDb" data-onevent-db="dbImport"&gt;import database &amp;lt;- file&lt;/button&gt;&lt;br&gt;\n\
@@ -3131,14 +3215,18 @@ local.assetsDict['/assets.index.template.html'] = local.assetsDict['/assets.swgg
             .replace('assets.swgg.swagger.json', 'assets.swgg.swagger.server.json')
             .replace((/\n&lt;script src=[\S\s]*\n&lt;\/html&gt;\n/), '\
 \n\
+&lt;!-- custom-html-end --&gt;\n\
+\n\
+\n\
+\n\
 &lt;!-- utility2-comment\n\
 {{#if isRollup}}\n\
 &lt;script src="assets.app.js"&gt;&lt;/script&gt;\n\
 {{#unless isRollup}}\n\
-utility2-comment --&gt;\n\
 &lt;script src="assets.utility2.rollup.js"&gt;&lt;/script&gt;\n\
 &lt;script&gt;window.utility2_onReadyBefore.counter += 1;&lt;/script&gt;\n\
 &lt;script src="jsonp.utility2.stateInit?callback=window.utility2.stateInit"&gt;&lt;/script&gt;\n\
+utility2-comment --&gt;\n\
 &lt;script src="assets.swgg.js"&gt;&lt;/script&gt;\n\
 &lt;script src="assets.example.js"&gt;&lt;/script&gt;\n\
 &lt;script src="assets.test.js"&gt;&lt;/script&gt;\n\
@@ -3146,6 +3234,26 @@ utility2-comment --&gt;\n\
 &lt;!-- utility2-comment\n\
 {{/if isRollup}}\n\
 utility2-comment --&gt;\n\
+&lt;script&gt;\n\
+/* jslint utility2:true */\n\
+(function () {\n\
+"use strict";\n\
+let htmlTestReport1;\n\
+let local;\n\
+htmlTestReport1 = document.querySelector("#htmlTestReport1");\n\
+local = window.utility2;\n\
+if (!(htmlTestReport1 &amp;&amp; local)) {\n\
+    return;\n\
+}\n\
+local.on("utility2.testRunProgressUpdate", function (testReport) {\n\
+    htmlTestReport1.innerHTML = local.testReportMerge(testReport, {});\n\
+});\n\
+local.on("utility2.testRunStart", function (testReport) {\n\
+    local.uiAnimateSlideDown(htmlTestReport1);\n\
+    htmlTestReport1.innerHTML = local.testReportMerge(testReport, {});\n\
+});\n\
+}());\n\
+&lt;/script&gt;\n\
 &lt;/body&gt;\n\
 &lt;/html&gt;\n\
 ');
@@ -3828,7 +3936,7 @@ local.assetsDict["/index.html"] = local.assetsDict["/"];
 </table></pre>
 </div>
 <div class="footer">
-    <div class="meta">Generated by <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a> at Wed, 11 Sep 2019 05:25:05 GMT</div>
+    <div class="meta">Generated by <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a> at Wed, 11 Sep 2019 06:24:46 GMT</div>
 </div>
 </body>
 </html>
