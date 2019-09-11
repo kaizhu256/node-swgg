@@ -1,648 +1,635 @@
-<svg height="5246" width="720" xmlns="http://www.w3.org/2000/svg">
-<rect height="5246" fill="#555" width="720"></rect>
+<svg height="5134" width="720" xmlns="http://www.w3.org/2000/svg">
+<rect height="5134" fill="#555" width="720"></rect>
 <text fill="#7f7" font-family="Courier New" font-size="12" xml:space="preserve">
-<tspan x="10" y="26">2019-09-11 02:12:02 -0500</tspan>
+<tspan x="10" y="26">2019-09-11 08:32:48 +0000</tspan>
 
-<tspan x="10" y="42">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
+<tspan x="10" y="42">- merge polyfills into assets.example.begin.js</tspan>
 
 <tspan x="10" y="58"></tspan>
 
-<tspan x="10" y="74">2019-09-11 01:54:03 -0500</tspan>
+<tspan x="10" y="74">2019-09-11 08:17:08 +0000</tspan>
 
-<tspan x="10" y="90">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
+<tspan x="10" y="90">- rename bff and chunk to buf</tspan>
 
 <tspan x="10" y="106"></tspan>
 
-<tspan x="10" y="122">2019-09-11 01:22:00 -0500</tspan>
+<tspan x="10" y="122">2019-09-11 07:52:25 +0000</tspan>
 
-<tspan x="10" y="138">readme</tspan>
+<tspan x="10" y="138">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
 
 <tspan x="10" y="154"></tspan>
 
-<tspan x="10" y="170">2019-09-11 06:20:22 +0000</tspan>
+<tspan x="10" y="170">2019-09-11 02:12:02 -0500</tspan>
 
-<tspan x="10" y="186">readme</tspan>
+<tspan x="10" y="186">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
 
 <tspan x="10" y="202"></tspan>
 
-<tspan x="10" y="218">2019-09-11 06:04:02 +0000</tspan>
+<tspan x="10" y="218">2019-09-11 01:54:03 -0500</tspan>
 
-<tspan x="10" y="234">readme</tspan>
+<tspan x="10" y="234">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
 
 <tspan x="10" y="250"></tspan>
 
-<tspan x="10" y="266">2019-09-11 00:22:42 -0500</tspan>
+<tspan x="10" y="266">2019-09-11 01:22:00 -0500</tspan>
 
-<tspan x="10" y="282">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
+<tspan x="10" y="282">readme</tspan>
 
 <tspan x="10" y="298"></tspan>
 
-<tspan x="10" y="314">2019-09-11 00:15:38 -0500</tspan>
+<tspan x="10" y="314">2019-09-11 06:20:22 +0000</tspan>
 
-<tspan x="10" y="330">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
+<tspan x="10" y="330">readme</tspan>
 
 <tspan x="10" y="346"></tspan>
 
-<tspan x="10" y="362">2019-09-11 05:07:08 +0000</tspan>
+<tspan x="10" y="362">2019-09-11 06:04:02 +0000</tspan>
 
-<tspan x="10" y="378">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
+<tspan x="10" y="378">readme</tspan>
 
 <tspan x="10" y="394"></tspan>
 
-<tspan x="10" y="410">2019-09-11 04:53:36 +0000</tspan>
+<tspan x="10" y="410">2019-09-11 00:22:42 -0500</tspan>
 
 <tspan x="10" y="426">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
 
 <tspan x="10" y="442"></tspan>
 
-<tspan x="10" y="458">2019-09-10 23:08:10 -0500</tspan>
+<tspan x="10" y="458">2019-09-11 00:15:38 -0500</tspan>
 
 <tspan x="10" y="474">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
 
 <tspan x="10" y="490"></tspan>
 
-<tspan x="10" y="506">2019-09-11 04:03:54 +0000</tspan>
+<tspan x="10" y="506">2019-09-11 05:07:08 +0000</tspan>
 
 <tspan x="10" y="522">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
 
 <tspan x="10" y="538"></tspan>
 
-<tspan x="10" y="554">2019-09-10 21:58:00 -0500</tspan>
+<tspan x="10" y="554">2019-09-11 04:53:36 +0000</tspan>
 
 <tspan x="10" y="570">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
 
 <tspan x="10" y="586"></tspan>
 
-<tspan x="10" y="602">2019-09-11 02:51:56 +0000</tspan>
+<tspan x="10" y="602">2019-09-10 23:08:10 -0500</tspan>
 
 <tspan x="10" y="618">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
 
 <tspan x="10" y="634"></tspan>
 
-<tspan x="10" y="650">2019-09-10 08:50:25 +0000</tspan>
+<tspan x="10" y="650">2019-09-11 04:03:54 +0000</tspan>
 
 <tspan x="10" y="666">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
 
 <tspan x="10" y="682"></tspan>
 
-<tspan x="10" y="698">2019-09-10 03:39:30 -0500</tspan>
+<tspan x="10" y="698">2019-09-10 21:58:00 -0500</tspan>
 
 <tspan x="10" y="714">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
 
 <tspan x="10" y="730"></tspan>
 
-<tspan x="10" y="746">2019-09-10 08:38:57 +0000</tspan>
+<tspan x="10" y="746">2019-09-11 02:51:56 +0000</tspan>
 
-<tspan x="10" y="762">- merge class _http.IncomingMessage into _http.ServerResponse</tspan>
+<tspan x="10" y="762">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
 
 <tspan x="10" y="778"></tspan>
 
-<tspan x="10" y="794">2019-09-10 08:23:39 +0000</tspan>
+<tspan x="10" y="794">2019-09-10 08:50:25 +0000</tspan>
 
-<tspan x="10" y="810">- merge class _http.IncomingMessage into _http.ServerResponse</tspan>
+<tspan x="10" y="810">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
 
 <tspan x="10" y="826"></tspan>
 
-<tspan x="10" y="842">2019-09-10 08:08:52 +0000</tspan>
+<tspan x="10" y="842">2019-09-10 03:39:30 -0500</tspan>
 
-<tspan x="10" y="858">- merge class _http.IncomingMessage into _http.ServerResponse</tspan>
+<tspan x="10" y="858">- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request</tspan>
 
 <tspan x="10" y="874"></tspan>
 
-<tspan x="10" y="890">2019-09-10 07:59:54 +0000</tspan>
+<tspan x="10" y="890">2019-09-10 08:38:57 +0000</tspan>
 
 <tspan x="10" y="906">- merge class _http.IncomingMessage into _http.ServerResponse</tspan>
 
 <tspan x="10" y="922"></tspan>
 
-<tspan x="10" y="938">2019-09-10 07:34:17 +0000</tspan>
+<tspan x="10" y="938">2019-09-10 08:23:39 +0000</tspan>
 
 <tspan x="10" y="954">- merge class _http.IncomingMessage into _http.ServerResponse</tspan>
 
 <tspan x="10" y="970"></tspan>
 
-<tspan x="10" y="986">2019-09-10 06:40:41 +0000</tspan>
+<tspan x="10" y="986">2019-09-10 08:08:52 +0000</tspan>
 
 <tspan x="10" y="1002">- merge class _http.IncomingMessage into _http.ServerResponse</tspan>
 
 <tspan x="10" y="1018"></tspan>
 
-<tspan x="10" y="1034">2019-09-10 06:11:37 +0000</tspan>
+<tspan x="10" y="1034">2019-09-10 07:59:54 +0000</tspan>
 
 <tspan x="10" y="1050">- merge class _http.IncomingMessage into _http.ServerResponse</tspan>
 
 <tspan x="10" y="1066"></tspan>
 
-<tspan x="10" y="1082">2019-09-09 02:12:45 -0500</tspan>
+<tspan x="10" y="1082">2019-09-10 07:34:17 +0000</tspan>
 
-<tspan x="10" y="1098">- jslint - remove unexpected_a hacks</tspan>
+<tspan x="10" y="1098">- merge class _http.IncomingMessage into _http.ServerResponse</tspan>
 
-<tspan x="10" y="1114">- jslint - migrate from let-declaration to var-declaration</tspan>
+<tspan x="10" y="1114"></tspan>
 
-<tspan x="10" y="1130">- inline lib.puppeteer.js into assets.app.js</tspan>
+<tspan x="10" y="1130">2019-09-10 06:40:41 +0000</tspan>
 
-<tspan x="10" y="1146">- remove electron dependency</tspan>
+<tspan x="10" y="1146">- merge class _http.IncomingMessage into _http.ServerResponse</tspan>
 
-<tspan x="10" y="1162">- revamp function local.ajaxProgressUpdate with window.domElementAjaxProgress1</tspan>
+<tspan x="10" y="1162"></tspan>
 
-<tspan x="10" y="1178">- jslint - remove ternary-operator/newline comment preceding bra</tspan>
+<tspan x="10" y="1178">2019-09-10 06:11:37 +0000</tspan>
 
-<tspan x="10" y="1194"></tspan>
+<tspan x="10" y="1194">- merge class _http.IncomingMessage into _http.ServerResponse</tspan>
 
-<tspan x="10" y="1210">2019-08-21 02:08:10 -0500</tspan>
+<tspan x="10" y="1210"></tspan>
 
-<tspan x="10" y="1226">- jslint - remove allow-method-chain-newline hack</tspan>
+<tspan x="10" y="1226">2019-09-09 02:12:45 -0500</tspan>
 
-<tspan x="10" y="1242"></tspan>
+<tspan x="10" y="1242">- jslint - remove unexpected_a hacks</tspan>
 
-<tspan x="10" y="1258">2019-08-19 00:19:34 -0500</tspan>
+<tspan x="10" y="1258">- jslint - migrate from let-declaration to var-declaration</tspan>
 
-<tspan x="10" y="1274">- jslint - upgrade to jslint edition 2019.8.3</tspan>
+<tspan x="10" y="1274">- inline lib.puppeteer.js into assets.app.js</tspan>
 
-<tspan x="10" y="1290">- rename coverage-hack to hack-istanbul, gotoNext to gotoNext, gotoState to gotoState, jslint-ha\</tspan>
-<tspan x="10" y="1306">ck to hack-jslint</tspan>
+<tspan x="10" y="1290">- remove electron dependency</tspan>
 
-<tspan x="10" y="1322">- istanbul - switch parser from esprima to acorn v6.3.0</tspan>
+<tspan x="10" y="1306">- revamp function local.ajaxProgressUpdate with window.domElementAjaxProgress1</tspan>
+
+<tspan x="10" y="1322">- jslint - remove ternary-operator/newline comment preceding bra</tspan>
 
 <tspan x="10" y="1338"></tspan>
 
-<tspan x="10" y="1354">2019-08-12 01:44:37 -0500</tspan>
+<tspan x="10" y="1354">2019-08-21 02:08:10 -0500</tspan>
 
-<tspan x="10" y="1370">- shorten name event to evt</tspan>
+<tspan x="10" y="1370">- jslint - remove allow-method-chain-newline hack</tspan>
 
-<tspan x="10" y="1386">- jslint - refactor files to 80 chr column-limit</tspan>
+<tspan x="10" y="1386"></tspan>
 
-<tspan x="10" y="1402">- rename function local.domElementRender to local.domFragmentRender</tspan>
+<tspan x="10" y="1402">2019-08-19 00:19:34 -0500</tspan>
 
-<tspan x="10" y="1418">- shorten name element to elem, option to opt, error to err, request to req, response to res</tspan>
+<tspan x="10" y="1418">- jslint - upgrade to jslint edition 2019.8.3</tspan>
 
-<tspan x="10" y="1434"></tspan>
+<tspan x="10" y="1434">- rename coverage-hack to hack-istanbul, gotoNext to gotoNext, gotoState to gotoState, jslint-ha\</tspan>
+<tspan x="10" y="1450">ck to hack-jslint</tspan>
 
-<tspan x="10" y="1450">2019-02-20 02:03:20 -0600</tspan>
+<tspan x="10" y="1466">- istanbul - switch parser from esprima to acorn v6.3.0</tspan>
 
-<tspan x="10" y="1466">[npm publish] - npm publish 2019.2.20</tspan>
+<tspan x="10" y="1482"></tspan>
 
-<tspan x="10" y="1482">- split function domOnEventDelegate into domOnEventDelegate, domOnEventResetOutput</tspan>
+<tspan x="10" y="1498">2019-08-12 01:44:37 -0500</tspan>
 
-<tspan x="10" y="1498">- add input-type=number</tspan>
+<tspan x="10" y="1514">- shorten name event to evt</tspan>
 
-<tspan x="10" y="1514">- revamp ui event-handling with window.domOnEventDelegateDict</tspan>
+<tspan x="10" y="1530">- jslint - refactor files to 80 chr column-limit</tspan>
 
-<tspan x="10" y="1530">- split function jslintAndPrint -&gt; jslintAndPrint, jslintAutofix, jslintUtility2</tspan>
+<tspan x="10" y="1546">- rename function local.domElementRender to local.domFragmentRender</tspan>
 
-<tspan x="10" y="1546">- add function local.objectAssignDefault</tspan>
-
-<tspan x="10" y="1562">- upgrade to jslint commit-de413767154641f490d6e96185e525255cca5f7e (v2018.11.14)</tspan>
+<tspan x="10" y="1562">- shorten name element to elem, option to opt, error to err, request to req, response to res</tspan>
 
 <tspan x="10" y="1578"></tspan>
 
-<tspan x="10" y="1594">2018-11-15 00:49:55 +0800</tspan>
+<tspan x="10" y="1594">2019-02-20 02:03:20 -0600</tspan>
 
-<tspan x="10" y="1610">[npm publish] - npm publish 2018.11.14</tspan>
+<tspan x="10" y="1610">[npm publish] - npm publish 2019.2.20</tspan>
 
-<tspan x="10" y="1626">- refactor files with new jslint (v2018.10.26)</tspan>
+<tspan x="10" y="1626">- split function domOnEventDelegate into domOnEventDelegate, domOnEventResetOutput</tspan>
 
-<tspan x="10" y="1642">- jslint - replace ",$s/^ *".*"\n *+ ".*"\(\n *+ ".*"\)*/(&amp;)/gc"</tspan>
+<tspan x="10" y="1642">- add input-type=number</tspan>
 
-<tspan x="10" y="1658">- jslint - unexpected_a \(</tspan>
+<tspan x="10" y="1658">- revamp ui event-handling with window.domOnEventDelegateDict</tspan>
 
-<tspan x="10" y="1674">- jslint - replace instanceof -&gt; Object.prototype.toString.call</tspan>
+<tspan x="10" y="1674">- split function jslintAndPrint -&gt; jslintAndPrint, jslintAutofix, jslintUtility2</tspan>
 
-<tspan x="10" y="1690">- jslint - replace var self -&gt; that</tspan>
+<tspan x="10" y="1690">- add function local.objectAssignDefault</tspan>
 
-<tspan x="10" y="1706">- jslint - unconst and unlet</tspan>
+<tspan x="10" y="1706">- upgrade to jslint commit-de413767154641f490d6e96185e525255cca5f7e (v2018.11.14)</tspan>
 
-<tspan x="10" y="1722">- jslint - prioritize fatal jslint-errors</tspan>
+<tspan x="10" y="1722"></tspan>
 
-<tspan x="10" y="1738">- jslint - merge function jslintAndPrintConditional -&gt; jslintAndPrint</tspan>
+<tspan x="10" y="1738">2018-11-15 00:49:55 +0800</tspan>
 
-<tspan x="10" y="1754">- jslint-autofix - braket</tspan>
+<tspan x="10" y="1754">[npm publish] - npm publish 2018.11.14</tspan>
 
-<tspan x="10" y="1770">- jslint-autofix - parenthesize open-statements</tspan>
+<tspan x="10" y="1770">- refactor files with new jslint (v2018.10.26)</tspan>
 
-<tspan x="10" y="1786">- jslint-autofix - prefix-operator</tspan>
+<tspan x="10" y="1786">- jslint - replace ",$s/^ *".*"\n *+ ".*"\(\n *+ ".*"\)*/(&amp;)/gc"</tspan>
 
-<tspan x="10" y="1802">- jslint-autofix - parenthesize rgx</tspan>
+<tspan x="10" y="1802">- jslint - unexpected_a \(</tspan>
 
-<tspan x="10" y="1818">- jslint-autofix - local-function</tspan>
+<tspan x="10" y="1818">- jslint - replace instanceof -&gt; Object.prototype.toString.call</tspan>
 
-<tspan x="10" y="1834">- jslint-autofix - add autofix button to live web-demo</tspan>
+<tspan x="10" y="1834">- jslint - replace var self -&gt; that</tspan>
 
-<tspan x="10" y="1850">- jslint-autofix - embedded ```javascript```, &lt;\script\&gt;, &lt;\style\&gt;</tspan>
+<tspan x="10" y="1850">- jslint - unconst and unlet</tspan>
 
-<tspan x="10" y="1866">- jslint-autofix - tweak to run before JSLint in function jslintAndPrint</tspan>
+<tspan x="10" y="1866">- jslint - prioritize fatal jslint-errors</tspan>
 
-<tspan x="10" y="1882">- update function uiEventDelegate to use dom-property data-event</tspan>
+<tspan x="10" y="1882">- jslint - merge function jslintAndPrintConditional -&gt; jslintAndPrint</tspan>
 
-<tspan x="10" y="1898"></tspan>
+<tspan x="10" y="1898">- jslint-autofix - braket</tspan>
 
-<tspan x="10" y="1914">2018-09-08 21:13:22 +0700</tspan>
+<tspan x="10" y="1914">- jslint-autofix - parenthesize open-statements</tspan>
 
-<tspan x="10" y="1930">[npm publish] - npm publish 2018.9.8</tspan>
+<tspan x="10" y="1930">- jslint-autofix - prefix-operator</tspan>
 
-<tspan x="10" y="1946">- prepare for jslint v2018.05.14</tspan>
+<tspan x="10" y="1946">- jslint-autofix - parenthesize rgx</tspan>
 
-<tspan x="10" y="1962">- update function buildLib to add section 'local functions - builtin' and remove duplicate local\</tspan>
-<tspan x="10" y="1978"> functions</tspan>
+<tspan x="10" y="1962">- jslint-autofix - local-function</tspan>
 
-<tspan x="10" y="1994">- merge env var modeTest and utility2_modeTestRun -&gt; local.global.utility2_modeTest</tspan>
+<tspan x="10" y="1978">- jslint-autofix - add autofix button to live web-demo</tspan>
 
-<tspan x="10" y="2010">- merge function onResetXxx -&gt; utility2_onReadyXxx</tspan>
+<tspan x="10" y="1994">- jslint-autofix - embedded ```javascript```, &lt;\script\&gt;, &lt;\style\&gt;</tspan>
 
-<tspan x="10" y="2026">- revamp bootstrap-mechanism before running tests</tspan>
+<tspan x="10" y="2010">- jslint-autofix - tweak to run before JSLint in function jslintAndPrint</tspan>
 
-<tspan x="10" y="2042">- revamp event-handling function uiEventDelegate</tspan>
+<tspan x="10" y="2026">- update function uiEventDelegate to use dom-property data-event</tspan>
 
-<tspan x="10" y="2058">- integrate function db.onEventDomDb with utility2_onReadyBefore</tspan>
+<tspan x="10" y="2042"></tspan>
 
-<tspan x="10" y="2074">- cleanup base64 &lt;-&gt; buffer helpers</tspan>
+<tspan x="10" y="2058">2018-09-08 21:13:22 +0700</tspan>
 
-<tspan x="10" y="2090"></tspan>
+<tspan x="10" y="2074">[npm publish] - npm publish 2018.9.8</tspan>
 
-<tspan x="10" y="2106">2018-08-17 14:00:18 +0700</tspan>
+<tspan x="10" y="2090">- prepare for jslint v2018.05.14</tspan>
 
-<tspan x="10" y="2122">[npm publish] - npm publish 2018.8.17</tspan>
+<tspan x="10" y="2106">- update function buildLib to add section 'local functions - builtin' and remove duplicate local\</tspan>
+<tspan x="10" y="2122"> functions</tspan>
 
-<tspan x="10" y="2138">- add swaggerJson param x-swgg-buttonDatabase</tspan>
+<tspan x="10" y="2138">- merge env var modeTest and utility2_modeTestRun -&gt; local.global.utility2_modeTest</tspan>
 
-<tspan x="10" y="2154">- do not require following nodejs builtins by default: console, constants, module, process, puny\</tspan>
-<tspan x="10" y="2170">code</tspan>
+<tspan x="10" y="2154">- merge function onResetXxx -&gt; utility2_onReadyXxx</tspan>
 
-<tspan x="10" y="2186">- add benchmark analytics domOnEventWindowOnloadTimeElapsed</tspan>
+<tspan x="10" y="2170">- revamp bootstrap-mechanism before running tests</tspan>
 
-<tspan x="10" y="2202">- add BigInt-support for jslint and istanbul</tspan>
+<tspan x="10" y="2186">- revamp event-handling function uiEventDelegate</tspan>
 
-<tspan x="10" y="2218">- migrate from modeJs -&gt; isBrowser</tspan>
+<tspan x="10" y="2202">- integrate function db.onEventDomDb with utility2_onReadyBefore</tspan>
 
-<tspan x="10" y="2234">- add validator semanticPaths3</tspan>
+<tspan x="10" y="2218">- cleanup base64 &lt;-&gt; buffer helpers</tspan>
 
-<tspan x="10" y="2250"></tspan>
+<tspan x="10" y="2234"></tspan>
 
-<tspan x="10" y="2266">2018-06-19 11:58:56 -0500</tspan>
+<tspan x="10" y="2250">2018-08-17 14:00:18 +0700</tspan>
 
-<tspan x="10" y="2282">[npm publish] - npm publish 2018.6.16</tspan>
+<tspan x="10" y="2266">[npm publish] - npm publish 2018.8.17</tspan>
 
-<tspan x="10" y="2298">- add sample testAudio1, testImage1, testVideo1 for file-upload api</tspan>
+<tspan x="10" y="2282">- add swaggerJson param x-swgg-buttonDatabase</tspan>
 
-<tspan x="10" y="2314">- fix default description for tags</tspan>
+<tspan x="10" y="2298">- do not require following nodejs builtins by default: console, constants, module, process, puny\</tspan>
+<tspan x="10" y="2314">code</tspan>
 
-<tspan x="10" y="2330">- add better test audio/image for file-upload api</tspan>
+<tspan x="10" y="2330">- add benchmark analytics domOnEventWindowOnloadTimeElapsed</tspan>
 
-<tspan x="10" y="2346">- allow submit-override in ui, in spite of validation-errors</tspan>
+<tspan x="10" y="2346">- add BigInt-support for jslint and istanbul</tspan>
 
-<tspan x="10" y="2362">- revamp function buildLib</tspan>
+<tspan x="10" y="2362">- migrate from modeJs -&gt; isBrowser</tspan>
 
-<tspan x="10" y="2378"></tspan>
+<tspan x="10" y="2378">- add validator semanticPaths3</tspan>
 
-<tspan x="10" y="2394">2018-04-22 03:26:21 +0800</tspan>
+<tspan x="10" y="2394"></tspan>
 
-<tspan x="10" y="2410">[npm publish] - npm publish v2018.4.21</tspan>
+<tspan x="10" y="2410">2018-06-19 11:58:56 -0500</tspan>
 
-<tspan x="10" y="2426">- add semantic validators from https://github.com/swagger-api/swagger-editor/tree/v3.1.20/src/pl\</tspan>
-<tspan x="10" y="2442">ugins/validation/semantic-validators/validators</tspan>
+<tspan x="10" y="2426">[npm publish] - npm publish 2018.6.16</tspan>
 
-<tspan x="10" y="2458">- add function swaggerValidateSchemaSemanticFormData</tspan>
+<tspan x="10" y="2442">- add sample testAudio1, testImage1, testVideo1 for file-upload api</tspan>
 
-<tspan x="10" y="2474">- rename function validateBySwaggerParameters -&gt; swaggerValidateDataParameters</tspan>
+<tspan x="10" y="2458">- fix default description for tags</tspan>
 
-<tspan x="10" y="2490">- rename function validateBySwaggerSchema -&gt; swaggerValidateDataSchema</tspan>
+<tspan x="10" y="2474">- add better test audio/image for file-upload api</tspan>
 
-<tspan x="10" y="2506">- rename function swaggerValidateJson -&gt; swaggerValidate</tspan>
+<tspan x="10" y="2490">- allow submit-override in ui, in spite of validation-errors</tspan>
 
-<tspan x="10" y="2522">- add assets assets.swagger-ui.logo.medium.png, assets.swagger-ui.logo.small.png</tspan>
+<tspan x="10" y="2506">- revamp function buildLib</tspan>
 
-<tspan x="10" y="2538">- update function apiUpdate to auto-create property x-swgg-tagNameList</tspan>
+<tspan x="10" y="2522"></tspan>
 
-<tspan x="10" y="2554">- hide info-template during initial render</tspan>
+<tspan x="10" y="2538">2018-04-22 03:26:21 +0800</tspan>
 
-<tspan x="10" y="2570">- fix css button margins</tspan>
+<tspan x="10" y="2554">[npm publish] - npm publish v2018.4.21</tspan>
 
-<tspan x="10" y="2586"></tspan>
+<tspan x="10" y="2570">- add semantic validators from https://github.com/swagger-api/swagger-editor/tree/v3.1.20/src/pl\</tspan>
+<tspan x="10" y="2586">ugins/validation/semantic-validators/validators</tspan>
 
-<tspan x="10" y="2602">2018-03-27 00:13:48 +0900</tspan>
+<tspan x="10" y="2602">- add function swaggerValidateSchemaSemanticFormData</tspan>
 
-<tspan x="10" y="2618">[npm publish] - npm publish v2018.3.25</tspan>
+<tspan x="10" y="2618">- rename function validateBySwaggerParameters -&gt; swaggerValidateDataParameters</tspan>
 
-<tspan x="10" y="2634">- fix transparency bug in firefox for textarea</tspan>
+<tspan x="10" y="2634">- rename function validateBySwaggerSchema -&gt; swaggerValidateDataSchema</tspan>
 
-<tspan x="10" y="2650">- revamp css</tspan>
+<tspan x="10" y="2650">- rename function swaggerValidateJson -&gt; swaggerValidate</tspan>
 
-<tspan x="10" y="2666"></tspan>
+<tspan x="10" y="2666">- add assets assets.swagger-ui.logo.medium.png, assets.swagger-ui.logo.small.png</tspan>
 
-<tspan x="10" y="2682">2018-02-25 18:35:39 +0700</tspan>
+<tspan x="10" y="2682">- update function apiUpdate to auto-create property x-swgg-tagNameList</tspan>
 
-<tspan x="10" y="2698">[npm publish] - npm publish v2018.2.24</tspan>
+<tspan x="10" y="2698">- hide info-template during initial render</tspan>
 
-<tspan x="10" y="2714">- assets.utility2.rollup.js - add function shlintUtility2 and macro # jslint-utility2</tspan>
+<tspan x="10" y="2714">- fix css button margins</tspan>
 
-<tspan x="10" y="2730">- merge function uiRenderAll into onEventUiReload</tspan>
+<tspan x="10" y="2730"></tspan>
 
-<tspan x="10" y="2746">- add ui-element swggAjaxErrorPre1, and uppdate function uiNotify to post errors there</tspan>
+<tspan x="10" y="2746">2018-03-27 00:13:48 +0900</tspan>
 
-<tspan x="10" y="2762">- fix bug in function normalizeSwaggerJson where options.objectSetDescription is not applied to \</tspan>
-<tspan x="10" y="2778">operation.parameters or operation.responses</tspan>
+<tspan x="10" y="2762">[npm publish] - npm publish v2018.3.25</tspan>
 
-<tspan x="10" y="2794">- update function normalizeSwaggerJson with option x-swgg-fixErrorSemanticUniquePath</tspan>
+<tspan x="10" y="2778">- fix transparency bug in firefox for textarea</tspan>
 
-<tspan x="10" y="2810">- add function operationIdFromAjax</tspan>
+<tspan x="10" y="2794">- revamp css</tspan>
 
-<tspan x="10" y="2826">- add function swaggerJsonFromAjax, swaggerJsonFromCurl, swaggerJsonFromPostBody</tspan>
+<tspan x="10" y="2810"></tspan>
 
-<tspan x="10" y="2842">- add function urlParseWithBraket</tspan>
+<tspan x="10" y="2826">2018-02-25 18:35:39 +0700</tspan>
 
-<tspan x="10" y="2858"></tspan>
+<tspan x="10" y="2842">[npm publish] - npm publish v2018.2.24</tspan>
 
-<tspan x="10" y="2874">2018-02-02 12:06:01 +0700</tspan>
+<tspan x="10" y="2858">- assets.utility2.rollup.js - add function shlintUtility2 and macro # jslint-utility2</tspan>
 
-<tspan x="10" y="2890">[npm publish] - npm publish 2018.2.1</tspan>
+<tspan x="10" y="2874">- merge function uiRenderAll into onEventUiReload</tspan>
 
-<tspan x="10" y="2906">- add validation semanticUniquePath in function swaggerValidateJson</tspan>
+<tspan x="10" y="2890">- add ui-element swggAjaxErrorPre1, and uppdate function uiNotify to post errors there</tspan>
 
-<tspan x="10" y="2922">- merge js-env for tests</tspan>
+<tspan x="10" y="2906">- fix bug in function normalizeSwaggerJson where options.objectSetDescription is not applied to \</tspan>
+<tspan x="10" y="2922">operation.parameters or operation.responses</tspan>
 
-<tspan x="10" y="2938">- add swaggerJson property x-swgg-descriptionLineList</tspan>
+<tspan x="10" y="2938">- update function normalizeSwaggerJson with option x-swgg-fixErrorSemanticUniquePath</tspan>
 
-<tspan x="10" y="2954">- add file assets.swgg.swagger.petstore.json</tspan>
+<tspan x="10" y="2954">- add function operationIdFromAjax</tspan>
 
-<tspan x="10" y="2970">- add function swaggerValidateFile</tspan>
+<tspan x="10" y="2970">- add function swaggerJsonFromAjax, swaggerJsonFromCurl, swaggerJsonFromPostBody</tspan>
 
-<tspan x="10" y="2986">- ignore env var $npm_package_swggAll and $npm_package_swggTags0 if package-name has -all suffix</tspan>
+<tspan x="10" y="2986">- add function urlParseWithBraket</tspan>
 
-<tspan x="10" y="3002">- dereference body-sub-schema.$ref in ui-documentation</tspan>
+<tspan x="10" y="3002"></tspan>
 
-<tspan x="10" y="3018">- fix failed semanticRequired validation-error in ui</tspan>
+<tspan x="10" y="3018">2018-02-02 12:06:01 +0700</tspan>
 
-<tspan x="10" y="3034">- update function dbFieldRandomCreate to use schemaP.default if available, in modeNotRandom</tspan>
+<tspan x="10" y="3034">[npm publish] - npm publish 2018.2.1</tspan>
 
-<tspan x="10" y="3050">- update function normalizeSwaggerJson to override tag.description with x-swgg-tags0-override</tspan>
+<tspan x="10" y="3050">- add validation semanticUniquePath in function swaggerValidateJson</tspan>
 
-<tspan x="10" y="3066"></tspan>
+<tspan x="10" y="3066">- merge js-env for tests</tspan>
 
-<tspan x="10" y="3082">2018-01-13 19:12:58 +0700</tspan>
+<tspan x="10" y="3082">- add swaggerJson property x-swgg-descriptionLineList</tspan>
 
-<tspan x="10" y="3098">[npm publish] - npm publish 2018.1.12</tspan>
+<tspan x="10" y="3098">- add file assets.swgg.swagger.petstore.json</tspan>
 
-<tspan x="10" y="3114">- do not auto-fill input if default value is null</tspan>
+<tspan x="10" y="3114">- add function swaggerValidateFile</tspan>
 
-<tspan x="10" y="3130">- remove unused datatable link</tspan>
+<tspan x="10" y="3130">- ignore env var $npm_package_swggAll and $npm_package_swggTags0 if package-name has -all suffix</tspan>
 
-<tspan x="10" y="3146"></tspan>
+<tspan x="10" y="3146">- dereference body-sub-schema.$ref in ui-documentation</tspan>
 
-<tspan x="10" y="3162">2017-11-21 12:42:25 +0800</tspan>
+<tspan x="10" y="3162">- fix failed semanticRequired validation-error in ui</tspan>
 
-<tspan x="10" y="3178">[npm publish] - npm publish 2017.11.20</tspan>
+<tspan x="10" y="3178">- update function dbFieldRandomCreate to use schemaP.default if available, in modeNotRandom</tspan>
 
-<tspan x="10" y="3194">- add param operation['x-swgg-consumes0'], operation['x-swgg-notRequired'], and operation['x-swg\</tspan>
-<tspan x="10" y="3210">g-required']</tspan>
+<tspan x="10" y="3194">- update function normalizeSwaggerJson to override tag.description with x-swgg-tags0-override</tspan>
 
-<tspan x="10" y="3226">- add operation['x-swgg-consumes0'] = 'application/xml' support for wechat-pay</tspan>
+<tspan x="10" y="3210"></tspan>
 
-<tspan x="10" y="3242">- allow function dbRowListRandomCreate to recurse objects and stop with modeSubdoc flag</tspan>
+<tspan x="10" y="3226">2018-01-13 19:12:58 +0700</tspan>
 
-<tspan x="10" y="3258">- disable submit-button on input-validation-error</tspan>
+<tspan x="10" y="3242">[npm publish] - npm publish 2018.1.12</tspan>
 
-<tspan x="10" y="3274">- fix in.body parameter not showing validation-error-message</tspan>
+<tspan x="10" y="3258">- do not auto-fill input if default value is null</tspan>
 
-<tspan x="10" y="3290">- update ui to show required attribute only in 'name and desscription' section</tspan>
+<tspan x="10" y="3274">- remove unused datatable link</tspan>
 
-<tspan x="10" y="3306">- use textarea for string (json)</tspan>
+<tspan x="10" y="3290"></tspan>
 
-<tspan x="10" y="3322"></tspan>
+<tspan x="10" y="3306">2017-11-21 12:42:25 +0800</tspan>
 
-<tspan x="10" y="3338">2017-11-16 21:17:57 +0800</tspan>
+<tspan x="10" y="3322">[npm publish] - npm publish 2017.11.20</tspan>
 
-<tspan x="10" y="3354">[npm publish] - npm publish 2017.11.15</tspan>
+<tspan x="10" y="3338">- add param operation['x-swgg-consumes0'], operation['x-swgg-notRequired'], and operation['x-swg\</tspan>
+<tspan x="10" y="3354">g-required']</tspan>
 
-<tspan x="10" y="3370">- add env tags filter $npm_package_swggTags0</tspan>
+<tspan x="10" y="3370">- add operation['x-swgg-consumes0'] = 'application/xml' support for wechat-pay</tspan>
 
-<tspan x="10" y="3386">- add function assertSwaggerValidate</tspan>
+<tspan x="10" y="3386">- allow function dbRowListRandomCreate to recurse objects and stop with modeSubdoc flag</tspan>
 
-<tspan x="10" y="3402">- allow function dbRowListRandomCreate to recurse objects and stop with modeSubdoc flag</tspan>
+<tspan x="10" y="3402">- disable submit-button on input-validation-error</tspan>
 
-<tspan x="10" y="3418">- function templateRender - default to htmlSafe and override with flag notHtmlSafe</tspan>
+<tspan x="10" y="3418">- fix in.body parameter not showing validation-error-message</tspan>
 
-<tspan x="10" y="3434">- ui - add cross-browser multiline placeholder support for textarea</tspan>
+<tspan x="10" y="3434">- update ui to show required attribute only in 'name and desscription' section</tspan>
 
-<tspan x="10" y="3450">- ui - add dynamic input validation</tspan>
+<tspan x="10" y="3450">- use textarea for string (json)</tspan>
 
-<tspan x="10" y="3466">- ui - include resource description from header in operationList</tspan>
+<tspan x="10" y="3466"></tspan>
 
-<tspan x="10" y="3482">- ui - merge template templateUiResponseAjax into templateUiOperation</tspan>
+<tspan x="10" y="3482">2017-11-16 21:17:57 +0800</tspan>
 
-<tspan x="10" y="3498">- ui - select pre-text when clicked</tspan>
+<tspan x="10" y="3498">[npm publish] - npm publish 2017.11.15</tspan>
 
-<tspan x="10" y="3514">- ui - truncate resource long-descriptions</tspan>
+<tspan x="10" y="3514">- add env tags filter $npm_package_swggTags0</tspan>
 
-<tspan x="10" y="3530">- ui - remove eventListeners in operation-div (and rely on resource-ui eventListeners)</tspan>
+<tspan x="10" y="3530">- add function assertSwaggerValidate</tspan>
 
-<tspan x="10" y="3546">- rename function uiRender -&gt; uiRenderAll</tspan>
+<tspan x="10" y="3546">- allow function dbRowListRandomCreate to recurse objects and stop with modeSubdoc flag</tspan>
 
-<tspan x="10" y="3562">- rename property x-swgg-urlApp -&gt; x-swgg-downloadStandaloneApp</tspan>
+<tspan x="10" y="3562">- function templateRender - default to htmlSafe and override with flag notHtmlSafe</tspan>
 
-<tspan x="10" y="3578">- update function normalizeSwaggerJson to override swaggerJson with x-swgg-tags0-override</tspan>
+<tspan x="10" y="3578">- ui - add cross-browser multiline placeholder support for textarea</tspan>
 
-<tspan x="10" y="3594"></tspan>
+<tspan x="10" y="3594">- ui - add dynamic input validation</tspan>
 
-<tspan x="10" y="3610">2017-11-08 02:30:09 +0800</tspan>
+<tspan x="10" y="3610">- ui - include resource description from header in operationList</tspan>
 
-<tspan x="10" y="3626">[npm publish] - npm publish 2017.11.7</tspan>
+<tspan x="10" y="3626">- ui - merge template templateUiResponseAjax into templateUiOperation</tspan>
 
-<tspan x="10" y="3642">- add responsive css to header</tspan>
+<tspan x="10" y="3642">- ui - select pre-text when clicked</tspan>
 
-<tspan x="10" y="3658">- merge properties paramDef.x-swgg-example and paramDef.default -&gt; paramDef.default</tspan>
+<tspan x="10" y="3658">- ui - truncate resource long-descriptions</tspan>
 
-<tspan x="10" y="3674">- modify function normalizeSwaggerParamDict to only set default-value if required (or modeDefaul\</tspan>
-<tspan x="10" y="3690">t flag is enabled)</tspan>
+<tspan x="10" y="3674">- ui - remove eventListeners in operation-div (and rely on resource-ui eventListeners)</tspan>
 
-<tspan x="10" y="3706">- rename x-swgg-definitionsParameter -&gt; #/parameters</tspan>
+<tspan x="10" y="3690">- rename function uiRender -&gt; uiRenderAll</tspan>
 
-<tspan x="10" y="3722">- remove unused apiAjax defer-routine</tspan>
+<tspan x="10" y="3706">- rename property x-swgg-urlApp -&gt; x-swgg-downloadStandaloneApp</tspan>
 
-<tspan x="10" y="3738">- revamp normalizers normalizeSwaggerJson, normalizeSwaggerParamDict</tspan>
+<tspan x="10" y="3722">- update function normalizeSwaggerJson to override swaggerJson with x-swgg-tags0-override</tspan>
 
-<tspan x="10" y="3754">- revamp validators validateBySwaggerJson, validateBySwaggerParameters, validateBySwaggerSchema</tspan>
+<tspan x="10" y="3738"></tspan>
 
-<tspan x="10" y="3770">- validate schema.default</tspan>
+<tspan x="10" y="3754">2017-11-08 02:30:09 +0800</tspan>
 
-<tspan x="10" y="3786"></tspan>
+<tspan x="10" y="3770">[npm publish] - npm publish 2017.11.7</tspan>
 
-<tspan x="10" y="3802">2017-10-29 03:37:37 +0800</tspan>
+<tspan x="10" y="3786">- add responsive css to header</tspan>
 
-<tspan x="10" y="3818">[npm publish] - npm publish 2017.10.28</tspan>
+<tspan x="10" y="3802">- merge properties paramDef.x-swgg-example and paramDef.default -&gt; paramDef.default</tspan>
 
-<tspan x="10" y="3834">- add jsonp ability to function swgg.apiUpdate</tspan>
+<tspan x="10" y="3818">- modify function normalizeSwaggerParamDict to only set default-value if required (or modeDefaul\</tspan>
+<tspan x="10" y="3834">t flag is enabled)</tspan>
 
-<tspan x="10" y="3850">- add property swaggerJson['x-swgg-operationIdFromPath']</tspan>
+<tspan x="10" y="3850">- rename x-swgg-definitionsParameter -&gt; #/parameters</tspan>
 
-<tspan x="10" y="3866">- add property swaggerJson.info['x-swgg-urlApp'] and 'download standalone app' link</tspan>
+<tspan x="10" y="3866">- remove unused apiAjax defer-routine</tspan>
 
-<tspan x="10" y="3882">- allow deferring of function apiAjax to wait for remote swaggerJson</tspan>
+<tspan x="10" y="3882">- revamp normalizers normalizeSwaggerJson, normalizeSwaggerParamDict</tspan>
 
-<tspan x="10" y="3898">- document apiDict.ajax methods</tspan>
+<tspan x="10" y="3898">- revamp validators validateBySwaggerJson, validateBySwaggerParameters, validateBySwaggerSchema</tspan>
 
-<tspan x="10" y="3914">- rename pathObject._idAlias -&gt; pathObject._idBackend</tspan>
+<tspan x="10" y="3914">- validate schema.default</tspan>
 
-<tspan x="10" y="3930">- rename pathObject._idField -&gt; pathObject._idName</tspan>
+<tspan x="10" y="3930"></tspan>
 
-<tspan x="10" y="3946">- rename pathObject._keyCrud -&gt; pathObject._crudType</tspan>
+<tspan x="10" y="3946">2017-10-29 03:37:37 +0800</tspan>
 
-<tspan x="10" y="3962">- rename pathObject._keyPath -&gt; pathObject._methodPath</tspan>
+<tspan x="10" y="3962">[npm publish] - npm publish 2017.10.28</tspan>
 
-<tspan x="10" y="3978">- rename request.swgg.crud.operationId -&gt; request.swgg.crud.crudType</tspan>
+<tspan x="10" y="3978">- add jsonp ability to function swgg.apiUpdate</tspan>
 
-<tspan x="10" y="3994">- split pathObject.operationId into pathObject.crudType from pathObject.operationId</tspan>
+<tspan x="10" y="3994">- add property swaggerJson['x-swgg-operationIdFromPath']</tspan>
 
-<tspan x="10" y="4010"></tspan>
+<tspan x="10" y="4010">- add property swaggerJson.info['x-swgg-urlApp'] and 'download standalone app' link</tspan>
 
-<tspan x="10" y="4026">2017-10-25 00:25:48 +0800</tspan>
+<tspan x="10" y="4026">- allow deferring of function apiAjax to wait for remote swaggerJson</tspan>
 
-<tspan x="10" y="4042">[npm publish] - npm publish 2017.10.24</tspan>
+<tspan x="10" y="4042">- document apiDict.ajax methods</tspan>
 
-<tspan x="10" y="4058">- remove datatable for future revamp</tspan>
+<tspan x="10" y="4058">- rename pathObject._idAlias -&gt; pathObject._idBackend</tspan>
 
-<tspan x="10" y="4074">- add feature $SWGG_TAGS0_FILTER to filter x-swgg-tags0</tspan>
+<tspan x="10" y="4074">- rename pathObject._idField -&gt; pathObject._idName</tspan>
 
-<tspan x="10" y="4090">- add feature x-swgg-operationIdFromPath to auto-create operationId from path</tspan>
+<tspan x="10" y="4090">- rename pathObject._keyCrud -&gt; pathObject._crudType</tspan>
 
-<tspan x="10" y="4106">- fix property items.enum not rendering multi-select input bug</tspan>
+<tspan x="10" y="4106">- rename pathObject._keyPath -&gt; pathObject._methodPath</tspan>
 
-<tspan x="10" y="4122">- fix missing resource.id bug</tspan>
+<tspan x="10" y="4122">- rename request.swgg.crud.operationId -&gt; request.swgg.crud.crudType</tspan>
 
-<tspan x="10" y="4138">- rename function normalizeParamDictSwagger -&gt; swaggerParamDictNormalize</tspan>
+<tspan x="10" y="4138">- split pathObject.operationId into pathObject.crudType from pathObject.operationId</tspan>
 
-<tspan x="10" y="4154">- rename property pathObject._operationId -&gt; pathObject._keyCrud</tspan>
+<tspan x="10" y="4154"></tspan>
 
-<tspan x="10" y="4170">- rename property swgg.pathname -&gt; swgg.keyPath</tspan>
+<tspan x="10" y="4170">2017-10-25 00:25:48 +0800</tspan>
 
-<tspan x="10" y="4186">- remove operationId display from ui</tspan>
+<tspan x="10" y="4186">[npm publish] - npm publish 2017.10.24</tspan>
 
-<tspan x="10" y="4202"></tspan>
+<tspan x="10" y="4202">- remove datatable for future revamp</tspan>
 
-<tspan x="10" y="4218">2017-10-19 01:09:50 +0800</tspan>
+<tspan x="10" y="4218">- add feature $SWGG_TAGS0_FILTER to filter x-swgg-tags0</tspan>
 
-<tspan x="10" y="4234">[npm publish] - npm publish 2017.10.17</tspan>
+<tspan x="10" y="4234">- add feature x-swgg-operationIdFromPath to auto-create operationId from path</tspan>
 
-<tspan x="10" y="4250">- auto-scroll to first operation if hashbang fails</tspan>
+<tspan x="10" y="4250">- fix property items.enum not rendering multi-select input bug</tspan>
 
-<tspan x="10" y="4266">- fix client-api initialization in browser</tspan>
+<tspan x="10" y="4266">- fix missing resource.id bug</tspan>
 
-<tspan x="10" y="4282">- fix bug where missing required-param in ui does not give error</tspan>
+<tspan x="10" y="4282">- rename function normalizeParamDictSwagger -&gt; swaggerParamDictNormalize</tspan>
 
-<tspan x="10" y="4298"></tspan>
+<tspan x="10" y="4298">- rename property pathObject._operationId -&gt; pathObject._keyCrud</tspan>
 
-<tspan x="10" y="4314">2017-10-13 02:44:27 +0800</tspan>
+<tspan x="10" y="4314">- rename property swgg.pathname -&gt; swgg.keyPath</tspan>
 
-<tspan x="10" y="4330">[npm publish] - npm publish 2017.10.11</tspan>
+<tspan x="10" y="4330">- remove operationId display from ui</tspan>
 
-<tspan x="10" y="4346">- add swgg credit to bottom on assets.swgg.html</tspan>
+<tspan x="10" y="4346"></tspan>
 
-<tspan x="10" y="4362">- add top-level swagger-json property x-definitionsParameters</tspan>
+<tspan x="10" y="4362">2017-10-19 01:09:50 +0800</tspan>
 
-<tspan x="10" y="4378">- add param-property x-host</tspan>
+<tspan x="10" y="4378">[npm publish] - npm publish 2017.10.17</tspan>
 
-<tspan x="10" y="4394">- document library-call equivalent to curl-request</tspan>
+<tspan x="10" y="4394">- auto-scroll to first operation if hashbang fails</tspan>
 
-<tspan x="10" y="4410">- rename function swgg.apiDictUpdate -&gt; swgg.apiUpdate</tspan>
+<tspan x="10" y="4410">- fix client-api initialization in browser</tspan>
 
-<tspan x="10" y="4426"></tspan>
+<tspan x="10" y="4426">- fix bug where missing required-param in ui does not give error</tspan>
 
-<tspan x="10" y="4442">2017-10-06 19:59:42 +0800</tspan>
+<tspan x="10" y="4442"></tspan>
 
-<tspan x="10" y="4458">[npm publish] - npm publish 2017.10.5</tspan>
+<tspan x="10" y="4458">2017-10-13 02:44:27 +0800</tspan>
 
-<tspan x="10" y="4474">- add api-key form-input, and persist in localStorage</tspan>
+<tspan x="10" y="4474">[npm publish] - npm publish 2017.10.11</tspan>
 
-<tspan x="10" y="4490">- add param-property 'x-apiKey'</tspan>
+<tspan x="10" y="4490">- add swgg credit to bottom on assets.swgg.html</tspan>
 
-<tspan x="10" y="4506">- add param-property 'x-example' (similar to 'default' param-property, except used in input-plac\</tspan>
-<tspan x="10" y="4522">eholder)</tspan>
+<tspan x="10" y="4506">- add top-level swagger-json property x-definitionsParameters</tspan>
 
-<tspan x="10" y="4538">- allow degenerate method-path's by appending # comment</tspan>
+<tspan x="10" y="4522">- add param-property x-host</tspan>
 
-<tspan x="10" y="4554">- fix double '//' bug when basePath is '/'</tspan>
+<tspan x="10" y="4538">- document library-call equivalent to curl-request</tspan>
 
-<tspan x="10" y="4570">- rename ajaxForwardProxyUrlTest to githubForwardProxyUrlTest</tspan>
+<tspan x="10" y="4554">- rename function swgg.apiDictUpdate -&gt; swgg.apiUpdate</tspan>
 
-<tspan x="10" y="4586"></tspan>
+<tspan x="10" y="4570"></tspan>
 
-<tspan x="10" y="4602">2017-07-26 07:28:11 +0800</tspan>
+<tspan x="10" y="4586">2017-10-06 19:59:42 +0800</tspan>
 
-<tspan x="10" y="4618">[npm publish] - npm publish 2017.7.24</tspan>
+<tspan x="10" y="4602">[npm publish] - npm publish 2017.10.5</tspan>
 
-<tspan x="10" y="4634">- add url property x-homepage in swagger.json to url-link info.title</tspan>
+<tspan x="10" y="4618">- add api-key form-input, and persist in localStorage</tspan>
 
-<tspan x="10" y="4650">- auto-scroll to hashtag of expanded element</tspan>
+<tspan x="10" y="4634">- add param-property 'x-apiKey'</tspan>
 
-<tspan x="10" y="4666">- chrome bug-workaround and w3 validation - replace &lt;form2&gt; tag with &lt;div class=form&gt;</tspan>
+<tspan x="10" y="4650">- add param-property 'x-example' (similar to 'default' param-property, except used in input-plac\</tspan>
+<tspan x="10" y="4666">eholder)</tspan>
 
-<tspan x="10" y="4682">- streamline server logs</tspan>
+<tspan x="10" y="4682">- allow degenerate method-path's by appending # comment</tspan>
 
-<tspan x="10" y="4698"></tspan>
+<tspan x="10" y="4698">- fix double '//' bug when basePath is '/'</tspan>
 
-<tspan x="10" y="4714">2017-07-16 03:25:36 +0800</tspan>
+<tspan x="10" y="4714">- rename ajaxForwardProxyUrlTest to githubForwardProxyUrlTest</tspan>
 
-<tspan x="10" y="4730">[npm publish] - npm publish 2017.7.1</tspan>
+<tspan x="10" y="4730"></tspan>
 
-<tspan x="10" y="4746">- auto-build README section 'table of contents'</tspan>
+<tspan x="10" y="4746">2017-07-26 07:28:11 +0800</tspan>
 
-<tspan x="10" y="4762">- enhance github-cors with function githubCorsUrlOverride</tspan>
+<tspan x="10" y="4762">[npm publish] - npm publish 2017.7.24</tspan>
 
-<tspan x="10" y="4778">- move functions uiAnimateSlideXxx from file lib.swgg.js to file assets.utility2.rollup.js</tspan>
+<tspan x="10" y="4778">- add url property x-homepage in swagger.json to url-link info.title</tspan>
 
-<tspan x="10" y="4794"></tspan>
+<tspan x="10" y="4794">- auto-scroll to hashtag of expanded element</tspan>
 
-<tspan x="10" y="4810">2017-05-22 16:55:49 +0800</tspan>
+<tspan x="10" y="4810">- chrome bug-workaround and w3 validation - replace &lt;form2&gt; tag with &lt;div class=form&gt;</tspan>
 
-<tspan x="10" y="4826">[npm publish] - npm publish 2017.5.20</tspan>
+<tspan x="10" y="4826">- streamline server logs</tspan>
 
-<tspan x="10" y="4842">- add url-search param modeSwaggerJsonUrl to override assets.swgg.swagger.json</tspan>
+<tspan x="10" y="4842"></tspan>
 
-<tspan x="10" y="4858">- deduplicate files assets.swgg.html and assets.swgg.rollup.js</tspan>
+<tspan x="10" y="4858">2017-07-16 03:25:36 +0800</tspan>
 
-<tspan x="10" y="4874">- hardcode server-based swagger.json as assets.swgg.swagger.server.json</tspan>
+<tspan x="10" y="4874">[npm publish] - npm publish 2017.7.1</tspan>
 
-<tspan x="10" y="4890">- merge assets.swgg.rollup.js into assets.utility2.rollup.js</tspan>
+<tspan x="10" y="4890">- auto-build README section 'table of contents'</tspan>
 
-<tspan x="10" y="4906">- rename api/v0/swagger.json -&gt; assets.swgg.swagger.server.json</tspan>
+<tspan x="10" y="4906">- enhance github-cors with function githubCorsUrlOverride</tspan>
 
-<tspan x="10" y="4922">- rename assets.swgg.petstore.json -&gt; assets.swgg.swagger.petstore.json</tspan>
+<tspan x="10" y="4922">- move functions uiAnimateSlideXxx from file lib.swgg.js to file assets.utility2.rollup.js</tspan>
 
-<tspan x="10" y="4938">- add README section 'internal screen-capture'</tspan>
+<tspan x="10" y="4938"></tspan>
 
-<tspan x="10" y="4954">- add README section 'quickstart standalone app'</tspan>
+<tspan x="10" y="4954">2017-05-22 16:55:49 +0800</tspan>
 
-<tspan x="10" y="4970">- rename README section 'quickstart web example' -&gt; 'quickstart example.js'</tspan>
+<tspan x="10" y="4970">[npm publish] - npm publish 2017.5.20</tspan>
 
-<tspan x="10" y="4986"></tspan>
+<tspan x="10" y="4986">- add url-search param modeSwaggerJsonUrl to override assets.swgg.swagger.json</tspan>
 
-<tspan x="10" y="5002">2017-05-02 12:58:31 +0800</tspan>
+<tspan x="10" y="5002">- deduplicate files assets.swgg.html and assets.swgg.rollup.js</tspan>
 
-<tspan x="10" y="5018">[npm publish] - npm publish 2017.5.1</tspan>
+<tspan x="10" y="5018">- hardcode server-based swagger.json as assets.swgg.swagger.server.json</tspan>
 
-<tspan x="10" y="5034">- update utility2 static-dependency in assets.swgg.rollup.js</tspan>
+<tspan x="10" y="5034">- merge assets.swgg.rollup.js into assets.utility2.rollup.js</tspan>
 
-<tspan x="10" y="5050"></tspan>
+<tspan x="10" y="5050">- rename api/v0/swagger.json -&gt; assets.swgg.swagger.server.json</tspan>
 
-<tspan x="10" y="5066">2017-03-30 19:19:56 +0800</tspan>
+<tspan x="10" y="5066">- rename assets.swgg.petstore.json -&gt; assets.swgg.swagger.petstore.json</tspan>
 
-<tspan x="10" y="5082">[npm publish] - update utility2 static-dependency in assets.swgg.rollup.js</tspan>
+<tspan x="10" y="5082">- add README section 'internal screen-capture'</tspan>
 
-<tspan x="10" y="5098">- add loading-text when resource is loading</tspan>
+<tspan x="10" y="5098">- add README section 'quickstart standalone app'</tspan>
 
-<tspan x="10" y="5114">- add validation for phone format-string</tspan>
-
-<tspan x="10" y="5130"></tspan>
-
-<tspan x="10" y="5146">2017-02-21 02:47:57 +0800</tspan>
-
-<tspan x="10" y="5162">- npm publish 2017.2.20</tspan>
-
-<tspan x="10" y="5178">- create published-alias oai-client oai-server swagger-client-lite swagger-lite swagger-server-l\</tspan>
-<tspan x="10" y="5194">ite</tspan>
-
-<tspan x="10" y="5210">- rename dom-element #outputTextareaStdout -&gt; #outputTextareaStdout1</tspan>
-
-<tspan x="10" y="5226">- replace env var npm_package_name with npm_package_nameAlias in istanbul code-coverage</tspan>
+<tspan x="10" y="5114">- rename README section 'quickstart web example' -&gt; 'quickstart example.js'</tspan>
 
 </text>
 </svg>
