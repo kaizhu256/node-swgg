@@ -50672,8 +50672,12 @@ utility2-comment -->\n\
 <script src="assets.{{packageJson.nameLib}}.js"></script>\n\
 <script src="assets.example.js"></script>\n\
 <script src="assets.test.js"></script>\n\
+<script>\n\
+if (window.utility2_onReadyBefore) {\n\
+    window.utility2_onReadyBefore();\n\
+}\n\
+</script>\n\
 <!-- utility2-comment\n\
-<script>window.utility2_onReadyBefore();</script>\n\
 {{/if isRollup}}\n\
 utility2-comment -->\n\
 <script>\n\
@@ -53060,7 +53064,7 @@ local.browserTest = function (opt, onError) {
 
 local.bufferConcat = function (bffList) {
 /*
- * this function will emulate node's Buffer.concat for Uint8Array in browser
+ * this function will emulate in browser, node's Buffer.concat
  */
     let byteLength;
     let ii;
@@ -65697,8 +65701,12 @@ utility2-comment -->\\n\\\n\
 <script src=\"jsonp.utility2.stateInit?callback=window.utility2.stateInit\"></script>\\n\\\n\
 <script src=\"assets.example.js\"></script>\\n\\\n\
 <script src=\"assets.test.js\"></script>\\n\\\n\
+<script>\\n\\\n\
+if (window.utility2_onReadyBefore) {\\n\\\n\
+    window.utility2_onReadyBefore();\\n\\\n\
+}\\n\\\n\
+</script>\\n\\\n\
 <!-- utility2-comment\\n\\\n\
-<script>window.utility2_onReadyBefore();</script>\\n\\\n\
 {{/if isRollup}}\\n\\\n\
 utility2-comment -->\\n\\\n\
 <script>\\n\\\n\
@@ -67316,7 +67324,7 @@ local.testCase_buildReadme_default = function (opt, onError) {\n\
             (\n\
                 /#\\u0020quickstart\\u0020example.js[\\S\\s]*?istanbul\\u0020instrument\\u0020in\\u0020package/\n\
             ),\n\
-            // customize quickstart-example-js-html-script\n\
+            // customize quickstart-example-js-script\n\
             (\n\
                 /#unless\\u0020isRollup[\\S\\s]*?<script\\u0020src=\"assets\\.example\\.js\">/\n\
             ),\n\

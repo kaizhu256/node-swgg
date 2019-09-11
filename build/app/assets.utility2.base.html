@@ -439,8 +439,12 @@ pre {
 <script src="assets.{{packageJson.nameLib}}.js"></script>
 <script src="assets.example.js"></script>
 <script src="assets.test.js"></script>
+<script>
+if (window.utility2_onReadyBefore) {
+    window.utility2_onReadyBefore();
+}
+</script>
 
-<script>window.utility2_onReadyBefore();</script>
 
 
 <script>

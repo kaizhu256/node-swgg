@@ -1,9 +1,9 @@
-<svg height="1230" width="720" xmlns="http://www.w3.org/2000/svg">
-<rect height="1230" fill="#555" width="720"></rect>
+<svg height="1374" width="720" xmlns="http://www.w3.org/2000/svg">
+<rect height="1374" fill="#555" width="720"></rect>
 <text fill="#7f7" font-family="Courier New" font-size="12" xml:space="preserve">
 <tspan x="10" y="26"></tspan>
 
-<tspan x="10" y="42">\x1b[35m[MODE_BUILD=buildApp]\x1b[0m - 2019-09-11T06:56:30.354Z - npm-testing /home/travis/build\</tspan>
+<tspan x="10" y="42">\x1b[35m[MODE_BUILD=buildApp]\x1b[0m - 2019-09-11T07:14:22.130Z - npm-testing /home/travis/build\</tspan>
 <tspan x="10" y="58">/kaizhu256/node-swgg</tspan>
 
 <tspan x="10" y="74"></tspan>
@@ -13,7 +13,7 @@
 <tspan x="10" y="106">buildApp - merged test-report from file /home/travis/build/kaizhu256/node-swgg/tmp/build/test-re\</tspan>
 <tspan x="10" y="122">port.json</tspan>
 
-<tspan x="10" y="138">&gt; http-server listening on port 64182</tspan>
+<tspan x="10" y="138">&gt; http-server listening on port 47871</tspan>
 
 <tspan x="10" y="154">db - dropping database ...</tspan>
 
@@ -24,7 +24,7 @@
 
 <tspan x="10" y="218">local-function - unused (README.md) local.onEventDomDb</tspan>
 
-<tspan x="10" y="234">jslint - 329ms /home/travis/build/kaizhu256/node-swgg/README.md</tspan>
+<tspan x="10" y="234">jslint - 275ms /home/travis/build/kaizhu256/node-swgg/README.md</tspan>
 
 <tspan x="10" y="250">jslint - 1ms /home/travis/build/kaizhu256/node-swgg/assets.swgg.swagger.petstore.json</tspan>
 
@@ -36,9 +36,9 @@
 
 <tspan x="10" y="314">db - seeding dbTable User ...</tspan>
 
-<tspan x="10" y="330">jslint - 963ms /home/travis/build/kaizhu256/node-swgg/lib.swgg.js</tspan>
+<tspan x="10" y="330">jslint - 909ms /home/travis/build/kaizhu256/node-swgg/lib.swgg.js</tspan>
 
-<tspan x="10" y="346">jslint - 5ms /home/travis/build/kaizhu256/node-swgg/npm_scripts.sh</tspan>
+<tspan x="10" y="346">jslint - 17ms /home/travis/build/kaizhu256/node-swgg/npm_scripts.sh</tspan>
 
 <tspan x="10" y="362">jslint - 0ms /home/travis/build/kaizhu256/node-swgg/package.json</tspan>
 
@@ -54,9 +54,9 @@
 
 <tspan x="10" y="458">db loaded from tmp/storage.test</tspan>
 
-<tspan x="10" y="474">jslint - 319ms /home/travis/build/kaizhu256/node-swgg/test.js</tspan>
+<tspan x="10" y="474">jslint - 383ms /home/travis/build/kaizhu256/node-swgg/test.js</tspan>
 
-<tspan x="10" y="490">http-server listening on port 32937</tspan>
+<tspan x="10" y="490">http-server listening on port 62670</tspan>
 
 <tspan x="10" y="506">db - seeding dbTable File ...</tspan>
 
@@ -66,27 +66,27 @@
 
 <tspan x="10" y="554">db - seeding dbTable User ...</tspan>
 
-<tspan x="10" y="570">testRunDefault - 10951 ms - testCase pending - testCase_buildApp_default ...</tspan>
+<tspan x="10" y="570">testRunDefault - 10893 ms - testCase pending - testCase_buildApp_default ...</tspan>
 
 <tspan x="10" y="586">db - seeding dbTable File ...</tspan>
 
-<tspan x="10" y="602">db - seeding dbTable File ...</tspan>
+<tspan x="10" y="602">db - seeding dbTable Pet ...</tspan>
 
-<tspan x="10" y="618">db - seeding dbTable Pet ...</tspan>
+<tspan x="10" y="618">db - seeding dbTable Order ...</tspan>
 
-<tspan x="10" y="634">db - seeding dbTable Order ...</tspan>
+<tspan x="10" y="634">db - seeding dbTable User ...</tspan>
 
-<tspan x="10" y="650">db - seeding dbTable User ...</tspan>
+<tspan x="10" y="650">db - seeding dbTable TestCrud ...</tspan>
 
-<tspan x="10" y="666">db - seeding dbTable Pet ...</tspan>
+<tspan x="10" y="666">db loaded from tmp/storage.undefined</tspan>
 
-<tspan x="10" y="682">db - seeding dbTable Order ...</tspan>
+<tspan x="10" y="682">db - seeding dbTable File ...</tspan>
 
-<tspan x="10" y="698">db - seeding dbTable User ...</tspan>
+<tspan x="10" y="698">db - seeding dbTable Pet ...</tspan>
 
-<tspan x="10" y="714">db - seeding dbTable TestCrud ...</tspan>
+<tspan x="10" y="714">db - seeding dbTable Order ...</tspan>
 
-<tspan x="10" y="730">db loaded from tmp/storage.undefined</tspan>
+<tspan x="10" y="730">db - seeding dbTable User ...</tspan>
 
 <tspan x="10" y="746">db - seeding dbTable File ...</tspan>
 
@@ -98,53 +98,71 @@
 
 <tspan x="10" y="810">db - seeding dbTable TestCrud ...</tspan>
 
-<tspan x="10" y="826">db loaded from tmp/storage.test</tspan>
+<tspan x="10" y="826">db - importing dbTable File ...</tspan>
 
-<tspan x="10" y="842">testRunDefault - 14993 ms - [node test-case 1 of 1 passed] - testCase_buildApp_default</tspan>
+<tspan x="10" y="842">db - importing dbTable Pet ...</tspan>
 
-<tspan x="10" y="858"></tspan>
+<tspan x="10" y="858">db - importing dbTable Order ...</tspan>
 
-<tspan x="10" y="874">buildApp - merged test-report from file /home/travis/build/kaizhu256/node-swgg/tmp/build/test-re\</tspan>
-<tspan x="10" y="890">port.json</tspan>
+<tspan x="10" y="874">db - importing dbTable User ...</tspan>
 
-<tspan x="10" y="906"></tspan>
+<tspan x="10" y="890">db - importing dbTable File ...</tspan>
 
-<tspan x="10" y="922">-------------------------------------------------------</tspan>
+<tspan x="10" y="906">db - importing dbTable Order ...</tspan>
 
-<tspan x="10" y="938">| test-report - buildApidoc - node - linux v12.10.0 - 2019-09-11T06:56:23.234Z</tspan>
+<tspan x="10" y="922">db - importing dbTable Pet ...</tspan>
 
-<tspan x="10" y="954">|   14994 ms            0 failed        1 passed      |</tspan>
+<tspan x="10" y="938">db - importing dbTable User ...</tspan>
 
-<tspan x="10" y="970">-------------------------------------------------------</tspan>
+<tspan x="10" y="954">db loaded from tmp/storage.test</tspan>
 
-<tspan x="10" y="986">| test-report - npmTest - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM\</tspan>
-<tspan x="10" y="1002">L, like Gecko) HeadlessChrome/77.0.3865.75 Safari/537.36 - 2019-09-11T06:56:11.058Z</tspan>
+<tspan x="10" y="970">testRunDefault - 14927 ms - [node test-case 1 of 1 passed] - testCase_buildApp_default</tspan>
 
-<tspan x="10" y="1018">|    2005 ms            0 failed       32 passed      |</tspan>
+<tspan x="10" y="986">testRunDefault - 15910 ms - testCase pending -  ...</tspan>
 
-<tspan x="10" y="1034">-------------------------------------------------------</tspan>
+<tspan x="10" y="1002"></tspan>
 
-<tspan x="10" y="1050">| test-report - npmTest - node - linux v12.10.0 - 2019-09-11T06:56:04.380Z</tspan>
+<tspan x="10" y="1018">buildApp - merged test-report from file /home/travis/build/kaizhu256/node-swgg/tmp/build/test-re\</tspan>
+<tspan x="10" y="1034">port.json</tspan>
 
-<tspan x="10" y="1066">|   13040 ms            0 failed       37 passed      |</tspan>
+<tspan x="10" y="1050"></tspan>
 
-<tspan x="10" y="1082">-------------------------------------------------------</tspan>
+<tspan x="10" y="1066">-------------------------------------------------------</tspan>
 
-<tspan x="10" y="1098"></tspan>
+<tspan x="10" y="1082">| test-report - buildApidoc - node - linux v12.10.0 - 2019-09-11T07:14:14.714Z</tspan>
 
-<tspan x="10" y="1114">created test-report file /home/travis/build/kaizhu256/node-swgg/tmp/build/test-report.html</tspan>
+<tspan x="10" y="1098">|   14928 ms            0 failed        1 passed      |</tspan>
 
-<tspan x="10" y="1130"></tspan>
+<tspan x="10" y="1114">-------------------------------------------------------</tspan>
 
-<tspan x="10" y="1146"></tspan>
+<tspan x="10" y="1130">| test-report - npmTest - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM\</tspan>
+<tspan x="10" y="1146">L, like Gecko) HeadlessChrome/77.0.3865.75 Safari/537.36 - 2019-09-11T07:14:02.328Z</tspan>
 
-<tspan x="10" y="1162">buildApp - 0 failed tests</tspan>
+<tspan x="10" y="1162">|    2014 ms            0 failed       32 passed      |</tspan>
 
-<tspan x="10" y="1178"></tspan>
+<tspan x="10" y="1178">-------------------------------------------------------</tspan>
 
-<tspan x="10" y="1194"></tspan>
+<tspan x="10" y="1194">| test-report - npmTest - node - linux v12.10.0 - 2019-09-11T07:13:55.228Z</tspan>
 
-<tspan x="10" y="1210">\x1b[35m[MODE_BUILD=buildApp]\x1b[0m - 2019-09-11T06:56:41.033Z - EXIT_CODE - 0</tspan>
+<tspan x="10" y="1210">|   13615 ms            0 failed       37 passed      |</tspan>
+
+<tspan x="10" y="1226">-------------------------------------------------------</tspan>
+
+<tspan x="10" y="1242"></tspan>
+
+<tspan x="10" y="1258">created test-report file /home/travis/build/kaizhu256/node-swgg/tmp/build/test-report.html</tspan>
+
+<tspan x="10" y="1274"></tspan>
+
+<tspan x="10" y="1290"></tspan>
+
+<tspan x="10" y="1306">buildApp - 0 failed tests</tspan>
+
+<tspan x="10" y="1322"></tspan>
+
+<tspan x="10" y="1338"></tspan>
+
+<tspan x="10" y="1354">\x1b[35m[MODE_BUILD=buildApp]\x1b[0m - 2019-09-11T07:14:32.774Z - EXIT_CODE - 0</tspan>
 
 </text>
 </svg>
