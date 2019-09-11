@@ -5092,11 +5092,11 @@ local.ajax = function (opt, onError) {
      * this function will validate and coerce/convert
      * <buf> to Buffer/Uint8Array, or String if <mode> = "string"
      */
-        // coerce ArrayBuffer -> Buffer
+        // coerce ArrayBuffer to Buffer
         if (Object.prototype.toString.call(buf) === "[object ArrayBuffer]") {
             buf = new Uint8Array(buf);
         }
-        // convert Buffer -> utf8
+        // convert Buffer to utf8
         if (mode === "string" && typeof buf !== "string") {
             buf = String(buf);
         }
@@ -5264,7 +5264,7 @@ local.ajax = function (opt, onError) {
         Object.keys(xhr.headers).forEach(function (key) {
             xhr.headers[key.toLowerCase()] = xhr.headers[key];
         });
-        // coerce Uint8Array -> Buffer
+        // coerce Uint8Array to Buffer
         if (
             !local.isBrowser
             && !Buffer.isBuffer(xhr.data)
@@ -36200,11 +36200,11 @@ local.jslintAutofix = function (code, file, opt) {
                 ), "/\\*");
                 break;
             case "/_/":
-                // autofix-js - rgx - " " -> "\\u0020"
+                // autofix-js - rgx - " " to "\\u0020"
                 data.code = data.code.replace((
                     /\u0020/g
                 ), "\\u0020");
-                // autofix-js - rgx - "-]" -> "\-]"
+                // autofix-js - rgx - "-]" to "\-]"
                 data.code = data.code.replace((
                     /\\.|-\]/g
                 ), function (match0) {
@@ -36251,7 +36251,7 @@ local.jslintAutofix = function (code, file, opt) {
                 break;
             }
         }
-        // autofix-js - remux - code, dataList.</_/> -> code
+        // autofix-js - remux - code, dataList.</_/> to code
         code = code.replace((
             /\/\u0000\//g
         ), function () {
@@ -36263,7 +36263,7 @@ local.jslintAutofix = function (code, file, opt) {
         ), function (match0) {
             return match0.split("\n").slice(0, -1).sort().join("\n") + "\n";
         });
-        // autofix-js - remux - code, ignoreList -> code
+        // autofix-js - remux - code, ignoreList to code
         code = code.replace((
             /^\u0020*?\/\*\u0020jslint\u0020ignore:start:end\u0020\*\/$/gm
         ), function () {
@@ -36312,7 +36312,7 @@ local.jslintAutofix = function (code, file, opt) {
 
 local.jslintGetColumnLine = function (code, ii) {
 /*
- * this function will transform <code> and <ii> -> {column, line, evidence}
+ * this function will transform <code> and <ii> to {column, line, evidence}
  */
     let column;
     let evidence;
@@ -53657,7 +53657,7 @@ local._http.request = function (xhr, onResponse) {
             }
             isDone = true;
             data = _data;
-            // async send req from client -> server
+            // async send req from client to server
             setTimeout(function () {
                 local.serverLocalReqHandler(req, res);
             });
@@ -53884,11 +53884,11 @@ local.ajax = function (opt, onError) {
      * this function will validate and coerce/convert
      * <buf> to Buffer/Uint8Array, or String if <mode> = "string"
      */
-        // coerce ArrayBuffer -> Buffer
+        // coerce ArrayBuffer to Buffer
         if (Object.prototype.toString.call(buf) === "[object ArrayBuffer]") {
             buf = new Uint8Array(buf);
         }
-        // convert Buffer -> utf8
+        // convert Buffer to utf8
         if (mode === "string" && typeof buf !== "string") {
             buf = String(buf);
         }
@@ -54056,7 +54056,7 @@ local.ajax = function (opt, onError) {
         Object.keys(xhr.headers).forEach(function (key) {
             xhr.headers[key.toLowerCase()] = xhr.headers[key];
         });
-        // coerce Uint8Array -> Buffer
+        // coerce Uint8Array to Buffer
         if (
             !local.isBrowser
             && !Buffer.isBuffer(xhr.data)
@@ -54229,7 +54229,7 @@ local.base64FromBuffer = function (buf) {
     let text;
     let uint24;
     let uint6ToB64;
-    // convert utf8 -> Uint8Array
+    // convert utf8 to Uint8Array
     if (typeof buf === "string") {
         buf = new TextEncoder().encode(buf);
     }
@@ -54310,7 +54310,7 @@ local.base64ToBuffer = function (b64, mode) {
 
 local.base64ToUtf8 = function (b64) {
 /*
- * this function will convert <b64> -> utf8
+ * this function will convert <b64> to utf8
  */
     return local.base64ToBuffer(b64, "string");
 };
@@ -54345,7 +54345,7 @@ local.blobRead = function (blob, onError) {
                 null,
                 Object.prototype.toString.call(reader.result)
                 === "[object ArrayBuffer]"
-                // convert ArrayBuffer -> Uint8Array
+                // convert ArrayBuffer to Uint8Array
                 ? new Uint8Array(reader.result)
                 : reader.result
             );
@@ -54629,7 +54629,7 @@ local.bufferValidateAndCoerce = function (buf, mode) {
     if (typeof buf === "string" && mode === "string") {
         return buf;
     }
-    // convert utf8 -> Uint8Array
+    // convert utf8 to Uint8Array
     if (typeof buf === "string") {
         buf = (
             local.isBrowser
@@ -54643,11 +54643,11 @@ local.bufferValidateAndCoerce = function (buf, mode) {
             + "ArrayBuffer, String, or Uint8Array"
         );
     }
-    // convert Uint8Array -> utf8
+    // convert Uint8Array to utf8
     if (mode === "string") {
         return new TextDecoder().decode(buf);
     }
-    // coerce Uint8Array -> Buffer
+    // coerce Uint8Array to Buffer
     if (!local.isBrowser && !Buffer.isBuffer(buf)) {
         Object.setPrototypeOf(buf, Buffer.prototype);
     }
@@ -66314,6 +66314,8 @@ instruction\n\
 /* jslint utility2:true */\n\
 (function (globalThis) {\n\
     \"use strict\";\n\
+    let ArrayPrototypeFlat;\n\
+    let TextXxcoder;\n\
     let consoleError;\n\
     let local;\n\
     // init globalThis\n\
@@ -66335,6 +66337,150 @@ instruction\n\
             return argList[0];\n\
         };\n\
     }\n\
+    // polyfill\n\
+    ArrayPrototypeFlat = function (depth) {\n\
+    /*\n\
+     * this function will polyfill Array.prototype.flat\n\
+     * https://github.com/jonathantneal/array-flat-polyfill\n\
+     */\n\
+        depth = (\n\
+            globalThis.isNaN(depth)\n\
+            ? 1\n\
+            : Number(depth)\n\
+        );\n\
+        if (!depth) {\n\
+            return Array.prototype.slice.call(this);\n\
+        }\n\
+        return Array.prototype.reduce.call(this, function (acc, cur) {\n\
+            if (Array.isArray(cur)) {\n\
+                // recurse\n\
+                acc.push.apply(acc, ArrayPrototypeFlat.call(cur, depth - 1));\n\
+            } else {\n\
+                acc.push(cur);\n\
+            }\n\
+            return acc;\n\
+        }, []);\n\
+    };\n\
+    Array.prototype.flat = Array.prototype.flat || ArrayPrototypeFlat;\n\
+    Array.prototype.flatMap = Array.prototype.flatMap || function flatMap(\n\
+        ...argList\n\
+    ) {\n\
+    /*\n\
+     * this function will polyfill Array.prototype.flatMap\n\
+     * https://github.com/jonathantneal/array-flat-polyfill\n\
+     */\n\
+        return this.map(...argList).flat();\n\
+    };\n\
+    (function () {\n\
+        try {\n\
+            globalThis.TextDecoder = (\n\
+                globalThis.TextDecoder || require(\"util\").TextDecoder\n\
+            );\n\
+            globalThis.TextEncoder = (\n\
+                globalThis.TextEncoder || require(\"util\").TextEncoder\n\
+            );\n\
+        } catch (ignore) {}\n\
+    }());\n\
+    TextXxcoder = function () {\n\
+    /*\n\
+     * this function will polyfill TextDecoder/TextEncoder\n\
+     * https://gist.github.com/Yaffle/5458286\n\
+     */\n\
+        return;\n\
+    };\n\
+    TextXxcoder.prototype.decode = function (octets) {\n\
+    /*\n\
+     * this function will polyfill TextDecoder.prototype.decode\n\
+     * https://gist.github.com/Yaffle/5458286\n\
+     */\n\
+        let bytesNeeded;\n\
+        let codePoint;\n\
+        let ii;\n\
+        let kk;\n\
+        let octet;\n\
+        let string;\n\
+        string = \"\";\n\
+        ii = 0;\n\
+        while (ii < octets.length) {\n\
+            octet = octets[ii];\n\
+            bytesNeeded = 0;\n\
+            codePoint = 0;\n\
+            if (octet <= 0x7F) {\n\
+                bytesNeeded = 0;\n\
+                codePoint = octet & 0xFF;\n\
+            } else if (octet <= 0xDF) {\n\
+                bytesNeeded = 1;\n\
+                codePoint = octet & 0x1F;\n\
+            } else if (octet <= 0xEF) {\n\
+                bytesNeeded = 2;\n\
+                codePoint = octet & 0x0F;\n\
+            } else if (octet <= 0xF4) {\n\
+                bytesNeeded = 3;\n\
+                codePoint = octet & 0x07;\n\
+            }\n\
+            if (octets.length - ii - bytesNeeded > 0) {\n\
+                kk = 0;\n\
+                while (kk < bytesNeeded) {\n\
+                    octet = octets[ii + kk + 1];\n\
+                    codePoint = (codePoint << 6) | (octet & 0x3F);\n\
+                    kk += 1;\n\
+                }\n\
+            } else {\n\
+                codePoint = 0xFFFD;\n\
+                bytesNeeded = octets.length - ii;\n\
+            }\n\
+            string += String.fromCodePoint(codePoint);\n\
+            ii += bytesNeeded + 1;\n\
+        }\n\
+        return string;\n\
+    };\n\
+    TextXxcoder.prototype.encode = function (string) {\n\
+    /*\n\
+     * this function will polyfill TextEncoder.prototype.encode\n\
+     * https://gist.github.com/Yaffle/5458286\n\
+     */\n\
+        let bits;\n\
+        let cc;\n\
+        let codePoint;\n\
+        let ii;\n\
+        let length;\n\
+        let octets;\n\
+        octets = [];\n\
+        length = string.length;\n\
+        ii = 0;\n\
+        while (ii < length) {\n\
+            codePoint = string.codePointAt(ii);\n\
+            cc = 0;\n\
+            bits = 0;\n\
+            if (codePoint <= 0x0000007F) {\n\
+                cc = 0;\n\
+                bits = 0x00;\n\
+            } else if (codePoint <= 0x000007FF) {\n\
+                cc = 6;\n\
+                bits = 0xC0;\n\
+            } else if (codePoint <= 0x0000FFFF) {\n\
+                cc = 12;\n\
+                bits = 0xE0;\n\
+            } else if (codePoint <= 0x001FFFFF) {\n\
+                cc = 18;\n\
+                bits = 0xF0;\n\
+            }\n\
+            octets.push(bits | (codePoint >> cc));\n\
+            cc -= 6;\n\
+            while (cc >= 0) {\n\
+                octets.push(0x80 | ((codePoint >> cc) & 0x3F));\n\
+                cc -= 6;\n\
+            }\n\
+            ii += (\n\
+                codePoint >= 0x10000\n\
+                ? 2\n\
+                : 1\n\
+            );\n\
+        }\n\
+        return octets;\n\
+    };\n\
+    globalThis.TextDecoder = globalThis.TextDecoder || TextXxcoder;\n\
+    globalThis.TextEncoder = globalThis.TextEncoder || TextXxcoder;\n\
     // init local\n\
     local = {};\n\
     local.local = local;\n\
@@ -67966,6 +68112,8 @@ local.assetsDict["/assets.utility2.test.js"] = "/* istanbul instrument in packag
 /* jslint utility2:true */\n\
 (function (globalThis) {\n\
     \"use strict\";\n\
+    let ArrayPrototypeFlat;\n\
+    let TextXxcoder;\n\
     let consoleError;\n\
     let local;\n\
     // init globalThis\n\
@@ -67987,6 +68135,150 @@ local.assetsDict["/assets.utility2.test.js"] = "/* istanbul instrument in packag
             return argList[0];\n\
         };\n\
     }\n\
+    // polyfill\n\
+    ArrayPrototypeFlat = function (depth) {\n\
+    /*\n\
+     * this function will polyfill Array.prototype.flat\n\
+     * https://github.com/jonathantneal/array-flat-polyfill\n\
+     */\n\
+        depth = (\n\
+            globalThis.isNaN(depth)\n\
+            ? 1\n\
+            : Number(depth)\n\
+        );\n\
+        if (!depth) {\n\
+            return Array.prototype.slice.call(this);\n\
+        }\n\
+        return Array.prototype.reduce.call(this, function (acc, cur) {\n\
+            if (Array.isArray(cur)) {\n\
+                // recurse\n\
+                acc.push.apply(acc, ArrayPrototypeFlat.call(cur, depth - 1));\n\
+            } else {\n\
+                acc.push(cur);\n\
+            }\n\
+            return acc;\n\
+        }, []);\n\
+    };\n\
+    Array.prototype.flat = Array.prototype.flat || ArrayPrototypeFlat;\n\
+    Array.prototype.flatMap = Array.prototype.flatMap || function flatMap(\n\
+        ...argList\n\
+    ) {\n\
+    /*\n\
+     * this function will polyfill Array.prototype.flatMap\n\
+     * https://github.com/jonathantneal/array-flat-polyfill\n\
+     */\n\
+        return this.map(...argList).flat();\n\
+    };\n\
+    (function () {\n\
+        try {\n\
+            globalThis.TextDecoder = (\n\
+                globalThis.TextDecoder || require(\"util\").TextDecoder\n\
+            );\n\
+            globalThis.TextEncoder = (\n\
+                globalThis.TextEncoder || require(\"util\").TextEncoder\n\
+            );\n\
+        } catch (ignore) {}\n\
+    }());\n\
+    TextXxcoder = function () {\n\
+    /*\n\
+     * this function will polyfill TextDecoder/TextEncoder\n\
+     * https://gist.github.com/Yaffle/5458286\n\
+     */\n\
+        return;\n\
+    };\n\
+    TextXxcoder.prototype.decode = function (octets) {\n\
+    /*\n\
+     * this function will polyfill TextDecoder.prototype.decode\n\
+     * https://gist.github.com/Yaffle/5458286\n\
+     */\n\
+        let bytesNeeded;\n\
+        let codePoint;\n\
+        let ii;\n\
+        let kk;\n\
+        let octet;\n\
+        let string;\n\
+        string = \"\";\n\
+        ii = 0;\n\
+        while (ii < octets.length) {\n\
+            octet = octets[ii];\n\
+            bytesNeeded = 0;\n\
+            codePoint = 0;\n\
+            if (octet <= 0x7F) {\n\
+                bytesNeeded = 0;\n\
+                codePoint = octet & 0xFF;\n\
+            } else if (octet <= 0xDF) {\n\
+                bytesNeeded = 1;\n\
+                codePoint = octet & 0x1F;\n\
+            } else if (octet <= 0xEF) {\n\
+                bytesNeeded = 2;\n\
+                codePoint = octet & 0x0F;\n\
+            } else if (octet <= 0xF4) {\n\
+                bytesNeeded = 3;\n\
+                codePoint = octet & 0x07;\n\
+            }\n\
+            if (octets.length - ii - bytesNeeded > 0) {\n\
+                kk = 0;\n\
+                while (kk < bytesNeeded) {\n\
+                    octet = octets[ii + kk + 1];\n\
+                    codePoint = (codePoint << 6) | (octet & 0x3F);\n\
+                    kk += 1;\n\
+                }\n\
+            } else {\n\
+                codePoint = 0xFFFD;\n\
+                bytesNeeded = octets.length - ii;\n\
+            }\n\
+            string += String.fromCodePoint(codePoint);\n\
+            ii += bytesNeeded + 1;\n\
+        }\n\
+        return string;\n\
+    };\n\
+    TextXxcoder.prototype.encode = function (string) {\n\
+    /*\n\
+     * this function will polyfill TextEncoder.prototype.encode\n\
+     * https://gist.github.com/Yaffle/5458286\n\
+     */\n\
+        let bits;\n\
+        let cc;\n\
+        let codePoint;\n\
+        let ii;\n\
+        let length;\n\
+        let octets;\n\
+        octets = [];\n\
+        length = string.length;\n\
+        ii = 0;\n\
+        while (ii < length) {\n\
+            codePoint = string.codePointAt(ii);\n\
+            cc = 0;\n\
+            bits = 0;\n\
+            if (codePoint <= 0x0000007F) {\n\
+                cc = 0;\n\
+                bits = 0x00;\n\
+            } else if (codePoint <= 0x000007FF) {\n\
+                cc = 6;\n\
+                bits = 0xC0;\n\
+            } else if (codePoint <= 0x0000FFFF) {\n\
+                cc = 12;\n\
+                bits = 0xE0;\n\
+            } else if (codePoint <= 0x001FFFFF) {\n\
+                cc = 18;\n\
+                bits = 0xF0;\n\
+            }\n\
+            octets.push(bits | (codePoint >> cc));\n\
+            cc -= 6;\n\
+            while (cc >= 0) {\n\
+                octets.push(0x80 | ((codePoint >> cc) & 0x3F));\n\
+                cc -= 6;\n\
+            }\n\
+            ii += (\n\
+                codePoint >= 0x10000\n\
+                ? 2\n\
+                : 1\n\
+            );\n\
+        }\n\
+        return octets;\n\
+    };\n\
+    globalThis.TextDecoder = globalThis.TextDecoder || TextXxcoder;\n\
+    globalThis.TextEncoder = globalThis.TextEncoder || TextXxcoder;\n\
     // init local\n\
     local = {};\n\
     local.local = local;\n\
