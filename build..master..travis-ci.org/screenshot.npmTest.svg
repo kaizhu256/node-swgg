@@ -1,0 +1,1871 @@
+<svg height="21038" width="720" xmlns="http://www.w3.org/2000/svg">
+<rect height="21038" fill="#555" width="720"></rect>
+<text fill="#7f7" font-family="Courier New" font-size="12" xml:space="preserve">
+<tspan x="10" y="26"></tspan>
+
+<tspan x="10" y="42">[MODE_BUILD=npmTest] - 2018-09-10T13:23:52.072Z - npm-testing /home/travis/build/kaizhu256/node-\</tspan>
+<tspan x="10" y="58">swgg</tspan>
+
+<tspan x="10" y="74"></tspan>
+
+<tspan x="10" y="90"></tspan>
+
+<tspan x="10" y="106">covering $ /home/travis/.nvm/versions/node/v10.10.0/bin/node /home/travis/build/kaizhu256/node-s\</tspan>
+<tspan x="10" y="122">wgg/test.js</tspan>
+
+<tspan x="10" y="138"></tspan>
+
+<tspan x="10" y="154">npmTest - merged test-report from file /home/travis/build/kaizhu256/node-swgg/tmp/build/test-rep\</tspan>
+<tspan x="10" y="170">ort.json</tspan>
+
+<tspan x="10" y="186">&gt; server listening on http-port 57153</tspan>
+
+<tspan x="10" y="202">db - dropping database ...</tspan>
+
+<tspan x="10" y="218">db - seeding dbTable File ...</tspan>
+
+<tspan x="10" y="234">db - seeding dbTable Pet ...</tspan>
+
+<tspan x="10" y="250">db - seeding dbTable Order ...</tspan>
+
+<tspan x="10" y="266">db - seeding dbTable User ...</tspan>
+
+<tspan x="10" y="282">db - seeding dbTable File ...</tspan>
+
+<tspan x="10" y="298">db - seeding dbTable Pet ...</tspan>
+
+<tspan x="10" y="314">db - seeding dbTable Order ...</tspan>
+
+<tspan x="10" y="330">db - seeding dbTable User ...</tspan>
+
+<tspan x="10" y="346">db - seeding dbTable TestCrud ...</tspan>
+
+<tspan x="10" y="362">db loaded from tmp/storage.test</tspan>
+
+<tspan x="10" y="378">[node test-case 1 of 40 passed] - testCase_buildApidoc_default</tspan>
+
+<tspan x="10" y="394">[node test-case 2 of 40 passed] - testCase_buildCustomOrg_default</tspan>
+
+<tspan x="10" y="410">[node test-case 3 of 40 passed] - testCase_buildLib_default</tspan>
+
+<tspan x="10" y="426">[node test-case 4 of 40 passed] - testCase_buildReadme_default</tspan>
+
+<tspan x="10" y="442">[node test-case 5 of 40 passed] - testCase_buildTest_default</tspan>
+
+<tspan x="10" y="458">[node test-case 6 of 40 passed] - testCase_domAnimateShake_default</tspan>
+
+<tspan x="10" y="474">[node test-case 7 of 40 passed] - testCase_nop_default</tspan>
+
+<tspan x="10" y="490">[node test-case 8 of 40 passed] - testCase_swaggerJsonFromCurl_default</tspan>
+
+<tspan x="10" y="506">[node test-case 9 of 40 passed] - testCase_swaggerValidateDataParameters_error</tspan>
+
+<tspan x="10" y="522">[node test-case 10 of 40 passed] - testCase_swaggerValidate_default</tspan>
+
+<tspan x="10" y="538">[node test-case 11 of 40 passed] - testCase_ui_apiKey</tspan>
+
+<tspan x="10" y="554">[node test-case 12 of 40 passed] - testCase_ui_click</tspan>
+
+<tspan x="10" y="570">[node test-case 13 of 40 passed] - testCase_ui_fileMedia</tspan>
+
+<tspan x="10" y="586">[node test-case 14 of 40 passed] - testCase_ui_keyup</tspan>
+
+<tspan x="10" y="602">Xlib:  extension "RANDR" missing on display ":99.0".</tspan>
+
+<tspan x="10" y="618">[node test-case 15 of 40 passed] - testCase_crudErrorXxx_default</tspan>
+
+<tspan x="10" y="634">[node test-case 16 of 40 passed] - testCase_crudNullXxx_default</tspan>
+
+<tspan x="10" y="650">[node test-case 17 of 40 passed] - testCase_onErrorJsonapi_default</tspan>
+
+<tspan x="10" y="666">[node test-case 18 of 40 passed] - testCase_onErrorJsonapi_emptyArray</tspan>
+
+<tspan x="10" y="682">[node test-case 19 of 40 passed] - testCase_onErrorJsonapi_error</tspan>
+
+<tspan x="10" y="698">[node test-case 20 of 40 passed] - testCase_swaggerValidateDataParameters_default</tspan>
+
+<tspan x="10" y="714">[5881:0910/132357.525763:ERROR:bus.cc(395)] Failed to connect to the bus: Could not parse server\</tspan>
+<tspan x="10" y="730"> address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")</tspan>
+
+<tspan x="10" y="746">[node test-case 21 of 40 passed] - testCase_crudCountManyByQuery_default</tspan>
+
+<tspan x="10" y="762">[node test-case 22 of 40 passed] - testCase_crudGetManyByQuery_default</tspan>
+
+<tspan x="10" y="778">[node test-case 23 of 40 passed] - testCase_crudGetOneById_default</tspan>
+
+<tspan x="10" y="794">[node test-case 24 of 40 passed] - testCase_crudGetOneByQuery_default</tspan>
+
+<tspan x="10" y="810">[node test-case 25 of 40 passed] - testCase_fileUploadManyByForm_nullCase</tspan>
+
+<tspan x="10" y="826">[5915:0910/132357.670658:ERROR:sandbox_linux.cc(344)] InitializeSandbox() called with multiple t\</tspan>
+<tspan x="10" y="842">hreads in process gpu-process.</tspan>
+
+<tspan x="10" y="858">[node test-case 26 of 40 passed] - testCase_petstoreStoreGetInventory_default</tspan>
+
+<tspan x="10" y="874">[node test-case 27 of 40 passed] - testCase_ajax_error</tspan>
+
+<tspan x="10" y="890">[5881:0910/132357.906177:INFO:CONSOLE(188)] "%cElectron Security Warning (Insecure Content-Secur\</tspan>
+<tspan x="10" y="906">ity-Policy)", source: /home/travis/build/kaizhu256/node-swgg/node_modules/electron-lite/external\</tspan>
+<tspan x="10" y="922">/resources/electron.asar/renderer/security-warnings.js (188)</tspan>
+
+<tspan x="10" y="938">[node test-case 28 of 40 passed] - testCase_crudSetManyById_default</tspan>
+
+<tspan x="10" y="954">[node test-case 29 of 40 passed] - testCase_crudSetOneById_default</tspan>
+
+<tspan x="10" y="970">[node test-case 30 of 40 passed] - testCase_fileGetOneById_default</tspan>
+
+<tspan x="10" y="986">[node test-case 31 of 40 passed] - testCase_swaggerValidateFile_default</tspan>
+
+<tspan x="10" y="1002">[node test-case 32 of 40 passed] - testCase_crudRemoveManyByQuery_default</tspan>
+
+<tspan x="10" y="1018">[node test-case 33 of 40 passed] - testCase_crudRemoveOneById_default</tspan>
+
+<tspan x="10" y="1034">[node test-case 34 of 40 passed] - testCase_crudUpdateOneById_default</tspan>
+
+<tspan x="10" y="1050">[node test-case 35 of 40 passed] - testCase_fileUploadManyByForm_default</tspan>
+
+<tspan x="10" y="1066">[5881:0910/132358.667161:INFO:CONSOLE(135)] "null", source: fs.js (135)</tspan>
+
+<tspan x="10" y="1082">[node test-case 36 of 40 passed] - testCase_crudCreateReplaceUpdateRemoveMany_default</tspan>
+
+<tspan x="10" y="1098">[node test-case 37 of 40 passed] - testCase_userLoginXxx_default</tspan>
+
+<tspan x="10" y="1114">[node test-case 38 of 40 passed] - testCase_crudCreateReplaceUpdateRemoveOne_default</tspan>
+
+<tspan x="10" y="1130">server listening on http-port 48384</tspan>
+
+<tspan x="10" y="1146">[5881:0910/132359.981760:INFO:CONSOLE(23438)] "server listening on http-port undefined", source:\</tspan>
+<tspan x="10" y="1162"> http://127.0.0.1:57153/assets.utility2.rollup.js (23438)</tspan>
+
+<tspan x="10" y="1178">[5881:0910/132359.985525:INFO:CONSOLE(2648)] "db - dropping database ...", source: http://127.0.\</tspan>
+<tspan x="10" y="1194">0.1:57153/assets.utility2.rollup.js (2648)</tspan>
+
+<tspan x="10" y="1210">[5881:0910/132359.990095:WARNING:quota_manager.cc(1629)] No storage quota provided in QuotaSetti\</tspan>
+<tspan x="10" y="1226">ngs.</tspan>
+
+<tspan x="10" y="1242">db - seeding dbTable File ...</tspan>
+
+<tspan x="10" y="1258">db - seeding dbTable Pet ...</tspan>
+
+<tspan x="10" y="1274">db - seeding dbTable Order ...</tspan>
+
+<tspan x="10" y="1290">db - seeding dbTable User ...</tspan>
+
+<tspan x="10" y="1306">&gt; [5881:0910/132401.438437:INFO:CONSOLE(3029)] "db - seeding dbTable File ...", source: http://1\</tspan>
+<tspan x="10" y="1322">27.0.0.1:57153/assets.utility2.rollup.js (3029)</tspan>
+
+<tspan x="10" y="1338">[5881:0910/132401.446673:INFO:CONSOLE(3029)] "db - seeding dbTable Pet ...", source: http://127.\</tspan>
+<tspan x="10" y="1354">0.0.1:57153/assets.utility2.rollup.js (3029)</tspan>
+
+<tspan x="10" y="1370">[5881:0910/132401.447350:INFO:CONSOLE(3029)] "db - seeding dbTable Order ...", source: http://12\</tspan>
+<tspan x="10" y="1386">7.0.0.1:57153/assets.utility2.rollup.js (3029)</tspan>
+
+<tspan x="10" y="1402">[5881:0910/132401.447788:INFO:CONSOLE(3029)] "db - seeding dbTable User ...", source: http://127\</tspan>
+<tspan x="10" y="1418">.0.0.1:57153/assets.utility2.rollup.js (3029)</tspan>
+
+<tspan x="10" y="1434">db - seeding dbTable File ...</tspan>
+
+<tspan x="10" y="1450">db - seeding dbTable Pet ...</tspan>
+
+<tspan x="10" y="1466">db - seeding dbTable Order ...</tspan>
+
+<tspan x="10" y="1482">db - seeding dbTable User ...</tspan>
+
+<tspan x="10" y="1498">db - seeding dbTable TestCrud ...</tspan>
+
+<tspan x="10" y="1514">db loaded from tmp/storage.undefined</tspan>
+
+<tspan x="10" y="1530">[5881:0910/132403.223099:INFO:CONSOLE(8)] "db - seeding dbTable File ...", source: http://127.0.\</tspan>
+<tspan x="10" y="1546">0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="1562">[5881:0910/132403.225655:INFO:CONSOLE(8)] "db - seeding dbTable Pet ...", source: http://127.0.0\</tspan>
+<tspan x="10" y="1578">.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="1594">[5881:0910/132403.226596:INFO:CONSOLE(8)] "db - seeding dbTable Order ...", source: http://127.0\</tspan>
+<tspan x="10" y="1610">.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="1626">[5881:0910/132403.227251:INFO:CONSOLE(8)] "db - seeding dbTable User ...", source: http://127.0.\</tspan>
+<tspan x="10" y="1642">0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="1658">[5881:0910/132403.227323:INFO:CONSOLE(8)] "db - seeding dbTable TestCrud ...", source: http://12\</tspan>
+<tspan x="10" y="1674">7.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="1690">[5881:0910/132403.530630:INFO:CONSOLE(128)] "%cElectron Security Warning (Insecure Resources)", \</tspan>
+<tspan x="10" y="1706">source: /home/travis/build/kaizhu256/node-swgg/node_modules/electron-lite/external/resources/ele\</tspan>
+<tspan x="10" y="1722">ctron.asar/renderer/security-warnings.js (128)</tspan>
+
+<tspan x="10" y="1738">[5881:0910/132403.534544:INFO:CONSOLE(188)] "%cElectron Security Warning (Insecure Content-Secur\</tspan>
+<tspan x="10" y="1754">ity-Policy)", source: /home/travis/build/kaizhu256/node-swgg/node_modules/electron-lite/external\</tspan>
+<tspan x="10" y="1770">/resources/electron.asar/renderer/security-warnings.js (188)</tspan>
+
+<tspan x="10" y="1786">[5881:0910/132403.789334:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /file/c\</tspan>
+<tspan x="10" y="1802">rudGetManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="1818">ts.example.js (8)</tspan>
+
+<tspan x="10" y="1834">[5881:0910/132403.791143:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /file/c\</tspan>
+<tspan x="10" y="1850">rudGetManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="1866">ts.example.js (8)</tspan>
+
+<tspan x="10" y="1882">[5881:0910/132403.800493:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /pet/cr\</tspan>
+<tspan x="10" y="1898">udGetManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:57153/asset\</tspan>
+<tspan x="10" y="1914">s.example.js (8)</tspan>
+
+<tspan x="10" y="1930">[5881:0910/132403.801574:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /pet/cr\</tspan>
+<tspan x="10" y="1946">udGetManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:57153/asset\</tspan>
+<tspan x="10" y="1962">s.example.js (8)</tspan>
+
+<tspan x="10" y="1978">[5881:0910/132403.805119:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /store/\</tspan>
+<tspan x="10" y="1994">crudGetManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:57153/ass\</tspan>
+<tspan x="10" y="2010">ets.example.js (8)</tspan>
+
+<tspan x="10" y="2026">[5881:0910/132403.810471:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /store/\</tspan>
+<tspan x="10" y="2042">crudGetManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:57153/ass\</tspan>
+<tspan x="10" y="2058">ets.example.js (8)</tspan>
+
+<tspan x="10" y="2074">[5881:0910/132403.812485:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /user/c\</tspan>
+<tspan x="10" y="2090">rudGetManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="2106">ts.example.js (8)</tspan>
+
+<tspan x="10" y="2122">[5881:0910/132403.813555:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /user/c\</tspan>
+<tspan x="10" y="2138">rudGetManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="2154">ts.example.js (8)</tspan>
+
+<tspan x="10" y="2170">[5881:0910/132403.820501:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /x-test\</tspan>
+<tspan x="10" y="2186">/crudGetManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:57153/as\</tspan>
+<tspan x="10" y="2202">sets.example.js (8)</tspan>
+
+<tspan x="10" y="2218">[5881:0910/132403.821375:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /x-test\</tspan>
+<tspan x="10" y="2234">/crudGetManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:57153/as\</tspan>
+<tspan x="10" y="2250">sets.example.js (8)</tspan>
+
+<tspan x="10" y="2266">[5881:0910/132403.862070:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="2282">parametersDefault/{}"]["typeArrayItemsInteger1"] = undefined is required", source: http://127.0.\</tspan>
+<tspan x="10" y="2298">0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="2314">[5881:0910/132403.862733:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="2330">parametersDefault/{}"]["typeArrayItemsNumber1"] = undefined is required", source: http://127.0.0\</tspan>
+<tspan x="10" y="2346">.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="2362">[5881:0910/132403.862819:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="2378">parametersDefault/{}"]["typeArrayItemsNumber2"] = undefined is required", source: http://127.0.0\</tspan>
+<tspan x="10" y="2394">.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="2410">[5881:0910/132403.862898:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="2426">parametersDefault/{}"]["typeArrayItemsNumberCollectionFormatMultiInFormData"] = undefined is req\</tspan>
+<tspan x="10" y="2442">uired", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="2458">[5881:0910/132403.862962:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="2474">parametersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0\</tspan>
+<tspan x="10" y="2490">.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="2506">[5881:0910/132403.863661:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="2522">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="2538">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="2554">[5881:0910/132403.863730:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="2570">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", sou\</tspan>
+<tspan x="10" y="2586">rce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="2602">[5881:0910/132403.863803:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="2618">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is req\</tspan>
+<tspan x="10" y="2634">uired", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="2650">[5881:0910/132403.863864:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="2666">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", so\</tspan>
+<tspan x="10" y="2682">urce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="2698">[5881:0910/132403.863932:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="2714">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="2730">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="2746">[5881:0910/132403.863988:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="2762">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="2778">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="2794">[5881:0910/132403.864811:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="2810">/parametersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:57153/\</tspan>
+<tspan x="10" y="2826">assets.example.js (8)</tspan>
+
+<tspan x="10" y="2842">[5881:0910/132403.864888:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="2858">/parametersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0\</tspan>
+<tspan x="10" y="2874">.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="2890">[5881:0910/132403.864963:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="2906">/parametersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="2922">:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="2938">[5881:0910/132403.865022:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="2954">/parametersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="2970">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="2986">[5881:0910/132403.872742:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3002">parametersDefault/{}"]["typeArrayItemsNumber1"] = undefined is required", source: http://127.0.0\</tspan>
+<tspan x="10" y="3018">.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3034">[5881:0910/132403.873131:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3050">parametersDefault/{}"]["typeArrayItemsNumber2"] = undefined is required", source: http://127.0.0\</tspan>
+<tspan x="10" y="3066">.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3082">[5881:0910/132403.873228:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3098">parametersDefault/{}"]["typeArrayItemsNumberCollectionFormatMultiInFormData"] = undefined is req\</tspan>
+<tspan x="10" y="3114">uired", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3130">[5881:0910/132403.873782:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3146">parametersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0\</tspan>
+<tspan x="10" y="3162">.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3178">[5881:0910/132403.873853:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3194">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="3210">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3226">[5881:0910/132403.873927:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3242">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", sou\</tspan>
+<tspan x="10" y="3258">rce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3274">[5881:0910/132403.873985:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3290">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is req\</tspan>
+<tspan x="10" y="3306">uired", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3322">[5881:0910/132403.874048:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3338">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", so\</tspan>
+<tspan x="10" y="3354">urce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3370">[5881:0910/132403.874856:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3386">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="3402">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3418">[5881:0910/132403.874923:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3434">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="3450">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3466">[5881:0910/132403.874986:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="3482">/parametersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:57153/\</tspan>
+<tspan x="10" y="3498">assets.example.js (8)</tspan>
+
+<tspan x="10" y="3514">[5881:0910/132403.875036:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="3530">/parametersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0\</tspan>
+<tspan x="10" y="3546">.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3562">[5881:0910/132403.875098:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="3578">/parametersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="3594">:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3610">[5881:0910/132403.875722:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="3626">/parametersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="3642">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3658">[5881:0910/132403.878733:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3674">parametersDefault/{}"]["typeArrayItemsNumber2"] = undefined is required", source: http://127.0.0\</tspan>
+<tspan x="10" y="3690">.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3706">[5881:0910/132403.879230:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3722">parametersDefault/{}"]["typeArrayItemsNumberCollectionFormatMultiInFormData"] = undefined is req\</tspan>
+<tspan x="10" y="3738">uired", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3754">[5881:0910/132403.879300:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3770">parametersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0\</tspan>
+<tspan x="10" y="3786">.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3802">[5881:0910/132403.879372:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3818">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="3834">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3850">[5881:0910/132403.879996:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3866">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", sou\</tspan>
+<tspan x="10" y="3882">rce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3898">[5881:0910/132403.880064:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3914">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is req\</tspan>
+<tspan x="10" y="3930">uired", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3946">[5881:0910/132403.880133:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="3962">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", so\</tspan>
+<tspan x="10" y="3978">urce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="3994">[5881:0910/132403.880220:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="4010">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="4026">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4042">[5881:0910/132403.880292:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="4058">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="4074">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4090">[5881:0910/132403.884209:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="4106">/parametersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:57153/\</tspan>
+<tspan x="10" y="4122">assets.example.js (8)</tspan>
+
+<tspan x="10" y="4138">[5881:0910/132403.884307:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="4154">/parametersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0\</tspan>
+<tspan x="10" y="4170">.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4186">[5881:0910/132403.884402:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="4202">/parametersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="4218">:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4234">[5881:0910/132403.884473:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="4250">/parametersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="4266">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4282">[5881:0910/132403.884533:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="4298">parametersDefault/{}"]["typeArrayItemsNumberCollectionFormatMultiInFormData"] = undefined is req\</tspan>
+<tspan x="10" y="4314">uired", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4330">[5881:0910/132403.884596:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="4346">parametersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0\</tspan>
+<tspan x="10" y="4362">.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4378">[5881:0910/132403.884653:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="4394">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="4410">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4426">[5881:0910/132403.884724:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="4442">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", sou\</tspan>
+<tspan x="10" y="4458">rce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4474">[5881:0910/132403.884782:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="4490">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is req\</tspan>
+<tspan x="10" y="4506">uired", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4522">[5881:0910/132403.884845:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="4538">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", so\</tspan>
+<tspan x="10" y="4554">urce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4570">[5881:0910/132403.884903:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="4586">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="4602">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4618">[5881:0910/132403.884969:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="4634">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="4650">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4666">[5881:0910/132403.886237:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="4682">/parametersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:57153/\</tspan>
+<tspan x="10" y="4698">assets.example.js (8)</tspan>
+
+<tspan x="10" y="4714">[5881:0910/132403.886530:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="4730">/parametersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0\</tspan>
+<tspan x="10" y="4746">.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4762">[5881:0910/132403.886975:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="4778">/parametersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="4794">:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4810">[5881:0910/132403.887261:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="4826">/parametersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="4842">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4858">[5881:0910/132403.888362:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="4874">parametersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0\</tspan>
+<tspan x="10" y="4890">.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4906">[5881:0910/132403.888816:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="4922">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="4938">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="4954">[5881:0910/132403.889104:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="4970">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", sou\</tspan>
+<tspan x="10" y="4986">rce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5002">[5881:0910/132403.889515:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="5018">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is req\</tspan>
+<tspan x="10" y="5034">uired", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5050">[5881:0910/132403.889918:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="5066">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", so\</tspan>
+<tspan x="10" y="5082">urce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5098">[5881:0910/132403.890225:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="5114">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="5130">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5146">[5881:0910/132403.890537:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="5162">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="5178">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5194">[5881:0910/132403.890814:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="5210">/parametersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:57153/\</tspan>
+<tspan x="10" y="5226">assets.example.js (8)</tspan>
+
+<tspan x="10" y="5242">[5881:0910/132403.891093:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="5258">/parametersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0\</tspan>
+<tspan x="10" y="5274">.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5290">[5881:0910/132403.891381:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="5306">/parametersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="5322">:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5338">[5881:0910/132403.891650:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="5354">/parametersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="5370">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5386">[5881:0910/132403.893612:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="5402">parametersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0\</tspan>
+<tspan x="10" y="5418">.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5434">[5881:0910/132403.893952:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="5450">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="5466">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5482">[5881:0910/132403.894407:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="5498">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", sou\</tspan>
+<tspan x="10" y="5514">rce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5530">[5881:0910/132403.894801:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="5546">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is req\</tspan>
+<tspan x="10" y="5562">uired", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5578">[5881:0910/132403.895093:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="5594">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", so\</tspan>
+<tspan x="10" y="5610">urce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5626">[5881:0910/132403.895396:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="5642">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="5658">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5674">[5881:0910/132403.895675:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="5690">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="5706">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5722">[5881:0910/132403.895940:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="5738">/parametersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:57153/\</tspan>
+<tspan x="10" y="5754">assets.example.js (8)</tspan>
+
+<tspan x="10" y="5770">[5881:0910/132403.896286:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="5786">/parametersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0\</tspan>
+<tspan x="10" y="5802">.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5818">[5881:0910/132403.896565:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="5834">/parametersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="5850">:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5866">[5881:0910/132403.896852:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="5882">/parametersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="5898">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5914">[5881:0910/132403.898280:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="5930">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="5946">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="5962">[5881:0910/132403.898677:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="5978">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", sou\</tspan>
+<tspan x="10" y="5994">rce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6010">[5881:0910/132403.899031:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="6026">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is req\</tspan>
+<tspan x="10" y="6042">uired", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6058">[5881:0910/132403.899455:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="6074">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", so\</tspan>
+<tspan x="10" y="6090">urce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6106">[5881:0910/132403.900026:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="6122">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="6138">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6154">[5881:0910/132403.900323:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="6170">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="6186">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6202">[5881:0910/132403.900608:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="6218">/parametersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:57153/\</tspan>
+<tspan x="10" y="6234">assets.example.js (8)</tspan>
+
+<tspan x="10" y="6250">[5881:0910/132403.901001:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="6266">/parametersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0\</tspan>
+<tspan x="10" y="6282">.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6298">[5881:0910/132403.901371:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="6314">/parametersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="6330">:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6346">[5881:0910/132403.902432:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="6362">/parametersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="6378">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6394">[5881:0910/132403.904795:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="6410">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", sou\</tspan>
+<tspan x="10" y="6426">rce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6442">[5881:0910/132403.906848:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="6458">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is req\</tspan>
+<tspan x="10" y="6474">uired", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6490">[5881:0910/132403.907560:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="6506">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", so\</tspan>
+<tspan x="10" y="6522">urce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6538">[5881:0910/132403.908708:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="6554">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="6570">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6586">[5881:0910/132403.909678:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="6602">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="6618">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6634">[5881:0910/132403.910905:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="6650">/parametersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:57153/\</tspan>
+<tspan x="10" y="6666">assets.example.js (8)</tspan>
+
+<tspan x="10" y="6682">[5881:0910/132403.911587:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="6698">/parametersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0\</tspan>
+<tspan x="10" y="6714">.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6730">[5881:0910/132403.912607:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="6746">/parametersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="6762">:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6778">[5881:0910/132403.913382:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="6794">/parametersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="6810">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6826">[5881:0910/132403.914748:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="6842">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is req\</tspan>
+<tspan x="10" y="6858">uired", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6874">[5881:0910/132403.915695:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="6890">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", so\</tspan>
+<tspan x="10" y="6906">urce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6922">[5881:0910/132403.916868:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="6938">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="6954">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="6970">[5881:0910/132403.917809:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="6986">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="7002">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7018">[5881:0910/132403.918977:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="7034">/parametersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:57153/\</tspan>
+<tspan x="10" y="7050">assets.example.js (8)</tspan>
+
+<tspan x="10" y="7066">[5881:0910/132403.919830:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="7082">/parametersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0\</tspan>
+<tspan x="10" y="7098">.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7114">[5881:0910/132403.920915:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="7130">/parametersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="7146">:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7162">[5881:0910/132403.921588:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="7178">/parametersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="7194">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7210">[5881:0910/132403.922416:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="7226">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", so\</tspan>
+<tspan x="10" y="7242">urce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7258">[5881:0910/132403.923426:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="7274">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="7290">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7306">[5881:0910/132403.924266:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="7322">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="7338">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7354">[5881:0910/132403.928812:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="7370">/parametersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:57153/\</tspan>
+<tspan x="10" y="7386">assets.example.js (8)</tspan>
+
+<tspan x="10" y="7402">[5881:0910/132403.929860:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="7418">/parametersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0\</tspan>
+<tspan x="10" y="7434">.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7450">[5881:0910/132403.930918:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="7466">/parametersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="7482">:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7498">[5881:0910/132403.931628:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="7514">/parametersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="7530">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7546">[node test-case 39 of 40 passed] - testCase_buildApp_default</tspan>
+
+<tspan x="10" y="7562">[5881:0910/132403.940667:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="7578">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="7594">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7610">[5881:0910/132403.942163:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="7626">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="7642">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7658">[5881:0910/132403.943332:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="7674">/parametersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:57153/\</tspan>
+<tspan x="10" y="7690">assets.example.js (8)</tspan>
+
+<tspan x="10" y="7706">[5881:0910/132403.944370:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="7722">/parametersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0\</tspan>
+<tspan x="10" y="7738">.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7754">[5881:0910/132403.945264:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="7770">/parametersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="7786">:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7802">[5881:0910/132403.946488:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="7818">/parametersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="7834">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7850">[5881:0910/132403.947299:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/\</tspan>
+<tspan x="10" y="7866">parametersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", sour\</tspan>
+<tspan x="10" y="7882">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7898">[5881:0910/132403.950883:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="7914">/parametersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:57153/\</tspan>
+<tspan x="10" y="7930">assets.example.js (8)</tspan>
+
+<tspan x="10" y="7946">[5881:0910/132403.951885:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="7962">/parametersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0\</tspan>
+<tspan x="10" y="7978">.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="7994">[5881:0910/132403.952859:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="8010">/parametersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="8026">:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8042">[5881:0910/132403.954078:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="8058">/parametersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="8074">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8090">[5881:0910/132403.955245:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="8106">/parametersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:57153/\</tspan>
+<tspan x="10" y="8122">assets.example.js (8)</tspan>
+
+<tspan x="10" y="8138">[5881:0910/132403.955947:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="8154">/parametersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0\</tspan>
+<tspan x="10" y="8170">.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8186">[5881:0910/132403.956957:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="8202">/parametersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="8218">:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8234">[5881:0910/132403.957883:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="8250">/parametersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="8266">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8282">[5881:0910/132403.965381:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="8298">/parametersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="8314">:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8330">[5881:0910/132403.966468:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test\</tspan>
+<tspan x="10" y="8346">/parametersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="8362">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8378">[5881:0910/132405.169402:INFO:CONSOLE(8)] "domOnEventWindowOnloadTimeElapsed = 6414", source: ht\</tspan>
+<tspan x="10" y="8394">tp://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8410">[5881:0910/132405.241561:INFO:CONSOLE(8)] "db loaded from tmp/storage.undefined", source: http:/\</tspan>
+<tspan x="10" y="8426">/127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8442">[5881:0910/132405.287941:INFO:CONSOLE(8)] "[browser test-case 1 of 34 passed] - testCase_buildAp\</tspan>
+<tspan x="10" y="8458">p_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8474">[5881:0910/132405.345666:INFO:CONSOLE(8)] "[browser test-case 2 of 34 passed] - testCase_nop_def\</tspan>
+<tspan x="10" y="8490">ault", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8506">[5881:0910/132405.375854:INFO:CONSOLE(8)] "[browser test-case 3 of 34 passed] - testCase_swagger\</tspan>
+<tspan x="10" y="8522">JsonFromCurl_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8538">[5881:0910/132405.400336:INFO:CONSOLE(8)] "error.numberMultipleOf - integer operation["POST /x-t\</tspan>
+<tspan x="10" y="8554">est/parametersDefault/{}"]["typeInteger1"] = 1 must be a multiple of 2", source: http://127.0.0.\</tspan>
+<tspan x="10" y="8570">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8586">[5881:0910/132405.403282:INFO:CONSOLE(8)] "swaggerValidateDataParameters - 0 - error.numberMulti\</tspan>
+<tspan x="10" y="8602">pleOf - integer operation["POST /x-test/parametersDefault/{}"]["typeInteger1"] = 1 must be a mul\</tspan>
+<tspan x="10" y="8618">tiple of 2", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8634">[5881:0910/132405.403635:INFO:CONSOLE(8)] "error.numberMaximum - integer operation["POST /x-test\</tspan>
+<tspan x="10" y="8650">/parametersDefault/{}"]["typeInteger1"] = 10 must be &lt;= 3", source: http://127.0.0.1:57153/asset\</tspan>
+<tspan x="10" y="8666">s.example.js (8)</tspan>
+
+<tspan x="10" y="8682">[5881:0910/132405.404672:INFO:CONSOLE(8)] "swaggerValidateDataParameters - 1 - error.numberMaxim\</tspan>
+<tspan x="10" y="8698">um - integer operation["POST /x-test/parametersDefault/{}"]["typeInteger1"] = 10 must be &lt;= 3", \</tspan>
+<tspan x="10" y="8714">source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8730">[5881:0910/132405.407691:INFO:CONSOLE(8)] "error.numberExclusiveMaximum - integer operation["POS\</tspan>
+<tspan x="10" y="8746">T /x-test/parametersDefault/{}"]["typeInteger2"] = 10 must be &lt; 3", source: http://127.0.0.1:571\</tspan>
+<tspan x="10" y="8762">53/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8778">[5881:0910/132405.408638:INFO:CONSOLE(8)] "swaggerValidateDataParameters - 2 - error.numberExclu\</tspan>
+<tspan x="10" y="8794">siveMaximum - integer operation["POST /x-test/parametersDefault/{}"]["typeInteger2"] = 10 must b\</tspan>
+<tspan x="10" y="8810">e &lt; 3", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8826">[5881:0910/132405.411584:INFO:CONSOLE(8)] "error.numberMinimum - integer operation["POST /x-test\</tspan>
+<tspan x="10" y="8842">/parametersDefault/{}"]["typeInteger1"] = -10 must be &gt;= 1", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="8858">ts.example.js (8)</tspan>
+
+<tspan x="10" y="8874">[5881:0910/132405.412462:INFO:CONSOLE(8)] "swaggerValidateDataParameters - 3 - error.numberMinim\</tspan>
+<tspan x="10" y="8890">um - integer operation["POST /x-test/parametersDefault/{}"]["typeInteger1"] = -10 must be &gt;= 1",\</tspan>
+<tspan x="10" y="8906"> source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8922">[5881:0910/132405.415518:INFO:CONSOLE(8)] "error.numberExclusiveMinimum - integer operation["POS\</tspan>
+<tspan x="10" y="8938">T /x-test/parametersDefault/{}"]["typeInteger2"] = -10 must be &gt; 1", source: http://127.0.0.1:57\</tspan>
+<tspan x="10" y="8954">153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="8970">[5881:0910/132405.416639:INFO:CONSOLE(8)] "swaggerValidateDataParameters - 4 - error.numberExclu\</tspan>
+<tspan x="10" y="8986">siveMinimum - integer operation["POST /x-test/parametersDefault/{}"]["typeInteger2"] = -10 must \</tspan>
+<tspan x="10" y="9002">be &gt; 1", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9018">[5881:0910/132405.419857:INFO:CONSOLE(8)] "error.stringMaxLength - string operation["POST /x-tes\</tspan>
+<tspan x="10" y="9034">t/parametersDefault/{}"]["typeString1"] = "01234567890123456789" must have &lt;= 19 characters", so\</tspan>
+<tspan x="10" y="9050">urce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9066">[5881:0910/132405.421137:INFO:CONSOLE(8)] "swaggerValidateDataParameters - 5 - error.stringMaxLe\</tspan>
+<tspan x="10" y="9082">ngth - string operation["POST /x-test/parametersDefault/{}"]["typeString1"] = "01234567890123456\</tspan>
+<tspan x="10" y="9098">789" must have &lt;= 19 characters", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9114">[5881:0910/132405.427865:INFO:CONSOLE(8)] "error.stringMinLength - string operation["POST /x-tes\</tspan>
+<tspan x="10" y="9130">t/parametersDefault/{}"]["typeString1"] = "" must have &gt;= 15 characters", source: http://127.0.0\</tspan>
+<tspan x="10" y="9146">.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9162">[5881:0910/132405.427954:INFO:CONSOLE(8)] "swaggerValidateDataParameters - 6 - error.stringMinLe\</tspan>
+<tspan x="10" y="9178">ngth - string operation["POST /x-test/parametersDefault/{}"]["typeString1"] = "" must have &gt;= 15\</tspan>
+<tspan x="10" y="9194"> characters", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9210">[5881:0910/132405.428031:INFO:CONSOLE(8)] "error.stringPattern - string operation["POST /x-test/\</tspan>
+<tspan x="10" y="9226">parametersDefault/{}"]["typeString1"] = "0123456789012345~" must match regexp pattern "^\\w*?$""\</tspan>
+<tspan x="10" y="9242">, source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9258">[5881:0910/132405.428809:INFO:CONSOLE(8)] "swaggerValidateDataParameters - 7 - error.stringPatte\</tspan>
+<tspan x="10" y="9274">rn - string operation["POST /x-test/parametersDefault/{}"]["typeString1"] = "0123456789012345~" \</tspan>
+<tspan x="10" y="9290">must match regexp pattern "^\\w*?$"", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9306">[5881:0910/132405.430449:INFO:CONSOLE(8)] "error.arrayMaxItems - array operation["POST /x-test/p\</tspan>
+<tspan x="10" y="9322">arametersDefault/{}"]["typeArrayItemsNumber2"] = [1,2,3,4,5,6,7,8,9,10] must have &lt;= 5 items", s\</tspan>
+<tspan x="10" y="9338">ource: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9354">[5881:0910/132405.437593:INFO:CONSOLE(8)] "swaggerValidateDataParameters - 8 - error.arrayMaxIte\</tspan>
+<tspan x="10" y="9370">ms - array operation["POST /x-test/parametersDefault/{}"]["typeArrayItemsNumber2"] = [1,2,3,4,5,\</tspan>
+<tspan x="10" y="9386">6,7,8,9,10] must have &lt;= 5 items", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9402">[5881:0910/132405.438681:INFO:CONSOLE(8)] "error.arrayMinItems - array operation["POST /x-test/p\</tspan>
+<tspan x="10" y="9418">arametersDefault/{}"]["typeArrayItemsNumber2"] = [] must have &gt;= 1 items", source: http://127.0.\</tspan>
+<tspan x="10" y="9434">0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9450">[5881:0910/132405.444367:INFO:CONSOLE(8)] "swaggerValidateDataParameters - 9 - error.arrayMinIte\</tspan>
+<tspan x="10" y="9466">ms - array operation["POST /x-test/parametersDefault/{}"]["typeArrayItemsNumber2"] = [] must hav\</tspan>
+<tspan x="10" y="9482">e &gt;= 1 items", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9498">[5881:0910/132405.445609:INFO:CONSOLE(8)] "error.arrayUniqueItems - array operation["POST /x-tes\</tspan>
+<tspan x="10" y="9514">t/parametersDefault/{}"]["typeArrayItemsNumber2"] = [0,0] must have unique items (has duplicate \</tspan>
+<tspan x="10" y="9530">item 0)", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9546">[5881:0910/132405.459983:INFO:CONSOLE(8)] "swaggerValidateDataParameters - 10 - error.arrayUniqu\</tspan>
+<tspan x="10" y="9562">eItems - array operation["POST /x-test/parametersDefault/{}"]["typeArrayItemsNumber2"] = [0,0] m\</tspan>
+<tspan x="10" y="9578">ust have unique items (has duplicate item 0)", source: http://127.0.0.1:57153/assets.example.js \</tspan>
+<tspan x="10" y="9594">(8)</tspan>
+
+<tspan x="10" y="9610">[5881:0910/132405.467076:INFO:CONSOLE(8)] "error.itemEnum - number operation["POST /x-test/param\</tspan>
+<tspan x="10" y="9626">etersDefault/{}"]["typeNumberEnum"] = 0 can only have items from the list [0.5,1.5]", source: ht\</tspan>
+<tspan x="10" y="9642">tp://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9658">[5881:0910/132405.468204:INFO:CONSOLE(8)] "swaggerValidateDataParameters - 11 - error.itemEnum -\</tspan>
+<tspan x="10" y="9674"> number operation["POST /x-test/parametersDefault/{}"]["typeNumberEnum"] = 0 can only have items\</tspan>
+<tspan x="10" y="9690"> from the list [0.5,1.5]", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9706">[5881:0910/132405.471037:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="9722">tersDefault/{}"]["typeString0"] = true is not a valid string", source: http://127.0.0.1:57153/as\</tspan>
+<tspan x="10" y="9738">sets.example.js (8)</tspan>
+
+<tspan x="10" y="9754">[5881:0910/132405.471689:INFO:CONSOLE(8)] "swaggerValidateDataParameters - 12 - error.itemType -\</tspan>
+<tspan x="10" y="9770"> value operation["POST /x-test/parametersDefault/{}"]["typeString0"] = true is not a valid strin\</tspan>
+<tspan x="10" y="9786">g", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9802">[5881:0910/132405.473746:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="9818">tersDefault/{}"]["typeStringFormatByte"] = "~" is not a valid string (byte)", source: http://127\</tspan>
+<tspan x="10" y="9834">.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9850">[5881:0910/132405.474321:INFO:CONSOLE(8)] "swaggerValidateDataParameters - 13 - error.itemType -\</tspan>
+<tspan x="10" y="9866"> value operation["POST /x-test/parametersDefault/{}"]["typeStringFormatByte"] = "~" is not a val\</tspan>
+<tspan x="10" y="9882">id string (byte)", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="9898">[5881:0910/132405.475284:INFO:CONSOLE(8)] "error.objectMaxProperties - object operation["POST /x\</tspan>
+<tspan x="10" y="9914">-test/parametersObjectInBody"]["typeObjectInBody"]["typeObjectMisc"] = {"aa":1,"bb":2,"cc":3,"dd\</tspan>
+<tspan x="10" y="9930">":4,"de":5,"ff":6} must have &lt;= 5 properties", source: http://127.0.0.1:57153/assets.example.js \</tspan>
+<tspan x="10" y="9946">(8)</tspan>
+
+<tspan x="10" y="9962">[5881:0910/132405.475987:INFO:CONSOLE(8)] "0", source: http://127.0.0.1:57153/assets.example.js \</tspan>
+<tspan x="10" y="9978">(8)</tspan>
+
+<tspan x="10" y="9994">[5881:0910/132405.476696:INFO:CONSOLE(8)] "error.objectMinProperties - object operation["POST /x\</tspan>
+<tspan x="10" y="10010">-test/parametersObjectInBody"]["typeObjectInBody"]["typeObjectMisc"] = {} must have &gt;= 1 propert\</tspan>
+<tspan x="10" y="10026">ies", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="10042">[5881:0910/132405.477248:INFO:CONSOLE(8)] "1", source: http://127.0.0.1:57153/assets.example.js \</tspan>
+<tspan x="10" y="10058">(8)</tspan>
+
+<tspan x="10" y="10074">[5881:0910/132405.477849:INFO:CONSOLE(8)] "error.semanticItemsRequiredForArrayObjects2 - object \</tspan>
+<tspan x="10" y="10090">operation["POST /x-test/parametersObjectInBody"]["typeObjectInBody"] = {} must have property "ty\</tspan>
+<tspan x="10" y="10106">peBooleanRequired"", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="10122">[5881:0910/132405.478332:INFO:CONSOLE(8)] "2", source: http://127.0.0.1:57153/assets.example.js \</tspan>
+<tspan x="10" y="10138">(8)</tspan>
+
+<tspan x="10" y="10154">[5881:0910/132405.478703:INFO:CONSOLE(8)] "[browser test-case 4 of 34 passed] - testCase_swagger\</tspan>
+<tspan x="10" y="10170">ValidateDataParameters_error", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="10186">[5881:0910/132405.479746:INFO:CONSOLE(8)] "[browser test-case 5 of 34 passed] - testCase_swagger\</tspan>
+<tspan x="10" y="10202">ValidateFile_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="10218">[5881:0910/132405.487320:INFO:CONSOLE(8)] "swaggerValidate - 0 - error.semanticItemsRequiredForA\</tspan>
+<tspan x="10" y="10234">rrayObjects2 - object swaggerJson = {} must have property "swagger"", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="10250">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="10266">[5881:0910/132405.488320:INFO:CONSOLE(8)] "swaggerValidate - 1 - error.semanticItemsRequiredForA\</tspan>
+<tspan x="10" y="10282">rrayObjects2 - object swaggerJson = {} must have property "swagger"", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="10298">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="10314">[5881:0910/132405.489219:INFO:CONSOLE(8)] "swaggerValidate - 2 - error.semanticItemsRequiredForA\</tspan>
+<tspan x="10" y="10330">rrayObjects2 - object swaggerJson = {} must have property "swagger"", source: http://127.0.0.1:5\</tspan>
+<tspan x="10" y="10346">7153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="10362">[5881:0910/132405.490281:INFO:CONSOLE(8)] "swaggerValidate - 3 - error.objectAdditionalPropertie\</tspan>
+<tspan x="10" y="10378">s - object swaggerJson = {"aa":true,"info":{"title":"","version":""},"paths":{"/aa":{"get":{"res\</tspan>
+<tspan x="10" y="10394">ponses":{"200":{"descripti... cannot have additional property "aa"", source: http://127.0.0.1:57\</tspan>
+<tspan x="10" y="10410">153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="10426">[5881:0910/132405.492769:INFO:CONSOLE(8)] "swaggerValidate - 4 - error.objectDependencies - obje\</tspan>
+<tspan x="10" y="10442">ct swaggerJson = {"exclusiveMaximum":true,"info":{"title":"","version":""},"paths":{"/aa":{"get"\</tspan>
+<tspan x="10" y="10458">:{"responses":{"20... with item "exclusiveMaximum" must have dependency "maximum"", source: http\</tspan>
+<tspan x="10" y="10474">://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="10490">[5881:0910/132405.494442:INFO:CONSOLE(8)] "swaggerValidate - 5 - error.itemOneOf - object swagge\</tspan>
+<tspan x="10" y="10506">rJson["securityDefinitions"]["aa"] = true did not validate against exactly one schema (validated\</tspan>
+<tspan x="10" y="10522"> 2) in schema.oneOf {"oneOf":[{"$ref":"http://json-schema.org/draft-04/schema#/definitions/basic\</tspan>
+<tspan x="10" y="10538">AuthenticationSecurity"},{"$ref":"http://json-schema.org/draft-04/schema#/definitions/apiKeySecu\</tspan>
+<tspan x="10" y="10554">rity"},{"$ref":"http://json-schema.org/draft-04/schema#/definitions/oauth2ImplicitSecurity"},{"$\</tspan>
+<tspan x="10" y="10570">ref":"http://json-schema.org/draft-04/schema#/definitions/oauth2PasswordSecurity"},{"$ref":"http\</tspan>
+<tspan x="10" y="10586">://json-schema.org/draft-04/schema#/definitions/oauth2ApplicationSecurity"},{"$ref":"http://json\</tspan>
+<tspan x="10" y="10602">-schema.org/draft-04/schema#/definiti...", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="10618">[5881:0910/132405.495449:INFO:CONSOLE(8)] "swaggerValidate - 6 - error.itemNot - object swaggerJ\</tspan>
+<tspan x="10" y="10634">son["paths"]["/aa"]["get"]["responses"] = {"x-":true} must not validate against schama.not {"add\</tspan>
+<tspan x="10" y="10650">itionalProperties":false,"description":"Response objects names can either be any valid HTTP stat\</tspan>
+<tspan x="10" y="10666">us code or 'default'.","minProperties":1,"not":{"additionalProperties":false,"patternProperties"\</tspan>
+<tspan x="10" y="10682">:{"^x-":{"$ref":"http://json-schema.org/draft-04/schema#/definitions/vendorExtension"}},"type":"\</tspan>
+<tspan x="10" y="10698">object"},"patternProperties":{"^([0-9]{3})$|^(default)$":{"$ref":"http://json-schema.org/draft-0\</tspan>
+<tspan x="10" y="10714">4/schema#/definitions/responseValue"},"^x-":{"$ref":"http://json-schema.org/draft-04/schema#/def\</tspan>
+<tspan x="10" y="10730">initions/ven...", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="10746">[5881:0910/132405.496297:INFO:CONSOLE(8)] "swaggerValidate - 7 - error.schemaDereference - canno\</tspan>
+<tspan x="10" y="10762">t dereference schema {"$ref":"#/undefined"}", source: http://127.0.0.1:57153/assets.example.js (\</tspan>
+<tspan x="10" y="10778">8)</tspan>
+
+<tspan x="10" y="10794">[5881:0910/132405.497136:INFO:CONSOLE(8)] "swaggerValidate - 8 - error.schemaDereferenceCircular\</tspan>
+<tspan x="10" y="10810"> - cannot dereference circular-reference schema {"$ref":"#/x-test/aa"}", source: http://127.0.0.\</tspan>
+<tspan x="10" y="10826">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="10842">[5881:0910/132405.497885:INFO:CONSOLE(8)] "swaggerValidate - 9 - error.semanticFormData1 - Param\</tspan>
+<tspan x="10" y="10858">eter swaggerJson["paths"]["/aa"]["get"]["parameters"][0]["in"] = "formdata" is invalid, did you \</tspan>
+<tspan x="10" y="10874">mean "in: formData" ( camelCase )?", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="10890">[5881:0910/132405.500174:INFO:CONSOLE(8)] "swaggerValidate - 10 - error.semanticOperations1 - Op\</tspan>
+<tspan x="10" y="10906">eration swaggerJson["paths"]["/aa"]["get"] = {"parameters":[{"in":"body","name":"aa","schema":{"\</tspan>
+<tspan x="10" y="10922">type":"string"}},{"in":"formData","type":"stri... cannot have both a "body" parameter and "formD\</tspan>
+<tspan x="10" y="10938">ata" parameter", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="10954">[5881:0910/132405.501263:INFO:CONSOLE(8)] "swaggerValidate - 11 - error.semanticFormData3 - Para\</tspan>
+<tspan x="10" y="10970">meter swaggerJson["paths"]["/aa"]["get"]["parameters"][0] = {"in":"query","type":"file"} with "t\</tspan>
+<tspan x="10" y="10986">ype: file" must have "in: formData"", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="11002">[5881:0910/132405.503030:INFO:CONSOLE(8)] "swaggerValidate - 12 - error.semanticFormData4 - Oper\</tspan>
+<tspan x="10" y="11018">ation swaggerJson["paths"]["/aa"]["get"] = {"parameters":[{"in":"formData","type":"file"}],"resp\</tspan>
+<tspan x="10" y="11034">onses":{"200":{"description":""}}} with Parameters of "type: file" must include "multipart/form-\</tspan>
+<tspan x="10" y="11050">data" in their "consumes" property", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="11066">[5881:0910/132405.504998:INFO:CONSOLE(8)] "swaggerValidate - 13 - error.semanticFormData5 - Oper\</tspan>
+<tspan x="10" y="11082">ation swaggerJson["paths"]["/aa"]["get"] = {"parameters":[{"in":"formData","type":"string"}],"re\</tspan>
+<tspan x="10" y="11098">sponses":{"200":{"description":""}}} with Parameters of "in: formData" must include "application\</tspan>
+<tspan x="10" y="11114">/x-www-form-urlencoded" or "multipart/form-data" in their "consumes" property", source: http://1\</tspan>
+<tspan x="10" y="11130">27.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="11146">[5881:0910/132405.506099:INFO:CONSOLE(8)] "swaggerValidate - 14 - error.semanticItemsRequiredFor\</tspan>
+<tspan x="10" y="11162">ArrayObjects1 - Schema {"type":"array"} with 'array' type require an 'items' property", source: \</tspan>
+<tspan x="10" y="11178">http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="11194">[5881:0910/132405.507146:INFO:CONSOLE(8)] "swaggerValidate - 15 - error.semanticItemsRequiredFor\</tspan>
+<tspan x="10" y="11210">ArrayObjects2 - object swaggerJson = {"x-errorType":"semanticItemsRequiredForArrayObjects2"} mus\</tspan>
+<tspan x="10" y="11226">t have property "swagger"", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="11242">[5881:0910/132405.508297:INFO:CONSOLE(8)] "swaggerValidate - 16 - error.semanticItemsRequiredFor\</tspan>
+<tspan x="10" y="11258">ArrayObjects1 - Schema {"type":"array"} with 'array' type require an 'items' property", source: \</tspan>
+<tspan x="10" y="11274">http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="11290">[5881:0910/132405.509262:INFO:CONSOLE(8)] "swaggerValidate - 17 - error.semanticItemsRequiredFor\</tspan>
+<tspan x="10" y="11306">ArrayObjects1 - Schema {"in":"header","type":"array"} with 'array' type require an 'items' prope\</tspan>
+<tspan x="10" y="11322">rty", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="11338">[5881:0910/132405.511591:INFO:CONSOLE(8)] "swaggerValidate - 18 - error.semanticOperationIds1 - \</tspan>
+<tspan x="10" y="11354">operationId swaggerJson["paths"]["/bb"]["get"]["operationId"] = "aa" must be unique", source: ht\</tspan>
+<tspan x="10" y="11370">tp://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="11386">[5881:0910/132405.513429:INFO:CONSOLE(8)] "swaggerValidate - 19 - error.semanticOperations1 - Op\</tspan>
+<tspan x="10" y="11402">eration swaggerJson["paths"]["/aa"]["get"] = {"parameters":[{"in":"body","name":"aa","schema":{"\</tspan>
+<tspan x="10" y="11418">type":"string"}},{"in":"formData","type":"stri... cannot have both a "body" parameter and "formD\</tspan>
+<tspan x="10" y="11434">ata" parameter", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="11450">[5881:0910/132405.515444:INFO:CONSOLE(8)] "swaggerValidate - 20 - error.semanticOperations2 - Op\</tspan>
+<tspan x="10" y="11466">eration swaggerJson["paths"]["/aa"]["get"] = {"parameters":[{"in":"body","name":"aa","schema":{"\</tspan>
+<tspan x="10" y="11482">type":"string"}},{"in":"body","name":"bb","sch... must have no more than one body parameter", so\</tspan>
+<tspan x="10" y="11498">urce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="11514">[5881:0910/132405.517397:INFO:CONSOLE(8)] "swaggerValidate - 21 - error.semanticOperations3 - Op\</tspan>
+<tspan x="10" y="11530">eration parameters swaggerJson["paths"]["/aa"]["get"]["parameters"] = [{"in":"query","name":"aa"\</tspan>
+<tspan x="10" y="11546">,"type":"string"},{"in":"query","name":"aa","type":"string"}] must have unique 'name' + 'in' pro\</tspan>
+<tspan x="10" y="11562">perties", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="11578">[5881:0910/132405.518575:INFO:CONSOLE(8)] "swaggerValidate - 22 - error.semanticItemsRequiredFor\</tspan>
+<tspan x="10" y="11594">ArrayObjects1 - Schema {"type":"array"} with 'array' type require an 'items' property", source: \</tspan>
+<tspan x="10" y="11610">http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="11626">[5881:0910/132405.519413:INFO:CONSOLE(8)] "swaggerValidate - 23 - error.semanticParameters2 - No\</tspan>
+<tspan x="10" y="11642">n-body parameter swaggerJson["paths"]["/aa"]["get"]["parameters"][0] = {"in":"query"} require a \</tspan>
+<tspan x="10" y="11658">'type' property.", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="11674">[5881:0910/132405.520612:INFO:CONSOLE(8)] "swaggerValidate - 24 - error.semanticPaths1 - Query s\</tspan>
+<tspan x="10" y="11690">trings in path "/aa?" are not allowed", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="11706">[5881:0910/132405.522438:INFO:CONSOLE(8)] "swaggerValidate - 25 - error.semanticPaths2 - Equival\</tspan>
+<tspan x="10" y="11722">ent paths ["/{aa}","/{bb}"] are not allowed", source: http://127.0.0.1:57153/assets.example.js (\</tspan>
+<tspan x="10" y="11738">8)</tspan>
+
+<tspan x="10" y="11754">[5881:0910/132405.524696:INFO:CONSOLE(8)] "swaggerValidate - 26 - error.semanticPaths3 - Path pa\</tspan>
+<tspan x="10" y="11770">rameter ${parameterDefinition.name jsonStringify} must be unique", source: http://127.0.0.1:5715\</tspan>
+<tspan x="10" y="11786">3/assets.example.js (8)</tspan>
+
+<tspan x="10" y="11802">[5881:0910/132405.526269:INFO:CONSOLE(8)] "swaggerValidate - 27 - error.semanticPaths5 - Empty p\</tspan>
+<tspan x="10" y="11818">ath parameter declarations are not valid - "/{}"", source: http://127.0.0.1:57153/assets.example\</tspan>
+<tspan x="10" y="11834">.js (8)</tspan>
+
+<tspan x="10" y="11850">[5881:0910/132405.528016:INFO:CONSOLE(8)] "swaggerValidate - 28 - error.semanticPaths6 - Declare\</tspan>
+<tspan x="10" y="11866">d path parameter "aa" needs to be defined as a path parameter "/{aa}[\"get\"][\"parameters\"][\"\</tspan>
+<tspan x="10" y="11882">ii\"]" at either the path or operation level", source: http://127.0.0.1:57153/assets.example.js \</tspan>
+<tspan x="10" y="11898">(8)</tspan>
+
+<tspan x="10" y="11914">[5881:0910/132405.530081:INFO:CONSOLE(8)] "swaggerValidate - 29 - error.semanticPaths7 - Path pa\</tspan>
+<tspan x="10" y="11930">rameter swaggerJson["paths"]["/"]["get"]["parameters"][0] = {"in":"path","name":"aa","required":\</tspan>
+<tspan x="10" y="11946">true,"type":"string"} was defined but never used", source: http://127.0.0.1:57153/assets.example\</tspan>
+<tspan x="10" y="11962">.js (8)</tspan>
+
+<tspan x="10" y="11978">[5881:0910/132405.531276:INFO:CONSOLE(8)] "swaggerValidate - 30 - error.semanticSchema1 - Read o\</tspan>
+<tspan x="10" y="11994">nly property swaggerJson["paths"]["/aa"]["get"]["parameters"][0]["schema"]["properties"]["aa"] =\</tspan>
+<tspan x="10" y="12010"> {"readOnly":true} cannot be marked as required by a schema.", source: http://127.0.0.1:57153/as\</tspan>
+<tspan x="10" y="12026">sets.example.js (8)</tspan>
+
+<tspan x="10" y="12042">[5881:0910/132405.532434:INFO:CONSOLE(8)] "swaggerValidate - 31 - error.semanticWalker1 - type s\</tspan>
+<tspan x="10" y="12058">waggerJson["paths"]["/aa"]["get"]["parameters"][0]["schema"]["type"] = 1 should be a string", so\</tspan>
+<tspan x="10" y="12074">urce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="12090">[5881:0910/132405.533641:INFO:CONSOLE(8)] "swaggerValidate - 32 - error.semanticWalker2 - Minimu\</tspan>
+<tspan x="10" y="12106">m cannot be more than maximum - swaggerJson["paths"]["/aa"]["get"]["parameters"][0]["schema"] = \</tspan>
+<tspan x="10" y="12122">{"maximum":0,"minimum":1,"type":"number"}", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="12138">[5881:0910/132405.535083:INFO:CONSOLE(8)] "swaggerValidate - 33 - error.semanticWalker3 - minPro\</tspan>
+<tspan x="10" y="12154">perties cannot be more than maxProperties - swaggerJson["paths"]["/aa"]["get"]["parameters"][0][\</tspan>
+<tspan x="10" y="12170">"schema"] = {"maxProperties":0,"minProperties":1,"type":"object"}", source: http://127.0.0.1:571\</tspan>
+<tspan x="10" y="12186">53/assets.example.js (8)</tspan>
+
+<tspan x="10" y="12202">[5881:0910/132405.536314:INFO:CONSOLE(8)] "swaggerValidate - 34 - error.semanticWalker4 - minLen\</tspan>
+<tspan x="10" y="12218">gth cannot be more than maxLength - swaggerJson["paths"]["/aa"]["get"]["parameters"][0]["schema"\</tspan>
+<tspan x="10" y="12234">] = {"maxLength":0,"minLength":1,"type":"object"}", source: http://127.0.0.1:57153/assets.exampl\</tspan>
+<tspan x="10" y="12250">e.js (8)</tspan>
+
+<tspan x="10" y="12266">[5881:0910/132405.537498:INFO:CONSOLE(8)] "swaggerValidate - 35 - error.semanticWalker6 - $ref s\</tspan>
+<tspan x="10" y="12282">waggerJson["paths"]["/aa"]["get"]["responses"]["200"]["$ref"] = "aa" must begin with "#/"", sour\</tspan>
+<tspan x="10" y="12298">ce: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="12314">[5881:0910/132405.538750:INFO:CONSOLE(8)] "swaggerValidate - 36 - error.objectAdditionalProperti\</tspan>
+<tspan x="10" y="12330">es - object swaggerJson["paths"]["/aa"]["get"]["responses"]["200"] = {"$ref":"#/aa","aa":true} c\</tspan>
+<tspan x="10" y="12346">annot have additional property "aa"", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="12362">[5881:0910/132405.539206:INFO:CONSOLE(8)] "[browser test-case 6 of 34 passed] - testCase_swagger\</tspan>
+<tspan x="10" y="12378">Validate_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="12394">[5881:0910/132405.541579:INFO:CONSOLE(8)] "[browser test-case 7 of 34 passed] - testCase_ui_apiK\</tspan>
+<tspan x="10" y="12410">ey", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="12426">[5881:0910/132405.694342:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="12442">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="12458">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="12474">[5881:0910/132405.750858:INFO:CONSOLE(8)] "[browser test-case 8 of 34 passed] - testCase_ui_file\</tspan>
+<tspan x="10" y="12490">Media", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="12506">[5881:0910/132405.763572:INFO:CONSOLE(8)] "[browser test-case 9 of 34 passed] - testCase_ui_keyu\</tspan>
+<tspan x="10" y="12522">p", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="12538">[5881:0910/132405.905851:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="12554">tersDefault/{}"]["typeStringFormatJson"] = "syntax error" is not a valid string (json)", source:\</tspan>
+<tspan x="10" y="12570"> http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="12586">[5881:0910/132405.909802:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="12602">ts.example.js (8)</tspan>
+
+<tspan x="10" y="12618">[5881:0910/132405.910030:INFO:CONSOLE(8)] "Error: 400 POST http://127.0.0.1:57153/api/v0/x-test/\</tspan>
+<tspan x="10" y="12634">parametersDefault/aa?typeStringFormatJson=syntax%20error</tspan>
+
+<tspan x="10" y="12650">error.itemType - value operation["POST /x-test/parametersDefault/{}"]["typeStringFormatJson"] = \</tspan>
+<tspan x="10" y="12666">"syntax error" is not a valid string (json)", source: http://127.0.0.1:57153/assets.example.js (\</tspan>
+<tspan x="10" y="12682">8)</tspan>
+
+<tspan x="10" y="12698">[5881:0910/132405.930120:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="12714">ts.example.js (8)</tspan>
+
+<tspan x="10" y="12730">[5881:0910/132405.930376:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="12746">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="12762">[5881:0910/132405.933767:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="12778">ts.example.js (8)</tspan>
+
+<tspan x="10" y="12794">[5881:0910/132405.934741:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="12810">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="12826">[5881:0910/132405.953673:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="12842">ts.example.js (8)</tspan>
+
+<tspan x="10" y="12858">[5881:0910/132405.954824:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="12874">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="12890">[5881:0910/132405.956998:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="12906">ts.example.js (8)</tspan>
+
+<tspan x="10" y="12922">[5881:0910/132405.957928:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="12938">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="12954">[5881:0910/132405.961023:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="12970">ts.example.js (8)</tspan>
+
+<tspan x="10" y="12986">[5881:0910/132405.962007:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="13002">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="13018">[5881:0910/132405.966353:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="13034">ts.example.js (8)</tspan>
+
+<tspan x="10" y="13050">[5881:0910/132405.967208:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="13066">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="13082">[5881:0910/132405.968882:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="13098">ts.example.js (8)</tspan>
+
+<tspan x="10" y="13114">[5881:0910/132405.969815:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="13130">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="13146">[5881:0910/132405.972081:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="13162">ts.example.js (8)</tspan>
+
+<tspan x="10" y="13178">[5881:0910/132405.973069:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="13194">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="13210">[5881:0910/132405.975364:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="13226">ts.example.js (8)</tspan>
+
+<tspan x="10" y="13242">[5881:0910/132405.976313:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="13258">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="13274">[5881:0910/132406.025835:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="13290">ts.example.js (8)</tspan>
+
+<tspan x="10" y="13306">[5881:0910/132406.028222:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="13322">ts.example.js (8)</tspan>
+
+<tspan x="10" y="13338">[5881:0910/132406.049419:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="13354">ts.example.js (8)</tspan>
+
+<tspan x="10" y="13370">[5881:0910/132406.051961:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="13386">ts.example.js (8)</tspan>
+
+<tspan x="10" y="13402">[5881:0910/132406.055271:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="13418">ts.example.js (8)</tspan>
+
+<tspan x="10" y="13434">[5881:0910/132406.247320:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="13450">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="13466">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="13482">[5881:0910/132406.267962:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="13498">ts.example.js (8)</tspan>
+
+<tspan x="10" y="13514">[5881:0910/132406.269408:INFO:CONSOLE(8)] "Error: 400 POST http://127.0.0.1:57153/api/v0/x-test/\</tspan>
+<tspan x="10" y="13530">parametersDefault/aa?typeArrayItemsBoolean1=false%2Ctrue&amp;typeArrayItemsInteger1=0%2C1&amp;typeArrayI\</tspan>
+<tspan x="10" y="13546">temsNumber1=0.5%2C1.5&amp;typeArrayItemsNumber2=0.5%2C1.5&amp;typeArrayItemsString0=abcd1234&amp;typeArrayIt\</tspan>
+<tspan x="10" y="13562">emsString1=aa%2Cbb&amp;typeArrayItemsStringCollectionFormatCsv=aa%2Cbb&amp;typeArrayItemsStringCollectio\</tspan>
+<tspan x="10" y="13578">nFormatJson=%5B%22aa%22%2C%22bb%22%5D&amp;typeArrayItemsStringCollectionFormatPipes=aa%7Cbb&amp;typeArra\</tspan>
+<tspan x="10" y="13594">yItemsStringCollectionFormatSsv=aa%20bb&amp;typeArrayItemsStringCollectionFormatTsv=aa%09bb&amp;typeArra\</tspan>
+<tspan x="10" y="13610">yItemsStringEnum=bb&amp;typeBooleanRequired=true&amp;typeNumber0=syntax%20error&amp;typeString1=012345678901\</tspan>
+<tspan x="10" y="13626">2345&amp;typeStringCharsetAscii=%00%01%02%03%04%05%06%07%08%09%0B%0C%0E%0F%10%11%12%13%14%15%16%17%1\</tspan>
+<tspan x="10" y="13642">8%19%1A%1B%1C%1D%1E%1F%20!%22%23%24%25%26%27()*%2B%2C-.%2F0123456789%3A%3B%3C%3D%3E%3F%40ABCDEFG\</tspan>
+<tspan x="10" y="13658">HIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~&amp;typeStringFormatJson=%7B\</tspan>
+<tspan x="10" y="13674">%7D</tspan>
+
+<tspan x="10" y="13690">error.itemType - value operation["POST /x-test/parametersDefault/{}"]["typeNumber0"] = "syntax e\</tspan>
+<tspan x="10" y="13706">rror" is not a valid number", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="13722">[5881:0910/132406.620027:INFO:CONSOLE(8)] "[browser test-case 10 of 34 passed] - testCase_ajax_e\</tspan>
+<tspan x="10" y="13738">rror", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="13754">[5881:0910/132406.797040:INFO:CONSOLE(8)] "[browser test-case 11 of 34 passed] - testCase_crudEr\</tspan>
+<tspan x="10" y="13770">rorXxx_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="13786">[5881:0910/132406.829482:INFO:CONSOLE(8)] "[browser test-case 12 of 34 passed] - testCase_crudNu\</tspan>
+<tspan x="10" y="13802">llXxx_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="13818">[5881:0910/132406.873039:INFO:CONSOLE(8)] "[browser test-case 13 of 34 passed] - testCase_onErro\</tspan>
+<tspan x="10" y="13834">rJsonapi_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="13850">[5881:0910/132406.879865:INFO:CONSOLE(8)] "[browser test-case 14 of 34 passed] - testCase_onErro\</tspan>
+<tspan x="10" y="13866">rJsonapi_emptyArray", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="13882">[5881:0910/132406.924769:INFO:CONSOLE(8)] "[browser test-case 15 of 34 passed] - testCase_onErro\</tspan>
+<tspan x="10" y="13898">rJsonapi_error", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="13914">[5881:0910/132406.971004:INFO:CONSOLE(8)] "[browser test-case 16 of 34 passed] - testCase_swagge\</tspan>
+<tspan x="10" y="13930">rValidateDataParameters_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="13946">[5881:0910/132407.247465:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="13962">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="13978">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="13994">[5881:0910/132407.287922:INFO:CONSOLE(8)] "Error: browser - 400 POST http://127.0.0.1:57153/api/\</tspan>
+<tspan x="10" y="14010">v0/x-test/parametersDefault/aa?typeArrayItemsBoolean1=false%2Ctrue&amp;typeArrayItemsInteger1=0%2C1&amp;\</tspan>
+<tspan x="10" y="14026">typeArrayItemsNumber1=0.5%2C1.5&amp;typeArrayItemsNumber2=0.5%2C1.5&amp;typeArrayItemsString0=abcd1234&amp;t\</tspan>
+<tspan x="10" y="14042">ypeArrayItemsString1=aa%2Cbb&amp;typeArrayItemsStringCollectionFormatCsv=aa%2Cbb&amp;typeArrayItemsStrin\</tspan>
+<tspan x="10" y="14058">gCollectionFormatJson=%5B%22aa%22%2C%22bb%22%5D&amp;typeArrayItemsStringCollectionFormatPipes=aa%7Cb\</tspan>
+<tspan x="10" y="14074">b&amp;typeArrayItemsStringCollectionFormatSsv=aa%20bb&amp;typeArrayItemsStringCollectionFormatTsv=aa%09b\</tspan>
+<tspan x="10" y="14090">b&amp;typeArrayItemsStringEnum=bb&amp;typeBooleanRequired=true&amp;typeNumber0=syntax%20error&amp;typeString1=01\</tspan>
+<tspan x="10" y="14106">23456789012345&amp;typeStringCharsetAscii=%00%01%02%03%04%05%06%07%08%09%0B%0C%0E%0F%10%11%12%13%14%\</tspan>
+<tspan x="10" y="14122">15%16%17%18%19%1A%1B%1C%1D%1E%1F%20!%22%23%24%25%26'()*%2B%2C-.%2F0123456789%3A%3B%3C%3D%3E%3F%4\</tspan>
+<tspan x="10" y="14138">0ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~&amp;typeStringFormat\</tspan>
+<tspan x="10" y="14154">Json=%7B%7D</tspan>
+
+<tspan x="10" y="14170">ajax - statusCode 400", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14186">[5881:0910/132407.345725:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14202">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14218">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14234">[5881:0910/132407.365187:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14250">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14266">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14282">[5881:0910/132407.516582:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14298">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14314">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14330">[5881:0910/132407.538073:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14346">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14362">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14378">[5881:0910/132407.600140:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14394">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14410">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14426">[5881:0910/132407.618124:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14442">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14458">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14474">[5881:0910/132407.637023:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14490">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14506">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14522">[5881:0910/132407.642375:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14538">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14554">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14570">[5881:0910/132407.647395:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14586">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14602">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14618">[5881:0910/132407.660066:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14634">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14650">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14666">[5881:0910/132407.673917:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14682">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14698">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14714">[5881:0910/132407.678728:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14730">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14746">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14762">[5881:0910/132407.684619:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14778">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14794">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14810">[5881:0910/132407.713111:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14826">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14842">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14858">[5881:0910/132407.723308:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14874">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14890">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14906">[5881:0910/132407.728528:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14922">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14938">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="14954">[5881:0910/132407.750806:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="14970">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="14986">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15002">[5881:0910/132407.755367:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15018">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15034">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15050">[5881:0910/132407.761554:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15066">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15082">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15098">[5881:0910/132407.766827:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15114">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15130">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15146">[5881:0910/132407.799518:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15162">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15178">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15194">[5881:0910/132407.815131:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15210">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15226">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15242">[5881:0910/132407.819427:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15258">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15274">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15290">[5881:0910/132407.830495:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15306">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15322">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15338">[5881:0910/132407.872881:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15354">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15370">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15386">[5881:0910/132407.877205:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15402">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15418">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15434">[5881:0910/132407.883303:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15450">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15466">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15482">[5881:0910/132407.906415:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15498">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15514">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15530">[5881:0910/132407.911654:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15546">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15562">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15578">[5881:0910/132407.916109:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15594">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15610">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15626">[5881:0910/132407.936864:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15642">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15658">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15674">[5881:0910/132407.941928:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15690">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15706">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15722">[5881:0910/132407.949539:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15738">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15754">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15770">[5881:0910/132407.954138:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15786">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15802">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15818">[5881:0910/132407.968379:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15834">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15850">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15866">[5881:0910/132407.971413:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15882">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15898">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15914">[5881:0910/132407.975909:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15930">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15946">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="15962">[5881:0910/132407.980323:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="15978">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="15994">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16010">[5881:0910/132407.991915:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="16026">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="16042">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16058">[5881:0910/132407.997126:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="16074">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="16090">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16106">[5881:0910/132408.001693:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="16122">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="16138">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16154">[5881:0910/132408.012472:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="16170">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="16186">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16202">[5881:0910/132408.033708:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="16218">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="16234">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16250">[5881:0910/132408.038758:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="16266">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="16282">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16298">[5881:0910/132408.044072:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="16314">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="16330">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16346">[5881:0910/132408.058905:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="16362">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="16378">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16394">[5881:0910/132408.064071:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="16410">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="16426">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16442">[5881:0910/132408.068052:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="16458">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="16474">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16490">[5881:0910/132408.076591:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="16506">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="16522">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16538">[5881:0910/132408.092033:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="16554">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="16570">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16586">[5881:0910/132408.118880:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="16602">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="16618">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16634">[5881:0910/132408.123784:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="16650">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="16666">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16682">[5881:0910/132408.128189:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="16698">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="16714">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16730">[5881:0910/132408.283364:INFO:CONSOLE(8)] "[browser test-case 17 of 34 passed] - testCase_crudCo\</tspan>
+<tspan x="10" y="16746">untManyByQuery_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16762">[5881:0910/132408.418577:INFO:CONSOLE(8)] "[browser test-case 18 of 34 passed] - testCase_crudGe\</tspan>
+<tspan x="10" y="16778">tManyByQuery_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16794">[5881:0910/132408.421673:INFO:CONSOLE(8)] "[browser test-case 19 of 34 passed] - testCase_crudGe\</tspan>
+<tspan x="10" y="16810">tOneById_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16826">[5881:0910/132408.422041:INFO:CONSOLE(8)] "[browser test-case 20 of 34 passed] - testCase_crudGe\</tspan>
+<tspan x="10" y="16842">tOneByQuery_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16858">[5881:0910/132408.464052:INFO:CONSOLE(8)] "[browser test-case 21 of 34 passed] - testCase_domAni\</tspan>
+<tspan x="10" y="16874">mateShake_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16890">[5881:0910/132408.509288:INFO:CONSOLE(8)] "[browser test-case 22 of 34 passed] - testCase_fileUp\</tspan>
+<tspan x="10" y="16906">loadManyByForm_nullCase", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16922">[5881:0910/132408.585325:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="16938">ts.example.js (8)</tspan>
+
+<tspan x="10" y="16954">[5881:0910/132408.586848:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="16970">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="16986">[5881:0910/132408.587358:INFO:CONSOLE(8)] "[browser test-case 23 of 34 passed] - testCase_petsto\</tspan>
+<tspan x="10" y="17002">reStoreGetInventory_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="17018">[5881:0910/132408.592690:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="17034">ts.example.js (8)</tspan>
+
+<tspan x="10" y="17050">[5881:0910/132408.592752:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="17066">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="17082">[5881:0910/132408.598143:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="17098">ts.example.js (8)</tspan>
+
+<tspan x="10" y="17114">[5881:0910/132408.598541:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="17130">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="17146">[5881:0910/132408.600238:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="17162">ts.example.js (8)</tspan>
+
+<tspan x="10" y="17178">[5881:0910/132408.600306:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="17194">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="17210">[5881:0910/132408.650691:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="17226">ts.example.js (8)</tspan>
+
+<tspan x="10" y="17242">[5881:0910/132408.650785:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="17258">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="17274">[5881:0910/132408.654716:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="17290">ts.example.js (8)</tspan>
+
+<tspan x="10" y="17306">[5881:0910/132408.655376:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="17322">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="17338">[5881:0910/132408.687364:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="17354">ts.example.js (8)</tspan>
+
+<tspan x="10" y="17370">[5881:0910/132408.687879:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="17386">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="17402">[5881:0910/132408.693193:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="17418">ts.example.js (8)</tspan>
+
+<tspan x="10" y="17434">[5881:0910/132408.693559:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="17450">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="17466">[5881:0910/132408.696920:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="17482">ts.example.js (8)</tspan>
+
+<tspan x="10" y="17498">[5881:0910/132408.697262:INFO:CONSOLE(8)] "Error: default error", source: http://127.0.0.1:57153\</tspan>
+<tspan x="10" y="17514">/assets.example.js (8)</tspan>
+
+<tspan x="10" y="17530">[5964:0910/132408.988642:ERROR:gl_implementation.cc(245)] Failed to load /home/travis/build/kaiz\</tspan>
+<tspan x="10" y="17546">hu256/node-swgg/node_modules/electron-lite/external/swiftshader/libGLESv2.so: /home/travis/build\</tspan>
+<tspan x="10" y="17562">/kaizhu256/node-swgg/node_modules/electron-lite/external/swiftshader/libGLESv2.so: cannot open s\</tspan>
+<tspan x="10" y="17578">hared object file: No such file or directory</tspan>
+
+<tspan x="10" y="17594">[5964:0910/132408.993785:ERROR:gpu_child_thread.cc(252)] Exiting GPU process due to errors durin\</tspan>
+<tspan x="10" y="17610">g initialization</tspan>
+
+<tspan x="10" y="17626">[5968:0910/132409.020920:ERROR:gl_implementation.cc(245)] Failed to load /home/travis/build/kaiz\</tspan>
+<tspan x="10" y="17642">hu256/node-swgg/node_modules/electron-lite/external/swiftshader/libGLESv2.so: /home/travis/build\</tspan>
+<tspan x="10" y="17658">/kaizhu256/node-swgg/node_modules/electron-lite/external/swiftshader/libGLESv2.so: cannot open s\</tspan>
+<tspan x="10" y="17674">hared object file: No such file or directory</tspan>
+
+<tspan x="10" y="17690">[5968:0910/132409.025096:ERROR:gpu_child_thread.cc(252)] Exiting GPU process due to errors durin\</tspan>
+<tspan x="10" y="17706">g initialization</tspan>
+
+<tspan x="10" y="17722">[5972:0910/132409.053123:ERROR:gl_implementation.cc(245)] Failed to load /home/travis/build/kaiz\</tspan>
+<tspan x="10" y="17738">hu256/node-swgg/node_modules/electron-lite/external/swiftshader/libGLESv2.so: /home/travis/build\</tspan>
+<tspan x="10" y="17754">/kaizhu256/node-swgg/node_modules/electron-lite/external/swiftshader/libGLESv2.so: cannot open s\</tspan>
+<tspan x="10" y="17770">hared object file: No such file or directory</tspan>
+
+<tspan x="10" y="17786">[5972:0910/132409.056489:ERROR:gpu_child_thread.cc(252)] Exiting GPU process due to errors durin\</tspan>
+<tspan x="10" y="17802">g initialization</tspan>
+
+<tspan x="10" y="17818">[5976:0910/132409.084236:ERROR:gl_implementation.cc(245)] Failed to load /home/travis/build/kaiz\</tspan>
+<tspan x="10" y="17834">hu256/node-swgg/node_modules/electron-lite/external/swiftshader/libGLESv2.so: /home/travis/build\</tspan>
+<tspan x="10" y="17850">/kaizhu256/node-swgg/node_modules/electron-lite/external/swiftshader/libGLESv2.so: cannot open s\</tspan>
+<tspan x="10" y="17866">hared object file: No such file or directory</tspan>
+
+<tspan x="10" y="17882">[5976:0910/132409.087229:ERROR:gpu_child_thread.cc(252)] Exiting GPU process due to errors durin\</tspan>
+<tspan x="10" y="17898">g initialization</tspan>
+
+<tspan x="10" y="17914">[5881:0910/132409.214106:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="17930">ts.example.js (8)</tspan>
+
+<tspan x="10" y="17946">[5881:0910/132409.236497:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="17962">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="17978">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="17994">[5881:0910/132409.237609:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="18010">ts.example.js (8)</tspan>
+
+<tspan x="10" y="18026">[5881:0910/132409.237858:INFO:CONSOLE(8)] "Error: 400 POST http://127.0.0.1:57153/api/v0/x-test/\</tspan>
+<tspan x="10" y="18042">parametersDefault/aa?typeArrayItemsBoolean1=false%2Ctrue&amp;typeArrayItemsInteger1=0%2C1&amp;typeArrayI\</tspan>
+<tspan x="10" y="18058">temsNumber1=0.5%2C1.5&amp;typeArrayItemsNumber2=0.5%2C1.5&amp;typeArrayItemsString0=abcd1234&amp;typeArrayIt\</tspan>
+<tspan x="10" y="18074">emsString1=aa%2Cbb&amp;typeArrayItemsStringCollectionFormatCsv=aa%2Cbb&amp;typeArrayItemsStringCollectio\</tspan>
+<tspan x="10" y="18090">nFormatJson=%5B%22aa%22%2C%22bb%22%5D&amp;typeArrayItemsStringCollectionFormatPipes=aa%7Cbb&amp;typeArra\</tspan>
+<tspan x="10" y="18106">yItemsStringCollectionFormatSsv=aa%20bb&amp;typeArrayItemsStringCollectionFormatTsv=aa%09bb&amp;typeArra\</tspan>
+<tspan x="10" y="18122">yItemsStringEnum=bb&amp;typeBooleanRequired=true&amp;typeNumber0=syntax%20error&amp;typeString1=012345678901\</tspan>
+<tspan x="10" y="18138">2345&amp;typeStringCharsetAscii=%00%01%02%03%04%05%06%07%08%09%0B%0C%0E%0F%10%11%12%13%14%15%16%17%1\</tspan>
+<tspan x="10" y="18154">8%19%1A%1B%1C%1D%1E%1F%20!%22%23%24%25%26%27()*%2B%2C-.%2F0123456789%3A%3B%3C%3D%3E%3F%40ABCDEFG\</tspan>
+<tspan x="10" y="18170">HIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~&amp;typeStringFormatJson=%7B\</tspan>
+<tspan x="10" y="18186">%7D</tspan>
+
+<tspan x="10" y="18202">error.itemType - value operation["POST /x-test/parametersDefault/{}"]["typeNumber0"] = "syntax e\</tspan>
+<tspan x="10" y="18218">rror" is not a valid number", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="18234">[5930:0910/132409.327304:ERROR:render_media_log.cc(30)] MediaEvent: MEDIA_ERROR_LOG_ENTRY {"erro\</tspan>
+<tspan x="10" y="18250">r":"FFmpegDemuxer: open context failed"}</tspan>
+
+<tspan x="10" y="18266">[5930:0910/132409.421077:ERROR:render_media_log.cc(30)] MediaEvent: PIPELINE_ERROR DEMUXER_ERROR\</tspan>
+<tspan x="10" y="18282">_COULD_NOT_OPEN</tspan>
+
+<tspan x="10" y="18298">[5881:0910/132409.522681:INFO:CONSOLE(8)] "error.itemType - value operation["POST /x-test/parame\</tspan>
+<tspan x="10" y="18314">tersDefault/{}"]["typeNumber0"] = "syntax error" is not a valid number", source: http://127.0.0.\</tspan>
+<tspan x="10" y="18330">1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="18346">[5881:0910/132409.567703:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="18362">ts.example.js (8)</tspan>
+
+<tspan x="10" y="18378">[5881:0910/132409.570375:INFO:CONSOLE(8)] "TypeError: 500 GET http://127.0.0.1:57153/api/v0/user\</tspan>
+<tspan x="10" y="18394">/login?username=abcd1234&amp;password=abcd1234</tspan>
+
+<tspan x="10" y="18410">Cannot read property 'slice' of undefined", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="18426">[5881:0910/132409.593947:INFO:CONSOLE(8)] "Error: browser - 401 GET http://127.0.0.1:57153/api/v\</tspan>
+<tspan x="10" y="18442">0/user/logout</tspan>
+
+<tspan x="10" y="18458">ajax - statusCode 401", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="18474">[5881:0910/132409.594366:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="18490">ts.example.js (8)</tspan>
+
+<tspan x="10" y="18506">[5881:0910/132409.594908:INFO:CONSOLE(8)] "TypeError: 500 GET http://127.0.0.1:57153/api/v0/user\</tspan>
+<tspan x="10" y="18522">/userLoginByPassword?username=abcd1234&amp;password=abcd1234</tspan>
+
+<tspan x="10" y="18538">Cannot read property 'slice' of undefined", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="18554">[5881:0910/132409.642398:INFO:CONSOLE(8)] "Error: browser - 401 GET http://127.0.0.1:57153/api/v\</tspan>
+<tspan x="10" y="18570">0/user/userLogout</tspan>
+
+<tspan x="10" y="18586">ajax - statusCode 401", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="18602">[5881:0910/132409.732001:INFO:CONSOLE(8)] "Error: browser - 500 DELETE http://127.0.0.1:57153/ap\</tspan>
+<tspan x="10" y="18618">i/v0/x-test/crudErrorDelete</tspan>
+
+<tspan x="10" y="18634">ajax - statusCode 500", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="18650">[5881:0910/132409.746897:INFO:CONSOLE(8)] "Error: browser - 500 GET http://127.0.0.1:57153/api/v\</tspan>
+<tspan x="10" y="18666">0/x-test/crudErrorGet</tspan>
+
+<tspan x="10" y="18682">ajax - statusCode 500", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="18698">[5881:0910/132409.762456:INFO:CONSOLE(8)] "Error: browser - 500 HEAD http://127.0.0.1:57153/api/\</tspan>
+<tspan x="10" y="18714">v0/x-test/crudErrorHead</tspan>
+
+<tspan x="10" y="18730">ajax - statusCode 500", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="18746">[5881:0910/132409.764720:INFO:CONSOLE(8)] "Error: browser - 500 GET http://127.0.0.1:57153/api/v\</tspan>
+<tspan x="10" y="18762">0/x-test/crudErrorLogin</tspan>
+
+<tspan x="10" y="18778">ajax - statusCode 500", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="18794">[5881:0910/132410.094943:INFO:CONSOLE(8)] "Error: browser - 500 OPTIONS http://127.0.0.1:57153/a\</tspan>
+<tspan x="10" y="18810">pi/v0/x-test/crudErrorOptions</tspan>
+
+<tspan x="10" y="18826">ajax - statusCode 500", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="18842">[5881:0910/132410.096379:INFO:CONSOLE(8)] "Error: browser - 500 PATCH http://127.0.0.1:57153/api\</tspan>
+<tspan x="10" y="18858">/v0/x-test/crudErrorPatch</tspan>
+
+<tspan x="10" y="18874">ajax - statusCode 500", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="18890">[5881:0910/132410.113000:INFO:CONSOLE(8)] "Error: browser - 500 POST http://127.0.0.1:57153/api/\</tspan>
+<tspan x="10" y="18906">v0/x-test/crudErrorPost</tspan>
+
+<tspan x="10" y="18922">ajax - statusCode 500", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="18938">[5881:0910/132410.117228:INFO:CONSOLE(8)] "Error: browser - 500 GET http://127.0.0.1:57153/api/v\</tspan>
+<tspan x="10" y="18954">0/x-test/crudErrorPre</tspan>
+
+<tspan x="10" y="18970">ajax - statusCode 500", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="18986">[5881:0910/132410.168163:INFO:CONSOLE(8)] "Error: browser - 500 PUT http://127.0.0.1:57153/api/v\</tspan>
+<tspan x="10" y="19002">0/x-test/crudErrorPut</tspan>
+
+<tspan x="10" y="19018">ajax - statusCode 500", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19034">[5881:0910/132410.313754:INFO:CONSOLE(8)] "Error: browser - 404 GET http://127.0.0.1:57153/api/v\</tspan>
+<tspan x="10" y="19050">0/x-test/errorUndefinedApi</tspan>
+
+<tspan x="10" y="19066">ajax - statusCode 404", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19082">[5881:0910/132410.363982:INFO:CONSOLE(8)] "Error: browser - 404 GET http://127.0.0.1:57153/api/v\</tspan>
+<tspan x="10" y="19098">0/x-test/fixErrorSemanticUniquePath/abcd1234</tspan>
+
+<tspan x="10" y="19114">ajax - statusCode 404", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19130">[5881:0910/132410.365791:INFO:CONSOLE(8)] "Error: browser - 404 GET http://127.0.0.1:57153/api/v\</tspan>
+<tspan x="10" y="19146">0/x-test/fixErrorSemanticUniquePath/abcd1234</tspan>
+
+<tspan x="10" y="19162">ajax - statusCode 404", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19178">[5881:0910/132410.376887:INFO:CONSOLE(8)] "Error: browser - 500 GET http://127.0.0.1:57153/api/v\</tspan>
+<tspan x="10" y="19194">0/x-test/onErrorJsonapi?data=%7B%0A%20%20%20%20%22foo%22%3A%20%22abcd1234%22%0A%7D&amp;error=%7B%0A%\</tspan>
+<tspan x="10" y="19210">20%20%20%20%22foo%22%3A%20%22abcd1234%22%0A%7D</tspan>
+
+<tspan x="10" y="19226">ajax - statusCode 500", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19242">[5881:0910/132410.390199:INFO:CONSOLE(8)] "[browser test-case 24 of 34 passed] - testCase_ui_cli\</tspan>
+<tspan x="10" y="19258">ck", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19274">[5881:0910/132410.391378:INFO:CONSOLE(8)] "Error: browser - 400 POST http://127.0.0.1:57153/api/\</tspan>
+<tspan x="10" y="19290">v0/x-test/parametersDefault/aa?typeArrayItemsBoolean1=false%2Ctrue&amp;typeArrayItemsInteger1=0%2C1&amp;\</tspan>
+<tspan x="10" y="19306">typeArrayItemsNumber1=0.5%2C1.5&amp;typeArrayItemsNumber2=0.5%2C1.5&amp;typeArrayItemsString0=abcd1234&amp;t\</tspan>
+<tspan x="10" y="19322">ypeArrayItemsString1=aa%2Cbb&amp;typeArrayItemsStringCollectionFormatCsv=aa%2Cbb&amp;typeArrayItemsStrin\</tspan>
+<tspan x="10" y="19338">gCollectionFormatJson=%5B%22aa%22%2C%22bb%22%5D&amp;typeArrayItemsStringCollectionFormatPipes=aa%7Cb\</tspan>
+<tspan x="10" y="19354">b&amp;typeArrayItemsStringCollectionFormatSsv=aa%20bb&amp;typeArrayItemsStringCollectionFormatTsv=aa%09b\</tspan>
+<tspan x="10" y="19370">b&amp;typeArrayItemsStringEnum=bb&amp;typeBooleanRequired=true&amp;typeNumber0=syntax%20error&amp;typeString1=01\</tspan>
+<tspan x="10" y="19386">23456789012345&amp;typeStringCharsetAscii=%00%01%02%03%04%05%06%07%08%09%0B%0C%0E%0F%10%11%12%13%14%\</tspan>
+<tspan x="10" y="19402">15%16%17%18%19%1A%1B%1C%1D%1E%1F%20!%22%23%24%25%26'()*%2B%2C-.%2F0123456789%3A%3B%3C%3D%3E%3F%4\</tspan>
+<tspan x="10" y="19418">0ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~&amp;typeStringFormat\</tspan>
+<tspan x="10" y="19434">Json=%7B%7D</tspan>
+
+<tspan x="10" y="19450">ajax - statusCode 400", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19466">[5881:0910/132410.456184:INFO:CONSOLE(8)] "Error: browser - 404 GET http://127.0.0.1:57153/api/v\</tspan>
+<tspan x="10" y="19482">0/x-test/tags0Filter</tspan>
+
+<tspan x="10" y="19498">ajax - statusCode 404", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19514">[5881:0910/132410.456715:INFO:CONSOLE(8)] "Error: browser - 404 GET http://127.0.0.1:57153/api/v\</tspan>
+<tspan x="10" y="19530">0/x-test-markdown/description</tspan>
+
+<tspan x="10" y="19546">ajax - statusCode 404", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19562">[5881:0910/132410.511716:INFO:CONSOLE(8)] "Error: browser - 500 GET http://127.0.0.1:57153/api/v\</tspan>
+<tspan x="10" y="19578">0/user/login?username=abcd1234&amp;password=abcd1234</tspan>
+
+<tspan x="10" y="19594">ajax - statusCode 500", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19610">[5881:0910/132410.512777:INFO:CONSOLE(8)] "Error: browser - 500 GET http://127.0.0.1:57153/api/v\</tspan>
+<tspan x="10" y="19626">0/user/userLoginByPassword?username=abcd1234&amp;password=abcd1234</tspan>
+
+<tspan x="10" y="19642">ajax - statusCode 500", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19658">[5881:0910/132410.608652:INFO:CONSOLE(8)] "[browser test-case 25 of 34 passed] - testCase_crudSe\</tspan>
+<tspan x="10" y="19674">tManyById_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19690">[5881:0910/132410.609169:INFO:CONSOLE(8)] "[browser test-case 26 of 34 passed] - testCase_crudSe\</tspan>
+<tspan x="10" y="19706">tOneById_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19722">[5881:0910/132410.615977:INFO:CONSOLE(8)] "[browser test-case 27 of 34 passed] - testCase_fileGe\</tspan>
+<tspan x="10" y="19738">tOneById_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19754">[5881:0910/132410.834886:INFO:CONSOLE(8)] "[browser test-case 28 of 34 passed] - testCase_crudRe\</tspan>
+<tspan x="10" y="19770">moveManyByQuery_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19786">[5881:0910/132410.836754:INFO:CONSOLE(8)] "[browser test-case 29 of 34 passed] - testCase_crudRe\</tspan>
+<tspan x="10" y="19802">moveOneById_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19818">[5881:0910/132410.900045:INFO:CONSOLE(8)] "[browser test-case 30 of 34 passed] - testCase_crudUp\</tspan>
+<tspan x="10" y="19834">dateOneById_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19850">[5881:0910/132410.960972:INFO:CONSOLE(8)] "[browser test-case 31 of 34 passed] - testCase_fileUp\</tspan>
+<tspan x="10" y="19866">loadManyByForm_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="19882">[5881:0910/132411.028088:INFO:CONSOLE(8)] "error.objectRequired - string operation["GET /user/us\</tspan>
+<tspan x="10" y="19898">erLoginByPassword"]["username"] = undefined is required", source: http://127.0.0.1:57153/assets.\</tspan>
+<tspan x="10" y="19914">example.js (8)</tspan>
+
+<tspan x="10" y="19930">[5881:0910/132411.029763:INFO:CONSOLE(8)] "[object Object]", source: http://127.0.0.1:57153/asse\</tspan>
+<tspan x="10" y="19946">ts.example.js (8)</tspan>
+
+<tspan x="10" y="19962">[5881:0910/132411.029923:INFO:CONSOLE(8)] "Error: 400 GET http://127.0.0.1:57153/api/v0/user/use\</tspan>
+<tspan x="10" y="19978">rLoginByPassword?password=1</tspan>
+
+<tspan x="10" y="19994">error.objectRequired - string operation["GET /user/userLoginByPassword"]["username"] = undefined\</tspan>
+<tspan x="10" y="20010"> is required", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="20026">[5881:0910/132411.080656:INFO:CONSOLE(8)] "[browser test-case 32 of 34 passed] - testCase_userLo\</tspan>
+<tspan x="10" y="20042">ginXxx_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="20058">[5881:0910/132411.124557:INFO:CONSOLE(8)] "[browser test-case 33 of 34 passed] - testCase_crudCr\</tspan>
+<tspan x="10" y="20074">eateReplaceUpdateRemoveMany_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="20090">[5881:0910/132411.127903:INFO:CONSOLE(8)] "[browser test-case 34 of 34 passed] - testCase_crudCr\</tspan>
+<tspan x="10" y="20106">eateReplaceUpdateRemoveOne_default", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="20122">[5881:0910/132412.135998:INFO:CONSOLE(8)] "----------|-----------|-----------|-----------|------\</tspan>
+<tspan x="10" y="20138">-----|</tspan>
+
+<tspan x="10" y="20154">File      |   % Stmts |% Branches |   % Funcs |   % Lines |</tspan>
+
+<tspan x="10" y="20170">----------|-----------|-----------|-----------|-----------|</tspan>
+
+<tspan x="10" y="20186">----------|-----------|-----------|-----------|-----------|</tspan>
+
+<tspan x="10" y="20202">All files |       100 |       100 |       100 |       100 |</tspan>
+
+<tspan x="10" y="20218">----------|-----------|-----------|-----------|-----------|</tspan>
+
+<tspan x="10" y="20234">", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="20250">[5881:0910/132412.142363:INFO:CONSOLE(8)] "created coverage file /tmp/build/coverage.html/index.\</tspan>
+<tspan x="10" y="20266">html", source: http://127.0.0.1:57153/assets.example.js (8)</tspan>
+
+<tspan x="10" y="20282"></tspan>
+
+<tspan x="10" y="20298">browserTest - created screenshot file /home/travis/build/kaizhu256/node-swgg/tmp/build/screensho\</tspan>
+<tspan x="10" y="20314">t.npmTest.browser.%2F.png</tspan>
+
+<tspan x="10" y="20330"></tspan>
+
+<tspan x="10" y="20346">browserTest - created screenshot file /home/travis/build/kaizhu256/node-swgg/tmp/build/screensho\</tspan>
+<tspan x="10" y="20362">t.npmTest.browser.%2F.html</tspan>
+
+<tspan x="10" y="20378">[node test-case 40 of 40 passed] - testCase_webpage_default</tspan>
+
+<tspan x="10" y="20394">------------------|-----------|-----------|-----------|-----------|</tspan>
+
+<tspan x="10" y="20410">File              |   % Stmts |% Branches |   % Funcs |   % Lines |</tspan>
+
+<tspan x="10" y="20426">------------------|-----------|-----------|-----------|-----------|</tspan>
+
+<tspan x="10" y="20442">   node-swgg/     |       100 |       100 |       100 |       100 |</tspan>
+
+<tspan x="10" y="20458">      example.js  |       100 |       100 |       100 |       100 |</tspan>
+
+<tspan x="10" y="20474">      lib.swgg.js |       100 |       100 |       100 |       100 |</tspan>
+
+<tspan x="10" y="20490">      test.js     |       100 |       100 |       100 |       100 |</tspan>
+
+<tspan x="10" y="20506">------------------|-----------|-----------|-----------|-----------|</tspan>
+
+<tspan x="10" y="20522">All files         |       100 |       100 |       100 |       100 |</tspan>
+
+<tspan x="10" y="20538">------------------|-----------|-----------|-----------|-----------|</tspan>
+
+<tspan x="10" y="20554"></tspan>
+
+<tspan x="10" y="20570">created coverage file /home/travis/build/kaizhu256/node-swgg/tmp/build/coverage.html/index.html</tspan>
+
+<tspan x="10" y="20586"></tspan>
+
+<tspan x="10" y="20602">npmTest - merged test-report from file /home/travis/build/kaizhu256/node-swgg/tmp/build/test-rep\</tspan>
+<tspan x="10" y="20618">ort.json</tspan>
+
+<tspan x="10" y="20634"></tspan>
+
+<tspan x="10" y="20650">-------------------------------------------------------</tspan>
+
+<tspan x="10" y="20666">| test-report - npmTest - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM\</tspan>
+<tspan x="10" y="20682">L, like Gecko) Chrome/61.0.3163.100 Electron/2.0.8 Safari/537.36 - 2018-09-10T13:23:58.652Z</tspan>
+
+<tspan x="10" y="20698">|    5851 ms            0 failed       34 passed      |</tspan>
+
+<tspan x="10" y="20714">-------------------------------------------------------</tspan>
+
+<tspan x="10" y="20730">| test-report - npmTest - node - linux v10.10.0 - 2018-09-10T13:23:52.468Z</tspan>
+
+<tspan x="10" y="20746">|   17240 ms            0 failed       40 passed      |</tspan>
+
+<tspan x="10" y="20762">-------------------------------------------------------</tspan>
+
+<tspan x="10" y="20778">| test-report - npmTestPublished - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537\</tspan>
+<tspan x="10" y="20794">.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.8 Safari/537.36 - 2018-09-10T13:22:47.\</tspan>
+<tspan x="10" y="20810">312Z</tspan>
+
+<tspan x="10" y="20826">|    6246 ms            0 failed       34 passed      |</tspan>
+
+<tspan x="10" y="20842">-------------------------------------------------------</tspan>
+
+<tspan x="10" y="20858">| test-report - npmTestPublished - node - linux v10.10.0 - 2018-09-10T13:22:40.493Z</tspan>
+
+<tspan x="10" y="20874">|   18895 ms            0 failed       40 passed      |</tspan>
+
+<tspan x="10" y="20890">-------------------------------------------------------</tspan>
+
+<tspan x="10" y="20906"></tspan>
+
+<tspan x="10" y="20922">created test-report file /home/travis/build/kaizhu256/node-swgg/tmp/build/test-report.html</tspan>
+
+<tspan x="10" y="20938"></tspan>
+
+<tspan x="10" y="20954"></tspan>
+
+<tspan x="10" y="20970">npmTest - 0 failed tests</tspan>
+
+<tspan x="10" y="20986"></tspan>
+
+<tspan x="10" y="21002"></tspan>
+
+<tspan x="10" y="21018">[MODE_BUILD=npmTest] - 2018-09-10T13:24:13.860Z - EXIT_CODE - 0</tspan>
+
+</text>
+</svg>

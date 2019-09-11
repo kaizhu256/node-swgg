@@ -1,0 +1,163 @@
+<svg height="1886" width="720" xmlns="http://www.w3.org/2000/svg">
+<rect height="1886" fill="#555" width="720"></rect>
+<text fill="#7f7" font-family="Courier New" font-size="12" xml:space="preserve">
+<tspan x="10" y="26"></tspan>
+
+<tspan x="10" y="42">&gt; swgg@2019.2.20 postinstall /tmp/app/node_modules/swgg</tspan>
+
+<tspan x="10" y="58">&gt; ./npm_scripts.sh</tspan>
+
+<tspan x="10" y="74"></tspan>
+
+<tspan x="10" y="90">running command 'npm run postinstall swgg' ...</tspan>
+
+<tspan x="10" y="106">... finished running command 'npm run postinstall swgg'</tspan>
+
+<tspan x="10" y="122">npm WARN saveError ENOENT: no such file or directory, open '/tmp/app/package.json'</tspan>
+
+<tspan x="10" y="138">npm notice created a lockfile as package-lock.json. You should commit this file.</tspan>
+
+<tspan x="10" y="154">npm WARN enoent ENOENT: no such file or directory, open '/tmp/app/package.json'</tspan>
+
+<tspan x="10" y="170">npm WARN app No description</tspan>
+
+<tspan x="10" y="186">npm WARN app No repository field.</tspan>
+
+<tspan x="10" y="202">npm WARN app No README data</tspan>
+
+<tspan x="10" y="218">npm WARN app No license field.</tspan>
+
+<tspan x="10" y="234"></tspan>
+
+<tspan x="10" y="250">+ swgg@2019.2.20</tspan>
+
+<tspan x="10" y="266">added 1 package from 1 contributor and audited 1 package in 0.337s</tspan>
+
+<tspan x="10" y="282">found 0 vulnerabilities</tspan>
+
+<tspan x="10" y="298"></tspan>
+
+<tspan x="10" y="314">http-server listening on port 8081</tspan>
+
+<tspan x="10" y="330">db - seeding dbTable File ...</tspan>
+
+<tspan x="10" y="346">db - seeding dbTable Pet ...</tspan>
+
+<tspan x="10" y="362">db - seeding dbTable Order ...</tspan>
+
+<tspan x="10" y="378">db - seeding dbTable User ...</tspan>
+
+<tspan x="10" y="394">db loaded from tmp/storage.undefined</tspan>
+
+<tspan x="10" y="410">serverLog - {"time":"2019-02-20T08:31:26.356Z","type":"serverResponse","method":"GET","url":"/",\</tspan>
+<tspan x="10" y="426">"statusCode":200,"timeElapsed":39,"requestContentLength":0,"responseContentLength":0,"requestHea\</tspan>
+<tspan x="10" y="442">derXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"","requestHeaderUserAgent"\</tspan>
+<tspan x="10" y="458">:"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 El\</tspan>
+<tspan x="10" y="474">ectron/2.0.16 Safari/537.36"}</tspan>
+
+<tspan x="10" y="490">serverLog - {"time":"2019-02-20T08:31:26.528Z","type":"serverResponse","method":"GET","url":"/",\</tspan>
+<tspan x="10" y="506">"statusCode":304,"timeElapsed":26,"requestContentLength":0,"responseContentLength":0,"requestHea\</tspan>
+<tspan x="10" y="522">derXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"","requestHeaderUserAgent"\</tspan>
+<tspan x="10" y="538">:"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 El\</tspan>
+<tspan x="10" y="554">ectron/2.0.16 Safari/537.36"}</tspan>
+
+<tspan x="10" y="570">serverLog - {"time":"2019-02-20T08:31:26.555Z","type":"serverResponse","method":"GET","url":"/",\</tspan>
+<tspan x="10" y="586">"statusCode":304,"timeElapsed":34,"requestContentLength":0,"responseContentLength":0,"requestHea\</tspan>
+<tspan x="10" y="602">derXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"","requestHeaderUserAgent"\</tspan>
+<tspan x="10" y="618">:"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 El\</tspan>
+<tspan x="10" y="634">ectron/2.0.16 Safari/537.36"}</tspan>
+
+<tspan x="10" y="650">serverLog - {"time":"2019-02-20T08:31:26.608Z","type":"serverResponse","method":"GET","url":"/",\</tspan>
+<tspan x="10" y="666">"statusCode":200,"timeElapsed":16,"requestContentLength":0,"responseContentLength":0,"requestHea\</tspan>
+<tspan x="10" y="682">derXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"","requestHeaderUserAgent"\</tspan>
+<tspan x="10" y="698">:"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 El\</tspan>
+<tspan x="10" y="714">ectron/2.0.16 Safari/537.36"}</tspan>
+
+<tspan x="10" y="730">serverLog - {"time":"2019-02-20T08:31:26.840Z","type":"serverResponse","method":"GET","url":"/js\</tspan>
+<tspan x="10" y="746">onp.utility2.stateInit?callback=window.utility2.stateInit","statusCode":200,"timeElapsed":9,"req\</tspan>
+<tspan x="10" y="762">uestContentLength":0,"responseContentLength":0,"requestHeaderXForwardedFor":"","requestHeaderOri\</tspan>
+<tspan x="10" y="778">gin":"","requestHeaderReferer":"http://127.0.0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X\</tspan>
+<tspan x="10" y="794">11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Sa\</tspan>
+<tspan x="10" y="810">fari/537.36"}</tspan>
+
+<tspan x="10" y="826">serverLog - {"time":"2019-02-20T08:31:26.901Z","type":"serverResponse","method":"GET","url":"/as\</tspan>
+<tspan x="10" y="842">sets.test.js","statusCode":404,"timeElapsed":33,"requestContentLength":0,"responseContentLength"\</tspan>
+<tspan x="10" y="858">:0,"requestHeaderXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"http://127.0\</tspan>
+<tspan x="10" y="874">.0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML,\</tspan>
+<tspan x="10" y="890"> like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36"}</tspan>
+
+<tspan x="10" y="906">serverLog - {"time":"2019-02-20T08:31:26.972Z","type":"serverResponse","method":"GET","url":"/as\</tspan>
+<tspan x="10" y="922">sets.test.js","statusCode":404,"timeElapsed":6,"requestContentLength":0,"responseContentLength":\</tspan>
+<tspan x="10" y="938">0,"requestHeaderXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"http://127.0.\</tspan>
+<tspan x="10" y="954">0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, \</tspan>
+<tspan x="10" y="970">like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36"}</tspan>
+
+<tspan x="10" y="986">serverLog - {"time":"2019-02-20T08:31:26.979Z","type":"serverResponse","method":"GET","url":"/js\</tspan>
+<tspan x="10" y="1002">onp.utility2.stateInit?callback=window.utility2.stateInit","statusCode":200,"timeElapsed":7,"req\</tspan>
+<tspan x="10" y="1018">uestContentLength":0,"responseContentLength":0,"requestHeaderXForwardedFor":"","requestHeaderOri\</tspan>
+<tspan x="10" y="1034">gin":"","requestHeaderReferer":"http://127.0.0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X\</tspan>
+<tspan x="10" y="1050">11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Sa\</tspan>
+<tspan x="10" y="1066">fari/537.36"}</tspan>
+
+<tspan x="10" y="1082">serverLog - {"time":"2019-02-20T08:31:26.900Z","type":"serverResponse","method":"GET","url":"/as\</tspan>
+<tspan x="10" y="1098">sets.example.js","statusCode":200,"timeElapsed":99,"requestContentLength":0,"responseContentLeng\</tspan>
+<tspan x="10" y="1114">th":0,"requestHeaderXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"http://12\</tspan>
+<tspan x="10" y="1130">7.0.0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHT\</tspan>
+<tspan x="10" y="1146">ML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36"}</tspan>
+
+<tspan x="10" y="1162">serverLog - {"time":"2019-02-20T08:31:27.009Z","type":"serverResponse","method":"GET","url":"/as\</tspan>
+<tspan x="10" y="1178">sets.example.js","statusCode":304,"timeElapsed":6,"requestContentLength":0,"responseContentLengt\</tspan>
+<tspan x="10" y="1194">h":0,"requestHeaderXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"http://127\</tspan>
+<tspan x="10" y="1210">.0.0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM\</tspan>
+<tspan x="10" y="1226">L, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36"}</tspan>
+
+<tspan x="10" y="1242">serverLog - {"time":"2019-02-20T08:31:26.899Z","type":"serverResponse","method":"GET","url":"/as\</tspan>
+<tspan x="10" y="1258">sets.swgg.js","statusCode":200,"timeElapsed":159,"requestContentLength":0,"responseContentLength\</tspan>
+<tspan x="10" y="1274">":0,"requestHeaderXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"http://127.\</tspan>
+<tspan x="10" y="1290">0.0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML\</tspan>
+<tspan x="10" y="1306">, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36"}</tspan>
+
+<tspan x="10" y="1322">serverLog - {"time":"2019-02-20T08:31:27.083Z","type":"serverResponse","method":"GET","url":"/as\</tspan>
+<tspan x="10" y="1338">sets.swgg.js","statusCode":304,"timeElapsed":13,"requestContentLength":0,"responseContentLength"\</tspan>
+<tspan x="10" y="1354">:0,"requestHeaderXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"http://127.0\</tspan>
+<tspan x="10" y="1370">.0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML,\</tspan>
+<tspan x="10" y="1386"> like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36"}</tspan>
+
+<tspan x="10" y="1402">serverLog - {"time":"2019-02-20T08:31:26.822Z","type":"serverResponse","method":"GET","url":"/as\</tspan>
+<tspan x="10" y="1418">sets.utility2.rollup.js","statusCode":200,"timeElapsed":365,"requestContentLength":0,"responseCo\</tspan>
+<tspan x="10" y="1434">ntentLength":0,"requestHeaderXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"\</tspan>
+<tspan x="10" y="1450">http://127.0.0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53\</tspan>
+<tspan x="10" y="1466">7.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36"}</tspan>
+
+<tspan x="10" y="1482">serverLog - {"time":"2019-02-20T08:31:27.204Z","type":"serverResponse","method":"GET","url":"/as\</tspan>
+<tspan x="10" y="1498">sets.utility2.rollup.js","statusCode":304,"timeElapsed":57,"requestContentLength":0,"responseCon\</tspan>
+<tspan x="10" y="1514">tentLength":0,"requestHeaderXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"h\</tspan>
+<tspan x="10" y="1530">ttp://127.0.0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537\</tspan>
+<tspan x="10" y="1546">.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36"}</tspan>
+
+<tspan x="10" y="1562">serverLog - {"time":"2019-02-20T08:31:28.362Z","type":"serverResponse","method":"GET","url":"/as\</tspan>
+<tspan x="10" y="1578">sets.swgg.swagger.server.json","statusCode":200,"timeElapsed":6,"requestContentLength":0,"respon\</tspan>
+<tspan x="10" y="1594">seContentLength":0,"requestHeaderXForwardedFor":"","requestHeaderOrigin":"","requestHeaderRefere\</tspan>
+<tspan x="10" y="1610">r":"http://127.0.0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKi\</tspan>
+<tspan x="10" y="1626">t/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36"}</tspan>
+
+<tspan x="10" y="1642">serverLog - {"time":"2019-02-20T08:31:28.373Z","type":"serverResponse","method":"GET","url":"/as\</tspan>
+<tspan x="10" y="1658">sets.test.js","statusCode":404,"timeElapsed":3,"requestContentLength":0,"responseContentLength":\</tspan>
+<tspan x="10" y="1674">0,"requestHeaderXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"http://127.0.\</tspan>
+<tspan x="10" y="1690">0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, \</tspan>
+<tspan x="10" y="1706">like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36"}</tspan>
+
+<tspan x="10" y="1722">serverLog - {"time":"2019-02-20T08:31:28.442Z","type":"serverResponse","method":"GET","url":"/as\</tspan>
+<tspan x="10" y="1738">sets.swgg.swagger.server.json","statusCode":304,"timeElapsed":2,"requestContentLength":0,"respon\</tspan>
+<tspan x="10" y="1754">seContentLength":0,"requestHeaderXForwardedFor":"","requestHeaderOrigin":"","requestHeaderRefere\</tspan>
+<tspan x="10" y="1770">r":"http://127.0.0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKi\</tspan>
+<tspan x="10" y="1786">t/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36"}</tspan>
+
+<tspan x="10" y="1802">serverLog - {"time":"2019-02-20T08:31:28.466Z","type":"serverResponse","method":"GET","url":"/as\</tspan>
+<tspan x="10" y="1818">sets.test.js","statusCode":404,"timeElapsed":7,"requestContentLength":0,"responseContentLength":\</tspan>
+<tspan x="10" y="1834">0,"requestHeaderXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"http://127.0.\</tspan>
+<tspan x="10" y="1850">0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, \</tspan>
+<tspan x="10" y="1866">like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36"}</tspan>
+
+</text>
+</svg>
