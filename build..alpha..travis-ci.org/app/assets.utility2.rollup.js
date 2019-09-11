@@ -51962,28 +51962,24 @@ local.cliDict["utility2.testReportCreate"] = function () {
 // run shared js-env code - function
 (function () {
 // init lib Blob
-local.Blob = (
-    local.isBrowser
-    ? globalThis.Blob
-    : function (array, opt) {
-        /*
-         * this function will create a node-compatible Blob instance
-         * https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob
-         */
-        this.bff = local.bufferConcat(array.map(function (elem) {
-            return (
-                (
-                    typeof elem === "string"
-                    || Object.prototype.toString.call(elem)
-                    === "[object Uint8Array]"
-                )
-                ? elem
-                : String(elem)
-            );
-        }));
-        this.type = opt && opt.type;
-    }
-);
+local.Blob = globalThis.Blob || function (list, opt) {
+    /*
+     * this function will emulate in node, browser's Blob class
+     * https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob
+     */
+    this.bff = local.bufferConcat(list.map(function (elem) {
+        return (
+            (
+                typeof elem === "string"
+                || Object.prototype.toString.call(elem)
+                === "[object Uint8Array]"
+            )
+            ? elem
+            : String(elem)
+        );
+    }));
+    this.type = opt && opt.type;
+};
 
 // init lib FormData
 local.FormData = function () {
@@ -52174,24 +52170,21 @@ local._http.STATUS_CODES = {
 
 local._http.createServer = function () {
 /*
- * Returns a new instance of http.Server.
+ * this function will emulate in browser, node's http.createServer function
  * https://nodejs.org/dist/v0.12.18/docs/api/all.html#all_http_createserver_requestlistener
  */
     return {
         listen: function (port, onError) {
-        /*
-         * This will cause the server to accept connections
-         * on the specified handle,
-         * but it is presumed that the file descriptor or handle
-         * has already been bound to a port or domain socket.
-         * https://nodejs.org/dist/v0.12.18/docs/api/all.html#all_server_listen_handle_callback
-         */
             onError(null, port);
         }
     };
 };
 
 local._http.request = function (xhr, onResponse) {
+/*
+ * this function will emulate in browser, node's http.request function
+ * https://nodejs.org/dist/v0.12.18/docs/api/all.html#all_http_request_options_callback
+ */
     let chunkList;
     let data;
     let handler;
@@ -53080,9 +53073,6 @@ local.bufferConcat = function (bffList) {
     ];
     byteLength = 0;
     bffList.forEach(function (bff) {
-        if (bff === 0) {
-            globalThis.debugInline(new Error().stack);
-        }
         if (bff !== 0 && !(bff && bff.length)) {
             return;
         }
@@ -58212,9 +58202,10 @@ if (globalThis.utility2_rollup) {
             local.fs.readFileSync(__dirname + "/README.md", "utf8").replace((
                 /<!doctype\u0020html>[\S\s]*?<\/html>\\n\\\n/
             ), function (match0) {
-                local.assetsDict[key] = local.templateRender(match0.replace((
+                match0 = match0.replace((
                     /\\n\\$/gm
-                ), "").replace(
+                ), "");
+                match0 = match0.replace(
                     "<script src=\"assets.app.js\"></script>\n",
                     (
                         "<script "
@@ -58224,17 +58215,22 @@ if (globalThis.utility2_rollup) {
                         + "<script "
                         + "src=\"assets.utility2.test.js\"></script>\n"
                     )
-                ).replace(
+                );
+                match0 = match0.replace(
                     "assets.example.js",
                     "assets.utility2.example.js"
-                ).replace(
+                );
+                match0 = match0.replace(
                     "assets.test.js",
                     "assets.utility2.test.js"
-                ).replace((
+                );
+                match0 = match0.replace((
                     /npm_package_/g
-                ), "").replace((
+                ), "");
+                match0 = match0.replace((
                     /<!--\u0020utility2-comment\b([\S\s]*?)\butility2-comment\u0020-->/g
-                ), "$1"), {
+                ), "$1");
+                local.assetsDict[key] = local.templateRender(match0, {
                     env: local.objectSetDefault({
                         version: "0.0.1"
                     }, require(__dirname + "/package.json")),
@@ -65690,6 +65686,7 @@ window.addEventListener(\"load\", function () {\\n\\\n\
 {{#if isRollup}}\\n\\\n\
 <script src=\"assets.app.js\"></script>\\n\\\n\
 {{#unless isRollup}}\\n\\\n\
+utility2-comment -->\\n\\\n\
 <script src=\"assets.utility2.lib.istanbul.js\"></script>\\n\\\n\
 <script src=\"assets.utility2.lib.jslint.js\"></script>\\n\\\n\
 <script src=\"assets.utility2.lib.db.js\"></script>\\n\\\n\
@@ -65700,11 +65697,8 @@ window.addEventListener(\"load\", function () {\\n\\\n\
 <script src=\"jsonp.utility2.stateInit?callback=window.utility2.stateInit\"></script>\\n\\\n\
 <script src=\"assets.example.js\"></script>\\n\\\n\
 <script src=\"assets.test.js\"></script>\\n\\\n\
-<script>\\n\\\n\
-if(window.utility2_onReadyBefore) {\\n\\\n\
-    window.utility2_onReadyBefore();\\n\\\n\
-}\\n\\\n\
-</script>\\n\\\n\
+<!-- utility2-comment\\n\\\n\
+<script>window.utility2_onReadyBefore();</script>\\n\\\n\
 {{/if isRollup}}\\n\\\n\
 utility2-comment -->\\n\\\n\
 <script>\\n\\\n\
