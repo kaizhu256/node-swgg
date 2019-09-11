@@ -1251,6 +1251,7 @@ local.templateRender = function (template, dict, opt) {
                     break;
                 case "padEnd":
                 case "padStart":
+                case "replace":
                 case "slice":
                     skip = ii + 2;
                     value = String(value)[fmt](
@@ -58279,11 +58280,12 @@ local.templateRender = function (template, dict, opt) {
                     break;
                 case "padEnd":
                 case "padStart":
+                case "replace":
                 case "slice":
                     skip = ii + 2;
                     value = String(value)[fmt](
                         list[skip - 1],
-                        list[skip]
+                        list[skip].replace("\"\"", "")
                     );
                     break;
                 case "truncate":
