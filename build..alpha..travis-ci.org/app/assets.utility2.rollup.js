@@ -54631,11 +54631,7 @@ local.bufferValidateAndCoerce = function (buf, mode) {
     }
     // convert utf8 to Uint8Array
     if (typeof buf === "string") {
-        buf = (
-            local.isBrowser
-            ? new TextEncoder().encode(buf)
-            : Buffer.from(buf)
-        );
+        buf = new TextEncoder().encode(buf);
     // validate instanceof Uint8Array
     } else if (Object.prototype.toString.call(buf) !== "[object Uint8Array]") {
         throw new Error(
@@ -54648,7 +54644,7 @@ local.bufferValidateAndCoerce = function (buf, mode) {
         return new TextDecoder().decode(buf);
     }
     // coerce Uint8Array to Buffer
-    if (!local.isBrowser && !Buffer.isBuffer(buf)) {
+    if (globalThis.Buffer && Buffer.isBuffer && !Buffer.isBuffer(buf)) {
         Object.setPrototypeOf(buf, Buffer.prototype);
     }
     return buf;
