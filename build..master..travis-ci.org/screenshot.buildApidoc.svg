@@ -1,0 +1,176 @@
+<svg height="1566" width="720" xmlns="http://www.w3.org/2000/svg">
+<rect height="1566" fill="#555" width="720"></rect>
+<text fill="#7f7" font-family="Courier New" font-size="12" xml:space="preserve">
+<tspan x="10" y="26"></tspan>
+
+<tspan x="10" y="42">[MODE_BUILD=buildApidoc] - 2018-09-10T13:24:14.975Z - npm-testing /home/travis/build/kaizhu256/n\</tspan>
+<tspan x="10" y="58">ode-swgg</tspan>
+
+<tspan x="10" y="74"></tspan>
+
+<tspan x="10" y="90"></tspan>
+
+<tspan x="10" y="106">buildApidoc - merged test-report from file /home/travis/build/kaizhu256/node-swgg/tmp/build/test\</tspan>
+<tspan x="10" y="122">-report.json</tspan>
+
+<tspan x="10" y="138">&gt; server listening on http-port 61607</tspan>
+
+<tspan x="10" y="154">db - dropping database ...</tspan>
+
+<tspan x="10" y="170">db - seeding dbTable File ...</tspan>
+
+<tspan x="10" y="186">db - seeding dbTable Pet ...</tspan>
+
+<tspan x="10" y="202">db - seeding dbTable Order ...</tspan>
+
+<tspan x="10" y="218">db - seeding dbTable User ...</tspan>
+
+<tspan x="10" y="234">db - seeding dbTable File ...</tspan>
+
+<tspan x="10" y="250">db - seeding dbTable Pet ...</tspan>
+
+<tspan x="10" y="266">db - seeding dbTable Order ...</tspan>
+
+<tspan x="10" y="282">db - seeding dbTable User ...</tspan>
+
+<tspan x="10" y="298">db - seeding dbTable TestCrud ...</tspan>
+
+<tspan x="10" y="314">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/package.json</tspan>
+
+<tspan x="10" y="330">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/assets.swgg.swagger.petstore.j\</tspan>
+<tspan x="10" y="346">son</tspan>
+
+<tspan x="10" y="362">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/.gitignore</tspan>
+
+<tspan x="10" y="378">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/lib.swgg.js</tspan>
+
+<tspan x="10" y="394">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/LICENSE</tspan>
+
+<tspan x="10" y="410">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/npm_scripts.sh</tspan>
+
+<tspan x="10" y="426">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/package.json</tspan>
+
+<tspan x="10" y="442">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/package-lock.json</tspan>
+
+<tspan x="10" y="458">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/README.md</tspan>
+
+<tspan x="10" y="474">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/test.js</tspan>
+
+<tspan x="10" y="490">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/.travis.yml</tspan>
+
+<tspan x="10" y="506">apidocCreate - requiring /home/travis/build/kaizhu256/node-swgg ...</tspan>
+
+<tspan x="10" y="522">apidocCreate - ... required /home/travis/build/kaizhu256/node-swgg</tspan>
+
+<tspan x="10" y="538">created apidoc file /home/travis/build/kaizhu256/node-swgg/tmp/build/apidoc.html</tspan>
+
+<tspan x="10" y="554"></tspan>
+
+<tspan x="10" y="570">[node test-case 1 of 1 passed] - testCase_buildApidoc_default</tspan>
+
+<tspan x="10" y="586">db loaded from tmp/storage.test</tspan>
+
+<tspan x="10" y="602">(node:6157) [DEP0025] DeprecationWarning: sys is deprecated. Use util instead.</tspan>
+
+<tspan x="10" y="618">(node:6157) [DEP0084] DeprecationWarning: Requiring Node.js-bundled 'v8/tools/splaytree' module \</tspan>
+<tspan x="10" y="634">is deprecated. Please install the necessary module locally.</tspan>
+
+<tspan x="10" y="650">(node:6157) [DEP0084] DeprecationWarning: Requiring Node.js-bundled 'v8/tools/codemap' module is\</tspan>
+<tspan x="10" y="666"> deprecated. Please install the necessary module locally.</tspan>
+
+<tspan x="10" y="682">(node:6157) [DEP0084] DeprecationWarning: Requiring Node.js-bundled 'v8/tools/consarray' module \</tspan>
+<tspan x="10" y="698">is deprecated. Please install the necessary module locally.</tspan>
+
+<tspan x="10" y="714">(node:6157) [DEP0084] DeprecationWarning: Requiring Node.js-bundled 'v8/tools/csvparser' module \</tspan>
+<tspan x="10" y="730">is deprecated. Please install the necessary module locally.</tspan>
+
+<tspan x="10" y="746">(node:6157) [DEP0084] DeprecationWarning: Requiring Node.js-bundled 'v8/tools/profile' module is\</tspan>
+<tspan x="10" y="762"> deprecated. Please install the necessary module locally.</tspan>
+
+<tspan x="10" y="778">(node:6157) [DEP0084] DeprecationWarning: Requiring Node.js-bundled 'v8/tools/profile_view' modu\</tspan>
+<tspan x="10" y="794">le is deprecated. Please install the necessary module locally.</tspan>
+
+<tspan x="10" y="810">(node:6157) [DEP0084] DeprecationWarning: Requiring Node.js-bundled 'v8/tools/logreader' module \</tspan>
+<tspan x="10" y="826">is deprecated. Please install the necessary module locally.</tspan>
+
+<tspan x="10" y="842">(node:6157) [DEP0084] DeprecationWarning: Requiring Node.js-bundled 'v8/tools/arguments' module \</tspan>
+<tspan x="10" y="858">is deprecated. Please install the necessary module locally.</tspan>
+
+<tspan x="10" y="874">(node:6157) [DEP0084] DeprecationWarning: Requiring Node.js-bundled 'v8/tools/tickprocessor' mod\</tspan>
+<tspan x="10" y="890">ule is deprecated. Please install the necessary module locally.</tspan>
+
+<tspan x="10" y="906">(node:6157) [DEP0084] DeprecationWarning: Requiring Node.js-bundled 'v8/tools/SourceMap' module \</tspan>
+<tspan x="10" y="922">is deprecated. Please install the necessary module locally.</tspan>
+
+<tspan x="10" y="938">(node:6157) [DEP0084] DeprecationWarning: Requiring Node.js-bundled 'v8/tools/tickprocessor-driv\</tspan>
+<tspan x="10" y="954">er' module is deprecated. Please install the necessary module locally.</tspan>
+
+<tspan x="10" y="970">(node:6157) [DEP0084] DeprecationWarning: Requiring Node.js-bundled 'node-inspect/lib/_inspect' \</tspan>
+<tspan x="10" y="986">module is deprecated. Please install the necessary module locally.</tspan>
+
+<tspan x="10" y="1002">(node:6157) [DEP0084] DeprecationWarning: Requiring Node.js-bundled 'node-inspect/lib/internal/i\</tspan>
+<tspan x="10" y="1018">nspect_client' module is deprecated. Please install the necessary module locally.</tspan>
+
+<tspan x="10" y="1034">(node:6157) [DEP0084] DeprecationWarning: Requiring Node.js-bundled 'node-inspect/lib/internal/i\</tspan>
+<tspan x="10" y="1050">nspect_repl' module is deprecated. Please install the necessary module locally.</tspan>
+
+<tspan x="10" y="1066"></tspan>
+
+<tspan x="10" y="1082">buildApidoc - merged test-report from file /home/travis/build/kaizhu256/node-swgg/tmp/build/test\</tspan>
+<tspan x="10" y="1098">-report.json</tspan>
+
+<tspan x="10" y="1114"></tspan>
+
+<tspan x="10" y="1130">-------------------------------------------------------</tspan>
+
+<tspan x="10" y="1146">| test-report - buildApidoc - node - linux v10.10.0 - 2018-09-10T13:24:15.169Z</tspan>
+
+<tspan x="10" y="1162">|    1053 ms            0 failed        1 passed      |</tspan>
+
+<tspan x="10" y="1178">-------------------------------------------------------</tspan>
+
+<tspan x="10" y="1194">| test-report - npmTest - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM\</tspan>
+<tspan x="10" y="1210">L, like Gecko) Chrome/61.0.3163.100 Electron/2.0.8 Safari/537.36 - 2018-09-10T13:23:58.652Z</tspan>
+
+<tspan x="10" y="1226">|    5851 ms            0 failed       34 passed      |</tspan>
+
+<tspan x="10" y="1242">-------------------------------------------------------</tspan>
+
+<tspan x="10" y="1258">| test-report - npmTest - node - linux v10.10.0 - 2018-09-10T13:23:52.468Z</tspan>
+
+<tspan x="10" y="1274">|   17240 ms            0 failed       40 passed      |</tspan>
+
+<tspan x="10" y="1290">-------------------------------------------------------</tspan>
+
+<tspan x="10" y="1306">| test-report - npmTestPublished - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537\</tspan>
+<tspan x="10" y="1322">.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.8 Safari/537.36 - 2018-09-10T13:22:47.\</tspan>
+<tspan x="10" y="1338">312Z</tspan>
+
+<tspan x="10" y="1354">|    6246 ms            0 failed       34 passed      |</tspan>
+
+<tspan x="10" y="1370">-------------------------------------------------------</tspan>
+
+<tspan x="10" y="1386">| test-report - npmTestPublished - node - linux v10.10.0 - 2018-09-10T13:22:40.493Z</tspan>
+
+<tspan x="10" y="1402">|   18895 ms            0 failed       40 passed      |</tspan>
+
+<tspan x="10" y="1418">-------------------------------------------------------</tspan>
+
+<tspan x="10" y="1434"></tspan>
+
+<tspan x="10" y="1450">created test-report file /home/travis/build/kaizhu256/node-swgg/tmp/build/test-report.html</tspan>
+
+<tspan x="10" y="1466"></tspan>
+
+<tspan x="10" y="1482"></tspan>
+
+<tspan x="10" y="1498">buildApidoc - 0 failed tests</tspan>
+
+<tspan x="10" y="1514"></tspan>
+
+<tspan x="10" y="1530"></tspan>
+
+<tspan x="10" y="1546">[MODE_BUILD=buildApidoc] - 2018-09-10T13:24:18.508Z - EXIT_CODE - 0</tspan>
+
+</text>
+</svg>

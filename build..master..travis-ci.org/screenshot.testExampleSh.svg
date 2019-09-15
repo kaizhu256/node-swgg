@@ -1,0 +1,58 @@
+<svg height="574" width="720" xmlns="http://www.w3.org/2000/svg">
+<rect height="574" fill="#555" width="720"></rect>
+<text fill="#7f7" font-family="Courier New" font-size="12" xml:space="preserve">
+<tspan x="10" y="26">  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</tspan>
+
+<tspan x="10" y="42">                                 Dload  Upload   Total   Spent    Left  Speed</tspan>
+
+<tspan x="10" y="58"></tspan>
+<tspan x="10" y="74">  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0</tspan>
+<tspan x="10" y="90">100 2803k  100 2803k    0     0  5362k      0 --:--:-- --:--:-- --:--:-- 5370k</tspan>
+
+<tspan x="10" y="106"></tspan>
+
+<tspan x="10" y="122">testExampleSh - merged test-report from file /home/travis/build/kaizhu256/node-swgg/tmp/build/te\</tspan>
+<tspan x="10" y="138">st-report.json</tspan>
+
+<tspan x="10" y="154">server listening on http-port 8081</tspan>
+
+<tspan x="10" y="170">db - seeding dbTable File ...</tspan>
+
+<tspan x="10" y="186">db - seeding dbTable Pet ...</tspan>
+
+<tspan x="10" y="202">db - seeding dbTable Order ...</tspan>
+
+<tspan x="10" y="218">db - seeding dbTable User ...</tspan>
+
+<tspan x="10" y="234">&gt; db - seeding dbTable File ...</tspan>
+
+<tspan x="10" y="250">db - seeding dbTable Pet ...</tspan>
+
+<tspan x="10" y="266">db - seeding dbTable Order ...</tspan>
+
+<tspan x="10" y="282">db - seeding dbTable User ...</tspan>
+
+<tspan x="10" y="298">db - seeding dbTable TestCrud ...</tspan>
+
+<tspan x="10" y="314">db loaded from tmp/storage.undefined</tspan>
+
+<tspan x="10" y="330">serverLog - {"time":"2018-09-10T13:26:38.001Z","type":"serverResponse","method":"GET","url":"/",\</tspan>
+<tspan x="10" y="346">"statusCode":200,"timeElapsed":13,"requestContentLength":0,"responseContentLength":0,"requestHea\</tspan>
+<tspan x="10" y="362">derXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"","requestHeaderUserAgent"\</tspan>
+<tspan x="10" y="378">:"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 El\</tspan>
+<tspan x="10" y="394">ectron/2.0.8 Safari/537.36"}</tspan>
+
+<tspan x="10" y="410">serverLog - {"time":"2018-09-10T13:26:38.128Z","type":"serverResponse","method":"GET","url":"/as\</tspan>
+<tspan x="10" y="426">sets.app.js","statusCode":200,"timeElapsed":144,"requestContentLength":0,"responseContentLength"\</tspan>
+<tspan x="10" y="442">:0,"requestHeaderXForwardedFor":"","requestHeaderOrigin":"","requestHeaderReferer":"http://127.0\</tspan>
+<tspan x="10" y="458">.0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML,\</tspan>
+<tspan x="10" y="474"> like Gecko) Chrome/61.0.3163.100 Electron/2.0.8 Safari/537.36"}</tspan>
+
+<tspan x="10" y="490">serverLog - {"time":"2018-09-10T13:26:38.856Z","type":"serverResponse","method":"GET","url":"/as\</tspan>
+<tspan x="10" y="506">sets.swgg.swagger.server.json","statusCode":200,"timeElapsed":8,"requestContentLength":0,"respon\</tspan>
+<tspan x="10" y="522">seContentLength":0,"requestHeaderXForwardedFor":"","requestHeaderOrigin":"","requestHeaderRefere\</tspan>
+<tspan x="10" y="538">r":"http://127.0.0.1:8081/","requestHeaderUserAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKi\</tspan>
+<tspan x="10" y="554">t/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.8 Safari/537.36"}</tspan>
+
+</text>
+</svg>
