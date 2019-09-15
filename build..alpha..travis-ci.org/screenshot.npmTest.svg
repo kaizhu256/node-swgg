@@ -1,9 +1,9 @@
-<svg height="10894" width="720" xmlns="http://www.w3.org/2000/svg">
-<rect height="10894" fill="#555" width="720"></rect>
+<svg height="10974" width="720" xmlns="http://www.w3.org/2000/svg">
+<rect height="10974" fill="#555" width="720"></rect>
 <text fill="#7f7" font-family="Courier New" font-size="12" xml:space="preserve">
 <tspan x="10" y="26"></tspan>
 
-<tspan x="10" y="42">\x1b[35m[MODE_BUILD=npmTest]\x1b[0m - 2019-09-15T22:12:47.901Z - npm-testing /home/travis/build/\</tspan>
+<tspan x="10" y="42">\x1b[35m[MODE_BUILD=npmTest]\x1b[0m - 2019-09-15T22:40:30.000Z - npm-testing /home/travis/build/\</tspan>
 <tspan x="10" y="58">kaizhu256/node-swgg</tspan>
 
 <tspan x="10" y="74"></tspan>
@@ -25,21 +25,21 @@
 
 <tspan x="10" y="234">local-function - unused (README.md) local.onEventDomDb</tspan>
 
-<tspan x="10" y="250">jslint - 361ms /home/travis/build/kaizhu256/node-swgg/README.md</tspan>
+<tspan x="10" y="250">jslint - 325ms /home/travis/build/kaizhu256/node-swgg/README.md</tspan>
 
-<tspan x="10" y="266">jslint - 13ms /home/travis/build/kaizhu256/node-swgg/assets.swgg.swagger.petstore.json</tspan>
+<tspan x="10" y="266">jslint - 1ms /home/travis/build/kaizhu256/node-swgg/assets.swgg.swagger.petstore.json</tspan>
 
-<tspan x="10" y="282">http-server listening on port 36997</tspan>
+<tspan x="10" y="282">jslint - 2ms /home/travis/build/kaizhu256/node-swgg/npm_scripts.sh</tspan>
 
-<tspan x="10" y="298">db - dropping database ...</tspan>
+<tspan x="10" y="298">jslint - 1ms /home/travis/build/kaizhu256/node-swgg/package.json</tspan>
 
-<tspan x="10" y="314">jslint - 782ms /home/travis/build/kaizhu256/node-swgg/lib.swgg.js</tspan>
+<tspan x="10" y="314">http-server listening on port 63930</tspan>
 
-<tspan x="10" y="330">jslint - 14ms /home/travis/build/kaizhu256/node-swgg/npm_scripts.sh</tspan>
+<tspan x="10" y="330">db - dropping database ...</tspan>
 
-<tspan x="10" y="346">jslint - 0ms /home/travis/build/kaizhu256/node-swgg/package.json</tspan>
+<tspan x="10" y="346">jslint - 773ms /home/travis/build/kaizhu256/node-swgg/lib.swgg.js</tspan>
 
-<tspan x="10" y="362">jslint - 453ms /home/travis/build/kaizhu256/node-swgg/test.js</tspan>
+<tspan x="10" y="362">jslint - 586ms /home/travis/build/kaizhu256/node-swgg/test.js</tspan>
 
 <tspan x="10" y="378">db - seeding dbTable File ...</tspan>
 
@@ -61,930 +61,940 @@
 
 <tspan x="10" y="522">db loaded from tmp/storage.test</tspan>
 
-<tspan x="10" y="538">testRunDefault - 45 ms - [node test-case 1 of 37 passed] - testCase_buildApidoc_default</tspan>
+<tspan x="10" y="538">testRunDefault - 44 ms - [node test-case 1 of 37 passed] - testCase_buildApidoc_default</tspan>
 
-<tspan x="10" y="554">testRunDefault - 83 ms - [node test-case 2 of 37 passed] - testCase_buildLib_default</tspan>
+<tspan x="10" y="554">testRunDefault - 81 ms - [node test-case 2 of 37 passed] - testCase_buildLib_default</tspan>
 
-<tspan x="10" y="570">testRunDefault - 91 ms - [node test-case 3 of 37 passed] - testCase_buildReadme_default</tspan>
+<tspan x="10" y="570">testRunDefault - 90 ms - [node test-case 3 of 37 passed] - testCase_buildReadme_default</tspan>
 
-<tspan x="10" y="586">testRunDefault - 96 ms - [node test-case 4 of 37 passed] - testCase_buildTest_default</tspan>
+<tspan x="10" y="586">testRunDefault - 95 ms - [node test-case 4 of 37 passed] - testCase_buildTest_default</tspan>
 
-<tspan x="10" y="602">testRunDefault - 306 ms - [node test-case 5 of 37 passed] - testCase_crudErrorXxx_default</tspan>
+<tspan x="10" y="602">testRunDefault - 290 ms - [node test-case 5 of 37 passed] - testCase_crudErrorXxx_default</tspan>
 
-<tspan x="10" y="618">testRunDefault - 312 ms - [node test-case 6 of 37 passed] - testCase_crudCountManyByQuery_defaul\</tspan>
+<tspan x="10" y="618">testRunDefault - 294 ms - [node test-case 6 of 37 passed] - testCase_crudCountManyByQuery_defaul\</tspan>
 <tspan x="10" y="634">t</tspan>
 
-<tspan x="10" y="650">testRunDefault - 343 ms - [node test-case 7 of 37 passed] - testCase_ajax_err</tspan>
+<tspan x="10" y="650">testRunDefault - 324 ms - [node test-case 7 of 37 passed] - testCase_ajax_err</tspan>
 
-<tspan x="10" y="666">testRunDefault - 350 ms - [node test-case 8 of 37 passed] - testCase_crudGetManyByQuery_default</tspan>
+<tspan x="10" y="666">testRunDefault - 343 ms - [node test-case 8 of 37 passed] - testCase_crudGetManyByQuery_default</tspan>
 
-<tspan x="10" y="682">testRunDefault - 438 ms - [node test-case 9 of 37 passed] - testCase_crudGetOneById_default</tspan>
+<tspan x="10" y="682">testRunDefault - 447 ms - [node test-case 9 of 37 passed] - testCase_crudGetOneById_default</tspan>
 
-<tspan x="10" y="698">testRunDefault - 442 ms - [node test-case 10 of 37 passed] - testCase_crudGetOneByQuery_default</tspan>
+<tspan x="10" y="698">testRunDefault - 452 ms - [node test-case 10 of 37 passed] - testCase_crudGetOneByQuery_default</tspan>
 
-<tspan x="10" y="714">testRunDefault - 484 ms - [node test-case 11 of 37 passed] - testCase_crudNullXxx_default</tspan>
+<tspan x="10" y="714">testRunDefault - 489 ms - [node test-case 11 of 37 passed] - testCase_crudNullXxx_default</tspan>
 
-<tspan x="10" y="730">testRunDefault - 675 ms - [node test-case 12 of 37 passed] - testCase_crudSetManyById_default</tspan>
+<tspan x="10" y="730">testRunDefault - 660 ms - [node test-case 12 of 37 passed] - testCase_crudSetManyById_default</tspan>
 
-<tspan x="10" y="746">testRunDefault - 711 ms - [node test-case 13 of 37 passed] - testCase_crudSetOneById_default</tspan>
+<tspan x="10" y="746">testRunDefault - 689 ms - [node test-case 13 of 37 passed] - testCase_crudSetOneById_default</tspan>
 
-<tspan x="10" y="762">testRunDefault - 719 ms - [node test-case 14 of 37 passed] - testCase_domAnimateShake_default</tspan>
+<tspan x="10" y="762">testRunDefault - 691 ms - [node test-case 14 of 37 passed] - testCase_domAnimateShake_default</tspan>
 
-<tspan x="10" y="778">testRunDefault - 754 ms - [node test-case 15 of 37 passed] - testCase_crudRemoveManyByQuery_defa\</tspan>
+<tspan x="10" y="778">testRunDefault - 719 ms - [node test-case 15 of 37 passed] - testCase_crudRemoveManyByQuery_defa\</tspan>
 <tspan x="10" y="794">ult</tspan>
 
-<tspan x="10" y="810">testRunDefault - 768 ms - [node test-case 16 of 37 passed] - testCase_crudRemoveOneById_default</tspan>
+<tspan x="10" y="810">testRunDefault - 728 ms - [node test-case 16 of 37 passed] - testCase_crudRemoveOneById_default</tspan>
 
-<tspan x="10" y="826">testRunDefault - 846 ms - [node test-case 17 of 37 passed] - testCase_fileUploadManyByForm_nullC\</tspan>
+<tspan x="10" y="826">testRunDefault - 785 ms - [node test-case 17 of 37 passed] - testCase_fileUploadManyByForm_nullC\</tspan>
 <tspan x="10" y="842">ase</tspan>
 
-<tspan x="10" y="858">testRunDefault - 853 ms - [node test-case 18 of 37 passed] - testCase_nop_default</tspan>
+<tspan x="10" y="858">testRunDefault - 788 ms - [node test-case 18 of 37 passed] - testCase_nop_default</tspan>
 
-<tspan x="10" y="874">testRunDefault - 894 ms - [node test-case 19 of 37 passed] - testCase_fileGetOneById_default</tspan>
+<tspan x="10" y="874">testRunDefault - 845 ms - [node test-case 19 of 37 passed] - testCase_onErrorJsonapi_default</tspan>
 
-<tspan x="10" y="890">testRunDefault - 982 ms - [node test-case 20 of 37 passed] - testCase_onErrorJsonapi_default</tspan>
+<tspan x="10" y="890">testRunDefault - 854 ms - [node test-case 20 of 37 passed] - testCase_fileGetOneById_default</tspan>
 
-<tspan x="10" y="906">testRunDefault - 1082 ms - [node test-case 21 of 37 passed] - testCase_onErrorJsonapi_emptyArray</tspan>
+<tspan x="10" y="906">testRunDefault - 932 ms - [node test-case 21 of 37 passed] - testCase_onErrorJsonapi_emptyArray</tspan>
 
-<tspan x="10" y="922">http-server listening on port 35928</tspan>
+<tspan x="10" y="922">testRunDefault - 939 ms - [node test-case 22 of 37 passed] - testCase_onErrorJsonapi_err</tspan>
 
-<tspan x="10" y="938">testRunDefault - 1138 ms - [node test-case 22 of 37 passed] - testCase_onErrorJsonapi_err</tspan>
+<tspan x="10" y="938">testRunDefault - 960 ms - [node test-case 23 of 37 passed] - testCase_swaggerJsonFromCurl_defaul\</tspan>
+<tspan x="10" y="954">t</tspan>
 
-<tspan x="10" y="954">testRunDefault - 1185 ms - [node test-case 23 of 37 passed] - testCase_swaggerJsonFromCurl_defau\</tspan>
-<tspan x="10" y="970">lt</tspan>
+<tspan x="10" y="970">testRunDefault - 997 ms - [node test-case 24 of 37 passed] - testCase_crudUpdateOneById_default</tspan>
 
-<tspan x="10" y="986">testRunDefault - 1245 ms - [node test-case 24 of 37 passed] - testCase_crudUpdateOneById_default</tspan>
+<tspan x="10" y="986">testRunDefault - 1038 ms - [node test-case 25 of 37 passed] - testCase_swaggerValidateDataParame\</tspan>
+<tspan x="10" y="1002">ters_err</tspan>
 
-<tspan x="10" y="1002">testRunDefault - 1314 ms - [node test-case 25 of 37 passed] - testCase_swaggerValidateDataParame\</tspan>
-<tspan x="10" y="1018">ters_err</tspan>
+<tspan x="10" y="1018">http-server listening on port 36108</tspan>
 
-<tspan x="10" y="1034">testRunDefault - 1675 ms - [node test-case 26 of 37 passed] - testCase_petstoreStoreGetInventory\</tspan>
-<tspan x="10" y="1050">_default</tspan>
+<tspan x="10" y="1034">testRunDefault - 1502 ms - [node test-case 26 of 37 passed] - testCase_swaggerValidateDataParame\</tspan>
+<tspan x="10" y="1050">ters_default</tspan>
 
-<tspan x="10" y="1066">testRunDefault - 1771 ms - [node test-case 27 of 37 passed] - testCase_swaggerValidate_default</tspan>
+<tspan x="10" y="1066">testRunDefault - 1561 ms - [node test-case 27 of 37 passed] - testCase_swaggerValidate_default</tspan>
 
-<tspan x="10" y="1082">testRunDefault - 1785 ms - [node test-case 28 of 37 passed] - testCase_ui_apiKey</tspan>
+<tspan x="10" y="1082">testRunDefault - 1569 ms - [node test-case 28 of 37 passed] - testCase_ui_apiKey</tspan>
 
-<tspan x="10" y="1098">testRunDefault - 1792 ms - [node test-case 29 of 37 passed] - testCase_ui_fileMedia</tspan>
+<tspan x="10" y="1098">testRunDefault - 1570 ms - [node test-case 29 of 37 passed] - testCase_ui_fileMedia</tspan>
 
-<tspan x="10" y="1114">testRunDefault - 1971 ms - [node test-case 30 of 37 passed] - testCase_swaggerValidateDataParame\</tspan>
-<tspan x="10" y="1130">ters_default</tspan>
+<tspan x="10" y="1114">testRunDefault - 1683 ms - [node test-case 30 of 37 passed] - testCase_petstoreStoreGetInventory\</tspan>
+<tspan x="10" y="1130">_default</tspan>
 
-<tspan x="10" y="1146">testRunDefault - 2273 ms - [node test-case 31 of 37 passed] - testCase_swaggerValidateFile_defau\</tspan>
+<tspan x="10" y="1146">testRunDefault - 1806 ms - [node test-case 31 of 37 passed] - testCase_swaggerValidateFile_defau\</tspan>
 <tspan x="10" y="1162">lt</tspan>
 
-<tspan x="10" y="1178">testRunDefault - 2309 ms - [node test-case 32 of 37 passed] - testCase_crudCreateReplaceUpdateRe\</tspan>
+<tspan x="10" y="1178">testRunDefault - 1893 ms - [node test-case 32 of 37 passed] - testCase_crudCreateReplaceUpdateRe\</tspan>
 <tspan x="10" y="1194">moveMany_default</tspan>
 
-<tspan x="10" y="1210">testRunDefault - 2360 ms - [node test-case 33 of 37 passed] - testCase_crudCreateReplaceUpdateRe\</tspan>
+<tspan x="10" y="1210">testRunDefault - 1919 ms - [node test-case 33 of 37 passed] - testCase_crudCreateReplaceUpdateRe\</tspan>
 <tspan x="10" y="1226">moveOne_default</tspan>
 
-<tspan x="10" y="1242">testRunDefault - 2367 ms - [node test-case 34 of 37 passed] - testCase_fileUploadManyByForm_defa\</tspan>
+<tspan x="10" y="1242">testRunDefault - 1929 ms - [node test-case 34 of 37 passed] - testCase_fileUploadManyByForm_defa\</tspan>
 <tspan x="10" y="1258">ult</tspan>
 
-<tspan x="10" y="1274">testRunDefault - 2553 ms - [node test-case 35 of 37 passed] - testCase_userLoginXxx_default</tspan>
+<tspan x="10" y="1274">testRunDefault - 2084 ms - [node test-case 35 of 37 passed] - testCase_userLoginXxx_default</tspan>
 
-<tspan x="10" y="1290">db - seeding dbTable File ...</tspan>
+<tspan x="10" y="1290"></tspan>
 
-<tspan x="10" y="1306">db - seeding dbTable Pet ...</tspan>
+<tspan x="10" y="1306">DevTools listening on ws://127.0.0.1:40315/devtools/browser/0d58890d-6c7e-479a-bc4f-b26d5f561b9e</tspan>
 
-<tspan x="10" y="1322">db - seeding dbTable Order ...</tspan>
+<tspan x="10" y="1322">[0915/224036.560103:ERROR:command_buffer_proxy_impl.cc(124)] ContextResult::kTransientFailure: F\</tspan>
+<tspan x="10" y="1338">ailed to send GpuChannelMsg_CreateCommandBuffer.</tspan>
 
-<tspan x="10" y="1338">db - seeding dbTable User ...</tspan>
+<tspan x="10" y="1354">[0915/224036.560069:WARNING:ipc_message_attachment_set.cc(49)] MessageAttachmentSet destroyed wi\</tspan>
+<tspan x="10" y="1370">th unconsumed attachments: 0/1</tspan>
 
-<tspan x="10" y="1354"></tspan>
-
-<tspan x="10" y="1370">DevTools listening on ws://127.0.0.1:39227/devtools/browser/59fb068c-eff0-4571-a4e9-1b3d3b98c635</tspan>
-
-<tspan x="10" y="1386">[0915/221255.020899:ERROR:command_buffer_proxy_impl.cc(124)] ContextResult::kTransientFailure: F\</tspan>
+<tspan x="10" y="1386">[0915/224036.566800:ERROR:command_buffer_proxy_impl.cc(124)] ContextResult::kTransientFailure: F\</tspan>
 <tspan x="10" y="1402">ailed to send GpuChannelMsg_CreateCommandBuffer.</tspan>
 
-<tspan x="10" y="1418">[0915/221255.020735:WARNING:ipc_message_attachment_set.cc(49)] MessageAttachmentSet destroyed wi\</tspan>
+<tspan x="10" y="1418">[0915/224036.566773:WARNING:ipc_message_attachment_set.cc(49)] MessageAttachmentSet destroyed wi\</tspan>
 <tspan x="10" y="1434">th unconsumed attachments: 0/1</tspan>
 
-<tspan x="10" y="1450">[0915/221255.048294:ERROR:command_buffer_proxy_impl.cc(124)] ContextResult::kTransientFailure: F\</tspan>
-<tspan x="10" y="1466">ailed to send GpuChannelMsg_CreateCommandBuffer.</tspan>
+<tspan x="10" y="1450">[0915/224036.570354:WARNING:ipc_message_attachment_set.cc(49)] MessageAttachmentSet destroyed wi\</tspan>
+<tspan x="10" y="1466">th unconsumed attachments: 0/1</tspan>
 
-<tspan x="10" y="1482">[0915/221255.048230:WARNING:ipc_message_attachment_set.cc(49)] MessageAttachmentSet destroyed wi\</tspan>
-<tspan x="10" y="1498">th unconsumed attachments: 0/1</tspan>
+<tspan x="10" y="1482">db - seeding dbTable File ...</tspan>
 
-<tspan x="10" y="1514">[0915/221255.062090:WARNING:ipc_message_attachment_set.cc(49)] MessageAttachmentSet destroyed wi\</tspan>
-<tspan x="10" y="1530">th unconsumed attachments: 0/1</tspan>
+<tspan x="10" y="1498">db - seeding dbTable Pet ...</tspan>
 
-<tspan x="10" y="1546">[0915/221255.069293:WARNING:ipc_message_attachment_set.cc(49)] MessageAttachmentSet destroyed wi\</tspan>
-<tspan x="10" y="1562">th unconsumed attachments: 0/1</tspan>
+<tspan x="10" y="1514">db - seeding dbTable Order ...</tspan>
 
-<tspan x="10" y="1578">[0915/221256.349837:INFO:CONSOLE(59051)] "http-server listening on port undefined", source: http\</tspan>
-<tspan x="10" y="1594">://127.0.0.1:36997/assets.utility2.rollup.js (59051)</tspan>
+<tspan x="10" y="1530">db - seeding dbTable User ...</tspan>
 
-<tspan x="10" y="1610">[0915/221256.351210:INFO:CONSOLE(3847)] "db - dropping database ...", source: http://127.0.0.1:3\</tspan>
-<tspan x="10" y="1626">6997/assets.utility2.rollup.js (3847)</tspan>
+<tspan x="10" y="1546">[0915/224037.715545:INFO:CONSOLE(59051)] "http-server listening on port undefined", source: http\</tspan>
+<tspan x="10" y="1562">://127.0.0.1:63930/assets.utility2.rollup.js (59051)</tspan>
 
-<tspan x="10" y="1642">testRunDefault - 5143 ms - testCase pending - testCase_buildApp_default, testCase_webpage_defaul\</tspan>
-<tspan x="10" y="1658">t ...</tspan>
+<tspan x="10" y="1578">[0915/224037.731922:INFO:CONSOLE(3847)] "db - dropping database ...", source: http://127.0.0.1:6\</tspan>
+<tspan x="10" y="1594">3930/assets.utility2.rollup.js (3847)</tspan>
 
-<tspan x="10" y="1674">db - seeding dbTable File ...</tspan>
+<tspan x="10" y="1610">testRunDefault - 5322 ms - testCase pending - testCase_buildApp_default, testCase_webpage_defaul\</tspan>
+<tspan x="10" y="1626">t ...</tspan>
 
-<tspan x="10" y="1690">db - seeding dbTable Pet ...</tspan>
+<tspan x="10" y="1642">db - seeding dbTable File ...</tspan>
 
-<tspan x="10" y="1706">db - seeding dbTable Order ...</tspan>
+<tspan x="10" y="1658">db - seeding dbTable Pet ...</tspan>
 
-<tspan x="10" y="1722">db - seeding dbTable User ...</tspan>
+<tspan x="10" y="1674">db - seeding dbTable Order ...</tspan>
 
-<tspan x="10" y="1738">db - seeding dbTable File ...</tspan>
+<tspan x="10" y="1690">db - seeding dbTable User ...</tspan>
 
-<tspan x="10" y="1754">db - seeding dbTable Pet ...</tspan>
+<tspan x="10" y="1706">[0915/224040.030302:INFO:CONSOLE(4286)] "db - seeding dbTable File ...", source: http://127.0.0.\</tspan>
+<tspan x="10" y="1722">1:63930/assets.utility2.rollup.js (4286)</tspan>
 
-<tspan x="10" y="1770">db - seeding dbTable Order ...</tspan>
+<tspan x="10" y="1738">[0915/224040.031876:INFO:CONSOLE(4286)] "db - seeding dbTable Pet ...", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="1754">:63930/assets.utility2.rollup.js (4286)</tspan>
 
-<tspan x="10" y="1786">db - seeding dbTable User ...</tspan>
+<tspan x="10" y="1770">[0915/224040.031936:INFO:CONSOLE(4286)] "db - seeding dbTable Order ...", source: http://127.0.0\</tspan>
+<tspan x="10" y="1786">.1:63930/assets.utility2.rollup.js (4286)</tspan>
 
-<tspan x="10" y="1802">db - seeding dbTable TestCrud ...</tspan>
+<tspan x="10" y="1802">[0915/224040.031989:INFO:CONSOLE(4286)] "db - seeding dbTable User ...", source: http://127.0.0.\</tspan>
+<tspan x="10" y="1818">1:63930/assets.utility2.rollup.js (4286)</tspan>
 
-<tspan x="10" y="1818">[0915/221258.724296:INFO:CONSOLE(4286)] "db - seeding dbTable File ...", source: http://127.0.0.\</tspan>
-<tspan x="10" y="1834">1:36997/assets.utility2.rollup.js (4286)</tspan>
+<tspan x="10" y="1834">db - seeding dbTable File ...</tspan>
 
-<tspan x="10" y="1850">[0915/221258.724525:INFO:CONSOLE(4286)] "db - seeding dbTable Pet ...", source: http://127.0.0.1\</tspan>
-<tspan x="10" y="1866">:36997/assets.utility2.rollup.js (4286)</tspan>
+<tspan x="10" y="1850">db - seeding dbTable Pet ...</tspan>
 
-<tspan x="10" y="1882">[0915/221258.732079:INFO:CONSOLE(4286)] "db - seeding dbTable Order ...", source: http://127.0.0\</tspan>
-<tspan x="10" y="1898">.1:36997/assets.utility2.rollup.js (4286)</tspan>
+<tspan x="10" y="1866">db - seeding dbTable Order ...</tspan>
 
-<tspan x="10" y="1914">[0915/221258.732348:INFO:CONSOLE(4286)] "db - seeding dbTable User ...", source: http://127.0.0.\</tspan>
-<tspan x="10" y="1930">1:36997/assets.utility2.rollup.js (4286)</tspan>
+<tspan x="10" y="1882">db - seeding dbTable User ...</tspan>
 
-<tspan x="10" y="1946">testRunDefault - 6566 ms - [node test-case 36 of 37 passed] - testCase_buildApp_default</tspan>
+<tspan x="10" y="1898">db - seeding dbTable TestCrud ...</tspan>
 
-<tspan x="10" y="1962">db - seeding dbTable File ...</tspan>
+<tspan x="10" y="1914">testRunDefault - 6618 ms - [node test-case 36 of 37 passed] - testCase_buildApp_default</tspan>
 
-<tspan x="10" y="1978">db - seeding dbTable Pet ...</tspan>
+<tspan x="10" y="1930">db - seeding dbTable File ...</tspan>
 
-<tspan x="10" y="1994">db - seeding dbTable Order ...</tspan>
+<tspan x="10" y="1946">db - seeding dbTable Pet ...</tspan>
 
-<tspan x="10" y="2010">db - seeding dbTable User ...</tspan>
+<tspan x="10" y="1962">db - seeding dbTable Order ...</tspan>
 
-<tspan x="10" y="2026">db - seeding dbTable TestCrud ...</tspan>
+<tspan x="10" y="1978">db - seeding dbTable User ...</tspan>
 
-<tspan x="10" y="2042">[0915/221301.256182:INFO:CONSOLE(4286)] "db - seeding dbTable File ...", source: http://127.0.0.\</tspan>
-<tspan x="10" y="2058">1:36997/assets.utility2.rollup.js (4286)</tspan>
+<tspan x="10" y="1994">db - seeding dbTable TestCrud ...</tspan>
 
-<tspan x="10" y="2074">[0915/221301.256493:INFO:CONSOLE(4286)] "db - seeding dbTable Pet ...", source: http://127.0.0.1\</tspan>
-<tspan x="10" y="2090">:36997/assets.utility2.rollup.js (4286)</tspan>
+<tspan x="10" y="2010">[0915/224043.071838:INFO:CONSOLE(4286)] "db - seeding dbTable File ...", source: http://127.0.0.\</tspan>
+<tspan x="10" y="2026">1:63930/assets.utility2.rollup.js (4286)</tspan>
 
-<tspan x="10" y="2106">[0915/221301.256553:INFO:CONSOLE(4286)] "db - seeding dbTable Order ...", source: http://127.0.0\</tspan>
-<tspan x="10" y="2122">.1:36997/assets.utility2.rollup.js (4286)</tspan>
+<tspan x="10" y="2042">[0915/224043.076537:INFO:CONSOLE(4286)] "db - seeding dbTable Pet ...", source: http://127.0.0.1\</tspan>
+<tspan x="10" y="2058">:63930/assets.utility2.rollup.js (4286)</tspan>
 
-<tspan x="10" y="2138">[0915/221301.285011:INFO:CONSOLE(4286)] "db - seeding dbTable User ...", source: http://127.0.0.\</tspan>
-<tspan x="10" y="2154">1:36997/assets.utility2.rollup.js (4286)</tspan>
+<tspan x="10" y="2074">[0915/224043.076636:INFO:CONSOLE(4286)] "db - seeding dbTable Order ...", source: http://127.0.0\</tspan>
+<tspan x="10" y="2090">.1:63930/assets.utility2.rollup.js (4286)</tspan>
 
-<tspan x="10" y="2170">[0915/221301.285110:INFO:CONSOLE(4286)] "db - seeding dbTable TestCrud ...", source: http://127.\</tspan>
-<tspan x="10" y="2186">0.0.1:36997/assets.utility2.rollup.js (4286)</tspan>
+<tspan x="10" y="2106">[0915/224043.076681:INFO:CONSOLE(4286)] "db - seeding dbTable User ...", source: http://127.0.0.\</tspan>
+<tspan x="10" y="2122">1:63930/assets.utility2.rollup.js (4286)</tspan>
 
-<tspan x="10" y="2202">[0915/221301.524554:INFO:CONSOLE(511)] "domOnEventWindowOnloadTimeElapsed = 6239", source: http:\</tspan>
-<tspan x="10" y="2218">//127.0.0.1:36997/?modeTest=1&amp;timeoutDefault=30000&amp;modeTestCase= (511)</tspan>
+<tspan x="10" y="2138">[0915/224043.076725:INFO:CONSOLE(4286)] "db - seeding dbTable TestCrud ...", source: http://127.\</tspan>
+<tspan x="10" y="2154">0.0.1:63930/assets.utility2.rollup.js (4286)</tspan>
 
-<tspan x="10" y="2234">[0915/221301.537028:INFO:CONSOLE(8)] "db loaded from tmp/storage.undefined", source: http://127.\</tspan>
-<tspan x="10" y="2250">0.0.1:36997/assets.example.js (8)</tspan>
+<tspan x="10" y="2170">[0915/224043.243766:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /file/crudGe\</tspan>
+<tspan x="10" y="2186">tManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:63930/assets.sw\</tspan>
+<tspan x="10" y="2202">gg.js (8)</tspan>
 
-<tspan x="10" y="2266">[0915/221301.750017:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /file/crudGe\</tspan>
-<tspan x="10" y="2282">tManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:36997/assets.sw\</tspan>
-<tspan x="10" y="2298">gg.js (8)</tspan>
+<tspan x="10" y="2218">[0915/224043.246796:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /file/crudGe\</tspan>
+<tspan x="10" y="2234">tManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:63930/assets.sw\</tspan>
+<tspan x="10" y="2250">gg.js (8)</tspan>
 
-<tspan x="10" y="2314">[0915/221301.753927:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /file/crudGe\</tspan>
-<tspan x="10" y="2330">tManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:36997/assets.sw\</tspan>
-<tspan x="10" y="2346">gg.js (8)</tspan>
+<tspan x="10" y="2266">[0915/224043.254632:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /pet/crudGet\</tspan>
+<tspan x="10" y="2282">ManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:63930/assets.swg\</tspan>
+<tspan x="10" y="2298">g.js (8)</tspan>
 
-<tspan x="10" y="2362">[0915/221301.763760:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /pet/crudGet\</tspan>
-<tspan x="10" y="2378">ManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:36997/assets.swg\</tspan>
-<tspan x="10" y="2394">g.js (8)</tspan>
+<tspan x="10" y="2314">[0915/224043.257219:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /pet/crudGet\</tspan>
+<tspan x="10" y="2330">ManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:63930/assets.swg\</tspan>
+<tspan x="10" y="2346">g.js (8)</tspan>
 
-<tspan x="10" y="2410">[0915/221301.767807:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /pet/crudGet\</tspan>
-<tspan x="10" y="2426">ManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:36997/assets.swg\</tspan>
-<tspan x="10" y="2442">g.js (8)</tspan>
+<tspan x="10" y="2362">[0915/224043.261127:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /store/crudG\</tspan>
+<tspan x="10" y="2378">etManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:63930/assets.s\</tspan>
+<tspan x="10" y="2394">wgg.js (8)</tspan>
 
-<tspan x="10" y="2458">[0915/221301.774406:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /store/crudG\</tspan>
-<tspan x="10" y="2474">etManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:36997/assets.s\</tspan>
-<tspan x="10" y="2490">wgg.js (8)</tspan>
-
-<tspan x="10" y="2506">[0915/221301.779479:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /store/crudG\</tspan>
-<tspan x="10" y="2522">etManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:36997/assets.s\</tspan>
-<tspan x="10" y="2538">wgg.js (8)</tspan>
-
-<tspan x="10" y="2554">[0915/221301.789748:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /user/crudGe\</tspan>
-<tspan x="10" y="2570">tManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:36997/assets.sw\</tspan>
-<tspan x="10" y="2586">gg.js (8)</tspan>
-
-<tspan x="10" y="2602">[0915/221301.794441:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /user/crudGe\</tspan>
-<tspan x="10" y="2618">tManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:36997/assets.sw\</tspan>
-<tspan x="10" y="2634">gg.js (8)</tspan>
-
-<tspan x="10" y="2650">[0915/221301.803033:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /x-test/crud\</tspan>
-<tspan x="10" y="2666">GetManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:36997/assets.\</tspan>
-<tspan x="10" y="2682">swgg.js (8)</tspan>
-
-<tspan x="10" y="2698">[0915/221301.808532:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /x-test/crud\</tspan>
-<tspan x="10" y="2714">GetManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:36997/assets.\</tspan>
-<tspan x="10" y="2730">swgg.js (8)</tspan>
-
-<tspan x="10" y="2746">[0915/221301.841314:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="2762">etersDefault/{}"]["typeArrayItemsInteger1"] = undefined is required", source: http://127.0.0.1:3\</tspan>
-<tspan x="10" y="2778">6997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="2794">[0915/221301.850979:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="2810">etersDefault/{}"]["typeArrayItemsNumber1"] = undefined is required", source: http://127.0.0.1:36\</tspan>
-<tspan x="10" y="2826">997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="2842">[0915/221301.853934:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="2858">etersDefault/{}"]["typeArrayItemsNumber2"] = undefined is required", source: http://127.0.0.1:36\</tspan>
-<tspan x="10" y="2874">997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="2890">[0915/221301.856924:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="2906">etersDefault/{}"]["typeArrayItemsNumberCollectionFormatMultiInFormData"] = undefined is required\</tspan>
-<tspan x="10" y="2922">", source: http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="2938">[0915/221301.859781:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="2954">etersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0.1:36\</tspan>
-<tspan x="10" y="2970">997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="2986">[0915/221301.862470:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3002">etersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="3018">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3034">[0915/221301.865708:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3050">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
-<tspan x="10" y="3066">http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3082">[0915/221301.868449:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3098">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
-<tspan x="10" y="3114">", source: http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3130">[0915/221301.870262:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3146">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
-<tspan x="10" y="3162"> http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3178">[0915/221301.870988:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3194">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="3210">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3226">[0915/221301.872445:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3242">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="3258">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3274">[0915/221301.874223:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="3290">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:36997/asset\</tspan>
-<tspan x="10" y="3306">s.swgg.js (8)</tspan>
-
-<tspan x="10" y="3322">[0915/221301.876018:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="3338">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
-<tspan x="10" y="3354">36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3370">[0915/221301.877355:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="3386">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:3699\</tspan>
-<tspan x="10" y="3402">7/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3418">[0915/221301.878971:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="3434">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:36997/\</tspan>
-<tspan x="10" y="3450">assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3466">[0915/221301.883453:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3482">etersDefault/{}"]["typeArrayItemsNumber1"] = undefined is required", source: http://127.0.0.1:36\</tspan>
-<tspan x="10" y="3498">997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3514">[0915/221301.889213:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3530">etersDefault/{}"]["typeArrayItemsNumber2"] = undefined is required", source: http://127.0.0.1:36\</tspan>
-<tspan x="10" y="3546">997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3562">[0915/221301.891282:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3578">etersDefault/{}"]["typeArrayItemsNumberCollectionFormatMultiInFormData"] = undefined is required\</tspan>
-<tspan x="10" y="3594">", source: http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3610">[0915/221301.892962:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3626">etersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0.1:36\</tspan>
-<tspan x="10" y="3642">997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3658">[0915/221301.894532:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3674">etersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="3690">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3706">[0915/221301.896039:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3722">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
-<tspan x="10" y="3738">http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3754">[0915/221301.897577:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3770">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
-<tspan x="10" y="3786">", source: http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3802">[0915/221301.899388:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3818">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
-<tspan x="10" y="3834"> http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3850">[0915/221301.901168:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3866">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="3882">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3898">[0915/221301.902944:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="3914">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="3930">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="3946">[0915/221301.904412:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="3962">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:36997/asset\</tspan>
-<tspan x="10" y="3978">s.swgg.js (8)</tspan>
-
-<tspan x="10" y="3994">[0915/221301.906480:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="4010">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
-<tspan x="10" y="4026">36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4042">[0915/221301.908263:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="4058">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:3699\</tspan>
-<tspan x="10" y="4074">7/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4090">[0915/221301.909943:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="4106">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:36997/\</tspan>
-<tspan x="10" y="4122">assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4138">[0915/221301.914157:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="4154">etersDefault/{}"]["typeArrayItemsNumber2"] = undefined is required", source: http://127.0.0.1:36\</tspan>
-<tspan x="10" y="4170">997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4186">[0915/221301.920657:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="4202">etersDefault/{}"]["typeArrayItemsNumberCollectionFormatMultiInFormData"] = undefined is required\</tspan>
-<tspan x="10" y="4218">", source: http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4234">[0915/221301.921922:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="4250">etersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0.1:36\</tspan>
-<tspan x="10" y="4266">997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4282">[0915/221301.923750:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="4298">etersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="4314">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4330">[0915/221301.925352:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="4346">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
-<tspan x="10" y="4362">http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4378">[0915/221301.927217:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="4394">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
-<tspan x="10" y="4410">", source: http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4426">[0915/221301.928270:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="4442">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
-<tspan x="10" y="4458"> http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4474">[0915/221301.929963:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="4490">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="4506">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4522">[0915/221301.931757:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="4538">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="4554">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4570">[0915/221301.933372:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="4586">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:36997/asset\</tspan>
-<tspan x="10" y="4602">s.swgg.js (8)</tspan>
-
-<tspan x="10" y="4618">[0915/221301.935263:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="4634">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
-<tspan x="10" y="4650">36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4666">[0915/221301.937196:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="4682">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:3699\</tspan>
-<tspan x="10" y="4698">7/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4714">[0915/221301.938435:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="4730">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:36997/\</tspan>
-<tspan x="10" y="4746">assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4762">[0915/221301.942973:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="4778">etersDefault/{}"]["typeArrayItemsNumberCollectionFormatMultiInFormData"] = undefined is required\</tspan>
-<tspan x="10" y="4794">", source: http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4810">[0915/221301.950100:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="4826">etersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0.1:36\</tspan>
-<tspan x="10" y="4842">997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4858">[0915/221301.952876:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="4874">etersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="4890">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4906">[0915/221301.955310:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="4922">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
-<tspan x="10" y="4938">http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="4954">[0915/221301.956562:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="4970">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
-<tspan x="10" y="4986">", source: http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5002">[0915/221301.959032:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="5018">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
-<tspan x="10" y="5034"> http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5050">[0915/221301.961328:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="5066">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="5082">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5098">[0915/221301.963531:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="5114">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="5130">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5146">[0915/221301.966026:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="5162">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:36997/asset\</tspan>
-<tspan x="10" y="5178">s.swgg.js (8)</tspan>
-
-<tspan x="10" y="5194">[0915/221301.968729:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="5210">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
-<tspan x="10" y="5226">36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5242">[0915/221301.970810:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="5258">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:3699\</tspan>
-<tspan x="10" y="5274">7/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5290">[0915/221301.972946:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="5306">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:36997/\</tspan>
-<tspan x="10" y="5322">assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5338">[0915/221301.978136:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="5354">etersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0.1:36\</tspan>
-<tspan x="10" y="5370">997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5386">[0915/221301.979755:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="5402">etersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="5418">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5434">[0915/221301.980719:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="5450">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
-<tspan x="10" y="5466">http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5482">[0915/221301.982292:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="5498">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
-<tspan x="10" y="5514">", source: http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5530">[0915/221301.983644:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="5546">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
-<tspan x="10" y="5562"> http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5578">[0915/221301.984465:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="5594">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="5610">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5626">[0915/221301.985810:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="5642">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="5658">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5674">[0915/221301.987170:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="5690">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:36997/asset\</tspan>
-<tspan x="10" y="5706">s.swgg.js (8)</tspan>
-
-<tspan x="10" y="5722">[0915/221301.988315:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="5738">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
-<tspan x="10" y="5754">36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5770">[0915/221301.989493:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="5786">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:3699\</tspan>
-<tspan x="10" y="5802">7/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5818">[0915/221301.990574:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="5834">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:36997/\</tspan>
-<tspan x="10" y="5850">assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5866">[0915/221301.995191:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="5882">etersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0.1:36\</tspan>
-<tspan x="10" y="5898">997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5914">[0915/221301.996565:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="5930">etersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="5946">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="5962">[0915/221301.997402:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="5978">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
-<tspan x="10" y="5994">http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6010">[0915/221301.998703:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="6026">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
-<tspan x="10" y="6042">", source: http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6058">[0915/221301.999718:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="6074">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
-<tspan x="10" y="6090"> http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6106">[0915/221302.000789:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="6122">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="6138">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6154">[0915/221302.003145:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="6170">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="6186">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6202">[0915/221302.004150:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="6218">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:36997/asset\</tspan>
-<tspan x="10" y="6234">s.swgg.js (8)</tspan>
-
-<tspan x="10" y="6250">[0915/221302.004889:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="6266">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
-<tspan x="10" y="6282">36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6298">[0915/221302.005686:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="6314">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:3699\</tspan>
-<tspan x="10" y="6330">7/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6346">[0915/221302.007086:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="6362">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:36997/\</tspan>
-<tspan x="10" y="6378">assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6394">[0915/221302.011350:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="6410">etersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="6426">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6442">[0915/221302.012896:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="6458">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
-<tspan x="10" y="6474">http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6490">[0915/221302.014121:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="6506">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
-<tspan x="10" y="6522">", source: http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6538">[0915/221302.014910:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="6554">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
-<tspan x="10" y="6570"> http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6586">[0915/221302.016205:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="6602">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="6618">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6634">[0915/221302.016971:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="6650">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="6666">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6682">[0915/221302.018571:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="6698">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:36997/asset\</tspan>
-<tspan x="10" y="6714">s.swgg.js (8)</tspan>
-
-<tspan x="10" y="6730">[0915/221302.019644:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="6746">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
-<tspan x="10" y="6762">36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6778">[0915/221302.020663:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="6794">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:3699\</tspan>
-<tspan x="10" y="6810">7/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6826">[0915/221302.021743:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="6842">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:36997/\</tspan>
-<tspan x="10" y="6858">assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6874">[0915/221302.025859:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="6890">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
-<tspan x="10" y="6906">http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6922">[0915/221302.027140:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="6938">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
-<tspan x="10" y="6954">", source: http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="6970">[0915/221302.028335:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="6986">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
-<tspan x="10" y="7002"> http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7018">[0915/221302.029445:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="7034">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="7050">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7066">[0915/221302.030606:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="7082">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="7098">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7114">[0915/221302.033013:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="7130">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:36997/asset\</tspan>
-<tspan x="10" y="7146">s.swgg.js (8)</tspan>
-
-<tspan x="10" y="7162">[0915/221302.034208:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="7178">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
-<tspan x="10" y="7194">36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7210">[0915/221302.036812:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="7226">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:3699\</tspan>
-<tspan x="10" y="7242">7/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7258">[0915/221302.038041:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="7274">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:36997/\</tspan>
-<tspan x="10" y="7290">assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7306">[0915/221302.042287:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="7322">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
-<tspan x="10" y="7338">", source: http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7354">[0915/221302.044434:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="7370">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
-<tspan x="10" y="7386"> http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7402">[0915/221302.046476:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="7418">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="7434">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7450">[0915/221302.047889:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="7466">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="7482">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7498">[0915/221302.049853:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="7514">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:36997/asset\</tspan>
-<tspan x="10" y="7530">s.swgg.js (8)</tspan>
-
-<tspan x="10" y="7546">[0915/221302.051102:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="7562">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
-<tspan x="10" y="7578">36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7594">[0915/221302.052339:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="7610">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:3699\</tspan>
-<tspan x="10" y="7626">7/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7642">[0915/221302.053148:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="7658">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:36997/\</tspan>
-<tspan x="10" y="7674">assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7690">[0915/221302.058756:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="7706">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
-<tspan x="10" y="7722"> http://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7738">[0915/221302.060455:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="7754">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="7770">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7786">[0915/221302.061821:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="7802">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="7818">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7834">[0915/221302.063491:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="7850">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:36997/asset\</tspan>
-<tspan x="10" y="7866">s.swgg.js (8)</tspan>
-
-<tspan x="10" y="7882">[0915/221302.064786:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="7898">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
-<tspan x="10" y="7914">36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7930">[0915/221302.066136:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="7946">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:3699\</tspan>
-<tspan x="10" y="7962">7/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="7978">[0915/221302.067335:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="7994">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:36997/\</tspan>
-<tspan x="10" y="8010">assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="8026">[0915/221302.072396:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="8042">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="8058">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="8074">[0915/221302.074033:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="8090">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="8106">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="8122">[0915/221302.075656:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="8138">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:36997/asset\</tspan>
-<tspan x="10" y="8154">s.swgg.js (8)</tspan>
-
-<tspan x="10" y="8170">[0915/221302.076959:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="8186">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
-<tspan x="10" y="8202">36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="8218">[0915/221302.078299:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="8234">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:3699\</tspan>
-<tspan x="10" y="8250">7/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="8266">[0915/221302.079409:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="8282">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:36997/\</tspan>
-<tspan x="10" y="8298">assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="8314">[0915/221302.084185:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
-<tspan x="10" y="8330">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
-<tspan x="10" y="8346">ttp://127.0.0.1:36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="8362">[0915/221302.085944:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="8378">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:36997/asset\</tspan>
-<tspan x="10" y="8394">s.swgg.js (8)</tspan>
-
-<tspan x="10" y="8410">[0915/221302.087146:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="8426">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
-<tspan x="10" y="8442">36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="8458">[0915/221302.088450:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="8474">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:3699\</tspan>
-<tspan x="10" y="8490">7/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="8506">[0915/221302.089638:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="8522">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:36997/\</tspan>
-<tspan x="10" y="8538">assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="8554">[0915/221302.095582:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="8570">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:36997/asset\</tspan>
-<tspan x="10" y="8586">s.swgg.js (8)</tspan>
-
-<tspan x="10" y="8602">[0915/221302.097421:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="8618">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
-<tspan x="10" y="8634">36997/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="8650">[0915/221302.099054:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="8666">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:3699\</tspan>
-<tspan x="10" y="8682">7/assets.swgg.js (8)</tspan>
-
-<tspan x="10" y="8698">[0915/221302.100405:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="8714">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:36997/\</tspan>
+<tspan x="10" y="2410">[0915/224043.261927:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /store/crudG\</tspan>
+<tspan x="10" y="2426">etManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:63930/assets.s\</tspan>
+<tspan x="10" y="2442">wgg.js (8)</tspan>
+
+<tspan x="10" y="2458">[0915/224043.270488:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /user/crudGe\</tspan>
+<tspan x="10" y="2474">tManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:63930/assets.sw\</tspan>
+<tspan x="10" y="2490">gg.js (8)</tspan>
+
+<tspan x="10" y="2506">[0915/224043.273843:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /user/crudGe\</tspan>
+<tspan x="10" y="2522">tManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:63930/assets.sw\</tspan>
+<tspan x="10" y="2538">gg.js (8)</tspan>
+
+<tspan x="10" y="2554">[0915/224043.280271:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /x-test/crud\</tspan>
+<tspan x="10" y="2570">GetManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:63930/assets.\</tspan>
+<tspan x="10" y="2586">swgg.js (8)</tspan>
+
+<tspan x="10" y="2602">[0915/224043.283168:INFO:CONSOLE(8)] "error.objectRequired - integer operation["GET /x-test/crud\</tspan>
+<tspan x="10" y="2618">GetManyByQuery"]["_queryLimit"] = undefined is required", source: http://127.0.0.1:63930/assets.\</tspan>
+<tspan x="10" y="2634">swgg.js (8)</tspan>
+
+<tspan x="10" y="2650">[0915/224043.302752:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="2666">etersDefault/{}"]["typeArrayItemsInteger1"] = undefined is required", source: http://127.0.0.1:6\</tspan>
+<tspan x="10" y="2682">3930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="2698">[0915/224043.303599:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="2714">etersDefault/{}"]["typeArrayItemsNumber1"] = undefined is required", source: http://127.0.0.1:63\</tspan>
+<tspan x="10" y="2730">930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="2746">[0915/224043.303691:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="2762">etersDefault/{}"]["typeArrayItemsNumber2"] = undefined is required", source: http://127.0.0.1:63\</tspan>
+<tspan x="10" y="2778">930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="2794">[0915/224043.309562:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="2810">etersDefault/{}"]["typeArrayItemsNumberCollectionFormatMultiInFormData"] = undefined is required\</tspan>
+<tspan x="10" y="2826">", source: http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="2842">[0915/224043.309831:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="2858">etersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0.1:63\</tspan>
+<tspan x="10" y="2874">930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="2890">[0915/224043.310156:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="2906">etersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="2922">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="2938">[0915/224043.310403:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="2954">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
+<tspan x="10" y="2970">http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="2986">[0915/224043.310674:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="3002">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
+<tspan x="10" y="3018">", source: http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3034">[0915/224043.310989:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="3050">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
+<tspan x="10" y="3066"> http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3082">[0915/224043.311667:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="3098">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="3114">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3130">[0915/224043.311757:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="3146">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="3162">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3178">[0915/224043.314605:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="3194">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:63930/asset\</tspan>
+<tspan x="10" y="3210">s.swgg.js (8)</tspan>
+
+<tspan x="10" y="3226">[0915/224043.314716:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="3242">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
+<tspan x="10" y="3258">63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3274">[0915/224043.314785:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="3290">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:6393\</tspan>
+<tspan x="10" y="3306">0/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3322">[0915/224043.314850:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="3338">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:63930/\</tspan>
+<tspan x="10" y="3354">assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3370">[0915/224043.325099:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="3386">etersDefault/{}"]["typeArrayItemsNumber1"] = undefined is required", source: http://127.0.0.1:63\</tspan>
+<tspan x="10" y="3402">930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3418">[0915/224043.325526:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="3434">etersDefault/{}"]["typeArrayItemsNumber2"] = undefined is required", source: http://127.0.0.1:63\</tspan>
+<tspan x="10" y="3450">930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3466">[0915/224043.325761:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="3482">etersDefault/{}"]["typeArrayItemsNumberCollectionFormatMultiInFormData"] = undefined is required\</tspan>
+<tspan x="10" y="3498">", source: http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3514">[0915/224043.326004:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="3530">etersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0.1:63\</tspan>
+<tspan x="10" y="3546">930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3562">[0915/224043.326245:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="3578">etersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="3594">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3610">[0915/224043.326397:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="3626">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
+<tspan x="10" y="3642">http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3658">[0915/224043.326834:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="3674">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
+<tspan x="10" y="3690">", source: http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3706">[0915/224043.327044:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="3722">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
+<tspan x="10" y="3738"> http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3754">[0915/224043.327298:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="3770">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="3786">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3802">[0915/224043.327473:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="3818">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="3834">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3850">[0915/224043.327841:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="3866">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:63930/asset\</tspan>
+<tspan x="10" y="3882">s.swgg.js (8)</tspan>
+
+<tspan x="10" y="3898">[0915/224043.328159:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="3914">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
+<tspan x="10" y="3930">63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3946">[0915/224043.328431:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="3962">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:6393\</tspan>
+<tspan x="10" y="3978">0/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="3994">[0915/224043.328942:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="4010">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:63930/\</tspan>
+<tspan x="10" y="4026">assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4042">[0915/224043.331297:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4058">etersDefault/{}"]["typeArrayItemsNumber2"] = undefined is required", source: http://127.0.0.1:63\</tspan>
+<tspan x="10" y="4074">930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4090">[0915/224043.331610:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4106">etersDefault/{}"]["typeArrayItemsNumberCollectionFormatMultiInFormData"] = undefined is required\</tspan>
+<tspan x="10" y="4122">", source: http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4138">[0915/224043.353135:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4154">etersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0.1:63\</tspan>
+<tspan x="10" y="4170">930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4186">[0915/224043.353471:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4202">etersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="4218">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4234">[0915/224043.353663:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4250">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
+<tspan x="10" y="4266">http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4282">[0915/224043.353993:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4298">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
+<tspan x="10" y="4314">", source: http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4330">[0915/224043.354194:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4346">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
+<tspan x="10" y="4362"> http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4378">[0915/224043.354454:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4394">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="4410">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4426">[0915/224043.354662:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4442">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="4458">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4474">[0915/224043.355299:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="4490">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:63930/asset\</tspan>
+<tspan x="10" y="4506">s.swgg.js (8)</tspan>
+
+<tspan x="10" y="4522">[0915/224043.355629:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="4538">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
+<tspan x="10" y="4554">63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4570">[0915/224043.355968:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="4586">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:6393\</tspan>
+<tspan x="10" y="4602">0/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4618">[0915/224043.356170:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="4634">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:63930/\</tspan>
+<tspan x="10" y="4650">assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4666">[0915/224043.358916:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4682">etersDefault/{}"]["typeArrayItemsNumberCollectionFormatMultiInFormData"] = undefined is required\</tspan>
+<tspan x="10" y="4698">", source: http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4714">[0915/224043.359231:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4730">etersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0.1:63\</tspan>
+<tspan x="10" y="4746">930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4762">[0915/224043.359431:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4778">etersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="4794">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4810">[0915/224043.377219:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4826">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
+<tspan x="10" y="4842">http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4858">[0915/224043.377587:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4874">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
+<tspan x="10" y="4890">", source: http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4906">[0915/224043.377800:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4922">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
+<tspan x="10" y="4938"> http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="4954">[0915/224043.378102:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="4970">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="4986">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5002">[0915/224043.378353:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="5018">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="5034">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5050">[0915/224043.379140:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="5066">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:63930/asset\</tspan>
+<tspan x="10" y="5082">s.swgg.js (8)</tspan>
+
+<tspan x="10" y="5098">[0915/224043.379234:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="5114">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
+<tspan x="10" y="5130">63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5146">[0915/224043.379607:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="5162">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:6393\</tspan>
+<tspan x="10" y="5178">0/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5194">[0915/224043.380209:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="5210">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:63930/\</tspan>
+<tspan x="10" y="5226">assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5242">[0915/224043.382636:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="5258">etersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0.1:63\</tspan>
+<tspan x="10" y="5274">930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5290">[0915/224043.382965:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="5306">etersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="5322">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5338">[0915/224043.383365:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="5354">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
+<tspan x="10" y="5370">http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5386">[0915/224043.383452:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="5402">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
+<tspan x="10" y="5418">", source: http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5434">[0915/224043.401965:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="5450">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
+<tspan x="10" y="5466"> http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5482">[0915/224043.403051:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="5498">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="5514">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5530">[0915/224043.403869:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="5546">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="5562">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5578">[0915/224043.404693:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="5594">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:63930/asset\</tspan>
+<tspan x="10" y="5610">s.swgg.js (8)</tspan>
+
+<tspan x="10" y="5626">[0915/224043.405427:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="5642">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
+<tspan x="10" y="5658">63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5674">[0915/224043.406172:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="5690">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:6393\</tspan>
+<tspan x="10" y="5706">0/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5722">[0915/224043.406743:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="5738">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:63930/\</tspan>
+<tspan x="10" y="5754">assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5770">[0915/224043.419027:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="5786">etersDefault/{}"]["typeArrayItemsString1"] = undefined is required", source: http://127.0.0.1:63\</tspan>
+<tspan x="10" y="5802">930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5818">[0915/224043.419872:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="5834">etersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="5850">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5866">[0915/224043.420471:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="5882">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
+<tspan x="10" y="5898">http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5914">[0915/224043.421088:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="5930">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
+<tspan x="10" y="5946">", source: http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="5962">[0915/224043.421636:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="5978">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
+<tspan x="10" y="5994"> http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6010">[0915/224043.422345:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="6026">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="6042">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6058">[0915/224043.422913:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="6074">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="6090">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6106">[0915/224043.426071:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="6122">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:63930/asset\</tspan>
+<tspan x="10" y="6138">s.swgg.js (8)</tspan>
+
+<tspan x="10" y="6154">[0915/224043.426655:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="6170">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
+<tspan x="10" y="6186">63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6202">[0915/224043.427269:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="6218">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:6393\</tspan>
+<tspan x="10" y="6234">0/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6250">[0915/224043.427852:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="6266">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:63930/\</tspan>
+<tspan x="10" y="6282">assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6298">[0915/224043.439821:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="6314">etersDefault/{}"]["typeArrayItemsStringCollectionFormatCsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="6330">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6346">[0915/224043.440662:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="6362">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
+<tspan x="10" y="6378">http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6394">[0915/224043.441275:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="6410">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
+<tspan x="10" y="6426">", source: http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6442">[0915/224043.441830:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="6458">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
+<tspan x="10" y="6474"> http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6490">[0915/224043.442432:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="6506">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="6522">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6538">[0915/224043.443008:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="6554">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="6570">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6586">[0915/224043.443858:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="6602">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:63930/asset\</tspan>
+<tspan x="10" y="6618">s.swgg.js (8)</tspan>
+
+<tspan x="10" y="6634">[0915/224043.444423:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="6650">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
+<tspan x="10" y="6666">63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6682">[0915/224043.445112:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="6698">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:6393\</tspan>
+<tspan x="10" y="6714">0/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6730">[0915/224043.445646:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="6746">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:63930/\</tspan>
+<tspan x="10" y="6762">assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6778">[0915/224043.449831:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="6794">etersDefault/{}"]["typeArrayItemsStringCollectionFormatJson"] = undefined is required", source: \</tspan>
+<tspan x="10" y="6810">http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6826">[0915/224043.450510:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="6842">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
+<tspan x="10" y="6858">", source: http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6874">[0915/224043.451146:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="6890">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
+<tspan x="10" y="6906"> http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6922">[0915/224043.451806:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="6938">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="6954">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="6970">[0915/224043.452478:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="6986">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="7002">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7018">[0915/224043.453447:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="7034">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:63930/asset\</tspan>
+<tspan x="10" y="7050">s.swgg.js (8)</tspan>
+
+<tspan x="10" y="7066">[0915/224043.467877:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="7082">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
+<tspan x="10" y="7098">63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7114">[0915/224043.471958:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="7130">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:6393\</tspan>
+<tspan x="10" y="7146">0/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7162">[0915/224043.477288:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="7178">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:63930/\</tspan>
+<tspan x="10" y="7194">assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7210">[0915/224043.481340:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="7226">etersDefault/{}"]["typeArrayItemsStringCollectionFormatMultiInFormData"] = undefined is required\</tspan>
+<tspan x="10" y="7242">", source: http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7258">[0915/224043.486905:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="7274">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
+<tspan x="10" y="7290"> http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7306">[0915/224043.490208:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="7322">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="7338">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7354">[0915/224043.495344:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="7370">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="7386">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7402">[0915/224043.498782:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="7418">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:63930/asset\</tspan>
+<tspan x="10" y="7434">s.swgg.js (8)</tspan>
+
+<tspan x="10" y="7450">[0915/224043.502663:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="7466">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
+<tspan x="10" y="7482">63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7498">[0915/224043.505985:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="7514">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:6393\</tspan>
+<tspan x="10" y="7530">0/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7546">[0915/224043.507284:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="7562">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:63930/\</tspan>
+<tspan x="10" y="7578">assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7594">[0915/224043.515244:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="7610">etersDefault/{}"]["typeArrayItemsStringCollectionFormatPipes"] = undefined is required", source:\</tspan>
+<tspan x="10" y="7626"> http://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7642">[0915/224043.524403:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="7658">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="7674">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7690">[0915/224043.528278:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="7706">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="7722">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7738">[0915/224043.529985:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="7754">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:63930/asset\</tspan>
+<tspan x="10" y="7770">s.swgg.js (8)</tspan>
+
+<tspan x="10" y="7786">[0915/224043.531125:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="7802">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
+<tspan x="10" y="7818">63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7834">[0915/224043.532529:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="7850">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:6393\</tspan>
+<tspan x="10" y="7866">0/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7882">[0915/224043.537612:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="7898">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:63930/\</tspan>
+<tspan x="10" y="7914">assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7930">[0915/224043.541908:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="7946">etersDefault/{}"]["typeArrayItemsStringCollectionFormatSsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="7962">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="7978">[0915/224043.548408:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="7994">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="8010">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="8026">[0915/224043.550092:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="8042">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:63930/asset\</tspan>
+<tspan x="10" y="8058">s.swgg.js (8)</tspan>
+
+<tspan x="10" y="8074">[0915/224043.550677:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="8090">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
+<tspan x="10" y="8106">63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="8122">[0915/224043.551952:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="8138">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:6393\</tspan>
+<tspan x="10" y="8154">0/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="8170">[0915/224043.552577:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="8186">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:63930/\</tspan>
+<tspan x="10" y="8202">assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="8218">[0915/224043.557260:INFO:CONSOLE(8)] "error.objectRequired - array operation["POST /x-test/param\</tspan>
+<tspan x="10" y="8234">etersDefault/{}"]["typeArrayItemsStringCollectionFormatTsv"] = undefined is required", source: h\</tspan>
+<tspan x="10" y="8250">ttp://127.0.0.1:63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="8266">[0915/224043.565061:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="8282">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:63930/asset\</tspan>
+<tspan x="10" y="8298">s.swgg.js (8)</tspan>
+
+<tspan x="10" y="8314">[0915/224043.566132:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="8330">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
+<tspan x="10" y="8346">63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="8362">[0915/224043.567137:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="8378">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:6393\</tspan>
+<tspan x="10" y="8394">0/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="8410">[0915/224043.568275:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="8426">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:63930/\</tspan>
+<tspan x="10" y="8442">assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="8458">[0915/224043.573066:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="8474">metersDefault/{}"]["typeString1"] = undefined is required", source: http://127.0.0.1:63930/asset\</tspan>
+<tspan x="10" y="8490">s.swgg.js (8)</tspan>
+
+<tspan x="10" y="8506">[0915/224043.580687:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="8522">metersDefault/{}"]["typeStringCharsetAscii"] = undefined is required", source: http://127.0.0.1:\</tspan>
+<tspan x="10" y="8538">63930/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="8554">[0915/224043.582031:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="8570">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:6393\</tspan>
+<tspan x="10" y="8586">0/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="8602">[0915/224043.582683:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="8618">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:63930/\</tspan>
+<tspan x="10" y="8634">assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="8650">[0915/224043.588244:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="8666">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:6393\</tspan>
+<tspan x="10" y="8682">0/assets.swgg.js (8)</tspan>
+
+<tspan x="10" y="8698">[0915/224043.592140:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
+<tspan x="10" y="8714">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:63930/\</tspan>
 <tspan x="10" y="8730">assets.swgg.js (8)</tspan>
 
-<tspan x="10" y="8746">[0915/221302.106529:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="8762">metersDefault/{}"]["typeStringInHeader"] = undefined is required", source: http://127.0.0.1:3699\</tspan>
-<tspan x="10" y="8778">7/assets.swgg.js (8)</tspan>
+<tspan x="10" y="8746">testRunDefault - 10324 ms - testCase pending - testCase_webpage_default ...</tspan>
 
-<tspan x="10" y="8794">[0915/221302.107966:INFO:CONSOLE(8)] "error.objectRequired - string operation["POST /x-test/para\</tspan>
-<tspan x="10" y="8810">metersDefault/{}"]["typeStringInPath"] = undefined is required", source: http://127.0.0.1:36997/\</tspan>
-<tspan x="10" y="8826">assets.swgg.js (8)</tspan>
+<tspan x="10" y="8762">[0915/224044.445803:INFO:CONSOLE(511)] "domOnEventWindowOnloadTimeElapsed = 7662", source: http:\</tspan>
+<tspan x="10" y="8778">//127.0.0.1:63930/?modeTest=1&amp;timeoutDefault=30000&amp;modeTestCase= (511)</tspan>
 
-<tspan x="10" y="8842">testRunDefault - 10253 ms - testCase pending - testCase_webpage_default ...</tspan>
+<tspan x="10" y="8794">[0915/224044.578996:INFO:CONSOLE(8)] "db loaded from tmp/storage.undefined", source: http://127.\</tspan>
+<tspan x="10" y="8810">0.0.1:63930/assets.example.js (8)</tspan>
 
-<tspan x="10" y="8858">[0915/221303.357972:INFO:CONSOLE(58934)] "testRunDefault - 12 ms - [browser test-case 1 of 32 pa\</tspan>
-<tspan x="10" y="8874">ssed] - testCase_buildApp_default", source: http://127.0.0.1:36997/assets.utility2.rollup.js (58\</tspan>
-<tspan x="10" y="8890">934)</tspan>
+<tspan x="10" y="8826">[0915/224044.718332:INFO:CONSOLE(58934)] "testRunDefault - 11 ms - [browser test-case 1 of 32 pa\</tspan>
+<tspan x="10" y="8842">ssed] - testCase_buildApp_default", source: http://127.0.0.1:63930/assets.utility2.rollup.js (58\</tspan>
+<tspan x="10" y="8858">934)</tspan>
 
-<tspan x="10" y="8906">[0915/221303.497249:INFO:CONSOLE(58934)] "testRunDefault - 151 ms - [browser test-case 2 of 32 p\</tspan>
-<tspan x="10" y="8922">assed] - testCase_ajax_err", source: http://127.0.0.1:36997/assets.utility2.rollup.js (58934)</tspan>
+<tspan x="10" y="8874">[0915/224044.816584:INFO:CONSOLE(58934)] "testRunDefault - 109 ms - [browser test-case 2 of 32 p\</tspan>
+<tspan x="10" y="8890">assed] - testCase_ajax_err", source: http://127.0.0.1:63930/assets.utility2.rollup.js (58934)</tspan>
 
-<tspan x="10" y="8938">[0915/221303.527851:INFO:CONSOLE(58934)] "testRunDefault - 182 ms - [browser test-case 3 of 32 p\</tspan>
-<tspan x="10" y="8954">assed] - testCase_crudErrorXxx_default", source: http://127.0.0.1:36997/assets.utility2.rollup.j\</tspan>
-<tspan x="10" y="8970">s (58934)</tspan>
+<tspan x="10" y="8906">[0915/224044.898265:INFO:CONSOLE(58934)] "testRunDefault - 191 ms - [browser test-case 3 of 32 p\</tspan>
+<tspan x="10" y="8922">assed] - testCase_crudErrorXxx_default", source: http://127.0.0.1:63930/assets.utility2.rollup.j\</tspan>
+<tspan x="10" y="8938">s (58934)</tspan>
 
-<tspan x="10" y="8986">[0915/221303.576852:INFO:CONSOLE(58934)] "testRunDefault - 230 ms - [browser test-case 4 of 32 p\</tspan>
-<tspan x="10" y="9002">assed] - testCase_crudCountManyByQuery_default", source: http://127.0.0.1:36997/assets.utility2.\</tspan>
-<tspan x="10" y="9018">rollup.js (58934)</tspan>
+<tspan x="10" y="8954">[0915/224044.915218:INFO:CONSOLE(58934)] "testRunDefault - 208 ms - [browser test-case 4 of 32 p\</tspan>
+<tspan x="10" y="8970">assed] - testCase_crudCountManyByQuery_default", source: http://127.0.0.1:63930/assets.utility2.\</tspan>
+<tspan x="10" y="8986">rollup.js (58934)</tspan>
 
-<tspan x="10" y="9034">[0915/221303.598987:INFO:CONSOLE(58934)] "testRunDefault - 253 ms - [browser test-case 5 of 32 p\</tspan>
-<tspan x="10" y="9050">assed] - testCase_crudNullXxx_default", source: http://127.0.0.1:36997/assets.utility2.rollup.js\</tspan>
-<tspan x="10" y="9066"> (58934)</tspan>
+<tspan x="10" y="9002">[0915/224044.968595:INFO:CONSOLE(58934)] "testRunDefault - 262 ms - [browser test-case 5 of 32 p\</tspan>
+<tspan x="10" y="9018">assed] - testCase_crudNullXxx_default", source: http://127.0.0.1:63930/assets.utility2.rollup.js\</tspan>
+<tspan x="10" y="9034"> (58934)</tspan>
 
-<tspan x="10" y="9082">[0915/221303.605188:INFO:CONSOLE(58934)] "testRunDefault - 259 ms - [browser test-case 6 of 32 p\</tspan>
-<tspan x="10" y="9098">assed] - testCase_crudGetManyByQuery_default", source: http://127.0.0.1:36997/assets.utility2.ro\</tspan>
-<tspan x="10" y="9114">llup.js (58934)</tspan>
+<tspan x="10" y="9050">[0915/224044.974922:INFO:CONSOLE(58934)] "testRunDefault - 268 ms - [browser test-case 6 of 32 p\</tspan>
+<tspan x="10" y="9066">assed] - testCase_crudGetManyByQuery_default", source: http://127.0.0.1:63930/assets.utility2.ro\</tspan>
+<tspan x="10" y="9082">llup.js (58934)</tspan>
 
-<tspan x="10" y="9130">[0915/221303.640393:INFO:CONSOLE(58934)] "testRunDefault - 292 ms - [browser test-case 7 of 32 p\</tspan>
-<tspan x="10" y="9146">assed] - testCase_crudGetOneById_default", source: http://127.0.0.1:36997/assets.utility2.rollup\</tspan>
-<tspan x="10" y="9162">.js (58934)</tspan>
+<tspan x="10" y="9098">[0915/224045.008352:INFO:CONSOLE(58934)] "testRunDefault - 301 ms - [browser test-case 7 of 32 p\</tspan>
+<tspan x="10" y="9114">assed] - testCase_crudGetOneById_default", source: http://127.0.0.1:63930/assets.utility2.rollup\</tspan>
+<tspan x="10" y="9130">.js (58934)</tspan>
 
-<tspan x="10" y="9178">[0915/221303.644211:INFO:CONSOLE(58934)] "testRunDefault - 298 ms - [browser test-case 8 of 32 p\</tspan>
-<tspan x="10" y="9194">assed] - testCase_crudGetOneByQuery_default", source: http://127.0.0.1:36997/assets.utility2.rol\</tspan>
-<tspan x="10" y="9210">lup.js (58934)</tspan>
+<tspan x="10" y="9146">[0915/224045.014495:INFO:CONSOLE(58934)] "testRunDefault - 306 ms - [browser test-case 8 of 32 p\</tspan>
+<tspan x="10" y="9162">assed] - testCase_crudGetOneByQuery_default", source: http://127.0.0.1:63930/assets.utility2.rol\</tspan>
+<tspan x="10" y="9178">lup.js (58934)</tspan>
 
-<tspan x="10" y="9226">[0915/221303.800762:INFO:CONSOLE(58934)] "testRunDefault - 455 ms - [browser test-case 9 of 32 p\</tspan>
-<tspan x="10" y="9242">assed] - testCase_crudSetManyById_default", source: http://127.0.0.1:36997/assets.utility2.rollu\</tspan>
-<tspan x="10" y="9258">p.js (58934)</tspan>
+<tspan x="10" y="9194">[0915/224045.131323:INFO:CONSOLE(58934)] "testRunDefault - 424 ms - [browser test-case 9 of 32 p\</tspan>
+<tspan x="10" y="9210">assed] - testCase_crudSetManyById_default", source: http://127.0.0.1:63930/assets.utility2.rollu\</tspan>
+<tspan x="10" y="9226">p.js (58934)</tspan>
 
-<tspan x="10" y="9274">[0915/221303.804327:INFO:CONSOLE(58934)] "testRunDefault - 459 ms - [browser test-case 10 of 32 \</tspan>
-<tspan x="10" y="9290">passed] - testCase_crudSetOneById_default", source: http://127.0.0.1:36997/assets.utility2.rollu\</tspan>
-<tspan x="10" y="9306">p.js (58934)</tspan>
+<tspan x="10" y="9242">[0915/224045.134524:INFO:CONSOLE(58934)] "testRunDefault - 426 ms - [browser test-case 10 of 32 \</tspan>
+<tspan x="10" y="9258">passed] - testCase_crudSetOneById_default", source: http://127.0.0.1:63930/assets.utility2.rollu\</tspan>
+<tspan x="10" y="9274">p.js (58934)</tspan>
 
-<tspan x="10" y="9322">[0915/221303.837278:INFO:CONSOLE(58934)] "testRunDefault - 491 ms - [browser test-case 11 of 32 \</tspan>
-<tspan x="10" y="9338">passed] - testCase_crudRemoveManyByQuery_default", source: http://127.0.0.1:36997/assets.utility\</tspan>
-<tspan x="10" y="9354">2.rollup.js (58934)</tspan>
+<tspan x="10" y="9290">[0915/224045.165621:INFO:CONSOLE(58934)] "testRunDefault - 459 ms - [browser test-case 11 of 32 \</tspan>
+<tspan x="10" y="9306">passed] - testCase_crudRemoveManyByQuery_default", source: http://127.0.0.1:63930/assets.utility\</tspan>
+<tspan x="10" y="9322">2.rollup.js (58934)</tspan>
 
-<tspan x="10" y="9370">[0915/221303.852190:INFO:CONSOLE(58934)] "testRunDefault - 506 ms - [browser test-case 12 of 32 \</tspan>
-<tspan x="10" y="9386">passed] - testCase_crudRemoveOneById_default", source: http://127.0.0.1:36997/assets.utility2.ro\</tspan>
-<tspan x="10" y="9402">llup.js (58934)</tspan>
+<tspan x="10" y="9338">[0915/224045.186277:INFO:CONSOLE(58934)] "testRunDefault - 479 ms - [browser test-case 12 of 32 \</tspan>
+<tspan x="10" y="9354">passed] - testCase_crudRemoveOneById_default", source: http://127.0.0.1:63930/assets.utility2.ro\</tspan>
+<tspan x="10" y="9370">llup.js (58934)</tspan>
 
-<tspan x="10" y="9418">[0915/221303.898652:INFO:CONSOLE(58934)] "testRunDefault - 553 ms - [browser test-case 13 of 32 \</tspan>
-<tspan x="10" y="9434">passed] - testCase_fileUploadManyByForm_nullCase", source: http://127.0.0.1:36997/assets.utility\</tspan>
-<tspan x="10" y="9450">2.rollup.js (58934)</tspan>
+<tspan x="10" y="9386">[0915/224045.225232:INFO:CONSOLE(58934)] "testRunDefault - 518 ms - [browser test-case 13 of 32 \</tspan>
+<tspan x="10" y="9402">passed] - testCase_fileUploadManyByForm_nullCase", source: http://127.0.0.1:63930/assets.utility\</tspan>
+<tspan x="10" y="9418">2.rollup.js (58934)</tspan>
 
-<tspan x="10" y="9466">[0915/221303.901846:INFO:CONSOLE(58934)] "testRunDefault - 554 ms - [browser test-case 14 of 32 \</tspan>
-<tspan x="10" y="9482">passed] - testCase_nop_default", source: http://127.0.0.1:36997/assets.utility2.rollup.js (58934\</tspan>
-<tspan x="10" y="9498">)</tspan>
+<tspan x="10" y="9434">[0915/224045.226594:INFO:CONSOLE(58934)] "testRunDefault - 519 ms - [browser test-case 14 of 32 \</tspan>
+<tspan x="10" y="9450">passed] - testCase_nop_default", source: http://127.0.0.1:63930/assets.utility2.rollup.js (58934\</tspan>
+<tspan x="10" y="9466">)</tspan>
 
-<tspan x="10" y="9514">[0915/221303.911486:INFO:CONSOLE(58934)] "testRunDefault - 566 ms - [browser test-case 15 of 32 \</tspan>
-<tspan x="10" y="9530">passed] - testCase_fileGetOneById_default", source: http://127.0.0.1:36997/assets.utility2.rollu\</tspan>
-<tspan x="10" y="9546">p.js (58934)</tspan>
+<tspan x="10" y="9482">[0915/224045.239457:INFO:CONSOLE(58934)] "testRunDefault - 533 ms - [browser test-case 15 of 32 \</tspan>
+<tspan x="10" y="9498">passed] - testCase_fileGetOneById_default", source: http://127.0.0.1:63930/assets.utility2.rollu\</tspan>
+<tspan x="10" y="9514">p.js (58934)</tspan>
 
-<tspan x="10" y="9562">[0915/221303.916023:INFO:CONSOLE(58934)] "testRunDefault - 570 ms - [browser test-case 16 of 32 \</tspan>
-<tspan x="10" y="9578">passed] - testCase_crudUpdateOneById_default", source: http://127.0.0.1:36997/assets.utility2.ro\</tspan>
-<tspan x="10" y="9594">llup.js (58934)</tspan>
+<tspan x="10" y="9530">[0915/224045.242818:INFO:CONSOLE(58934)] "testRunDefault - 536 ms - [browser test-case 16 of 32 \</tspan>
+<tspan x="10" y="9546">passed] - testCase_crudUpdateOneById_default", source: http://127.0.0.1:63930/assets.utility2.ro\</tspan>
+<tspan x="10" y="9562">llup.js (58934)</tspan>
 
-<tspan x="10" y="9610">[0915/221303.950039:INFO:CONSOLE(58934)] "testRunDefault - 604 ms - [browser test-case 17 of 32 \</tspan>
-<tspan x="10" y="9626">passed] - testCase_onErrorJsonapi_default", source: http://127.0.0.1:36997/assets.utility2.rollu\</tspan>
-<tspan x="10" y="9642">p.js (58934)</tspan>
+<tspan x="10" y="9578">[0915/224045.271381:INFO:CONSOLE(58934)] "testRunDefault - 564 ms - [browser test-case 17 of 32 \</tspan>
+<tspan x="10" y="9594">passed] - testCase_onErrorJsonapi_default", source: http://127.0.0.1:63930/assets.utility2.rollu\</tspan>
+<tspan x="10" y="9610">p.js (58934)</tspan>
 
-<tspan x="10" y="9658">[0915/221303.958918:INFO:CONSOLE(58934)] "testRunDefault - 613 ms - [browser test-case 18 of 32 \</tspan>
-<tspan x="10" y="9674">passed] - testCase_onErrorJsonapi_emptyArray", source: http://127.0.0.1:36997/assets.utility2.ro\</tspan>
-<tspan x="10" y="9690">llup.js (58934)</tspan>
+<tspan x="10" y="9626">[0915/224045.280878:INFO:CONSOLE(58934)] "testRunDefault - 574 ms - [browser test-case 18 of 32 \</tspan>
+<tspan x="10" y="9642">passed] - testCase_onErrorJsonapi_emptyArray", source: http://127.0.0.1:63930/assets.utility2.ro\</tspan>
+<tspan x="10" y="9658">llup.js (58934)</tspan>
 
-<tspan x="10" y="9706">[0915/221303.991606:INFO:CONSOLE(58934)] "testRunDefault - 646 ms - [browser test-case 19 of 32 \</tspan>
-<tspan x="10" y="9722">passed] - testCase_swaggerJsonFromCurl_default", source: http://127.0.0.1:36997/assets.utility2.\</tspan>
-<tspan x="10" y="9738">rollup.js (58934)</tspan>
+<tspan x="10" y="9674">[0915/224045.314053:INFO:CONSOLE(58934)] "testRunDefault - 607 ms - [browser test-case 19 of 32 \</tspan>
+<tspan x="10" y="9690">passed] - testCase_swaggerJsonFromCurl_default", source: http://127.0.0.1:63930/assets.utility2.\</tspan>
+<tspan x="10" y="9706">rollup.js (58934)</tspan>
 
-<tspan x="10" y="9754">[0915/221304.028177:INFO:CONSOLE(58934)] "testRunDefault - 682 ms - [browser test-case 20 of 32 \</tspan>
-<tspan x="10" y="9770">passed] - testCase_onErrorJsonapi_err", source: http://127.0.0.1:36997/assets.utility2.rollup.js\</tspan>
-<tspan x="10" y="9786"> (58934)</tspan>
+<tspan x="10" y="9722">[0915/224045.335699:INFO:CONSOLE(58934)] "testRunDefault - 629 ms - [browser test-case 20 of 32 \</tspan>
+<tspan x="10" y="9738">passed] - testCase_onErrorJsonapi_err", source: http://127.0.0.1:63930/assets.utility2.rollup.js\</tspan>
+<tspan x="10" y="9754"> (58934)</tspan>
 
-<tspan x="10" y="9802">[0915/221304.060056:INFO:CONSOLE(58934)] "testRunDefault - 714 ms - [browser test-case 21 of 32 \</tspan>
-<tspan x="10" y="9818">passed] - testCase_swaggerValidateDataParameters_err", source: http://127.0.0.1:36997/assets.uti\</tspan>
-<tspan x="10" y="9834">lity2.rollup.js (58934)</tspan>
+<tspan x="10" y="9770">[0915/224045.372549:INFO:CONSOLE(58934)] "testRunDefault - 666 ms - [browser test-case 21 of 32 \</tspan>
+<tspan x="10" y="9786">passed] - testCase_swaggerValidateDataParameters_err", source: http://127.0.0.1:63930/assets.uti\</tspan>
+<tspan x="10" y="9802">lity2.rollup.js (58934)</tspan>
 
-<tspan x="10" y="9850">[0915/221304.064970:INFO:CONSOLE(58934)] "testRunDefault - 719 ms - [browser test-case 22 of 32 \</tspan>
-<tspan x="10" y="9866">passed] - testCase_swaggerValidateFile_default", source: http://127.0.0.1:36997/assets.utility2.\</tspan>
-<tspan x="10" y="9882">rollup.js (58934)</tspan>
+<tspan x="10" y="9818">[0915/224045.373821:INFO:CONSOLE(58934)] "testRunDefault - 667 ms - [browser test-case 22 of 32 \</tspan>
+<tspan x="10" y="9834">passed] - testCase_swaggerValidateFile_default", source: http://127.0.0.1:63930/assets.utility2.\</tspan>
+<tspan x="10" y="9850">rollup.js (58934)</tspan>
 
-<tspan x="10" y="9898">[0915/221304.095026:INFO:CONSOLE(58934)] "testRunDefault - 749 ms - [browser test-case 23 of 32 \</tspan>
-<tspan x="10" y="9914">passed] - testCase_swaggerValidate_default", source: http://127.0.0.1:36997/assets.utility2.roll\</tspan>
-<tspan x="10" y="9930">up.js (58934)</tspan>
+<tspan x="10" y="9866">[0915/224045.420909:INFO:CONSOLE(58934)] "testRunDefault - 714 ms - [browser test-case 23 of 32 \</tspan>
+<tspan x="10" y="9882">passed] - testCase_swaggerValidate_default", source: http://127.0.0.1:63930/assets.utility2.roll\</tspan>
+<tspan x="10" y="9898">up.js (58934)</tspan>
 
-<tspan x="10" y="9946">[0915/221304.101348:INFO:CONSOLE(58934)] "testRunDefault - 755 ms - [browser test-case 24 of 32 \</tspan>
-<tspan x="10" y="9962">passed] - testCase_ui_apiKey", source: http://127.0.0.1:36997/assets.utility2.rollup.js (58934)</tspan>
+<tspan x="10" y="9914">[0915/224045.423995:INFO:CONSOLE(58934)] "testRunDefault - 717 ms - [browser test-case 24 of 32 \</tspan>
+<tspan x="10" y="9930">passed] - testCase_ui_apiKey", source: http://127.0.0.1:63930/assets.utility2.rollup.js (58934)</tspan>
 
-<tspan x="10" y="9978">[0915/221304.117034:INFO:CONSOLE(58934)] "testRunDefault - 771 ms - [browser test-case 25 of 32 \</tspan>
-<tspan x="10" y="9994">passed] - testCase_ui_fileMedia", source: http://127.0.0.1:36997/assets.utility2.rollup.js (5893\</tspan>
-<tspan x="10" y="10010">4)</tspan>
+<tspan x="10" y="9946">[0915/224045.442333:INFO:CONSOLE(58934)] "testRunDefault - 735 ms - [browser test-case 25 of 32 \</tspan>
+<tspan x="10" y="9962">passed] - testCase_ui_fileMedia", source: http://127.0.0.1:63930/assets.utility2.rollup.js (5893\</tspan>
+<tspan x="10" y="9978">4)</tspan>
 
-<tspan x="10" y="10026">[0915/221304.170166:INFO:CONSOLE(58934)] "testRunDefault - 824 ms - [browser test-case 26 of 32 \</tspan>
-<tspan x="10" y="10042">passed] - testCase_swaggerValidateDataParameters_default", source: http://127.0.0.1:36997/assets\</tspan>
-<tspan x="10" y="10058">.utility2.rollup.js (58934)</tspan>
+<tspan x="10" y="9994">[0915/224045.487125:INFO:CONSOLE(58934)] "testRunDefault - 780 ms - [browser test-case 26 of 32 \</tspan>
+<tspan x="10" y="10010">passed] - testCase_swaggerValidateDataParameters_default", source: http://127.0.0.1:63930/assets\</tspan>
+<tspan x="10" y="10026">.utility2.rollup.js (58934)</tspan>
 
-<tspan x="10" y="10074">[0915/221304.190473:INFO:CONSOLE(58934)] "testRunDefault - 845 ms - [browser test-case 27 of 32 \</tspan>
-<tspan x="10" y="10090">passed] - testCase_petstoreStoreGetInventory_default", source: http://127.0.0.1:36997/assets.uti\</tspan>
-<tspan x="10" y="10106">lity2.rollup.js (58934)</tspan>
+<tspan x="10" y="10042">[0915/224045.508301:INFO:CONSOLE(58934)] "testRunDefault - 801 ms - [browser test-case 27 of 32 \</tspan>
+<tspan x="10" y="10058">passed] - testCase_petstoreStoreGetInventory_default", source: http://127.0.0.1:63930/assets.uti\</tspan>
+<tspan x="10" y="10074">lity2.rollup.js (58934)</tspan>
 
-<tspan x="10" y="10122">[0915/221304.303500:INFO:CONSOLE(58934)] "testRunDefault - 958 ms - [browser test-case 28 of 32 \</tspan>
-<tspan x="10" y="10138">passed] - testCase_crudCreateReplaceUpdateRemoveMany_default", source: http://127.0.0.1:36997/as\</tspan>
-<tspan x="10" y="10154">sets.utility2.rollup.js (58934)</tspan>
+<tspan x="10" y="10090">[0915/224045.636815:INFO:CONSOLE(58934)] "testRunDefault - 930 ms - [browser test-case 28 of 32 \</tspan>
+<tspan x="10" y="10106">passed] - testCase_crudCreateReplaceUpdateRemoveMany_default", source: http://127.0.0.1:63930/as\</tspan>
+<tspan x="10" y="10122">sets.utility2.rollup.js (58934)</tspan>
 
-<tspan x="10" y="10170">[0915/221304.305763:INFO:CONSOLE(58934)] "testRunDefault - 959 ms - [browser test-case 29 of 32 \</tspan>
-<tspan x="10" y="10186">passed] - testCase_crudCreateReplaceUpdateRemoveOne_default", source: http://127.0.0.1:36997/ass\</tspan>
-<tspan x="10" y="10202">ets.utility2.rollup.js (58934)</tspan>
+<tspan x="10" y="10138">[0915/224045.643136:INFO:CONSOLE(58934)] "testRunDefault - 931 ms - [browser test-case 29 of 32 \</tspan>
+<tspan x="10" y="10154">passed] - testCase_crudCreateReplaceUpdateRemoveOne_default", source: http://127.0.0.1:63930/ass\</tspan>
+<tspan x="10" y="10170">ets.utility2.rollup.js (58934)</tspan>
 
-<tspan x="10" y="10218">[0915/221304.317269:INFO:CONSOLE(58934)] "testRunDefault - 971 ms - [browser test-case 30 of 32 \</tspan>
-<tspan x="10" y="10234">passed] - testCase_fileUploadManyByForm_default", source: http://127.0.0.1:36997/assets.utility2\</tspan>
-<tspan x="10" y="10250">.rollup.js (58934)</tspan>
+<tspan x="10" y="10186">[0915/224045.654917:INFO:CONSOLE(58934)] "testRunDefault - 948 ms - [browser test-case 30 of 32 \</tspan>
+<tspan x="10" y="10202">passed] - testCase_fileUploadManyByForm_default", source: http://127.0.0.1:63930/assets.utility2\</tspan>
+<tspan x="10" y="10218">.rollup.js (58934)</tspan>
 
-<tspan x="10" y="10266">[0915/221304.466316:INFO:CONSOLE(58934)] "testRunDefault - 1120 ms - [browser test-case 31 of 32\</tspan>
-<tspan x="10" y="10282"> passed] - testCase_userLoginXxx_default", source: http://127.0.0.1:36997/assets.utility2.rollup\</tspan>
-<tspan x="10" y="10298">.js (58934)</tspan>
+<tspan x="10" y="10234">[0915/224045.798919:INFO:CONSOLE(58934)] "testRunDefault - 1092 ms - [browser test-case 31 of 32\</tspan>
+<tspan x="10" y="10250"> passed] - testCase_userLoginXxx_default", source: http://127.0.0.1:63930/assets.utility2.rollup\</tspan>
+<tspan x="10" y="10266">.js (58934)</tspan>
 
-<tspan x="10" y="10314">[0915/221305.304129:INFO:CONSOLE(58934)] "testRunDefault - 1958 ms - [browser test-case 32 of 32\</tspan>
-<tspan x="10" y="10330"> passed] - testCase_domAnimateShake_default", source: http://127.0.0.1:36997/assets.utility2.rol\</tspan>
-<tspan x="10" y="10346">lup.js (58934)</tspan>
+<tspan x="10" y="10282">[0915/224046.638526:INFO:CONSOLE(58934)] "testRunDefault - 1932 ms - [browser test-case 32 of 32\</tspan>
+<tspan x="10" y="10298"> passed] - testCase_domAnimateShake_default", source: http://127.0.0.1:63930/assets.utility2.rol\</tspan>
+<tspan x="10" y="10314">lup.js (58934)</tspan>
 
-<tspan x="10" y="10362">testRunDefault - 14230 ms - [node test-case 37 of 37 passed] - testCase_webpage_default</tspan>
+<tspan x="10" y="10330">testRunDefault - 13753 ms - [node test-case 37 of 37 passed] - testCase_webpage_default</tspan>
+
+<tspan x="10" y="10346">------------------|-----------|-----------|-----------|-----------|</tspan>
+
+<tspan x="10" y="10362">File              |   % Stmts |% Branches |   % Funcs |   % Lines |</tspan>
 
 <tspan x="10" y="10378">------------------|-----------|-----------|-----------|-----------|</tspan>
 
-<tspan x="10" y="10394">File              |   % Stmts |% Branches |   % Funcs |   % Lines |</tspan>
+<tspan x="10" y="10394">   node-swgg/     |      98.6 |     98.08 |     97.88 |      98.6 |</tspan>
 
-<tspan x="10" y="10410">------------------|-----------|-----------|-----------|-----------|</tspan>
+<tspan x="10" y="10410">      example.js  |       100 |       100 |       100 |       100 |</tspan>
 
-<tspan x="10" y="10426">   node-swgg/     |      98.6 |     98.08 |     97.88 |      98.6 |</tspan>
+<tspan x="10" y="10426">      lib.swgg.js |     97.79 |     97.53 |     96.51 |     97.79 |</tspan>
 
-<tspan x="10" y="10442">      example.js  |       100 |       100 |       100 |       100 |</tspan>
+<tspan x="10" y="10442">      test.js     |       100 |       100 |       100 |       100 |</tspan>
 
-<tspan x="10" y="10458">      lib.swgg.js |     97.79 |     97.53 |     96.51 |     97.79 |</tspan>
+<tspan x="10" y="10458">------------------|-----------|-----------|-----------|-----------|</tspan>
 
-<tspan x="10" y="10474">      test.js     |       100 |       100 |       100 |       100 |</tspan>
+<tspan x="10" y="10474">All files         |      98.6 |     98.08 |     97.88 |      98.6 |</tspan>
 
 <tspan x="10" y="10490">------------------|-----------|-----------|-----------|-----------|</tspan>
 
-<tspan x="10" y="10506">All files         |      98.6 |     98.08 |     97.88 |      98.6 |</tspan>
+<tspan x="10" y="10506"></tspan>
 
-<tspan x="10" y="10522">------------------|-----------|-----------|-----------|-----------|</tspan>
+<tspan x="10" y="10522">created coverage file /home/travis/build/kaizhu256/node-swgg/tmp/build/coverage.html/index.html</tspan>
 
 <tspan x="10" y="10538"></tspan>
 
-<tspan x="10" y="10554">created coverage file /home/travis/build/kaizhu256/node-swgg/tmp/build/coverage.html/index.html</tspan>
+<tspan x="10" y="10554">npmTest - merged test-report from file /home/travis/build/kaizhu256/node-swgg/tmp/build/test-rep\</tspan>
+<tspan x="10" y="10570">ort.json</tspan>
 
-<tspan x="10" y="10570"></tspan>
+<tspan x="10" y="10586"></tspan>
 
-<tspan x="10" y="10586">npmTest - merged test-report from file /home/travis/build/kaizhu256/node-swgg/tmp/build/test-rep\</tspan>
-<tspan x="10" y="10602">ort.json</tspan>
+<tspan x="10" y="10602">-------------------------------------------------------</tspan>
 
-<tspan x="10" y="10618"></tspan>
+<tspan x="10" y="10618">| test-report - npmTest - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM\</tspan>
+<tspan x="10" y="10634">L, like Gecko) HeadlessChrome/77.0.3865.75 Safari/537.36 - 2019-09-15T22:40:37.465Z</tspan>
 
-<tspan x="10" y="10634">-------------------------------------------------------</tspan>
+<tspan x="10" y="10650">|    2008 ms            0 failed       32 passed      |</tspan>
 
-<tspan x="10" y="10650">| test-report - npmTest - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM\</tspan>
-<tspan x="10" y="10666">L, like Gecko) HeadlessChrome/77.0.3865.75 Safari/537.36 - 2019-09-15T22:12:56.109Z</tspan>
+<tspan x="10" y="10666">-------------------------------------------------------</tspan>
 
-<tspan x="10" y="10682">|    2009 ms            0 failed       32 passed      |</tspan>
+<tspan x="10" y="10682">| test-report - npmTest - node - linux v12.10.0 - 2019-09-15T22:40:30.391Z</tspan>
 
-<tspan x="10" y="10698">-------------------------------------------------------</tspan>
+<tspan x="10" y="10698">|   13754 ms            0 failed       37 passed      |</tspan>
 
-<tspan x="10" y="10714">| test-report - npmTest - node - linux v12.10.0 - 2019-09-15T22:12:48.323Z</tspan>
+<tspan x="10" y="10714">-------------------------------------------------------</tspan>
 
-<tspan x="10" y="10730">|   14235 ms            0 failed       37 passed      |</tspan>
+<tspan x="10" y="10730">| test-report - npmTestPublished - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537\</tspan>
+<tspan x="10" y="10746">.36 (KHTML, like Gecko) HeadlessChrome/77.0.3865.75 Safari/537.36 - 2019-09-15T22:39:45.340Z</tspan>
 
-<tspan x="10" y="10746">-------------------------------------------------------</tspan>
+<tspan x="10" y="10762">|    2009 ms            0 failed       32 passed      |</tspan>
 
-<tspan x="10" y="10762"></tspan>
+<tspan x="10" y="10778">-------------------------------------------------------</tspan>
 
-<tspan x="10" y="10778">created test-report file /home/travis/build/kaizhu256/node-swgg/tmp/build/test-report.html</tspan>
+<tspan x="10" y="10794">| test-report - npmTestPublished - node - linux v12.10.0 - 2019-09-15T22:39:38.201Z</tspan>
 
-<tspan x="10" y="10794"></tspan>
+<tspan x="10" y="10810">|   13910 ms            0 failed       37 passed      |</tspan>
 
-<tspan x="10" y="10810"></tspan>
-
-<tspan x="10" y="10826">npmTest - 0 failed tests</tspan>
+<tspan x="10" y="10826">-------------------------------------------------------</tspan>
 
 <tspan x="10" y="10842"></tspan>
 
-<tspan x="10" y="10858"></tspan>
+<tspan x="10" y="10858">created test-report file /home/travis/build/kaizhu256/node-swgg/tmp/build/test-report.html</tspan>
 
-<tspan x="10" y="10874">\x1b[35m[MODE_BUILD=npmTest]\x1b[0m - 2019-09-15T22:13:07.772Z - EXIT_CODE - 0</tspan>
+<tspan x="10" y="10874"></tspan>
+
+<tspan x="10" y="10890"></tspan>
+
+<tspan x="10" y="10906">npmTest - 0 failed tests</tspan>
+
+<tspan x="10" y="10922"></tspan>
+
+<tspan x="10" y="10938"></tspan>
+
+<tspan x="10" y="10954">\x1b[35m[MODE_BUILD=npmTest]\x1b[0m - 2019-09-15T22:40:49.124Z - EXIT_CODE - 0</tspan>
 
 </text>
 </svg>
