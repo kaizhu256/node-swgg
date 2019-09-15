@@ -71,22 +71,9 @@ this zero-dependency package will run a virtual swagger-ui server with persisten
 - add cached version crudGetManyByQueryCached
 - none
 
-#### changelog 2019.9.14
-- npm publish 2019.9.14
-- add replace-string-operation to function templateRender
-- merge polyfills into assets.example.begin.js
-- create function eventEmitterCreate
-- merge class _http.IncomingMessage, _http.ServerResponse into function _http.request
-- jslint - remove unexpected_a hacks
-- jslint - migrate from let-declaration to var-declaration
-- inline lib.puppeteer.js into assets.app.js
-- remove electron dependency
-- revamp function local.ajaxProgressUpdate with window.domElementAjaxProgress1
-- jslint - remove ternary-operator/newline comment preceding bra
-- jslint - remove allow-method-chain-newline hack
-- jslint - upgrade to jslint edition 2019.8.3
-- rename coverage-hack to hack-istanbul, gotoNext to gotoNext, gotoState to gotoState, jslint-hack to hack-jslint
-- istanbul - switch parser from esprima to acorn v6.3.0
+#### changelog 2019.9.15
+- npm publish 2019.9.15
+- update build
 - none
 
 #### this package requires
@@ -1450,7 +1437,7 @@ local.http.createServer(function (req, res) {
         "test": "./npm_scripts.sh",
         "utility2": "./npm_scripts.sh"
     },
-    "version": "2019.9.14"
+    "version": "2019.9.15"
 }
 ```
 
