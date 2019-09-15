@@ -1256,7 +1256,7 @@ local.templateRender = function (template, dict, opt) {
                     skip = ii + 2;
                     value = String(value)[fmt](
                         list[skip - 1],
-                        list[skip]
+                        list[skip].replace("\"\"", "")
                     );
                     break;
                 case "truncate":
