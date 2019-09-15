@@ -1,1 +1,1330 @@
-{"testPlatformList":[{"name":"buildApidoc - node - linux v11.10.0 - 2019-02-20T08:32:24.299Z","testCaseList":[{"isBrowser":false,"name":"testCase_buildApp_default","status":"passed","errorStack":"","timeElapsed":7937,"timeStart":1550651571996,"isDone":true}],"timeElapsed":33846,"testsFailed":0,"testsPassed":1,"testsPending":0,"status":"passed","timeStart":1550651546087},{"name":"buildApp - node - linux v11.10.0 - 2019-02-20T08:32:50.355Z","testCaseList":[],"timeElapsed":0,"testsFailed":0,"testsPassed":0,"testsPending":0,"status":"passed"},{"domOnEventWindowOnloadTimeElapsed":4267,"name":"deployGithubTest - browser - /node-swgg/build..beta..travis-ci.org/app/ - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36 - 2019-02-20T08:34:03.888Z","status":"passed","testCaseList":[{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ajax_error","status":"passed","timeElapsed":1789,"timeStart":1550651650439},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_buildApp_default","status":"passed","timeElapsed":1,"timeStart":1550651650452},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCountManyByQuery_default","status":"passed","timeElapsed":2254,"timeStart":1550651650454},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCreateReplaceUpdateRemoveMany_default","status":"passed","timeElapsed":6412,"timeStart":1550651650458},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCreateReplaceUpdateRemoveOne_default","status":"passed","timeElapsed":6386,"timeStart":1550651650504},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudErrorXxx_default","status":"passed","timeElapsed":1723,"timeStart":1550651650531},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetManyByQuery_default","status":"passed","timeElapsed":2166,"timeStart":1550651650560},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetOneById_default","status":"passed","timeElapsed":2156,"timeStart":1550651650571},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetOneByQuery_default","status":"passed","timeElapsed":2151,"timeStart":1550651650583},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudNullXxx_default","status":"passed","timeElapsed":1673,"timeStart":1550651650589},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudRemoveManyByQuery_default","status":"passed","timeElapsed":4603,"timeStart":1550651650613},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudRemoveOneById_default","status":"passed","timeElapsed":4610,"timeStart":1550651650616},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudSetManyById_default","status":"passed","timeElapsed":4378,"timeStart":1550651650623},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudSetOneById_default","status":"passed","timeElapsed":4375,"timeStart":1550651650634},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudUpdateOneById_default","status":"passed","timeElapsed":4703,"timeStart":1550651650636},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_domAnimateShake_default","status":"passed","timeElapsed":2055,"timeStart":1550651650644},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileGetOneById_default","status":"passed","timeElapsed":4372,"timeStart":1550651650650},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileUploadManyByForm_default","status":"passed","timeElapsed":5106,"timeStart":1550651650652},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileUploadManyByForm_nullCase","status":"passed","timeElapsed":2071,"timeStart":1550651650681},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_nop_default","status":"passed","timeElapsed":0,"timeStart":1550651650684},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_default","status":"passed","timeElapsed":1581,"timeStart":1550651650686},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_emptyArray","status":"passed","timeElapsed":1559,"timeStart":1550651650717},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_error","status":"passed","timeElapsed":1537,"timeStart":1550651650744},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_petstoreStoreGetInventory_default","status":"passed","timeElapsed":1983,"timeStart":1550651650769},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerJsonFromCurl_default","status":"passed","timeElapsed":61,"timeStart":1550651650771},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateDataParameters_default","status":"passed","timeElapsed":1860,"timeStart":1550651650837},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateDataParameters_error","status":"passed","timeElapsed":61,"timeStart":1550651650934},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateFile_default","status":"passed","timeElapsed":0,"timeStart":1550651650997},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidate_default","status":"passed","timeElapsed":117,"timeStart":1550651650999},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ui_apiKey","status":"passed","timeElapsed":2,"timeStart":1550651651117},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ui_fileMedia","status":"passed","timeElapsed":275,"timeStart":1550651651121},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_userLoginXxx_default","status":"passed","timeElapsed":4628,"timeStart":1550651651399}],"testsFailed":0,"testsPassed":32,"testsPending":0,"timeElapsed":7007,"timeStart":1550651650430,"screenshot":"screenshot.deployGithubTest.browser.%2Fnode-swgg%2Fbuild%2Fapp.png"},{"domOnEventWindowOnloadTimeElapsed":11764,"name":"deployGithubTest - browser - /node-swgg/build..beta..travis-ci.org/app/ - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36 - 2019-02-20T08:34:04.248Z","status":"passed","testCaseList":[{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ajax_error","status":"passed","timeElapsed":1020,"timeStart":1550651659023},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_buildApp_default","status":"passed","timeElapsed":0,"timeStart":1550651659028},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCountManyByQuery_default","status":"passed","timeElapsed":1118,"timeStart":1550651659029},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCreateReplaceUpdateRemoveMany_default","status":"passed","timeElapsed":2221,"timeStart":1550651659034},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCreateReplaceUpdateRemoveOne_default","status":"passed","timeElapsed":2214,"timeStart":1550651659043},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudErrorXxx_default","status":"passed","timeElapsed":1010,"timeStart":1550651659045},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetManyByQuery_default","status":"passed","timeElapsed":1242,"timeStart":1550651659056},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetOneById_default","status":"passed","timeElapsed":1242,"timeStart":1550651659058},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetOneByQuery_default","status":"passed","timeElapsed":1241,"timeStart":1550651659060},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudNullXxx_default","status":"passed","timeElapsed":997,"timeStart":1550651659062},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudRemoveManyByQuery_default","status":"passed","timeElapsed":1815,"timeStart":1550651659067},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudRemoveOneById_default","status":"passed","timeElapsed":1816,"timeStart":1550651659069},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudSetManyById_default","status":"passed","timeElapsed":1720,"timeStart":1550651659071},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudSetOneById_default","status":"passed","timeElapsed":1718,"timeStart":1550651659073},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudUpdateOneById_default","status":"passed","timeElapsed":1857,"timeStart":1550651659075},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_domAnimateShake_default","status":"passed","timeElapsed":1657,"timeStart":1550651659077},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileGetOneById_default","status":"passed","timeElapsed":1742,"timeStart":1550651659077},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileUploadManyByForm_default","status":"passed","timeElapsed":1902,"timeStart":1550651659079},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileUploadManyByForm_nullCase","status":"passed","timeElapsed":1244,"timeStart":1550651659086},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_nop_default","status":"passed","timeElapsed":0,"timeStart":1550651659093},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_default","status":"passed","timeElapsed":967,"timeStart":1550651659098},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_emptyArray","status":"passed","timeElapsed":963,"timeStart":1550651659104},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_error","status":"passed","timeElapsed":965,"timeStart":1550651659106},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_petstoreStoreGetInventory_default","status":"passed","timeElapsed":1221,"timeStart":1550651659109},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerJsonFromCurl_default","status":"passed","timeElapsed":8,"timeStart":1550651659111},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateDataParameters_default","status":"passed","timeElapsed":963,"timeStart":1550651659119},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateDataParameters_error","status":"passed","timeElapsed":29,"timeStart":1550651659134},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateFile_default","status":"passed","timeElapsed":0,"timeStart":1550651659164},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidate_default","status":"passed","timeElapsed":40,"timeStart":1550651659165},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ui_apiKey","status":"passed","timeElapsed":1,"timeStart":1550651659206},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ui_fileMedia","status":"passed","timeElapsed":186,"timeStart":1550651659207},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_userLoginXxx_default","status":"passed","timeElapsed":1818,"timeStart":1550651659396}],"testsFailed":0,"testsPassed":32,"testsPending":0,"timeElapsed":3010,"timeStart":1550651659011,"screenshot":"screenshot.deployGithubTest.browser.%2Fnode-swgg%2Fbuild%2Fapp.png"},{"name":"deployGithubTest - node - linux v11.10.0 - 2019-02-20T08:34:02.076Z","testCaseList":[],"timeElapsed":0,"testsFailed":0,"testsPassed":0,"testsPending":0,"status":"passed"},{"domOnEventWindowOnloadTimeElapsed":3546,"name":"deployHerokuTest - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36 - 2019-02-20T08:34:59.766Z","status":"passed","testCaseList":[{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ajax_error","status":"passed","timeElapsed":1038,"timeStart":1550651705865},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_buildApp_default","status":"passed","timeElapsed":1,"timeStart":1550651705869},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCountManyByQuery_default","status":"passed","timeElapsed":1477,"timeStart":1550651705872},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCreateReplaceUpdateRemoveMany_default","status":"passed","timeElapsed":7982,"timeStart":1550651705876},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCreateReplaceUpdateRemoveOne_default","status":"passed","timeElapsed":7980,"timeStart":1550651705887},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudErrorXxx_default","status":"passed","timeElapsed":1033,"timeStart":1550651705889},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetManyByQuery_default","status":"passed","timeElapsed":1483,"timeStart":1550651705897},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetOneById_default","status":"passed","timeElapsed":1482,"timeStart":1550651705899},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetOneByQuery_default","status":"passed","timeElapsed":1480,"timeStart":1550651705901},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudNullXxx_default","status":"passed","timeElapsed":1021,"timeStart":1550651705903},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudRemoveManyByQuery_default","status":"passed","timeElapsed":4875,"timeStart":1550651705908},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudRemoveOneById_default","status":"passed","timeElapsed":4871,"timeStart":1550651705913},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudSetManyById_default","status":"passed","timeElapsed":3768,"timeStart":1550651705915},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudSetOneById_default","status":"passed","timeElapsed":3776,"timeStart":1550651705921},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudUpdateOneById_default","status":"passed","timeElapsed":5958,"timeStart":1550651705923},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_domAnimateShake_default","status":"passed","timeElapsed":2840,"timeStart":1550651705926},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileGetOneById_default","status":"passed","timeElapsed":3779,"timeStart":1550651705927},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileUploadManyByForm_default","status":"passed","timeElapsed":6877,"timeStart":1550651705931},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileUploadManyByForm_nullCase","status":"passed","timeElapsed":1484,"timeStart":1550651705938},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_nop_default","status":"passed","timeElapsed":0,"timeStart":1550651705940},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_default","status":"passed","timeElapsed":990,"timeStart":1550651705940},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_emptyArray","status":"passed","timeElapsed":984,"timeStart":1550651705947},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_error","status":"passed","timeElapsed":982,"timeStart":1550651705950},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_petstoreStoreGetInventory_default","status":"passed","timeElapsed":1467,"timeStart":1550651705955},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerJsonFromCurl_default","status":"passed","timeElapsed":13,"timeStart":1550651705957},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateDataParameters_default","status":"passed","timeElapsed":1050,"timeStart":1550651705970},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateDataParameters_error","status":"passed","timeElapsed":53,"timeStart":1550651705988},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateFile_default","status":"passed","timeElapsed":1,"timeStart":1550651706042},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidate_default","status":"passed","timeElapsed":108,"timeStart":1550651706045},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ui_apiKey","status":"passed","timeElapsed":3,"timeStart":1550651706158},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ui_fileMedia","status":"passed","timeElapsed":120,"timeStart":1550651706162},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_userLoginXxx_default","status":"passed","timeElapsed":7515,"timeStart":1550651706288}],"testsFailed":0,"testsPassed":32,"testsPending":0,"timeElapsed":8026,"timeStart":1550651705856,"screenshot":"screenshot.deployHerokuTest.browser.%2F.png"},{"domOnEventWindowOnloadTimeElapsed":8989,"name":"deployHerokuTest - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36 - 2019-02-20T08:35:00.037Z","status":"passed","testCaseList":[{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ajax_error","status":"passed","timeElapsed":979,"timeStart":1550651715202},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_buildApp_default","status":"passed","timeElapsed":1,"timeStart":1550651715206},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCountManyByQuery_default","status":"passed","timeElapsed":1034,"timeStart":1550651715208},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCreateReplaceUpdateRemoveMany_default","status":"passed","timeElapsed":2163,"timeStart":1550651715213},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCreateReplaceUpdateRemoveOne_default","status":"passed","timeElapsed":2153,"timeStart":1550651715223},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudErrorXxx_default","status":"passed","timeElapsed":964,"timeStart":1550651715225},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetManyByQuery_default","status":"passed","timeElapsed":1022,"timeStart":1550651715232},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetOneById_default","status":"passed","timeElapsed":1020,"timeStart":1550651715234},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetOneByQuery_default","status":"passed","timeElapsed":1017,"timeStart":1550651715237},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudNullXxx_default","status":"passed","timeElapsed":955,"timeStart":1550651715238},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudRemoveManyByQuery_default","status":"passed","timeElapsed":1613,"timeStart":1550651715244},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudRemoveOneById_default","status":"passed","timeElapsed":1612,"timeStart":1550651715246},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudSetManyById_default","status":"passed","timeElapsed":1438,"timeStart":1550651715248},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudSetOneById_default","status":"passed","timeElapsed":1437,"timeStart":1550651715249},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudUpdateOneById_default","status":"passed","timeElapsed":1727,"timeStart":1550651715251},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_domAnimateShake_default","status":"passed","timeElapsed":1612,"timeStart":1550651715253},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileGetOneById_default","status":"passed","timeElapsed":1433,"timeStart":1550651715254},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileUploadManyByForm_default","status":"passed","timeElapsed":1837,"timeStart":1550651715255},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileUploadManyByForm_nullCase","status":"passed","timeElapsed":1014,"timeStart":1550651715267},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_nop_default","status":"passed","timeElapsed":0,"timeStart":1550651715269},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_default","status":"passed","timeElapsed":927,"timeStart":1550651715270},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_emptyArray","status":"passed","timeElapsed":924,"timeStart":1550651715274},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_error","status":"passed","timeElapsed":925,"timeStart":1550651715278},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_petstoreStoreGetInventory_default","status":"passed","timeElapsed":1006,"timeStart":1550651715281},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerJsonFromCurl_default","status":"passed","timeElapsed":8,"timeStart":1550651715283},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateDataParameters_default","status":"passed","timeElapsed":946,"timeStart":1550651715293},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateDataParameters_error","status":"passed","timeElapsed":63,"timeStart":1550651715311},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateFile_default","status":"passed","timeElapsed":1,"timeStart":1550651715376},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidate_default","status":"passed","timeElapsed":101,"timeStart":1550651715380},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ui_apiKey","status":"passed","timeElapsed":1,"timeStart":1550651715483},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ui_fileMedia","status":"passed","timeElapsed":176,"timeStart":1550651715486},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_userLoginXxx_default","status":"passed","timeElapsed":1676,"timeStart":1550651715665}],"testsFailed":0,"testsPassed":32,"testsPending":0,"timeElapsed":3017,"timeStart":1550651715190,"screenshot":"screenshot.deployHerokuTest.browser.%2F.png"},{"name":"deployHerokuTest - node - linux v11.10.0 - 2019-02-20T08:34:58.026Z","testCaseList":[],"timeElapsed":0,"testsFailed":0,"testsPassed":0,"testsPending":0,"status":"passed"},{"domOnEventWindowOnloadTimeElapsed":10477,"name":"npmTest - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36 - 2019-02-20T08:32:05.016Z","status":"passed","testCaseList":[{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ajax_error","status":"passed","timeElapsed":670,"timeStart":1550651538088},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_buildApp_default","status":"passed","timeElapsed":1,"timeStart":1550651538097},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCountManyByQuery_default","status":"passed","timeElapsed":735,"timeStart":1550651538098},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCreateReplaceUpdateRemoveMany_default","status":"passed","timeElapsed":1939,"timeStart":1550651538106},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCreateReplaceUpdateRemoveOne_default","status":"passed","timeElapsed":1928,"timeStart":1550651538117},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudErrorXxx_default","status":"passed","timeElapsed":637,"timeStart":1550651538128},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetManyByQuery_default","status":"passed","timeElapsed":708,"timeStart":1550651538142},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetOneById_default","status":"passed","timeElapsed":705,"timeStart":1550651538145},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetOneByQuery_default","status":"passed","timeElapsed":705,"timeStart":1550651538147},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudNullXxx_default","status":"passed","timeElapsed":618,"timeStart":1550651538150},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudRemoveManyByQuery_default","status":"passed","timeElapsed":1338,"timeStart":1550651538155},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudRemoveOneById_default","status":"passed","timeElapsed":1352,"timeStart":1550651538157},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudSetManyById_default","status":"passed","timeElapsed":1243,"timeStart":1550651538160},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudSetOneById_default","status":"passed","timeElapsed":1241,"timeStart":1550651538162},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudUpdateOneById_default","status":"passed","timeElapsed":1457,"timeStart":1550651538164},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_domAnimateShake_default","status":"passed","timeElapsed":1526,"timeStart":1550651538168},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileGetOneById_default","status":"passed","timeElapsed":1259,"timeStart":1550651538168},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileUploadManyByForm_default","status":"passed","timeElapsed":1653,"timeStart":1550651538170},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileUploadManyByForm_nullCase","status":"passed","timeElapsed":696,"timeStart":1550651538177},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_nop_default","status":"passed","timeElapsed":0,"timeStart":1550651538179},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_default","status":"passed","timeElapsed":605,"timeStart":1550651538188},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_emptyArray","status":"passed","timeElapsed":603,"timeStart":1550651538192},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_error","status":"passed","timeElapsed":619,"timeStart":1550651538194},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_petstoreStoreGetInventory_default","status":"passed","timeElapsed":685,"timeStart":1550651538198},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerJsonFromCurl_default","status":"passed","timeElapsed":19,"timeStart":1550651538201},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateDataParameters_default","status":"passed","timeElapsed":599,"timeStart":1550651538229},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateDataParameters_error","status":"passed","timeElapsed":48,"timeStart":1550651538249},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateFile_default","status":"passed","timeElapsed":2,"timeStart":1550651538297},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidate_default","status":"passed","timeElapsed":45,"timeStart":1550651538299},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ui_apiKey","status":"passed","timeElapsed":1,"timeStart":1550651538344},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ui_fileMedia","status":"passed","timeElapsed":88,"timeStart":1550651538346},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_userLoginXxx_default","status":"passed","timeElapsed":1534,"timeStart":1550651538434}],"testsFailed":0,"testsPassed":32,"testsPending":0,"timeElapsed":2033,"timeStart":1550651538067,"screenshot":"screenshot.npmTest.browser.%2F.png"},{"name":"npmTest - node - linux v11.10.0 - 2019-02-20T08:31:57.971Z","testCaseList":[{"isBrowser":false,"name":"testCase_ajax_error","status":"passed","errorStack":"","timeElapsed":2206,"timeStart":1550651521430,"isDone":true},{"isBrowser":false,"name":"testCase_buildApidoc_default","status":"passed","errorStack":"","timeElapsed":1094,"timeStart":1550651521440,"isDone":true},{"isBrowser":false,"name":"testCase_buildApp_default","status":"passed","errorStack":"","timeElapsed":9710,"timeStart":1550651522535,"isDone":true},{"isBrowser":false,"name":"testCase_buildLib_default","status":"passed","errorStack":"","timeElapsed":1,"timeStart":1550651522559,"isDone":true},{"isBrowser":false,"name":"testCase_buildReadme_default","status":"passed","errorStack":"","timeElapsed":4,"timeStart":1550651522562,"isDone":true},{"isBrowser":false,"name":"testCase_buildTest_default","status":"passed","errorStack":"","timeElapsed":2,"timeStart":1550651522566,"isDone":true},{"isBrowser":false,"name":"testCase_crudCountManyByQuery_default","status":"passed","errorStack":"","timeElapsed":999,"timeStart":1550651522569,"isDone":true},{"isBrowser":false,"name":"testCase_crudCreateReplaceUpdateRemoveMany_default","status":"passed","errorStack":"","timeElapsed":2851,"timeStart":1550651522575,"isDone":true},{"isBrowser":false,"name":"testCase_crudCreateReplaceUpdateRemoveOne_default","status":"passed","errorStack":"","timeElapsed":2898,"timeStart":1550651522585,"isDone":true},{"isBrowser":false,"name":"testCase_crudErrorXxx_default","status":"passed","errorStack":"","timeElapsed":874,"timeStart":1550651522588,"isDone":true},{"isBrowser":false,"name":"testCase_crudGetManyByQuery_default","status":"passed","errorStack":"","timeElapsed":986,"timeStart":1550651522595,"isDone":true},{"isBrowser":false,"name":"testCase_crudGetOneById_default","status":"passed","errorStack":"","timeElapsed":984,"timeStart":1550651522597,"isDone":true},{"isBrowser":false,"name":"testCase_crudGetOneByQuery_default","status":"passed","errorStack":"","timeElapsed":983,"timeStart":1550651522599,"isDone":true},{"isBrowser":false,"name":"testCase_crudNullXxx_default","status":"passed","errorStack":"","timeElapsed":864,"timeStart":1550651522601,"isDone":true},{"isBrowser":false,"name":"testCase_crudRemoveManyByQuery_default","status":"passed","errorStack":"","timeElapsed":1835,"timeStart":1550651522611,"isDone":true},{"isBrowser":false,"name":"testCase_crudRemoveOneById_default","status":"passed","errorStack":"","timeElapsed":1844,"timeStart":1550651522614,"isDone":true},{"isBrowser":false,"name":"testCase_crudSetManyById_default","status":"passed","errorStack":"","timeElapsed":1310,"timeStart":1550651522617,"isDone":true},{"isBrowser":false,"name":"testCase_crudSetOneById_default","status":"passed","errorStack":"","timeElapsed":1314,"timeStart":1550651522620,"isDone":true},{"isBrowser":false,"name":"testCase_crudUpdateOneById_default","status":"passed","errorStack":"","timeElapsed":2056,"timeStart":1550651522623,"isDone":true},{"isBrowser":false,"name":"testCase_domAnimateShake_default","status":"passed","errorStack":"","timeElapsed":0,"timeStart":1550651522625,"isDone":true},{"isBrowser":false,"name":"testCase_fileGetOneById_default","status":"passed","errorStack":"","timeElapsed":1324,"timeStart":1550651522626,"isDone":true},{"isBrowser":false,"name":"testCase_fileUploadManyByForm_default","status":"passed","errorStack":"","timeElapsed":2199,"timeStart":1550651522627,"isDone":true},{"isBrowser":false,"name":"testCase_fileUploadManyByForm_nullCase","status":"passed","errorStack":"","timeElapsed":968,"timeStart":1550651522632,"isDone":true},{"isBrowser":false,"name":"testCase_nop_default","status":"passed","errorStack":"","timeElapsed":0,"timeStart":1550651522633,"isDone":true},{"isBrowser":false,"name":"testCase_onErrorJsonapi_default","status":"passed","errorStack":"","timeElapsed":833,"timeStart":1550651522634,"isDone":true},{"isBrowser":false,"name":"testCase_onErrorJsonapi_emptyArray","status":"passed","errorStack":"","timeElapsed":832,"timeStart":1550651522637,"isDone":true},{"isBrowser":false,"name":"testCase_onErrorJsonapi_error","status":"passed","errorStack":"","timeElapsed":831,"timeStart":1550651522642,"isDone":true},{"isBrowser":false,"name":"testCase_petstoreStoreGetInventory_default","status":"passed","errorStack":"","timeElapsed":955,"timeStart":1550651522646,"isDone":true},{"isBrowser":false,"name":"testCase_swaggerJsonFromCurl_default","status":"passed","errorStack":"","timeElapsed":10,"timeStart":1550651522647,"isDone":true},{"isBrowser":false,"name":"testCase_swaggerValidateDataParameters_default","status":"passed","errorStack":"","timeElapsed":820,"timeStart":1550651522658,"isDone":true},{"isBrowser":false,"name":"testCase_swaggerValidateDataParameters_error","status":"passed","errorStack":"","timeElapsed":40,"timeStart":1550651522673,"isDone":true},{"isBrowser":false,"name":"testCase_swaggerValidateFile_default","status":"passed","errorStack":"","timeElapsed":1443,"timeStart":1550651522714,"isDone":true},{"isBrowser":false,"name":"testCase_swaggerValidate_default","status":"passed","errorStack":"","timeElapsed":35,"timeStart":1550651522789,"isDone":true},{"isBrowser":false,"name":"testCase_ui_apiKey","status":"passed","errorStack":"","timeElapsed":1,"timeStart":1550651522825,"isDone":true},{"isBrowser":false,"name":"testCase_ui_fileMedia","status":"passed","errorStack":"","timeElapsed":1,"timeStart":1550651522826,"isDone":true},{"isBrowser":false,"name":"testCase_userLoginXxx_default","status":"passed","errorStack":"","timeElapsed":2563,"timeStart":1550651522827,"isDone":true},{"isBrowser":false,"name":"testCase_webpage_default","status":"passed","errorStack":"","timeElapsed":18698,"timeStart":1550651522830,"isDone":true}],"timeElapsed":20136,"testsFailed":0,"testsPassed":37,"testsPending":0,"status":"passed","timeStart":1550651521393},{"domOnEventWindowOnloadTimeElapsed":12161,"name":"npmTestPublished - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36 - 2019-02-20T08:30:49.933Z","status":"passed","testCaseList":[{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ajax_error","status":"passed","timeElapsed":667,"timeStart":1550651464938},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_buildApp_default","status":"passed","timeElapsed":1,"timeStart":1550651464942},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCountManyByQuery_default","status":"passed","timeElapsed":735,"timeStart":1550651464945},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCreateReplaceUpdateRemoveMany_default","status":"passed","timeElapsed":1689,"timeStart":1550651464948},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudCreateReplaceUpdateRemoveOne_default","status":"passed","timeElapsed":1681,"timeStart":1550651464960},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudErrorXxx_default","status":"passed","timeElapsed":672,"timeStart":1550651464962},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetManyByQuery_default","status":"passed","timeElapsed":719,"timeStart":1550651464970},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetOneById_default","status":"passed","timeElapsed":716,"timeStart":1550651464973},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudGetOneByQuery_default","status":"passed","timeElapsed":715,"timeStart":1550651464975},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudNullXxx_default","status":"passed","timeElapsed":659,"timeStart":1550651464978},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudRemoveManyByQuery_default","status":"passed","timeElapsed":1213,"timeStart":1550651464984},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudRemoveOneById_default","status":"passed","timeElapsed":1214,"timeStart":1550651464987},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudSetManyById_default","status":"passed","timeElapsed":1151,"timeStart":1550651464989},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudSetOneById_default","status":"passed","timeElapsed":1148,"timeStart":1550651464992},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_crudUpdateOneById_default","status":"passed","timeElapsed":1268,"timeStart":1550651464994},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_domAnimateShake_default","status":"passed","timeElapsed":1530,"timeStart":1550651464996},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileGetOneById_default","status":"passed","timeElapsed":1147,"timeStart":1550651464997},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileUploadManyByForm_default","status":"passed","timeElapsed":1331,"timeStart":1550651464999},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_fileUploadManyByForm_nullCase","status":"passed","timeElapsed":719,"timeStart":1550651465017},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_nop_default","status":"passed","timeElapsed":0,"timeStart":1550651465019},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_default","status":"passed","timeElapsed":621,"timeStart":1550651465019},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_emptyArray","status":"passed","timeElapsed":615,"timeStart":1550651465026},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_onErrorJsonapi_error","status":"passed","timeElapsed":614,"timeStart":1550651465029},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_petstoreStoreGetInventory_default","status":"passed","timeElapsed":704,"timeStart":1550651465034},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerJsonFromCurl_default","status":"passed","timeElapsed":15,"timeStart":1550651465036},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateDataParameters_default","status":"passed","timeElapsed":624,"timeStart":1550651465052},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateDataParameters_error","status":"passed","timeElapsed":49,"timeStart":1550651465071},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidateFile_default","status":"passed","timeElapsed":1,"timeStart":1550651465121},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_swaggerValidate_default","status":"passed","timeElapsed":54,"timeStart":1550651465124},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ui_apiKey","status":"passed","timeElapsed":2,"timeStart":1550651465178},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_ui_fileMedia","status":"passed","timeElapsed":85,"timeStart":1550651465181},{"errorStack":"","isBrowser":true,"isDone":true,"name":"testCase_userLoginXxx_default","status":"passed","timeElapsed":1322,"timeStart":1550651465267}],"testsFailed":0,"testsPassed":32,"testsPending":0,"timeElapsed":2032,"timeStart":1550651464919,"screenshot":"screenshot.npmTestPublished.browser.%2F.png"},{"name":"npmTestPublished - node - linux v11.10.0 - 2019-02-20T08:30:41.528Z","testCaseList":[{"isBrowser":false,"name":"testCase_ajax_error","status":"passed","errorStack":"","timeElapsed":2295,"timeStart":1550651445582,"isDone":true},{"isBrowser":false,"name":"testCase_buildApidoc_default","status":"passed","errorStack":"","timeElapsed":1259,"timeStart":1550651445593,"isDone":true},{"isBrowser":false,"name":"testCase_buildApp_default","status":"passed","errorStack":"","timeElapsed":11986,"timeStart":1550651446853,"isDone":true},{"isBrowser":false,"name":"testCase_buildLib_default","status":"passed","errorStack":"","timeElapsed":1,"timeStart":1550651446877,"isDone":true},{"isBrowser":false,"name":"testCase_buildReadme_default","status":"passed","errorStack":"","timeElapsed":5,"timeStart":1550651446878,"isDone":true},{"isBrowser":false,"name":"testCase_buildTest_default","status":"passed","errorStack":"","timeElapsed":2,"timeStart":1550651446883,"isDone":true},{"isBrowser":false,"name":"testCase_crudCountManyByQuery_default","status":"passed","errorStack":"","timeElapsed":865,"timeStart":1550651446886,"isDone":true},{"isBrowser":false,"name":"testCase_crudCreateReplaceUpdateRemoveMany_default","status":"passed","errorStack":"","timeElapsed":2184,"timeStart":1550651446891,"isDone":true},{"isBrowser":false,"name":"testCase_crudCreateReplaceUpdateRemoveOne_default","status":"passed","errorStack":"","timeElapsed":2192,"timeStart":1550651446900,"isDone":true},{"isBrowser":false,"name":"testCase_crudErrorXxx_default","status":"passed","errorStack":"","timeElapsed":756,"timeStart":1550651446902,"isDone":true},{"isBrowser":false,"name":"testCase_crudGetManyByQuery_default","status":"passed","errorStack":"","timeElapsed":878,"timeStart":1550651446908,"isDone":true},{"isBrowser":false,"name":"testCase_crudGetOneById_default","status":"passed","errorStack":"","timeElapsed":883,"timeStart":1550651446910,"isDone":true},{"isBrowser":false,"name":"testCase_crudGetOneByQuery_default","status":"passed","errorStack":"","timeElapsed":891,"timeStart":1550651446912,"isDone":true},{"isBrowser":false,"name":"testCase_crudNullXxx_default","status":"passed","errorStack":"","timeElapsed":749,"timeStart":1550651446913,"isDone":true},{"isBrowser":false,"name":"testCase_crudRemoveManyByQuery_default","status":"passed","errorStack":"","timeElapsed":1537,"timeStart":1550651446926,"isDone":true},{"isBrowser":false,"name":"testCase_crudRemoveOneById_default","status":"passed","errorStack":"","timeElapsed":1534,"timeStart":1550651446929,"isDone":true},{"isBrowser":false,"name":"testCase_crudSetManyById_default","status":"passed","errorStack":"","timeElapsed":1243,"timeStart":1550651446932,"isDone":true},{"isBrowser":false,"name":"testCase_crudSetOneById_default","status":"passed","errorStack":"","timeElapsed":1242,"timeStart":1550651446934,"isDone":true},{"isBrowser":false,"name":"testCase_crudUpdateOneById_default","status":"passed","errorStack":"","timeElapsed":1738,"timeStart":1550651446936,"isDone":true},{"isBrowser":false,"name":"testCase_domAnimateShake_default","status":"passed","errorStack":"","timeElapsed":0,"timeStart":1550651446938,"isDone":true},{"isBrowser":false,"name":"testCase_fileGetOneById_default","status":"passed","errorStack":"","timeElapsed":1240,"timeStart":1550651446938,"isDone":true},{"isBrowser":false,"name":"testCase_fileUploadManyByForm_default","status":"passed","errorStack":"","timeElapsed":1789,"timeStart":1550651446940,"isDone":true},{"isBrowser":false,"name":"testCase_fileUploadManyByForm_nullCase","status":"passed","errorStack":"","timeElapsed":898,"timeStart":1550651446945,"isDone":true},{"isBrowser":false,"name":"testCase_nop_default","status":"passed","errorStack":"","timeElapsed":0,"timeStart":1550651446947,"isDone":true},{"isBrowser":false,"name":"testCase_onErrorJsonapi_default","status":"passed","errorStack":"","timeElapsed":717,"timeStart":1550651446947,"isDone":true},{"isBrowser":false,"name":"testCase_onErrorJsonapi_emptyArray","status":"passed","errorStack":"","timeElapsed":713,"timeStart":1550651446952,"isDone":true},{"isBrowser":false,"name":"testCase_onErrorJsonapi_error","status":"passed","errorStack":"","timeElapsed":714,"timeStart":1550651446954,"isDone":true},{"isBrowser":false,"name":"testCase_petstoreStoreGetInventory_default","status":"passed","errorStack":"","timeElapsed":896,"timeStart":1550651446958,"isDone":true},{"isBrowser":false,"name":"testCase_swaggerJsonFromCurl_default","status":"passed","errorStack":"","timeElapsed":9,"timeStart":1550651446959,"isDone":true},{"isBrowser":false,"name":"testCase_swaggerValidateDataParameters_default","status":"passed","errorStack":"","timeElapsed":704,"timeStart":1550651446969,"isDone":true},{"isBrowser":false,"name":"testCase_swaggerValidateDataParameters_error","status":"passed","errorStack":"","timeElapsed":39,"timeStart":1550651446994,"isDone":true},{"isBrowser":false,"name":"testCase_swaggerValidateFile_default","status":"passed","errorStack":"","timeElapsed":1288,"timeStart":1550651447033,"isDone":true},{"isBrowser":false,"name":"testCase_swaggerValidate_default","status":"passed","errorStack":"","timeElapsed":36,"timeStart":1550651447108,"isDone":true},{"isBrowser":false,"name":"testCase_ui_apiKey","status":"passed","errorStack":"","timeElapsed":0,"timeStart":1550651447144,"isDone":true},{"isBrowser":false,"name":"testCase_ui_fileMedia","status":"passed","errorStack":"","timeElapsed":0,"timeStart":1550651447145,"isDone":true},{"isBrowser":false,"name":"testCase_userLoginXxx_default","status":"passed","errorStack":"","timeElapsed":1919,"timeStart":1550651447145,"isDone":true},{"isBrowser":false,"name":"testCase_webpage_default","status":"passed","errorStack":"","timeElapsed":20983,"timeStart":1550651447148,"isDone":true}],"timeStart":1550651445531,"timeElapsed":22601,"testsFailed":0,"testsPassed":37,"testsPending":0,"status":"passed"}],"date":"2019-02-20T08:34:58.031Z","errorStackList":[],"timeElapsed":20581,"testsFailed":0,"testsPassed":267,"testsPending":0,"timeStart":1550651698032}
+{
+    "testPlatformList": [
+        {
+            "name": "buildApidoc - node - linux v12.10.0 - 2019-09-15T22:20:47.351Z",
+            "testCaseList": [
+                {
+                    "isBrowser": false,
+                    "name": "testCase_buildApp_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 7624,
+                    "timeStart": 1568586059480,
+                    "isDone": true
+                }
+            ],
+            "timeElapsed": 17915,
+            "testsFailed": 0,
+            "testsPassed": 1,
+            "testsPending": 0,
+            "status": "passed",
+            "timeStart": 1568586049189
+        },
+        {
+            "name": "buildApp - node - linux v12.10.0 - 2019-09-15T22:20:57.503Z",
+            "testCaseList": [],
+            "timeElapsed": 0,
+            "testsFailed": 0,
+            "testsPassed": 0,
+            "testsPending": 0,
+            "status": "passed"
+        },
+        {
+            "name": "npmTest - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/77.0.3865.75 Safari/537.36 - 2019-09-15T22:20:34.422Z",
+            "testCaseList": [
+                {
+                    "isBrowser": true,
+                    "name": "testCase_ajax_err",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 127,
+                    "timeStart": 1568586042004,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_buildApp_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 0,
+                    "timeStart": 1568586042008,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudCountManyByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 187,
+                    "timeStart": 1568586042009,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudCreateReplaceUpdateRemoveMany_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 969,
+                    "timeStart": 1568586042015,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudCreateReplaceUpdateRemoveOne_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 962,
+                    "timeStart": 1568586042023,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudErrorXxx_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 157,
+                    "timeStart": 1568586042028,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudGetManyByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 238,
+                    "timeStart": 1568586042033,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudGetOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 243,
+                    "timeStart": 1568586042035,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudGetOneByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 149,
+                    "timeStart": 1568586042132,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudNullXxx_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 80,
+                    "timeStart": 1568586042187,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudRemoveManyByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 288,
+                    "timeStart": 1568586042197,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudRemoveOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 235,
+                    "timeStart": 1568586042269,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudSetManyById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 182,
+                    "timeStart": 1568586042272,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudSetOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 176,
+                    "timeStart": 1568586042279,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudUpdateOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 272,
+                    "timeStart": 1568586042282,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_domAnimateShake_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 1502,
+                    "timeStart": 1568586042455,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_fileGetOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 95,
+                    "timeStart": 1568586042456,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_fileUploadManyByForm_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 504,
+                    "timeStart": 1568586042485,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_fileUploadManyByForm_nullCase",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 42,
+                    "timeStart": 1568586042505,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_nop_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 0,
+                    "timeStart": 1568586042547,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_onErrorJsonapi_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 51,
+                    "timeStart": 1568586042548,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_onErrorJsonapi_emptyArray",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 54,
+                    "timeStart": 1568586042552,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_onErrorJsonapi_err",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 128,
+                    "timeStart": 1568586042554,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_petstoreStoreGetInventory_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 266,
+                    "timeStart": 1568586042600,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_swaggerJsonFromCurl_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 20,
+                    "timeStart": 1568586042608,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_swaggerValidateDataParameters_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 209,
+                    "timeStart": 1568586042630,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_swaggerValidateDataParameters_err",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 35,
+                    "timeStart": 1568586042684,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_swaggerValidateFile_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 0,
+                    "timeStart": 1568586042730,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_swaggerValidate_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 26,
+                    "timeStart": 1568586042735,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_ui_apiKey",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 1,
+                    "timeStart": 1568586042766,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_ui_fileMedia",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 17,
+                    "timeStart": 1568586042768,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_userLoginXxx_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 341,
+                    "timeStart": 1568586042787,
+                    "isDone": true
+                }
+            ],
+            "timeStart": 1568586041996,
+            "timeElapsed": 2012,
+            "testsFailed": 0,
+            "testsPassed": 32,
+            "testsPending": 0,
+            "status": "passed",
+            "domOnEventWindowOnloadTimeElapsed": 8090,
+            "screenshot": "screenshot.npmTest.browser.%2F.png"
+        },
+        {
+            "name": "npmTest - node - linux v12.10.0 - 2019-09-15T22:20:27.467Z",
+            "testCaseList": [
+                {
+                    "isBrowser": false,
+                    "name": "testCase_ajax_err",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 286,
+                    "timeStart": 1568586031252,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_buildApidoc_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 0,
+                    "timeStart": 1568586031263,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_buildApp_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 6705,
+                    "timeStart": 1568586031266,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_buildLib_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 1,
+                    "timeStart": 1568586031306,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_buildReadme_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 6,
+                    "timeStart": 1568586031308,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_buildTest_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 2,
+                    "timeStart": 1568586031315,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudCountManyByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 193,
+                    "timeStart": 1568586031318,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudCreateReplaceUpdateRemoveMany_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 1609,
+                    "timeStart": 1568586031325,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudCreateReplaceUpdateRemoveOne_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 1617,
+                    "timeStart": 1568586031334,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudErrorXxx_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 170,
+                    "timeStart": 1568586031336,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudGetManyByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 203,
+                    "timeStart": 1568586031343,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudGetOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 148,
+                    "timeStart": 1568586031506,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudGetOneByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 147,
+                    "timeStart": 1568586031512,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudNullXxx_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 157,
+                    "timeStart": 1568586031538,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudRemoveManyByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 375,
+                    "timeStart": 1568586031546,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudRemoveOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 301,
+                    "timeStart": 1568586031654,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudSetManyById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 219,
+                    "timeStart": 1568586031659,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudSetOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 213,
+                    "timeStart": 1568586031695,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudUpdateOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 416,
+                    "timeStart": 1568586031879,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_domAnimateShake_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 0,
+                    "timeStart": 1568586031914,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_fileGetOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 141,
+                    "timeStart": 1568586031918,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_fileUploadManyByForm_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 1038,
+                    "timeStart": 1568586031927,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_fileUploadManyByForm_nullCase",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 58,
+                    "timeStart": 1568586031961,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_nop_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 1,
+                    "timeStart": 1568586032024,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_onErrorJsonapi_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 76,
+                    "timeStart": 1568586032028,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_onErrorJsonapi_emptyArray",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 111,
+                    "timeStart": 1568586032061,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_onErrorJsonapi_err",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 104,
+                    "timeStart": 1568586032110,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_petstoreStoreGetInventory_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 422,
+                    "timeStart": 1568586032178,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_swaggerJsonFromCurl_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 33,
+                    "timeStart": 1568586032220,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_swaggerValidateDataParameters_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 460,
+                    "timeStart": 1568586032259,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_swaggerValidateDataParameters_err",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 48,
+                    "timeStart": 1568586032295,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_swaggerValidateFile_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 515,
+                    "timeStart": 1568586032343,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_swaggerValidate_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 36,
+                    "timeStart": 1568586032601,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_ui_apiKey",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 1,
+                    "timeStart": 1568586032637,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_ui_fileMedia",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 0,
+                    "timeStart": 1568586032638,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_userLoginXxx_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 588,
+                    "timeStart": 1568586032639,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_webpage_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 12378,
+                    "timeStart": 1568586032720,
+                    "isDone": true
+                }
+            ],
+            "timeElapsed": 13883,
+            "testsFailed": 0,
+            "testsPassed": 37,
+            "testsPending": 0,
+            "status": "passed",
+            "timeStart": 1568586031216
+        },
+        {
+            "name": "npmTestPublished - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/77.0.3865.75 Safari/537.36 - 2019-09-15T22:19:43.190Z",
+            "testCaseList": [
+                {
+                    "isBrowser": true,
+                    "name": "testCase_ajax_err",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 102,
+                    "timeStart": 1568585990606,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_buildApp_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 1,
+                    "timeStart": 1568585990609,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudCountManyByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 184,
+                    "timeStart": 1568585990613,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudCreateReplaceUpdateRemoveMany_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 909,
+                    "timeStart": 1568585990615,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudCreateReplaceUpdateRemoveOne_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 904,
+                    "timeStart": 1568585990620,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudErrorXxx_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 138,
+                    "timeStart": 1568585990622,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudGetManyByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 203,
+                    "timeStart": 1568585990625,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudGetOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 205,
+                    "timeStart": 1568585990627,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudGetOneByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 126,
+                    "timeStart": 1568585990709,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudNullXxx_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 62,
+                    "timeStart": 1568585990762,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudRemoveManyByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 239,
+                    "timeStart": 1568585990798,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudRemoveOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 234,
+                    "timeStart": 1568585990825,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudSetManyById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 173,
+                    "timeStart": 1568585990829,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudSetOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 172,
+                    "timeStart": 1568585990832,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_crudUpdateOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 283,
+                    "timeStart": 1568585990836,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_domAnimateShake_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 1501,
+                    "timeStart": 1568585991003,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_fileGetOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 97,
+                    "timeStart": 1568585991005,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_fileUploadManyByForm_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 502,
+                    "timeStart": 1568585991038,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_fileUploadManyByForm_nullCase",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 37,
+                    "timeStart": 1568585991060,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_nop_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 0,
+                    "timeStart": 1568585991098,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_onErrorJsonapi_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 46,
+                    "timeStart": 1568585991099,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_onErrorJsonapi_emptyArray",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 51,
+                    "timeStart": 1568585991103,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_onErrorJsonapi_err",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 97,
+                    "timeStart": 1568585991120,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_petstoreStoreGetInventory_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 252,
+                    "timeStart": 1568585991146,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_swaggerJsonFromCurl_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 31,
+                    "timeStart": 1568585991156,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_swaggerValidateDataParameters_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 191,
+                    "timeStart": 1568585991189,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_swaggerValidateDataParameters_err",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 32,
+                    "timeStart": 1568585991219,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_swaggerValidateFile_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 0,
+                    "timeStart": 1568585991253,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_swaggerValidate_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 42,
+                    "timeStart": 1568585991254,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_ui_apiKey",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 1,
+                    "timeStart": 1568585991298,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_ui_fileMedia",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 30,
+                    "timeStart": 1568585991301,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": true,
+                    "name": "testCase_userLoginXxx_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 355,
+                    "timeStart": 1568585991335,
+                    "isDone": true
+                }
+            ],
+            "timeStart": 1568585990598,
+            "timeElapsed": 2014,
+            "testsFailed": 0,
+            "testsPassed": 32,
+            "testsPending": 0,
+            "status": "passed",
+            "domOnEventWindowOnloadTimeElapsed": 7954,
+            "screenshot": "screenshot.npmTestPublished.browser.%2F.png"
+        },
+        {
+            "name": "npmTestPublished - node - linux v12.10.0 - 2019-09-15T22:19:35.192Z",
+            "testCaseList": [
+                {
+                    "isBrowser": false,
+                    "name": "testCase_ajax_err",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 311,
+                    "timeStart": 1568585979085,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_buildApidoc_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 0,
+                    "timeStart": 1568585979095,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_buildApp_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 6846,
+                    "timeStart": 1568585979097,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_buildLib_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 3,
+                    "timeStart": 1568585979134,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_buildReadme_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 7,
+                    "timeStart": 1568585979138,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_buildTest_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 2,
+                    "timeStart": 1568585979147,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudCountManyByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 216,
+                    "timeStart": 1568585979151,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudCreateReplaceUpdateRemoveMany_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 1975,
+                    "timeStart": 1568585979159,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudCreateReplaceUpdateRemoveOne_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 2057,
+                    "timeStart": 1568585979173,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudErrorXxx_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 184,
+                    "timeStart": 1568585979177,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudGetManyByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 217,
+                    "timeStart": 1568585979186,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudGetOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 141,
+                    "timeStart": 1568585979362,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudGetOneByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 139,
+                    "timeStart": 1568585979368,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudNullXxx_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 148,
+                    "timeStart": 1568585979396,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudRemoveManyByQuery_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 384,
+                    "timeStart": 1568585979404,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudRemoveOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 310,
+                    "timeStart": 1568585979503,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudSetManyById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 241,
+                    "timeStart": 1568585979507,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudSetOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 231,
+                    "timeStart": 1568585979544,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_crudUpdateOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 468,
+                    "timeStart": 1568585979749,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_domAnimateShake_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 1,
+                    "timeStart": 1568585979775,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_fileGetOneById_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 167,
+                    "timeStart": 1568585979776,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_fileUploadManyByForm_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 1450,
+                    "timeStart": 1568585979788,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_fileUploadManyByForm_nullCase",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 61,
+                    "timeStart": 1568585979814,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_nop_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 0,
+                    "timeStart": 1568585979875,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_onErrorJsonapi_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 123,
+                    "timeStart": 1568585979876,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_onErrorJsonapi_emptyArray",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 92,
+                    "timeStart": 1568585979949,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_onErrorJsonapi_err",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 133,
+                    "timeStart": 1568585980004,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_petstoreStoreGetInventory_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 483,
+                    "timeStart": 1568585980047,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_swaggerJsonFromCurl_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 15,
+                    "timeStart": 1568585980143,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_swaggerValidateDataParameters_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 615,
+                    "timeStart": 1568585980164,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_swaggerValidateDataParameters_err",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 48,
+                    "timeStart": 1568585980223,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_swaggerValidateFile_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 784,
+                    "timeStart": 1568585980277,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_swaggerValidate_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 78,
+                    "timeStart": 1568585980530,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_ui_apiKey",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 0,
+                    "timeStart": 1568585980609,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_ui_fileMedia",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 1,
+                    "timeStart": 1568585980609,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_userLoginXxx_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 813,
+                    "timeStart": 1568585980610,
+                    "isDone": true
+                },
+                {
+                    "isBrowser": false,
+                    "name": "testCase_webpage_default",
+                    "status": "passed",
+                    "errorStack": "",
+                    "timeElapsed": 12827,
+                    "timeStart": 1568585980796,
+                    "isDone": true
+                }
+            ],
+            "timeStart": 1568585979050,
+            "timeElapsed": 14574,
+            "testsFailed": 0,
+            "testsPassed": 37,
+            "testsPending": 0,
+            "status": "passed"
+        }
+    ],
+    "date": "2019-09-15T22:20:57.513Z",
+    "errorStackList": [],
+    "timeElapsed": 9591,
+    "testsFailed": 0,
+    "testsPassed": 139,
+    "testsPending": 0,
+    "timeStart": 1568586057514
+}

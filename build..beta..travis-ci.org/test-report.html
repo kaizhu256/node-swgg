@@ -17,29 +17,31 @@
 }
 /* csslint ignore:end */
 @keyframes uiAnimateShake {
-    0%, 50% {
-        transform: translateX(10px);
-    }
-    25%, 75% {
-        transform: translateX(-10px);
-    }
-    100% {
-        transform: translateX(0);
-    }
+0%,
+50% {
+    transform: translateX(10px);
+}
+100% {
+    transform: translateX(0);
+}
+25%,
+75% {
+    transform: translateX(-10px);
+}
 }
 @keyframes uiAnimateSpin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+0% {
+    transform: rotate(0deg);
+}
+100% {
+    transform: rotate(360deg);
+}
 }
 a {
     overflow-wrap: break-word;
 }
 body {
-    background: #eef;
+    background: #f7f7f7;
     font-family: Arial, Helvetica, sans-serif;
     font-size: small;
     margin: 0 40px;
@@ -82,24 +84,17 @@ pre {
     white-space: pre-wrap;
 }
 .button {
-    background-color: #fff;
-    border: 1px solid;
-    border-bottom-color: rgb(186, 186, 186);
-    border-left-color: rgb(209, 209, 209);
-    border-radius: 4px;
-    border-right-color: rgb(209, 209, 209);
-    border-top-color: rgb(216, 216, 216);
-    color: #00d;
+    background: #ddd;
+    border: 1px solid #999;
+    color: #000;
     cursor: pointer;
     display: inline-block;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: normal;
-    margin: 0;
-    padding: 2px 7px 3px 7px;
+    padding: 2px 5px;
     text-align: center;
-    text-decoration: underline;
+    text-decoration: none;
+}
+.button:hover {
+    background: #bbb;
 }
 .colorError {
     color: #d00;
@@ -120,9 +115,6 @@ pre {
     overflow-y: hidden;
     transition: max-height ease-in 250ms, min-height ease-in 250ms, padding-bottom ease-in 250ms, padding-top ease-in 250ms;
 }
-.utility2FooterDiv {
-    text-align: center;
-}
 .zeroPixel {
     border: 0;
     height: 0;
@@ -134,14 +126,14 @@ pre {
 /*csslint
 */
 .testReportDiv img {
-    border: 1px solid black;
+    border: 1px solid #999;
     margin: 5px 0 5px 0;
     max-height: 256px;
     max-width: 512px;
 }
 .testReportDiv pre {
     background: #fdd;
-    border-top: 1px solid black;
+    border-top: 1px solid #999;
     margin-bottom: 0;
     padding: 10px;
 }
@@ -150,7 +142,7 @@ pre {
     width: 120px;
 }
 .testReportDiv table {
-    border-top: 1px solid black;
+    border-top: 1px solid #999;
     text-align: left;
     width: 100%;
 }
@@ -165,7 +157,7 @@ pre {
 }
 .testReportDiv .platform {
     background: #fff;
-    border: 1px solid black;
+    border: 1px solid #999;
     margin-bottom: 20px;
     padding: 0 10px 10px 10px;
     text-align: left;
@@ -182,7 +174,6 @@ pre {
 </style>
 </head>
 <body>
-<div id="ajaxProgressDiv1" style="background: #d00; height: 2px; left: 0; margin: 0; padding: 0; position: fixed; top: 0; transition: background 500ms, width 1500ms; width: 0%; z-index: 1;"></div>
 <div class="uiAnimateSpin" style="animation: uiAnimateSpin 2s linear infinite; border: 5px solid #999; border-radius: 50%; border-top: 5px solid #7d7; display: none; height: 25px; vertical-align: middle; width: 25px;"></div>
 <a class="zeroPixel" download="db.persistence.json" href="" id="dbExportA1"></a>
 <input class="zeroPixel" data-onevent="onEventDomDb" data-onevent-db="dbImportInput" type="file">
@@ -214,80 +205,193 @@ pre {
 
 
 
+// init domOnEventAjaxProgressUpdate
+(function () {
+/*
+ * this function will display incrementing ajax-progress-bar
+ */
+    "use strict";
+    let opt;
+    if (window.domOnEventAjaxProgressUpdate) {
+        return;
+    }
+    window.domOnEventAjaxProgressUpdate = function (gotoState, onError) {
+        gotoState = (gotoState | 0) + 1;
+        switch (gotoState) {
+        // ajaxProgress - show
+        case 1:
+            // init timerInterval and timerTimeout
+            opt.timerInterval = (
+                opt.timerInterval || setInterval(opt, 2000, 1, onError)
+            );
+            opt.timerTimeout = (
+                opt.timerTimeout || setTimeout(opt, 30000, 2, onError)
+            );
+            // show ajaxProgress
+            if (opt.width !== -1) {
+                opt.style.background = opt.background;
+            }
+            setTimeout(opt, 50, gotoState, onError);
+            break;
+        // ajaxProgress - increment
+        case 2:
+            // show ajaxProgress
+            if (opt.width === -1) {
+                return;
+            }
+            opt.style.background = opt.background;
+            // reset ajaxProgress if it goes too high
+            if ((opt.style.width.slice(0, -1) | 0) > 95) {
+                opt.width = 0;
+            }
+            // this algorithm will indefinitely increment ajaxProgress
+            // with successively smaller increments without ever reaching 100%
+            opt.width += 1;
+            opt.style.width = Math.max(
+                100 - 75 * Math.exp(-0.125 * opt.width),
+                opt.style.width.slice(0, -1) | 0
+            ) + "%";
+            if (!opt.counter) {
+                setTimeout(opt, 0, gotoState, onError);
+            }
+            break;
+        // ajaxProgress - 100%
+        case 3:
+            opt.width = -1;
+            opt.style.width = "100%";
+            setTimeout(opt, 1000, gotoState, onError);
+            break;
+        // ajaxProgress - hide
+        case 4:
+            // cleanup timerInterval and timerTimeout
+            clearInterval(opt.timerInterval);
+            opt.timerInterval = null;
+            clearTimeout(opt.timerTimeout);
+            opt.timerTimeout = null;
+            // hide ajaxProgress
+            opt.style.background = "transparent";
+            if (onError) {
+                onError();
+            }
+            setTimeout(opt, 250, gotoState);
+            break;
+        // ajaxProgress - reset
+        default:
+            // reset ajaxProgress
+            opt.counter = 0;
+            opt.width = 0;
+            opt.style.width = "0%";
+        }
+    };
+    opt = window.domOnEventAjaxProgressUpdate;
+    opt.end = function (onError) {
+        opt.counter = 0;
+        window.domOnEventAjaxProgressUpdate(2, onError);
+    };
+    opt.elem = document.getElementById("domElementAjaxProgress1");
+    if (!opt.elem) {
+        opt.elem = document.createElement("div");
+        setTimeout(function () {
+            document.body.insertBefore(opt.elem, document.body.firstChild);
+        });
+    }
+    opt.elem.id = "domElementAjaxProgress1";
+    opt.style = opt.elem.style;
+    // init style
+    Object.entries({
+        background: "#d00",
+        height: "2px",
+        left: "0",
+        margin: "0",
+        padding: "0",
+        position: "fixed",
+        top: "0",
+        transition: "background 250ms, width 750ms",
+        width: "0%",
+        "z-index": "1"
+    }).forEach(function (entry) {
+        opt.style[entry[0]] = opt.style[entry[0]] || entry[1];
+    });
+    // init state
+    opt.background = opt.style.background;
+    opt.counter = 0;
+    opt.width = 0;
+}());
+
+
+
 // init domOnEventDelegateDict
 (function () {
 /*
  * this function will handle delegated dom-event
  */
     "use strict";
-    var timerTimeoutDict;
+    let timerTimeoutDict;
     if (window.domOnEventDelegateDict) {
         return;
     }
     window.domOnEventDelegateDict = {};
     timerTimeoutDict = {};
-    window.domOnEventDelegateDict.domOnEventDelegate = function (event) {
-        event.targetOnEvent = event.target.closest(
+    window.domOnEventDelegateDict.domOnEventDelegate = function (evt) {
+        evt.targetOnEvent = evt.target.closest(
             "[data-onevent]"
         );
         if (
-            !event.targetOnEvent
-            || event.targetOnEvent.dataset.onevent === "domOnEventNop"
-            || event.target.closest(
+            !evt.targetOnEvent
+            || evt.targetOnEvent.dataset.onevent === "domOnEventNop"
+            || evt.target.closest(
                 ".disabled, .readonly"
             )
         ) {
             return;
         }
         // rate-limit high-frequency-event
-        switch (event.type) {
+        switch (evt.type) {
         case "keydown":
         case "keyup":
             // filter non-input keyboard-event
-            if (!event.target.closest(
+            if (!evt.target.closest(
                 "input, option, select, textarea"
             )) {
                 return;
             }
-            if (timerTimeoutDict[event.type] !== true) {
-                timerTimeoutDict[event.type] = timerTimeoutDict[
-                    event.type
+            if (timerTimeoutDict[evt.type] !== true) {
+                timerTimeoutDict[evt.type] = timerTimeoutDict[
+                    evt.type
                 ] || setTimeout(function () {
-                    timerTimeoutDict[event.type] = true;
-                    window.domOnEventDelegateDict.domOnEventDelegate(
-                        event
-                    );
+                    timerTimeoutDict[evt.type] = true;
+                    window.domOnEventDelegateDict.domOnEventDelegate(evt);
                 }, 50);
                 return;
             }
-            timerTimeoutDict[event.type] = null;
+            timerTimeoutDict[evt.type] = null;
             break;
         }
-        switch (event.targetOnEvent.tagName) {
+        switch (evt.targetOnEvent.tagName) {
         case "BUTTON":
         case "FORM":
-            event.preventDefault();
+            evt.preventDefault();
             break;
         }
-        event.stopPropagation();
-        window.domOnEventDelegateDict[event.targetOnEvent.dataset.onevent](
-            event
+        evt.stopPropagation();
+        window.domOnEventDelegateDict[evt.targetOnEvent.dataset.onevent](
+            evt
         );
     };
     window.domOnEventDelegateDict.domOnEventResetOutput = function () {
-        Array.from(document.querySelectorAll(
+        document.querySelectorAll(
             ".onevent-reset-output"
-        )).forEach(function (element) {
-            switch (element.tagName) {
+        ).forEach(function (elem) {
+            switch (elem.tagName) {
             case "INPUT":
             case "TEXTAREA":
-                element.value = "";
+                elem.value = "";
                 break;
             case "PRE":
-                element.textContent = "";
+                elem.textContent = "";
                 break;
             default:
-                element.innerHTML = "";
+                elem.innerHTML = "";
             }
         });
     };
@@ -307,58 +411,6 @@ pre {
 
 
 
-// init timerIntervalAjaxProgressUpdate
-(function () {
-/*
- * this function will increment ajax-progress-bar
- * until webpage has loaded
- */
-    "use strict";
-    var ajaxProgressDiv1;
-    var ajaxProgressState;
-    var ajaxProgressUpdate;
-    if (
-        window.timerIntervalAjaxProgressUpdate
-        || !document.querySelector(
-            "#ajaxProgressDiv1"
-        )
-    ) {
-        return;
-    }
-    ajaxProgressDiv1 = document.querySelector(
-        "#ajaxProgressDiv1"
-    );
-    setTimeout(function () {
-        ajaxProgressDiv1.style.width = "25%";
-    });
-    ajaxProgressState = 0;
-    ajaxProgressUpdate = (
-        window.local
-        && window.local.ajaxProgressUpdate
-    ) || function () {
-        ajaxProgressDiv1.style.width = "100%";
-        setTimeout(function () {
-            ajaxProgressDiv1.style.background = "transparent";
-            setTimeout(function () {
-                ajaxProgressDiv1.style.width = "0%";
-            }, 500);
-        }, 1000);
-    };
-    window.timerIntervalAjaxProgressUpdate = setInterval(function () {
-        ajaxProgressState += 1;
-        ajaxProgressDiv1.style.width = Math.max(
-            100 - 75 * Math.exp(-0.125 * ajaxProgressState),
-            ajaxProgressDiv1.style.width.slice(0, -1) | 0
-        ) + "%";
-    }, 1000);
-    window.addEventListener("load", function () {
-        clearInterval(window.timerIntervalAjaxProgressUpdate);
-        ajaxProgressUpdate();
-    });
-}());
-
-
-
 // init domOnEventSelectAllWithinPre
 (function () {
 /*
@@ -369,25 +421,25 @@ pre {
     if (window.domOnEventSelectAllWithinPre) {
         return;
     }
-    window.domOnEventSelectAllWithinPre = function (event) {
-        var range;
-        var selection;
+    window.domOnEventSelectAllWithinPre = function (evt) {
+        let range;
+        let selection;
         if (
-            event
-            && event.key === "a"
-            && (event.ctrlKey || event.metaKey)
-            && event.target.closest(
+            evt
+            && evt.key === "a"
+            && (evt.ctrlKey || evt.metaKey)
+            && evt.target.closest(
                 "pre"
             )
         ) {
             range = document.createRange();
-            range.selectNodeContents(event.target.closest(
+            range.selectNodeContents(evt.target.closest(
                 "pre"
             ));
             selection = window.getSelection();
             selection.removeAllRanges();
             selection.addRange(range);
-            event.preventDefault();
+            evt.preventDefault();
         }
     };
     // init event-handling
@@ -404,18 +456,18 @@ pre {
         href="https://github.com/kaizhu256/node-swgg"
         
     >
-        swgg (2019.2.20)
+        swgg (2019.9.14)
     </a>
 </h1>
 <div class="platform summary">
 <h2>summary</h2>
 <h4>
     <span>version</span>-
-        2019.2.20<br>
-    <span>test date</span>- 2019-02-20T08:34:58.031Z<br>
+        2019.9.14<br>
+    <span>test date</span>- 2019-09-15T22:20:57.513Z<br>
     <span>commit info</span>-
         
-        9f75d3534cc53604d14e6774943f5aa3f6a0c7a6 - <br>
+        9b53b27b94c9aaf4d6af41edeb62efcd222543e9 - <br>
         
 </h4>
 <table>
@@ -428,9 +480,9 @@ pre {
     </tr>
 </thead>
 <tbody><tr>
-    <td>273301 ms</td>
+    <td>89215 ms</td>
     <td class="testPassed">0</td>
-    <td>267</td>
+    <td>139</td>
     <td>0</td>
 </tr></tbody>
 </table>
@@ -438,10 +490,10 @@ pre {
 
 <div class="platform">
 <h4>
-    1. buildApidoc - node - linux v11.10.0 - 2019-02-20T08:32:24.299Z<br>
+    1. buildApidoc - node - linux v12.10.0 - 2019-09-15T22:20:47.351Z<br>
     
     
-    <span>time-elapsed</span>- 172744 ms<br>
+    <span>time-elapsed</span>- 19076 ms<br>
     <span>tests failed</span>- 0<br>
     <span>tests passed</span>- 1<br>
     <span>tests pending</span>- 0<br>
@@ -457,7 +509,7 @@ pre {
 
 <tr>
     <td>1</td>
-    <td>7937 ms</td>
+    <td>7624 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_buildApp_default</td>
 </tr>
@@ -471,17 +523,17 @@ pre {
 
 <div class="platform">
 <h4>
-    2. deployGithubTest - browser - /node-swgg/build..beta..travis-ci.org/app/ - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36 - 2019-02-20T08:34:03.888Z<br>
+    2. npmTest - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/77.0.3865.75 Safari/537.36 - 2019-09-15T22:20:34.422Z<br>
     
-    <a href="screenshot.deployGithubTest.browser.%252Fnode-swgg%252Fbuild%252Fapp.png">
-        <img alt="screenshot.deployGithubTest.browser.%252Fnode-swgg%252Fbuild%252Fapp.png" src="screenshot.deployGithubTest.browser.%252Fnode-swgg%252Fbuild%252Fapp.png">
+    <a href="screenshot.npmTest.browser.%252F.png">
+        <img alt="screenshot.npmTest.browser.%252F.png" src="screenshot.npmTest.browser.%252F.png">
     </a>
     <br>
     
     
-    <span>onload-time</span>- 4267 ms<br>
+    <span>onload-time</span>- 8090 ms<br>
     
-    <span>time-elapsed</span>- 68401 ms<br>
+    <span>time-elapsed</span>- 26269 ms<br>
     <span>tests failed</span>- 0<br>
     <span>tests passed</span>- 32<br>
     <span>tests pending</span>- 0<br>
@@ -497,133 +549,133 @@ pre {
 
 <tr>
     <td>2</td>
-    <td>1789 ms</td>
+    <td>127 ms</td>
     <td class="testPassed">passed</td>
-    <td>testCase_ajax_error</td>
+    <td>testCase_ajax_err</td>
 </tr>
 
 <tr>
     <td>3</td>
-    <td>1 ms</td>
+    <td>0 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_buildApp_default</td>
 </tr>
 
 <tr>
     <td>4</td>
-    <td>2254 ms</td>
+    <td>187 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudCountManyByQuery_default</td>
 </tr>
 
 <tr>
     <td>5</td>
-    <td>6412 ms</td>
+    <td>969 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudCreateReplaceUpdateRemoveMany_default</td>
 </tr>
 
 <tr>
     <td>6</td>
-    <td>6386 ms</td>
+    <td>962 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudCreateReplaceUpdateRemoveOne_default</td>
 </tr>
 
 <tr>
     <td>7</td>
-    <td>1723 ms</td>
+    <td>157 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudErrorXxx_default</td>
 </tr>
 
 <tr>
     <td>8</td>
-    <td>2166 ms</td>
+    <td>238 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudGetManyByQuery_default</td>
 </tr>
 
 <tr>
     <td>9</td>
-    <td>2156 ms</td>
+    <td>243 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudGetOneById_default</td>
 </tr>
 
 <tr>
     <td>10</td>
-    <td>2151 ms</td>
+    <td>149 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudGetOneByQuery_default</td>
 </tr>
 
 <tr>
     <td>11</td>
-    <td>1673 ms</td>
+    <td>80 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudNullXxx_default</td>
 </tr>
 
 <tr>
     <td>12</td>
-    <td>4603 ms</td>
+    <td>288 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudRemoveManyByQuery_default</td>
 </tr>
 
 <tr>
     <td>13</td>
-    <td>4610 ms</td>
+    <td>235 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudRemoveOneById_default</td>
 </tr>
 
 <tr>
     <td>14</td>
-    <td>4378 ms</td>
+    <td>182 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudSetManyById_default</td>
 </tr>
 
 <tr>
     <td>15</td>
-    <td>4375 ms</td>
+    <td>176 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudSetOneById_default</td>
 </tr>
 
 <tr>
     <td>16</td>
-    <td>4703 ms</td>
+    <td>272 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudUpdateOneById_default</td>
 </tr>
 
 <tr>
     <td>17</td>
-    <td>2055 ms</td>
+    <td>1502 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_domAnimateShake_default</td>
 </tr>
 
 <tr>
     <td>18</td>
-    <td>4372 ms</td>
+    <td>95 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_fileGetOneById_default</td>
 </tr>
 
 <tr>
     <td>19</td>
-    <td>5106 ms</td>
+    <td>504 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_fileUploadManyByForm_default</td>
 </tr>
 
 <tr>
     <td>20</td>
-    <td>2071 ms</td>
+    <td>42 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_fileUploadManyByForm_nullCase</td>
 </tr>
@@ -637,51 +689,51 @@ pre {
 
 <tr>
     <td>22</td>
-    <td>1581 ms</td>
+    <td>51 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_onErrorJsonapi_default</td>
 </tr>
 
 <tr>
     <td>23</td>
-    <td>1559 ms</td>
+    <td>54 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_onErrorJsonapi_emptyArray</td>
 </tr>
 
 <tr>
     <td>24</td>
-    <td>1537 ms</td>
+    <td>128 ms</td>
     <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_error</td>
+    <td>testCase_onErrorJsonapi_err</td>
 </tr>
 
 <tr>
     <td>25</td>
-    <td>1983 ms</td>
+    <td>266 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_petstoreStoreGetInventory_default</td>
 </tr>
 
 <tr>
     <td>26</td>
-    <td>61 ms</td>
+    <td>20 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_swaggerJsonFromCurl_default</td>
 </tr>
 
 <tr>
     <td>27</td>
-    <td>1860 ms</td>
+    <td>209 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_swaggerValidateDataParameters_default</td>
 </tr>
 
 <tr>
     <td>28</td>
-    <td>61 ms</td>
+    <td>35 ms</td>
     <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateDataParameters_error</td>
+    <td>testCase_swaggerValidateDataParameters_err</td>
 </tr>
 
 <tr>
@@ -693,28 +745,28 @@ pre {
 
 <tr>
     <td>30</td>
-    <td>117 ms</td>
+    <td>26 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_swaggerValidate_default</td>
 </tr>
 
 <tr>
     <td>31</td>
-    <td>2 ms</td>
+    <td>1 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_ui_apiKey</td>
 </tr>
 
 <tr>
     <td>32</td>
-    <td>275 ms</td>
+    <td>17 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_ui_fileMedia</td>
 </tr>
 
 <tr>
     <td>33</td>
-    <td>4628 ms</td>
+    <td>341 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_userLoginXxx_default</td>
 </tr>
@@ -728,19 +780,12 @@ pre {
 
 <div class="platform">
 <h4>
-    3. deployGithubTest - browser - /node-swgg/build..beta..travis-ci.org/app/ - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36 - 2019-02-20T08:34:04.248Z<br>
-    
-    <a href="screenshot.deployGithubTest.browser.%252Fnode-swgg%252Fbuild%252Fapp.png">
-        <img alt="screenshot.deployGithubTest.browser.%252Fnode-swgg%252Fbuild%252Fapp.png" src="screenshot.deployGithubTest.browser.%252Fnode-swgg%252Fbuild%252Fapp.png">
-    </a>
-    <br>
+    3. npmTest - node - linux v12.10.0 - 2019-09-15T22:20:27.467Z<br>
     
     
-    <span>onload-time</span>- 11764 ms<br>
-    
-    <span>time-elapsed</span>- 59820 ms<br>
+    <span>time-elapsed</span>- 37049 ms<br>
     <span>tests failed</span>- 0<br>
-    <span>tests passed</span>- 32<br>
+    <span>tests passed</span>- 37<br>
     <span>tests pending</span>- 0<br>
 </h4>
 <table>
@@ -754,1280 +799,259 @@ pre {
 
 <tr>
     <td>34</td>
-    <td>1020 ms</td>
+    <td>286 ms</td>
     <td class="testPassed">passed</td>
-    <td>testCase_ajax_error</td>
+    <td>testCase_ajax_err</td>
 </tr>
 
 <tr>
     <td>35</td>
     <td>0 ms</td>
     <td class="testPassed">passed</td>
-    <td>testCase_buildApp_default</td>
-</tr>
-
-<tr>
-    <td>36</td>
-    <td>1118 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudCountManyByQuery_default</td>
-</tr>
-
-<tr>
-    <td>37</td>
-    <td>2221 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudCreateReplaceUpdateRemoveMany_default</td>
-</tr>
-
-<tr>
-    <td>38</td>
-    <td>2214 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudCreateReplaceUpdateRemoveOne_default</td>
-</tr>
-
-<tr>
-    <td>39</td>
-    <td>1010 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudErrorXxx_default</td>
-</tr>
-
-<tr>
-    <td>40</td>
-    <td>1242 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudGetManyByQuery_default</td>
-</tr>
-
-<tr>
-    <td>41</td>
-    <td>1242 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudGetOneById_default</td>
-</tr>
-
-<tr>
-    <td>42</td>
-    <td>1241 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudGetOneByQuery_default</td>
-</tr>
-
-<tr>
-    <td>43</td>
-    <td>997 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudNullXxx_default</td>
-</tr>
-
-<tr>
-    <td>44</td>
-    <td>1815 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudRemoveManyByQuery_default</td>
-</tr>
-
-<tr>
-    <td>45</td>
-    <td>1816 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudRemoveOneById_default</td>
-</tr>
-
-<tr>
-    <td>46</td>
-    <td>1720 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudSetManyById_default</td>
-</tr>
-
-<tr>
-    <td>47</td>
-    <td>1718 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudSetOneById_default</td>
-</tr>
-
-<tr>
-    <td>48</td>
-    <td>1857 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudUpdateOneById_default</td>
-</tr>
-
-<tr>
-    <td>49</td>
-    <td>1657 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_domAnimateShake_default</td>
-</tr>
-
-<tr>
-    <td>50</td>
-    <td>1742 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_fileGetOneById_default</td>
-</tr>
-
-<tr>
-    <td>51</td>
-    <td>1902 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_fileUploadManyByForm_default</td>
-</tr>
-
-<tr>
-    <td>52</td>
-    <td>1244 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_fileUploadManyByForm_nullCase</td>
-</tr>
-
-<tr>
-    <td>53</td>
-    <td>0 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_nop_default</td>
-</tr>
-
-<tr>
-    <td>54</td>
-    <td>967 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_default</td>
-</tr>
-
-<tr>
-    <td>55</td>
-    <td>963 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_emptyArray</td>
-</tr>
-
-<tr>
-    <td>56</td>
-    <td>965 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_error</td>
-</tr>
-
-<tr>
-    <td>57</td>
-    <td>1221 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_petstoreStoreGetInventory_default</td>
-</tr>
-
-<tr>
-    <td>58</td>
-    <td>8 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerJsonFromCurl_default</td>
-</tr>
-
-<tr>
-    <td>59</td>
-    <td>963 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateDataParameters_default</td>
-</tr>
-
-<tr>
-    <td>60</td>
-    <td>29 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateDataParameters_error</td>
-</tr>
-
-<tr>
-    <td>61</td>
-    <td>0 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateFile_default</td>
-</tr>
-
-<tr>
-    <td>62</td>
-    <td>40 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidate_default</td>
-</tr>
-
-<tr>
-    <td>63</td>
-    <td>1 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_ui_apiKey</td>
-</tr>
-
-<tr>
-    <td>64</td>
-    <td>186 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_ui_fileMedia</td>
-</tr>
-
-<tr>
-    <td>65</td>
-    <td>1818 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_userLoginXxx_default</td>
-</tr>
-
-</tbody>
-</table>
-<pre class="displayNone" tabIndex="0">
-
-</pre>
-</div>
-
-<div class="platform">
-<h4>
-    4. deployHerokuTest - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36 - 2019-02-20T08:34:59.766Z<br>
-    
-    <a href="screenshot.deployHerokuTest.browser.%252F.png">
-        <img alt="screenshot.deployHerokuTest.browser.%252F.png" src="screenshot.deployHerokuTest.browser.%252F.png">
-    </a>
-    <br>
-    
-    
-    <span>onload-time</span>- 3546 ms<br>
-    
-    <span>time-elapsed</span>- 12976 ms<br>
-    <span>tests failed</span>- 0<br>
-    <span>tests passed</span>- 32<br>
-    <span>tests pending</span>- 0<br>
-</h4>
-<table>
-<thead><tr>
-    <th>#</th>
-    <th>time-elapsed</th>
-    <th>status</th>
-    <th>test-case</th>
-</tr></thead>
-<tbody>
-
-<tr>
-    <td>66</td>
-    <td>1038 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_ajax_error</td>
-</tr>
-
-<tr>
-    <td>67</td>
-    <td>1 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_buildApp_default</td>
-</tr>
-
-<tr>
-    <td>68</td>
-    <td>1477 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudCountManyByQuery_default</td>
-</tr>
-
-<tr>
-    <td>69</td>
-    <td>7982 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudCreateReplaceUpdateRemoveMany_default</td>
-</tr>
-
-<tr>
-    <td>70</td>
-    <td>7980 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudCreateReplaceUpdateRemoveOne_default</td>
-</tr>
-
-<tr>
-    <td>71</td>
-    <td>1033 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudErrorXxx_default</td>
-</tr>
-
-<tr>
-    <td>72</td>
-    <td>1483 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudGetManyByQuery_default</td>
-</tr>
-
-<tr>
-    <td>73</td>
-    <td>1482 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudGetOneById_default</td>
-</tr>
-
-<tr>
-    <td>74</td>
-    <td>1480 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudGetOneByQuery_default</td>
-</tr>
-
-<tr>
-    <td>75</td>
-    <td>1021 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudNullXxx_default</td>
-</tr>
-
-<tr>
-    <td>76</td>
-    <td>4875 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudRemoveManyByQuery_default</td>
-</tr>
-
-<tr>
-    <td>77</td>
-    <td>4871 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudRemoveOneById_default</td>
-</tr>
-
-<tr>
-    <td>78</td>
-    <td>3768 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudSetManyById_default</td>
-</tr>
-
-<tr>
-    <td>79</td>
-    <td>3776 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudSetOneById_default</td>
-</tr>
-
-<tr>
-    <td>80</td>
-    <td>5958 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudUpdateOneById_default</td>
-</tr>
-
-<tr>
-    <td>81</td>
-    <td>2840 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_domAnimateShake_default</td>
-</tr>
-
-<tr>
-    <td>82</td>
-    <td>3779 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_fileGetOneById_default</td>
-</tr>
-
-<tr>
-    <td>83</td>
-    <td>6877 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_fileUploadManyByForm_default</td>
-</tr>
-
-<tr>
-    <td>84</td>
-    <td>1484 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_fileUploadManyByForm_nullCase</td>
-</tr>
-
-<tr>
-    <td>85</td>
-    <td>0 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_nop_default</td>
-</tr>
-
-<tr>
-    <td>86</td>
-    <td>990 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_default</td>
-</tr>
-
-<tr>
-    <td>87</td>
-    <td>984 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_emptyArray</td>
-</tr>
-
-<tr>
-    <td>88</td>
-    <td>982 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_error</td>
-</tr>
-
-<tr>
-    <td>89</td>
-    <td>1467 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_petstoreStoreGetInventory_default</td>
-</tr>
-
-<tr>
-    <td>90</td>
-    <td>13 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerJsonFromCurl_default</td>
-</tr>
-
-<tr>
-    <td>91</td>
-    <td>1050 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateDataParameters_default</td>
-</tr>
-
-<tr>
-    <td>92</td>
-    <td>53 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateDataParameters_error</td>
-</tr>
-
-<tr>
-    <td>93</td>
-    <td>1 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateFile_default</td>
-</tr>
-
-<tr>
-    <td>94</td>
-    <td>108 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidate_default</td>
-</tr>
-
-<tr>
-    <td>95</td>
-    <td>3 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_ui_apiKey</td>
-</tr>
-
-<tr>
-    <td>96</td>
-    <td>120 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_ui_fileMedia</td>
-</tr>
-
-<tr>
-    <td>97</td>
-    <td>7515 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_userLoginXxx_default</td>
-</tr>
-
-</tbody>
-</table>
-<pre class="displayNone" tabIndex="0">
-
-</pre>
-</div>
-
-<div class="platform">
-<h4>
-    5. deployHerokuTest - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36 - 2019-02-20T08:35:00.037Z<br>
-    
-    <a href="screenshot.deployHerokuTest.browser.%252F.png">
-        <img alt="screenshot.deployHerokuTest.browser.%252F.png" src="screenshot.deployHerokuTest.browser.%252F.png">
-    </a>
-    <br>
-    
-    
-    <span>onload-time</span>- 8989 ms<br>
-    
-    <span>time-elapsed</span>- 3642 ms<br>
-    <span>tests failed</span>- 0<br>
-    <span>tests passed</span>- 32<br>
-    <span>tests pending</span>- 0<br>
-</h4>
-<table>
-<thead><tr>
-    <th>#</th>
-    <th>time-elapsed</th>
-    <th>status</th>
-    <th>test-case</th>
-</tr></thead>
-<tbody>
-
-<tr>
-    <td>98</td>
-    <td>979 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_ajax_error</td>
-</tr>
-
-<tr>
-    <td>99</td>
-    <td>1 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_buildApp_default</td>
-</tr>
-
-<tr>
-    <td>100</td>
-    <td>1034 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudCountManyByQuery_default</td>
-</tr>
-
-<tr>
-    <td>101</td>
-    <td>2163 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudCreateReplaceUpdateRemoveMany_default</td>
-</tr>
-
-<tr>
-    <td>102</td>
-    <td>2153 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudCreateReplaceUpdateRemoveOne_default</td>
-</tr>
-
-<tr>
-    <td>103</td>
-    <td>964 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudErrorXxx_default</td>
-</tr>
-
-<tr>
-    <td>104</td>
-    <td>1022 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudGetManyByQuery_default</td>
-</tr>
-
-<tr>
-    <td>105</td>
-    <td>1020 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudGetOneById_default</td>
-</tr>
-
-<tr>
-    <td>106</td>
-    <td>1017 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudGetOneByQuery_default</td>
-</tr>
-
-<tr>
-    <td>107</td>
-    <td>955 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudNullXxx_default</td>
-</tr>
-
-<tr>
-    <td>108</td>
-    <td>1613 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudRemoveManyByQuery_default</td>
-</tr>
-
-<tr>
-    <td>109</td>
-    <td>1612 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudRemoveOneById_default</td>
-</tr>
-
-<tr>
-    <td>110</td>
-    <td>1438 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudSetManyById_default</td>
-</tr>
-
-<tr>
-    <td>111</td>
-    <td>1437 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudSetOneById_default</td>
-</tr>
-
-<tr>
-    <td>112</td>
-    <td>1727 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudUpdateOneById_default</td>
-</tr>
-
-<tr>
-    <td>113</td>
-    <td>1612 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_domAnimateShake_default</td>
-</tr>
-
-<tr>
-    <td>114</td>
-    <td>1433 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_fileGetOneById_default</td>
-</tr>
-
-<tr>
-    <td>115</td>
-    <td>1837 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_fileUploadManyByForm_default</td>
-</tr>
-
-<tr>
-    <td>116</td>
-    <td>1014 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_fileUploadManyByForm_nullCase</td>
-</tr>
-
-<tr>
-    <td>117</td>
-    <td>0 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_nop_default</td>
-</tr>
-
-<tr>
-    <td>118</td>
-    <td>927 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_default</td>
-</tr>
-
-<tr>
-    <td>119</td>
-    <td>924 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_emptyArray</td>
-</tr>
-
-<tr>
-    <td>120</td>
-    <td>925 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_error</td>
-</tr>
-
-<tr>
-    <td>121</td>
-    <td>1006 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_petstoreStoreGetInventory_default</td>
-</tr>
-
-<tr>
-    <td>122</td>
-    <td>8 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerJsonFromCurl_default</td>
-</tr>
-
-<tr>
-    <td>123</td>
-    <td>946 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateDataParameters_default</td>
-</tr>
-
-<tr>
-    <td>124</td>
-    <td>63 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateDataParameters_error</td>
-</tr>
-
-<tr>
-    <td>125</td>
-    <td>1 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateFile_default</td>
-</tr>
-
-<tr>
-    <td>126</td>
-    <td>101 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidate_default</td>
-</tr>
-
-<tr>
-    <td>127</td>
-    <td>1 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_ui_apiKey</td>
-</tr>
-
-<tr>
-    <td>128</td>
-    <td>176 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_ui_fileMedia</td>
-</tr>
-
-<tr>
-    <td>129</td>
-    <td>1676 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_userLoginXxx_default</td>
-</tr>
-
-</tbody>
-</table>
-<pre class="displayNone" tabIndex="0">
-
-</pre>
-</div>
-
-<div class="platform">
-<h4>
-    6. npmTest - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36 - 2019-02-20T08:32:05.016Z<br>
-    
-    <a href="screenshot.npmTest.browser.%252F.png">
-        <img alt="screenshot.npmTest.browser.%252F.png" src="screenshot.npmTest.browser.%252F.png">
-    </a>
-    <br>
-    
-    
-    <span>onload-time</span>- 10477 ms<br>
-    
-    <span>time-elapsed</span>- 180765 ms<br>
-    <span>tests failed</span>- 0<br>
-    <span>tests passed</span>- 32<br>
-    <span>tests pending</span>- 0<br>
-</h4>
-<table>
-<thead><tr>
-    <th>#</th>
-    <th>time-elapsed</th>
-    <th>status</th>
-    <th>test-case</th>
-</tr></thead>
-<tbody>
-
-<tr>
-    <td>130</td>
-    <td>670 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_ajax_error</td>
-</tr>
-
-<tr>
-    <td>131</td>
-    <td>1 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_buildApp_default</td>
-</tr>
-
-<tr>
-    <td>132</td>
-    <td>735 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudCountManyByQuery_default</td>
-</tr>
-
-<tr>
-    <td>133</td>
-    <td>1939 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudCreateReplaceUpdateRemoveMany_default</td>
-</tr>
-
-<tr>
-    <td>134</td>
-    <td>1928 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudCreateReplaceUpdateRemoveOne_default</td>
-</tr>
-
-<tr>
-    <td>135</td>
-    <td>637 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudErrorXxx_default</td>
-</tr>
-
-<tr>
-    <td>136</td>
-    <td>708 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudGetManyByQuery_default</td>
-</tr>
-
-<tr>
-    <td>137</td>
-    <td>705 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudGetOneById_default</td>
-</tr>
-
-<tr>
-    <td>138</td>
-    <td>705 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudGetOneByQuery_default</td>
-</tr>
-
-<tr>
-    <td>139</td>
-    <td>618 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudNullXxx_default</td>
-</tr>
-
-<tr>
-    <td>140</td>
-    <td>1338 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudRemoveManyByQuery_default</td>
-</tr>
-
-<tr>
-    <td>141</td>
-    <td>1352 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudRemoveOneById_default</td>
-</tr>
-
-<tr>
-    <td>142</td>
-    <td>1243 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudSetManyById_default</td>
-</tr>
-
-<tr>
-    <td>143</td>
-    <td>1241 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudSetOneById_default</td>
-</tr>
-
-<tr>
-    <td>144</td>
-    <td>1457 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_crudUpdateOneById_default</td>
-</tr>
-
-<tr>
-    <td>145</td>
-    <td>1526 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_domAnimateShake_default</td>
-</tr>
-
-<tr>
-    <td>146</td>
-    <td>1259 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_fileGetOneById_default</td>
-</tr>
-
-<tr>
-    <td>147</td>
-    <td>1653 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_fileUploadManyByForm_default</td>
-</tr>
-
-<tr>
-    <td>148</td>
-    <td>696 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_fileUploadManyByForm_nullCase</td>
-</tr>
-
-<tr>
-    <td>149</td>
-    <td>0 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_nop_default</td>
-</tr>
-
-<tr>
-    <td>150</td>
-    <td>605 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_default</td>
-</tr>
-
-<tr>
-    <td>151</td>
-    <td>603 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_emptyArray</td>
-</tr>
-
-<tr>
-    <td>152</td>
-    <td>619 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_error</td>
-</tr>
-
-<tr>
-    <td>153</td>
-    <td>685 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_petstoreStoreGetInventory_default</td>
-</tr>
-
-<tr>
-    <td>154</td>
-    <td>19 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerJsonFromCurl_default</td>
-</tr>
-
-<tr>
-    <td>155</td>
-    <td>599 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateDataParameters_default</td>
-</tr>
-
-<tr>
-    <td>156</td>
-    <td>48 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateDataParameters_error</td>
-</tr>
-
-<tr>
-    <td>157</td>
-    <td>2 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateFile_default</td>
-</tr>
-
-<tr>
-    <td>158</td>
-    <td>45 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidate_default</td>
-</tr>
-
-<tr>
-    <td>159</td>
-    <td>1 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_ui_apiKey</td>
-</tr>
-
-<tr>
-    <td>160</td>
-    <td>88 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_ui_fileMedia</td>
-</tr>
-
-<tr>
-    <td>161</td>
-    <td>1534 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_userLoginXxx_default</td>
-</tr>
-
-</tbody>
-</table>
-<pre class="displayNone" tabIndex="0">
-
-</pre>
-</div>
-
-<div class="platform">
-<h4>
-    7. npmTest - node - linux v11.10.0 - 2019-02-20T08:31:57.971Z<br>
-    
-    
-    <span>time-elapsed</span>- 197439 ms<br>
-    <span>tests failed</span>- 0<br>
-    <span>tests passed</span>- 37<br>
-    <span>tests pending</span>- 0<br>
-</h4>
-<table>
-<thead><tr>
-    <th>#</th>
-    <th>time-elapsed</th>
-    <th>status</th>
-    <th>test-case</th>
-</tr></thead>
-<tbody>
-
-<tr>
-    <td>162</td>
-    <td>2206 ms</td>
-    <td class="testPassed">passed</td>
-    <td>testCase_ajax_error</td>
-</tr>
-
-<tr>
-    <td>163</td>
-    <td>1094 ms</td>
-    <td class="testPassed">passed</td>
     <td>testCase_buildApidoc_default</td>
 </tr>
 
 <tr>
-    <td>164</td>
-    <td>9710 ms</td>
+    <td>36</td>
+    <td>6705 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_buildApp_default</td>
 </tr>
 
 <tr>
-    <td>165</td>
+    <td>37</td>
     <td>1 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_buildLib_default</td>
 </tr>
 
 <tr>
-    <td>166</td>
-    <td>4 ms</td>
+    <td>38</td>
+    <td>6 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_buildReadme_default</td>
 </tr>
 
 <tr>
-    <td>167</td>
+    <td>39</td>
     <td>2 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_buildTest_default</td>
 </tr>
 
 <tr>
-    <td>168</td>
-    <td>999 ms</td>
+    <td>40</td>
+    <td>193 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudCountManyByQuery_default</td>
 </tr>
 
 <tr>
-    <td>169</td>
-    <td>2851 ms</td>
+    <td>41</td>
+    <td>1609 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudCreateReplaceUpdateRemoveMany_default</td>
 </tr>
 
 <tr>
-    <td>170</td>
-    <td>2898 ms</td>
+    <td>42</td>
+    <td>1617 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudCreateReplaceUpdateRemoveOne_default</td>
 </tr>
 
 <tr>
-    <td>171</td>
-    <td>874 ms</td>
+    <td>43</td>
+    <td>170 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudErrorXxx_default</td>
 </tr>
 
 <tr>
-    <td>172</td>
-    <td>986 ms</td>
+    <td>44</td>
+    <td>203 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudGetManyByQuery_default</td>
 </tr>
 
 <tr>
-    <td>173</td>
-    <td>984 ms</td>
+    <td>45</td>
+    <td>148 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudGetOneById_default</td>
 </tr>
 
 <tr>
-    <td>174</td>
-    <td>983 ms</td>
+    <td>46</td>
+    <td>147 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudGetOneByQuery_default</td>
 </tr>
 
 <tr>
-    <td>175</td>
-    <td>864 ms</td>
+    <td>47</td>
+    <td>157 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudNullXxx_default</td>
 </tr>
 
 <tr>
-    <td>176</td>
-    <td>1835 ms</td>
+    <td>48</td>
+    <td>375 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudRemoveManyByQuery_default</td>
 </tr>
 
 <tr>
-    <td>177</td>
-    <td>1844 ms</td>
+    <td>49</td>
+    <td>301 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudRemoveOneById_default</td>
 </tr>
 
 <tr>
-    <td>178</td>
-    <td>1310 ms</td>
+    <td>50</td>
+    <td>219 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudSetManyById_default</td>
 </tr>
 
 <tr>
-    <td>179</td>
-    <td>1314 ms</td>
+    <td>51</td>
+    <td>213 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudSetOneById_default</td>
 </tr>
 
 <tr>
-    <td>180</td>
-    <td>2056 ms</td>
+    <td>52</td>
+    <td>416 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudUpdateOneById_default</td>
 </tr>
 
 <tr>
-    <td>181</td>
+    <td>53</td>
     <td>0 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_domAnimateShake_default</td>
 </tr>
 
 <tr>
-    <td>182</td>
-    <td>1324 ms</td>
+    <td>54</td>
+    <td>141 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_fileGetOneById_default</td>
 </tr>
 
 <tr>
-    <td>183</td>
-    <td>2199 ms</td>
+    <td>55</td>
+    <td>1038 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_fileUploadManyByForm_default</td>
 </tr>
 
 <tr>
-    <td>184</td>
-    <td>968 ms</td>
+    <td>56</td>
+    <td>58 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_fileUploadManyByForm_nullCase</td>
 </tr>
 
 <tr>
-    <td>185</td>
-    <td>0 ms</td>
+    <td>57</td>
+    <td>1 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_nop_default</td>
 </tr>
 
 <tr>
-    <td>186</td>
-    <td>833 ms</td>
+    <td>58</td>
+    <td>76 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_onErrorJsonapi_default</td>
 </tr>
 
 <tr>
-    <td>187</td>
-    <td>832 ms</td>
+    <td>59</td>
+    <td>111 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_onErrorJsonapi_emptyArray</td>
 </tr>
 
 <tr>
-    <td>188</td>
-    <td>831 ms</td>
+    <td>60</td>
+    <td>104 ms</td>
     <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_error</td>
+    <td>testCase_onErrorJsonapi_err</td>
 </tr>
 
 <tr>
-    <td>189</td>
-    <td>955 ms</td>
+    <td>61</td>
+    <td>422 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_petstoreStoreGetInventory_default</td>
 </tr>
 
 <tr>
-    <td>190</td>
-    <td>10 ms</td>
+    <td>62</td>
+    <td>33 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_swaggerJsonFromCurl_default</td>
 </tr>
 
 <tr>
-    <td>191</td>
-    <td>820 ms</td>
+    <td>63</td>
+    <td>460 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_swaggerValidateDataParameters_default</td>
 </tr>
 
 <tr>
-    <td>192</td>
-    <td>40 ms</td>
+    <td>64</td>
+    <td>48 ms</td>
     <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateDataParameters_error</td>
+    <td>testCase_swaggerValidateDataParameters_err</td>
 </tr>
 
 <tr>
-    <td>193</td>
-    <td>1443 ms</td>
+    <td>65</td>
+    <td>515 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_swaggerValidateFile_default</td>
 </tr>
 
 <tr>
-    <td>194</td>
-    <td>35 ms</td>
+    <td>66</td>
+    <td>36 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_swaggerValidate_default</td>
 </tr>
 
 <tr>
-    <td>195</td>
+    <td>67</td>
     <td>1 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_ui_apiKey</td>
 </tr>
 
 <tr>
-    <td>196</td>
-    <td>1 ms</td>
+    <td>68</td>
+    <td>0 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_ui_fileMedia</td>
 </tr>
 
 <tr>
-    <td>197</td>
-    <td>2563 ms</td>
+    <td>69</td>
+    <td>588 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_userLoginXxx_default</td>
 </tr>
 
 <tr>
-    <td>198</td>
-    <td>18698 ms</td>
+    <td>70</td>
+    <td>12378 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_webpage_default</td>
 </tr>
@@ -2041,7 +1065,7 @@ pre {
 
 <div class="platform">
 <h4>
-    8. npmTestPublished - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36 - 2019-02-20T08:30:49.933Z<br>
+    4. npmTestPublished - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/77.0.3865.75 Safari/537.36 - 2019-09-15T22:19:43.190Z<br>
     
     <a href="screenshot.npmTestPublished.browser.%252F.png">
         <img alt="screenshot.npmTestPublished.browser.%252F.png" src="screenshot.npmTestPublished.browser.%252F.png">
@@ -2049,9 +1073,9 @@ pre {
     <br>
     
     
-    <span>onload-time</span>- 12161 ms<br>
+    <span>onload-time</span>- 7954 ms<br>
     
-    <span>time-elapsed</span>- 253913 ms<br>
+    <span>time-elapsed</span>- 77667 ms<br>
     <span>tests failed</span>- 0<br>
     <span>tests passed</span>- 32<br>
     <span>tests pending</span>- 0<br>
@@ -2066,225 +1090,225 @@ pre {
 <tbody>
 
 <tr>
-    <td>199</td>
-    <td>667 ms</td>
+    <td>71</td>
+    <td>102 ms</td>
     <td class="testPassed">passed</td>
-    <td>testCase_ajax_error</td>
+    <td>testCase_ajax_err</td>
 </tr>
 
 <tr>
-    <td>200</td>
+    <td>72</td>
     <td>1 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_buildApp_default</td>
 </tr>
 
 <tr>
-    <td>201</td>
-    <td>735 ms</td>
+    <td>73</td>
+    <td>184 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudCountManyByQuery_default</td>
 </tr>
 
 <tr>
-    <td>202</td>
-    <td>1689 ms</td>
+    <td>74</td>
+    <td>909 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudCreateReplaceUpdateRemoveMany_default</td>
 </tr>
 
 <tr>
-    <td>203</td>
-    <td>1681 ms</td>
+    <td>75</td>
+    <td>904 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudCreateReplaceUpdateRemoveOne_default</td>
 </tr>
 
 <tr>
-    <td>204</td>
-    <td>672 ms</td>
+    <td>76</td>
+    <td>138 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudErrorXxx_default</td>
 </tr>
 
 <tr>
-    <td>205</td>
-    <td>719 ms</td>
+    <td>77</td>
+    <td>203 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudGetManyByQuery_default</td>
 </tr>
 
 <tr>
-    <td>206</td>
-    <td>716 ms</td>
+    <td>78</td>
+    <td>205 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudGetOneById_default</td>
 </tr>
 
 <tr>
-    <td>207</td>
-    <td>715 ms</td>
+    <td>79</td>
+    <td>126 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudGetOneByQuery_default</td>
 </tr>
 
 <tr>
-    <td>208</td>
-    <td>659 ms</td>
+    <td>80</td>
+    <td>62 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudNullXxx_default</td>
 </tr>
 
 <tr>
-    <td>209</td>
-    <td>1213 ms</td>
+    <td>81</td>
+    <td>239 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudRemoveManyByQuery_default</td>
 </tr>
 
 <tr>
-    <td>210</td>
-    <td>1214 ms</td>
+    <td>82</td>
+    <td>234 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudRemoveOneById_default</td>
 </tr>
 
 <tr>
-    <td>211</td>
-    <td>1151 ms</td>
+    <td>83</td>
+    <td>173 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudSetManyById_default</td>
 </tr>
 
 <tr>
-    <td>212</td>
-    <td>1148 ms</td>
+    <td>84</td>
+    <td>172 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudSetOneById_default</td>
 </tr>
 
 <tr>
-    <td>213</td>
-    <td>1268 ms</td>
+    <td>85</td>
+    <td>283 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudUpdateOneById_default</td>
 </tr>
 
 <tr>
-    <td>214</td>
-    <td>1530 ms</td>
+    <td>86</td>
+    <td>1501 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_domAnimateShake_default</td>
 </tr>
 
 <tr>
-    <td>215</td>
-    <td>1147 ms</td>
+    <td>87</td>
+    <td>97 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_fileGetOneById_default</td>
 </tr>
 
 <tr>
-    <td>216</td>
-    <td>1331 ms</td>
+    <td>88</td>
+    <td>502 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_fileUploadManyByForm_default</td>
 </tr>
 
 <tr>
-    <td>217</td>
-    <td>719 ms</td>
+    <td>89</td>
+    <td>37 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_fileUploadManyByForm_nullCase</td>
 </tr>
 
 <tr>
-    <td>218</td>
+    <td>90</td>
     <td>0 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_nop_default</td>
 </tr>
 
 <tr>
-    <td>219</td>
-    <td>621 ms</td>
+    <td>91</td>
+    <td>46 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_onErrorJsonapi_default</td>
 </tr>
 
 <tr>
-    <td>220</td>
-    <td>615 ms</td>
+    <td>92</td>
+    <td>51 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_onErrorJsonapi_emptyArray</td>
 </tr>
 
 <tr>
-    <td>221</td>
-    <td>614 ms</td>
+    <td>93</td>
+    <td>97 ms</td>
     <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_error</td>
+    <td>testCase_onErrorJsonapi_err</td>
 </tr>
 
 <tr>
-    <td>222</td>
-    <td>704 ms</td>
+    <td>94</td>
+    <td>252 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_petstoreStoreGetInventory_default</td>
 </tr>
 
 <tr>
-    <td>223</td>
-    <td>15 ms</td>
+    <td>95</td>
+    <td>31 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_swaggerJsonFromCurl_default</td>
 </tr>
 
 <tr>
-    <td>224</td>
-    <td>624 ms</td>
+    <td>96</td>
+    <td>191 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_swaggerValidateDataParameters_default</td>
 </tr>
 
 <tr>
-    <td>225</td>
-    <td>49 ms</td>
+    <td>97</td>
+    <td>32 ms</td>
     <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateDataParameters_error</td>
+    <td>testCase_swaggerValidateDataParameters_err</td>
 </tr>
 
 <tr>
-    <td>226</td>
-    <td>1 ms</td>
+    <td>98</td>
+    <td>0 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_swaggerValidateFile_default</td>
 </tr>
 
 <tr>
-    <td>227</td>
-    <td>54 ms</td>
+    <td>99</td>
+    <td>42 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_swaggerValidate_default</td>
 </tr>
 
 <tr>
-    <td>228</td>
-    <td>2 ms</td>
+    <td>100</td>
+    <td>1 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_ui_apiKey</td>
 </tr>
 
 <tr>
-    <td>229</td>
-    <td>85 ms</td>
+    <td>101</td>
+    <td>30 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_ui_fileMedia</td>
 </tr>
 
 <tr>
-    <td>230</td>
-    <td>1322 ms</td>
+    <td>102</td>
+    <td>355 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_userLoginXxx_default</td>
 </tr>
@@ -2298,10 +1322,10 @@ pre {
 
 <div class="platform">
 <h4>
-    9. npmTestPublished - node - linux v11.10.0 - 2019-02-20T08:30:41.528Z<br>
+    5. npmTestPublished - node - linux v12.10.0 - 2019-09-15T22:19:35.192Z<br>
     
     
-    <span>time-elapsed</span>- 273301 ms<br>
+    <span>time-elapsed</span>- 89215 ms<br>
     <span>tests failed</span>- 0<br>
     <span>tests passed</span>- 37<br>
     <span>tests pending</span>- 0<br>
@@ -2316,260 +1340,260 @@ pre {
 <tbody>
 
 <tr>
-    <td>231</td>
-    <td>2295 ms</td>
+    <td>103</td>
+    <td>311 ms</td>
     <td class="testPassed">passed</td>
-    <td>testCase_ajax_error</td>
+    <td>testCase_ajax_err</td>
 </tr>
 
 <tr>
-    <td>232</td>
-    <td>1259 ms</td>
+    <td>104</td>
+    <td>0 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_buildApidoc_default</td>
 </tr>
 
 <tr>
-    <td>233</td>
-    <td>11986 ms</td>
+    <td>105</td>
+    <td>6846 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_buildApp_default</td>
 </tr>
 
 <tr>
-    <td>234</td>
-    <td>1 ms</td>
+    <td>106</td>
+    <td>3 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_buildLib_default</td>
 </tr>
 
 <tr>
-    <td>235</td>
-    <td>5 ms</td>
+    <td>107</td>
+    <td>7 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_buildReadme_default</td>
 </tr>
 
 <tr>
-    <td>236</td>
+    <td>108</td>
     <td>2 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_buildTest_default</td>
 </tr>
 
 <tr>
-    <td>237</td>
-    <td>865 ms</td>
+    <td>109</td>
+    <td>216 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudCountManyByQuery_default</td>
 </tr>
 
 <tr>
-    <td>238</td>
-    <td>2184 ms</td>
+    <td>110</td>
+    <td>1975 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudCreateReplaceUpdateRemoveMany_default</td>
 </tr>
 
 <tr>
-    <td>239</td>
-    <td>2192 ms</td>
+    <td>111</td>
+    <td>2057 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudCreateReplaceUpdateRemoveOne_default</td>
 </tr>
 
 <tr>
-    <td>240</td>
-    <td>756 ms</td>
+    <td>112</td>
+    <td>184 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudErrorXxx_default</td>
 </tr>
 
 <tr>
-    <td>241</td>
-    <td>878 ms</td>
+    <td>113</td>
+    <td>217 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudGetManyByQuery_default</td>
 </tr>
 
 <tr>
-    <td>242</td>
-    <td>883 ms</td>
+    <td>114</td>
+    <td>141 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudGetOneById_default</td>
 </tr>
 
 <tr>
-    <td>243</td>
-    <td>891 ms</td>
+    <td>115</td>
+    <td>139 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudGetOneByQuery_default</td>
 </tr>
 
 <tr>
-    <td>244</td>
-    <td>749 ms</td>
+    <td>116</td>
+    <td>148 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudNullXxx_default</td>
 </tr>
 
 <tr>
-    <td>245</td>
-    <td>1537 ms</td>
+    <td>117</td>
+    <td>384 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudRemoveManyByQuery_default</td>
 </tr>
 
 <tr>
-    <td>246</td>
-    <td>1534 ms</td>
+    <td>118</td>
+    <td>310 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudRemoveOneById_default</td>
 </tr>
 
 <tr>
-    <td>247</td>
-    <td>1243 ms</td>
+    <td>119</td>
+    <td>241 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudSetManyById_default</td>
 </tr>
 
 <tr>
-    <td>248</td>
-    <td>1242 ms</td>
+    <td>120</td>
+    <td>231 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudSetOneById_default</td>
 </tr>
 
 <tr>
-    <td>249</td>
-    <td>1738 ms</td>
+    <td>121</td>
+    <td>468 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_crudUpdateOneById_default</td>
 </tr>
 
 <tr>
-    <td>250</td>
-    <td>0 ms</td>
+    <td>122</td>
+    <td>1 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_domAnimateShake_default</td>
 </tr>
 
 <tr>
-    <td>251</td>
-    <td>1240 ms</td>
+    <td>123</td>
+    <td>167 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_fileGetOneById_default</td>
 </tr>
 
 <tr>
-    <td>252</td>
-    <td>1789 ms</td>
+    <td>124</td>
+    <td>1450 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_fileUploadManyByForm_default</td>
 </tr>
 
 <tr>
-    <td>253</td>
-    <td>898 ms</td>
+    <td>125</td>
+    <td>61 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_fileUploadManyByForm_nullCase</td>
 </tr>
 
 <tr>
-    <td>254</td>
+    <td>126</td>
     <td>0 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_nop_default</td>
 </tr>
 
 <tr>
-    <td>255</td>
-    <td>717 ms</td>
+    <td>127</td>
+    <td>123 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_onErrorJsonapi_default</td>
 </tr>
 
 <tr>
-    <td>256</td>
-    <td>713 ms</td>
+    <td>128</td>
+    <td>92 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_onErrorJsonapi_emptyArray</td>
 </tr>
 
 <tr>
-    <td>257</td>
-    <td>714 ms</td>
+    <td>129</td>
+    <td>133 ms</td>
     <td class="testPassed">passed</td>
-    <td>testCase_onErrorJsonapi_error</td>
+    <td>testCase_onErrorJsonapi_err</td>
 </tr>
 
 <tr>
-    <td>258</td>
-    <td>896 ms</td>
+    <td>130</td>
+    <td>483 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_petstoreStoreGetInventory_default</td>
 </tr>
 
 <tr>
-    <td>259</td>
-    <td>9 ms</td>
+    <td>131</td>
+    <td>15 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_swaggerJsonFromCurl_default</td>
 </tr>
 
 <tr>
-    <td>260</td>
-    <td>704 ms</td>
+    <td>132</td>
+    <td>615 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_swaggerValidateDataParameters_default</td>
 </tr>
 
 <tr>
-    <td>261</td>
-    <td>39 ms</td>
+    <td>133</td>
+    <td>48 ms</td>
     <td class="testPassed">passed</td>
-    <td>testCase_swaggerValidateDataParameters_error</td>
+    <td>testCase_swaggerValidateDataParameters_err</td>
 </tr>
 
 <tr>
-    <td>262</td>
-    <td>1288 ms</td>
+    <td>134</td>
+    <td>784 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_swaggerValidateFile_default</td>
 </tr>
 
 <tr>
-    <td>263</td>
-    <td>36 ms</td>
+    <td>135</td>
+    <td>78 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_swaggerValidate_default</td>
 </tr>
 
 <tr>
-    <td>264</td>
+    <td>136</td>
     <td>0 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_ui_apiKey</td>
 </tr>
 
 <tr>
-    <td>265</td>
-    <td>0 ms</td>
+    <td>137</td>
+    <td>1 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_ui_fileMedia</td>
 </tr>
 
 <tr>
-    <td>266</td>
-    <td>1919 ms</td>
+    <td>138</td>
+    <td>813 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_userLoginXxx_default</td>
 </tr>
 
 <tr>
-    <td>267</td>
-    <td>20983 ms</td>
+    <td>139</td>
+    <td>12827 ms</td>
     <td class="testPassed">passed</td>
     <td>testCase_webpage_default</td>
 </tr>

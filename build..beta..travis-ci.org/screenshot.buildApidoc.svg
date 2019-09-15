@@ -1,10 +1,10 @@
-<svg height="1262" width="720" xmlns="http://www.w3.org/2000/svg">
-<rect height="1262" fill="#555" width="720"></rect>
+<svg height="1246" width="720" xmlns="http://www.w3.org/2000/svg">
+<rect height="1246" fill="#555" width="720"></rect>
 <text fill="#7f7" font-family="Courier New" font-size="12" xml:space="preserve">
 <tspan x="10" y="26"></tspan>
 
-<tspan x="10" y="42">[MODE_BUILD=buildApidoc] - 2019-02-20T08:32:24.105Z - npm-testing /home/travis/build/kaizhu256/n\</tspan>
-<tspan x="10" y="58">ode-swgg</tspan>
+<tspan x="10" y="42">\x1b[35m[MODE_BUILD=buildApidoc]\x1b[0m - 2019-09-15T22:20:47.211Z - npm-testing /home/travis/bu\</tspan>
+<tspan x="10" y="58">ild/kaizhu256/node-swgg</tspan>
 
 <tspan x="10" y="74"></tspan>
 
@@ -13,7 +13,7 @@
 <tspan x="10" y="106">buildApidoc - merged test-report from file /home/travis/build/kaizhu256/node-swgg/tmp/build/test\</tspan>
 <tspan x="10" y="122">-report.json</tspan>
 
-<tspan x="10" y="138">&gt; http-server listening on port 58388</tspan>
+<tspan x="10" y="138">&gt; http-server listening on port 39468</tspan>
 
 <tspan x="10" y="154">db - dropping database ...</tspan>
 
@@ -22,25 +22,25 @@
 <tspan x="10" y="186">buildApidoc - merged test-report from file /home/travis/build/kaizhu256/node-swgg/tmp/build/test\</tspan>
 <tspan x="10" y="202">-report.json</tspan>
 
-<tspan x="10" y="218">jslint - 12ms /home/travis/build/kaizhu256/node-swgg/npm_scripts.sh</tspan>
+<tspan x="10" y="218">local-function - unused (README.md) local.onEventDomDb</tspan>
 
-<tspan x="10" y="234">jslint - 0ms /home/travis/build/kaizhu256/node-swgg/package.json</tspan>
+<tspan x="10" y="234">jslint - 290ms /home/travis/build/kaizhu256/node-swgg/README.md</tspan>
 
 <tspan x="10" y="250">jslint - 1ms /home/travis/build/kaizhu256/node-swgg/assets.swgg.swagger.petstore.json</tspan>
 
-<tspan x="10" y="266">local-function - unused (README.md) local.onEventDomDb</tspan>
+<tspan x="10" y="266">db - seeding dbTable File ...</tspan>
 
-<tspan x="10" y="282">db - seeding dbTable File ...</tspan>
+<tspan x="10" y="282">db - seeding dbTable Pet ...</tspan>
 
-<tspan x="10" y="298">db - seeding dbTable Pet ...</tspan>
+<tspan x="10" y="298">db - seeding dbTable Order ...</tspan>
 
-<tspan x="10" y="314">db - seeding dbTable Order ...</tspan>
+<tspan x="10" y="314">db - seeding dbTable User ...</tspan>
 
-<tspan x="10" y="330">db - seeding dbTable User ...</tspan>
+<tspan x="10" y="330">jslint - 754ms /home/travis/build/kaizhu256/node-swgg/lib.swgg.js</tspan>
 
-<tspan x="10" y="346">jslint - 362ms /home/travis/build/kaizhu256/node-swgg/README.md</tspan>
+<tspan x="10" y="346">jslint - 19ms /home/travis/build/kaizhu256/node-swgg/npm_scripts.sh</tspan>
 
-<tspan x="10" y="362">jslint - 555ms /home/travis/build/kaizhu256/node-swgg/test.js</tspan>
+<tspan x="10" y="362">jslint - 0ms /home/travis/build/kaizhu256/node-swgg/package.json</tspan>
 
 <tspan x="10" y="378">db - seeding dbTable File ...</tspan>
 
@@ -54,38 +54,38 @@
 
 <tspan x="10" y="458">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/package.json</tspan>
 
-<tspan x="10" y="474">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/assets.swgg.swagger.petstore.j\</tspan>
-<tspan x="10" y="490">son</tspan>
+<tspan x="10" y="474">jslint - 533ms /home/travis/build/kaizhu256/node-swgg/test.js</tspan>
 
-<tspan x="10" y="506">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/.gitignore</tspan>
+<tspan x="10" y="490">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/assets.swgg.swagger.petstore.j\</tspan>
+<tspan x="10" y="506">son</tspan>
 
-<tspan x="10" y="522">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/lib.swgg.js</tspan>
+<tspan x="10" y="522">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/.gitignore</tspan>
 
-<tspan x="10" y="538">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/LICENSE</tspan>
+<tspan x="10" y="538">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/lib.swgg.js</tspan>
 
-<tspan x="10" y="554">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/npm_scripts.sh</tspan>
+<tspan x="10" y="554">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/LICENSE</tspan>
 
-<tspan x="10" y="570">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/package.json</tspan>
+<tspan x="10" y="570">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/npm_scripts.sh</tspan>
 
-<tspan x="10" y="586">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/package-lock.json</tspan>
+<tspan x="10" y="586">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/package.json</tspan>
 
-<tspan x="10" y="602">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/README.md</tspan>
+<tspan x="10" y="602">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/package-lock.json</tspan>
 
-<tspan x="10" y="618">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/test.js</tspan>
+<tspan x="10" y="618">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/README.md</tspan>
 
-<tspan x="10" y="634">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/.travis.yml</tspan>
+<tspan x="10" y="634">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/test.js</tspan>
 
-<tspan x="10" y="650">apidocCreate - requiring /home/travis/build/kaizhu256/node-swgg ...</tspan>
+<tspan x="10" y="650">apidocCreate - readExample /home/travis/build/kaizhu256/node-swgg/.travis.yml</tspan>
 
-<tspan x="10" y="666">apidocCreate - ... required /home/travis/build/kaizhu256/node-swgg</tspan>
+<tspan x="10" y="666">apidocCreate - requiring /home/travis/build/kaizhu256/node-swgg ...</tspan>
 
-<tspan x="10" y="682">jslint - 1160ms /home/travis/build/kaizhu256/node-swgg/lib.swgg.js</tspan>
+<tspan x="10" y="682">apidocCreate - ... required /home/travis/build/kaizhu256/node-swgg</tspan>
 
 <tspan x="10" y="698">created apidoc file /home/travis/build/kaizhu256/node-swgg/apidoc.html</tspan>
 
 <tspan x="10" y="714"></tspan>
 
-<tspan x="10" y="730">testRunDefault - 1375 ms - [node test-case 1 of 1 passed] - testCase_buildApidoc_default</tspan>
+<tspan x="10" y="730">testRunDefault - 1248 ms - [node test-case 1 of 1 passed] - testCase_buildApidoc_default</tspan>
 
 <tspan x="10" y="746">db loaded from tmp/storage.test</tspan>
 
@@ -98,54 +98,53 @@
 
 <tspan x="10" y="826">-------------------------------------------------------</tspan>
 
-<tspan x="10" y="842">| test-report - buildApidoc - node - linux v11.10.0 - 2019-02-20T08:32:24.299Z</tspan>
+<tspan x="10" y="842">| test-report - buildApidoc - node - linux v12.10.0 - 2019-09-15T22:20:47.351Z</tspan>
 
-<tspan x="10" y="858">|    1376 ms            0 failed        1 passed      |</tspan>
+<tspan x="10" y="858">|    1248 ms            0 failed        1 passed      |</tspan>
 
 <tspan x="10" y="874">-------------------------------------------------------</tspan>
 
 <tspan x="10" y="890">| test-report - npmTest - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM\</tspan>
-<tspan x="10" y="906">L, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36 - 2019-02-20T08:32:05.016Z</tspan>
+<tspan x="10" y="906">L, like Gecko) HeadlessChrome/77.0.3865.75 Safari/537.36 - 2019-09-15T22:20:34.422Z</tspan>
 
-<tspan x="10" y="922">|    2033 ms            0 failed       32 passed      |</tspan>
+<tspan x="10" y="922">|    2012 ms            0 failed       32 passed      |</tspan>
 
 <tspan x="10" y="938">-------------------------------------------------------</tspan>
 
-<tspan x="10" y="954">| test-report - npmTest - node - linux v11.10.0 - 2019-02-20T08:31:57.971Z</tspan>
+<tspan x="10" y="954">| test-report - npmTest - node - linux v12.10.0 - 2019-09-15T22:20:27.467Z</tspan>
 
-<tspan x="10" y="970">|   20136 ms            0 failed       37 passed      |</tspan>
+<tspan x="10" y="970">|   13883 ms            0 failed       37 passed      |</tspan>
 
 <tspan x="10" y="986">-------------------------------------------------------</tspan>
 
 <tspan x="10" y="1002">| test-report - npmTestPublished - browser - / - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537\</tspan>
-<tspan x="10" y="1018">.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Electron/2.0.16 Safari/537.36 - 2019-02-20T08:30:49\</tspan>
-<tspan x="10" y="1034">.933Z</tspan>
+<tspan x="10" y="1018">.36 (KHTML, like Gecko) HeadlessChrome/77.0.3865.75 Safari/537.36 - 2019-09-15T22:19:43.190Z</tspan>
 
-<tspan x="10" y="1050">|    2032 ms            0 failed       32 passed      |</tspan>
+<tspan x="10" y="1034">|    2014 ms            0 failed       32 passed      |</tspan>
 
-<tspan x="10" y="1066">-------------------------------------------------------</tspan>
+<tspan x="10" y="1050">-------------------------------------------------------</tspan>
 
-<tspan x="10" y="1082">| test-report - npmTestPublished - node - linux v11.10.0 - 2019-02-20T08:30:41.528Z</tspan>
+<tspan x="10" y="1066">| test-report - npmTestPublished - node - linux v12.10.0 - 2019-09-15T22:19:35.192Z</tspan>
 
-<tspan x="10" y="1098">|   22601 ms            0 failed       37 passed      |</tspan>
+<tspan x="10" y="1082">|   14574 ms            0 failed       37 passed      |</tspan>
 
-<tspan x="10" y="1114">-------------------------------------------------------</tspan>
+<tspan x="10" y="1098">-------------------------------------------------------</tspan>
 
-<tspan x="10" y="1130"></tspan>
+<tspan x="10" y="1114"></tspan>
 
-<tspan x="10" y="1146">created test-report file /home/travis/build/kaizhu256/node-swgg/tmp/build/test-report.html</tspan>
+<tspan x="10" y="1130">created test-report file /home/travis/build/kaizhu256/node-swgg/tmp/build/test-report.html</tspan>
+
+<tspan x="10" y="1146"></tspan>
 
 <tspan x="10" y="1162"></tspan>
 
-<tspan x="10" y="1178"></tspan>
+<tspan x="10" y="1178">buildApidoc - 0 failed tests</tspan>
 
-<tspan x="10" y="1194">buildApidoc - 0 failed tests</tspan>
+<tspan x="10" y="1194"></tspan>
 
 <tspan x="10" y="1210"></tspan>
 
-<tspan x="10" y="1226"></tspan>
-
-<tspan x="10" y="1242">[MODE_BUILD=buildApidoc] - 2019-02-20T08:32:28.727Z - EXIT_CODE - 0</tspan>
+<tspan x="10" y="1226">\x1b[35m[MODE_BUILD=buildApidoc]\x1b[0m - 2019-09-15T22:20:51.657Z - EXIT_CODE - 0</tspan>
 
 </text>
 </svg>
